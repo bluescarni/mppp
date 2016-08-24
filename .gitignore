@@ -1,0 +1,15 @@
+# Build dirs.
+build*
+
+# Documentation.
+#doc/doxygen/html/
+#doc/doxygen/latex/
+#doc/doxygen/xml/
+#doc/sphinx/_build/
+
+# Temp files.
+*~
+*.bak
+
+# .orig files from patch.
+*.orig
