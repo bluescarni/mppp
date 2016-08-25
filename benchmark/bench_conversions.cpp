@@ -39,6 +39,20 @@ using namespace mppp;
 
 std::mt19937 rng;
 
+NONIUS_BENCHMARK("ulong conversion", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<unsigned long> dist(std::numeric_limits<unsigned long>::min(),
+                                                  std::numeric_limits<unsigned long>::max());
+    auto val = integer(dist(rng));
+    meter.measure([&val] { return static_cast<unsigned long>(val); });
+});
+
+NONIUS_BENCHMARK("ulonglong conversion", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<unsigned long long> dist(std::numeric_limits<unsigned long long>::min(),
+                                                  std::numeric_limits<unsigned long long>::max());
+    auto val = integer(dist(rng));
+    meter.measure([&val] { return static_cast<unsigned long long>(val); });
+});
+
 NONIUS_BENCHMARK("string conversion, base 10", [](nonius::chronometer meter) {
     std::uniform_int_distribution<long long> dist(std::numeric_limits<long long>::min(),
                                                   std::numeric_limits<long long>::max());

@@ -48,6 +48,8 @@ using namespace mppp_test;
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
                              unsigned long, long long, unsigned long long>;
 
+static std::mt19937 rng;
+
 struct int_ctor_tester {
     template <typename Int>
     inline void operator()(const Int &) const
@@ -105,4 +107,43 @@ struct fp_ctor_tester {
 TEST_CASE("floating-point constructors")
 {
     tuple_for_each(fp_types{}, fp_ctor_tester{});
+}
+
+TEST_CASE("msb_index()")
+{
+    integer foo{std::numeric_limits<unsigned long long>::max()};
+    foo.promote();
+    std::cout << static_cast<unsigned long long>(foo) << '\n';
+    ::mp_limb_t n = 1;
+    REQUIRE(msb_index(n) == 0u);
+    n = 2;
+    REQUIRE(msb_index(n) == 1u);
+    n = 3;
+    REQUIRE(msb_index(n) == 1u);
+    n = 4;
+    REQUIRE(msb_index(n) == 2u);
+    n = 252;
+    REQUIRE(msb_index(n) == 7u);
+    n = 256;
+    REQUIRE(msb_index(n) == 8u);
+    // Random testing.
+    std::uniform_int_distribution<int> idx_dist(0,GMP_NUMB_BITS - 1), nbits_dist(1,20);
+    for (auto i = 0; i < ntries; ++i) {
+        // Reset n.
+        n = 0;
+        // How many bits to set (always 1 at least).
+        const auto nbits = nbits_dist(rng);
+        int highest_idx = 0;
+        for (auto j = 0; j < nbits; ++j) {
+            // Get a random bit index among the allowed ones.
+            const auto idx = idx_dist(rng);
+            // Set it in n.
+            n |= ::mp_limb_t(1) << idx;
+            // Check if it's the highest bit set.
+            if (idx > highest_idx) {
+                highest_idx = idx;
+            }
+        }
+        REQUIRE(msb_index(n) == unsigned(highest_idx));
+    }
 }

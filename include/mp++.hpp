@@ -569,11 +569,66 @@ public:
         assert(!is_static());
         return m_dy;
     }
+    void promote()
+    {
+        assert(is_static());
+        // Construct an mpz from the static.
+        mpz_struct_t tmp_mpz;
+        auto v = g_st().get_mpz_view();
+        ::mpz_init_set(&tmp_mpz, v);
+        // Destroy static.
+        g_st().~s_storage();
+        // Construct the dynamic struct.
+        ::new (static_cast<void *>(&m_dy)) d_storage;
+        mpz_shallow_copy(m_dy, tmp_mpz);
+    }
 
 private:
     s_storage m_st;
     d_storage m_dy;
 };
+
+// Utility function to detect the highest bit set in the data part of a limb. Adapted from:
+// https://graphics.stanford.edu/~seander/bithacks.html#IntegerLogLookup
+// The data part of n must not be zero.
+inline unsigned msb_index(::mp_limb_t n)
+{
+    // This is a table that stores the MSB index for the values from 0 to 255.
+    constexpr std::array<unsigned char,256> lt_256 =
+    {
+#define MPP_LT256(n) n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n
+        0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
+        MPP_LT256(4), MPP_LT256(5), MPP_LT256(5), MPP_LT256(6), MPP_LT256(6), MPP_LT256(6), MPP_LT256(6),
+        MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7),
+        MPP_LT256(7)
+#undef MPP_LT256
+    };
+    // Remove non-data bits.
+    n = n & GMP_NUMB_MASK;
+    assert(n);
+    static_assert(GMP_NUMB_BITS >= 8, "Invalid number of bits.");
+    auto shift = static_cast<unsigned>(GMP_NUMB_BITS - 8);
+    // NOTE: the idea here is that we keep decreasing the shift amount 8 bits at a time until
+    // we remain with some nonzero value when doing n >> shift.
+    while (shift) {
+        const ::mp_limb_t tmp = n >> shift;
+        if (tmp) {
+            return shift + lt_256[std::size_t(tmp)];
+        }
+        if (GMP_NUMB_BITS % 8) {
+            // If GMP_NUMB_BITS is not divided exactly by 8 (a nail build perhaps), we need to make sure
+            // that we don't decrease shift too much.
+            shift = shift >= 8u ? (shift - 8u) : 0u;
+        } else {
+            // If GMP_NUMB_BITS is divided exactly by 8 (as usual) we can keep on subtracting
+            // without fear of shift wrapping over.
+            shift -= 8u;
+        }
+    }
+    // The number must be smaller 256, use the table directly.
+    return lt_256[std::size_t(n)];
+}
+
 }
 
 class integer
@@ -611,15 +666,45 @@ class integer
     template <typename T>
     static T conversion_impl(const mpz_struct_t &m)
     {
-        if (::mpz_fits_ulong_p(&m)) {
+        /*if (::mpz_fits_ulong_p(&m)) {
             const auto ul = ::mpz_get_ui(&m);
             if (ul <= std::numeric_limits<T>::max()) {
                 return static_cast<T>(ul);
             }
             // TODO error message.
             throw std::overflow_error("");
+        }*/
+        // We are now in a situation in which m does not fit in ulong. The only hope is that it does
+        // fit in ulonglong. We will try to build one operating in ulong chunks.
+        unsigned long long retval = 0u;
+        // q will be a copy of m that will be right-shifted down in chunks.
+        static thread_local mpz_raii q;
+        ::mpz_set(&q.m_mpz,&m);
+        unsigned shift_count = 0u;
+        // Handy shortcut.
+        constexpr unsigned uld = std::numeric_limits<unsigned long long>::digits;
+        do {
+            if (shift_count >= unsigned(std::numeric_limits<unsigned long long>::digits)) {
+                // Excessive shifting means the value overflows unsigned long long.
+                // TODO error message.
+                throw std::overflow_error("sadsdsada");
+            }
+            // NOTE: this cannot be unsigned long, otherwise we are at risk of shifting
+            // too much below.
+            // NOTE: mpz_get_ui() already gives the lower bits of q.
+            unsigned long long ull = ::mpz_get_ui(&q.m_mpz);
+            retval += ull << shift_count;
+            // Update the shift count.
+            shift_count += uld;
+            // Shift down q.
+            ::mpz_tdiv_q_2exp(&q.m_mpz,&q.m_mpz,uld);
+            // The iteration will stop when q becomes zero.
+        } while (mpz_sgn(&q.m_mpz) != 0);
+        if (retval > std::numeric_limits<T>::max()) {
+            // TODO error message.
+            throw std::overflow_error("");
         }
-        unsigned long long tmp = m._mp_d[0] & GMP_NUMB_MASK;
+        return static_cast<T>(retval);
     }
 
 public:
@@ -659,6 +744,14 @@ public:
             return conversion_impl<T>(m_int.g_st());
         }
         return conversion_impl<T>(m_int.g_dy());
+    }
+    void promote()
+    {
+        if (!m_int.is_static()) {
+            // TODO throw.
+            //piranha_throw(std::invalid_argument, "cannot promote non-static integer");
+        }
+        m_int.promote();
     }
 
 private:
