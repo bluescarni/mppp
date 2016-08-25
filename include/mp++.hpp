@@ -197,7 +197,9 @@ struct static_int {
             _mp_size = 0;
             return true;
         }
-        if (n <= GMP_NUMB_MAX) {
+        // This contraption is to avoid a compiler warning when Int is bool: in that case cast it to unsigned,
+        // otherwise use the original value.
+        if ((std::is_same<bool, Int>::value ? unsigned(n) : n) <= GMP_NUMB_MAX) {
             _mp_size = 1;
             m_limbs[0] = static_cast<::mp_limb_t>(n);
             return true;
@@ -580,20 +582,48 @@ class integer
     using generic_ctor_enabler = typename std::enable_if<is_supported_interop<T>::value, int>::type;
     template <typename T>
     using generic_conversion_enabler = generic_ctor_enabler<T>;
-    template <typename T,
-              typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, int>::type = 0>
+    template <typename T, typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value
+                                                      && !std::is_same<bool, T>::value,
+                                                  int>::type
+                          = 0>
     static T conversion_impl(const static_int &n)
     {
+        // Handle zero.
+        if (!n._mp_size) {
+            return T(0);
+        }
+        if (n._mp_size == 1) {
+            // Single-limb, positive value case.
+            if (n.m_limbs[0] > std::numeric_limits<T>::max()) {
+                // TODO error message.
+                throw std::overflow_error("");
+            }
+            return static_cast<T>(n.m_limbs[0]);
+        }
+        if (n._mp_size < 0) {
+            // Negative values cannot be converted to unsigned ints.
+            // TODO error message.
+            throw std::overflow_error("");
+        }
+        // In multilimb case, forward to mpz.
+        return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
     template <typename T>
     static T conversion_impl(const mpz_struct_t &m)
     {
+        if (::mpz_fits_ulong_p(&m)) {
+            const auto ul = ::mpz_get_ui(&m);
+            if (ul <= std::numeric_limits<T>::max()) {
+                return static_cast<T>(ul);
+            }
+            // TODO error message.
+            throw std::overflow_error("");
+        }
+        unsigned long long tmp = m._mp_d[0] & GMP_NUMB_MASK;
     }
 
 public:
-    integer() : m_int()
-    {
-    }
+    integer() = default;
     integer(const integer &other) = default;
     integer(integer &&other) = default;
     template <typename T, generic_ctor_enabler<T> = 0>
