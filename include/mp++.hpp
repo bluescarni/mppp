@@ -594,11 +594,11 @@ class integer
         }
         if (n._mp_size == 1) {
             // Single-limb, positive value case.
-            if (n.m_limbs[0] > std::numeric_limits<T>::max()) {
+            if ((n.m_limbs[0] & GMP_NUMB_MASK) > std::numeric_limits<T>::max()) {
                 // TODO error message.
                 throw std::overflow_error("");
             }
-            return static_cast<T>(n.m_limbs[0]);
+            return static_cast<T>(n.m_limbs[0] & GMP_NUMB_MASK);
         }
         if (n._mp_size < 0) {
             // Negative values cannot be converted to unsigned ints.
