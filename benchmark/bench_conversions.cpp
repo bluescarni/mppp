@@ -26,6 +26,7 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the mp++ library.  If not,
 see https://www.gnu.org/licenses/. */
 
+#include <boost/multiprecision/gmp.hpp>
 #include <limits>
 #include <random>
 
@@ -35,7 +36,9 @@ see https://www.gnu.org/licenses/. */
 #include <nonius/main.h++>
 #include <nonius/nonius.h++>
 
+namespace bmp = boost::multiprecision;
 using namespace mppp;
+using mpz_int = bmp::number<bmp::gmp_int,bmp::et_off>;
 
 std::mt19937 rng;
 
@@ -67,45 +70,45 @@ NONIUS_BENCHMARK("long long conversion", [](nonius::chronometer meter) {
     meter.measure([&val] { return static_cast<long long>(val); });
 });
 
-NONIUS_BENCHMARK("ulong conversion, promoted", [](nonius::chronometer meter) {
-    std::uniform_int_distribution<unsigned long> dist(std::numeric_limits<unsigned long>::min(),
-                                                      std::numeric_limits<unsigned long>::max());
-    auto val = integer(dist(rng));
-    if (val.is_static()) {
-        val.promote();
-    }
-    meter.measure([&val] { return static_cast<unsigned long>(val); });
+NONIUS_BENCHMARK("bmp double conversion", [](nonius::chronometer meter) {
+    std::uniform_real_distribution<double> dist(-1E20,1E20);
+    auto val = mpz_int(dist(rng));
+    meter.measure([&val]() -> double {
+        volatile double retval = static_cast<double>(val);
+        return retval;
+    });
 });
 
-NONIUS_BENCHMARK("ulonglong conversion, promoted", [](nonius::chronometer meter) {
-    std::uniform_int_distribution<unsigned long long> dist(std::numeric_limits<unsigned long long>::min(),
-                                                           std::numeric_limits<unsigned long long>::max());
+NONIUS_BENCHMARK("double conversion", [](nonius::chronometer meter) {
+    std::uniform_real_distribution<double> dist(-1E20,1E20);
     auto val = integer(dist(rng));
-    if (val.is_static()) {
-        val.promote();
-    }
-    meter.measure([&val] { return static_cast<unsigned long long>(val); });
+    meter.measure([&val]() -> double {
+        volatile double retval = static_cast<double>(val);
+        return retval;
+    });
 });
 
-NONIUS_BENCHMARK("long conversion, promoted", [](nonius::chronometer meter) {
-    std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
-                                                      std::numeric_limits<long>::max());
-    auto val = integer(dist(rng));
-    if (val.is_static()) {
-        val.promote();
-    }
-    meter.measure([&val] { return static_cast<long>(val); });
+#if defined(MPPP_WITH_LONG_DOUBLE)
+
+NONIUS_BENCHMARK("bmp long double conversion", [](nonius::chronometer meter) {
+    std::uniform_real_distribution<long double> dist(-1E20l,1E20l);
+    auto val = mpz_int(dist(rng));
+    meter.measure([&val]() -> long double {
+        volatile long double retval = static_cast<long double>(val);
+        return retval;
+    });
 });
 
-NONIUS_BENCHMARK("long long conversion, promoted", [](nonius::chronometer meter) {
-    std::uniform_int_distribution<long long> dist(std::numeric_limits<long long>::min(),
-                                                      std::numeric_limits<long long>::max());
+NONIUS_BENCHMARK("long double conversion", [](nonius::chronometer meter) {
+    std::uniform_real_distribution<long double> dist(-1E20l,1E20l);
     auto val = integer(dist(rng));
-    if (val.is_static()) {
-        val.promote();
-    }
-    meter.measure([&val] { return static_cast<long long>(val); });
+    meter.measure([&val]() -> long double {
+        volatile long double retval = static_cast<long double>(val);
+        return retval;
+    });
 });
+
+#endif
 
 NONIUS_BENCHMARK("string conversion, base 10", [](nonius::chronometer meter) {
     std::uniform_int_distribution<long long> dist(std::numeric_limits<long long>::min(),
