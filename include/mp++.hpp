@@ -607,13 +607,13 @@ private:
 inline unsigned msb_index(::mp_limb_t n)
 {
     // This is a table that stores the MSB index for the values from 0 to 255.
-    constexpr std::array<unsigned char, 256> lt_256 = {
+    constexpr std::array<unsigned char, 256> lt_256 = {{
 #define MPP_LT256(n) n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n
         0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, MPP_LT256(4), MPP_LT256(5), MPP_LT256(5), MPP_LT256(6),
         MPP_LT256(6), MPP_LT256(6), MPP_LT256(6), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7),
         MPP_LT256(7), MPP_LT256(7), MPP_LT256(7)
 #undef MPP_LT256
-    };
+    }};
     // Remove non-data bits.
     n = n & GMP_NUMB_MASK;
     assert(n);
@@ -730,31 +730,48 @@ class integer
             throw std::overflow_error("");
         }
         // We are now in a situation in which m does not fit in ulong. The only hope is that it does
-        // fit in ulonglong. We will try to build one operating in ulong chunks.
+        // fit in ulonglong. We will try to build one operating in 31-bit chunks (2**31 is the highest
+        // power of 2 guaranteed to be representable by unsigned long - we need to use unsigned long
+        // instead of unsigned long long because of the GMP API).
         unsigned long long retval = 0u;
         // q will be a copy of m that will be right-shifted down in chunks.
         static thread_local mpz_raii q;
         ::mpz_set(&q.m_mpz, &m);
-        unsigned shift_count = 0u;
+        // Init the multiplier for use in the loop below.
+        unsigned long long multiplier = 1u;
         // Handy shortcut.
-        constexpr unsigned uld = std::numeric_limits<unsigned long>::digits;
-        do {
-            if (shift_count >= unsigned(std::numeric_limits<unsigned long long>::digits)) {
-                // Excessive shifting means the value overflows unsigned long long.
-                // TODO error message.
-                throw std::overflow_error("sadsdsada");
+        constexpr auto ull_max = std::numeric_limits<unsigned long long>::max();
+        while (true) {
+            // NOTE: mpz_get_ui() already gives the lower bits of q, select the first 31 bits.
+            unsigned long long ull = ::mpz_get_ui(&q.m_mpz) & ((1ul << 31) - 1ul);
+            // Overflow check.
+            if (ull > ull_max / multiplier) {
+                // TODO message.
+                throw std::overflow_error("");
             }
-            // NOTE: this cannot be unsigned long, otherwise we are at risk of shifting
-            // too much below.
-            // NOTE: mpz_get_ui() already gives the lower bits of q.
-            unsigned long long ull = ::mpz_get_ui(&q.m_mpz);
-            retval += ull << shift_count;
-            // Update the shift count.
-            shift_count += uld;
+            // Shift up the current 31 bits being considered.
+            ull *= multiplier;
+            // Overflow check.
+            if (retval > ull_max - ull) {
+                // TODO message.
+                throw std::overflow_error("");
+            }
+            // Add the current 31 bits to the result.
+            retval += ull;
             // Shift down q.
-            ::mpz_tdiv_q_2exp(&q.m_mpz, &q.m_mpz, uld);
+            ::mpz_tdiv_q_2exp(&q.m_mpz, &q.m_mpz, 31);
             // The iteration will stop when q becomes zero.
-        } while (mpz_sgn(&q.m_mpz) != 0);
+            if (!mpz_sgn(&q.m_mpz)) {
+                break;
+            }
+            // Overflow check.
+            if (multiplier > ull_max / (1ul << 31)) {
+                // TODO message.
+                throw std::overflow_error("");
+            }
+            // Update the multiplier.
+            multiplier *= (1ul << 31);
+        }
         if (retval > std::numeric_limits<T>::max()) {
             // TODO error message.
             throw std::overflow_error("");
@@ -773,32 +790,41 @@ class integer
             // TODO error message.
             throw std::overflow_error("");
         }
+        // The same approach as for the unsigned case, just slightly more complicated because
+        // of the presence of the sign.
         long long retval = 0;
         static thread_local mpz_raii q;
         ::mpz_set(&q.m_mpz, &m);
-        unsigned shift_count = 0u;
-        // Handy shortcut.
-        constexpr unsigned uld = std::numeric_limits<unsigned long>::digits;
-        do {
-            if (shift_count >= unsigned(std::numeric_limits<unsigned long long>::digits)) {
-                // Excessive shifting means the value overflows unsigned long long.
+        const bool sign = mpz_sgn(&q.m_mpz) > 0;
+        long long multiplier = sign ? 1 : -1;
+        // Shortcuts.
+        constexpr auto ll_max = std::numeric_limits<long long>::max();
+        constexpr auto ll_min = std::numeric_limits<long long>::min();
+        while (true) {
+            auto ll = static_cast<long long>(::mpz_get_ui(&q.m_mpz) & ((1ul << 31) - 1ul));
+            if ((sign && ll && multiplier > ll_max / ll) || (!sign && ll && multiplier < ll_min / ll)) {
                 // TODO error message.
-                throw std::overflow_error("sadsdsada");
+                throw std::overflow_error("1");
             }
-            // NOTE: this cannot be unsigned long, otherwise we are at risk of shifting
-            // too much below.
-            // NOTE: mpz_get_ui() already gives the lower bits of q.
-            unsigned long long ull = ::mpz_get_ui(&q.m_mpz);
-            retval += ull << shift_count;
-            // Update the shift count.
-            shift_count += uld;
-            // Shift down q.
-            ::mpz_tdiv_q_2exp(&q.m_mpz, &q.m_mpz, uld);
-            // The iteration will stop when q becomes zero.
-        } while (mpz_sgn(&q.m_mpz) != 0);
-        if (retval > std::numeric_limits<T>::max()) {
+            ll *= multiplier;
+            if ((sign && retval > ll_max - ll) || (!sign && retval < ll_min - ll)) {
+                // TODO error message.
+                throw std::overflow_error("2");
+            }
+            retval += ll;
+            ::mpz_tdiv_q_2exp(&q.m_mpz, &q.m_mpz, 31);
+            if (!mpz_sgn(&q.m_mpz)) {
+                break;
+            }
+            if ((sign && multiplier > ll_max / (1ll << 31)) || (!sign && multiplier < ll_min / (1ll << 31))) {
+                // TODO error message.
+                throw std::overflow_error("3");
+            }
+            multiplier *= (1ll << 31);
+        }
+        if (retval > std::numeric_limits<T>::max() || retval < std::numeric_limits<T>::min()) {
             // TODO error message.
-            throw std::overflow_error("");
+            throw std::overflow_error("4");
         }
         return static_cast<T>(retval);
     }
