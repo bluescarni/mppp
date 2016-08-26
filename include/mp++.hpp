@@ -124,16 +124,6 @@ inline const char *mpz_to_str(const mpz_struct_t *mpz, int base = 10)
     return ::mpz_get_str(&tmp[0u], base, mpz);
 }
 
-// Internal exception type used when an mpz cannot be assigned to a static int because
-// it is too large. This exception never escapes to user code, and it might transport
-// a pointer to the mpz from which the assignment was attempted.
-struct too_many_limbs {
-    explicit too_many_limbs(const mpz_struct_t *p) : m_p(p)
-    {
-    }
-    const mpz_struct_t *m_p;
-};
-
 // Type trait to check if T is a supported integral type.
 template <typename T>
 using is_supported_integral
@@ -156,6 +146,15 @@ using is_supported_float = std::integral_constant<bool, std::is_same<T, float>::
 template <typename T>
 using is_supported_interop
     = std::integral_constant<bool, is_supported_integral<T>::value || is_supported_float<T>::value>;
+
+// A global thread local pointer, initially set to null, that signals if a static int construction via mpz
+// fails due to too many limbs required. The pointer is set by static_int's constructors to a thread local
+// mpz variable that contains the constructed object.
+inline const mpz_struct_t * &fail_too_many_limbs()
+{
+    static thread_local const mpz_struct_t *m = nullptr;
+    return m;
+}
 
 // The static integer class.
 struct static_int {
@@ -202,15 +201,18 @@ struct static_int {
     {
         return static_cast<mpz_size_t>(_mp_size >= 0 ? _mp_size : -_mp_size);
     }
-    // Copy over size and limbs from m. Will throw if the size in limbs is too large.
-    void assign_from_mpz(const mpz_struct_t &m)
+    // Construct from mpz. If the size in limbs is too large, it will set a global
+    // thread local pointer referring to m, so that the constructed mpz can be re-used.
+    void ctor_from_mpz(const mpz_struct_t &m)
     {
         if (m._mp_size > s_size || m._mp_size < -s_size) {
-            throw too_many_limbs(&m);
+            _mp_size = 0;
+            fail_too_many_limbs() = &m;
+        } else {
+            // All this is noexcept.
+            _mp_size = m._mp_size;
+            std::copy(m._mp_d, m._mp_d + abs_size(), m_limbs.begin());
         }
-        // All this is noexcept.
-        _mp_size = m._mp_size;
-        std::copy(m._mp_d, m._mp_d + abs_size(), m_limbs.begin());
     }
     template <typename Int,
               typename std::enable_if<is_supported_integral<Int>::value && std::is_unsigned<Int>::value, int>::type = 0>
@@ -288,7 +290,7 @@ struct static_int {
                 n >>= std::numeric_limits<unsigned long>::digits;
             }
         }
-        assign_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz.m_mpz);
     }
     // Ctor from unsigned integral types that are not wider than unsigned long.
     template <typename Uint, typename std::enable_if<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
@@ -303,7 +305,7 @@ struct static_int {
         }
         static thread_local mpz_raii mpz;
         ::mpz_set_ui(&mpz.m_mpz, static_cast<unsigned long>(n));
-        assign_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz.m_mpz);
     }
     // Ctor from signed integral types that are wider than long.
     template <typename Int,
@@ -341,7 +343,7 @@ struct static_int {
                 n /= (1l << 30);
             }
         }
-        assign_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz.m_mpz);
     }
     // Ctor from signed integral types that are not wider than long.
     template <typename Int,
@@ -357,7 +359,7 @@ struct static_int {
         }
         static thread_local mpz_raii mpz;
         ::mpz_set_si(&mpz.m_mpz, static_cast<long>(n));
-        assign_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz.m_mpz);
     }
     // Ctor from float or double.
     template <
@@ -370,7 +372,7 @@ struct static_int {
         }
         static thread_local mpz_raii mpz;
         ::mpz_set_d(&mpz.m_mpz, static_cast<double>(f));
-        assign_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz.m_mpz);
     }
 #if defined(MPPP_WITH_LONG_DOUBLE)
     // Ctor from long double.
@@ -389,7 +391,7 @@ struct static_int {
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
         static thread_local mpz_raii mpz;
         ::mpfr_get_z(&mpz.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
-        assign_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz.m_mpz);
     }
 #endif
 
@@ -468,18 +470,18 @@ public:
     template <typename T, typename std::enable_if<is_supported_interop<T>::value, int>::type = 0>
     explicit integer_union(T x)
     {
-        // NOTE: we should benchmark the cost here of using an exception to transmit the failure. Maybe
-        // we could optionally add a force_dynamic boolean parameter: if true, the construction happens directly
-        // in dynamic storage without having to attempt a construction in static storage. For this to work, we need
-        // some generic wrappers to set an mpz from a basic type (to be refactored from the static int ctors above
-        // most likely).
-        try {
-            ::new (static_cast<void *>(&m_st)) s_storage(x);
-        } catch (const too_many_limbs &t) {
-            // NOTE: upon throwing an exception, m_st is not constructed so there
-            // should be no need to destroy it.
+        // Attempt static storage construction.
+        ::new (static_cast<void *>(&m_st)) s_storage(x);
+        // Check if too many limbs were generated.
+        auto ptr = fail_too_many_limbs();
+        if (ptr) {
+            // Get the pointer to the mpz storing the constructed value, then reset it.
+            fail_too_many_limbs() = nullptr;
+            // Destroy static.
+            g_st().~s_storage();
+            // Init dynamic.
             ::new (static_cast<void *>(&m_dy)) d_storage;
-            ::mpz_init_set(&m_dy, t.m_p);
+            ::mpz_init_set(&m_dy, ptr);
         }
     }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
