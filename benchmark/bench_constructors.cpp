@@ -26,6 +26,7 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the mp++ library.  If not,
 see https://www.gnu.org/licenses/. */
 
+#include <boost/multiprecision/gmp.hpp>
 #include <limits>
 #include <random>
 
@@ -36,6 +37,8 @@ see https://www.gnu.org/licenses/. */
 #include <nonius/nonius.h++>
 
 using namespace mppp;
+namespace bmp = boost::multiprecision;
+using mpz_int = bmp::number<bmp::gmp_int,bmp::et_off>;
 
 std::mt19937 rng;
 
@@ -45,6 +48,12 @@ NONIUS_BENCHMARK("long constructor", [](nonius::chronometer meter) {
     meter.measure([val] { return integer{val}; });
 })
 
+NONIUS_BENCHMARK("bmp long constructor", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
+    auto val = dist(rng);
+    meter.measure([val] { return mpz_int{val}; });
+})
+
 NONIUS_BENCHMARK("long long constructor", [](nonius::chronometer meter) {
     std::uniform_int_distribution<long long> dist(std::numeric_limits<long long>::min(),
                                                   std::numeric_limits<long long>::max());
@@ -52,18 +61,39 @@ NONIUS_BENCHMARK("long long constructor", [](nonius::chronometer meter) {
     meter.measure([val] { return integer{val}; });
 })
 
+NONIUS_BENCHMARK("bmp long long constructor", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<long long> dist(std::numeric_limits<long long>::min(),
+                                                  std::numeric_limits<long long>::max());
+    auto val = dist(rng);
+    meter.measure([val] { return mpz_int{val}; });
+})
+
 NONIUS_BENCHMARK("unsigned long constructor", [](nonius::chronometer meter) {
-    std::uniform_int_distribution<long> dist(std::numeric_limits<unsigned long>::min(),
+    std::uniform_int_distribution<unsigned long> dist(std::numeric_limits<unsigned long>::min(),
                                              std::numeric_limits<unsigned long>::max());
     auto val = dist(rng);
     meter.measure([val] { return integer{val}; });
 })
 
+NONIUS_BENCHMARK("bmp unsigned long constructor", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<unsigned long> dist(std::numeric_limits<unsigned long>::min(),
+                                             std::numeric_limits<unsigned long>::max());
+    auto val = dist(rng);
+    meter.measure([val] { return mpz_int{val}; });
+})
+
 NONIUS_BENCHMARK("unsigned long long constructor", [](nonius::chronometer meter) {
-    std::uniform_int_distribution<long long> dist(std::numeric_limits<unsigned long long>::min(),
+    std::uniform_int_distribution<unsigned long long> dist(std::numeric_limits<unsigned long long>::min(),
                                                   std::numeric_limits<unsigned long long>::max());
     auto val = dist(rng);
     meter.measure([val] { return integer{val}; });
+})
+
+NONIUS_BENCHMARK("bmp unsigned long long constructor", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<unsigned long long> dist(std::numeric_limits<unsigned long long>::min(),
+                                                  std::numeric_limits<unsigned long long>::max());
+    auto val = dist(rng);
+    meter.measure([val] { return mpz_int{val}; });
 })
 
 NONIUS_BENCHMARK("double constructor, small values", [](nonius::chronometer meter) {
@@ -72,10 +102,22 @@ NONIUS_BENCHMARK("double constructor, small values", [](nonius::chronometer mete
     meter.measure([val] { return integer{val}; });
 })
 
+NONIUS_BENCHMARK("bmp double constructor, small values", [](nonius::chronometer meter) {
+    std::uniform_real_distribution<double> dist(-1E6, 1E6);
+    auto val = dist(rng);
+    meter.measure([val] { return mpz_int{val}; });
+})
+
 NONIUS_BENCHMARK("double constructor, large values", [](nonius::chronometer meter) {
     std::uniform_real_distribution<double> dist(-1E128, 1E128);
     auto val = dist(rng);
     meter.measure([val] { return integer{val}; });
+})
+
+NONIUS_BENCHMARK("bmp double constructor, large values", [](nonius::chronometer meter) {
+    std::uniform_real_distribution<double> dist(-1E128, 1E128);
+    auto val = dist(rng);
+    meter.measure([val] { return mpz_int{val}; });
 })
 
 #if defined(MPPP_WITH_LONG_DOUBLE)
@@ -86,10 +128,22 @@ NONIUS_BENCHMARK("long double constructor, small values", [](nonius::chronometer
     meter.measure([val] { return integer{val}; });
 })
 
+NONIUS_BENCHMARK("bmp long double constructor, small values", [](nonius::chronometer meter) {
+    std::uniform_real_distribution<long double> dist(-1E6, 1E6);
+    auto val = dist(rng);
+    meter.measure([val] { return mpz_int{val}; });
+})
+
 NONIUS_BENCHMARK("long double constructor, large values", [](nonius::chronometer meter) {
     std::uniform_real_distribution<long double> dist(-1E128, 1E128);
     auto val = dist(rng);
     meter.measure([val] { return integer{val}; });
+})
+
+NONIUS_BENCHMARK("bmp long double constructor, large values", [](nonius::chronometer meter) {
+    std::uniform_real_distribution<long double> dist(-1E128, 1E128);
+    auto val = dist(rng);
+    meter.measure([val] { return mpz_int{val}; });
 })
 
 #endif
