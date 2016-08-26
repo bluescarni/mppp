@@ -55,6 +55,7 @@ inline namespace detail
 {
 
 // TODO mpz struct checks.
+// TODO check that we verify both _mp_alloc and _mp_size.
 
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
@@ -134,13 +135,36 @@ struct too_many_limbs {
     const mpz_struct_t *m_p;
 };
 
+// Type trait to check if T is a supported integral type.
+template <typename T>
+using is_supported_integral
+    = std::integral_constant<bool, std::is_same<T, bool>::value || std::is_same<T, char>::value
+                                       || std::is_same<T, signed char>::value || std::is_same<T, unsigned char>::value
+                                       || std::is_same<T, short>::value || std::is_same<T, unsigned short>::value
+                                       || std::is_same<T, int>::value || std::is_same<T, unsigned>::value
+                                       || std::is_same<T, long>::value || std::is_same<T, unsigned long>::value
+                                       || std::is_same<T, long long>::value
+                                       || std::is_same<T, unsigned long long>::value>;
+
+// Type trait to check if T is a supported floating-point type.
+template <typename T>
+using is_supported_float = std::integral_constant<bool, std::is_same<T, float>::value || std::is_same<T, double>::value
+#if defined(MPPP_WITH_LONG_DOUBLE)
+                                                            || std::is_same<T, long double>::value
+#endif
+                                                  >;
+
+template <typename T>
+using is_supported_interop
+    = std::integral_constant<bool, is_supported_integral<T>::value || is_supported_float<T>::value>;
+
 // The static integer class.
 struct static_int {
     // Special alloc value to signal static storage in the union.
     static const mpz_alloc_t s_alloc = -1;
     // Number of limbs in static storage.
     static const int s_size = 2;
-    // Let's put a hard cap.
+    // Let's put a hard cap and sanity check.
     static_assert(s_size > 0 && s_size < 512, "Invalid static size.");
     using limbs_type = std::array<::mp_limb_t, s_size>;
     // NOTE: def ctor leaves the limbs uninited.
@@ -190,7 +214,7 @@ struct static_int {
         std::copy(m._mp_d, m._mp_d + abs_size(), m_limbs.begin());
     }
     template <typename Int,
-              typename std::enable_if<std::is_integral<Int>::value && std::is_unsigned<Int>::value, int>::type = 0>
+              typename std::enable_if<is_supported_integral<Int>::value && std::is_unsigned<Int>::value, int>::type = 0>
     bool attempt_1limb_ctor(Int n)
     {
         if (!n) {
@@ -207,7 +231,7 @@ struct static_int {
         return false;
     }
     template <typename Int,
-              typename std::enable_if<std::is_integral<Int>::value && std::is_signed<Int>::value, int>::type = 0>
+              typename std::enable_if<is_supported_integral<Int>::value && std::is_signed<Int>::value, int>::type = 0>
     bool attempt_1limb_ctor(Int n)
     {
         using uint_t = typename std::make_unsigned<Int>::type;
@@ -233,11 +257,11 @@ struct static_int {
     }
     // Ctor from unsigned integral types that are wider than unsigned long.
     // This requires special handling as the GMP api does not support unsigned long long natively.
-    template <typename Uint,
-              typename std::enable_if<std::is_unsigned<Uint>::value && (std::numeric_limits<Uint>::max()
-                                                                        > std::numeric_limits<unsigned long>::max()),
-                                      int>::type
-              = 0>
+    template <typename Uint, typename std::enable_if<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
+                                                         && (std::numeric_limits<Uint>::max()
+                                                             > std::numeric_limits<unsigned long>::max()),
+                                                     int>::type
+                             = 0>
     explicit static_int(Uint n) : _mp_alloc(s_alloc)
     {
         if (attempt_1limb_ctor(n)) {
@@ -268,11 +292,11 @@ struct static_int {
         assign_from_mpz(mpz.m_mpz);
     }
     // Ctor from unsigned integral types that are not wider than unsigned long.
-    template <typename Uint,
-              typename std::enable_if<std::is_unsigned<Uint>::value && (std::numeric_limits<Uint>::max()
-                                                                        <= std::numeric_limits<unsigned long>::max()),
-                                      int>::type
-              = 0>
+    template <typename Uint, typename std::enable_if<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
+                                                         && (std::numeric_limits<Uint>::max()
+                                                             <= std::numeric_limits<unsigned long>::max()),
+                                                     int>::type
+                             = 0>
     explicit static_int(Uint n) : _mp_alloc(s_alloc)
     {
         if (attempt_1limb_ctor(n)) {
@@ -284,7 +308,7 @@ struct static_int {
     }
     // Ctor from signed integral types that are wider than long.
     template <typename Int,
-              typename std::enable_if<std::is_signed<Int>::value && std::is_integral<Int>::value
+              typename std::enable_if<std::is_signed<Int>::value && is_supported_integral<Int>::value
                                           && (std::numeric_limits<Int>::max() > std::numeric_limits<long>::max()
                                               || std::numeric_limits<Int>::min() < std::numeric_limits<long>::min()),
                                       int>::type
@@ -322,7 +346,7 @@ struct static_int {
     }
     // Ctor from signed integral types that are not wider than long.
     template <typename Int,
-              typename std::enable_if<std::is_signed<Int>::value && std::is_integral<Int>::value
+              typename std::enable_if<std::is_signed<Int>::value && is_supported_integral<Int>::value
                                           && (std::numeric_limits<Int>::max() <= std::numeric_limits<long>::max()
                                               && std::numeric_limits<Int>::min() >= std::numeric_limits<long>::min()),
                                       int>::type
@@ -399,17 +423,6 @@ struct static_int {
     mpz_size_t _mp_size;
     limbs_type m_limbs;
 };
-
-// Type trait to check if T is a supported floating-point type.
-template <typename T>
-using is_supported_float = std::integral_constant<bool, std::is_same<T, float>::value || std::is_same<T, double>::value
-#if defined(MPPP_WITH_LONG_DOUBLE)
-                                                            || std::is_same<T, long double>::value
-#endif
-                                                  >;
-
-template <typename T>
-using is_supported_interop = std::integral_constant<bool, std::is_integral<T>::value || is_supported_float<T>::value>;
 
 // {static_int,mpz} union.
 union integer_union {
@@ -542,7 +555,6 @@ public:
         ::mpz_clear(&g_dy());
         m_dy.~d_storage();
     }
-
     // Check static flag.
     bool is_static() const
     {
@@ -569,6 +581,7 @@ public:
         assert(!is_static());
         return m_dy;
     }
+    // Promotion from static to dynamic.
     void promote()
     {
         assert(is_static());
@@ -594,13 +607,11 @@ private:
 inline unsigned msb_index(::mp_limb_t n)
 {
     // This is a table that stores the MSB index for the values from 0 to 255.
-    constexpr std::array<unsigned char,256> lt_256 =
-    {
+    constexpr std::array<unsigned char, 256> lt_256 = {
 #define MPP_LT256(n) n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n
-        0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
-        MPP_LT256(4), MPP_LT256(5), MPP_LT256(5), MPP_LT256(6), MPP_LT256(6), MPP_LT256(6), MPP_LT256(6),
-        MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7),
-        MPP_LT256(7)
+        0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, MPP_LT256(4), MPP_LT256(5), MPP_LT256(5), MPP_LT256(6),
+        MPP_LT256(6), MPP_LT256(6), MPP_LT256(6), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7),
+        MPP_LT256(7), MPP_LT256(7), MPP_LT256(7)
 #undef MPP_LT256
     };
     // Remove non-data bits.
@@ -628,19 +639,31 @@ inline unsigned msb_index(::mp_limb_t n)
     // The number must be smaller 256, use the table directly.
     return lt_256[std::size_t(n)];
 }
-
 }
 
 class integer
 {
     template <typename T>
     using generic_ctor_enabler = typename std::enable_if<is_supported_interop<T>::value, int>::type;
+    // Conversion operator.
     template <typename T>
     using generic_conversion_enabler = generic_ctor_enabler<T>;
-    template <typename T, typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value
-                                                      && !std::is_same<bool, T>::value,
-                                                  int>::type
-                          = 0>
+    template <typename T>
+    using uint_conversion_enabler =
+        typename std::enable_if<is_supported_integral<T>::value && std::is_unsigned<T>::value
+                                    && !std::is_same<bool, T>::value,
+                                int>::type;
+    template <typename T>
+    using int_conversion_enabler =
+        typename std::enable_if<is_supported_integral<T>::value && std::is_signed<T>::value, int>::type;
+    // Static conversion to bool.
+    template <typename T, typename std::enable_if<std::is_same<T, bool>::value, int>::type = 0>
+    static T conversion_impl(const static_int &n)
+    {
+        return n._mp_size != 0;
+    }
+    // Static conversion to unsigned ints.
+    template <typename T, uint_conversion_enabler<T> = 0>
     static T conversion_impl(const static_int &n)
     {
         // Handle zero.
@@ -663,26 +686,58 @@ class integer
         // In multilimb case, forward to mpz.
         return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
-    template <typename T>
+    // Static conversion to signed ints.
+    template <typename T, int_conversion_enabler<T> = 0>
+    static T conversion_impl(const static_int &n)
+    {
+        using uint_t = typename std::make_unsigned<T>::type;
+        // Handle zero.
+        if (!n._mp_size) {
+            return T(0);
+        }
+        if (n._mp_size == 1) {
+            // Single-limb, positive value case.
+            if ((n.m_limbs[0] & GMP_NUMB_MASK) > uint_t(std::numeric_limits<T>::max())) {
+                // TODO error message.
+                throw std::overflow_error("");
+            }
+            return static_cast<T>(n.m_limbs[0] & GMP_NUMB_MASK);
+        }
+        // In multilimb or negative case, forward to mpz.
+        return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
+    }
+    // Dynamic conversion to bool.
+    template <typename T, typename std::enable_if<std::is_same<T, bool>::value, int>::type = 0>
     static T conversion_impl(const mpz_struct_t &m)
     {
-        /*if (::mpz_fits_ulong_p(&m)) {
+        return mpz_sgn(&m);
+    }
+    // Dynamic conversion to unsigned ints.
+    template <typename T, uint_conversion_enabler<T> = 0>
+    static T conversion_impl(const mpz_struct_t &m)
+    {
+        if (mpz_sgn(&m) < 0) {
+            // Cannot convert negative values into unsigned ints.
+            // TODO error message.
+            throw std::overflow_error("");
+        }
+        if (::mpz_fits_ulong_p(&m)) {
             const auto ul = ::mpz_get_ui(&m);
             if (ul <= std::numeric_limits<T>::max()) {
                 return static_cast<T>(ul);
             }
             // TODO error message.
             throw std::overflow_error("");
-        }*/
+        }
         // We are now in a situation in which m does not fit in ulong. The only hope is that it does
         // fit in ulonglong. We will try to build one operating in ulong chunks.
         unsigned long long retval = 0u;
         // q will be a copy of m that will be right-shifted down in chunks.
         static thread_local mpz_raii q;
-        ::mpz_set(&q.m_mpz,&m);
+        ::mpz_set(&q.m_mpz, &m);
         unsigned shift_count = 0u;
         // Handy shortcut.
-        constexpr unsigned uld = std::numeric_limits<unsigned long long>::digits;
+        constexpr unsigned uld = std::numeric_limits<unsigned long>::digits;
         do {
             if (shift_count >= unsigned(std::numeric_limits<unsigned long long>::digits)) {
                 // Excessive shifting means the value overflows unsigned long long.
@@ -697,7 +752,48 @@ class integer
             // Update the shift count.
             shift_count += uld;
             // Shift down q.
-            ::mpz_tdiv_q_2exp(&q.m_mpz,&q.m_mpz,uld);
+            ::mpz_tdiv_q_2exp(&q.m_mpz, &q.m_mpz, uld);
+            // The iteration will stop when q becomes zero.
+        } while (mpz_sgn(&q.m_mpz) != 0);
+        if (retval > std::numeric_limits<T>::max()) {
+            // TODO error message.
+            throw std::overflow_error("");
+        }
+        return static_cast<T>(retval);
+    }
+    // Dynamic conversion to signed ints.
+    template <typename T, int_conversion_enabler<T> = 0>
+    static T conversion_impl(const mpz_struct_t &m)
+    {
+        if (::mpz_fits_slong_p(&m)) {
+            const auto sl = ::mpz_get_si(&m);
+            if (sl >= std::numeric_limits<T>::min() && sl <= std::numeric_limits<T>::max()) {
+                return static_cast<T>(sl);
+            }
+            // TODO error message.
+            throw std::overflow_error("");
+        }
+        long long retval = 0;
+        static thread_local mpz_raii q;
+        ::mpz_set(&q.m_mpz, &m);
+        unsigned shift_count = 0u;
+        // Handy shortcut.
+        constexpr unsigned uld = std::numeric_limits<unsigned long>::digits;
+        do {
+            if (shift_count >= unsigned(std::numeric_limits<unsigned long long>::digits)) {
+                // Excessive shifting means the value overflows unsigned long long.
+                // TODO error message.
+                throw std::overflow_error("sadsdsada");
+            }
+            // NOTE: this cannot be unsigned long, otherwise we are at risk of shifting
+            // too much below.
+            // NOTE: mpz_get_ui() already gives the lower bits of q.
+            unsigned long long ull = ::mpz_get_ui(&q.m_mpz);
+            retval += ull << shift_count;
+            // Update the shift count.
+            shift_count += uld;
+            // Shift down q.
+            ::mpz_tdiv_q_2exp(&q.m_mpz, &q.m_mpz, uld);
             // The iteration will stop when q becomes zero.
         } while (mpz_sgn(&q.m_mpz) != 0);
         if (retval > std::numeric_limits<T>::max()) {
@@ -749,7 +845,7 @@ public:
     {
         if (!m_int.is_static()) {
             // TODO throw.
-            //piranha_throw(std::invalid_argument, "cannot promote non-static integer");
+            throw std::invalid_argument("");
         }
         m_int.promote();
     }

@@ -111,9 +111,6 @@ TEST_CASE("floating-point constructors")
 
 TEST_CASE("msb_index()")
 {
-    integer foo{std::numeric_limits<unsigned long long>::max()};
-    foo.promote();
-    std::cout << static_cast<unsigned long long>(foo) << '\n';
     ::mp_limb_t n = 1;
     REQUIRE(msb_index(n) == 0u);
     n = 2;
@@ -127,7 +124,7 @@ TEST_CASE("msb_index()")
     n = 256;
     REQUIRE(msb_index(n) == 8u);
     // Random testing.
-    std::uniform_int_distribution<int> idx_dist(0,GMP_NUMB_BITS - 1), nbits_dist(1,20);
+    std::uniform_int_distribution<int> idx_dist(0, GMP_NUMB_BITS - 1), nbits_dist(1, 20);
     for (auto i = 0; i < ntries; ++i) {
         // Reset n.
         n = 0;
