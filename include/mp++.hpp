@@ -55,7 +55,6 @@ inline namespace detail
 {
 
 // TODO mpz struct checks.
-// TODO check that we verify both _mp_alloc and _mp_size.
 
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
@@ -248,7 +247,7 @@ struct static_int {
         // For the negative case, we cast to long long and we check against
         // guaranteed limits for taking the absolute value of n.
         const long long lln = n;
-        if (lln < 0 && lln >= -9223372036854775807LL && (unsigned long long)(-lln) <= GMP_NUMB_MAX) {
+        if (lln < 0 && lln >= -9223372036854775807ll && (unsigned long long)(-lln) <= GMP_NUMB_MAX) {
             _mp_size = -1;
             m_limbs[0] = static_cast<::mp_limb_t>(-lln);
             return true;
@@ -703,7 +702,16 @@ class integer
             }
             return static_cast<T>(n.m_limbs[0] & GMP_NUMB_MASK);
         }
-        // In multilimb or negative case, forward to mpz.
+        if (n._mp_size == -1 && (n.m_limbs[0] & GMP_NUMB_MASK) <= 9223372036854775807ull) {
+            // Handle negative single limb only if we are in the safe range of long long.
+            const auto candidate = -static_cast<long long>(n.m_limbs[0] & GMP_NUMB_MASK);
+            if (candidate < std::numeric_limits<T>::min()) {
+                // TODO error message.
+                throw std::overflow_error("");
+            }
+            return static_cast<T>(candidate);
+        }
+        // Forward to mpz.
         return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
     // Dynamic conversion to bool.
@@ -722,6 +730,7 @@ class integer
             throw std::overflow_error("");
         }
         if (::mpz_fits_ulong_p(&m)) {
+            // Go through GMP if possible.
             const auto ul = ::mpz_get_ui(&m);
             if (ul <= std::numeric_limits<T>::max()) {
                 return static_cast<T>(ul);
