@@ -103,8 +103,7 @@ struct mpfr_raii {
 };
 
 // A couple of sanity checks when constructing temporary mpfrs from long double.
-static_assert(std::numeric_limits<long double>::digits10 < std::numeric_limits<int>::max() / 4,
-              "Overflow error.");
+static_assert(std::numeric_limits<long double>::digits10 < std::numeric_limits<int>::max() / 4, "Overflow error.");
 static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limits<::mpfr_prec_t>::max(),
               "Overflow error.");
 
@@ -156,7 +155,7 @@ using is_supported_interop
 // A global thread local pointer, initially set to null, that signals if a static int construction via mpz
 // fails due to too many limbs required. The pointer is set by static_int's constructors to a thread local
 // mpz variable that contains the constructed object.
-inline const mpz_struct_t * &fail_too_many_limbs()
+inline const mpz_struct_t *&fail_too_many_limbs()
 {
     static thread_local const mpz_struct_t *m = nullptr;
     return m;
@@ -719,7 +718,7 @@ class integer
         return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
     // Static conversion to floating-point.
-    template <typename T, typename std::enable_if<is_supported_float<T>::value,int>::type = 0>
+    template <typename T, typename std::enable_if<is_supported_float<T>::value, int>::type = 0>
     static T conversion_impl(const static_int &n)
     {
         return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
@@ -848,21 +847,22 @@ class integer
         return static_cast<T>(retval);
     }
     // Dynamic conversion to float/double.
-    template <typename T, typename std::enable_if<std::is_same<T,float>::value || std::is_same<T,double>::value,int>::type = 0>
+    template <typename T,
+              typename std::enable_if<std::is_same<T, float>::value || std::is_same<T, double>::value, int>::type = 0>
     static T conversion_impl(const mpz_struct_t &m)
     {
         return static_cast<T>(::mpz_get_d(&m));
     }
 #if defined(MPPP_WITH_LONG_DOUBLE)
     // Dynamic conversion to long double.
-    template <typename T, typename std::enable_if<std::is_same<T,long double>::value,int>::type = 0>
+    template <typename T, typename std::enable_if<std::is_same<T, long double>::value, int>::type = 0>
     static T conversion_impl(const mpz_struct_t &m)
     {
         static thread_local mpfr_raii mpfr;
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
         ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
         ::mpfr_set_z(&mpfr.m_mpfr, &m, MPFR_RNDN);
-        return ::mpfr_get_ld(&mpfr.m_mpfr,MPFR_RNDN);
+        return ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN);
     }
 #endif
 

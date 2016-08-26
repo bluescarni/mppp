@@ -38,7 +38,7 @@ see https://www.gnu.org/licenses/. */
 
 using namespace mppp;
 namespace bmp = boost::multiprecision;
-using mpz_int = bmp::number<bmp::gmp_int,bmp::et_off>;
+using mpz_int = bmp::number<bmp::gmp_int, bmp::et_off>;
 
 std::mt19937 rng;
 
@@ -70,28 +70,28 @@ NONIUS_BENCHMARK("bmp long long constructor", [](nonius::chronometer meter) {
 
 NONIUS_BENCHMARK("unsigned long constructor", [](nonius::chronometer meter) {
     std::uniform_int_distribution<unsigned long> dist(std::numeric_limits<unsigned long>::min(),
-                                             std::numeric_limits<unsigned long>::max());
+                                                      std::numeric_limits<unsigned long>::max());
     auto val = dist(rng);
     meter.measure([val] { return integer{val}; });
 })
 
 NONIUS_BENCHMARK("bmp unsigned long constructor", [](nonius::chronometer meter) {
     std::uniform_int_distribution<unsigned long> dist(std::numeric_limits<unsigned long>::min(),
-                                             std::numeric_limits<unsigned long>::max());
+                                                      std::numeric_limits<unsigned long>::max());
     auto val = dist(rng);
     meter.measure([val] { return mpz_int{val}; });
 })
 
 NONIUS_BENCHMARK("unsigned long long constructor", [](nonius::chronometer meter) {
     std::uniform_int_distribution<unsigned long long> dist(std::numeric_limits<unsigned long long>::min(),
-                                                  std::numeric_limits<unsigned long long>::max());
+                                                           std::numeric_limits<unsigned long long>::max());
     auto val = dist(rng);
     meter.measure([val] { return integer{val}; });
 })
 
 NONIUS_BENCHMARK("bmp unsigned long long constructor", [](nonius::chronometer meter) {
     std::uniform_int_distribution<unsigned long long> dist(std::numeric_limits<unsigned long long>::min(),
-                                                  std::numeric_limits<unsigned long long>::max());
+                                                           std::numeric_limits<unsigned long long>::max());
     auto val = dist(rng);
     meter.measure([val] { return mpz_int{val}; });
 })

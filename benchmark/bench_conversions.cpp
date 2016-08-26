@@ -38,7 +38,7 @@ see https://www.gnu.org/licenses/. */
 
 namespace bmp = boost::multiprecision;
 using namespace mppp;
-using mpz_int = bmp::number<bmp::gmp_int,bmp::et_off>;
+using mpz_int = bmp::number<bmp::gmp_int, bmp::et_off>;
 
 std::mt19937 rng;
 
@@ -57,21 +57,20 @@ NONIUS_BENCHMARK("ulonglong conversion", [](nonius::chronometer meter) {
 });
 
 NONIUS_BENCHMARK("long conversion", [](nonius::chronometer meter) {
-    std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
-                                                      std::numeric_limits<long>::max());
+    std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     auto val = integer(dist(rng));
     meter.measure([&val] { return static_cast<long>(val); });
 });
 
 NONIUS_BENCHMARK("long long conversion", [](nonius::chronometer meter) {
     std::uniform_int_distribution<long long> dist(std::numeric_limits<long long>::min(),
-                                                      std::numeric_limits<long long>::max());
+                                                  std::numeric_limits<long long>::max());
     auto val = integer(dist(rng));
     meter.measure([&val] { return static_cast<long long>(val); });
 });
 
 NONIUS_BENCHMARK("bmp double conversion", [](nonius::chronometer meter) {
-    std::uniform_real_distribution<double> dist(-1E20,1E20);
+    std::uniform_real_distribution<double> dist(-1E20, 1E20);
     auto val = mpz_int(dist(rng));
     meter.measure([&val]() -> double {
         volatile double retval = static_cast<double>(val);
@@ -80,7 +79,7 @@ NONIUS_BENCHMARK("bmp double conversion", [](nonius::chronometer meter) {
 });
 
 NONIUS_BENCHMARK("double conversion", [](nonius::chronometer meter) {
-    std::uniform_real_distribution<double> dist(-1E20,1E20);
+    std::uniform_real_distribution<double> dist(-1E20, 1E20);
     auto val = integer(dist(rng));
     meter.measure([&val]() -> double {
         volatile double retval = static_cast<double>(val);
@@ -91,7 +90,7 @@ NONIUS_BENCHMARK("double conversion", [](nonius::chronometer meter) {
 #if defined(MPPP_WITH_LONG_DOUBLE)
 
 NONIUS_BENCHMARK("bmp long double conversion", [](nonius::chronometer meter) {
-    std::uniform_real_distribution<long double> dist(-1E20l,1E20l);
+    std::uniform_real_distribution<long double> dist(-1E20l, 1E20l);
     auto val = mpz_int(dist(rng));
     meter.measure([&val]() -> long double {
         volatile long double retval = static_cast<long double>(val);
@@ -100,7 +99,7 @@ NONIUS_BENCHMARK("bmp long double conversion", [](nonius::chronometer meter) {
 });
 
 NONIUS_BENCHMARK("long double conversion", [](nonius::chronometer meter) {
-    std::uniform_real_distribution<long double> dist(-1E20l,1E20l);
+    std::uniform_real_distribution<long double> dist(-1E20l, 1E20l);
     auto val = integer(dist(rng));
     meter.measure([&val]() -> long double {
         volatile long double retval = static_cast<long double>(val);
