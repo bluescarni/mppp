@@ -27,6 +27,7 @@ GNU Lesser General Public License along with the mp++ library.  If not,
 see https://www.gnu.org/licenses/. */
 
 #include <atomic>
+#include <gmp.h>
 #include <limits>
 #include <random>
 #include <thread>
@@ -79,6 +80,8 @@ struct int_ctor_tester {
     }
 };
 
+struct no_const {};
+
 TEST_CASE("integral constructors")
 {
     tuple_for_each(int_types{}, int_ctor_tester{});
@@ -86,6 +89,8 @@ TEST_CASE("integral constructors")
     REQUIRE((std::is_constructible<integer, bool>::value));
     REQUIRE((lex_cast(integer{false}) == "0"));
     REQUIRE((lex_cast(integer{true}) == "1"));
+    REQUIRE((!std::is_constructible<integer,wchar_t>::value));
+    REQUIRE((!std::is_constructible<integer,no_const>::value));
 }
 
 using fp_types = std::tuple<float, double
@@ -143,4 +148,72 @@ TEST_CASE("msb_index()")
         }
         REQUIRE(msb_index(n) == unsigned(highest_idx));
     }
+}
+
+struct yes {};
+struct no {};
+
+template <typename From, typename To>
+static inline auto test_static_cast(int) -> decltype(void(static_cast<To>(std::declval<From>())),yes{});
+
+template <typename From, typename To>
+static inline no test_static_cast(...);
+
+template <typename From, typename To>
+using is_convertible = std::integral_constant<bool,std::is_same<decltype(test_static_cast<From,To>(0)),yes>::value>;
+
+template <typename T>
+static inline bool roundtrip_conversion(const T &x)
+{
+    return static_cast<T>(integer{x}) == x;
+}
+
+struct int_convert_tester {
+    template <typename Int>
+    inline void operator()(const Int &) const
+    {
+        REQUIRE((is_convertible<integer, Int>::value));
+        REQUIRE(roundtrip_conversion(0));
+        auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
+        REQUIRE(roundtrip_conversion(min));
+        REQUIRE(roundtrip_conversion(max));
+        REQUIRE(roundtrip_conversion(min + Int(1)));
+        REQUIRE(roundtrip_conversion(max - Int(1)));
+        REQUIRE(roundtrip_conversion(min + Int(2)));
+        REQUIRE(roundtrip_conversion(max - Int(2)));
+        REQUIRE(roundtrip_conversion(min + Int(3)));
+        REQUIRE(roundtrip_conversion(max - Int(3)));
+        REQUIRE(roundtrip_conversion(min + Int(42)));
+        REQUIRE(roundtrip_conversion(max - Int(42)));
+        std::atomic<bool> fail(false);
+        auto f = [&fail](unsigned n) {
+            std::uniform_int_distribution<Int> dist(min, max);
+            std::mt19937 eng(static_cast<std::mt19937::result_type>(n));
+            for (auto i = 0; i < ntries; ++i) {
+                if (!roundtrip_conversion(dist(eng))) {
+                    fail.store(false);
+                }
+            }
+        };
+        std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+        t0.join();
+        t1.join();
+        t2.join();
+        t3.join();
+        REQUIRE(!fail.load());
+    }
+};
+
+struct no_conv {};
+
+TEST_CASE("integral conversions")
+{
+    tuple_for_each(int_types{}, int_convert_tester{});
+    // Some testing for bool.
+    REQUIRE((is_convertible<integer, bool>::value));
+    REQUIRE(roundtrip_conversion(true));
+    REQUIRE(roundtrip_conversion(false));
+    // Extra.
+    REQUIRE((!is_convertible<integer, wchar_t>::value));
+    REQUIRE((!is_convertible<integer, no_conv>::value));
 }

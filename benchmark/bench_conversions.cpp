@@ -46,34 +46,85 @@ NONIUS_BENCHMARK("ulong conversion", [](nonius::chronometer meter) {
     std::uniform_int_distribution<unsigned long> dist(std::numeric_limits<unsigned long>::min(),
                                                       std::numeric_limits<unsigned long>::max());
     auto val = integer(dist(rng));
-    meter.measure([&val] { return static_cast<unsigned long>(val); });
+    meter.measure([&val]() -> unsigned long {
+        auto volatile retval = static_cast<unsigned long>(val);
+        return retval;
+    });
+});
+
+NONIUS_BENCHMARK("bmp ulong conversion", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<unsigned long> dist(std::numeric_limits<unsigned long>::min(),
+                                                      std::numeric_limits<unsigned long>::max());
+    auto val = mpz_int(dist(rng));
+    meter.measure([&val]() -> unsigned long {
+        auto volatile retval = static_cast<unsigned long>(val);
+        return retval;
+    });
 });
 
 NONIUS_BENCHMARK("ulonglong conversion", [](nonius::chronometer meter) {
     std::uniform_int_distribution<unsigned long long> dist(std::numeric_limits<unsigned long long>::min(),
                                                            std::numeric_limits<unsigned long long>::max());
     auto val = integer(dist(rng));
-    meter.measure([&val] { return static_cast<unsigned long long>(val); });
+    meter.measure([&val]() -> unsigned long long {
+        auto volatile retval = static_cast<unsigned long long>(val);
+        return retval;
+    });
+});
+
+NONIUS_BENCHMARK("bmp ulonglong conversion", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<unsigned long long> dist(std::numeric_limits<unsigned long long>::min(),
+                                                           std::numeric_limits<unsigned long long>::max());
+    auto val = mpz_int(dist(rng));
+    meter.measure([&val]() -> unsigned long long {
+        auto volatile retval = static_cast<unsigned long long>(val);
+        return retval;
+    });
 });
 
 NONIUS_BENCHMARK("long conversion", [](nonius::chronometer meter) {
     std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     auto val = integer(dist(rng));
-    meter.measure([&val] { return static_cast<long>(val); });
+    meter.measure([&val]() -> long {
+        auto volatile retval = static_cast<long>(val);
+        return retval;
+    });
+});
+
+NONIUS_BENCHMARK("bmp long conversion", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
+    auto val = mpz_int(dist(rng));
+    meter.measure([&val]() -> long {
+        auto volatile retval = static_cast<long>(val);
+        return retval;
+    });
 });
 
 NONIUS_BENCHMARK("long long conversion", [](nonius::chronometer meter) {
     std::uniform_int_distribution<long long> dist(std::numeric_limits<long long>::min(),
                                                   std::numeric_limits<long long>::max());
     auto val = integer(dist(rng));
-    meter.measure([&val] { return static_cast<long long>(val); });
+    meter.measure([&val]() -> long long {
+        auto volatile retval = static_cast<long long>(val);
+        return retval;
+    });
+});
+
+NONIUS_BENCHMARK("bmp long long conversion", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<long long> dist(std::numeric_limits<long long>::min(),
+                                                  std::numeric_limits<long long>::max());
+    auto val = mpz_int(dist(rng));
+    meter.measure([&val]() -> long long {
+        auto volatile retval = static_cast<long long>(val);
+        return retval;
+    });
 });
 
 NONIUS_BENCHMARK("bmp double conversion", [](nonius::chronometer meter) {
     std::uniform_real_distribution<double> dist(-1E20, 1E20);
     auto val = mpz_int(dist(rng));
     meter.measure([&val]() -> double {
-        volatile double retval = static_cast<double>(val);
+        auto volatile retval = static_cast<double>(val);
         return retval;
     });
 });
@@ -82,7 +133,7 @@ NONIUS_BENCHMARK("double conversion", [](nonius::chronometer meter) {
     std::uniform_real_distribution<double> dist(-1E20, 1E20);
     auto val = integer(dist(rng));
     meter.measure([&val]() -> double {
-        volatile double retval = static_cast<double>(val);
+        auto volatile retval = static_cast<double>(val);
         return retval;
     });
 });
@@ -93,7 +144,7 @@ NONIUS_BENCHMARK("bmp long double conversion", [](nonius::chronometer meter) {
     std::uniform_real_distribution<long double> dist(-1E20l, 1E20l);
     auto val = mpz_int(dist(rng));
     meter.measure([&val]() -> long double {
-        volatile long double retval = static_cast<long double>(val);
+        auto volatile retval = static_cast<long double>(val);
         return retval;
     });
 });
@@ -102,7 +153,7 @@ NONIUS_BENCHMARK("long double conversion", [](nonius::chronometer meter) {
     std::uniform_real_distribution<long double> dist(-1E20l, 1E20l);
     auto val = integer(dist(rng));
     meter.measure([&val]() -> long double {
-        volatile long double retval = static_cast<long double>(val);
+        auto volatile retval = static_cast<long double>(val);
         return retval;
     });
 });
