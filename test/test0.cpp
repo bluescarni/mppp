@@ -80,7 +80,8 @@ struct int_ctor_tester {
     }
 };
 
-struct no_const {};
+struct no_const {
+};
 
 TEST_CASE("integral constructors")
 {
@@ -89,8 +90,8 @@ TEST_CASE("integral constructors")
     REQUIRE((std::is_constructible<integer, bool>::value));
     REQUIRE((lex_cast(integer{false}) == "0"));
     REQUIRE((lex_cast(integer{true}) == "1"));
-    REQUIRE((!std::is_constructible<integer,wchar_t>::value));
-    REQUIRE((!std::is_constructible<integer,no_const>::value));
+    REQUIRE((!std::is_constructible<integer, wchar_t>::value));
+    REQUIRE((!std::is_constructible<integer, no_const>::value));
 }
 
 using fp_types = std::tuple<float, double
@@ -114,53 +115,20 @@ TEST_CASE("floating-point constructors")
     tuple_for_each(fp_types{}, fp_ctor_tester{});
 }
 
-TEST_CASE("msb_index()")
-{
-    ::mp_limb_t n = 1;
-    REQUIRE(msb_index(n) == 0u);
-    n = 2;
-    REQUIRE(msb_index(n) == 1u);
-    n = 3;
-    REQUIRE(msb_index(n) == 1u);
-    n = 4;
-    REQUIRE(msb_index(n) == 2u);
-    n = 252;
-    REQUIRE(msb_index(n) == 7u);
-    n = 256;
-    REQUIRE(msb_index(n) == 8u);
-    // Random testing.
-    std::uniform_int_distribution<int> idx_dist(0, GMP_NUMB_BITS - 1), nbits_dist(1, 20);
-    for (auto i = 0; i < ntries; ++i) {
-        // Reset n.
-        n = 0;
-        // How many bits to set (always 1 at least).
-        const auto nbits = nbits_dist(rng);
-        int highest_idx = 0;
-        for (auto j = 0; j < nbits; ++j) {
-            // Get a random bit index among the allowed ones.
-            const auto idx = idx_dist(rng);
-            // Set it in n.
-            n |= ::mp_limb_t(1) << idx;
-            // Check if it's the highest bit set.
-            if (idx > highest_idx) {
-                highest_idx = idx;
-            }
-        }
-        REQUIRE(msb_index(n) == unsigned(highest_idx));
-    }
-}
+struct yes {
+};
 
-struct yes {};
-struct no {};
+struct no {
+};
 
 template <typename From, typename To>
-static inline auto test_static_cast(int) -> decltype(void(static_cast<To>(std::declval<From>())),yes{});
+static inline auto test_static_cast(int) -> decltype(void(static_cast<To>(std::declval<From>())), yes{});
 
 template <typename From, typename To>
 static inline no test_static_cast(...);
 
 template <typename From, typename To>
-using is_convertible = std::integral_constant<bool,std::is_same<decltype(test_static_cast<From,To>(0)),yes>::value>;
+using is_convertible = std::integral_constant<bool, std::is_same<decltype(test_static_cast<From, To>(0)), yes>::value>;
 
 template <typename T>
 static inline bool roundtrip_conversion(const T &x)
@@ -204,7 +172,8 @@ struct int_convert_tester {
     }
 };
 
-struct no_conv {};
+struct no_conv {
+};
 
 TEST_CASE("integral conversions")
 {

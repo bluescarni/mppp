@@ -17,3 +17,4 @@ endmacro()
 
 ADD_MPPP_BENCHMARK(bench_constructors)
 ADD_MPPP_BENCHMARK(bench_conversions)
+ADD_MPPP_BENCHMARK(bench_nbits)

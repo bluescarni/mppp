@@ -46,8 +46,8 @@ NONIUS_BENCHMARK("long constructor", [](nonius::chronometer meter) {
     std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(), std::numeric_limits<long>::max());
     auto val = dist(rng);
     meter.measure([val]() -> integer {
-      integer retval{val};
-      return retval;
+        integer retval{val};
+        return retval;
     });
 })
 

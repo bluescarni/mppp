@@ -168,7 +168,7 @@ struct static_int {
     // Number of limbs in static storage.
     static const int s_size = 2;
     // Let's put a hard cap and sanity check.
-    static_assert(s_size > 0 && s_size < 512, "Invalid static size.");
+    static_assert(s_size > 0 && s_size <= 64, "Invalid static size.");
     using limbs_type = std::array<::mp_limb_t, s_size>;
     // NOTE: def ctor leaves the limbs uninited.
     static_int() : _mp_alloc(s_alloc), _mp_size(0)
@@ -399,6 +399,11 @@ struct static_int {
     class static_mpz_view
     {
     public:
+        // NOTE: this is needed when we have the variant view in the integer class: if the active view
+        // is the dynamic one, we need to def construct a static view that we will never use.
+        static_mpz_view()
+        {
+        }
         // NOTE: we use the const_cast to cast away the constness from the pointer to the limbs
         // in n. This is valid as we are never going to use this pointer for writing.
         explicit static_mpz_view(const static_int &n)
@@ -602,45 +607,6 @@ private:
     s_storage m_st;
     d_storage m_dy;
 };
-
-// Utility function to detect the highest bit set in the data part of a limb. Adapted from:
-// https://graphics.stanford.edu/~seander/bithacks.html#IntegerLogLookup
-// The data part of n must not be zero.
-inline unsigned msb_index(::mp_limb_t n)
-{
-    // This is a table that stores the MSB index for the values from 0 to 255.
-    constexpr std::array<unsigned char, 256> lt_256 = {{
-#define MPP_LT256(n) n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n
-        0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, MPP_LT256(4), MPP_LT256(5), MPP_LT256(5), MPP_LT256(6),
-        MPP_LT256(6), MPP_LT256(6), MPP_LT256(6), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7), MPP_LT256(7),
-        MPP_LT256(7), MPP_LT256(7), MPP_LT256(7)
-#undef MPP_LT256
-    }};
-    // Remove non-data bits.
-    n = n & GMP_NUMB_MASK;
-    assert(n);
-    static_assert(GMP_NUMB_BITS >= 8, "Invalid number of bits.");
-    auto shift = static_cast<unsigned>(GMP_NUMB_BITS - 8);
-    // NOTE: the idea here is that we keep decreasing the shift amount 8 bits at a time until
-    // we remain with some nonzero value when doing n >> shift.
-    while (shift) {
-        const ::mp_limb_t tmp = n >> shift;
-        if (tmp) {
-            return shift + lt_256[std::size_t(tmp)];
-        }
-        if (GMP_NUMB_BITS % 8) {
-            // If GMP_NUMB_BITS is not divided exactly by 8 (a nail build perhaps), we need to make sure
-            // that we don't decrease shift too much.
-            shift = shift >= 8u ? (shift - 8u) : 0u;
-        } else {
-            // If GMP_NUMB_BITS is divided exactly by 8 (as usual) we can keep on subtracting
-            // without fear of shift wrapping over.
-            shift -= 8u;
-        }
-    }
-    // The number must be smaller 256, use the table directly.
-    return lt_256[std::size_t(n)];
-}
 }
 
 class integer
@@ -863,6 +829,38 @@ class integer
         return ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN);
     }
 #endif
+    // mpz view class.
+    class mpz_view
+    {
+        using static_mpz_view = static_int::static_mpz_view;
+
+    public:
+        explicit mpz_view(const integer &n)
+            : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : static_mpz_view{}),
+              m_dyn_ptr(n.is_static() ? nullptr : &(n.m_int.g_dy()))
+        {
+        }
+        mpz_view(const mpz_view &) = delete;
+        mpz_view(mpz_view &&) = default;
+        mpz_view &operator=(const mpz_view &) = delete;
+        mpz_view &operator=(mpz_view &&) = delete;
+        operator const mpz_struct_t *() const
+        {
+            return get();
+        }
+        const mpz_struct_t *get() const
+        {
+            if (m_dyn_ptr) {
+                return m_dyn_ptr;
+            } else {
+                return m_static_view;
+            }
+        }
+
+    private:
+        static_mpz_view m_static_view;
+        const mpz_struct_t *m_dyn_ptr;
+    };
 
 public:
     integer() = default;
@@ -904,11 +902,19 @@ public:
     }
     void promote()
     {
-        if (!m_int.is_static()) {
+        if (!is_static()) {
             // TODO throw.
             throw std::invalid_argument("");
         }
         m_int.promote();
+    }
+    std::size_t nbits() const
+    {
+        return ::mpz_sizeinbase(get_mpz_view(), 2);
+    }
+    mpz_view get_mpz_view() const
+    {
+        return mpz_view(*this);
     }
 
 private:
