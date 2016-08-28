@@ -30,6 +30,7 @@ see https://www.gnu.org/licenses/. */
 #include <gmp.h>
 #include <limits>
 #include <random>
+#include <stdexcept>
 #include <thread>
 #include <tuple>
 #include <type_traits>
@@ -115,6 +116,55 @@ TEST_CASE("floating-point constructors")
     tuple_for_each(fp_types{}, fp_ctor_tester{});
 }
 
+#define REQUIRE_THROWS_PREDICATE(expr, exc, pred)                                                                      \
+    {                                                                                                                  \
+        bool thrown_checked = false;                                                                                   \
+        try {                                                                                                          \
+            expr;                                                                                                      \
+        } catch (const exc &e) {                                                                                       \
+            if (pred(e)) {                                                                                             \
+                thrown_checked = true;                                                                                 \
+            }                                                                                                          \
+        }                                                                                                              \
+        REQUIRE(thrown_checked);                                                                                       \
+    }
+
+TEST_CASE("string constructor")
+{
+    REQUIRE_THROWS_PREDICATE(integer{""}, std::invalid_argument,
+                             [](const std::invalid_argument &ia) {
+                                 return std::string(ia.what()) == "The string '' is not a valid integer in base 10.";
+                             });
+    REQUIRE_THROWS_PREDICATE((integer{"", 2}), std::invalid_argument, [](const std::invalid_argument &ia) {
+        return std::string(ia.what()) == "The string '' is not a valid integer in base 2.";
+    });
+    REQUIRE_THROWS_PREDICATE((integer{"--31"}), std::invalid_argument, [](const std::invalid_argument &ia) {
+        return std::string(ia.what()) == "The string '--31' is not a valid integer in base 10.";
+    });
+    REQUIRE_THROWS_PREDICATE((integer{"-+31"}), std::invalid_argument, [](const std::invalid_argument &ia) {
+        return std::string(ia.what()) == "The string '-+31' is not a valid integer in base 10.";
+    });
+    REQUIRE_THROWS_PREDICATE((integer{"-31a"}), std::invalid_argument, [](const std::invalid_argument &ia) {
+        return std::string(ia.what()) == "The string '-31a' is not a valid integer in base 10.";
+    });
+    REQUIRE_THROWS_PREDICATE((integer{"+a31"}), std::invalid_argument, [](const std::invalid_argument &ia) {
+        return std::string(ia.what()) == "The string '+a31' is not a valid integer in base 10.";
+    });
+    REQUIRE_THROWS_PREDICATE((integer{"+a31"}), std::invalid_argument, [](const std::invalid_argument &ia) {
+        return std::string(ia.what()) == "The string '+a31' is not a valid integer in base 10.";
+    });
+    REQUIRE_THROWS_PREDICATE((integer{"1E45",12}), std::invalid_argument, [](const std::invalid_argument &ia) {
+        return std::string(ia.what()) == "The string '1E45' is not a valid integer in base 12.";
+    });
+    REQUIRE(lex_cast(integer{"123"}) == "123");
+    REQUIRE(lex_cast(integer{"-123"}) == "-123");
+    REQUIRE(lex_cast(integer{"123"}) == "123");
+    REQUIRE(lex_cast(integer{"0b11",0}) == "3");
+    REQUIRE(lex_cast(integer{"-0b11",0}) == "-3");
+    REQUIRE(lex_cast(integer{"110",2}) == "6");
+    REQUIRE(lex_cast(integer{"-110",2}) == "-6");
+}
+
 struct yes {
 };
 
@@ -122,7 +172,7 @@ struct no {
 };
 
 template <typename From, typename To>
-static inline auto test_static_cast(int) -> decltype(void(static_cast<To>(std::declval<From>())), yes{});
+static inline auto test_static_cast(int) -> decltype(void(static_cast<To>(std::declval<const From &>())), yes{});
 
 template <typename From, typename To>
 static inline no test_static_cast(...);

@@ -481,7 +481,27 @@ public:
         // Check if too many limbs were generated.
         auto ptr = fail_too_many_limbs();
         if (ptr) {
-            // Get the pointer to the mpz storing the constructed value, then reset it.
+            // Reset the pointer before proceeding.
+            fail_too_many_limbs() = nullptr;
+            // Destroy static.
+            g_st().~s_storage();
+            // Init dynamic.
+            ::new (static_cast<void *>(&m_dy)) d_storage;
+            ::mpz_init_set(&m_dy, ptr);
+        }
+    }
+    explicit integer_union(const char *s, int base) : m_st()
+    {
+        static thread_local mpz_raii mpz;
+        if (::mpz_set_str(&mpz.m_mpz, s, base)) {
+            throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
+                                        + std::to_string(base) + ".");
+        }
+        g_st().ctor_from_mpz(mpz.m_mpz);
+        // Check if too many limbs were generated.
+        auto ptr = fail_too_many_limbs();
+        if (ptr) {
+            // Reset the pointer before proceeding.
             fail_too_many_limbs() = nullptr;
             // Destroy static.
             g_st().~s_storage();
@@ -868,6 +888,12 @@ public:
     integer(integer &&other) = default;
     template <typename T, generic_ctor_enabler<T> = 0>
     explicit integer(T x) : m_int(x)
+    {
+    }
+    explicit integer(const char *s, int base = 10) : m_int(s, base)
+    {
+    }
+    explicit integer(const std::string &s, int base = 10) : integer(s.c_str(), base)
     {
     }
     integer &operator=(const integer &other) = default;
