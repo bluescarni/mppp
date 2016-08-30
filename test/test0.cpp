@@ -153,16 +153,16 @@ TEST_CASE("string constructor")
     REQUIRE_THROWS_PREDICATE((integer{"+a31"}), std::invalid_argument, [](const std::invalid_argument &ia) {
         return std::string(ia.what()) == "The string '+a31' is not a valid integer in base 10.";
     });
-    REQUIRE_THROWS_PREDICATE((integer{"1E45",12}), std::invalid_argument, [](const std::invalid_argument &ia) {
+    REQUIRE_THROWS_PREDICATE((integer{"1E45", 12}), std::invalid_argument, [](const std::invalid_argument &ia) {
         return std::string(ia.what()) == "The string '1E45' is not a valid integer in base 12.";
     });
     REQUIRE(lex_cast(integer{"123"}) == "123");
     REQUIRE(lex_cast(integer{"-123"}) == "-123");
     REQUIRE(lex_cast(integer{"123"}) == "123");
-    REQUIRE(lex_cast(integer{"0b11",0}) == "3");
-    REQUIRE(lex_cast(integer{"-0b11",0}) == "-3");
-    REQUIRE(lex_cast(integer{"110",2}) == "6");
-    REQUIRE(lex_cast(integer{"-110",2}) == "-6");
+    REQUIRE(lex_cast(integer{"0b11", 0}) == "3");
+    REQUIRE(lex_cast(integer{"-0b11", 0}) == "-3");
+    REQUIRE(lex_cast(integer{"110", 2}) == "6");
+    REQUIRE(lex_cast(integer{"-110", 2}) == "-6");
 }
 
 struct yes {

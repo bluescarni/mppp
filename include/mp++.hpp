@@ -38,6 +38,7 @@ see https://www.gnu.org/licenses/. */
 #include <iostream>
 #include <limits>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -55,6 +56,7 @@ inline namespace detail
 {
 
 // TODO mpz struct checks.
+// FIXME use of std::copy for potentially overlapping ranges.
 
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
@@ -110,6 +112,8 @@ static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limi
 #endif
 
 // Convert an mpz to a string in a specific base.
+// NOTE: this function returns a pointer to thread_local storage: the return value will be overwritten
+// by successive calls to mpz_to_str() from the same thread.
 inline const char *mpz_to_str(const mpz_struct_t *mpz, int base = 10)
 {
     assert(base >= 2 && base <= 62);
@@ -174,6 +178,8 @@ struct static_int {
     static_int() : _mp_alloc(s_alloc), _mp_size(0)
     {
     }
+    // NOTE: implement this manually - the default implementation would read from uninited limbs
+    // in case o is not full.
     static_int(const static_int &o) : _mp_alloc(s_alloc), _mp_size(o._mp_size)
     {
         std::copy(o.m_limbs.begin(), o.m_limbs.begin() + abs_size(), m_limbs.begin());
@@ -182,7 +188,8 @@ struct static_int {
     static_int(static_int &&o) noexcept : static_int(o)
     {
     }
-    // Copy assignment.
+    // NOTE: implement this manually - the default implementation would read from uninited limbs
+    // in case other is not full.
     static_int &operator=(const static_int &other)
     {
         if (this != &other) {
@@ -285,6 +292,8 @@ struct static_int {
             // Set output to the lowest UL limb of n.
             ::mpz_set_ui(&mpz.m_mpz, static_cast<unsigned long>(n & ulmax));
             // Move the limbs of n to the right.
+            // NOTE: this is ok because we tested above that n is wider than unsigned long, so its bit
+            // width must be larger than unsigned long's.
             n >>= std::numeric_limits<unsigned long>::digits;
             while (n) {
                 // Increase the shifter.
@@ -401,7 +410,9 @@ struct static_int {
     public:
         // NOTE: this is needed when we have the variant view in the integer class: if the active view
         // is the dynamic one, we need to def construct a static view that we will never use.
-        static_mpz_view()
+        // NOTE: m_mpz needs to be zero inited because otherwise when using the move ctor we will
+        // be reading from uninited memory.
+        static_mpz_view() : m_mpz()
         {
         }
         // NOTE: we use the const_cast to cast away the constness from the pointer to the limbs
@@ -857,7 +868,7 @@ class integer
     public:
         explicit mpz_view(const integer &n)
             : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : static_mpz_view{}),
-              m_dyn_ptr(n.is_static() ? nullptr : &(n.m_int.g_dy()))
+              m_ptr(n.is_static() ? m_static_view : &(n.m_int.g_dy()))
         {
         }
         mpz_view(const mpz_view &) = delete;
@@ -870,16 +881,12 @@ class integer
         }
         const mpz_struct_t *get() const
         {
-            if (m_dyn_ptr) {
-                return m_dyn_ptr;
-            } else {
-                return m_static_view;
-            }
+            return m_ptr;
         }
 
     private:
         static_mpz_view m_static_view;
-        const mpz_struct_t *m_dyn_ptr;
+        const mpz_struct_t *m_ptr;
     };
 
 public:
@@ -906,7 +913,7 @@ public:
     {
         return os << n.to_string();
     }
-    const char *to_string(int base = 10) const
+    std::string to_string(int base = 10) const
     {
         if (base < 2 || base > 62) {
             throw std::invalid_argument("Invalid base for string conversion: the base must be between "
