@@ -949,6 +949,65 @@ public:
     {
         return mpz_view(*this);
     }
+    static ::mp_limb_t add_impl(static_int &rop, const static_int &op1, const static_int &op2)
+    {
+        auto size1 = op1._mp_size, size2 = op2._mp_size;
+        const bool sign1 = size1 >= 0, sign2 = size2 >= 0;
+        const auto asize1 = sign1 ? size1 : -size1, asize2 = sign2 ? size2 : -size2;
+        if (!size1) {
+            // First op is zero, copy over the second op.
+            rop._mp_size = size2;
+            std::copy(op2.m_limbs.data(), op2.m_limbs.data() + asize2, rop.m_limbs.data());
+            return 0;
+        }
+        if (!size2) {
+            // Second op is zero, copy over the first op.
+            rop._mp_size = size1;
+            std::copy(op1.m_limbs.data(), op1.m_limbs.data() + asize1, rop.m_limbs.data());
+            return 0;
+        }
+        // Both operands are nonzero.
+        if (size1 == size2) {
+            // Same sizes, same sign.
+            auto cy = ::mpn_add_n(rop.m_limbs.data(), op1.m_limbs.data(), op2.m_limbs.data(),
+                                      static_cast<::mp_size_t>(asize1));
+            rop._mp_size = size1;
+            if (cy) {
+                if (asize1 == static_int::s_size) {
+                    return 1;
+                }
+                rop._mp_size = sign1 ? rop._mp_size + 1 : rop._mp_size - 1;
+                *(rop.m_limbs.data() + asize1) = 1;
+            }
+            return 0;
+        } else if (sign1 == sign2) {
+            // Different sizes, same sign.
+            if (asize1 > asize2) {
+                // op1 is larger.
+                auto retval = ::mpn_add(rop.m_limbs.data(), op1.m_limbs.data(), static_cast<::mp_size_t>(asize1),
+                                        op2.m_limbs.data(), static_cast<::mp_size_t>(asize2));
+                rop._mp_size = size1;
+                return retval;
+            } else {
+                // op2 is larger.
+                auto retval = ::mpn_add(rop.m_limbs.data(), op2.m_limbs.data(), static_cast<::mp_size_t>(asize2),
+                                        op1.m_limbs.data(), static_cast<::mp_size_t>(asize1));
+                rop._mp_size = size2;
+                return retval;
+            }
+        }
+        // Different signs.
+        throw;
+    }
+    friend void add(integer &rop, const integer &op1, const integer &op2)
+    {
+        const unsigned mask
+            = (unsigned)!rop.is_static() + ((unsigned)!op1.is_static() << 1u) + ((unsigned)!op2.is_static() << 2u);
+        switch (mask) {
+            case 0u:
+                add_impl(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
+        }
+    }
 
 private:
     integer_union m_int;

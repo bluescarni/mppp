@@ -235,4 +235,7 @@ TEST_CASE("integral conversions")
     // Extra.
     REQUIRE((!is_convertible<integer, wchar_t>::value));
     REQUIRE((!is_convertible<integer, no_conv>::value));
+    integer r, a{(unsigned long long)(-1)}, b{(unsigned long long)(-1)};
+    add(r, a, b);
+    std::cout << r << '\n';
 }
