@@ -1074,49 +1074,43 @@ private:
                 case 0u: {
                     // Both sizes are 1. This can never fail, and at most bumps the asize to 2.
                     const auto lo = data1[0u] + data2[0u];
-                    const auto cy = static_cast<::mp_limb_t>(lo < data1[0u]);
+                    const auto hi = static_cast<::mp_limb_t>(lo < data1[0u]);
                     rdata[0] = lo;
-                    rdata[1] = cy;
-                    rop._mp_size = sign1 ? static_cast<mpz_size_t>(cy + 1) : -static_cast<mpz_size_t>(cy + 1);
+                    rdata[1] = hi;
+                    rop._mp_size = sign1 ? static_cast<mpz_size_t>(hi + 1) : -static_cast<mpz_size_t>(hi + 1);
                     return 0;
                 }
                 case 1u: {
                     // asize1 is 2, asize2 is 1. Result could have 3 limbs.
-                    const auto lo = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[0u]) + data2[0u]);
-                    const auto hi = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[1u]) + (lo >> GMP_LIMB_BITS));
-                    rdata[0] = static_cast<::mp_limb_t>(lo);
-                    rdata[1] = static_cast<::mp_limb_t>(hi);
+                    const auto lo = data1[0u] + data2[0u];
+                    const auto hi = data1[1u] + static_cast<::mp_limb_t>(lo < data1[0u]);
+                    rdata[0] = lo;
+                    rdata[1] = hi;
                     // Set the size before checking overflow.
                     rop._mp_size = sign1 ? 2 : -2;
-                    if (hi >> GMP_LIMB_BITS) {
-                        return 1;
-                    }
-                    return 0;
+                    return static_cast<int>(hi == 0u);
                 }
                 case 2u: {
                     // asize1 is 1, asize2 is 2. Result could have 3 limbs.
-                    const auto lo = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[0u]) + data2[0u]);
-                    const auto hi = static_cast<dlimb_t>(static_cast<dlimb_t>(data2[1u]) + (lo >> GMP_LIMB_BITS));
-                    rdata[0] = static_cast<::mp_limb_t>(lo);
-                    rdata[1] = static_cast<::mp_limb_t>(hi);
+                    const auto lo = data1[0u] + data2[0u];
+                    const auto hi = data2[1u] + static_cast<::mp_limb_t>(lo < data1[0u]);
+                    rdata[0] = lo;
+                    rdata[1] = hi;
                     rop._mp_size = sign1 ? 2 : -2;
-                    if (hi >> GMP_LIMB_BITS) {
-                        return 1;
-                    }
-                    return 0;
+                    return static_cast<int>(hi == 0u);
                 }
                 case 3u: {
                     // Both have asize 2.
-                    const auto lo = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[0u]) + data2[0u]);
-                    const auto hi
-                        = static_cast<dlimb_t>((static_cast<dlimb_t>(data1[1u]) + data2[1u]) + (lo >> GMP_LIMB_BITS));
-                    rdata[0] = static_cast<::mp_limb_t>(lo);
-                    rdata[1] = static_cast<::mp_limb_t>(hi);
+                    const auto lo = data1[0u] + data2[0u];
+                    const auto hi1 = data1[1u] + data2[1u];
+                    const auto cy_lo = static_cast<::mp_limb_t>(lo < data1[0u]);
+                    const auto cy_hi1 = static_cast<::mp_limb_t>(hi1 < data1[1u]);
+                    const auto hi2 = hi1 + cy_lo;
+                    const auto cy_hi2 = static_cast<::mp_limb_t>(hi2 == 0u);
+                    rdata[0] = lo;
+                    rdata[1] = hi2;
                     rop._mp_size = sign1 ? 2 : -2;
-                    if (hi >> GMP_LIMB_BITS) {
-                        return 1;
-                    }
-                    return 0;
+                    return static_cast<int>(cy_hi1 || cy_hi2);
                 }
             }
         } else {
