@@ -29,11 +29,11 @@ see https://www.gnu.org/licenses/. */
 #ifndef MPPP_MPPP_HPP
 #define MPPP_MPPP_HPP
 
-#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <gmp.h>
 #include <iostream>
 #include <limits>
@@ -56,7 +56,8 @@ inline namespace detail
 {
 
 // TODO mpz struct checks.
-// FIXME use of std::copy for potentially overlapping ranges.
+// TODO --> config.hpp
+#define MPPP_UINT128 __uint128_t
 
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
@@ -165,6 +166,43 @@ inline const mpz_struct_t *&fail_too_many_limbs()
     return m;
 }
 
+// Small wrapper to copy limbs. We cannot use std::copy because it requires non-overlapping ranges.
+inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_limb_t *out)
+{
+    for (; begin != end; ++begin, ++out) {
+        *out = *begin;
+    }
+}
+
+template <typename, typename = void>
+struct dlimb_available : std::false_type {
+};
+
+#if defined(MPPP_UINT128)
+
+// Enable dual limb optimisation with 128bit integer if:
+// - there are no nail bits,
+// - the bit size of the limb type is 64.
+template <typename T>
+struct dlimb_available<T, typename std::enable_if<std::is_same<T, ::mp_limb_t>::value && !GMP_NAIL_BITS
+                                                  && GMP_LIMB_BITS == 64>::type> : std::true_type {
+    using type = MPPP_UINT128;
+};
+
+#endif
+
+// Enable dual limb optimisation with 64bit integer if:
+// - there are no nail bits,
+// - the bit size of the limb type is 32,
+// - the least 64-bit type on the platform has exactly 64 bits.
+template <typename T>
+struct dlimb_available<T, typename std::enable_if<std::is_same<T, ::mp_limb_t>::value && !GMP_NAIL_BITS
+                                                  && GMP_LIMB_BITS == 32
+                                                  && std::numeric_limits<std::uint_least64_t>::digits == 64>::type>
+    : std::true_type {
+    using type = std::uint_least64_t;
+};
+
 // The static integer class.
 struct static_int {
     // Special alloc value to signal static storage in the union.
@@ -182,7 +220,7 @@ struct static_int {
     // in case o is not full.
     static_int(const static_int &o) : _mp_alloc(s_alloc), _mp_size(o._mp_size)
     {
-        std::copy(o.m_limbs.begin(), o.m_limbs.begin() + abs_size(), m_limbs.begin());
+        copy_limbs(o.m_limbs.data(), o.m_limbs.data() + abs_size(), m_limbs.data());
     }
     // Delegate to the copy ctor.
     static_int(static_int &&o) noexcept : static_int(o)
@@ -194,7 +232,7 @@ struct static_int {
     {
         if (this != &other) {
             _mp_size = other._mp_size;
-            std::copy(other.m_limbs.begin(), other.m_limbs.begin() + other.abs_size(), m_limbs.begin());
+            copy_limbs(other.m_limbs.data(), other.m_limbs.data() + other.abs_size(), m_limbs.data());
         }
         return *this;
     }
@@ -223,7 +261,7 @@ struct static_int {
         } else {
             // All this is noexcept.
             _mp_size = m._mp_size;
-            std::copy(m._mp_d, m._mp_d + abs_size(), m_limbs.begin());
+            copy_limbs(m._mp_d, m._mp_d + abs_size(), m_limbs.data());
         }
     }
     template <typename Int,
@@ -949,55 +987,189 @@ public:
     {
         return mpz_view(*this);
     }
-    static ::mp_limb_t add_impl(static_int &rop, const static_int &op1, const static_int &op2)
+    template <typename SInt, typename T = ::mp_limb_t,
+              typename std::enable_if<dlimb_available<T>::value && SInt::s_size == 2, int>::type = 0>
+    static int static_add_impl(SInt &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
+                               mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
+                               mpz_size_t asize2, bool sign2)
     {
-        auto size1 = op1._mp_size, size2 = op2._mp_size;
-        const bool sign1 = size1 >= 0, sign2 = size2 >= 0;
-        const auto asize1 = sign1 ? size1 : -size1, asize2 = sign2 ? size2 : -size2;
+        using dlimb_t = typename dlimb_available<T>::type;
+        if (sign1 == sign2) {
+            // When the signs are identical, we can implement addition as a true addition.
+            const unsigned size_mask = (unsigned)(asize1 - 1) + ((unsigned)(asize2 - 1) << 1u);
+            switch (size_mask) {
+                case 0u: {
+                    const auto lo = static_cast<::mp_limb_t>(data1[0u] + data2[0u]);
+                    const auto cy = static_cast<::mp_limb_t>(lo < data1[0u]);
+                    rdata[0] = lo;
+                    rdata[1] = cy;
+                    rop._mp_size = sign1 ? static_cast<mpz_size_t>(cy + 1) : -static_cast<mpz_size_t>(cy + 1);
+                    /*
+                    // Both asizes are 1. At most the result will have 2 limbs.
+                    const auto lo = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[0u]) + data2[0u]);
+                    const auto hi = static_cast<::mp_limb_t>(lo >> GMP_LIMB_BITS);
+                    rdata[0] = static_cast<::mp_limb_t>(lo);
+                    rdata[1] = hi;
+                    // If the sign is negative, we need to negate the result.
+                    rop._mp_size = sign1 ? static_cast<mpz_size_t>(hi + 1) : -static_cast<mpz_size_t>(hi + 1);*/
+                    return 0;
+                }
+                case 1u: {
+                    // asize1 is 2, asize2 is 1. Result could have 3 limbs.
+                    const auto lo = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[0u]) + data2[0u]);
+                    const auto hi = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[1u]) + (lo >> GMP_LIMB_BITS));
+                    rdata[0] = static_cast<::mp_limb_t>(lo);
+                    rdata[1] = static_cast<::mp_limb_t>(hi);
+                    if (hi >> GMP_LIMB_BITS) {
+                        return 1;
+                    }
+                    rop._mp_size = sign1 ? 2 : -2;
+                    return 0;
+                }
+                case 2u: {
+                    // asize1 is 1, asize2 is 2. Result could have 3 limbs.
+                    const auto lo = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[0u]) + data2[0u]);
+                    const auto hi = static_cast<dlimb_t>(static_cast<dlimb_t>(data2[1u]) + (lo >> GMP_LIMB_BITS));
+                    rdata[0] = static_cast<::mp_limb_t>(lo);
+                    rdata[1] = static_cast<::mp_limb_t>(hi);
+                    if (hi >> GMP_LIMB_BITS) {
+                        return 1;
+                    }
+                    rop._mp_size = sign1 ? 2 : -2;
+                    return 0;
+                }
+                case 3u: {
+                    // Both have asize 2.
+                    const auto lo = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[0u]) + data2[0u]);
+                    const auto hi
+                        = static_cast<dlimb_t>((static_cast<dlimb_t>(data1[1u]) + data2[1u]) + (lo >> GMP_LIMB_BITS));
+                    rdata[0] = static_cast<::mp_limb_t>(lo);
+                    rdata[1] = static_cast<::mp_limb_t>(hi);
+                    if (hi >> GMP_LIMB_BITS) {
+                        return 1;
+                    }
+                    rop._mp_size = sign1 ? 2 : -2;
+                    return 0;
+                }
+            }
+        } else {
+            // When the signs differ, we need to implement addition as a subtraction.
+            throw;
+            return 1;
+        }
+    }
+    template <typename T = ::mp_limb_t, typename std::enable_if<!dlimb_available<T>::value, int>::type = 0>
+    static int add_impl(static_int &rop, const static_int &op1, const static_int &op2)
+    {
+        // TODO put the current result in rop before returning 1.
+        const auto size1 = op1._mp_size, size2 = op2._mp_size;
+        bool sign1 = true, sign2 = true;
+        auto asize1 = size1, asize2 = size2;
+        if (asize1 < 0) {
+            asize1 = -asize1;
+            sign1 = false;
+        }
+        if (asize2 < 0) {
+            asize2 = -asize2;
+            sign2 = false;
+        }
+        ::mp_limb_t *rdata = rop.m_limbs.data();
+        const ::mp_limb_t *data1 = op1.m_limbs.data(), *data2 = op2.m_limbs.data();
         if (!size1) {
             // First op is zero, copy over the second op.
             rop._mp_size = size2;
-            std::copy(op2.m_limbs.data(), op2.m_limbs.data() + asize2, rop.m_limbs.data());
+            copy_limbs(data2, data2 + asize2, rdata);
             return 0;
         }
         if (!size2) {
             // Second op is zero, copy over the first op.
             rop._mp_size = size1;
-            std::copy(op1.m_limbs.data(), op1.m_limbs.data() + asize1, rop.m_limbs.data());
+            copy_limbs(data1, data1 + asize1, rdata);
             return 0;
         }
         // Both operands are nonzero.
         if (size1 == size2) {
             // Same sizes, same sign.
-            auto cy = ::mpn_add_n(rop.m_limbs.data(), op1.m_limbs.data(), op2.m_limbs.data(),
-                                      static_cast<::mp_size_t>(asize1));
-            rop._mp_size = size1;
+            auto cy = ::mpn_add_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
             if (cy) {
+                // If there is a carry digit, we need to check if we can increase the size of the static.
+                // Otherwise, we return failure.
                 if (asize1 == static_int::s_size) {
                     return 1;
                 }
-                rop._mp_size = sign1 ? rop._mp_size + 1 : rop._mp_size - 1;
-                *(rop.m_limbs.data() + asize1) = 1;
+                rop._mp_size = sign1 ? size1 + 1 : size1 - 1;
+                *(rdata + asize1) = 1;
+            } else {
+                rop._mp_size = size1;
             }
             return 0;
         } else if (sign1 == sign2) {
             // Different sizes, same sign.
             if (asize1 > asize2) {
                 // op1 is larger.
-                auto retval = ::mpn_add(rop.m_limbs.data(), op1.m_limbs.data(), static_cast<::mp_size_t>(asize1),
-                                        op2.m_limbs.data(), static_cast<::mp_size_t>(asize2));
-                rop._mp_size = size1;
-                return retval;
+                const auto cy = ::mpn_add(rdata, data1, static_cast<::mp_size_t>(asize1), data2,
+                                          static_cast<::mp_size_t>(asize2));
+                if (cy) {
+                    if (asize1 == static_int::s_size) {
+                        return 1;
+                    }
+                    rop._mp_size = sign1 ? size1 + 1 : size1 - 1;
+                    *(rdata + asize1) = 1;
+                } else {
+                    rop._mp_size = size1;
+                }
+                return 0;
             } else {
                 // op2 is larger.
-                auto retval = ::mpn_add(rop.m_limbs.data(), op2.m_limbs.data(), static_cast<::mp_size_t>(asize2),
-                                        op1.m_limbs.data(), static_cast<::mp_size_t>(asize1));
-                rop._mp_size = size2;
-                return retval;
+                const auto cy = ::mpn_add(rdata, data2, static_cast<::mp_size_t>(asize2), data1,
+                                          static_cast<::mp_size_t>(asize1));
+                if (cy) {
+                    if (asize2 == static_int::s_size) {
+                        return 1;
+                    }
+                    rop._mp_size = sign2 ? size2 + 1 : size2 - 1;
+                    *(rdata + asize2) = 1;
+                } else {
+                    rop._mp_size = size2;
+                }
+                return 0;
             }
         }
         // Different signs.
         throw;
+    }
+    template <bool AddOrSub>
+    static int static_addsub(static_int &rop, const static_int &op1, const static_int &op2)
+    {
+        // Cache a few quantities.
+        const auto size1 = op1._mp_size, size2 = op2._mp_size;
+        // NOTE: effectively negate op2 if we are subtracting.
+        auto asize1 = size1, asize2 = static_cast<mpz_size_t>(AddOrSub ? size2 : -size2);
+        bool sign1 = true, sign2 = true;
+        if (asize1 < 0) {
+            asize1 = -asize1;
+            sign1 = false;
+        }
+        if (asize2 < 0) {
+            asize2 = -asize2;
+            sign2 = false;
+        }
+        ::mp_limb_t *rdata = rop.m_limbs.data();
+        const ::mp_limb_t *data1 = op1.m_limbs.data(), *data2 = op2.m_limbs.data();
+        // Handle the case in which at least one operand is zero.
+        if (!size2) {
+            // Second op is zero, copy over the first op.
+            rop._mp_size = size1;
+            copy_limbs(data1, data1 + asize1, rdata);
+            return 0;
+        }
+        if (!size1) {
+            // First op is zero, copy over the second op, flipping sign in case of subtraction.
+            rop._mp_size = static_cast<mpz_size_t>(AddOrSub ? size2 : -size2);
+            copy_limbs(data2, data2 + asize2, rdata);
+            return 0;
+        }
+        return static_add_impl(rop, rdata, data1, size1, asize1, sign1, data2, size2, asize2, sign2);
     }
     friend void add(integer &rop, const integer &op1, const integer &op2)
     {
@@ -1005,8 +1177,66 @@ public:
             = (unsigned)!rop.is_static() + ((unsigned)!op1.is_static() << 1u) + ((unsigned)!op2.is_static() << 2u);
         switch (mask) {
             case 0u:
-                add_impl(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
+                // All 3 statics.
+                auto fail = static_addsub<true>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
+                if (fail) {
+                    std::cout << "Adadsa\n";
+                }
         }
+    }
+    static int static_mul(static_int &rop, const static_int &op1, const static_int &op2)
+    {
+        // Cache a few quantities.
+        const auto size1 = op1._mp_size, size2 = op2._mp_size;
+        auto asize1 = size1, asize2 = size2;
+        bool sign1 = true, sign2 = true;
+        if (asize1 < 0) {
+            asize1 = -asize1;
+            sign1 = false;
+        }
+        if (asize2 < 0) {
+            asize2 = -asize2;
+            sign2 = false;
+        }
+        ::mp_limb_t *rdata = rop.m_limbs.data();
+        const ::mp_limb_t *data1 = op1.m_limbs.data(), *data2 = op2.m_limbs.data();
+        // Handle the case in which at least one operand is zero.
+        if (!size1 || !size2) {
+            rop._mp_size = 0;
+            return 0;
+        }
+        using dlimb_t = dlimb_available<::mp_limb_t>::type;
+        const unsigned size_mask = (unsigned)(asize1 - 1) + ((unsigned)(asize2 - 1) << 1u);
+        switch (size_mask) {
+            case 0u: {
+                const auto lo = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[0u]) * data2[0u]);
+                rdata[0u] = static_cast<::mp_limb_t>(lo);
+                const auto cy_limb = static_cast<::mp_limb_t>(lo >> GMP_LIMB_BITS);
+                rdata[1u] = cy_limb;
+                auto new_size = static_cast<mpz_size_t>((asize1 + asize2) - mpz_size_t(cy_limb == 0u));
+                if (sign1 != sign2) {
+                    new_size = -new_size;
+                }
+                rop._mp_size = new_size;
+                return 0;
+            }
+        }
+        throw;
+    }
+    friend void mul(integer &rop, const integer &op1, const integer &op2)
+    {
+        const unsigned mask
+            = (unsigned)!rop.is_static() + ((unsigned)!op1.is_static() << 1u) + ((unsigned)!op2.is_static() << 2u);
+        switch (mask) {
+            case 0u:
+                // All 3 statics.
+                auto fail = static_mul(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
+                if (fail) {
+                    std::cout << "Adadsa\n";
+                }
+                return;
+        }
+        throw;
     }
 
 private:

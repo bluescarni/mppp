@@ -15,6 +15,7 @@ macro(ADD_MPPP_BENCHMARK arg1)
     set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
 endmacro()
 
+ADD_MPPP_BENCHMARK(bench_arith)
 ADD_MPPP_BENCHMARK(bench_constructors)
 ADD_MPPP_BENCHMARK(bench_conversions)
 ADD_MPPP_BENCHMARK(bench_nbits)
