@@ -36,23 +36,70 @@ see https://www.gnu.org/licenses/. */
 #include <nonius/main.h++>
 #include <nonius/nonius.h++>
 
-#include <piranha/piranha.hpp>
+//#include <piranha/piranha.hpp>
 
 #include "utils.hpp"
 
 using namespace mppp;
+
+using integer = mp_integer<1>;
 
 std::mt19937 rng;
 
 NONIUS_BENCHMARK("1-limb unsigned addition", [](nonius::chronometer meter) {
     std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
                                                     std::numeric_limits<::mp_limb_t>::max());
-    auto a = integer((dist(rng) & GMP_NUMB_MASK)), b = integer((dist(rng) & GMP_NUMB_MASK));
+    // NOTE: divide by 2 so we always stay in a single limb.
+    auto a = integer((dist(rng) & GMP_NUMB_MASK) / 2u), b = integer((dist(rng) & GMP_NUMB_MASK) / 2u);
     integer c;
     meter.measure([&a, &b, &c] { add(c, a, b); });
 });
 
-NONIUS_BENCHMARK("1-limb unsigned mul", [](nonius::chronometer meter) {
+NONIUS_BENCHMARK("mpz 1-limb unsigned addition", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
+                                                    std::numeric_limits<::mp_limb_t>::max());
+    mpz_raii a, b, c;
+    const auto s1 = lex_cast((dist(rng) & GMP_NUMB_MASK) / 2u);
+    const auto s2 = lex_cast((dist(rng) & GMP_NUMB_MASK) / 2u);
+    ::mpz_set_str(&a.m_mpz, s1.data(), 10);
+    ::mpz_set_str(&b.m_mpz, s2.data(), 10);
+    meter.measure([&a, &b, &c] { ::mpz_add(&c.m_mpz, &a.m_mpz, &b.m_mpz); });
+});
+
+NONIUS_BENCHMARK("1-limb signed addition", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
+                                                    std::numeric_limits<::mp_limb_t>::max());
+    std::uniform_int_distribution<int> sdist(0, 1);
+    auto a = integer((dist(rng) & GMP_NUMB_MASK) / 2u), b = integer((dist(rng) & GMP_NUMB_MASK) / 2u);
+    if (sdist(rng)) {
+        a.negate();
+    }
+    if (sdist(rng)) {
+        b.negate();
+    }
+    integer c;
+    meter.measure([&a, &b, &c] { add(c, a, b); });
+});
+
+NONIUS_BENCHMARK("mpz 1-limb signed addition", [](nonius::chronometer meter) {
+    std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
+                                                    std::numeric_limits<::mp_limb_t>::max());
+    std::uniform_int_distribution<int> sdist(0, 1);
+    mpz_raii a, b, c;
+    const auto s1 = lex_cast((dist(rng) & GMP_NUMB_MASK) / 2u);
+    const auto s2 = lex_cast((dist(rng) & GMP_NUMB_MASK) / 2u);
+    ::mpz_set_str(&a.m_mpz, s1.data(), 10);
+    ::mpz_set_str(&b.m_mpz, s2.data(), 10);
+    if (sdist(rng)) {
+        ::mpz_neg(&a.m_mpz, &a.m_mpz);
+    }
+    if (sdist(rng)) {
+        ::mpz_neg(&b.m_mpz, &b.m_mpz);
+    }
+    meter.measure([&a, &b, &c] { ::mpz_add(&c.m_mpz, &a.m_mpz, &b.m_mpz); });
+});
+
+/*NONIUS_BENCHMARK("1-limb unsigned mul", [](nonius::chronometer meter) {
     std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
                                                     std::numeric_limits<::mp_limb_t>::max());
     auto a = integer((dist(rng) & GMP_NUMB_MASK)), b = integer((dist(rng) & GMP_NUMB_MASK));
@@ -107,19 +154,9 @@ NONIUS_BENCHMARK("piranha 2-limbs unsigned mult", [](nonius::chronometer meter) 
     d.add(b, piranha::integer{::mp_limb_t(-1) & GMP_NUMB_MASK});
     piranha::integer e;
     meter.measure([&e, &c, &d] { e.mul(c, d); });
-});
+});*/
 
-NONIUS_BENCHMARK("mpz 1-limb unsigned addition", [](nonius::chronometer meter) {
-    std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
-                                                    std::numeric_limits<::mp_limb_t>::max());
-    mpz_raii a, b, c;
-    const auto s1 = lex_cast(dist(rng) & GMP_NUMB_MASK);
-    const auto s2 = lex_cast(dist(rng) & GMP_NUMB_MASK);
-    ::mpz_set_str(&a.m_mpz, s1.data(), 10);
-    ::mpz_set_str(&b.m_mpz, s2.data(), 10);
-    meter.measure([&a, &b, &c] { ::mpz_add(&c.m_mpz, &a.m_mpz, &b.m_mpz); });
-});
-
+/*
 NONIUS_BENCHMARK("mpz 2-limbs unsigned addition", [](nonius::chronometer meter) {
     std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
                                                     std::numeric_limits<::mp_limb_t>::max());
@@ -134,4 +171,4 @@ NONIUS_BENCHMARK("mpz 2-limbs unsigned addition", [](nonius::chronometer meter) 
     ::mpz_add(&e.m_mpz, &a.m_mpz, &c.m_mpz);
     ::mpz_add(&f.m_mpz, &b.m_mpz, &d.m_mpz);
     meter.measure([&g, &e, &f] { ::mpz_add(&g.m_mpz, &e.m_mpz, &f.m_mpz); });
-});
+});*/

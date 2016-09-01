@@ -174,44 +174,16 @@ inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_li
     }
 }
 
-template <typename, typename = void>
-struct dlimb_available : std::false_type {
-};
-
-#if defined(MPPP_UINT128)
-
-// Enable dual limb optimisation with 128bit integer if:
-// - there are no nail bits,
-// - the bit size of the limb type is 64.
-template <typename T>
-struct dlimb_available<T, typename std::enable_if<std::is_same<T, ::mp_limb_t>::value && !GMP_NAIL_BITS
-                                                  && GMP_LIMB_BITS == 64>::type> : std::true_type {
-    using type = MPPP_UINT128;
-};
-
-#endif
-
-// Enable dual limb optimisation with 64bit integer if:
-// - there are no nail bits,
-// - the bit size of the limb type is 32,
-// - the least 64-bit type on the platform has exactly 64 bits.
-template <typename T>
-struct dlimb_available<T, typename std::enable_if<std::is_same<T, ::mp_limb_t>::value && !GMP_NAIL_BITS
-                                                  && GMP_LIMB_BITS == 32
-                                                  && std::numeric_limits<std::uint_least64_t>::digits == 64>::type>
-    : std::true_type {
-    using type = std::uint_least64_t;
-};
-
 // The static integer class.
+template <std::size_t SSize>
 struct static_int {
+    // Let's put a hard cap and sanity check on the static size.
+    static_assert(SSize > 0u && SSize <= 64u, "Invalid static size.");
+    using limbs_type = std::array<::mp_limb_t, SSize>;
+    // Cast it to mpz_size_t for convenience.
+    static const mpz_size_t s_size = SSize;
     // Special alloc value to signal static storage in the union.
     static const mpz_alloc_t s_alloc = -1;
-    // Number of limbs in static storage.
-    static const int s_size = 2;
-    // Let's put a hard cap and sanity check.
-    static_assert(s_size > 0 && s_size <= 64, "Invalid static size.");
-    using limbs_type = std::array<::mp_limb_t, s_size>;
     // NOTE: def ctor leaves the limbs uninited.
     static_int() : _mp_alloc(s_alloc), _mp_size(0)
     {
@@ -249,7 +221,7 @@ struct static_int {
     // Size in limbs (absolute value of the _mp_size member).
     mpz_size_t abs_size() const
     {
-        return static_cast<mpz_size_t>(_mp_size >= 0 ? _mp_size : -_mp_size);
+        return _mp_size >= 0 ? _mp_size : -_mp_size;
     }
     // Construct from mpz. If the size in limbs is too large, it will set a global
     // thread local pointer referring to m, so that the constructed mpz can be re-used.
@@ -481,9 +453,10 @@ struct static_int {
 };
 
 // {static_int,mpz} union.
+template <std::size_t SSize>
 union integer_union {
 public:
-    using s_storage = static_int;
+    using s_storage = static_int<SSize>;
     using d_storage = mpz_struct_t;
     // Utility function to shallow copy "from" into "to".
     static void mpz_shallow_copy(mpz_struct_t &to, const mpz_struct_t &from)
@@ -671,15 +644,56 @@ public:
         ::new (static_cast<void *>(&m_dy)) d_storage;
         mpz_shallow_copy(m_dy, tmp_mpz);
     }
+    void negate()
+    {
+        // NOTE: _mp_size is part of the common initial sequence.
+        m_st._mp_size = -m_st._mp_size;
+    }
 
 private:
     s_storage m_st;
     d_storage m_dy;
 };
+
+// Metaprogramming to select the strategy to perform addition on static integers.
+// Case 0 (default): use the vanilla mpn functions.
+template <typename SInt, typename = void>
+struct static_add_algo : std::integral_constant<int, 0> {
+};
+
+// Case 1: no nails and static integer has 1 limb.
+template <typename SInt>
+struct static_add_algo<SInt, typename std::enable_if<!GMP_NAIL_BITS && SInt::s_size == 1>::type>
+    : std::integral_constant<int, 1> {
+};
+
+// Case 2: 32-bit architecture, no nails, exact-width 64-bit type available, and static integer has 2 limbs.
+template <typename SInt>
+struct static_add_algo<SInt, typename std::enable_if<!GMP_NAIL_BITS && GMP_LIMB_BITS == 32
+                                                     && std::numeric_limits<std::uint_least64_t>::digits == 64
+                                                     && SInt::s_size == 2>::type> : std::integral_constant<int, 2> {
+    using dlimb_t = std::uint_least64_t;
+};
+
+#if defined(MPPP_UINT128)
+
+// Case 3: 64-bit architecture, no nails, exact-width 128-bit type available, and static integer has 2 limbs.
+template <typename SInt>
+struct static_add_algo<SInt, typename std::enable_if<!GMP_NAIL_BITS && GMP_LIMB_BITS == 64 && SInt::s_size == 2>::type>
+    : std::integral_constant<int, 3> {
+    using dlimb_t = MPPP_UINT128;
+};
+
+#endif
 }
 
-class integer
+template <std::size_t SSize>
+class mp_integer
 {
+    // The underlying static int.
+    using s_int = static_int<SSize>;
+    // TODO maybe move the enablers next to where they are used.
+    // Enabler for generic ctor.
     template <typename T>
     using generic_ctor_enabler = typename std::enable_if<is_supported_interop<T>::value, int>::type;
     // Conversion operator.
@@ -695,13 +709,13 @@ class integer
         typename std::enable_if<is_supported_integral<T>::value && std::is_signed<T>::value, int>::type;
     // Static conversion to bool.
     template <typename T, typename std::enable_if<std::is_same<T, bool>::value, int>::type = 0>
-    static T conversion_impl(const static_int &n)
+    static T conversion_impl(const s_int &n)
     {
         return n._mp_size != 0;
     }
     // Static conversion to unsigned ints.
     template <typename T, uint_conversion_enabler<T> = 0>
-    static T conversion_impl(const static_int &n)
+    static T conversion_impl(const s_int &n)
     {
         // Handle zero.
         if (!n._mp_size) {
@@ -725,7 +739,7 @@ class integer
     }
     // Static conversion to signed ints.
     template <typename T, int_conversion_enabler<T> = 0>
-    static T conversion_impl(const static_int &n)
+    static T conversion_impl(const s_int &n)
     {
         using uint_t = typename std::make_unsigned<T>::type;
         // Handle zero.
@@ -754,7 +768,7 @@ class integer
     }
     // Static conversion to floating-point.
     template <typename T, typename std::enable_if<is_supported_float<T>::value, int>::type = 0>
-    static T conversion_impl(const static_int &n)
+    static T conversion_impl(const s_int &n)
     {
         return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
@@ -901,10 +915,10 @@ class integer
     // mpz view class.
     class mpz_view
     {
-        using static_mpz_view = static_int::static_mpz_view;
+        using static_mpz_view = typename s_int::static_mpz_view;
 
     public:
-        explicit mpz_view(const integer &n)
+        explicit mpz_view(const mp_integer &n)
             : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : static_mpz_view{}),
               m_ptr(n.is_static() ? m_static_view : &(n.m_int.g_dy()))
         {
@@ -928,26 +942,26 @@ class integer
     };
 
 public:
-    integer() = default;
-    integer(const integer &other) = default;
-    integer(integer &&other) = default;
+    mp_integer() = default;
+    mp_integer(const mp_integer &other) = default;
+    mp_integer(mp_integer &&other) = default;
     template <typename T, generic_ctor_enabler<T> = 0>
-    explicit integer(T x) : m_int(x)
+    explicit mp_integer(T x) : m_int(x)
     {
     }
-    explicit integer(const char *s, int base = 10) : m_int(s, base)
+    explicit mp_integer(const char *s, int base = 10) : m_int(s, base)
     {
     }
-    explicit integer(const std::string &s, int base = 10) : integer(s.c_str(), base)
+    explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
     {
     }
-    integer &operator=(const integer &other) = default;
-    integer &operator=(integer &&other) = default;
+    mp_integer &operator=(const mp_integer &other) = default;
+    mp_integer &operator=(mp_integer &&other) = default;
     bool is_static() const
     {
         return m_int.is_static();
     }
-    friend std::ostream &operator<<(std::ostream &os, const integer &n)
+    friend std::ostream &operator<<(std::ostream &os, const mp_integer &n)
     {
         return os << n.to_string();
     }
@@ -979,6 +993,10 @@ public:
         }
         m_int.promote();
     }
+    void negate()
+    {
+        m_int.negate();
+    }
     std::size_t nbits() const
     {
         return ::mpz_sizeinbase(get_mpz_view(), 2);
@@ -987,31 +1005,79 @@ public:
     {
         return mpz_view(*this);
     }
-    template <typename SInt, typename T = ::mp_limb_t,
-              typename std::enable_if<dlimb_available<T>::value && SInt::s_size == 2, int>::type = 0>
+
+private:
+    // General implementation via mpn.
+    template <typename SInt, typename std::enable_if<static_add_algo<SInt>::value == 0, int>::type = 0>
     static int static_add_impl(SInt &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
                                mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
                                mpz_size_t asize2, bool sign2)
     {
-        using dlimb_t = typename dlimb_available<T>::type;
+    }
+    // Optimization for single-limb statics.
+    template <typename SInt, typename std::enable_if<static_add_algo<SInt>::value == 1, int>::type = 0>
+    static int static_add_impl(SInt &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
+                               mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
+                               mpz_size_t asize2, bool sign2)
+    {
+        // NOTE: both sizes have to be 1 here.
+        assert(asize1 == 1 && asize2 == 1);
+        if (sign1 == sign2) {
+            // When the signs are identical, we can implement addition as a true addition.
+            auto tmp = data1[0] + data2[0];
+            // Detect overflow in the result.
+            const int retval = tmp < data1[0];
+            // Assign the output. The abs size will always be 1 (in case of overflow
+            // we return the error flag).
+            rdata[0] = tmp;
+            if (!sign1) {
+                rop._mp_size = -1;
+            }
+            return retval;
+        } else {
+            // When the signs differ, we need to implement addition as a subtraction.
+            if (data1[0] >= data2[0]) {
+                // op1 has larger absolute value than op2.
+                const auto tmp = data1[0] - data2[0];
+                rdata[0] = tmp;
+                // Size is either 1 or 0 (0 iff abs(op1) == abs(op2)).
+                rop._mp_size = tmp != 0;
+                if (!sign1) {
+                    rop._mp_size = -rop._mp_size;
+                }
+            } else {
+                const auto tmp = data2[0] - data1[0];
+                rdata[0] = tmp;
+                rop._mp_size = tmp != 0;
+                if (!sign2) {
+                    rop._mp_size = -rop._mp_size;
+                }
+            }
+            return 0;
+        }
+    }
+    // Optimization for two-limbs statics via double-limb type.
+    template <typename SInt,
+              typename std::enable_if<static_add_algo<SInt>::value == 2 || static_add_algo<SInt>::value == 3, int>::type
+              = 0>
+    static int static_add_impl(SInt &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
+                               mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
+                               mpz_size_t asize2, bool sign2)
+    {
+        using dlimb_t = typename static_add_algo<SInt>::dlimb_t;
+        // abs sizes must be 1 or 2.
+        assert(asize1 <= 2 && asize2 <= 2 && asize1 > 0 && asize2 > 0);
         if (sign1 == sign2) {
             // When the signs are identical, we can implement addition as a true addition.
             const unsigned size_mask = (unsigned)(asize1 - 1) + ((unsigned)(asize2 - 1) << 1u);
             switch (size_mask) {
                 case 0u: {
-                    const auto lo = static_cast<::mp_limb_t>(data1[0u] + data2[0u]);
+                    // Both sizes are 1. This can never fail, and at most bumps the asize to 2.
+                    const auto lo = data1[0u] + data2[0u];
                     const auto cy = static_cast<::mp_limb_t>(lo < data1[0u]);
                     rdata[0] = lo;
                     rdata[1] = cy;
                     rop._mp_size = sign1 ? static_cast<mpz_size_t>(cy + 1) : -static_cast<mpz_size_t>(cy + 1);
-                    /*
-                    // Both asizes are 1. At most the result will have 2 limbs.
-                    const auto lo = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[0u]) + data2[0u]);
-                    const auto hi = static_cast<::mp_limb_t>(lo >> GMP_LIMB_BITS);
-                    rdata[0] = static_cast<::mp_limb_t>(lo);
-                    rdata[1] = hi;
-                    // If the sign is negative, we need to negate the result.
-                    rop._mp_size = sign1 ? static_cast<mpz_size_t>(hi + 1) : -static_cast<mpz_size_t>(hi + 1);*/
                     return 0;
                 }
                 case 1u: {
@@ -1020,10 +1086,11 @@ public:
                     const auto hi = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[1u]) + (lo >> GMP_LIMB_BITS));
                     rdata[0] = static_cast<::mp_limb_t>(lo);
                     rdata[1] = static_cast<::mp_limb_t>(hi);
+                    // Set the size before checking overflow.
+                    rop._mp_size = sign1 ? 2 : -2;
                     if (hi >> GMP_LIMB_BITS) {
                         return 1;
                     }
-                    rop._mp_size = sign1 ? 2 : -2;
                     return 0;
                 }
                 case 2u: {
@@ -1032,10 +1099,10 @@ public:
                     const auto hi = static_cast<dlimb_t>(static_cast<dlimb_t>(data2[1u]) + (lo >> GMP_LIMB_BITS));
                     rdata[0] = static_cast<::mp_limb_t>(lo);
                     rdata[1] = static_cast<::mp_limb_t>(hi);
+                    rop._mp_size = sign1 ? 2 : -2;
                     if (hi >> GMP_LIMB_BITS) {
                         return 1;
                     }
-                    rop._mp_size = sign1 ? 2 : -2;
                     return 0;
                 }
                 case 3u: {
@@ -1045,10 +1112,10 @@ public:
                         = static_cast<dlimb_t>((static_cast<dlimb_t>(data1[1u]) + data2[1u]) + (lo >> GMP_LIMB_BITS));
                     rdata[0] = static_cast<::mp_limb_t>(lo);
                     rdata[1] = static_cast<::mp_limb_t>(hi);
+                    rop._mp_size = sign1 ? 2 : -2;
                     if (hi >> GMP_LIMB_BITS) {
                         return 1;
                     }
-                    rop._mp_size = sign1 ? 2 : -2;
                     return 0;
                 }
             }
@@ -1058,8 +1125,65 @@ public:
             return 1;
         }
     }
+    template <bool AddOrSub>
+    static int static_addsub(s_int &rop, const s_int &op1, const s_int &op2)
+    {
+        // Cache a few quantities.
+        const auto size1 = op1._mp_size, size2 = op2._mp_size;
+        // NOTE: effectively negate op2 if we are subtracting.
+        mpz_size_t asize1 = size1, asize2 = AddOrSub ? size2 : -size2;
+        bool sign1 = true, sign2 = true;
+        if (asize1 < 0) {
+            asize1 = -asize1;
+            sign1 = false;
+        }
+        if (asize2 < 0) {
+            asize2 = -asize2;
+            sign2 = false;
+        }
+        ::mp_limb_t *rdata = rop.m_limbs.data();
+        const ::mp_limb_t *data1 = op1.m_limbs.data(), *data2 = op2.m_limbs.data();
+        // Handle the case in which at least one operand is zero.
+        if (!size2) {
+            // Second op is zero, copy over the first op.
+            rop._mp_size = size1;
+            copy_limbs(data1, data1 + asize1, rdata);
+            return 0;
+        }
+        if (!size1) {
+            // First op is zero, copy over the second op, flipping sign in case of subtraction.
+            rop._mp_size = AddOrSub ? size2 : -size2;
+            copy_limbs(data2, data2 + asize2, rdata);
+            return 0;
+        }
+        return static_add_impl<s_int>(rop, rdata, data1, size1, asize1, sign1, data2, size2, asize2, sign2);
+    }
+
+public:
+    friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
+    {
+        const unsigned mask
+            = (unsigned)!rop.is_static() + ((unsigned)!op1.is_static() << 1u) + ((unsigned)!op2.is_static() << 2u);
+        switch (mask) {
+            case 0u:
+                // All 3 statics.
+                auto fail = static_addsub<true>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
+                if (fail) {
+                    throw;
+                }
+        }
+    }
+#if 0
+    template <typename SInt, typename T = ::mp_limb_t,
+              typename std::enable_if<dlimb_available<T>::value && SInt::s_size == 2, int>::type = 0>
+    static int static_add_impl(SInt &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
+                               mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
+                               mpz_size_t asize2, bool sign2)
+    {
+
+    }
     template <typename T = ::mp_limb_t, typename std::enable_if<!dlimb_available<T>::value, int>::type = 0>
-    static int add_impl(static_int &rop, const static_int &op1, const static_int &op2)
+    static int add_impl(s_int &rop, const s_int &op1, const s_int &op2)
     {
         // TODO put the current result in rop before returning 1.
         const auto size1 = op1._mp_size, size2 = op2._mp_size;
@@ -1094,7 +1218,7 @@ public:
             if (cy) {
                 // If there is a carry digit, we need to check if we can increase the size of the static.
                 // Otherwise, we return failure.
-                if (asize1 == static_int::s_size) {
+                if (asize1 == s_int::s_size) {
                     return 1;
                 }
                 rop._mp_size = sign1 ? size1 + 1 : size1 - 1;
@@ -1110,7 +1234,7 @@ public:
                 const auto cy = ::mpn_add(rdata, data1, static_cast<::mp_size_t>(asize1), data2,
                                           static_cast<::mp_size_t>(asize2));
                 if (cy) {
-                    if (asize1 == static_int::s_size) {
+                    if (asize1 == s_int::s_size) {
                         return 1;
                     }
                     rop._mp_size = sign1 ? size1 + 1 : size1 - 1;
@@ -1124,7 +1248,7 @@ public:
                 const auto cy = ::mpn_add(rdata, data2, static_cast<::mp_size_t>(asize2), data1,
                                           static_cast<::mp_size_t>(asize1));
                 if (cy) {
-                    if (asize2 == static_int::s_size) {
+                    if (asize2 == s_int::s_size) {
                         return 1;
                     }
                     rop._mp_size = sign2 ? size2 + 1 : size2 - 1;
@@ -1138,53 +1262,7 @@ public:
         // Different signs.
         throw;
     }
-    template <bool AddOrSub>
-    static int static_addsub(static_int &rop, const static_int &op1, const static_int &op2)
-    {
-        // Cache a few quantities.
-        const auto size1 = op1._mp_size, size2 = op2._mp_size;
-        // NOTE: effectively negate op2 if we are subtracting.
-        auto asize1 = size1, asize2 = static_cast<mpz_size_t>(AddOrSub ? size2 : -size2);
-        bool sign1 = true, sign2 = true;
-        if (asize1 < 0) {
-            asize1 = -asize1;
-            sign1 = false;
-        }
-        if (asize2 < 0) {
-            asize2 = -asize2;
-            sign2 = false;
-        }
-        ::mp_limb_t *rdata = rop.m_limbs.data();
-        const ::mp_limb_t *data1 = op1.m_limbs.data(), *data2 = op2.m_limbs.data();
-        // Handle the case in which at least one operand is zero.
-        if (!size2) {
-            // Second op is zero, copy over the first op.
-            rop._mp_size = size1;
-            copy_limbs(data1, data1 + asize1, rdata);
-            return 0;
-        }
-        if (!size1) {
-            // First op is zero, copy over the second op, flipping sign in case of subtraction.
-            rop._mp_size = static_cast<mpz_size_t>(AddOrSub ? size2 : -size2);
-            copy_limbs(data2, data2 + asize2, rdata);
-            return 0;
-        }
-        return static_add_impl(rop, rdata, data1, size1, asize1, sign1, data2, size2, asize2, sign2);
-    }
-    friend void add(integer &rop, const integer &op1, const integer &op2)
-    {
-        const unsigned mask
-            = (unsigned)!rop.is_static() + ((unsigned)!op1.is_static() << 1u) + ((unsigned)!op2.is_static() << 2u);
-        switch (mask) {
-            case 0u:
-                // All 3 statics.
-                auto fail = static_addsub<true>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
-                if (fail) {
-                    std::cout << "Adadsa\n";
-                }
-        }
-    }
-    static int static_mul(static_int &rop, const static_int &op1, const static_int &op2)
+    static int static_mul(s_int &rop, const s_int &op1, const s_int &op2)
     {
         // Cache a few quantities.
         const auto size1 = op1._mp_size, size2 = op2._mp_size;
@@ -1223,7 +1301,7 @@ public:
         }
         throw;
     }
-    friend void mul(integer &rop, const integer &op1, const integer &op2)
+    friend void mul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
         const unsigned mask
             = (unsigned)!rop.is_static() + ((unsigned)!op1.is_static() << 1u) + ((unsigned)!op2.is_static() << 2u);
@@ -1238,9 +1316,10 @@ public:
         }
         throw;
     }
+#endif
 
 private:
-    integer_union m_int;
+    integer_union<SSize> m_int;
 };
 }
 

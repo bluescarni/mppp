@@ -135,4 +135,18 @@ inline std::string lex_cast(const T &x)
 }
 }
 
+// A macro for checking that an expression throws a specific exception object satisfying a predicate.
+#define REQUIRE_THROWS_PREDICATE(expr, exc, pred)                                                                      \
+    {                                                                                                                  \
+        bool thrown_checked = false;                                                                                   \
+        try {                                                                                                          \
+            expr;                                                                                                      \
+        } catch (const exc &e) {                                                                                       \
+            if (pred(e)) {                                                                                             \
+                thrown_checked = true;                                                                                 \
+            }                                                                                                          \
+        }                                                                                                              \
+        REQUIRE(thrown_checked);                                                                                       \
+    }
+
 #endif
