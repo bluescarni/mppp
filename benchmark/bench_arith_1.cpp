@@ -36,7 +36,7 @@ see https://www.gnu.org/licenses/. */
 #include <nonius/main.h++>
 #include <nonius/nonius.h++>
 
-//#include <piranha/piranha.hpp>
+#include <piranha/piranha.hpp>
 
 #include "utils.hpp"
 
@@ -105,16 +105,16 @@ NONIUS_BENCHMARK("mpz 1-limb signed addition", [](nonius::chronometer meter) {
     auto a = integer((dist(rng) & GMP_NUMB_MASK)), b = integer((dist(rng) & GMP_NUMB_MASK));
     integer c;
     meter.measure([&a, &b, &c] { mul(c, a, b); });
-});
+});*/
 
 NONIUS_BENCHMARK("piranha 1-limb unsigned addition", [](nonius::chronometer meter) {
     std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
                                                     std::numeric_limits<::mp_limb_t>::max());
-    auto a = piranha::integer((dist(rng) & GMP_NUMB_MASK)), b = piranha::integer((dist(rng) & GMP_NUMB_MASK));
+    auto a = piranha::integer((dist(rng) & GMP_NUMB_MASK) / 2u), b = piranha::integer((dist(rng) & GMP_NUMB_MASK) / 2u);
     piranha::integer c;
     meter.measure([&a, &b, &c] { c.add(a, b); });
 });
-
+/*
 NONIUS_BENCHMARK("piranha 1-limb unsigned mult", [](nonius::chronometer meter) {
     std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
                                                     std::numeric_limits<::mp_limb_t>::max());

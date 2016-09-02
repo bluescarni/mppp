@@ -667,24 +667,11 @@ struct static_add_algo<SInt, typename std::enable_if<!GMP_NAIL_BITS && SInt::s_s
     : std::integral_constant<int, 1> {
 };
 
-// Case 2: 32-bit architecture, no nails, exact-width 64-bit type available, and static integer has 2 limbs.
+// Case 2: no nails and static integer has 2 limbs.
 template <typename SInt>
-struct static_add_algo<SInt, typename std::enable_if<!GMP_NAIL_BITS && GMP_LIMB_BITS == 32
-                                                     && std::numeric_limits<std::uint_least64_t>::digits == 64
-                                                     && SInt::s_size == 2>::type> : std::integral_constant<int, 2> {
-    using dlimb_t = std::uint_least64_t;
+struct static_add_algo<SInt, typename std::enable_if<!GMP_NAIL_BITS && SInt::s_size == 2>::type>
+    : std::integral_constant<int, 2> {
 };
-
-#if defined(MPPP_UINT128)
-
-// Case 3: 64-bit architecture, no nails, exact-width 128-bit type available, and static integer has 2 limbs.
-template <typename SInt>
-struct static_add_algo<SInt, typename std::enable_if<!GMP_NAIL_BITS && GMP_LIMB_BITS == 64 && SInt::s_size == 2>::type>
-    : std::integral_constant<int, 3> {
-    using dlimb_t = MPPP_UINT128;
-};
-
-#endif
 }
 
 template <std::size_t SSize>
@@ -1056,20 +1043,17 @@ private:
             return 0;
         }
     }
-    // Optimization for two-limbs statics via double-limb type.
-    template <typename SInt,
-              typename std::enable_if<static_add_algo<SInt>::value == 2 || static_add_algo<SInt>::value == 3, int>::type
-              = 0>
+    // Optimization for two-limbs statics.
+    template <typename SInt, typename std::enable_if<static_add_algo<SInt>::value == 2, int>::type = 0>
     static int static_add_impl(SInt &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
                                mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
                                mpz_size_t asize2, bool sign2)
     {
-        using dlimb_t = typename static_add_algo<SInt>::dlimb_t;
         // abs sizes must be 1 or 2.
         assert(asize1 <= 2 && asize2 <= 2 && asize1 > 0 && asize2 > 0);
+        const unsigned size_mask = (unsigned)(asize1 - 1) + ((unsigned)(asize2 - 1) << 1u);
         if (sign1 == sign2) {
             // When the signs are identical, we can implement addition as a true addition.
-            const unsigned size_mask = (unsigned)(asize1 - 1) + ((unsigned)(asize2 - 1) << 1u);
             switch (size_mask) {
                 case 0u: {
                     // Both sizes are 1. This can never fail, and at most bumps the asize to 2.
@@ -1086,7 +1070,6 @@ private:
                     const auto hi = data1[1u] + static_cast<::mp_limb_t>(lo < data1[0u]);
                     rdata[0] = lo;
                     rdata[1] = hi;
-                    // Set the size before checking overflow.
                     rop._mp_size = sign1 ? 2 : -2;
                     return static_cast<int>(hi == 0u);
                 }
