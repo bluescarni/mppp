@@ -51,6 +51,8 @@ see https://www.gnu.org/licenses/. */
 // - streaming.
 // - utility funcs.
 // - promote() in tests.
+// - need comprehensive testing for all the special cases for limbs (1 vs 1, 1 vs 2, 2 vs 1, 2 vs 2),
+//   with all the corner cases around upper limits for limbs.
 
 static int ntries = 1000;
 
