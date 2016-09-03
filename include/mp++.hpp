@@ -1327,68 +1327,6 @@ public:
         }
     }
 #if 0
-    template <typename SInt, typename T = ::mp_limb_t,
-              typename std::enable_if<dlimb_available<T>::value && SInt::s_size == 2, int>::type = 0>
-    static int static_add_impl(SInt &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
-                               mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
-                               mpz_size_t asize2, bool sign2)
-    {
-
-    }
-    template <typename T = ::mp_limb_t, typename std::enable_if<!dlimb_available<T>::value, int>::type = 0>
-    static int add_impl(s_int &rop, const s_int &op1, const s_int &op2)
-    {
-        // Both operands are nonzero.
-        if (size1 == size2) {
-            // Same sizes, same sign.
-            auto cy = ::mpn_add_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
-            if (cy) {
-                // If there is a carry digit, we need to check if we can increase the size of the static.
-                // Otherwise, we return failure.
-                if (asize1 == s_int::s_size) {
-                    return 1;
-                }
-                rop._mp_size = sign1 ? size1 + 1 : size1 - 1;
-                *(rdata + asize1) = 1;
-            } else {
-                rop._mp_size = size1;
-            }
-            return 0;
-        } else if (sign1 == sign2) {
-            // Different sizes, same sign.
-            if (asize1 > asize2) {
-                // op1 is larger.
-                const auto cy = ::mpn_add(rdata, data1, static_cast<::mp_size_t>(asize1), data2,
-                                          static_cast<::mp_size_t>(asize2));
-                if (cy) {
-                    if (asize1 == s_int::s_size) {
-                        return 1;
-                    }
-                    rop._mp_size = sign1 ? size1 + 1 : size1 - 1;
-                    *(rdata + asize1) = 1;
-                } else {
-                    rop._mp_size = size1;
-                }
-                return 0;
-            } else {
-                // op2 is larger.
-                const auto cy = ::mpn_add(rdata, data2, static_cast<::mp_size_t>(asize2), data1,
-                                          static_cast<::mp_size_t>(asize1));
-                if (cy) {
-                    if (asize2 == s_int::s_size) {
-                        return 1;
-                    }
-                    rop._mp_size = sign2 ? size2 + 1 : size2 - 1;
-                    *(rdata + asize2) = 1;
-                } else {
-                    rop._mp_size = size2;
-                }
-                return 0;
-            }
-        }
-        // Different signs.
-        throw;
-    }
     static int static_mul(s_int &rop, const s_int &op1, const s_int &op2)
     {
         // Cache a few quantities.
