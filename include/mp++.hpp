@@ -987,8 +987,8 @@ private:
                                                             : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
     // General implementation via mpn.
     static int static_add_impl(s_int &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
-                               mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
-                               mpz_size_t asize2, bool sign2, const std::integral_constant<int, 0> &)
+                               mpz_size_t asize1, int sign1, const ::mp_limb_t *data2, mpz_size_t size2,
+                               mpz_size_t asize2, int sign2, const std::integral_constant<int, 0> &)
     {
         // mpn functions require nonzero arguments.
         assert(asize1 > 0 && asize2 > 0);
@@ -1014,7 +1014,7 @@ private:
                         rop._mp_size = size1;
                         return 1;
                     }
-                    rop._mp_size = sign1 ? (size1 + 1) : (size1 - 1);
+                    rop._mp_size = size1 + sign1;
                     // NOTE: there should be no need to use GMP_NUMB_MASK here.
                     rdata[asize1] = 1;
                 } else {
@@ -1036,7 +1036,7 @@ private:
                         rop._mp_size = size2;
                         return 1;
                     }
-                    rop._mp_size = sign2 ? (size2 + 1) : (size2 - 1);
+                    rop._mp_size = size2 + sign2;
                     rdata[asize2] = 1;
                 } else {
                     rop._mp_size = size2;
@@ -1064,7 +1064,7 @@ private:
                         break;
                     }
                 }
-                rop._mp_size = sign1 ? s : -s;
+                rop._mp_size = (sign1 == 1) ? s : -s;
             } else {
                 // abs(op2) > abs(op1).
                 ::mp_limb_t br;
@@ -1081,7 +1081,7 @@ private:
                         break;
                     }
                 }
-                rop._mp_size = sign2 ? s : -s;
+                rop._mp_size = (sign2 == 1) ? s : -s;
             }
             return 0;
         }
@@ -1089,8 +1089,8 @@ private:
     }
     // Optimization for single-limb statics with no nails.
     static int static_add_impl(s_int &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
-                               mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
-                               mpz_size_t asize2, bool sign2, const std::integral_constant<int, 1> &)
+                               mpz_size_t asize1, int sign1, const ::mp_limb_t *data2, mpz_size_t size2,
+                               mpz_size_t asize2, int sign2, const std::integral_constant<int, 1> &)
     {
         // NOTE: both sizes have to be 1 here.
         assert(asize1 == 1 && asize2 == 1);
@@ -1100,7 +1100,7 @@ private:
             // Detect overflow in the result.
             const int retval = tmp < data1[0];
             // Assign the output. The abs size will always be 1.
-            rop._mp_size = sign1 ? 1 : -1;
+            rop._mp_size = sign1;
             rdata[0] = tmp;
             return retval;
         } else {
@@ -1110,12 +1110,12 @@ private:
                 const auto tmp = data1[0] - data2[0];
                 // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
                 const mpz_size_t s = (tmp != 0u);
-                rop._mp_size = sign1 ? s : -s;
+                rop._mp_size = (sign1 == 1) ? s : -s;
                 rdata[0] = tmp;
             } else {
                 const auto tmp = data2[0] - data1[0];
                 // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
-                rop._mp_size = sign2 ? 1 : -1;
+                rop._mp_size = sign2;
                 rdata[0] = tmp;
             }
             return 0;
@@ -1145,8 +1145,8 @@ private:
         return 0;
     }
     static int static_add_impl(s_int &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
-                               mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
-                               mpz_size_t asize2, bool sign2, const std::integral_constant<int, 2> &)
+                               mpz_size_t asize1, int sign1, const ::mp_limb_t *data2, mpz_size_t size2,
+                               mpz_size_t asize2, int sign2, const std::integral_constant<int, 2> &)
     {
         // abs sizes must be 1 or 2.
         assert(asize1 <= 2 && asize2 <= 2 && asize1 > 0 && asize2 > 0);
@@ -1158,7 +1158,7 @@ private:
                     // Both sizes are 1. This can never fail, and at most bumps the asize to 2.
                     const auto lo = data1[0] + data2[0];
                     const auto hi = static_cast<::mp_limb_t>(lo < data1[0]);
-                    rop._mp_size = sign1 ? static_cast<mpz_size_t>(hi + 1u) : -static_cast<mpz_size_t>(hi + 1u);
+                    rop._mp_size = (sign1 == 1) ? static_cast<mpz_size_t>(hi + 1u) : -static_cast<mpz_size_t>(hi + 1u);
                     rdata[0] = lo;
                     rdata[1] = hi;
                     return 0;
@@ -1167,7 +1167,7 @@ private:
                     // asize1 is 2, asize2 is 1. Result could have 3 limbs.
                     const auto lo = data1[0] + data2[0];
                     const auto hi = data1[1] + static_cast<::mp_limb_t>(lo < data1[0]);
-                    rop._mp_size = sign1 ? 2 : -2;
+                    rop._mp_size = sign1 + sign1;
                     rdata[0] = lo;
                     rdata[1] = hi;
                     return static_cast<int>(hi == 0u);
@@ -1176,7 +1176,7 @@ private:
                     // asize1 is 1, asize2 is 2. Result could have 3 limbs.
                     const auto lo = data1[0] + data2[0];
                     const auto hi = data2[1] + static_cast<::mp_limb_t>(lo < data1[0]);
-                    rop._mp_size = sign1 ? 2 : -2;
+                    rop._mp_size = sign1 + sign1;
                     rdata[0] = lo;
                     rdata[1] = hi;
                     return static_cast<int>(hi == 0u);
@@ -1192,7 +1192,7 @@ private:
                     const auto cy_hi1 = static_cast<::mp_limb_t>(hi1 < data1[1]);
                     const auto hi2 = hi1 + cy_lo;
                     const auto cy_hi2 = static_cast<::mp_limb_t>(hi2 == 0u);
-                    rop._mp_size = sign1 ? 2 : -2;
+                    rop._mp_size = sign1 + sign1;
                     rdata[0] = lo;
                     rdata[1] = hi2;
                     return static_cast<int>(cy_hi1 || cy_hi2);
@@ -1207,7 +1207,7 @@ private:
                         const auto tmp = data1[0] - data2[0];
                         // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
                         const mpz_size_t s = (tmp != 0u);
-                        rop._mp_size = sign1 ? s : -s;
+                        rop._mp_size = (sign1 == 1) ? s : -s;
                         rdata[0] = tmp;
                         return 0;
                     }
@@ -1217,7 +1217,7 @@ private:
                         // Subtract the borrow, if any, from the top limb.
                         const auto hi = data1[1] - static_cast<::mp_limb_t>(data1[0] < data2[0]);
                         // The asize can be 2 or 1. It will be 1 if the new hi limb is 0.
-                        rop._mp_size = sign1 ? (2 - (hi == 0u)) : -(2 - (hi == 0u));
+                        rop._mp_size = (sign1 == 1) ? (2 - (hi == 0u)) : -(2 - (hi == 0u));
                         rdata[0] = lo;
                         rdata[1] = hi;
                         return 0;
@@ -1235,7 +1235,7 @@ private:
                         const auto hi = data1[1] - data2[1] - static_cast<::mp_limb_t>(data1[0] < data2[0]);
                         // asize can be 0, 1 or 2.
                         const mpz_size_t s = (hi == 0u) ? (lo == 0u ? 0 : 1) : 2;
-                        rop._mp_size = sign1 ? s : -s;
+                        rop._mp_size = (sign1 == 1) ? s : -s;
                         rdata[0] = lo;
                         rdata[1] = hi;
                         return 0;
@@ -1246,7 +1246,7 @@ private:
                     case 0u: {
                         const auto tmp = data2[0] - data1[0];
                         // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
-                        rop._mp_size = sign2 ? 1 : -1;
+                        rop._mp_size = sign2;
                         rdata[0] = tmp;
                         return 0;
                     }
@@ -1256,7 +1256,7 @@ private:
                         // asize1 is 1, asize2 is 2.
                         const auto lo = data2[0] - data1[0];
                         const auto hi = data2[1] - static_cast<::mp_limb_t>(data2[0] < data1[0]);
-                        rop._mp_size = sign2 ? (2 - (hi == 0u)) : -(2 - (hi == 0u));
+                        rop._mp_size = (sign2 == 1) ? (2 - (hi == 0u)) : -(2 - (hi == 0u));
                         rdata[0] = lo;
                         rdata[1] = hi;
                         return 0;
@@ -1267,7 +1267,7 @@ private:
                         assert(data2[0] >= data1[0] || data2[1] > data1[1]);
                         const auto hi = data2[1] - data1[1] - static_cast<::mp_limb_t>(data2[0] < data1[0]);
                         // asize can be 1 or 2, but not zero as we know abs(op1) != abs(op2).
-                        rop._mp_size = sign2 ? (1 + (hi != 0u)) : -(1 + (hi != 0u));
+                        rop._mp_size = (sign2 == 1) ? (1 + (hi != 0u)) : -(1 + (hi != 0u));
                         rdata[0] = lo;
                         rdata[1] = hi;
                         return 0;
@@ -1284,14 +1284,14 @@ private:
         const auto size1 = op1._mp_size, size2 = op2._mp_size;
         // NOTE: effectively negate op2 if we are subtracting.
         mpz_size_t asize1 = size1, asize2 = AddOrSub ? size2 : -size2;
-        bool sign1 = true, sign2 = true;
+        int sign1 = 1, sign2 = 1;
         if (asize1 < 0) {
             asize1 = -asize1;
-            sign1 = false;
+            sign1 = -1;
         }
         if (asize2 < 0) {
             asize2 = -asize2;
-            sign2 = false;
+            sign2 = -1;
         }
         ::mp_limb_t *rdata = rop.m_limbs.data();
         const ::mp_limb_t *data1 = op1.m_limbs.data(), *data2 = op2.m_limbs.data();
