@@ -17,6 +17,7 @@ endmacro()
 
 ADD_MPPP_BENCHMARK(bench_arith_1)
 ADD_MPPP_BENCHMARK(bench_arith_2)
+ADD_MPPP_BENCHMARK(bench_arith_3)
 ADD_MPPP_BENCHMARK(bench_constructors)
 ADD_MPPP_BENCHMARK(bench_conversions)
 ADD_MPPP_BENCHMARK(bench_nbits)

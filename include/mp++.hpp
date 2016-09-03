@@ -993,27 +993,101 @@ private:
         // mpn functions require nonzero arguments.
         assert(asize1 > 0 && asize2 > 0);
         if (sign1 == sign2) {
-            if (size1 == size2) {
-                rop._mp_size = size1;
-                auto cy = ::mpn_add_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
+            // Same sign.
+            if (asize1 >= asize2) {
+                // The number of limbs of op1 >= op2.
+                ::mp_limb_t cy;
+                if (asize2 == 1) {
+                    // NOTE: we are not masking data2[0] with GMP_NUMB_MASK, I am assuming the mpn function
+                    // is able to deal with a limb with a nail.
+                    cy = ::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+                } else if (asize1 == asize2) {
+                    cy = ::mpn_add_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
+                } else {
+                    cy = ::mpn_add(rdata, data1, static_cast<::mp_size_t>(asize1), data2,
+                                   static_cast<::mp_size_t>(asize2));
+                }
                 if (cy) {
                     // If there is a carry digit, we need to check if we can increase the size of the static.
                     // Otherwise, we return failure.
                     if (asize1 == s_int::s_size) {
+                        rop._mp_size = size1;
                         return 1;
                     }
-                    rop._mp_size += sign1 ? 1 : -1;
-                    *(rdata + asize1) = 1;
+                    rop._mp_size = sign1 ? (size1 + 1) : (size1 - 1);
+                    // NOTE: there should be no need to use GMP_NUMB_MASK here.
+                    rdata[asize1] = 1;
+                } else {
+                    // Without carry, the size is unchanged.
+                    rop._mp_size = size1;
                 }
                 return 0;
             } else {
-
+                // The number of limbs of op2 > op1.
+                ::mp_limb_t cy;
+                if (asize1 == 1) {
+                    cy = ::mpn_add_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+                } else {
+                    cy = ::mpn_add(rdata, data2, static_cast<::mp_size_t>(asize2), data1,
+                                   static_cast<::mp_size_t>(asize1));
+                }
+                if (cy) {
+                    if (asize2 == s_int::s_size) {
+                        rop._mp_size = size2;
+                        return 1;
+                    }
+                    rop._mp_size = sign2 ? (size2 + 1) : (size2 - 1);
+                    rdata[asize2] = 1;
+                } else {
+                    rop._mp_size = size2;
+                }
+                return 0;
             }
         } else {
-
+            if (asize1 > asize2
+                || (asize1 == asize2 && ::mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
+                // abs(op1) >= abs(op2).
+                ::mp_limb_t br;
+                if (asize2 == 1) {
+                    br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+                } else if (asize1 == asize2) {
+                    br = ::mpn_sub_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
+                } else {
+                    br = ::mpn_sub(rdata, data1, static_cast<::mp_size_t>(asize1), data2,
+                                   static_cast<::mp_size_t>(asize2));
+                }
+                assert(!br);
+                mpz_size_t s = asize1;
+                // When subtracting, we need to compute the size. It could be anything from s (the larger size) to zero.
+                while (s > 0) {
+                    if (rdata[--s] & GMP_NUMB_MASK) {
+                        break;
+                    }
+                }
+                rop._mp_size = sign1 ? s : -s;
+            } else {
+                // abs(op2) > abs(op1).
+                ::mp_limb_t br;
+                if (asize1 == 1) {
+                    br = ::mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+                } else {
+                    br = ::mpn_sub(rdata, data2, static_cast<::mp_size_t>(asize2), data1,
+                                   static_cast<::mp_size_t>(asize1));
+                }
+                assert(!br);
+                mpz_size_t s = asize2;
+                while (s > 0) {
+                    if (rdata[--s] & GMP_NUMB_MASK) {
+                        break;
+                    }
+                }
+                rop._mp_size = sign2 ? s : -s;
+            }
+            return 0;
         }
+        assert(false);
     }
-    // Optimization for single-limb statics.
+    // Optimization for single-limb statics with no nails.
     static int static_add_impl(s_int &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
                                mpz_size_t asize1, bool sign1, const ::mp_limb_t *data2, mpz_size_t size2,
                                mpz_size_t asize2, bool sign2, const std::integral_constant<int, 1> &)
@@ -1047,11 +1121,11 @@ private:
             return 0;
         }
     }
-    // Optimization for two-limbs statics.
+    // Optimization for two-limbs statics with no nails.
     // Small helper to compare two statics of equal asize 1 or 2.
-    // NOTE: this requires no nail bits.
     static int compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *data2, mpz_size_t asize)
     {
+        // NOTE: this requires no nail bits.
         assert(!GMP_NAIL_BITS);
         assert(asize == 1 || asize == 2);
         // Start comparing from the top.
