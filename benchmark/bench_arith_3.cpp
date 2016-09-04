@@ -95,7 +95,7 @@ NONIUS_BENCHMARK("mpz 2-limbs unsigned addition", [](nonius::chronometer meter) 
 
 NONIUS_BENCHMARK("3-limbs unsigned addition", [](nonius::chronometer meter) {
     integer a{"1361129467683753853853498429727072845824"}, b{a}, c;
-    meter.measure([&a,&b,&c] { add(c, a, b); });
+    meter.measure([&a, &b, &c] { add(c, a, b); });
 });
 
 NONIUS_BENCHMARK("mpz 3-limbs unsigned addition", [](nonius::chronometer meter) {

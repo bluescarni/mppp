@@ -452,19 +452,20 @@ struct static_int {
     limbs_type m_limbs;
 };
 
+// Utility function to shallow copy "from" into "to".
+void inline mpz_shallow_copy(mpz_struct_t &to, const mpz_struct_t &from)
+{
+    to._mp_alloc = from._mp_alloc;
+    to._mp_size = from._mp_size;
+    to._mp_d = from._mp_d;
+}
+
 // {static_int,mpz} union.
 template <std::size_t SSize>
 union integer_union {
 public:
     using s_storage = static_int<SSize>;
     using d_storage = mpz_struct_t;
-    // Utility function to shallow copy "from" into "to".
-    static void mpz_shallow_copy(mpz_struct_t &to, const mpz_struct_t &from)
-    {
-        to._mp_alloc = from._mp_alloc;
-        to._mp_size = from._mp_size;
-        to._mp_d = from._mp_d;
-    }
     // Def ctor, will init to static.
     integer_union() : m_st()
     {
@@ -630,6 +631,15 @@ public:
         assert(!is_static());
         return m_dy;
     }
+    // Reset a dynamic int to a default constructed static.
+    void reset_to_static()
+    {
+        assert(is_dynamic());
+        // Destroy the dynamic storage.
+        destroy_dynamic();
+        // Init the static storage.
+        ::new (static_cast<void *>(&m_st)) s_storage();
+    }
     // Promotion from static to dynamic.
     void promote()
     {
@@ -644,13 +654,32 @@ public:
         ::new (static_cast<void *>(&m_dy)) d_storage;
         mpz_shallow_copy(m_dy, tmp_mpz);
     }
+    // Demotion from dynamic to static.
+    bool demote()
+    {
+        assert(!is_static());
+        const auto dyn_size = ::mpz_size(&g_dy());
+        // If the dynamic size is greater than the static size, we cannot demote.
+        if (dyn_size > SSize) {
+            return false;
+        }
+        // Copy over the limbs to temporary storage.
+        std::array<::mp_limb_t, SSize> tmp;
+        copy_limbs(g_dy()._mp_d, g_dy()._mp_d + dyn_size, tmp.data());
+        const auto signed_size = g_dy()._mp_size;
+        // Destroy the dynamic storage.
+        destroy_dynamic();
+        // Init the static storage and copy over the data.
+        ::new (static_cast<void *>(&m_st)) s_storage();
+        g_st()._mp_size = signed_size;
+        copy_limbs(tmp.data(), tmp.data() + dyn_size, g_st().m_limbs.data());
+    }
     void negate()
     {
         // NOTE: _mp_size is part of the common initial sequence.
         m_st._mp_size = -m_st._mp_size;
     }
 
-private:
     s_storage m_st;
     d_storage m_dy;
 };
@@ -1317,13 +1346,59 @@ public:
     {
         const unsigned mask
             = (unsigned)!rop.is_static() + ((unsigned)!op1.is_static() << 1u) + ((unsigned)!op2.is_static() << 2u);
+        // Implementation of the static addition (all 3 operands are static). We write it here as a functor because
+        // we use it more than once in the switch below.
+        auto static_adder = [&]() {
+            auto fail = static_addsub<true>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
+            if (fail) {
+                // Now rop contains the lower limbs of the result. We need to promote it and add the carry.
+                // Init tmp mpz with an adequate number of limbs.
+                mpz_struct_t tmp;
+                // TODO overflow check, static.
+                ::mpz_init2(&tmp,GMP_NUMB_BITS * (SSize + 1u));
+                // Copy over from rop.
+                tmp._mp_size = rop.m_int.g_st()._mp_size > 0 ? static_cast<mpz_size_t>(SSize + 1) :
+                        -static_cast<mpz_size_t>(SSize + 1);
+                copy_limbs(rop.m_int.g_st().m_limbs.data(), rop.m_int.g_st().m_limbs.data() + SSize + 1u,
+                    tmp._mp_d);
+                // Write the carry.
+                tmp._mp_d[SSize] = 1;
+                // Destroy the static, init dynamic and copy it.
+                rop.m_int.g_st().~s_int();
+                ::new (static_cast<void *>(&rop.m_int.m_dy)) mpz_struct_t;
+                mpz_shallow_copy(rop.m_int.m_dy, tmp);
+            }
+        };
         switch (mask) {
             case 0u:
-                // All 3 statics.
-                auto fail = static_addsub<true>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
-                if (fail) {
-                    throw;
-                }
+                // All 3 static.
+                static_adder();
+                break;
+            case 1u:
+                // rop is dynamic, the others are static. Demote rop and do the static add.
+                rop.m_int.reset_to_static();
+                static_adder();
+                break;
+            case 2u:
+                // rop static, op1 dynamic, op2 static. We fall through the case 3u after promoting rop.
+                rop.m_int.promote();
+            case 3u:
+                // rop and op1 dynamic, op2 static.
+                ::mpz_add(&rop.m_int.g_dy(),&op1.m_int.g_dy(),op2.m_int.g_st().get_mpz_view());
+                break;
+            case 4u:
+                // rop and op1 static, op2 dynamic.
+                rop.m_int.promote();
+            case 5u:
+                // rop dynamic, op1 static, op2 dynamic.
+                ::mpz_add(&rop.m_int.g_dy(),op1.m_int.g_st().get_mpz_view(),&op2.m_int.g_dy());
+                break;
+            case 6u:
+                // rop static, op1 and op2 dynamic.
+                rop.m_int.promote();
+            case 7u:
+                // All 3 dynamic.
+                ::mpz_add(&rop.m_int.g_dy(),&op1.m_int.g_dy(),&op2.m_int.g_dy());
         }
     }
 #if 0
