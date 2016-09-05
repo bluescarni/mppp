@@ -58,6 +58,8 @@ inline namespace detail
 // TODO mpz struct checks -> TODO check about _mp_size as well.
 // TODO --> config.hpp
 #define MPPP_UINT128 __uint128_t
+#define mppp_likely(x) __builtin_expect(!!(x), 1)
+#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
 
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
@@ -184,27 +186,20 @@ struct static_int {
     static const mpz_size_t s_size = SSize;
     // Special alloc value to signal static storage in the union.
     static const mpz_alloc_t s_alloc = -1;
-    // NOTE: def ctor leaves the limbs uninited.
-    static_int() : _mp_alloc(s_alloc), _mp_size(0)
+    // NOTE: init limbs to zero: in some few-limbs optimisations we operate on the whole limb
+    // array regardless of the integer size, for performance reasons. If we didn't init to zero,
+    // we would read from uninited storage and we would have wrong results as well.
+    static_int() : _mp_alloc(s_alloc), _mp_size(0), m_limbs{}
     {
     }
-    // NOTE: implement this manually - the default implementation would read from uninited limbs
-    // in case o is not full.
-    static_int(const static_int &o) : _mp_alloc(s_alloc), _mp_size(o._mp_size)
-    {
-        copy_limbs(o.m_limbs.data(), o.m_limbs.data() + abs_size(), m_limbs.data());
-    }
-    // Delegate to the copy ctor.
-    static_int(static_int &&o) noexcept : static_int(o)
-    {
-    }
-    // NOTE: implement this manually - the default implementation would read from uninited limbs
-    // in case other is not full.
+    // The defaults here are good.
+    static_int(const static_int &) = default;
+    static_int(static_int &&) = default;
     static_int &operator=(const static_int &other)
     {
         if (this != &other) {
             _mp_size = other._mp_size;
-            copy_limbs(other.m_limbs.data(), other.m_limbs.data() + other.abs_size(), m_limbs.data());
+            m_limbs = other.m_limbs;
         }
         return *this;
     }
@@ -285,7 +280,7 @@ struct static_int {
                                                              > std::numeric_limits<unsigned long>::max()),
                                                      int>::type
                              = 0>
-    explicit static_int(Uint n) : _mp_alloc(s_alloc)
+    explicit static_int(Uint n) : _mp_alloc(s_alloc), m_limbs{}
     {
         if (attempt_1limb_ctor(n)) {
             return;
@@ -322,7 +317,7 @@ struct static_int {
                                                              <= std::numeric_limits<unsigned long>::max()),
                                                      int>::type
                              = 0>
-    explicit static_int(Uint n) : _mp_alloc(s_alloc)
+    explicit static_int(Uint n) : _mp_alloc(s_alloc), m_limbs{}
     {
         if (attempt_1limb_ctor(n)) {
             return;
@@ -338,7 +333,7 @@ struct static_int {
                                               || std::numeric_limits<Int>::min() < std::numeric_limits<long>::min()),
                                       int>::type
               = 0>
-    explicit static_int(Int n) : _mp_alloc(s_alloc)
+    explicit static_int(Int n) : _mp_alloc(s_alloc), m_limbs{}
     {
         if (attempt_1limb_ctor(n)) {
             return;
@@ -376,7 +371,7 @@ struct static_int {
                                               && std::numeric_limits<Int>::min() >= std::numeric_limits<long>::min()),
                                       int>::type
               = 0>
-    explicit static_int(Int n) : _mp_alloc(s_alloc)
+    explicit static_int(Int n) : _mp_alloc(s_alloc), m_limbs{}
     {
         if (attempt_1limb_ctor(n)) {
             return;
@@ -389,7 +384,7 @@ struct static_int {
     template <
         typename Float,
         typename std::enable_if<std::is_same<Float, float>::value || std::is_same<Float, double>::value, int>::type = 0>
-    explicit static_int(Float f) : _mp_alloc(s_alloc)
+    explicit static_int(Float f) : _mp_alloc(s_alloc), m_limbs{}
     {
         if (!std::isfinite(f)) {
             throw std::invalid_argument("Cannot init integer from non-finite floating-point value.");
@@ -400,7 +395,7 @@ struct static_int {
     }
 #if defined(MPPP_WITH_LONG_DOUBLE)
     // Ctor from long double.
-    explicit static_int(long double x) : _mp_alloc(s_alloc)
+    explicit static_int(long double x) : _mp_alloc(s_alloc), m_limbs{}
     {
         if (!std::isfinite(x)) {
             throw std::invalid_argument("Cannot init integer from non-finite floating-point value.");
@@ -422,11 +417,14 @@ struct static_int {
         // is the dynamic one, we need to def construct a static view that we will never use.
         // NOTE: m_mpz needs to be zero inited because otherwise when using the move ctor we will
         // be reading from uninited memory.
-        static_mpz_view() : m_mpz()
+        static_mpz_view() : m_mpz{}
         {
         }
         // NOTE: we use the const_cast to cast away the constness from the pointer to the limbs
         // in n. This is valid as we are never going to use this pointer for writing.
+        // NOTE: in recent GMP versions there are functions to accomplish this type of read-only init
+        // of an mpz:
+        // https://gmplib.org/manual/Integer-Special-Functions.html#Integer-Special-Functions
         explicit static_mpz_view(const static_int &n)
             : m_mpz{s_size, n._mp_size, const_cast<::mp_limb_t *>(n.m_limbs.data())}
         {
@@ -673,11 +671,6 @@ public:
         ::new (static_cast<void *>(&m_st)) s_storage();
         g_st()._mp_size = signed_size;
         copy_limbs(tmp.data(), tmp.data() + dyn_size, g_st().m_limbs.data());
-    }
-    void negate()
-    {
-        // NOTE: _mp_size is part of the common initial sequence.
-        m_st._mp_size = -m_st._mp_size;
     }
 
     s_storage m_st;
@@ -991,10 +984,6 @@ public:
         }
         m_int.promote();
     }
-    void negate()
-    {
-        m_int.negate();
-    }
     std::size_t nbits() const
     {
         return ::mpz_sizeinbase(get_mpz_view(), 2);
@@ -1179,55 +1168,28 @@ private:
     {
         // abs sizes must be 1 or 2.
         assert(asize1 <= 2 && asize2 <= 2 && asize1 > 0 && asize2 > 0);
-        const unsigned size_mask = (unsigned)(asize1 - 1) + ((unsigned)(asize2 - 1) << 1u);
         if (sign1 == sign2) {
-            // When the signs are identical, we can implement addition as a true addition.
-            switch (size_mask) {
-                case 0u: {
-                    // Both sizes are 1. This can never fail, and at most bumps the asize to 2.
-                    const auto lo = data1[0] + data2[0];
-                    const auto hi = static_cast<::mp_limb_t>(lo < data1[0]);
-                    rop._mp_size = (sign1 == 1) ? static_cast<mpz_size_t>(hi + 1u) : -static_cast<mpz_size_t>(hi + 1u);
-                    rdata[0] = lo;
-                    rdata[1] = hi;
-                    return 0;
-                }
-                case 1u: {
-                    // asize1 is 2, asize2 is 1. Result could have 3 limbs.
-                    const auto lo = data1[0] + data2[0];
-                    const auto hi = data1[1] + static_cast<::mp_limb_t>(lo < data1[0]);
-                    rop._mp_size = sign1 + sign1;
-                    rdata[0] = lo;
-                    rdata[1] = hi;
-                    return static_cast<int>(hi == 0u);
-                }
-                case 2u: {
-                    // asize1 is 1, asize2 is 2. Result could have 3 limbs.
-                    const auto lo = data1[0] + data2[0];
-                    const auto hi = data2[1] + static_cast<::mp_limb_t>(lo < data1[0]);
-                    rop._mp_size = sign1 + sign1;
-                    rdata[0] = lo;
-                    rdata[1] = hi;
-                    return static_cast<int>(hi == 0u);
-                }
-                case 3u: {
-                    // Both have asize 2.
-                    // The rop hi limb might spill over either from the addition of the hi limbs
-                    // of op1 and op2, or by the addition of carry coming over from the addition of
-                    // the lo limbs of op1 and op2.
-                    const auto lo = data1[0] + data2[0];
-                    const auto hi1 = data1[1] + data2[1];
-                    const auto cy_lo = static_cast<::mp_limb_t>(lo < data1[0]);
-                    const auto cy_hi1 = static_cast<::mp_limb_t>(hi1 < data1[1]);
-                    const auto hi2 = hi1 + cy_lo;
-                    const auto cy_hi2 = static_cast<::mp_limb_t>(hi2 == 0u);
-                    rop._mp_size = sign1 + sign1;
-                    rdata[0] = lo;
-                    rdata[1] = hi2;
-                    return static_cast<int>(cy_hi1 || cy_hi2);
-                }
-            }
+            // NOTE: this is the implementation for 2 limbs, even if potentially the operands have 1 limb.
+            // The idea here is that it's better to do a few computations more rather than paying the branching
+            // cost. 1-limb operands will have the upper limb set to zero from the zero-initialization of
+            // the limbs of static ints.
+            // NOTE: the rop hi limb might spill over either from the addition of the hi limbs
+            // of op1 and op2, or by the addition of carry coming over from the addition of
+            // the lo limbs of op1 and op2.
+            const auto lo = data1[0] + data2[0];
+            const auto hi1 = data1[1] + data2[1];
+            const bool has_hi = data1[1] || data2[1];
+            const auto cy_lo = static_cast<::mp_limb_t>(lo < data1[0]);
+            const auto cy_hi1 = static_cast<::mp_limb_t>(hi1 < data1[1]);
+            const auto hi2 = hi1 + cy_lo;
+            const auto cy_hi2 = static_cast<::mp_limb_t>(hi2 < hi1);
+            // The asize is at least 1, it will be 2 if at least one of the two high limbs is nonzero.
+            rop._mp_size = sign1 + (has_hi ? sign1 : 0);
+            rdata[0] = lo;
+            rdata[1] = hi2;
+            return static_cast<int>(cy_hi1 || cy_hi2);
         } else {
+            const unsigned size_mask = (unsigned)(asize1 - 1) + ((unsigned)(asize2 - 1) << 1u);
             // When the signs differ, we need to implement addition as a subtraction.
             if (asize1 > asize2 || (asize1 == asize2 && compare_limbs_2(data1, data2, asize1) >= 0)) {
                 // op1 is >= op2 in absolute value.
@@ -1309,7 +1271,7 @@ private:
     template <bool AddOrSub>
     static int static_addsub(s_int &rop, const s_int &op1, const s_int &op2)
     {
-        // Cache a few quantities.
+        // Cache a few quantities, detect signs.
         const auto size1 = op1._mp_size, size2 = op2._mp_size;
         // NOTE: effectively negate op2 if we are subtracting.
         mpz_size_t asize1 = size1, asize2 = AddOrSub ? size2 : -size2;
@@ -1325,13 +1287,13 @@ private:
         ::mp_limb_t *rdata = rop.m_limbs.data();
         const ::mp_limb_t *data1 = op1.m_limbs.data(), *data2 = op2.m_limbs.data();
         // Handle the case in which at least one operand is zero.
-        if (!size2) {
+        if (mppp_unlikely(!size2)) {
             // Second op is zero, copy over the first op.
             rop._mp_size = size1;
             copy_limbs(data1, data1 + asize1, rdata);
             return 0;
         }
-        if (!size1) {
+        if (mppp_unlikely(!size1)) {
             // First op is zero, copy over the second op, flipping sign in case of subtraction.
             rop._mp_size = AddOrSub ? size2 : -size2;
             copy_limbs(data2, data2 + asize2, rdata);
