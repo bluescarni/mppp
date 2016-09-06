@@ -51,42 +51,43 @@ using integer = mp_integer<2>;
 
 std::mt19937 rng;
 
-BENCHMARK("expensive setup", ([](benchpress::context* ctx) {
-    std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
-                                                    std::numeric_limits<::mp_limb_t>::max());
-    // NOTE: divide by 2 so we always stay in a single limb.
-    auto a = integer((dist(rng) & GMP_NUMB_MASK) / 2u), b = integer((dist(rng) & GMP_NUMB_MASK) / 2u);
-    integer c;
-    ctx->reset_timer();
-    for (size_t i = 0; i < ctx->num_iterations(); ++i) {
-        add(c, a, b);
-    }
-}))
+BENCHMARK("expensive setup", ([](benchpress::context *ctx) {
+              std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
+                                                              std::numeric_limits<::mp_limb_t>::max());
+              // NOTE: divide by 2 so we always stay in a single limb.
+              auto a = integer((dist(rng) & GMP_NUMB_MASK) / 2u), b = integer((dist(rng) & GMP_NUMB_MASK) / 2u);
+              integer c;
+              ctx->reset_timer();
+              for (size_t i = 0; i < ctx->num_iterations(); ++i) {
+                  add(c, a, b);
+              }
+          }))
 
-BENCHMARK("piranha 1-limb unsigned addition", ([](benchpress::context* ctx) {
-    std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
-                                                    std::numeric_limits<::mp_limb_t>::max());
-    auto a = piranha::integer((dist(rng) & GMP_NUMB_MASK) / 2u), b = piranha::integer((dist(rng) & GMP_NUMB_MASK) / 2u);
-    piranha::integer c;
-    ctx->reset_timer();
-    for (size_t i = 0; i < ctx->num_iterations(); ++i) {
-        c.add(a,b);
-    }
-}));
+BENCHMARK("piranha 1-limb unsigned addition", ([](benchpress::context *ctx) {
+              std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
+                                                              std::numeric_limits<::mp_limb_t>::max());
+              auto a = piranha::integer((dist(rng) & GMP_NUMB_MASK) / 2u),
+                   b = piranha::integer((dist(rng) & GMP_NUMB_MASK) / 2u);
+              piranha::integer c;
+              ctx->reset_timer();
+              for (size_t i = 0; i < ctx->num_iterations(); ++i) {
+                  c.add(a, b);
+              }
+          }));
 
-BENCHMARK("mpz 1-limb unsigned addition", ([](benchpress::context* ctx) {
-    std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
-                                                    std::numeric_limits<::mp_limb_t>::max());
-    mpz_raii a, b, c;
-    const auto s1 = lex_cast((dist(rng) & GMP_NUMB_MASK) / 2u);
-    const auto s2 = lex_cast((dist(rng) & GMP_NUMB_MASK) / 2u);
-    ::mpz_set_str(&a.m_mpz, s1.data(), 10);
-    ::mpz_set_str(&b.m_mpz, s2.data(), 10);
-    ctx->reset_timer();
-    for (size_t i = 0; i < ctx->num_iterations(); ++i) {
-        ::mpz_add(&c.m_mpz, &a.m_mpz, &b.m_mpz);
-    }
-}))
+BENCHMARK("mpz 1-limb unsigned addition", ([](benchpress::context *ctx) {
+              std::uniform_int_distribution<::mp_limb_t> dist(std::numeric_limits<::mp_limb_t>::min(),
+                                                              std::numeric_limits<::mp_limb_t>::max());
+              mpz_raii a, b, c;
+              const auto s1 = lex_cast((dist(rng) & GMP_NUMB_MASK) / 2u);
+              const auto s2 = lex_cast((dist(rng) & GMP_NUMB_MASK) / 2u);
+              ::mpz_set_str(&a.m_mpz, s1.data(), 10);
+              ::mpz_set_str(&b.m_mpz, s2.data(), 10);
+              ctx->reset_timer();
+              for (size_t i = 0; i < ctx->num_iterations(); ++i) {
+                  ::mpz_add(&c.m_mpz, &a.m_mpz, &b.m_mpz);
+              }
+          }))
 
 /*
 NONIUS_BENCHMARK("1-limb unsigned addition", [](nonius::chronometer meter) {

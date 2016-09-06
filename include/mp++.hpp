@@ -195,19 +195,8 @@ struct static_int {
     // The defaults here are good.
     static_int(const static_int &) = default;
     static_int(static_int &&) = default;
-    static_int &operator=(const static_int &other)
-    {
-        if (this != &other) {
-            _mp_size = other._mp_size;
-            m_limbs = other.m_limbs;
-        }
-        return *this;
-    }
-    // Move assignment (same as copy assignment).
-    static_int &operator=(static_int &&other) noexcept
-    {
-        return operator=(other);
-    }
+    static_int &operator=(const static_int &) = default;
+    static_int &operator=(static_int &&) == default;
     ~static_int()
     {
         assert(_mp_alloc == s_alloc);
@@ -1317,12 +1306,11 @@ public:
                 // Init tmp mpz with an adequate number of limbs.
                 mpz_struct_t tmp;
                 // TODO overflow check, static.
-                ::mpz_init2(&tmp,GMP_NUMB_BITS * (SSize + 1u));
+                ::mpz_init2(&tmp, GMP_NUMB_BITS * (SSize + 1u));
                 // Copy over from rop.
-                tmp._mp_size = rop.m_int.g_st()._mp_size > 0 ? static_cast<mpz_size_t>(SSize + 1) :
-                        -static_cast<mpz_size_t>(SSize + 1);
-                copy_limbs(rop.m_int.g_st().m_limbs.data(), rop.m_int.g_st().m_limbs.data() + SSize + 1u,
-                    tmp._mp_d);
+                tmp._mp_size = rop.m_int.g_st()._mp_size > 0 ? static_cast<mpz_size_t>(SSize + 1)
+                                                             : -static_cast<mpz_size_t>(SSize + 1);
+                copy_limbs(rop.m_int.g_st().m_limbs.data(), rop.m_int.g_st().m_limbs.data() + SSize + 1u, tmp._mp_d);
                 // Write the carry.
                 tmp._mp_d[SSize] = 1;
                 // Destroy the static, init dynamic and copy it.
@@ -1346,21 +1334,21 @@ public:
                 rop.m_int.promote();
             case 3u:
                 // rop and op1 dynamic, op2 static.
-                ::mpz_add(&rop.m_int.g_dy(),&op1.m_int.g_dy(),op2.m_int.g_st().get_mpz_view());
+                ::mpz_add(&rop.m_int.g_dy(), &op1.m_int.g_dy(), op2.m_int.g_st().get_mpz_view());
                 break;
             case 4u:
                 // rop and op1 static, op2 dynamic.
                 rop.m_int.promote();
             case 5u:
                 // rop dynamic, op1 static, op2 dynamic.
-                ::mpz_add(&rop.m_int.g_dy(),op1.m_int.g_st().get_mpz_view(),&op2.m_int.g_dy());
+                ::mpz_add(&rop.m_int.g_dy(), op1.m_int.g_st().get_mpz_view(), &op2.m_int.g_dy());
                 break;
             case 6u:
                 // rop static, op1 and op2 dynamic.
                 rop.m_int.promote();
             case 7u:
                 // All 3 dynamic.
-                ::mpz_add(&rop.m_int.g_dy(),&op1.m_int.g_dy(),&op2.m_int.g_dy());
+                ::mpz_add(&rop.m_int.g_dy(), &op1.m_int.g_dy(), &op2.m_int.g_dy());
         }
     }
 #if 0
