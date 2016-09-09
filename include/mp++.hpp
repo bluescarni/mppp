@@ -1046,6 +1046,7 @@ private:
     // Small helper to compute the size when subtracting.
     static mpz_size_t sub_compute_size(const ::mp_limb_t *rdata, mpz_size_t s)
     {
+        assert(s > 0);
         mpz_size_t cur_idx = s - 1;
         for (; cur_idx >= 0; --cur_idx) {
             if (rdata[cur_idx] & GMP_NUMB_MASK) {

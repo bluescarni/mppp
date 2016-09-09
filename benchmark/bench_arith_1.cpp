@@ -29,7 +29,7 @@ see https://www.gnu.org/licenses/. */
 #include <mp++.hpp>
 #include <random>
 
-#include "utils.hpp"
+#include "benchmark_utils.hpp"
 
 using namespace mppp;
 using namespace mppp_bench;
