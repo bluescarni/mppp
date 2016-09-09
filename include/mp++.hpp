@@ -205,13 +205,15 @@ struct static_int {
         if (_mp_size < -s_size || _mp_size > s_size) {
             return false;
         }
-        // Check that all limbs which do not participate in the value are zero.
-        // const auto asize = std::size_t(_mp_size >= 0 ? _mp_size : -_mp_size);
-        // for (std::size_t i = asize; i < SSize; ++i) {
-        //     if (m_limbs[i]) {
-        //         return false;
-        //     }
-        // }
+        // Check that all limbs which do not participate in the value are zero, iff the SSize is small enough.
+        if (SSize <= 2u) {
+            const auto asize = std::size_t(abs_size());
+            for (std::size_t i = asize; i < SSize; ++i) {
+                if (m_limbs[i]) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
     ~static_int()
@@ -224,9 +226,9 @@ struct static_int {
     // for few static limbs.
     void zero_unused_limbs()
     {
-        // for (auto i = std::size_t(abs_size()); i < SSize; ++i) {
-        //     m_limbs[i] = 0u;
-        // }
+        for (auto i = std::size_t(abs_size()); i < SSize; ++i) {
+            m_limbs[i] = 0u;
+        }
     }
     // Size in limbs (absolute value of the _mp_size member).
     mpz_size_t abs_size() const
@@ -1041,6 +1043,19 @@ private:
                                                             ? 1
                                                             : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
     // General implementation via mpn.
+    // Small helper to compute the size when subtracting.
+    static mpz_size_t sub_compute_size(const ::mp_limb_t *rdata, mpz_size_t s)
+    {
+        mpz_size_t cur_idx = s - 1;
+        for (; cur_idx >= 0; --cur_idx) {
+            if (rdata[cur_idx] & GMP_NUMB_MASK) {
+                break;
+            }
+        }
+        return cur_idx + 1;
+    }
+    // NOTE: here we do not need to zero the unused static limbs after using mpn functions, as this code is run
+    // only when no few-limbs optimisation are activated.
     static int static_add_impl(s_int &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t size1,
                                mpz_size_t asize1, int sign1, const ::mp_limb_t *data2, mpz_size_t size2,
                                mpz_size_t asize2, int sign2, const std::integral_constant<int, 0> &)
@@ -1049,13 +1064,11 @@ private:
         if (mppp_unlikely(!sign2)) {
             rop._mp_size = size1;
             copy_limbs(data1, data1 + asize1, rdata);
-            rop.zero_unused_limbs();
             return 0;
         }
         if (mppp_unlikely(!sign1)) {
             rop._mp_size = size2;
             copy_limbs(data2, data2 + asize2, rdata);
-            rop.zero_unused_limbs();
             return 0;
         }
         if (sign1 == sign2) {
@@ -1087,7 +1100,6 @@ private:
                     // Without carry, the size is unchanged.
                     rop._mp_size = size1;
                 }
-                rop.zero_unused_limbs();
                 return 0;
             } else {
                 // The number of limbs of op2 > op1.
@@ -1108,20 +1120,9 @@ private:
                 } else {
                     rop._mp_size = size2;
                 }
-                rop.zero_unused_limbs();
                 return 0;
             }
         } else {
-            // When subtracting, we need to compute the size. It could be anything from s (the larger size) to zero.
-            auto compute_size = [rdata](mpz_size_t s) -> mpz_size_t {
-                mpz_size_t cur_idx = s - 1;
-                for (; cur_idx >= 0; --cur_idx) {
-                    if (rdata[cur_idx] & GMP_NUMB_MASK) {
-                        break;
-                    }
-                }
-                return cur_idx + 1;
-            };
             if (asize1 > asize2
                 || (asize1 == asize2 && ::mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
                 // abs(op1) >= abs(op2).
@@ -1135,7 +1136,7 @@ private:
                                    static_cast<::mp_size_t>(asize2));
                 }
                 assert(!br);
-                const auto s = compute_size(asize1);
+                const auto s = sub_compute_size(rdata, asize1);
                 rop._mp_size = (sign1 == 1) ? s : -s;
             } else {
                 // abs(op2) > abs(op1).
@@ -1147,13 +1148,11 @@ private:
                                    static_cast<::mp_size_t>(asize1));
                 }
                 assert(!br);
-                const auto s = compute_size(asize2);
+                const auto s = sub_compute_size(rdata, asize2);
                 rop._mp_size = (sign2 == 1) ? s : -s;
             }
-            rop.zero_unused_limbs();
             return 0;
         }
-        assert(false);
     }
     // Optimization for single-limb statics with no nails.
     static int static_add_impl(s_int &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t, mpz_size_t asize1,
@@ -1167,8 +1166,8 @@ private:
             const auto tmp = data1[0] + data2[0];
             // Detect overflow in the result.
             const int retval = tmp < data1[0];
-            // Assign the output. Size can be zero or 1.
-            rop._mp_size = (data1[0] || data2[0]) ? sign1 : 0;
+            // Assign the output. asize can be zero (sign1 == sign2 == 0) or 1.
+            rop._mp_size = sign1;
             rdata[0] = tmp;
             return retval;
         } else {
@@ -1295,11 +1294,14 @@ private:
 public:
     friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
-        const unsigned mask
-            = (unsigned)rop.is_dynamic() + ((unsigned)op1.is_dynamic() << 1u) + ((unsigned)op2.is_dynamic() << 2u);
-        // Implementation of the static addition (all 3 operands are static). We write it here as a functor because
-        // we use it more than once in the switch below.
-        auto static_adder = [&]() {
+        const bool dr = rop.is_dynamic(), d1 = op1.is_dynamic(), d2 = op2.is_dynamic();
+        unsigned mask = (unsigned)dr + ((unsigned)d1 << 1u) + ((unsigned)d2 << 2u);
+        if (mppp_likely(mask <= 1u)) {
+            // mask 0 or 1 means that op1 and op2 are static. We reset rop to static
+            // if needed, and then proceed with the static adder.
+            if (dr) {
+                rop.m_int.reset_to_static();
+            }
             auto fail = static_addsub<true>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
             if (mppp_unlikely(fail)) {
                 // NOTE: this would be unsafe in case GMP did proper error handling in case of memory allocation error:
@@ -1327,37 +1329,27 @@ public:
                 ::new (static_cast<void *>(&rop.m_int.m_dy)) mpz_struct_t;
                 mpz_shallow_copy(rop.m_int.m_dy, tmp);
             }
-        };
+            return;
+        }
+        if (mask % 2u == 0u) {
+            // If mask is even, it means that rop needs to be promoted: rop is static and at least 1 op
+            // is dynamic.
+            rop.m_int.promote();
+        }
+        mask /= 2u;
         switch (mask) {
-            case 0u:
-                // All 3 static.
-                static_adder();
-                break;
             case 1u:
-                // rop is dynamic, the others are static. Demote rop and do the static add.
-                rop.m_int.reset_to_static();
-                static_adder();
-                break;
-            case 2u:
-                // rop static, op1 dynamic, op2 static. We fall through the case 3u after promoting rop.
-                rop.m_int.promote();
-            case 3u:
-                // rop and op1 dynamic, op2 static.
+                // This covers masks 2 and 3: rop and op1 dynamic, op2 static.
                 ::mpz_add(&rop.m_int.g_dy(), &op1.m_int.g_dy(), op2.m_int.g_st().get_mpz_view());
                 break;
-            case 4u:
-                // rop and op1 static, op2 dynamic. Promote rop, fall through to case 5.
-                rop.m_int.promote();
-            case 5u:
-                // rop dynamic, op1 static, op2 dynamic.
+            case 2u:
+                // This covers masks 4 and 5: rop dynamic, op1 static, op2 dynamic.
                 ::mpz_add(&rop.m_int.g_dy(), op1.m_int.g_st().get_mpz_view(), &op2.m_int.g_dy());
                 break;
-            case 6u:
-                // rop static, op1 and op2 dynamic. Promote rop, fall through.
-                rop.m_int.promote();
-            case 7u:
-                // All 3 dynamic.
+            case 3u:
+                // This covers masks 6 and 7: rop dynamic, op1 static, op2 dynamic: all 3 dynamic.
                 ::mpz_add(&rop.m_int.g_dy(), &op1.m_int.g_dy(), &op2.m_int.g_dy());
+                break;
         }
     }
 #if 0

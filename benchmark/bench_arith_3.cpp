@@ -26,6 +26,36 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the mp++ library.  If not,
 see https://www.gnu.org/licenses/. */
 
+#include <mp++.hpp>
+#include <random>
+
+#include "utils.hpp"
+
+using namespace mppp;
+using namespace mppp_bench;
+
+using integer = mp_integer<3>;
+
+std::mt19937 rng;
+
+BENCHMARK("1-limb unsigned addition", [](benchpress::context *ctx) { uadd1_mppp<integer>(ctx, rng); })
+BENCHMARK("piranha 1-limb unsigned addition", [](benchpress::context *ctx) { uadd1_piranha(ctx, rng); })
+BENCHMARK("gmp 1-limb unsigned addition", [](benchpress::context *ctx) { uadd1_gmp(ctx, rng); })
+
+BENCHMARK("1-limb unsigned vector addition", [](benchpress::context *ctx) { uadd1_vec_mppp<integer>(ctx, rng); })
+BENCHMARK("piranha 1-limb unsigned vector addition", [](benchpress::context *ctx) { uadd1_vec_piranha(ctx, rng); })
+BENCHMARK("gmp 1-limb unsigned vector addition", [](benchpress::context *ctx) { uadd1_vec_gmp(ctx, rng); })
+
+BENCHMARK("1-limb signed addition", [](benchpress::context *ctx) { sadd1_mppp<integer>(ctx, rng); })
+BENCHMARK("piranha 1-limb signed addition", [](benchpress::context *ctx) { sadd1_piranha(ctx, rng); })
+BENCHMARK("gmp 1-limb signed addition", [](benchpress::context *ctx) { sadd1_gmp(ctx, rng); })
+
+BENCHMARK("1-limb signed vector addition", [](benchpress::context *ctx) { sadd1_vec_mppp<integer>(ctx, rng); })
+BENCHMARK("piranha 1-limb signed vector addition", [](benchpress::context *ctx) { sadd1_vec_piranha(ctx, rng); })
+BENCHMARK("gmp 1-limb signed vector addition", [](benchpress::context *ctx) { sadd1_vec_gmp(ctx, rng); })
+
+#if 0
+
 #include <gmp.h>
 #include <limits>
 #include <random>
@@ -104,6 +134,8 @@ NONIUS_BENCHMARK("mpz 3-limbs unsigned addition", [](nonius::chronometer meter) 
     ::mpz_set_str(&b.m_mpz, "1361129467683753853853498429727072845824", 10);
     meter.measure([&a, &b, &c] { ::mpz_add(&c.m_mpz, &a.m_mpz, &b.m_mpz); });
 });
+
+#endif
 
 /*
 NONIUS_BENCHMARK("1-limb signed addition", [](nonius::chronometer meter) {
