@@ -1,0 +1,58 @@
+language: cpp
+sudo: false
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - boost-latest
+    - llvm-toolchain-precise-3.8
+    - george-edison55-precise-backports
+    packages:
+    - libgmp-dev
+    - libmpfr-dev
+    - libboost1.55-all-dev
+    - g++-4.8
+    - clang-3.8
+    - doxygen
+    - graphviz
+    - graphviz-dev
+    - cmake
+    - cmake-data
+    - texlive
+    - gcc-5
+    - g++-5
+
+matrix:
+  include:
+    - compiler: gcc
+      env: BUILD_TYPE="Release"
+    - compiler: gcc
+      env: BUILD_TYPE="Debug"
+    - compiler: gcc
+      env: BUILD_TYPE="Coverage"
+    - compiler: clang
+      env: BUILD_TYPE="Release"
+    - compiler: clang
+      env: BUILD_TYPE="Debug"
+
+install:
+    - if [[ "${CC}" == "clang" ]]; then
+          export MPPP_COMPILER=clang;
+          export CC=clang-3.8;
+          export CXX=clang++-3.8;
+      elif [[ "${CC}" == "gcc" && "${BUILD_TYPE}" == "Coverage" ]]; then
+          export MPPP_COMPILER=gcc;
+          export CC=gcc-5;
+          export CXX=g++-5;
+          export GCOV_EXECUTABLE=gcov-5;
+      else
+          export MPPP_COMPILER=gcc;
+          export CC=gcc-4.8;
+          export CXX=g++-4.8;
+      fi
+script:
+    - mkdir build
+    - cd build
+    - source ../tools/install_travis.sh
+notifications:
+  email: false
