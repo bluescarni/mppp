@@ -53,6 +53,13 @@ matrix:
           - texlive
           - gcc-5
           - g++-5
+          - libc6:i386
+          - libstdc++6:i386
+          - zlib1g-dev:i386
+          - libssl-dev:i386
+          - pkg-config:i386
+          - gcc-multilib
+          - libgmp-dev:i386
     - compiler: gcc
       env: BUILD_TYPE="Coverage"
     - compiler: clang
