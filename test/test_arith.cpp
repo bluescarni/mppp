@@ -154,6 +154,9 @@ struct add_tester {
                     add(n1, n2, n3);
                     ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    add(n1, n3, n2);
+                    ::mpz_add(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 }
             }
         };
@@ -185,6 +188,103 @@ struct add_tester {
         random_xy(4, 2);
         random_xy(4, 3);
         random_xy(4, 4);
+
+        // Testing specific to the 2-limb optimisation.
+        if (S::value == 2u) {
+            // Carry only from lo.
+            mpz_raii m1, m2, m3;
+            max_integer(m2, 1u);
+            ::mpz_set_ui(&m3.m_mpz,1u);
+            integer n1, n2(::mp_limb_t(-1) & GMP_NUMB_MAX), n3(1);
+            ::mpz_add(&m1.m_mpz,&m2.m_mpz,&m3.m_mpz);
+            add(n1,n2,n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            ::mpz_add(&m1.m_mpz,&m3.m_mpz,&m2.m_mpz);
+            add(n1,n3,n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            // Carry only from hi.
+            max_integer(m2, 2u);
+            ::mpz_set_ui(&m3.m_mpz,1u);
+            ::mpz_mul_2exp(&m3.m_mpz,&m3.m_mpz,GMP_NUMB_BITS);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_add(&m1.m_mpz,&m2.m_mpz,&m3.m_mpz);
+            add(n1,n2,n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            ::mpz_add(&m1.m_mpz,&m3.m_mpz,&m2.m_mpz);
+            add(n1,n3,n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            // Carry from hi and lo.
+            max_integer(m2, 2u);
+            ::mpz_set_ui(&m3.m_mpz,1u);
+            ::mpz_mul_2exp(&m3.m_mpz,&m3.m_mpz,GMP_NUMB_BITS);
+            ::mpz_add_ui(&m3.m_mpz,&m3.m_mpz,1u);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_add(&m1.m_mpz,&m2.m_mpz,&m3.m_mpz);
+            add(n1,n2,n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            ::mpz_add(&m1.m_mpz,&m3.m_mpz,&m2.m_mpz);
+            add(n1,n3,n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            // Subtraction that kills hi.
+            max_integer(m2, 2u);
+            max_integer(m3, 1u);
+            ::mpz_mul_2exp(&m3.m_mpz,&m3.m_mpz,GMP_NUMB_BITS);
+            ::mpz_neg(&m3.m_mpz,&m3.m_mpz);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_add(&m1.m_mpz,&m2.m_mpz,&m3.m_mpz);
+            add(n1,n2,n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            REQUIRE((::mpz_size(&m1.m_mpz) == 1u));
+            ::mpz_add(&m1.m_mpz,&m3.m_mpz,&m2.m_mpz);
+            add(n1,n3,n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            REQUIRE((::mpz_size(&m1.m_mpz) == 1u));
+            ::mpz_neg(&m3.m_mpz,&m3.m_mpz);
+            ::mpz_neg(&m2.m_mpz,&m2.m_mpz);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_add(&m1.m_mpz,&m2.m_mpz,&m3.m_mpz);
+            add(n1,n2,n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            REQUIRE((::mpz_size(&m1.m_mpz) == 1u));
+            ::mpz_add(&m1.m_mpz,&m3.m_mpz,&m2.m_mpz);
+            add(n1,n3,n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            REQUIRE((::mpz_size(&m1.m_mpz) == 1u));
+            // Subtraction that kills lo.
+            max_integer(m2, 2u);
+            max_integer(m3, 1u);
+            ::mpz_neg(&m3.m_mpz,&m3.m_mpz);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_add(&m1.m_mpz,&m2.m_mpz,&m3.m_mpz);
+            add(n1,n2,n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            REQUIRE((::mpz_size(&m1.m_mpz) == 2u));
+            ::mpz_add(&m1.m_mpz,&m3.m_mpz,&m2.m_mpz);
+            add(n1,n3,n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            REQUIRE((::mpz_size(&m1.m_mpz) == 2u));
+            ::mpz_neg(&m3.m_mpz,&m3.m_mpz);
+            ::mpz_neg(&m2.m_mpz,&m2.m_mpz);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_add(&m1.m_mpz,&m2.m_mpz,&m3.m_mpz);
+            add(n1,n2,n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            REQUIRE((::mpz_size(&m1.m_mpz) == 2u));
+            ::mpz_add(&m1.m_mpz,&m3.m_mpz,&m2.m_mpz);
+            add(n1,n3,n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            REQUIRE((::mpz_size(&m1.m_mpz) == 2u));
+        }
     }
 };
 

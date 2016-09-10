@@ -741,10 +741,12 @@ public:
     mp_integer() = default;
     mp_integer(const mp_integer &other) = default;
     mp_integer(mp_integer &&other) = default;
+
 private:
     // Enabler for generic ctor.
     template <typename T>
     using generic_ctor_enabler = typename std::enable_if<is_supported_interop<T>::value, int>::type;
+
 public:
     template <typename T, generic_ctor_enabler<T> = 0>
     explicit mp_integer(T x) : m_int(x)
@@ -782,6 +784,7 @@ public:
         }
         return mpz_to_str(&m_int.g_dy());
     }
+
 private:
     // Conversion operator.
     template <typename T>
