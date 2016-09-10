@@ -35,29 +35,14 @@ matrix:
         apt:
           sources:
           - ubuntu-toolchain-r-test
-          - boost-latest
-          - llvm-toolchain-precise-3.8
           - george-edison55-precise-backports
           packages:
-          - libgmp-dev
-          - libmpfr-dev
-          - libboost1.55-all-dev
           - g++-4.8
           - g++-4.8-multilib
-          - clang-3.8
-          - doxygen
-          - graphviz
-          - graphviz-dev
           - cmake
           - cmake-data
-          - texlive
-          - gcc-5
-          - g++-5
           - libc6:i386
           - libstdc++6:i386
-          - zlib1g-dev:i386
-          - libssl-dev:i386
-          - pkg-config:i386
           - gcc-multilib
           - libgmp-dev:i386
     - compiler: gcc
