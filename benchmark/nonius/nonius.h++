@@ -19,7 +19,9 @@
 #include <nonius/constructor.h++>
 #include <nonius/configuration.h++>
 #include <nonius/chronometer.h++>
+#include <nonius/optimizer.h++>
 #include <nonius/go.h++>
+#include <nonius/param.h++>
 
 #include <nonius/reporters/standard_reporter.h++>
 
@@ -36,4 +38,3 @@
 #endif // NONIUS_DISABLE_EXTRA_REPORTERS
 
 #endif // NONIUS_HPP
-
