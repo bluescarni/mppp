@@ -15,6 +15,10 @@ if [[ "${BUILD_TYPE}" == "Debug" ]]; then
         make;
         ctest -V;
     fi
+elif [[ "${BUILD_TYPE}" == "Debug32" ]]; then
+    cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="-fsanitize=address -m32" ../;
+    make;
+    ctest -V;
 elif [[ "${BUILD_TYPE}" == "Coverage" ]]; then
     cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
     make;

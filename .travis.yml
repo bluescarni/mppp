@@ -12,6 +12,7 @@ addons:
     - libmpfr-dev
     - libboost1.55-all-dev
     - g++-4.8
+    - g++-4.8-multilib
     - clang-3.8
     - doxygen
     - graphviz
@@ -21,6 +22,8 @@ addons:
     - texlive
     - gcc-5
     - g++-5
+    - lib32gmp-dev
+    - lib32mpfr-dev
 
 matrix:
   include:
@@ -28,6 +31,8 @@ matrix:
       env: BUILD_TYPE="Release"
     - compiler: gcc
       env: BUILD_TYPE="Debug"
+    - compiler: gcc
+      env: BUILD_TYPE="Debug32"
     - compiler: gcc
       env: BUILD_TYPE="Coverage"
     - compiler: clang
