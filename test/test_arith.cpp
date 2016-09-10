@@ -155,22 +155,6 @@ struct add_tester {
                     ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 }
-                // Check the zeroing of upper limbs.
-                // First we create a 4 limbs random int into n1.
-                random_integer(tmp, 4u, rng);
-                n1 = integer(mpz_to_str(&tmp.m_mpz));
-                // Set n2 and n3 to 3 limb randoms.
-                random_integer(tmp, 3u, rng);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                random_integer(tmp, 3u, rng);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
-                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                // Since n2 and n3 are 3 limbs, mpn will be used. The high limb of n1 will have to be zeroed
-                // out (assuming there's no carry).
-                add(n1, n2, n3);
-                ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
-                REQUIRE((lex_cast(n1) == lex_cast(m1)));
             }
         };
 
