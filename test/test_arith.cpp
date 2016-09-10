@@ -192,10 +192,10 @@ struct add_tester {
         // Testing specific to the 2-limb optimisation.
         if (S::value == 2u) {
             // Carry only from lo.
-            mpz_raii m1, m2, m3;
             max_integer(m2, 1u);
             ::mpz_set_ui(&m3.m_mpz,1u);
-            integer n1, n2(::mp_limb_t(-1) & GMP_NUMB_MAX), n3(1);
+            n2 = integer(::mp_limb_t(-1) & GMP_NUMB_MAX);
+            n3 = integer(1);
             ::mpz_add(&m1.m_mpz,&m2.m_mpz,&m3.m_mpz);
             add(n1,n2,n3);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
