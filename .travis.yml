@@ -22,8 +22,8 @@ addons:
     - texlive
     - gcc-5
     - g++-5
-    - lib32gmp-dev
-    - lib32mpfr-dev
+    - libgmp-dev:386
+    - libmpfr-dev:386
 
 matrix:
   include:
