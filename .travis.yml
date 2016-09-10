@@ -22,6 +22,8 @@ addons:
     - texlive
     - gcc-5
     - g++-5
+    - libgmp-dev:386
+    - libmpfr-dev:386
 
 matrix:
   include:
@@ -30,21 +32,7 @@ matrix:
     - compiler: gcc
       env: BUILD_TYPE="Debug"
     - compiler: gcc
-      env:
-        - BUILD_TYPE="Debug32"
-        - TARGET=i686-unknown-linux-gnu
-          BITS=32
-          FEATURES=''
-        addons:
-          apt:
-            packages:
-            - libc6:i386
-            - libstdc++6:i386
-            - zlib1g-dev:i386
-            - libssl-dev:i386
-            - pkg-config:i386
-            - gcc-multilib
-            - libgmp-dev:i386
+      env: BUILD_TYPE="Debug32"
     - compiler: gcc
       env: BUILD_TYPE="Coverage"
     - compiler: clang
