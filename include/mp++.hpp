@@ -206,6 +206,7 @@ struct static_int {
             return false;
         }
         // Check that all limbs which do not participate in the value are zero, iff the SSize is small enough.
+        // For small SSize, we might be using optimisations that require unused limbs to be zero.
         if (SSize <= 2u) {
             const auto asize = std::size_t(abs_size());
             for (std::size_t i = asize; i < SSize; ++i) {
@@ -707,10 +708,81 @@ class mp_integer
 {
     // The underlying static int.
     using s_int = static_int<SSize>;
-    // TODO maybe move the enablers next to where they are used.
+    // mpz view class.
+    class mpz_view
+    {
+        using static_mpz_view = typename s_int::static_mpz_view;
+
+    public:
+        explicit mpz_view(const mp_integer &n)
+            : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : static_mpz_view{}),
+              m_ptr(n.is_static() ? m_static_view : &(n.m_int.g_dy()))
+        {
+        }
+        mpz_view(const mpz_view &) = delete;
+        mpz_view(mpz_view &&) = default;
+        mpz_view &operator=(const mpz_view &) = delete;
+        mpz_view &operator=(mpz_view &&) = delete;
+        operator const mpz_struct_t *() const
+        {
+            return get();
+        }
+        const mpz_struct_t *get() const
+        {
+            return m_ptr;
+        }
+
+    private:
+        static_mpz_view m_static_view;
+        const mpz_struct_t *m_ptr;
+    };
+
+public:
+    mp_integer() = default;
+    mp_integer(const mp_integer &other) = default;
+    mp_integer(mp_integer &&other) = default;
+private:
     // Enabler for generic ctor.
     template <typename T>
     using generic_ctor_enabler = typename std::enable_if<is_supported_interop<T>::value, int>::type;
+public:
+    template <typename T, generic_ctor_enabler<T> = 0>
+    explicit mp_integer(T x) : m_int(x)
+    {
+    }
+    explicit mp_integer(const char *s, int base = 10) : m_int(s, base)
+    {
+    }
+    explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
+    {
+    }
+    mp_integer &operator=(const mp_integer &other) = default;
+    mp_integer &operator=(mp_integer &&other) = default;
+    bool is_static() const
+    {
+        return m_int.is_static();
+    }
+    bool is_dynamic() const
+    {
+        return m_int.is_dynamic();
+    }
+    friend std::ostream &operator<<(std::ostream &os, const mp_integer &n)
+    {
+        return os << n.to_string();
+    }
+    std::string to_string(int base = 10) const
+    {
+        if (base < 2 || base > 62) {
+            throw std::invalid_argument("Invalid base for string conversion: the base must be between "
+                                        "2 and 62, but a value of "
+                                        + std::to_string(base) + " was provided instead.");
+        }
+        if (is_static()) {
+            return mpz_to_str(m_int.g_st().get_mpz_view());
+        }
+        return mpz_to_str(&m_int.g_dy());
+    }
+private:
     // Conversion operator.
     template <typename T>
     using generic_conversion_enabler = generic_ctor_enabler<T>;
@@ -930,75 +1002,7 @@ class mp_integer
         return ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN);
     }
 #endif
-    // mpz view class.
-    class mpz_view
-    {
-        using static_mpz_view = typename s_int::static_mpz_view;
-
-    public:
-        explicit mpz_view(const mp_integer &n)
-            : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : static_mpz_view{}),
-              m_ptr(n.is_static() ? m_static_view : &(n.m_int.g_dy()))
-        {
-        }
-        mpz_view(const mpz_view &) = delete;
-        mpz_view(mpz_view &&) = default;
-        mpz_view &operator=(const mpz_view &) = delete;
-        mpz_view &operator=(mpz_view &&) = delete;
-        operator const mpz_struct_t *() const
-        {
-            return get();
-        }
-        const mpz_struct_t *get() const
-        {
-            return m_ptr;
-        }
-
-    private:
-        static_mpz_view m_static_view;
-        const mpz_struct_t *m_ptr;
-    };
-
 public:
-    mp_integer() = default;
-    mp_integer(const mp_integer &other) = default;
-    mp_integer(mp_integer &&other) = default;
-    template <typename T, generic_ctor_enabler<T> = 0>
-    explicit mp_integer(T x) : m_int(x)
-    {
-    }
-    explicit mp_integer(const char *s, int base = 10) : m_int(s, base)
-    {
-    }
-    explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
-    {
-    }
-    mp_integer &operator=(const mp_integer &other) = default;
-    mp_integer &operator=(mp_integer &&other) = default;
-    bool is_static() const
-    {
-        return m_int.is_static();
-    }
-    bool is_dynamic() const
-    {
-        return m_int.is_dynamic();
-    }
-    friend std::ostream &operator<<(std::ostream &os, const mp_integer &n)
-    {
-        return os << n.to_string();
-    }
-    std::string to_string(int base = 10) const
-    {
-        if (base < 2 || base > 62) {
-            throw std::invalid_argument("Invalid base for string conversion: the base must be between "
-                                        "2 and 62, but a value of "
-                                        + std::to_string(base) + " was provided instead.");
-        }
-        if (is_static()) {
-            return mpz_to_str(m_int.g_st().get_mpz_view());
-        }
-        return mpz_to_str(&m_int.g_dy());
-    }
     template <typename T, generic_conversion_enabler<T> = 0>
     explicit operator T() const
     {
@@ -1043,9 +1047,10 @@ private:
                                                             ? 1
                                                             : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
     // General implementation via mpn.
-    // Small helper to compute the size when subtracting.
+    // Small helper to compute the size when subtracting. "as" is a strictly positive size.
     static mpz_size_t sub_compute_size(const ::mp_limb_t *rdata, mpz_size_t s)
     {
+        assert(!GMP_NAIL_BITS);
         assert(s > 0);
         mpz_size_t cur_idx = s - 1;
         for (; cur_idx >= 0; --cur_idx) {
