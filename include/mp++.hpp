@@ -176,6 +176,55 @@ inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_li
     }
 }
 
+class mpz_cache
+{
+public:
+    // Max mpz alloc size.
+    static const unsigned max_size = 10u;
+    // Max number of cache entries per size.
+    static const unsigned max_entries = 100u;
+    mpz_cache()
+    {
+        m_vec.resize(max_size);
+    }
+    void push(mpz_struct_t &m)
+    {
+        // NOTE: here we are assuming always nonegative mp_alloc.
+        const auto size = static_cast<std::make_unsigned<mpz_size_t>::type>(m._mp_alloc);
+        if (!size || size > max_size || m_vec[size - 1u].size() >= max_entries) {
+            // If the allocated size is zero, too large, or we have reached the max number of entries,
+            // don't cache it. Just clear it.
+            ::mpz_clear(&m);
+        } else {
+            // Add it to the cache.
+            m_vec[size - 1u].push_back(m);
+        }
+    }
+    void pop(mpz_struct_t &retval, std::size_t size)
+    {
+        if (!size || size > max_size || !m_vec[size - 1u].size()) {
+            // If the size is zero, too large, or we don't have entries for the specified
+            // size, init a new mpz.
+            ::mpz_init2(&retval, )
+        } else {
+            // If we have cache entries, use them: pop the last one
+            // for the current size.
+            retval = m_vec[size - 1u].back();
+            m_vec.pop_back();
+        }
+    }
+    ~mpz_cache()
+    {
+        for (auto &v: m_vec) {
+            for (auto &m: v) {
+                ::mpz_clear(&m);
+            }
+        }
+    }
+private:
+    std::vector<std::vector<mpz_struct_t>> m_vec;
+};
+
 // The static integer class.
 template <std::size_t SSize>
 struct static_int {
@@ -1361,62 +1410,154 @@ public:
                 break;
         }
     }
-#if 0
-    static int static_mul(s_int &rop, const s_int &op1, const s_int &op2)
+
+private:
+    // The double limb multiplication optimization is available in the following cases:
+    // - we have a 128bit unsigned available, there are no nail bits and the limb bit size is 64, or
+    // - there are no nail bits, the limb bit size is 32 and the smallest 64 bit unsigned type has exactly 64 bits.
+    using have_dlimb_mul
+        = std::integral_constant<bool,
+                                 !GMP_NAIL_BITS && (
+#if defined(MPPP_UINT128)
+                                                       (GMP_NUMB_BITS == 64) ||
+#endif
+                                                       (GMP_NUMB_BITS == 32
+                                                        && std::numeric_limits<std::uint_least64_t>::digits == 64))>;
+    template <typename SInt>
+    using static_mul_algo = std::integral_constant<int, (SInt::s_size == 1 && have_dlimb_mul::value)
+                                                            ? 1
+                                                            : ((SInt::s_size == 2 && have_dlimb_mul::value) ? 2 : 0)>;
+    // mpn implementation.
+    static const ::mp_limb_t *static_mul_impl(s_int &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t,
+                                              mpz_size_t asize1, int sign1, const ::mp_limb_t *data2, mpz_size_t,
+                                              mpz_size_t asize2, int sign2, const std::integral_constant<int, 0> &)
     {
-        // Cache a few quantities.
+        // Handle zeroes.
+        if (mppp_unlikely(!sign1 || !sign2)) {
+            // TODO clean upper limbs?
+            rop._mp_size = 0;
+            return nullptr;
+        }
+        const auto max_asize = std::size_t(asize1 + asize2);
+        // Temporary storage, to be used if we cannot write into rop.
+        static thread_local std::array<::mp_limb_t, SSize * 2u> res;
+        // We can write directly into rop if all these conditions hold:
+        // - rop does not overlap with op1 and op2,
+        // - SSize is large enough to hold the max size of the result.
+        // TODO check if restrict helps here.
+        ::mp_limb_t *res_data = (rdata != data1 && rdata != data2 && SSize >= max_asize) ? rdata : res.data();
+        // Proceed to the multiplication.
+        ::mp_limb_t hi;
+        if (asize2 == 1) {
+            hi = ::mpn_mul_1(res_data, data1, asize1, data2[0]);
+            res_data[asize1] = hi;
+        } else if (asize1 == 1) {
+            hi = ::mpn_mul_1(res_data, data2, asize2, data1[0]);
+            res_data[asize2] = hi;
+        } else if (asize1 == asize2) {
+            // TODO check about hi: is it written?
+            ::mpn_mul_n(res_data, data1, data2, asize1);
+            hi = res_data[2 * asize1 - 1];
+        } else if (asize1 >= asize2) {
+            // TODO check about hi: is it written?
+            hi = ::mpn_mul(res_data, data1, asize1, data2, asize2);
+        } else {
+            hi = ::mpn_mul(res_data, data2, asize2, data1, asize1);
+        }
+        // The actual size.
+        const std::size_t asize = max_asize - (hi == 0u);
+        // Always write the actual size into rop. If it is too big, we will have to fix this before destroying
+        // the static (otherwise an assertion will fail).
+        rop._mp_size = (sign1 == sign2) ? mpz_size_t(asize) : -mpz_size_t(asize);
+        if (res_data == rdata) {
+            // If we wrote directly into rop, it means that we had enough storage in it to begin with.
+            // TODO clean upper limbs.
+            return nullptr;
+        } else {
+            // If we used the temporary storage, we need to check if we can write into rop.
+            if (asize <= SSize) {
+                // Enough space, copy limbs over and set the size.
+                copy_limbs(res_data, res_data + asize, rdata);
+                // TODO clean upper limbs.
+                return nullptr;
+            } else {
+                // Return the pointer to the result, for use by the upper level routine.
+                return res_data;
+            }
+        }
+    }
+    static const ::mp_limb_t *static_mul(s_int &rop, const s_int &op1, const s_int &op2)
+    {
+        // Cache a few quantities, detect signs.
         const auto size1 = op1._mp_size, size2 = op2._mp_size;
-        auto asize1 = size1, asize2 = size2;
-        bool sign1 = true, sign2 = true;
+        mpz_size_t asize1 = size1, asize2 = size2;
+        int sign1 = size1 != 0, sign2 = size2 != 0;
         if (asize1 < 0) {
             asize1 = -asize1;
-            sign1 = false;
+            sign1 = -1;
         }
         if (asize2 < 0) {
             asize2 = -asize2;
-            sign2 = false;
+            sign2 = -1;
         }
         ::mp_limb_t *rdata = rop.m_limbs.data();
         const ::mp_limb_t *data1 = op1.m_limbs.data(), *data2 = op2.m_limbs.data();
-        // Handle the case in which at least one operand is zero.
-        if (!size1 || !size2) {
-            rop._mp_size = 0;
-            return 0;
-        }
-        using dlimb_t = dlimb_available<::mp_limb_t>::type;
-        const unsigned size_mask = (unsigned)(asize1 - 1) + ((unsigned)(asize2 - 1) << 1u);
-        switch (size_mask) {
-            case 0u: {
-                const auto lo = static_cast<dlimb_t>(static_cast<dlimb_t>(data1[0u]) * data2[0u]);
-                rdata[0u] = static_cast<::mp_limb_t>(lo);
-                const auto cy_limb = static_cast<::mp_limb_t>(lo >> GMP_LIMB_BITS);
-                rdata[1u] = cy_limb;
-                auto new_size = static_cast<mpz_size_t>((asize1 + asize2) - mpz_size_t(cy_limb == 0u));
-                if (sign1 != sign2) {
-                    new_size = -new_size;
-                }
-                rop._mp_size = new_size;
-                return 0;
-            }
-        }
-        throw;
+        return static_mul_impl(rop, rdata, data1, size1, asize1, sign1, data2, size2, asize2, sign2,
+                               /*static_add_algo<s_int>{}*/ std::integral_constant<int, 0>{});
     }
+
+public:
     friend void mul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
-        const unsigned mask
-            = (unsigned)!rop.is_static() + ((unsigned)!op1.is_static() << 1u) + ((unsigned)!op2.is_static() << 2u);
-        switch (mask) {
-            case 0u:
-                // All 3 statics.
-                auto fail = static_mul(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
-                if (fail) {
-                    std::cout << "Adadsa\n";
+        const bool dr = rop.is_dynamic(), d1 = op1.is_dynamic(), d2 = op2.is_dynamic();
+        unsigned mask = (unsigned)dr + ((unsigned)d1 << 1u) + ((unsigned)d2 << 2u);
+        if (mppp_likely(mask <= 1u)) {
+            if (dr) {
+                rop.m_int.reset_to_static();
+            }
+            auto fail = static_mul(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
+            if (mppp_unlikely(fail)) {
+                // NOTE: this would be unsafe in case GMP did proper error handling in case of memory allocation
+                // errors (see above).
+                // Get the real asize and its sign from rop.
+                auto asize = rop.m_int.g_st()._mp_size;
+                const bool sign = asize >= 0;
+                if (!sign) {
+                    asize = -asize;
                 }
-                return;
+                // Reset rop size to a sane value before destroying it.
+                rop.m_int.g_st()._mp_size = mpz_size_t(SSize);
+                // Init the tmp.
+                mpz_struct_t tmp;
+                // TODO overflow check. asize can be up to SSize * 2.
+                ::mpz_init2(&tmp, ::mp_bitcnt_t(GMP_NUMB_BITS) * ::mp_bitcnt_t(asize));
+                assert(tmp._mp_alloc >= asize);
+                // Set tmp size and copy over from the pointer.
+                tmp._mp_size = sign ? asize : -asize;
+                copy_limbs(fail, fail + asize, tmp._mp_d);
+                // Destroy the static, init dynamic and copy it.
+                rop.m_int.g_st().~s_int();
+                ::new (static_cast<void *>(&rop.m_int.m_dy)) mpz_struct_t;
+                mpz_shallow_copy(rop.m_int.m_dy, tmp);
+            }
+            return;
         }
-        throw;
+        if (mask % 2u == 0u) {
+            rop.m_int.promote();
+        }
+        mask /= 2u;
+        switch (mask) {
+            case 1u:
+                ::mpz_mul(&rop.m_int.g_dy(), &op1.m_int.g_dy(), op2.m_int.g_st().get_mpz_view());
+                break;
+            case 2u:
+                ::mpz_mul(&rop.m_int.g_dy(), op1.m_int.g_st().get_mpz_view(), &op2.m_int.g_dy());
+                break;
+            case 3u:
+                ::mpz_mul(&rop.m_int.g_dy(), &op1.m_int.g_dy(), &op2.m_int.g_dy());
+                break;
+        }
     }
-#endif
 
 private:
     integer_union<SSize> m_int;
