@@ -34,6 +34,7 @@ see https://www.gnu.org/licenses/. */
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <gmp.h>
 #include <iostream>
 #include <limits>
@@ -66,6 +67,102 @@ using mpz_struct_t = std::remove_extent<::mpz_t>::type;
 // Integral types used for allocation size and number of limbs.
 using mpz_alloc_t = decltype(std::declval<mpz_struct_t>()._mp_alloc);
 using mpz_size_t = decltype(std::declval<mpz_struct_t>()._mp_size);
+
+// This is a cache that is used by functions below in order to keep a pool of allocated mpzs, with the goal
+// of avoiding continuous (de)allocation when frequently creating/destroying mpzs.
+class mpz_cache
+{
+    // Helper function to init an mpz to zero with nlimbs preallocated limbs.
+    static void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
+    {
+        // A bit of horrid overflow checking.
+        using ump_bitcnt_t = std::make_unsigned<::mp_bitcnt_t>::type;
+        if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
+            // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
+            // to do anything else, as long as GMP does not provide error recovery.
+            std::abort();
+        }
+        const std::size_t nbits = unsigned(GMP_NUMB_BITS) * nlimbs;
+        if (mppp_unlikely(nbits > ump_bitcnt_t(std::numeric_limits<::mp_bitcnt_t>::max()))) {
+            std::abort();
+        }
+        // NOTE: nbits == 0 is allowed.
+        ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
+        assert(std::make_unsigned<mpz_size_t>::type(rop._mp_alloc) >= nlimbs);
+    }
+public:
+    // Max mpz alloc size.
+    static const unsigned max_size = 10u;
+    // Max number of cache entries per size.
+    static const unsigned max_entries = 100u;
+    mpz_cache()
+    {
+        m_vec.resize(max_size);
+    }
+    void push(mpz_struct_t &m)
+    {
+        // NOTE: here we are assuming always nonegative mp_alloc.
+        const auto size = static_cast<std::make_unsigned<mpz_size_t>::type>(m._mp_alloc);
+        if (!size || size > max_size || m_vec[size - 1u].size() >= max_entries) {
+            // If the allocated size is zero, too large, or we have reached the max number of entries,
+            // don't cache it. Just clear it.
+            ::mpz_clear(&m);
+        } else {
+            // Add it to the cache.
+            m_vec[size - 1u].push_back(m);
+        }
+    }
+    void pop(mpz_struct_t &retval, std::size_t size)
+    {
+        if (!size || size > max_size || !m_vec[size - 1u].size()) {
+            // If the size is zero, too large, or we don't have entries for the specified
+            // size, init a new mpz.
+            mpz_init_nlimbs(retval, size);
+        } else {
+            // If we have cache entries, use them: pop the last one
+            // for the current size.
+            retval = m_vec[size - 1u].back();
+            m_vec[size - 1u].pop_back();
+        }
+    }
+    ~mpz_cache()
+    {
+        // On destruction, deallocate all the cached mpzs.
+        for (auto &v: m_vec) {
+            for (auto &m: v) {
+                ::mpz_clear(&m);
+            }
+        }
+    }
+private:
+    std::vector<std::vector<mpz_struct_t>> m_vec;
+};
+
+inline mpz_cache &get_mpz_cache()
+{
+    static thread_local mpz_cache cache;
+    return cache;
+}
+
+// NOTE: contrary to the GMP functions, this one does *not* init to zero:
+// after init, m will have whatever value was contained in the cached mpz.
+inline void mpz_init_cache(mpz_struct_t &m, std::size_t nlimbs)
+{
+    mpz_cache &cache = get_mpz_cache();
+    cache.pop(m, nlimbs);
+}
+
+inline void mpz_init_set_cache(mpz_struct_t &m0, const mpz_struct_t &m1)
+{
+    mpz_init_cache(m0, ::mpz_size(&m1));
+    ::mpz_set(&m0, &m1);
+}
+
+inline void mpz_clear_cache(mpz_struct_t &m)
+{
+    mpz_cache &cache = get_mpz_cache();
+    cache.push(m);
+}
 
 // Simple RAII holder for GMP integers.
 struct mpz_raii {
@@ -175,55 +272,6 @@ inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_li
         *out = *begin;
     }
 }
-
-class mpz_cache
-{
-public:
-    // Max mpz alloc size.
-    static const unsigned max_size = 10u;
-    // Max number of cache entries per size.
-    static const unsigned max_entries = 100u;
-    mpz_cache()
-    {
-        m_vec.resize(max_size);
-    }
-    void push(mpz_struct_t &m)
-    {
-        // NOTE: here we are assuming always nonegative mp_alloc.
-        const auto size = static_cast<std::make_unsigned<mpz_size_t>::type>(m._mp_alloc);
-        if (!size || size > max_size || m_vec[size - 1u].size() >= max_entries) {
-            // If the allocated size is zero, too large, or we have reached the max number of entries,
-            // don't cache it. Just clear it.
-            ::mpz_clear(&m);
-        } else {
-            // Add it to the cache.
-            m_vec[size - 1u].push_back(m);
-        }
-    }
-    void pop(mpz_struct_t &retval, std::size_t size)
-    {
-        if (!size || size > max_size || !m_vec[size - 1u].size()) {
-            // If the size is zero, too large, or we don't have entries for the specified
-            // size, init a new mpz.
-            ::mpz_init2(&retval, )
-        } else {
-            // If we have cache entries, use them: pop the last one
-            // for the current size.
-            retval = m_vec[size - 1u].back();
-            m_vec.pop_back();
-        }
-    }
-    ~mpz_cache()
-    {
-        for (auto &v: m_vec) {
-            for (auto &m: v) {
-                ::mpz_clear(&m);
-            }
-        }
-    }
-private:
-    std::vector<std::vector<mpz_struct_t>> m_vec;
-};
 
 // The static integer class.
 template <std::size_t SSize>
@@ -545,7 +593,7 @@ public:
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
             ::new (static_cast<void *>(&m_dy)) d_storage;
-            ::mpz_init_set(&m_dy, &other.g_dy());
+            mpz_init_set_cache(m_dy, other.g_dy());
             assert(m_dy._mp_alloc >= 0);
         }
     }
@@ -578,7 +626,7 @@ public:
             g_st().~s_storage();
             // Init dynamic.
             ::new (static_cast<void *>(&m_dy)) d_storage;
-            ::mpz_init_set(&m_dy, ptr);
+            mpz_init_set_cache(m_dy, *ptr);
         }
     }
     explicit integer_union(const char *s, int base) : m_st()
@@ -598,7 +646,7 @@ public:
             g_st().~s_storage();
             // Init dynamic.
             ::new (static_cast<void *>(&m_dy)) d_storage;
-            ::mpz_init_set(&m_dy, ptr);
+            mpz_init_set_cache(m_dy, *ptr);
         }
     }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
@@ -616,7 +664,7 @@ public:
             // Construct the dynamic struct.
             ::new (static_cast<void *>(&m_dy)) d_storage;
             // Init + assign the mpz.
-            ::mpz_init_set(&m_dy, &other.g_dy());
+            mpz_init_set_cache(m_dy, other.g_dy());
             assert(m_dy._mp_alloc >= 0);
         } else if (!s1 && s2) {
             // Destroy the dynamic this.
@@ -670,7 +718,7 @@ public:
         assert(!is_static());
         assert(g_dy()._mp_alloc >= 0);
         assert(g_dy()._mp_d != nullptr);
-        ::mpz_clear(&g_dy());
+        mpz_clear_cache(g_dy());
         m_dy.~d_storage();
     }
     // Check storage type.
@@ -719,7 +767,7 @@ public:
         // Construct an mpz from the static.
         mpz_struct_t tmp_mpz;
         auto v = g_st().get_mpz_view();
-        ::mpz_init_set(&tmp_mpz, v);
+        mpz_init_set_cache(tmp_mpz, *v);
         // Destroy static.
         g_st().~s_storage();
         // Construct the dynamic struct.
@@ -1364,18 +1412,13 @@ public:
             if (mppp_unlikely(fail)) {
                 // NOTE: this would be unsafe in case GMP did proper error handling in case of memory allocation error:
                 // the static_addsub() routine can leave rop in an inconsistent state in case of overflow (e.g., all
-                // limbs are zero and the size is nonzero). So if mpz_init2() below failed and we could somehow handle
+                // limbs are zero and the size is nonzero). So if the init below failed and we could somehow handle
                 // the memory error, we would need to take care of cleaning up rop. But it does not matter at the
-                // moment, as an mpz_init2() failure will terminate the program anyway.
+                // moment, as an init failure will terminate the program anyway.
                 // Now rop contains the lower limbs of the result. We need to promote it and add the carry.
                 // Init tmp mpz with an adequate number of limbs.
                 mpz_struct_t tmp;
-                // Paranoid overflow check.
-                static_assert(::mp_bitcnt_t(GMP_NUMB_BITS)
-                                  <= std::numeric_limits<::mp_bitcnt_t>::max() / ::mp_bitcnt_t(SSize + 1u),
-                              "Overflow error.");
-                ::mpz_init2(&tmp, ::mp_bitcnt_t(GMP_NUMB_BITS) * ::mp_bitcnt_t(SSize + 1u));
-                assert(tmp._mp_alloc >= mpz_size_t(SSize + 1u));
+                mpz_init_cache(tmp, SSize + 1u);
                 // Copy over from rop.
                 tmp._mp_size = rop.m_int.g_st()._mp_size > 0 ? static_cast<mpz_size_t>(SSize + 1u)
                                                              : -static_cast<mpz_size_t>(SSize + 1u);
@@ -1529,9 +1572,7 @@ public:
                 rop.m_int.g_st()._mp_size = mpz_size_t(SSize);
                 // Init the tmp.
                 mpz_struct_t tmp;
-                // TODO overflow check. asize can be up to SSize * 2.
-                ::mpz_init2(&tmp, ::mp_bitcnt_t(GMP_NUMB_BITS) * ::mp_bitcnt_t(asize));
-                assert(tmp._mp_alloc >= asize);
+                mpz_init_cache(tmp, std::size_t(asize));
                 // Set tmp size and copy over from the pointer.
                 tmp._mp_size = sign ? asize : -asize;
                 copy_limbs(fail, fail + asize, tmp._mp_d);
