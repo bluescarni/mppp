@@ -148,8 +148,7 @@ inline mpz_cache &get_mpz_cache()
 // after init, m will have whatever value was contained in the cached mpz.
 inline void mpz_init_cache(mpz_struct_t &m, std::size_t nlimbs)
 {
-    mpz_cache &cache = get_mpz_cache();
-    cache.pop(m, nlimbs);
+    get_mpz_cache().pop(m, nlimbs);
 }
 
 inline void mpz_init_set_cache(mpz_struct_t &m0, const mpz_struct_t &m1)
@@ -160,8 +159,7 @@ inline void mpz_init_set_cache(mpz_struct_t &m0, const mpz_struct_t &m1)
 
 inline void mpz_clear_cache(mpz_struct_t &m)
 {
-    mpz_cache &cache = get_mpz_cache();
-    cache.push(m);
+    get_mpz_cache().push(m);
 }
 
 // Simple RAII holder for GMP integers.
@@ -568,14 +566,6 @@ struct static_int {
     limbs_type m_limbs;
 };
 
-// Utility function to shallow copy "from" into "to".
-void inline mpz_shallow_copy(mpz_struct_t &to, const mpz_struct_t &from)
-{
-    to._mp_alloc = from._mp_alloc;
-    to._mp_size = from._mp_size;
-    to._mp_d = from._mp_d;
-}
-
 // {static_int,mpz} union.
 template <std::size_t SSize>
 union integer_union {
@@ -604,7 +594,8 @@ public:
             ::new (static_cast<void *>(&m_st)) s_storage(std::move(other.g_st()));
         } else {
             ::new (static_cast<void *>(&m_dy)) d_storage;
-            mpz_shallow_copy(m_dy, other.g_dy());
+            // NOTE: this copies the mpz struct members (shallow copy).
+            m_dy = other.g_dy();
             // Downgrade the other to an empty static.
             other.g_dy().~d_storage();
             ::new (static_cast<void *>(&other.m_st)) s_storage();
@@ -691,7 +682,7 @@ public:
             g_st().~s_storage();
             // Construct the dynamic struct.
             ::new (static_cast<void *>(&m_dy)) d_storage;
-            mpz_shallow_copy(m_dy, other.g_dy());
+            m_dy = other.g_dy();
             // Downgrade the other to an empty static.
             other.g_dy().~d_storage();
             ::new (static_cast<void *>(&other.m_st)) s_storage();
@@ -772,7 +763,7 @@ public:
         g_st().~s_storage();
         // Construct the dynamic struct.
         ::new (static_cast<void *>(&m_dy)) d_storage;
-        mpz_shallow_copy(m_dy, tmp_mpz);
+        m_dy = tmp_mpz;
     }
     // Demotion from dynamic to static.
     bool demote()
@@ -1428,7 +1419,7 @@ public:
                 // Destroy the static, init dynamic and copy it.
                 rop.m_int.g_st().~s_int();
                 ::new (static_cast<void *>(&rop.m_int.m_dy)) mpz_struct_t;
-                mpz_shallow_copy(rop.m_int.m_dy, tmp);
+                rop.m_int.m_dy = tmp;
             }
             return;
         }
@@ -1484,7 +1475,7 @@ private:
         const auto max_asize = std::size_t(asize1 + asize2);
         // Temporary storage, to be used if we cannot write into rop.
         static thread_local std::array<::mp_limb_t, SSize * 2u> res;
-        // We can write directly into rop if all these conditions hold:
+        // We can write directly into rop if these conditions hold:
         // - rop does not overlap with op1 and op2,
         // - SSize is large enough to hold the max size of the result.
         // TODO check if restrict helps here.
@@ -1492,23 +1483,22 @@ private:
         // Proceed to the multiplication.
         ::mp_limb_t hi;
         if (asize2 == 1) {
+            // NOTE: the 1-limb versions do not write the hi limb.
             hi = ::mpn_mul_1(res_data, data1, asize1, data2[0]);
             res_data[asize1] = hi;
         } else if (asize1 == 1) {
             hi = ::mpn_mul_1(res_data, data2, asize2, data1[0]);
             res_data[asize2] = hi;
         } else if (asize1 == asize2) {
-            // TODO check about hi: is it written?
             ::mpn_mul_n(res_data, data1, data2, asize1);
             hi = res_data[2 * asize1 - 1];
         } else if (asize1 >= asize2) {
-            // TODO check about hi: is it written?
             hi = ::mpn_mul(res_data, data1, asize1, data2, asize2);
         } else {
             hi = ::mpn_mul(res_data, data2, asize2, data1, asize1);
         }
         // The actual size.
-        const std::size_t asize = max_asize - (hi == 0u);
+        const std::size_t asize = max_asize - unsigned(hi == 0u);
         // Always write the actual size into rop. If it is too big, we will have to fix this before destroying
         // the static (otherwise an assertion will fail).
         rop._mp_size = (sign1 == sign2) ? mpz_size_t(asize) : -mpz_size_t(asize);
@@ -1563,7 +1553,8 @@ public:
                 // NOTE: this would be unsafe in case GMP did proper error handling in case of memory allocation
                 // errors (see above).
                 // Get the real asize and its sign from rop.
-                auto asize = rop.m_int.g_st()._mp_size;
+                const auto size = rop.m_int.g_st()._mp_size;
+                auto asize = size;
                 const bool sign = asize >= 0;
                 if (!sign) {
                     asize = -asize;
@@ -1574,12 +1565,12 @@ public:
                 mpz_struct_t tmp;
                 mpz_init_cache(tmp, std::size_t(asize));
                 // Set tmp size and copy over from the pointer.
-                tmp._mp_size = sign ? asize : -asize;
+                tmp._mp_size = size;
                 copy_limbs(fail, fail + asize, tmp._mp_d);
                 // Destroy the static, init dynamic and copy it.
                 rop.m_int.g_st().~s_int();
                 ::new (static_cast<void *>(&rop.m_int.m_dy)) mpz_struct_t;
-                mpz_shallow_copy(rop.m_int.m_dy, tmp);
+                rop.m_int.m_dy = tmp;
             }
             return;
         }
