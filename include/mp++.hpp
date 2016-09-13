@@ -266,6 +266,7 @@ inline const mpz_struct_t *&fail_too_many_limbs()
 }
 
 // Small wrapper to copy limbs. We cannot use std::copy because it requires non-overlapping ranges.
+// TODO try a non-overlapping version of this with restricted pointers, we can use it in a few places.
 inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_limb_t *out)
 {
     for (; begin != end; ++begin, ++out) {
@@ -767,6 +768,17 @@ public:
         ::new (static_cast<void *>(&m_dy)) d_storage;
         m_dy = tmp_mpz;
     }
+    void promote(std::size_t nlimbs)
+    {
+        assert(is_static());
+        mpz_struct_t tmp_mpz;
+        mpz_init_cache(tmp_mpz, nlimbs);
+        // Destroy static.
+        g_st().~s_storage();
+        // Construct the dynamic struct.
+        ::new (static_cast<void *>(&m_dy)) d_storage;
+        m_dy = tmp_mpz;
+    }
     // Demotion from dynamic to static.
     bool demote()
     {
@@ -1116,6 +1128,14 @@ public:
     {
         return ::mpz_sizeinbase(get_mpz_view(), 2);
     }
+    std::size_t size() const
+    {
+        if (is_static()) {
+            return std::size_t(m_int.g_st().abs_size());
+        } else {
+            return ::mpz_size(&m_int.g_dy());
+        }
+    }
     mpz_view get_mpz_view() const
     {
         return mpz_view(*this);
@@ -1425,22 +1445,21 @@ public:
             }
             return;
         }
-        if (mask % 2u == 0u) {
-            // If mask is even, it means that rop needs to be promoted: rop is static and at least 1 op
-            // is dynamic.
-            rop.m_int.promote();
+        if (!dr) {
+            // FIXME re-detect d1 and 2.
+            rop.m_int.promote(op1.size() + op2.size() + 1u);
         }
-        mask /= 2u;
+        mask = (mask / 2u) - 1u;
         switch (mask) {
-            case 1u:
+            case 0u:
                 // This covers masks 2 and 3: rop and op1 dynamic, op2 static.
                 ::mpz_add(&rop.m_int.g_dy(), &op1.m_int.g_dy(), op2.m_int.g_st().get_mpz_view());
                 break;
-            case 2u:
+            case 1u:
                 // This covers masks 4 and 5: rop dynamic, op1 static, op2 dynamic.
                 ::mpz_add(&rop.m_int.g_dy(), op1.m_int.g_st().get_mpz_view(), &op2.m_int.g_dy());
                 break;
-            case 3u:
+            case 2u:
                 // This covers masks 6 and 7: rop dynamic, op1 static, op2 dynamic: all 3 dynamic.
                 ::mpz_add(&rop.m_int.g_dy(), &op1.m_int.g_dy(), &op2.m_int.g_dy());
                 break;
@@ -1527,7 +1546,7 @@ private:
         using dlimb_t = MPPP_UINT128;
         const dlimb_t res = dlimb_t(op1) * op2;
         *hi = res >> 64;
-        return res;
+        return static_cast<::mp_limb_t>(res);
     }
 #elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
     static ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
@@ -1535,7 +1554,7 @@ private:
         using dlimb_t = std::uint_least64_t;
         const dlimb_t res = dlimb_t(op1) * op2;
         *hi = res >> 32;
-        return res;
+        return static_cast<::mp_limb_t>(res);
     }
 #endif
     // 1-limb optimization via dlimb.
@@ -1552,8 +1571,8 @@ private:
             rop._mp_size = (sign1 == sign2) ? 2 : -2;
             return tmp.data();
         } else {
-            const mpz_size_t has_lo = (lo != 0u);
-            rop._mp_size = (sign1 == sign2) ? has_lo : -has_lo;
+            const mpz_size_t asize = (lo != 0u);
+            rop._mp_size = (sign1 == sign2) ? asize : -asize;
             rdata[0] = lo;
             return nullptr;
         }
@@ -1563,32 +1582,36 @@ private:
                                               mpz_size_t asize1, int sign1, const ::mp_limb_t *data2, mpz_size_t,
                                               mpz_size_t asize2, int sign2, const std::integral_constant<int, 2> &)
     {
-        // Optimize the case in which the result always fits in rop.
+        static thread_local std::array<::mp_limb_t, 4> tmp;
         if (asize1 <= 1 && asize2 <= 1) {
+            // This will always fit in rop.
             ::mp_limb_t hi;
             const ::mp_limb_t lo = dlimb_mul(data1[0], data2[0], &hi);
+            // The asize could be any of 2, 1 or 0 (as we are dealing with potentially null operands).
             const mpz_size_t asize = (hi != 0u) ? 2 : (lo != 0u ? 1 : 0);
             rop._mp_size = (sign1 == sign2) ? asize : -asize;
             rdata[0] = lo;
             rdata[1] = hi;
             return nullptr;
-        }
-        //        b  a X
-        //        d  c
-        // -----------
-        //    t3 t2 t1
-        // t6 t5 t4 --
-        static thread_local std::array<::mp_limb_t, 4> tmp;
-        if (asize1 > asize2) {
-            const auto a = data1[0], b = data1[1], c = data2[0];
+        } else if (asize1 != asize2) {
+            //             b      a X
+            //                    c
+            // --------------------
+            // tmp[2] tmp[1] tmp[0]
+            ::mp_limb_t a, b, c;
+            if (asize1 > asize2) {
+                a = data1[0], b = data1[1], c = data2[0];
+            } else {
+                a = data2[0], b = data2[1], c = data1[0];
+            }
             ::mp_limb_t ca_lo, ca_hi, cb_lo, cb_hi;
             ca_lo = dlimb_mul(c, a, &ca_hi);
             cb_lo = dlimb_mul(c, b, &cb_hi);
             tmp[0] = ca_lo;
             tmp[1] = cb_lo + ca_hi;
             tmp[2] = cb_hi + (tmp[1] < cb_lo);
-            // Now determine the size.
-            const mpz_size_t asize = 2 + (tmp[2] ? 1 : 0);
+            // Now determine the size. asize must be at least 2.
+            const mpz_size_t asize = 2 + mpz_size_t(tmp[2] != 0u);
             rop._mp_size = (sign1 == sign2) ? asize : -asize;
             if (asize == 2) {
                 rdata[0] = tmp[0];
@@ -1598,7 +1621,13 @@ private:
                 return tmp.data();
             }
         } else {
-std::cout << "noooo\n";
+            //                    b      a X
+            //                    d      c
+            // ---------------------------
+            //            t3     t2     t1
+            //     t6     t5     t4     --
+            // ---------------------------
+            // tmp[3] tmp[2] tmp[1] tmp[0]
             const auto a = data1[0], b = data1[1], c = data2[0], d = data2[1];
             // First perform all 4 limb-by-limb mults.
             ::mp_limb_t ca_lo, ca_hi, cb_lo, cb_hi, da_lo, da_hi, db_lo, db_hi;
@@ -1626,16 +1655,10 @@ std::cout << "noooo\n";
             tmp[2] = tmp[2] + cy24;
             const ::mp_limb_t cy35b = tmp[2] < cy24;
             tmp[3] = t6 + ::mp_limb_t(cy35 || cy35b);
-            // Now determine the size.
-            const mpz_size_t asize = 2 + (tmp[3] ? 2 : (tmp[2] ? 1 : 0));
+            // Now determine the size. asize must be 3 or 4.
+            const mpz_size_t asize = 3 + mpz_size_t(tmp[2] != 0u);
             rop._mp_size = (sign1 == sign2) ? asize : -asize;
-            if (asize == 2) {
-                rdata[0] = tmp[0];
-                rdata[1] = tmp[1];
-                return nullptr;
-            } else {
-                return tmp.data();
-            }
+            return tmp.data();
         }
     }
     static const ::mp_limb_t *static_mul(s_int &rop, const s_int &op1, const s_int &op2)
