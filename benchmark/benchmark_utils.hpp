@@ -194,12 +194,12 @@ inline void smul_vec_mppp_half(nonius::chronometer meter, std::mt19937 &rng)
 }
 
 template <typename Integer>
-inline void umul_vec_mppp(nonius::chronometer meter, std::mt19937 &rng, unsigned N)
+inline void umul_vec_mppp(nonius::chronometer meter, std::mt19937 &rng, unsigned N1, unsigned N2)
 {
     const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
     std::array<Integer, size> arr1, arr2, arr3;
-    std::for_each(arr1.begin(), arr1.end(), [&rng, N](Integer &i) { random_integer(i, N, rng); });
-    std::for_each(arr2.begin(), arr2.end(), [&rng, N](Integer &i) { random_integer(i, N, rng); });
+    std::for_each(arr1.begin(), arr1.end(), [&rng, N1](Integer &i) { random_integer(i, N1, rng); });
+    std::for_each(arr2.begin(), arr2.end(), [&rng, N2](Integer &i) { /*random_integer(i, N2, rng);*/ i = Integer(1); });
     meter.measure([&arr1, &arr2, &arr3, size]() {
         for (unsigned j = 0u; j < size; ++j) {
             mul(arr3[j], arr1[j], arr2[j]);

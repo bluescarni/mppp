@@ -90,6 +90,7 @@ class mpz_cache
         ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
         assert(std::make_unsigned<mpz_size_t>::type(rop._mp_alloc) >= nlimbs);
     }
+
 public:
     // Max mpz alloc size.
     static const unsigned max_size = 10u;
@@ -128,12 +129,13 @@ public:
     ~mpz_cache()
     {
         // On destruction, deallocate all the cached mpzs.
-        for (auto &v: m_vec) {
-            for (auto &m: v) {
+        for (auto &v : m_vec) {
+            for (auto &m : v) {
                 ::mpz_clear(&m);
             }
         }
     }
+
 private:
     std::vector<std::vector<mpz_struct_t>> m_vec;
 };
@@ -1519,6 +1521,123 @@ private:
             }
         }
     }
+#if defined(MPPP_UINT128) && GMP_NUMB_BITS == 64 && !GMP_NAIL_BITS
+    static ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
+    {
+        using dlimb_t = MPPP_UINT128;
+        const dlimb_t res = dlimb_t(op1) * op2;
+        *hi = res >> 64;
+        return res;
+    }
+#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
+    static ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
+    {
+        using dlimb_t = std::uint_least64_t;
+        const dlimb_t res = dlimb_t(op1) * op2;
+        *hi = res >> 32;
+        return res;
+    }
+#endif
+    // 1-limb optimization via dlimb.
+    static const ::mp_limb_t *static_mul_impl(s_int &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t,
+                                              mpz_size_t asize1, int sign1, const ::mp_limb_t *data2, mpz_size_t,
+                                              mpz_size_t asize2, int sign2, const std::integral_constant<int, 1> &)
+    {
+        ::mp_limb_t hi;
+        const ::mp_limb_t lo = dlimb_mul(data1[0], data2[0], &hi);
+        if (mppp_unlikely(hi)) {
+            static thread_local std::array<::mp_limb_t, 2> tmp;
+            tmp[0] = lo;
+            tmp[1] = hi;
+            rop._mp_size = (sign1 == sign2) ? 2 : -2;
+            return tmp.data();
+        } else {
+            const mpz_size_t has_lo = (lo != 0u);
+            rop._mp_size = (sign1 == sign2) ? has_lo : -has_lo;
+            rdata[0] = lo;
+            return nullptr;
+        }
+    }
+    // 2-limb optimization via dlimb.
+    static const ::mp_limb_t *static_mul_impl(s_int &rop, ::mp_limb_t *rdata, const ::mp_limb_t *data1, mpz_size_t,
+                                              mpz_size_t asize1, int sign1, const ::mp_limb_t *data2, mpz_size_t,
+                                              mpz_size_t asize2, int sign2, const std::integral_constant<int, 2> &)
+    {
+        // Optimize the case in which the result always fits in rop.
+        if (asize1 <= 1 && asize2 <= 1) {
+            ::mp_limb_t hi;
+            const ::mp_limb_t lo = dlimb_mul(data1[0], data2[0], &hi);
+            const mpz_size_t asize = (hi != 0u) ? 2 : (lo != 0u ? 1 : 0);
+            rop._mp_size = (sign1 == sign2) ? asize : -asize;
+            rdata[0] = lo;
+            rdata[1] = hi;
+            return nullptr;
+        }
+        //        b  a X
+        //        d  c
+        // -----------
+        //    t3 t2 t1
+        // t6 t5 t4 --
+        static thread_local std::array<::mp_limb_t, 4> tmp;
+        if (asize1 > asize2) {
+            const auto a = data1[0], b = data1[1], c = data2[0];
+            ::mp_limb_t ca_lo, ca_hi, cb_lo, cb_hi;
+            ca_lo = dlimb_mul(c, a, &ca_hi);
+            cb_lo = dlimb_mul(c, b, &cb_hi);
+            tmp[0] = ca_lo;
+            tmp[1] = cb_lo + ca_hi;
+            tmp[2] = cb_hi + (tmp[1] < cb_lo);
+            // Now determine the size.
+            const mpz_size_t asize = 2 + (tmp[2] ? 1 : 0);
+            rop._mp_size = (sign1 == sign2) ? asize : -asize;
+            if (asize == 2) {
+                rdata[0] = tmp[0];
+                rdata[1] = tmp[1];
+                return nullptr;
+            } else {
+                return tmp.data();
+            }
+        } else {
+std::cout << "noooo\n";
+            const auto a = data1[0], b = data1[1], c = data2[0], d = data2[1];
+            // First perform all 4 limb-by-limb mults.
+            ::mp_limb_t ca_lo, ca_hi, cb_lo, cb_hi, da_lo, da_hi, db_lo, db_hi;
+            ca_lo = dlimb_mul(c, a, &ca_hi);
+            cb_lo = dlimb_mul(c, b, &cb_hi);
+            da_lo = dlimb_mul(d, a, &da_hi);
+            db_lo = dlimb_mul(d, b, &db_hi);
+            // Next fill in the adding rows.
+            ::mp_limb_t t1, t2, t3, t4, t5, t6;
+            t1 = ca_lo;
+            t2 = cb_lo + ca_hi;
+            t3 = cb_hi + (t2 < cb_lo);
+            t4 = da_lo;
+            t5 = db_lo + da_hi;
+            t6 = db_hi + (t5 < db_lo);
+            // The final addition.
+            tmp[0] = t1;
+            tmp[1] = t2 + t4;
+            // Carry coming from t2 + t4.
+            const ::mp_limb_t cy24 = tmp[1] < t2;
+            tmp[2] = t3 + t5;
+            // Carry coming from t3 + t5.
+            const ::mp_limb_t cy35 = tmp[2] < t3;
+            // Add the carry from the previous sum.
+            tmp[2] = tmp[2] + cy24;
+            const ::mp_limb_t cy35b = tmp[2] < cy24;
+            tmp[3] = t6 + ::mp_limb_t(cy35 || cy35b);
+            // Now determine the size.
+            const mpz_size_t asize = 2 + (tmp[3] ? 2 : (tmp[2] ? 1 : 0));
+            rop._mp_size = (sign1 == sign2) ? asize : -asize;
+            if (asize == 2) {
+                rdata[0] = tmp[0];
+                rdata[1] = tmp[1];
+                return nullptr;
+            } else {
+                return tmp.data();
+            }
+        }
+    }
     static const ::mp_limb_t *static_mul(s_int &rop, const s_int &op1, const s_int &op2)
     {
         // Cache a few quantities, detect signs.
@@ -1536,7 +1655,7 @@ private:
         ::mp_limb_t *rdata = rop.m_limbs.data();
         const ::mp_limb_t *data1 = op1.m_limbs.data(), *data2 = op2.m_limbs.data();
         return static_mul_impl(rop, rdata, data1, size1, asize1, sign1, data2, size2, asize2, sign2,
-                               /*static_add_algo<s_int>{}*/ std::integral_constant<int, 0>{});
+                               static_add_algo<s_int>{});
     }
 
 public:

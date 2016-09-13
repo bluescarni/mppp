@@ -34,7 +34,7 @@ see https://www.gnu.org/licenses/. */
 using namespace mppp;
 using namespace mppp_bench;
 
-using integer = mp_integer<1>;
+using integer = mp_integer<2>;
 
 std::mt19937 rng;
 
@@ -43,7 +43,9 @@ NONIUS_BENCHMARK("half-limb unsigned vector multiplication",
 NONIUS_BENCHMARK("half-limb signed vector multiplication",
                  [](nonius::chronometer meter) { smul_vec_mppp_half<integer>(meter, rng); });
 NONIUS_BENCHMARK("1-limb unsigned vector multiplication",
-                 [](nonius::chronometer meter) { umul_vec_mppp<integer>(meter, rng, 1); });
+                 [](nonius::chronometer meter) { umul_vec_mppp<integer>(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("2-limb unsigned vector multiplication",
+                 [](nonius::chronometer meter) { umul_vec_mppp<integer>(meter, rng, 2, 1); });
 
 NONIUS_BENCHMARK("gmp half-limb unsigned vector multiplication",
                  [](nonius::chronometer meter) { umul_vec_gmp_half(meter, rng); });
