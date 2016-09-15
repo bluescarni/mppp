@@ -50,6 +50,9 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 
 static std::mt19937 rng;
 
+// TODO inplace tests, particularily for add/mul/etc. when promotion of rop might mean
+// promotion of operands.
+
 struct add_tester {
     template <typename S>
     inline void operator()(const S &) const

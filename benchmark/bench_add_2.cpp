@@ -38,47 +38,80 @@ using integer = mp_integer<2>;
 
 std::mt19937 rng;
 
-NONIUS_BENCHMARK("1-1-limb unsigned vector addition",
+NONIUS_BENCHMARK("mppp 1-1-limb unsigned vector addition",
                  [](nonius::chronometer meter) { uadd_vec_mppp<integer>(meter, rng, 1, 1); });
-NONIUS_BENCHMARK("1-1-limb signed vector addition",
+NONIUS_BENCHMARK("mppp 1-1-limb signed vector addition",
                  [](nonius::chronometer meter) { sadd_vec_mppp<integer>(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("mppp 1-1-limb unsigned vector accumulation",
+                 [](nonius::chronometer meter) { uacc_mppp<integer>(meter, rng, 1); });
+NONIUS_BENCHMARK("mppp 1-1-limb signed vector accumulation",
+                 [](nonius::chronometer meter) { sacc_mppp<integer>(meter, rng, 1); });
 
 NONIUS_BENCHMARK("piranha 1-1-limb unsigned vector addition",
                  [](nonius::chronometer meter) { uadd_vec_piranha(meter, rng, 1, 1); });
 NONIUS_BENCHMARK("piranha 1-1-limb signed vector addition",
                  [](nonius::chronometer meter) { sadd_vec_piranha(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("piranha 1-1-limb unsigned vector accumulation",
+                 [](nonius::chronometer meter) { uacc_piranha(meter, rng, 1); });
+NONIUS_BENCHMARK("piranha 1-1-limb signed vector accumulation",
+                 [](nonius::chronometer meter) { sacc_piranha(meter, rng, 1); });
 
 NONIUS_BENCHMARK("gmp 1-1-limb unsigned vector addition",
                  [](nonius::chronometer meter) { uadd_vec_gmp(meter, rng, 1, 1); });
 NONIUS_BENCHMARK("gmp 1-1-limb signed vector addition",
                  [](nonius::chronometer meter) { sadd_vec_gmp(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("gmp 1-1-limb unsigned vector accumulation",
+                 [](nonius::chronometer meter) { uacc_gmp(meter, rng, 1); });
+NONIUS_BENCHMARK("gmp 1-1-limb signed vector accumulation", [](nonius::chronometer meter) { sacc_gmp(meter, rng, 1); });
 
-NONIUS_BENCHMARK("2-2-limb unsigned vector addition",
+NONIUS_BENCHMARK("mppp 2-2-limb unsigned vector addition",
                  [](nonius::chronometer meter) { uadd_vec_mppp<integer>(meter, rng, 2, 2); });
-NONIUS_BENCHMARK("2-2-limb signed vector addition",
+NONIUS_BENCHMARK("mppp 2-2-limb signed vector addition",
                  [](nonius::chronometer meter) { sadd_vec_mppp<integer>(meter, rng, 2, 2); });
+NONIUS_BENCHMARK("mppp 2-2-limb unsigned vector accumulation",
+                 [](nonius::chronometer meter) { uacc_mppp<integer>(meter, rng, 2); });
+NONIUS_BENCHMARK("mppp 2-2-limb signed vector accumulation",
+                 [](nonius::chronometer meter) { sacc_mppp<integer>(meter, rng, 2); });
 
 NONIUS_BENCHMARK("piranha 2-2-limb unsigned vector addition",
                  [](nonius::chronometer meter) { uadd_vec_piranha(meter, rng, 2, 2); });
 NONIUS_BENCHMARK("piranha 2-2-limb signed vector addition",
                  [](nonius::chronometer meter) { sadd_vec_piranha(meter, rng, 2, 2); });
+NONIUS_BENCHMARK("piranha 2-2-limb unsigned vector accumulation",
+                 [](nonius::chronometer meter) { uacc_piranha(meter, rng, 2); });
+NONIUS_BENCHMARK("piranha 2-2-limb signed vector accumulation",
+                 [](nonius::chronometer meter) { sacc_piranha(meter, rng, 2); });
 
 NONIUS_BENCHMARK("gmp 2-2-limb unsigned vector addition",
                  [](nonius::chronometer meter) { uadd_vec_gmp(meter, rng, 2, 2); });
 NONIUS_BENCHMARK("gmp 2-2-limb signed vector addition",
                  [](nonius::chronometer meter) { sadd_vec_gmp(meter, rng, 2, 2); });
+NONIUS_BENCHMARK("gmp 2-2-limb unsigned vector accumulation",
+                 [](nonius::chronometer meter) { uacc_gmp(meter, rng, 2); });
+NONIUS_BENCHMARK("gmp 2-2-limb signed vector accumulation", [](nonius::chronometer meter) { sacc_gmp(meter, rng, 2); });
 
-NONIUS_BENCHMARK("3-3-limb unsigned vector addition",
+NONIUS_BENCHMARK("mppp 3-3-limb unsigned vector addition",
                  [](nonius::chronometer meter) { uadd_vec_mppp<integer>(meter, rng, 3, 3); });
-NONIUS_BENCHMARK("3-3-limb signed vector addition",
+NONIUS_BENCHMARK("mppp 3-3-limb signed vector addition",
                  [](nonius::chronometer meter) { sadd_vec_mppp<integer>(meter, rng, 3, 3); });
+NONIUS_BENCHMARK("mppp 3-3-limb unsigned vector accumulation",
+                 [](nonius::chronometer meter) { uacc_mppp<integer>(meter, rng, 3); });
+NONIUS_BENCHMARK("mppp 3-3-limb signed vector accumulation",
+                 [](nonius::chronometer meter) { sacc_mppp<integer>(meter, rng, 3); });
 
 NONIUS_BENCHMARK("piranha 3-3-limb unsigned vector addition",
                  [](nonius::chronometer meter) { uadd_vec_piranha(meter, rng, 3, 3); });
 NONIUS_BENCHMARK("piranha 3-3-limb signed vector addition",
                  [](nonius::chronometer meter) { sadd_vec_piranha(meter, rng, 3, 3); });
+NONIUS_BENCHMARK("piranha 3-3-limb unsigned vector accumulation",
+                 [](nonius::chronometer meter) { uacc_piranha(meter, rng, 3); });
+NONIUS_BENCHMARK("piranha 3-3-limb signed vector accumulation",
+                 [](nonius::chronometer meter) { sacc_piranha(meter, rng, 3); });
 
 NONIUS_BENCHMARK("gmp 3-3-limb unsigned vector addition",
                  [](nonius::chronometer meter) { uadd_vec_gmp(meter, rng, 3, 3); });
 NONIUS_BENCHMARK("gmp 3-3-limb signed vector addition",
                  [](nonius::chronometer meter) { sadd_vec_gmp(meter, rng, 3, 3); });
+NONIUS_BENCHMARK("gmp 3-3-limb unsigned vector accumulation",
+                 [](nonius::chronometer meter) { uacc_gmp(meter, rng, 3); });
+NONIUS_BENCHMARK("gmp 3-3-limb signed vector accumulation", [](nonius::chronometer meter) { sacc_gmp(meter, rng, 3); });
