@@ -59,6 +59,8 @@ inline namespace detail
 
 // TODO mpz struct checks -> TODO check about _mp_size as well.
 // TODO --> config.hpp
+// NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
+// http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
 #define MPPP_UINT128 __uint128_t
 #define mppp_likely(x) __builtin_expect(!!(x), 1)
 #define mppp_unlikely(x) __builtin_expect(!!(x), 0)

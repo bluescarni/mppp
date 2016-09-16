@@ -34,7 +34,7 @@ see https://www.gnu.org/licenses/. */
 using namespace mppp;
 using namespace mppp_bench;
 
-using integer = mp_integer<1>;
+using integer = mp_integer<2>;
 
 std::mt19937 rng;
 
