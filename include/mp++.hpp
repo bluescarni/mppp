@@ -286,6 +286,7 @@ inline void copy_limbs_no(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp
     }
 }
 
+// Add a and b, store the result in res, and return 1 if there's unsigned overflow, 0 othersize.
 inline ::mp_limb_t limb_add_overflow(::mp_limb_t a, ::mp_limb_t b, ::mp_limb_t *res)
 {
     *res = a + b;
@@ -1296,11 +1297,10 @@ private:
         auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
         // NOTE: both asizes have to be 0 or 1 here.
         assert(asize1 <= 1 && asize2 <= 1);
+        ::mp_limb_t tmp;
         if (sign1 == sign2) {
             // When the signs are identical, we can implement addition as a true addition.
-            ::mp_limb_t tmp;
-            const auto hi = static_cast<int>(limb_add_overflow(data1[0], data2[0], &tmp));
-            if (mppp_unlikely(hi)) {
+            if (mppp_unlikely(limb_add_overflow(data1[0], data2[0], &tmp))) {
                 return false;
             }
             // Assign the output. asize can be zero (sign1 == sign2 == 0) or 1.
@@ -1310,7 +1310,7 @@ private:
             // When the signs differ, we need to implement addition as a subtraction.
             if (data1[0] >= data2[0]) {
                 // op1 is not smaller than op2.
-                const auto tmp = data1[0] - data2[0];
+                tmp = data1[0] - data2[0];
                 // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
                 rop._mp_size = sign1;
                 if (mppp_unlikely(!tmp)) {
@@ -1318,10 +1318,9 @@ private:
                 }
                 rdata[0] = tmp;
             } else {
-                const auto tmp = data2[0] - data1[0];
                 // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
                 rop._mp_size = sign2;
-                rdata[0] = tmp;
+                rdata[0] = data2[0] - data1[0];
             }
         }
         return true;
@@ -1440,7 +1439,7 @@ private:
 public:
     friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
-        bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
         if (mppp_likely(sr && s1 && s2)) {
             // Optimise the case of all statics.
             if (mppp_likely(static_addsub<true>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st()))) {
@@ -1636,7 +1635,7 @@ private:
 public:
     friend void mul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
-        bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
         std::size_t size_hint = 0u;
         if (mppp_likely(sr && s1 && s2)) {
             size_hint = static_mul(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
