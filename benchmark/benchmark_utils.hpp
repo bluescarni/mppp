@@ -271,6 +271,24 @@ inline void smul_vec_mppp(nonius::chronometer meter, std::mt19937 &rng, unsigned
     });
 }
 
+template <typename Integer>
+inline void uaddmul_vec_mppp_half(nonius::chronometer meter, std::mt19937 &rng)
+{
+    const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
+    std::array<Integer, size> arr1, arr2, arr3;
+    std::for_each(arr1.begin(), arr1.end(),
+                  [&rng](Integer &i) { random_integer(i, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2)); });
+    std::for_each(arr2.begin(), arr2.end(),
+                  [&rng](Integer &i) { random_integer(i, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2)); });
+    std::for_each(arr3.begin(), arr3.end(), [](Integer &i) { i = Integer(1); });
+    meter.measure([&arr1, &arr2, &arr3, size]() {
+        auto arr3a(arr3);
+        for (unsigned j = 0u; j < size; ++j) {
+            addmul(arr3a[j], arr1[j], arr2[j]);
+        }
+    });
+}
+
 // piranha::integer.
 inline void uadd_vec_piranha(nonius::chronometer meter, std::mt19937 &rng, unsigned N, unsigned M)
 {
@@ -452,6 +470,28 @@ inline void smul_vec_piranha(nonius::chronometer meter, std::mt19937 &rng, unsig
     meter.measure([&arr1, &arr2, &arr3, size]() {
         for (unsigned j = 0u; j < size; ++j) {
             arr3[j].mul(arr1[j], arr2[j]);
+        }
+    });
+}
+
+inline void uaddmul_vec_piranha_half(nonius::chronometer meter, std::mt19937 &rng)
+{
+    const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
+    std::array<piranha::integer, size> arr1, arr2, arr3;
+    mppp::mpz_raii tmp;
+    std::for_each(arr1.begin(), arr1.end(), [&rng, &tmp](piranha::integer &i) {
+        random_mpz(tmp, 1, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
+        i = piranha::integer(&tmp.m_mpz);
+    });
+    std::for_each(arr2.begin(), arr2.end(), [&rng, &tmp](piranha::integer &i) {
+        random_mpz(tmp, 1, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
+        i = piranha::integer(&tmp.m_mpz);
+    });
+    std::for_each(arr3.begin(), arr3.end(), [](piranha::integer &i) { i = piranha::integer(1); });
+    meter.measure([&arr1, &arr2, &arr3, size]() {
+        auto arr3a(arr3);
+        for (unsigned j = 0u; j < size; ++j) {
+            arr3a[j].multiply_accumulate(arr1[j], arr2[j]);
         }
     });
 }

@@ -51,6 +51,33 @@ see https://www.gnu.org/licenses/. */
 
 #endif
 
+// Compiler configuration.
+#if defined(__clang__) || defined(__GNUC__)
+
+#define mppp_likely(x) __builtin_expect(!!(x), 1)
+#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
+#define MPPP_RESTRICT __restrict
+
+// NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
+// http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
+#if defined(__SIZEOF_INT128__)
+#define MPPP_UINT128 __uint128_t
+#endif
+
+#elif defined(_MSC_VER)
+
+#define mppp_likely(x) (x)
+#define mppp_unlikely(x) (x)
+#define MPPP_RESTRICT __restrict
+
+#else
+
+#define mppp_likely(x) (x)
+#define mppp_unlikely(x) (x)
+#define MPPP_RESTRICT
+
+#endif
+
 namespace mppp
 {
 
@@ -58,13 +85,6 @@ inline namespace detail
 {
 
 // TODO mpz struct checks -> TODO check about _mp_size as well.
-// TODO --> config.hpp
-// NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
-// http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
-#define MPPP_UINT128 __uint128_t
-#define mppp_likely(x) __builtin_expect(!!(x), 1)
-#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
-#define MPPP_RESTRICT __restrict
 
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
@@ -157,12 +177,14 @@ inline void mpz_init_cache(mpz_struct_t &m, std::size_t nlimbs)
     get_mpz_cache().pop(m, nlimbs);
 }
 
+// Combined init+set.
 inline void mpz_init_set_cache(mpz_struct_t &m0, const mpz_struct_t &m1)
 {
     mpz_init_cache(m0, ::mpz_size(&m1));
     ::mpz_set(&m0, &m1);
 }
 
+// Clear m (might move its value into the cache).
 inline void mpz_clear_cache(mpz_struct_t &m)
 {
     get_mpz_cache().push(m);
@@ -287,6 +309,8 @@ inline void copy_limbs_no(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp
 }
 
 // Add a and b, store the result in res, and return 1 if there's unsigned overflow, 0 othersize.
+// NOTE: recent GCC versions have builtins for this, but they don't seem to make much of a difference:
+// https://gcc.gnu.org/onlinedocs/gcc/Integer-Overflow-Builtins.html
 inline ::mp_limb_t limb_add_overflow(::mp_limb_t a, ::mp_limb_t b, ::mp_limb_t *res)
 {
     *res = a + b;
@@ -762,15 +786,6 @@ public:
         assert(is_dynamic());
         return m_dy;
     }
-    // Reset a dynamic int to a default constructed static.
-    void reset_to_static()
-    {
-        assert(is_dynamic());
-        // Destroy the dynamic storage.
-        destroy_dynamic();
-        // Init the static storage.
-        ::new (static_cast<void *>(&m_st)) s_storage();
-    }
     // Promotion from static to dynamic. If nlimbs != 0u, allocate nlimbs limbs, wtherwise
     // allocate exactly the nlimbs necessary to represent this.
     void promote(std::size_t nlimbs = 0u)
@@ -814,7 +829,7 @@ public:
         g_st()._mp_size = signed_size;
         copy_limbs_no(tmp.data(), tmp.data() + dyn_size, g_st().m_limbs.data());
     }
-
+    // NOTE: keep these public as we need them below.
     s_storage m_st;
     d_storage m_dy;
 };
@@ -1371,8 +1386,7 @@ private:
             const ::mp_limb_t cy_lo = limb_add_overflow(a, b, &lo), cy_hi1 = limb_add_overflow(c, d, &hi1),
                               cy_hi2 = limb_add_overflow(hi1, cy_lo, &hi2);
             // The result will overflow if we have any carry relating to the high limb.
-            const bool overflow = cy_hi1 || cy_hi2;
-            if (mppp_unlikely(overflow)) {
+            if (mppp_unlikely(cy_hi1 || cy_hi2)) {
                 return false;
             }
             // For the size compuation:
@@ -1629,7 +1643,7 @@ private:
             asize2 = -asize2;
             sign2 = -1;
         }
-        return static_mul_impl(rop, op1, op2, asize1, asize2, sign1, sign2, static_add_algo<s_int>{});
+        return static_mul_impl(rop, op1, op2, asize1, asize2, sign1, sign2, static_mul_algo<s_int>{});
     }
 
 public:
@@ -1652,6 +1666,200 @@ public:
             rop.m_int.promote(size_hint);
         }
         ::mpz_mul(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    }
+
+private:
+    // Selection of the algorithm for addmul: if optimised algorithms exist for both add and mul, then use the optimised
+    // addmul algos. Otherwise, use the mpn one.
+    template <typename SInt>
+    using static_addmul_algo
+        = std::integral_constant<int,
+                                 (static_add_algo<SInt>::value == 2 && static_mul_algo<SInt>::value == 2)
+                                     ? 2
+                                     : ((static_add_algo<SInt>::value == 1 && static_mul_algo<SInt>::value == 1) ? 1
+                                                                                                                 : 0)>;
+    static std::size_t static_addmul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t, mpz_size_t,
+                                          mpz_size_t, int signr, int sign1, int sign2,
+                                          const std::integral_constant<int, 1> &)
+    {
+        // First we do op1 * op2.
+        ::mp_limb_t tmp;
+        const ::mp_limb_t prod = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &tmp);
+        if (mppp_unlikely(tmp)) {
+            return 3u;
+        }
+        // Determine the sign of the product: 0, 1 or -1.
+        int sign_prod = prod != 0u;
+        if (sign1 != sign2) {
+            sign_prod = -sign_prod;
+        }
+        // Now add/sub.
+        if (signr == sign_prod) {
+            // Same sign, do addition with overflow check.
+            if (mppp_unlikely(limb_add_overflow(rop.m_limbs[0], prod, &tmp))) {
+                return 2u;
+            }
+            // Assign the output.
+            rop._mp_size = signr;
+            rop.m_limbs[0] = tmp;
+        } else {
+            // When the signs differ, we need to implement addition as a subtraction.
+            if (rop.m_limbs[0] >= prod) {
+                // abs(rop) >= abs(prod).
+                tmp = rop.m_limbs[0] - prod;
+                // asize is either 1 or 0 (0 iff rop == prod).
+                rop._mp_size = signr;
+                if (mppp_unlikely(!tmp)) {
+                    rop._mp_size = 0;
+                }
+                rop.m_limbs[0] = tmp;
+            } else {
+                // NOTE: this cannot be zero, as rop and prod cannot be equal.
+                rop._mp_size = sign_prod;
+                rop.m_limbs[0] = prod - rop.m_limbs[0];
+            }
+        }
+        return 0u;
+    }
+    static std::size_t static_addmul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asizer,
+                                          mpz_size_t asize1, mpz_size_t asize2, int signr, int sign1, int sign2,
+                                          const std::integral_constant<int, 2> &)
+    {
+        if (mppp_unlikely(!asize1 || !asize2)) {
+            // If op1 or op2 are zero, rop will be unchanged.
+            return 0u;
+        }
+        // Handle op1 * op2.
+        std::array<::mp_limb_t, 2> prod;
+        int sign_prod = 1;
+        if (sign1 != sign2) {
+            sign_prod = -1;
+        }
+        mpz_size_t asize_prod;
+        if (asize1 == 1 && asize2 == 1) {
+            prod[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &prod[1]);
+            asize_prod = (asize1 + asize2) - mpz_size_t(prod[1] == 0u);
+        } else {
+            // The only possibility of success is 2limbs x 1limb.
+            //
+            //       b       a X
+            //               c
+            // ---------------
+            // prod[1] prod[0]
+            //
+            if (mppp_unlikely(asize1 == asize2)) {
+                // This means that both sizes are 2.
+                return 5u;
+            }
+            ::mp_limb_t a = op1.m_limbs[0], b = op1.m_limbs[1], c = op2.m_limbs[0];
+            if (asize1 < asize2) {
+                // Switch them around if needed.
+                a = op2.m_limbs[0], b = op2.m_limbs[1], c = op1.m_limbs[0];
+            }
+            ::mp_limb_t ca_hi, cb_hi;
+            // These are the three operations that build the result, two mults, one add.
+            prod[0] = dlimb_mul(c, a, &ca_hi);
+            prod[1] = dlimb_mul(c, b, &cb_hi);
+            // NOTE: we can use this with overlapping arguments because the first two
+            // are passed as copies.
+            const auto cy = limb_add_overflow(prod[1], ca_hi, &prod[1]);
+            // Check if the third limb exists, if so we return failure.
+            if (mppp_unlikely(cb_hi || cy)) {
+                return 4u;
+            }
+            asize_prod = 2;
+        }
+        // Proceed to the addition.
+        if (signr == sign_prod) {
+            // Add the hi and lo limbs.
+            ::mp_limb_t lo, hi1, hi2;
+            const ::mp_limb_t cy_lo = limb_add_overflow(rop.m_limbs[0], prod[0], &lo),
+                              cy_hi1 = limb_add_overflow(rop.m_limbs[1], prod[1], &hi1),
+                              cy_hi2 = limb_add_overflow(hi1, cy_lo, &hi2);
+            // The result will overflow if we have any carry relating to the high limb.
+            if (mppp_unlikely(cy_hi1 || cy_hi2)) {
+                return 3u;
+            }
+            // For the size compuation:
+            // - cannot be zero, as prod is not zero,
+            // - if signr == +-1, then the size is either +-1 or +-2: asize is 2 if the result
+            //   has a nonzero 2nd limb, otherwise asize is 1.
+            rop._mp_size = signr;
+            if (hi2) {
+                rop._mp_size = signr + signr;
+            }
+            rop.m_limbs[0] = lo;
+            rop.m_limbs[1] = hi2;
+        } else {
+            // When the signs differ, we need to implement addition as a subtraction.
+            if (asizer > asize_prod
+                || (asizer == asize_prod && compare_limbs_2(&rop.m_limbs[0], &prod[0], asizer) >= 0)) {
+                // rop >= prod in absolute value.
+                const auto lo = rop.m_limbs[0] - prod[0];
+                // If there's a borrow, then hi1 > hi2, otherwise we would have a negative result.
+                assert(rop.m_limbs[0] >= prod[0] || rop.m_limbs[1] > prod[1]);
+                // This can never wrap around, at most it goes to zero.
+                const auto hi = rop.m_limbs[1] - prod[1] - static_cast<::mp_limb_t>(rop.m_limbs[0] < prod[0]);
+                // asize can be 0, 1 or 2.
+                rop._mp_size = 0;
+                if (hi) {
+                    rop._mp_size = signr + signr;
+                } else if (lo) {
+                    rop._mp_size = signr;
+                }
+                rop.m_limbs[0] = lo;
+                rop.m_limbs[1] = hi;
+            } else {
+                // prod > rop in absolute value.
+                const auto lo = prod[0] - rop.m_limbs[0];
+                assert(prod[0] >= rop.m_limbs[0] || prod[1] > rop.m_limbs[1]);
+                const auto hi = prod[1] - rop.m_limbs[1] - static_cast<::mp_limb_t>(prod[0] < rop.m_limbs[0]);
+                // asize can be 1 or 2, but not zero as we know abs(prod) != abs(rop).
+                rop._mp_size = sign_prod;
+                if (hi) {
+                    rop._mp_size = sign_prod + sign_prod;
+                }
+                rop.m_limbs[0] = lo;
+                rop.m_limbs[1] = hi;
+            }
+        }
+        return 0u;
+    }
+    static std::size_t static_addmul(s_int &rop, const s_int &op1, const s_int &op2)
+    {
+        mpz_size_t asizer = rop._mp_size, asize1 = op1._mp_size, asize2 = op2._mp_size;
+        int signr = asizer != 0, sign1 = asize1 != 0, sign2 = asize2 != 0;
+        if (asizer < 0) {
+            asizer = -asizer;
+            signr = -1;
+        }
+        if (asize1 < 0) {
+            asize1 = -asize1;
+            sign1 = -1;
+        }
+        if (asize2 < 0) {
+            asize2 = -asize2;
+            sign2 = -1;
+        }
+        return static_addmul_impl(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
+                                  static_addmul_algo<s_int>{});
+    }
+
+public:
+    friend void addmul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
+    {
+        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+        std::size_t size_hint = 0u;
+        if (mppp_likely(sr && s1 && s2)) {
+            size_hint = static_addmul(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
+            if (mppp_likely(size_hint == 0u)) {
+                return;
+            }
+        }
+        if (sr) {
+            rop.m_int.promote(size_hint);
+        }
+        ::mpz_addmul(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     }
 
 private:
