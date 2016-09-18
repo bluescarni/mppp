@@ -24,7 +24,7 @@ install:
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] 7z x -oC:\ mppp_deps_msvc_32.7z > NUL
 # Same for MinGW.
 - if [%COMPILER%]==[MinGW] set PATH=C:\mingw64\bin;%PATH%
-- if [%COMPILER%]==[MinGW] call tools\appveyor-download.cmd http://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/6.2.0/threads-posix/seh/x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z?r=&ts=1474205342&use_mirror=netassist
+- if [%COMPILER%]==[MinGW] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z
 - if [%COMPILER%]==[MinGW] 7z x -oC:\ x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z > NUL
 - if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_mingw_64.7z
 - if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ mppp_deps_mingw_64.7z > NUL
