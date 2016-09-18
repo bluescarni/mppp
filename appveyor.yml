@@ -11,14 +11,23 @@ environment:
     - BUILD_TYPE: Debug
       COMPILER: MSVC15
       PLATFORM: x64
+    - BUILD_TYPE: Debug
+      COMPILER: MinGW
+      PLATFORM: x64
 
 install:
-# Set path and download deps.
+# Set path and download deps for MSVC.
 - if [%COMPILER%]==[MSVC15] set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_msvc_64.7z
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_msvc_32.7z
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] 7z x -oC:\ mppp_deps_msvc_64.7z > NUL
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] 7z x -oC:\ mppp_deps_msvc_32.7z > NUL
+# Same for MinGW.
+- if [%COMPILER%]==[MinGW] set PATH=C:\mingw64\bin;%PATH%
+- if [%COMPILER%]==[MinGW] call tools\appveyor-download.cmd http://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/6.2.0/threads-posix/seh/x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z?r=&ts=1474205342&use_mirror=netassist
+- if [%COMPILER%]==[MinGW] 7z x -oC:\ x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z > NUL
+- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_mingw_64.7z
+- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ mppp_deps_mingw_64.7z > NUL
 
 build_script:
 - mkdir build
@@ -26,6 +35,7 @@ build_script:
 
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] cmake -G "Visual Studio 14 2015" -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/mppp_deps_32/mpir -DGMP_LIBRARY=C:/mppp_deps_32/mpir/mpir.lib ..
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] cmake -G "Visual Studio 14 2015 Win64" -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/mppp_deps_64/mpir -DGMP_LIBRARY=C:/mppp_deps_64/mpir/mpir.lib ..
+- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles"" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_LONG_DOUBLE=YES -DGMP_INCLUDE_DIR=C:/mppp_deps_64/gmp -DGMP_LIBRARY=C:/mppp_deps_64/gmp/libgmp.a -DMPFR_INCLUDE_DIR=C:/mppp_deps_64/mpfr -DMPFR_LIBRARY=C:/mppp_deps_64/mpfr/libmpfr.a ..
 
 - cmake --build . --config %BUILD_TYPE% --target ALL_BUILD
 
