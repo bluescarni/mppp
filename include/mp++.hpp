@@ -66,9 +66,17 @@ see https://www.gnu.org/licenses/. */
 
 #elif defined(_MSC_VER)
 
+#include <windows.h>
+#include <Winnt.h>
+
 #define mppp_likely(x) (x)
 #define mppp_unlikely(x) (x)
 #define MPPP_RESTRICT __restrict
+
+// Disable some warnings for MSVC.
+#pragma warning( push )
+#pragma warning( disable : 4127 )
+#pragma warning( disable : 4804 )
 
 #else
 
@@ -432,11 +440,20 @@ struct static_int {
         }
         return false;
     }
+	// NOTE: this wrapper around std::numeric_limits is to work around an MSVC bug (it is seemingly
+	// unable to deal with constexpr functions in a SFINAE context).
+	template <typename T, typename = void>
+	struct limits {};
+	template <typename T>
+	struct limits<T,typename std::enable_if<std::is_integral<T>::value>::type>
+	{
+		static const T max = std::numeric_limits<T>::max();
+		static const T min = std::numeric_limits<T>::min();
+	};
     // Ctor from unsigned integral types that are wider than unsigned long.
     // This requires special handling as the GMP api does not support unsigned long long natively.
     template <typename Uint, typename std::enable_if<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
-                                                         && (std::numeric_limits<Uint>::max()
-                                                             > std::numeric_limits<unsigned long>::max()),
+                                                         && (limits<Uint>::max > limits<unsigned long>::max),
                                                      int>::type
                              = 0>
     explicit static_int(Uint n) : _mp_alloc(s_alloc), m_limbs{}
@@ -472,8 +489,7 @@ struct static_int {
     }
     // Ctor from unsigned integral types that are not wider than unsigned long.
     template <typename Uint, typename std::enable_if<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
-                                                         && (std::numeric_limits<Uint>::max()
-                                                             <= std::numeric_limits<unsigned long>::max()),
+                                                         && (limits<Uint>::max <= limits<unsigned long>::max),
                                                      int>::type
                              = 0>
     explicit static_int(Uint n) : _mp_alloc(s_alloc), m_limbs{}
@@ -488,8 +504,8 @@ struct static_int {
     // Ctor from signed integral types that are wider than long.
     template <typename Int,
               typename std::enable_if<std::is_signed<Int>::value && is_supported_integral<Int>::value
-                                          && (std::numeric_limits<Int>::max() > std::numeric_limits<long>::max()
-                                              || std::numeric_limits<Int>::min() < std::numeric_limits<long>::min()),
+                                          && (limits<Int>::max > limits<long>::max
+                                              || limits<Int>::min < limits<long>::min),
                                       int>::type
               = 0>
     explicit static_int(Int n) : _mp_alloc(s_alloc), m_limbs{}
@@ -526,8 +542,8 @@ struct static_int {
     // Ctor from signed integral types that are not wider than long.
     template <typename Int,
               typename std::enable_if<std::is_signed<Int>::value && is_supported_integral<Int>::value
-                                          && (std::numeric_limits<Int>::max() <= std::numeric_limits<long>::max()
-                                              && std::numeric_limits<Int>::min() >= std::numeric_limits<long>::min()),
+                                          && (limits<Int>::max <= limits<long>::max
+                                              && limits<Int>::min >= limits<long>::min),
                                       int>::type
               = 0>
     explicit static_int(Int n) : _mp_alloc(s_alloc), m_limbs{}
@@ -998,7 +1014,7 @@ private:
     template <typename T, typename std::enable_if<std::is_same<T, bool>::value, int>::type = 0>
     static T conversion_impl(const mpz_struct_t &m)
     {
-        return mpz_sgn(&m);
+        return mpz_sgn(&m) != 0;
     }
     // Dynamic conversion to unsigned ints.
     template <typename T, uint_conversion_enabler<T> = 0>
@@ -1468,16 +1484,18 @@ public:
 
 private:
     // The double limb multiplication optimization is available in the following cases:
-    // - we have a 128bit unsigned available, there are no nail bits and the limb bit size is 64, or
-    // - there are no nail bits, the limb bit size is 32 and the smallest 64 bit unsigned type has exactly 64 bits.
-    using have_dlimb_mul
-        = std::integral_constant<bool,
-                                 !GMP_NAIL_BITS && (
-#if defined(MPPP_UINT128)
-                                                       (GMP_NUMB_BITS == 64) ||
+	// - no nails, and we are on a 64bit MSVC build,
+    // - no nails, we have a 128bit unsigned available, and the limb bit size is 64,
+    // - no nails, the limb bit size is 32 and the smallest 64 bit unsigned type has exactly 64 bits.
+	using have_dlimb_mul = std::integral_constant<bool,
+#if (defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64)) || (defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64))
+		!GMP_NAIL_BITS
+#elif GMP_NUMB_BITS == 32
+		!GMP_NAIL_BITS && std::numeric_limits<std::uint_least64_t>::digits == 64
+#else
+		false
 #endif
-                                                       (GMP_NUMB_BITS == 32
-                                                        && std::numeric_limits<std::uint_least64_t>::digits == 64))>;
+	>;
     template <typename SInt>
     using static_mul_algo = std::integral_constant<int, (SInt::s_size == 1 && have_dlimb_mul::value)
                                                             ? 1
@@ -1541,7 +1559,12 @@ private:
         copy_limbs_no(res_data, res_data + asize, rdata);
         return 0u;
     }
-#if defined(MPPP_UINT128) && GMP_NUMB_BITS == 64 && !GMP_NAIL_BITS
+#if defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+	static ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
+	{
+		return ::UnsignedMultiply128(op1, op2, hi);
+	}
+#elif defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
     static ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
     {
         using dlimb_t = MPPP_UINT128;
@@ -1866,5 +1889,11 @@ private:
     integer_union<SSize> m_int;
 };
 }
+
+#if defined(_MSC_VER)
+
+#pragma warning( pop )
+
+#endif
 
 #endif
