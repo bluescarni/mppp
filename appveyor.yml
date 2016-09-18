@@ -17,8 +17,8 @@ install:
 - if [%COMPILER%]==[MSVC15] set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_msvc_64.7z
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_msvc_32.7z
-- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] 7z x mppp_deps_msvc_64.7z > NUL
-- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] 7z x mppp_deps_msvc_32.7z > NUL
+- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] 7z x -oC:\ mppp_deps_msvc_64.7z > NUL
+- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] 7z x -oC:\ mppp_deps_msvc_32.7z > NUL
 
 build_script:
 - mkdir build
@@ -35,5 +35,5 @@ test_script:
 # Enable this to be able to login to the build worker. You can use the
 # `remmina` program in Ubuntu, use the login information that the line below
 # prints into the log.
-on_finish:
-- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# on_finish:
+# - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
