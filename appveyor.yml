@@ -28,6 +28,8 @@ install:
 - if [%COMPILER%]==[MinGW] 7z x -oC:\ x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z > NUL
 - if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_mingw_64.7z
 - if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ mppp_deps_mingw_64.7z > NUL
+# Rename sh.exe as sh.exe in PATH interferes with MinGW.
+- if [%COMPILER%]==[MinGW] rename "C:\Program Files\Git\usr\bin\sh.exe" "sh2.exe"
 
 build_script:
 - mkdir build
