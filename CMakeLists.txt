@@ -22,14 +22,16 @@ if(MSVC)
 	target_compile_options(mp++ INTERFACE "-DNOMINMAX")
 endif()
 
-# mp++ depends on GMP.
-target_link_libraries(mp++ INTERFACE GMP::GMP)
-
 if(MPPP_WITH_LONG_DOUBLE)
     find_package(MPFR REQUIRED)
     target_compile_definitions(mp++ INTERFACE MPPP_WITH_LONG_DOUBLE)
     target_link_libraries(mp++ INTERFACE MPFR::MPFR)
 endif()
+
+# mp++ depends on GMP.
+# NOTE: depend on GMP *after* optionally depending on MPFR, as the order
+# of the libraries matters on some platforms.
+target_link_libraries(mp++ INTERFACE GMP::GMP)
 
 target_include_directories(mp++ INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
