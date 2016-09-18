@@ -87,7 +87,7 @@ struct int_ctor_tester {
             REQUIRE(lex_cast(min) == lex_cast(integer{min}));
             REQUIRE(lex_cast(max) == lex_cast(integer{max}));
             std::atomic<bool> fail(false);
-            auto f = [&fail](unsigned n) {
+            auto f = [&fail, min, max](unsigned n) {
                 std::uniform_int_distribution<Int> dist(min, max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
@@ -247,7 +247,7 @@ struct int_convert_tester {
             REQUIRE(roundtrip_conversion<integer>(min + Int(42)));
             REQUIRE(roundtrip_conversion<integer>(max - Int(42)));
             std::atomic<bool> fail(false);
-            auto f = [&fail](unsigned n) {
+            auto f = [&fail, min, max](unsigned n) {
                 std::uniform_int_distribution<Int> dist(min, max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
