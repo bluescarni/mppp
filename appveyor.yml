@@ -37,12 +37,12 @@ build_script:
 
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] cmake -G "Visual Studio 14 2015" -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/mppp_deps_32/mpir -DGMP_LIBRARY=C:/mppp_deps_32/mpir/mpir.lib ..
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] cmake -G "Visual Studio 14 2015 Win64" -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/mppp_deps_64/mpir -DGMP_LIBRARY=C:/mppp_deps_64/mpir/mpir.lib ..
+- if [%COMPILER%]==[MSVC15] cmake --build . --config %BUILD_TYPE% --target ALL_BUILD
 - if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_LONG_DOUBLE=YES -DGMP_INCLUDE_DIR=C:/mppp_deps_64/gmp -DGMP_LIBRARY=C:/mppp_deps_64/gmp/libgmp.a -DMPFR_INCLUDE_DIR=C:/mppp_deps_64/mpfr -DMPFR_LIBRARY=C:/mppp_deps_64/mpfr/libmpfr.a ..
-
-- cmake --build . --config %BUILD_TYPE% --target ALL_BUILD
+- if [%COMPILER%]==[MinGW] cmake --build . --config %BUILD_TYPE% --target all
 
 test_script:
-- ctest --output-on-failure
+- ctest -V
 
 # Enable this to be able to login to the build worker. You can use the
 # `remmina` program in Ubuntu, use the login information that the line below
