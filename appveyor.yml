@@ -15,8 +15,8 @@ environment:
 install:
 # Set path and download deps.
 - if [%COMPILER%]==[MSVC15] set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
-- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] call bin\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_msvc_64.7z
-- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] call bin\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_msvc_32.7z
+- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_msvc_64.7z
+- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_msvc_32.7z
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] 7z x mppp_deps_msvc_64.7z > NUL
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] 7z x mppp_deps_msvc_32.7z > NUL
 
