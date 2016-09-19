@@ -163,9 +163,11 @@ struct string_ctor_tester {
     void operator()(const S &) const
     {
         using integer = mp_integer<S::value>;
-        REQUIRE_THROWS_PREDICATE(integer{""}, std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '' is not a valid integer in base 10.";
-        });
+        REQUIRE_THROWS_PREDICATE(integer{""}, std::invalid_argument,
+                                 [](const std::invalid_argument &ia) {
+                                     return std::string(ia.what())
+                                            == "The string '' is not a valid integer in base 10.";
+                                 });
         REQUIRE_THROWS_PREDICATE((integer{"", 2}), std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what()) == "The string '' is not a valid integer in base 2.";
         });
