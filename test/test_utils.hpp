@@ -34,17 +34,17 @@ see https://www.gnu.org/licenses/. */
 
 #include <cassert>
 #include <cstddef>
+#include <gmp.h>
 #include <initializer_list>
 #include <limits>
 #include <locale>
+#include <mp++.hpp>
 #include <random>
 #include <sstream>
 #include <string>
 #include <tuple>
 #include <type_traits>
 #include <utility>
-
-#include <mp++.hpp>
 
 namespace mppp_test
 {
@@ -144,8 +144,8 @@ inline std::string lex_cast(const mppp::mpz_raii &m)
     return std::string(mppp::mpz_to_str(&m.m_mpz));
 }
 
-// Set mpz to random value with n limbs.
-inline void random_integer(mppp::mpz_raii &m, unsigned n, std::mt19937 &rng)
+// Set mpz to random value with n limbs. Top limb is divided by div.
+inline void random_integer(mppp::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
 {
     if (!n) {
         ::mpz_set_ui(&m.m_mpz, 0);
@@ -154,7 +154,7 @@ inline void random_integer(mppp::mpz_raii &m, unsigned n, std::mt19937 &rng)
     static thread_local mppp::mpz_raii tmp;
     std::uniform_int_distribution<::mp_limb_t> dist(0u, std::numeric_limits<::mp_limb_t>::max());
     // Set the first limb.
-    ::mpz_set_str(&m.m_mpz, lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
+    ::mpz_set_str(&m.m_mpz, lex_cast((dist(rng) & GMP_NUMB_MASK) / div).c_str(), 10);
     for (unsigned i = 1u; i < n; ++i) {
         ::mpz_set_str(&tmp.m_mpz, lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
         ::mpz_mul_2exp(&m.m_mpz, &m.m_mpz, GMP_NUMB_BITS);

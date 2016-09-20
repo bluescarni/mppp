@@ -1217,6 +1217,8 @@ private:
     }
     // NOTE: here we do not need to zero the unused static limbs after using mpn functions, as this code is run
     // only when no few-limbs optimisation are activated.
+    // NOTE: this function (and its other overloads) will return true in case of success, false in case of failure
+    // (i.e., the addition overflows and the static size is not enough).
     static bool static_add_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
                                 int sign1, int sign2, const std::integral_constant<int, 0> &)
     {
@@ -1239,6 +1241,12 @@ private:
         // - the highest bit in the highest limb is set.
         // If this condition holds for op1 and op2, we return failure, as the computation might require
         // an extra limb.
+        // NOTE: the reason we check this is that we do not want to run into the situation in which we have written
+        // something into rop (via the mpn functions below), only to realize later that the computation overflows.
+        // This would be bad because, in case of overlapping arguments, it would destroy one or two operands without
+        // possibility of recovering. The alternative would be to do the computation in some local buffer and then copy
+        // it out, but that is rather costly. Note that this means that in principle a computation that could fit in
+        // static storage ends up triggering a promotion.
         const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
         const bool c2 = std::size_t(asize2) == SSize && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
         if (mppp_unlikely(c1 || c2)) {
@@ -1485,15 +1493,19 @@ public:
 
 private:
     // The double limb multiplication optimization is available in the following cases:
-    // - no nails, and we are on a 64bit MSVC build,
-    // - no nails, we have a 128bit unsigned available, and the limb bit size is 64,
-    // - no nails, the limb bit size is 32 and the smallest 64 bit unsigned type has exactly 64 bits.
+    // - no nails, we are on a 64bit MSVC build, the limb type has exactly 64 bits and GMP_NUMB_BITS is 64,
+    // - no nails, we have a 128bit unsigned available, the limb type has exactly 64 bits and GMP_NUMB_BITS is 64,
+    // - no nails, the smallest 64 bit unsigned type has exactly 64 bits, the limb type has exactly 32 bits and
+    //   GMP_NUMB_BITS is 32.
+    // NOTE: here we are checking that GMP_NUMB_BITS is the same as the limits ::digits property, which is probably
+    // rather redundant on any conceivable architecture.
     using have_dlimb_mul = std::integral_constant<bool,
 #if (defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64)) || (defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64))
-                                                  !GMP_NAIL_BITS
+                                                  !GMP_NAIL_BITS && std::numeric_limits<::mp_limb_t>::digits == 64
 #elif GMP_NUMB_BITS == 32
                                                   !GMP_NAIL_BITS
                                                       && std::numeric_limits<std::uint_least64_t>::digits == 64
+                                                      && std::numeric_limits<::mp_limb_t>::digits == 32
 #else
                                                   false
 #endif
@@ -1503,6 +1515,8 @@ private:
                                                             ? 1
                                                             : ((SInt::s_size == 2 && have_dlimb_mul::value) ? 2 : 0)>;
     // mpn implementation.
+    // NOTE: this function (and its other overloads) returns 0 in case of success, otherwise it returns a hint
+    // about the size in limbs of the result.
     static std::size_t static_mul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1,
                                        mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 0> &)
     {
@@ -1703,6 +1717,32 @@ private:
                                      ? 2
                                      : ((static_add_algo<SInt>::value == 1 && static_mul_algo<SInt>::value == 1) ? 1
                                                                                                                  : 0)>;
+    // NOTE: same return value as mul: 0 for success, otherwise a hint for the size of the result.
+    static std::size_t static_addmul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asizer,
+                                          mpz_size_t asize1, mpz_size_t asize2, int signr, int sign1, int sign2,
+                                          const std::integral_constant<int, 0> &)
+    {
+        // First try to do the static prod, if it does not work it's a failure.
+        s_int prod;
+        if (mppp_unlikely(
+                static_mul_impl(prod, op1, op2, asize1, asize2, sign1, sign2, std::integral_constant<int, 0>{}))) {
+            // This is the maximum size a static addmul can have.
+            return SSize * 2u + 1u;
+        }
+        // Determine sign and asize of the product.
+        mpz_size_t asize_prod = prod._mp_size;
+        int sign_prod = (asize_prod != 0);
+        if (asize_prod < 0) {
+            asize_prod = -asize_prod;
+            sign_prod = -1;
+        }
+        // Try to do the add.
+        if (mppp_unlikely(!static_add_impl(rop, rop, prod, asizer, asize_prod, signr, sign_prod,
+                                           std::integral_constant<int, 0>{}))) {
+            return SSize + 1u;
+        }
+        return 0u;
+    }
     static std::size_t static_addmul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t, mpz_size_t,
                                           mpz_size_t, int signr, int sign1, int sign2,
                                           const std::integral_constant<int, 1> &)

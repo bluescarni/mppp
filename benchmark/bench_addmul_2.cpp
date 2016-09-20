@@ -42,16 +42,64 @@ NONIUS_BENCHMARK("mppp half-limb unsigned vector addmul",
                  [](nonius::chronometer meter) { uaddmul_vec_mppp_half<integer>(meter, rng); });
 NONIUS_BENCHMARK("mppp half-limb unsigned acc addmul",
                  [](nonius::chronometer meter) { uaddmul_acc_mppp_half<integer>(meter, rng); });
+NONIUS_BENCHMARK("mppp half-limb signed vector addmul",
+                 [](nonius::chronometer meter) { saddmul_vec_mppp_half<integer>(meter, rng); });
+NONIUS_BENCHMARK("mppp half-limb signed acc addmul",
+                 [](nonius::chronometer meter) { saddmul_acc_mppp_half<integer>(meter, rng); });
 NONIUS_BENCHMARK("mppp 1-1-limb unsigned vector addmul",
                  [](nonius::chronometer meter) { uaddmul_vec_mppp<integer>(meter, rng, 1, 1); });
 NONIUS_BENCHMARK("mppp 1-1-limb unsigned acc addmul",
                  [](nonius::chronometer meter) { uaddmul_acc_mppp<integer>(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("mppp 1-1-limb signed vector addmul",
+                 [](nonius::chronometer meter) { saddmul_vec_mppp<integer>(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("mppp 1-1-limb signed acc addmul",
+                 [](nonius::chronometer meter) { saddmul_acc_mppp<integer>(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("mppp 2-1-limb unsigned vector addmul",
+                 [](nonius::chronometer meter) { uaddmul_vec_mppp<integer>(meter, rng, 2, 1); });
+NONIUS_BENCHMARK("mppp 2-1-limb unsigned acc addmul",
+                 [](nonius::chronometer meter) { uaddmul_acc_mppp<integer>(meter, rng, 2, 1); });
+NONIUS_BENCHMARK("mppp 2-1-limb signed vector addmul",
+                 [](nonius::chronometer meter) { saddmul_vec_mppp<integer>(meter, rng, 2, 1); });
+NONIUS_BENCHMARK("mppp 2-1-limb signed acc addmul",
+                 [](nonius::chronometer meter) { saddmul_acc_mppp<integer>(meter, rng, 2, 1); });
+NONIUS_BENCHMARK("mppp 1-2-limb unsigned vector addmul",
+                 [](nonius::chronometer meter) { uaddmul_vec_mppp<integer>(meter, rng, 1, 2); });
+NONIUS_BENCHMARK("mppp 1-2-limb unsigned acc addmul",
+                 [](nonius::chronometer meter) { uaddmul_acc_mppp<integer>(meter, rng, 1, 2); });
+NONIUS_BENCHMARK("mppp 1-2-limb signed vector addmul",
+                 [](nonius::chronometer meter) { saddmul_vec_mppp<integer>(meter, rng, 1, 2); });
+NONIUS_BENCHMARK("mppp 1-2-limb signed acc addmul",
+                 [](nonius::chronometer meter) { saddmul_acc_mppp<integer>(meter, rng, 1, 2); });
 
 NONIUS_BENCHMARK("piranha half-limb unsigned vector addmul",
                  [](nonius::chronometer meter) { uaddmul_vec_piranha_half(meter, rng); });
 NONIUS_BENCHMARK("piranha half-limb unsigned acc addmul",
                  [](nonius::chronometer meter) { uaddmul_acc_piranha_half(meter, rng); });
+NONIUS_BENCHMARK("piranha half-limb signed vector addmul",
+                 [](nonius::chronometer meter) { saddmul_vec_piranha_half(meter, rng); });
+NONIUS_BENCHMARK("piranha half-limb signed acc addmul",
+                 [](nonius::chronometer meter) { saddmul_acc_piranha_half(meter, rng); });
 NONIUS_BENCHMARK("piranha 1-1-limb unsigned vector addmul",
                  [](nonius::chronometer meter) { uaddmul_vec_piranha(meter, rng, 1, 1); });
 NONIUS_BENCHMARK("piranha 1-1-limb unsigned acc addmul",
                  [](nonius::chronometer meter) { uaddmul_acc_piranha(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("piranha 1-1-limb signed vector addmul",
+                 [](nonius::chronometer meter) { uaddmul_vec_piranha(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("piranha 1-1-limb signed acc addmul",
+                 [](nonius::chronometer meter) { uaddmul_acc_piranha(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("piranha 2-1-limb unsigned vector addmul",
+                 [](nonius::chronometer meter) { uaddmul_vec_piranha(meter, rng, 2, 1); });
+NONIUS_BENCHMARK("piranha 2-1-limb unsigned acc addmul",
+                 [](nonius::chronometer meter) { uaddmul_acc_piranha(meter, rng, 2, 1); });
+NONIUS_BENCHMARK("piranha 2-1-limb signed vector addmul",
+                 [](nonius::chronometer meter) { uaddmul_vec_piranha(meter, rng, 2, 1); });
+NONIUS_BENCHMARK("piranha 2-1-limb signed acc addmul",
+                 [](nonius::chronometer meter) { uaddmul_acc_piranha(meter, rng, 2, 1); });
+NONIUS_BENCHMARK("piranha 1-2-limb unsigned vector addmul",
+                 [](nonius::chronometer meter) { uaddmul_vec_piranha(meter, rng, 1, 2); });
+NONIUS_BENCHMARK("piranha 1-2-limb unsigned acc addmul",
+                 [](nonius::chronometer meter) { uaddmul_acc_piranha(meter, rng, 1, 2); });
+NONIUS_BENCHMARK("piranha 1-2-limb signed vector addmul",
+                 [](nonius::chronometer meter) { uaddmul_vec_piranha(meter, rng, 1, 2); });
+NONIUS_BENCHMARK("piranha 1-2-limb signed acc addmul",
+                 [](nonius::chronometer meter) { uaddmul_acc_piranha(meter, rng, 1, 2); });
