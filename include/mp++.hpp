@@ -1490,6 +1490,49 @@ public:
         }
         ::mpz_add(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     }
+    friend void sub(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
+    {
+        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+        if (mppp_likely(sr && s1 && s2)) {
+            // Optimise the case of all statics.
+            if (mppp_likely(static_addsub<false>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st()))) {
+                return;
+            }
+        }
+        if (sr) {
+            rop.m_int.promote(SSize + 1u);
+        }
+        ::mpz_sub(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    }
+    mp_integer &operator+=(const mp_integer &other)
+    {
+        add(*this, *this, other);
+        return *this;
+    }
+    friend mp_integer operator+(const mp_integer &a, const mp_integer &b)
+    {
+        mp_integer retval;
+        add(retval, a, b);
+        return retval;
+    }
+    friend mp_integer operator+(const mp_integer &a, int n)
+    {
+        mp_integer retval;
+        const mp_integer b{n};
+        add(retval, a, b);
+        return retval;
+    }
+    mp_integer &operator-=(const mp_integer &other)
+    {
+        sub(*this, *this, other);
+        return *this;
+    }
+    friend mp_integer operator-(const mp_integer &a, const mp_integer &b)
+    {
+        mp_integer retval;
+        sub(retval, a, b);
+        return retval;
+    }
 
 private:
     // The double limb multiplication optimization is available in the following cases:
@@ -1705,6 +1748,48 @@ public:
             rop.m_int.promote(size_hint);
         }
         ::mpz_mul(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    }
+    mp_integer &operator*=(const mp_integer &other)
+    {
+        mul(*this, *this, other);
+        return *this;
+    }
+    friend mp_integer operator*(const mp_integer &a, const mp_integer &b)
+    {
+        mp_integer retval;
+        mul(retval, a, b);
+        return retval;
+    }
+    friend mp_integer operator*(const mp_integer &a, int n)
+    {
+        mp_integer retval;
+        const mp_integer b{n};
+        mul(retval, a, b);
+        return retval;
+    }
+    int sign() const
+    {
+        if (m_int.m_st._mp_size != 0) {
+            return m_int.m_st._mp_size > 0 ? 1 : -1;
+        } else {
+            return 0;
+        }
+    }
+    friend bool operator==(const mp_integer &a, const mp_integer &b)
+    {
+        const bool sa = a.is_static(), sb = b.is_static();
+        if (sa && sb) {
+            return a.m_int.g_st()._mp_size == b.m_int.g_st()._mp_size
+                   && std::equal(a.m_int.g_st().m_limbs.begin(),
+                                 a.m_int.g_st().m_limbs.begin() + a.m_int.g_st().abs_size(),
+                                 b.m_int.g_st().m_limbs.begin());
+        } else {
+            return ::mpz_cmp(a.get_mpz_view(), b.get_mpz_view()) == 0;
+        }
+    }
+    friend bool operator!=(const mp_integer &a, const mp_integer &b)
+    {
+        return !(a == b);
     }
 
 private:
