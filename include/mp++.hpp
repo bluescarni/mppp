@@ -341,7 +341,7 @@ struct static_int {
     // NOTE: init limbs to zero: in some few-limbs optimisations we operate on the whole limb
     // array regardless of the integer size, for performance reasons. If we didn't init to zero,
     // we would read from uninited storage and we would have wrong results as well.
-    static_int() : _mp_alloc(s_alloc), _mp_size(0), m_limbs{}
+    static_int() : _mp_alloc(s_alloc), _mp_size(0), m_limbs()
     {
     }
     // The defaults here are good.
@@ -459,7 +459,7 @@ struct static_int {
                                                          && (limits<Uint>::max > limits<unsigned long>::max),
                                                      int>::type
                              = 0>
-    explicit static_int(Uint n) : _mp_alloc(s_alloc), m_limbs{}
+    explicit static_int(Uint n) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
             return;
@@ -495,7 +495,7 @@ struct static_int {
                                                          && (limits<Uint>::max <= limits<unsigned long>::max),
                                                      int>::type
                              = 0>
-    explicit static_int(Uint n) : _mp_alloc(s_alloc), m_limbs{}
+    explicit static_int(Uint n) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
             return;
@@ -510,7 +510,7 @@ struct static_int {
                                                             || limits<Int>::min < limits<long>::min),
                                                     int>::type
                             = 0>
-    explicit static_int(Int n) : _mp_alloc(s_alloc), m_limbs{}
+    explicit static_int(Int n) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
             return;
@@ -547,7 +547,7 @@ struct static_int {
                                                             && limits<Int>::min >= limits<long>::min),
                                                     int>::type
                             = 0>
-    explicit static_int(Int n) : _mp_alloc(s_alloc), m_limbs{}
+    explicit static_int(Int n) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
             return;
@@ -560,7 +560,7 @@ struct static_int {
     template <
         typename Float,
         typename std::enable_if<std::is_same<Float, float>::value || std::is_same<Float, double>::value, int>::type = 0>
-    explicit static_int(Float f) : _mp_alloc(s_alloc), m_limbs{}
+    explicit static_int(Float f) : _mp_alloc(s_alloc), m_limbs()
     {
         if (!std::isfinite(f)) {
             throw std::invalid_argument("Cannot init integer from non-finite floating-point value.");
@@ -571,7 +571,7 @@ struct static_int {
     }
 #if defined(MPPP_WITH_LONG_DOUBLE)
     // Ctor from long double.
-    explicit static_int(long double x) : _mp_alloc(s_alloc), m_limbs{}
+    explicit static_int(long double x) : _mp_alloc(s_alloc), m_limbs()
     {
         if (!std::isfinite(x)) {
             throw std::invalid_argument("Cannot init integer from non-finite floating-point value.");
