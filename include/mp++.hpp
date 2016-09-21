@@ -1782,7 +1782,9 @@ public:
             return a.m_int.g_st()._mp_size == b.m_int.g_st()._mp_size
                    && std::equal(a.m_int.g_st().m_limbs.begin(),
                                  a.m_int.g_st().m_limbs.begin() + a.m_int.g_st().abs_size(),
-                                 b.m_int.g_st().m_limbs.begin());
+                                 b.m_int.g_st().m_limbs.begin(), [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) {
+                                     return (l1 & GMP_NUMB_BITS) == (l2 & GMP_NUMB_BITS);
+                                 });
         } else {
             return ::mpz_cmp(a.get_mpz_view(), b.get_mpz_view()) == 0;
         }
