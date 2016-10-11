@@ -19,6 +19,8 @@ elif [[ "${BUILD_TYPE}" == "Coverage" ]]; then
     cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
     make;
     ctest -V;
+    cd test;
+    bash <(curl -s https://codecov.io/bash);
 elif [[ "${BUILD_TYPE}" == "Release" ]]; then
     cmake -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes ../;
     make;

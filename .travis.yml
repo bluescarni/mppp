@@ -54,5 +54,6 @@ script:
     - mkdir build
     - cd build
     - source ../tools/install_travis.sh
+
 notifications:
   email: false
