@@ -21,7 +21,7 @@ elif [[ "${BUILD_TYPE}" == "Coverage" ]]; then
     ctest -V;
     cd test;
     wget https://codecov.io/bash -O codecov.sh;
-    bash codecov.sh -x ${GCOV_EXECUTABLE};
+    bash codecov.sh -x ${GCOV_EXECUTABLE} -g "test/";
 elif [[ "${BUILD_TYPE}" == "Release" ]]; then
     cmake -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes ../;
     make;
