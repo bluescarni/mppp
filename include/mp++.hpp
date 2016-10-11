@@ -52,7 +52,7 @@ see https://www.gnu.org/licenses/. */
 #endif
 
 // Compiler configuration.
-#if defined(__clang__) || defined(__GNUC__)
+#if defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
 
 #define mppp_likely(x) __builtin_expect(!!(x), 1)
 #define mppp_unlikely(x) __builtin_expect(!!(x), 0)
@@ -89,6 +89,22 @@ see https://www.gnu.org/licenses/. */
 
 #endif
 
+// Configuration of the thread_local keyword.
+#if defined(__apple_build_version__) || defined(__MINGW32__) || defined(__INTEL_COMPILER)
+
+// - Apple clang does not support the thread_local keyword until very recent versions.
+// - Testing shows that at least some MinGW versions have buggy thread_local implementations.
+// - Also on Intel the thread_local keyword looks buggy.
+#define MPPP_MAYBE_TLS
+
+#else
+
+// For the rest, we assume thread_local is available.
+#define MPPP_HAVE_THREAD_LOCAL
+#define MPPP_MAYBE_TLS static thread_local
+
+#endif
+
 namespace mppp
 {
 
@@ -103,30 +119,29 @@ using mpz_struct_t = std::remove_extent<::mpz_t>::type;
 using mpz_alloc_t = decltype(std::declval<mpz_struct_t>()._mp_alloc);
 using mpz_size_t = decltype(std::declval<mpz_struct_t>()._mp_size);
 
+// Helper function to init an mpz to zero with nlimbs preallocated limbs.
+inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
+{
+    // A bit of horrid overflow checking.
+    using ump_bitcnt_t = std::make_unsigned<::mp_bitcnt_t>::type;
+    if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
+        // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
+        // to do anything else, as long as GMP does not provide error recovery.
+        std::abort();
+    }
+    const std::size_t nbits = unsigned(GMP_NUMB_BITS) * nlimbs;
+    if (mppp_unlikely(nbits > ump_bitcnt_t(std::numeric_limits<::mp_bitcnt_t>::max()))) {
+        std::abort();
+    }
+    // NOTE: nbits == 0 is allowed.
+    ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
+    assert(std::make_unsigned<mpz_size_t>::type(rop._mp_alloc) >= nlimbs);
+}
+
 // This is a cache that is used by functions below in order to keep a pool of allocated mpzs, with the goal
 // of avoiding continuous (de)allocation when frequently creating/destroying mpzs.
-class mpz_cache
+struct mpz_cache
 {
-    // Helper function to init an mpz to zero with nlimbs preallocated limbs.
-    static void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
-    {
-        // A bit of horrid overflow checking.
-        using ump_bitcnt_t = std::make_unsigned<::mp_bitcnt_t>::type;
-        if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
-            // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
-            // to do anything else, as long as GMP does not provide error recovery.
-            std::abort();
-        }
-        const std::size_t nbits = unsigned(GMP_NUMB_BITS) * nlimbs;
-        if (mppp_unlikely(nbits > ump_bitcnt_t(std::numeric_limits<::mp_bitcnt_t>::max()))) {
-            std::abort();
-        }
-        // NOTE: nbits == 0 is allowed.
-        ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
-        assert(std::make_unsigned<mpz_size_t>::type(rop._mp_alloc) >= nlimbs);
-    }
-
-public:
     // Max mpz alloc size.
     static const unsigned max_size = 10u;
     // Max number of cache entries per size.
@@ -175,6 +190,8 @@ private:
     std::vector<std::vector<mpz_struct_t>> m_vec;
 };
 
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+
 inline mpz_cache &get_mpz_cache()
 {
     static thread_local mpz_cache cache;
@@ -188,6 +205,26 @@ inline void mpz_init_cache(mpz_struct_t &m, std::size_t nlimbs)
     get_mpz_cache().pop(m, nlimbs);
 }
 
+// Clear m (might move its value into the cache).
+inline void mpz_clear_cache(mpz_struct_t &m)
+{
+    get_mpz_cache().push(m);
+}
+
+#else
+
+inline void mpz_init_cache(mpz_struct_t &m, std::size_t nlimbs)
+{
+    mpz_init_nlimbs(m,nlimbs);
+}
+
+inline void mpz_clear_cache(mpz_struct_t &m)
+{
+    ::mpz_clear(&m);
+}
+
+#endif
+
 // Combined init+set.
 inline void mpz_init_set_cache(mpz_struct_t &m0, const mpz_struct_t &m1)
 {
@@ -195,15 +232,9 @@ inline void mpz_init_set_cache(mpz_struct_t &m0, const mpz_struct_t &m1)
     ::mpz_set(&m0, &m1);
 }
 
-// Clear m (might move its value into the cache).
-inline void mpz_clear_cache(mpz_struct_t &m)
-{
-    get_mpz_cache().push(m);
-}
-
 // Simple RAII holder for GMP integers.
 struct mpz_raii {
-    mpz_raii()
+    mpz_raii():fail_flag(false)
     {
         ::mpz_init(&m_mpz);
         assert(m_mpz._mp_alloc >= 0);
@@ -221,6 +252,9 @@ struct mpz_raii {
         ::mpz_clear(&m_mpz);
     }
     mpz_struct_t m_mpz;
+    // This is a failure flag that is used in the static integer ctors (it can be ignored
+    // for other uses of mpz_raii)
+    bool fail_flag;
 };
 
 #if defined(MPPP_WITH_LONG_DOUBLE)
@@ -248,10 +282,8 @@ static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limi
 
 #endif
 
-// Convert an mpz to a string in a specific base.
-// NOTE: this function returns a pointer to thread_local storage: the return value will be overwritten
-// by successive calls to mpz_to_str() from the same thread.
-inline const char *mpz_to_str(const mpz_struct_t *mpz, int base = 10)
+// Convert an mpz to a string in a specific base, to be written into out.
+inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base = 10)
 {
     assert(base >= 2 && base <= 62);
     const auto size_base = ::mpz_sizeinbase(mpz, base);
@@ -262,12 +294,20 @@ inline const char *mpz_to_str(const mpz_struct_t *mpz, int base = 10)
     const auto total_size = size_base + 2u;
     // NOTE: possible improvement: use a null allocator to avoid initing the chars each time
     // we resize up.
-    static thread_local std::vector<char> tmp;
-    tmp.resize(static_cast<std::vector<char>::size_type>(total_size));
-    if (tmp.size() != total_size) {
+    out.resize(static_cast<std::vector<char>::size_type>(total_size));
+    // Overflow check.
+    if (mppp_unlikely(out.size() != total_size)) {
         throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
     }
-    return ::mpz_get_str(&tmp[0], base, mpz);
+    ::mpz_get_str(out.data(), base, mpz);
+}
+
+// Convenience overload for the above.
+inline std::string mpz_to_str(const mpz_struct_t *mpz, int base = 10)
+{
+    MPPP_MAYBE_TLS std::vector<char> tmp;
+    mpz_to_str(tmp, mpz, base);
+    return tmp.data();
 }
 
 // Type trait to check if T is a supported integral type.
@@ -292,15 +332,6 @@ using is_supported_float = std::integral_constant<bool, std::is_same<T, float>::
 template <typename T>
 using is_supported_interop
     = std::integral_constant<bool, is_supported_integral<T>::value || is_supported_float<T>::value>;
-
-// A global thread local pointer, initially set to null, that signals if a static int construction via mpz
-// fails due to too many limbs required. The pointer is set by static_int's constructors to a thread local
-// mpz variable that contains the constructed object.
-inline const mpz_struct_t *&fail_too_many_limbs()
-{
-    static thread_local const mpz_struct_t *m = nullptr;
-    return m;
-}
 
 // Small wrapper to copy limbs.
 inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_limb_t *out)
@@ -390,15 +421,15 @@ struct static_int {
     }
     // Construct from mpz. If the size in limbs is too large, it will set a global
     // thread local pointer referring to m, so that the constructed mpz can be re-used.
-    void ctor_from_mpz(const mpz_struct_t &m)
+    void ctor_from_mpz(mpz_raii &m)
     {
-        if (m._mp_size > s_size || m._mp_size < -s_size) {
+        if (m.m_mpz._mp_size > s_size || m.m_mpz._mp_size < -s_size) {
             _mp_size = 0;
-            fail_too_many_limbs() = &m;
+            m.fail_flag = true;
         } else {
             // All this is noexcept.
-            _mp_size = m._mp_size;
-            copy_limbs_no(m._mp_d, m._mp_d + abs_size(), m_limbs.data());
+            _mp_size = m.m_mpz._mp_size;
+            copy_limbs_no(m.m_mpz._mp_d, m.m_mpz._mp_d + abs_size(), m_limbs.data());
         }
     }
     template <typename Int,
@@ -459,19 +490,18 @@ struct static_int {
                                                          && (limits<Uint>::max > limits<unsigned long>::max),
                                                      int>::type
                              = 0>
-    explicit static_int(Uint n) : _mp_alloc(s_alloc), m_limbs()
+    explicit static_int(Uint n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
             return;
         }
-        static thread_local mpz_raii mpz;
         constexpr auto ulmax = std::numeric_limits<unsigned long>::max();
         if (n <= ulmax) {
             // The value fits unsigned long, just cast it.
             ::mpz_set_ui(&mpz.m_mpz, static_cast<unsigned long>(n));
         } else {
             // Init the shifter.
-            static thread_local mpz_raii shifter;
+            MPPP_MAYBE_TLS mpz_raii shifter;
             ::mpz_set_ui(&shifter.m_mpz, 1u);
             // Set output to the lowest UL limb of n.
             ::mpz_set_ui(&mpz.m_mpz, static_cast<unsigned long>(n & ulmax));
@@ -488,21 +518,20 @@ struct static_int {
                 n >>= std::numeric_limits<unsigned long>::digits;
             }
         }
-        ctor_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz);
     }
     // Ctor from unsigned integral types that are not wider than unsigned long.
     template <typename Uint, typename std::enable_if<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
                                                          && (limits<Uint>::max <= limits<unsigned long>::max),
                                                      int>::type
                              = 0>
-    explicit static_int(Uint n) : _mp_alloc(s_alloc), m_limbs()
+    explicit static_int(Uint n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
             return;
         }
-        static thread_local mpz_raii mpz;
         ::mpz_set_ui(&mpz.m_mpz, static_cast<unsigned long>(n));
-        ctor_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz);
     }
     // Ctor from signed integral types that are wider than long.
     template <typename Int, typename std::enable_if<std::is_signed<Int>::value && is_supported_integral<Int>::value
@@ -510,12 +539,11 @@ struct static_int {
                                                             || limits<Int>::min < limits<long>::min),
                                                     int>::type
                             = 0>
-    explicit static_int(Int n) : _mp_alloc(s_alloc), m_limbs()
+    explicit static_int(Int n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
             return;
         }
-        static thread_local mpz_raii mpz;
         constexpr auto lmax = std::numeric_limits<long>::max(), lmin = std::numeric_limits<long>::min();
         if (n <= lmax && n >= lmin) {
             // The value fits long, just cast it.
@@ -523,12 +551,12 @@ struct static_int {
         } else {
             // A temporary variable for the accumulation of the result in the loop below.
             // Needed because GMP does not have mpz_addmul_si().
-            static thread_local mpz_raii tmp;
+            MPPP_MAYBE_TLS mpz_raii tmp;
             // The rest is as above, with the following differences:
             // - use % instead of bit masking and division instead of bit shift,
             // - proceed by chunks of 30 bits, as that's the highest power of 2 portably
             //   representable by long.
-            static thread_local mpz_raii shifter;
+            MPPP_MAYBE_TLS mpz_raii shifter;
             ::mpz_set_ui(&shifter.m_mpz, 1u);
             ::mpz_set_si(&mpz.m_mpz, static_cast<long>(n % (1l << 30)));
             n /= (1l << 30);
@@ -539,7 +567,7 @@ struct static_int {
                 n /= (1l << 30);
             }
         }
-        ctor_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz);
     }
     // Ctor from signed integral types that are not wider than long.
     template <typename Int, typename std::enable_if<std::is_signed<Int>::value && is_supported_integral<Int>::value
@@ -547,43 +575,40 @@ struct static_int {
                                                             && limits<Int>::min >= limits<long>::min),
                                                     int>::type
                             = 0>
-    explicit static_int(Int n) : _mp_alloc(s_alloc), m_limbs()
+    explicit static_int(Int n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
             return;
         }
-        static thread_local mpz_raii mpz;
         ::mpz_set_si(&mpz.m_mpz, static_cast<long>(n));
-        ctor_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz);
     }
     // Ctor from float or double.
     template <
         typename Float,
         typename std::enable_if<std::is_same<Float, float>::value || std::is_same<Float, double>::value, int>::type = 0>
-    explicit static_int(Float f) : _mp_alloc(s_alloc), m_limbs()
+    explicit static_int(Float f, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (!std::isfinite(f)) {
             throw std::invalid_argument("Cannot init integer from non-finite floating-point value.");
         }
-        static thread_local mpz_raii mpz;
         ::mpz_set_d(&mpz.m_mpz, static_cast<double>(f));
-        ctor_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz);
     }
 #if defined(MPPP_WITH_LONG_DOUBLE)
     // Ctor from long double.
-    explicit static_int(long double x) : _mp_alloc(s_alloc), m_limbs()
+    explicit static_int(long double x, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (!std::isfinite(x)) {
             throw std::invalid_argument("Cannot init integer from non-finite floating-point value.");
         }
-        static thread_local mpfr_raii mpfr;
+        MPPP_MAYBE_TLS mpfr_raii mpfr;
         // NOTE: static checks for overflows are done above.
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
         ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
-        static thread_local mpz_raii mpz;
         ::mpfr_get_z(&mpz.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
-        ctor_from_mpz(mpz.m_mpz);
+        ctor_from_mpz(mpz);
     }
 #endif
 
@@ -667,38 +692,39 @@ public:
     template <typename T, typename std::enable_if<is_supported_interop<T>::value, int>::type = 0>
     explicit integer_union(T x)
     {
+        MPPP_MAYBE_TLS mpz_raii mpz;
+        assert(!mpz.fail_flag);
         // Attempt static storage construction.
-        ::new (static_cast<void *>(&m_st)) s_storage(x);
+        ::new (static_cast<void *>(&m_st)) s_storage(x, mpz);
         // Check if too many limbs were generated.
-        auto ptr = fail_too_many_limbs();
-        if (ptr) {
-            // Reset the pointer before proceeding.
-            fail_too_many_limbs() = nullptr;
+        if (mpz.fail_flag) {
+            // Reset the fail_flag.
+            mpz.fail_flag = false;
             // Destroy static.
             g_st().~s_storage();
             // Init dynamic.
             ::new (static_cast<void *>(&m_dy)) d_storage;
-            mpz_init_set_cache(m_dy, *ptr);
+            mpz_init_set_cache(m_dy, mpz.m_mpz);
         }
     }
     explicit integer_union(const char *s, int base) : m_st()
     {
-        static thread_local mpz_raii mpz;
+        MPPP_MAYBE_TLS mpz_raii mpz;
         if (::mpz_set_str(&mpz.m_mpz, s, base)) {
             throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
                                         + std::to_string(base) + ".");
         }
-        g_st().ctor_from_mpz(mpz.m_mpz);
-        // Check if too many limbs were generated.
-        auto ptr = fail_too_many_limbs();
-        if (ptr) {
-            // Reset the pointer before proceeding.
-            fail_too_many_limbs() = nullptr;
+        assert(!mpz.fail_flag);
+        g_st().ctor_from_mpz(mpz);
+        // Check if the construction succeeded.
+        if (mpz.fail_flag) {
+            // Reset the fail_flag.
+            mpz.fail_flag = false;
             // Destroy static.
             g_st().~s_storage();
             // Init dynamic.
             ::new (static_cast<void *>(&m_dy)) d_storage;
-            mpz_init_set_cache(m_dy, *ptr);
+            mpz_init_set_cache(m_dy, mpz.m_mpz);
         }
     }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
@@ -1039,7 +1065,7 @@ private:
         // fit in ulonglong. We will try to build one operating in 32-bit chunks.
         unsigned long long retval = 0u;
         // q will be a copy of m that will be right-shifted down in chunks.
-        static thread_local mpz_raii q;
+        MPPP_MAYBE_TLS mpz_raii q;
         ::mpz_set(&q.m_mpz, &m);
         // Init the multiplier for use in the loop below.
         unsigned long long multiplier = 1u;
@@ -1097,7 +1123,7 @@ private:
         // The same approach as for the unsigned case, just slightly more complicated because
         // of the presence of the sign.
         long long retval = 0;
-        static thread_local mpz_raii q;
+        MPPP_MAYBE_TLS mpz_raii q;
         ::mpz_set(&q.m_mpz, &m);
         const bool sign = mpz_sgn(&q.m_mpz) > 0;
         long long multiplier = sign ? 1 : -1;
@@ -1144,7 +1170,7 @@ private:
     template <typename T, typename std::enable_if<std::is_same<T, long double>::value, int>::type = 0>
     static T conversion_impl(const mpz_struct_t &m)
     {
-        static thread_local mpfr_raii mpfr;
+        MPPP_MAYBE_TLS mpfr_raii mpfr;
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
         ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
         ::mpfr_set_z(&mpfr.m_mpfr, &m, MPFR_RNDN);

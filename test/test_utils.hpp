@@ -141,7 +141,7 @@ inline std::string lex_cast(const T &x)
 
 inline std::string lex_cast(const mppp::mpz_raii &m)
 {
-    return std::string(mppp::mpz_to_str(&m.m_mpz));
+    return mppp::mpz_to_str(&m.m_mpz);
 }
 
 // Set mpz to random value with n limbs. Top limb is divided by div.

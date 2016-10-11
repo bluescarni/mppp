@@ -15,11 +15,19 @@ option(MPPP_WITH_LONG_DOUBLE "Enable interoperability with long double (requires
 find_package(GMP REQUIRED)
 
 add_library(mp++ INTERFACE)
+
+# TODO proper YACMA use of compiler id.
 if(MSVC)
 	# On MSVC, make sure that everything using mp++ uses the /bigobj flag
 	# and disables the min/max macros that wreck up the STL.
 	target_compile_options(mp++ INTERFACE "/bigobj")
 	target_compile_options(mp++ INTERFACE "-DNOMINMAX")
+endif()
+
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
+    # NOTE: on MSVC we use the push/pop pragmas, but they do not seem to work on Intel (the pragmas
+    # in icc influence the behaviour at instantiation point, not at definition point).
+    target_compile_options(mp++ INTERFACE "-diag-disable" "3373,1682")
 endif()
 
 if(MPPP_WITH_LONG_DOUBLE)
