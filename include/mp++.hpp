@@ -39,6 +39,7 @@ see https://www.gnu.org/licenses/. */
 #include <gmp.h>
 #include <iostream>
 #include <limits>
+#include <new>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -129,7 +130,7 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
         // to do anything else, as long as GMP does not provide error recovery.
         std::abort();
     }
-    const std::size_t nbits = unsigned(GMP_NUMB_BITS) * nlimbs;
+    const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
     if (mppp_unlikely(nbits > ump_bitcnt_t(std::numeric_limits<::mp_bitcnt_t>::max()))) {
         std::abort();
     }
@@ -153,27 +154,30 @@ struct mpz_cache
     void push(mpz_struct_t &m)
     {
         // NOTE: here we are assuming always nonegative mp_alloc.
+        assert(m._mp_alloc >= 0);
         const auto size = static_cast<std::make_unsigned<mpz_size_t>::type>(m._mp_alloc);
-        if (!size || size > max_size || m_vec[size - 1u].size() >= max_entries) {
+        using v_size_t = decltype(m_vec.size());
+        if (!size || size > max_size || m_vec[static_cast<v_size_t>(size - 1u)].size() >= max_entries) {
             // If the allocated size is zero, too large, or we have reached the max number of entries,
             // don't cache it. Just clear it.
             ::mpz_clear(&m);
         } else {
             // Add it to the cache.
-            m_vec[size - 1u].push_back(m);
+            m_vec[static_cast<v_size_t>(size - 1u)].emplace_back(m);
         }
     }
     void pop(mpz_struct_t &retval, std::size_t size)
     {
-        if (!size || size > max_size || !m_vec[size - 1u].size()) {
+        using v_size_t = decltype(m_vec.size());
+        if (!size || size > max_size || !m_vec[static_cast<v_size_t>(size - 1u)].size()) {
             // If the size is zero, too large, or we don't have entries for the specified
             // size, init a new mpz.
             mpz_init_nlimbs(retval, size);
         } else {
             // If we have cache entries, use them: pop the last one
             // for the current size.
-            retval = m_vec[size - 1u].back();
-            m_vec[size - 1u].pop_back();
+            retval = m_vec[static_cast<v_size_t>(size - 1u)].back();
+            m_vec[static_cast<v_size_t>(size - 1u)].pop_back();
         }
     }
     ~mpz_cache()
@@ -391,7 +395,7 @@ struct static_int {
         // Check that all limbs which do not participate in the value are zero, iff the SSize is small enough.
         // For small SSize, we might be using optimisations that require unused limbs to be zero.
         if (SSize <= 2u) {
-            const auto asize = std::size_t(abs_size());
+            const auto asize = static_cast<std::size_t>(abs_size());
             for (std::size_t i = asize; i < SSize; ++i) {
                 if (m_limbs[i]) {
                     return false;
@@ -410,7 +414,7 @@ struct static_int {
     // for few static limbs.
     void zero_unused_limbs()
     {
-        for (auto i = std::size_t(abs_size()); i < SSize; ++i) {
+        for (auto i = static_cast<std::size_t>(abs_size()); i < SSize; ++i) {
             m_limbs[i] = 0u;
         }
     }
@@ -419,8 +423,8 @@ struct static_int {
     {
         return _mp_size >= 0 ? _mp_size : -_mp_size;
     }
-    // Construct from mpz. If the size in limbs is too large, it will set a global
-    // thread local pointer referring to m, so that the constructed mpz can be re-used.
+    // Construct from mpz. If the size in limbs is too large, it will set a failure flag
+    // into m, to signal that the operation failed.
     void ctor_from_mpz(mpz_raii &m)
     {
         if (m.m_mpz._mp_size > s_size || m.m_mpz._mp_size < -s_size) {
@@ -589,7 +593,7 @@ struct static_int {
         typename std::enable_if<std::is_same<Float, float>::value || std::is_same<Float, double>::value, int>::type = 0>
     explicit static_int(Float f, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
-        if (!std::isfinite(f)) {
+        if (mppp_unlikely(!std::isfinite(f))) {
             throw std::invalid_argument("Cannot init integer from non-finite floating-point value.");
         }
         ::mpz_set_d(&mpz.m_mpz, static_cast<double>(f));
