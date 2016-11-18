@@ -147,16 +147,17 @@ struct mpz_cache
     static const unsigned max_size = 10u;
     // Max number of cache entries per size.
     static const unsigned max_entries = 100u;
-    mpz_cache()
+    // Type definitions.
+    using v_type = std::vector<std::vector<mpz_struct_t>>;
+    using v_size_t = v_type::size_type;
+    mpz_cache():m_vec(v_size_t(max_size))
     {
-        m_vec.resize(max_size);
     }
     void push(mpz_struct_t &m)
     {
         // NOTE: here we are assuming always nonegative mp_alloc.
         assert(m._mp_alloc >= 0);
         const auto size = static_cast<std::make_unsigned<mpz_size_t>::type>(m._mp_alloc);
-        using v_size_t = decltype(m_vec.size());
         if (!size || size > max_size || m_vec[static_cast<v_size_t>(size - 1u)].size() >= max_entries) {
             // If the allocated size is zero, too large, or we have reached the max number of entries,
             // don't cache it. Just clear it.
@@ -168,7 +169,6 @@ struct mpz_cache
     }
     void pop(mpz_struct_t &retval, std::size_t size)
     {
-        using v_size_t = decltype(m_vec.size());
         if (!size || size > max_size || !m_vec[static_cast<v_size_t>(size - 1u)].size()) {
             // If the size is zero, too large, or we don't have entries for the specified
             // size, init a new mpz.
@@ -190,8 +190,7 @@ struct mpz_cache
         }
     }
 
-private:
-    std::vector<std::vector<mpz_struct_t>> m_vec;
+    v_type m_vec;
 };
 
 #if defined(MPPP_HAVE_THREAD_LOCAL)
@@ -833,7 +832,7 @@ public:
         assert(is_dynamic());
         return m_dy;
     }
-    // Promotion from static to dynamic. If nlimbs != 0u, allocate nlimbs limbs, wtherwise
+    // Promotion from static to dynamic. If nlimbs != 0u, allocate nlimbs limbs, otherwise
     // allocate exactly the nlimbs necessary to represent this.
     void promote(std::size_t nlimbs = 0u)
     {

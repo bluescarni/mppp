@@ -44,9 +44,9 @@ set(_YACMA_CXX_FLAGS "")
 set(_YACMA_CXX_FLAGS_DEBUG "")
 
 # Enable conditionally a CXX flags, is supported by the compiler.
-# The flag will be enabled in all buld types.
+# This is for flags intended to be enabled in all configurations.
 macro(YACMA_CHECK_ENABLE_CXX_FLAG flag)
-    set(YACMA_CHECK_CXX_FLAG)
+    message(STATUS "Checking the availability of the compiler flag '${flag}'")
     check_cxx_compiler_flag("${flag}" YACMA_CHECK_CXX_FLAG)
     if(YACMA_CHECK_CXX_FLAG)
         message(STATUS "Enabling the '${flag}' compiler flag.")
@@ -59,9 +59,9 @@ macro(YACMA_CHECK_ENABLE_CXX_FLAG flag)
 endmacro()
 
 # Enable conditionally a debug CXX flags, is supported by the compiler.
-# The flag will be enabled only in debug builds.
+# This is for flags intended to be enabled in debug mode.
 macro(YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG flag)
-    set(YACMA_CHECK_DEBUG_CXX_FLAG)
+    message(STATUS "Checking the availability of the debug compiler flag '${flag}'")
     check_cxx_compiler_flag("${flag}" YACMA_CHECK_DEBUG_CXX_FLAG)
     if(YACMA_CHECK_DEBUG_CXX_FLAG)
         message(STATUS "Enabling the '${flag}' debug compiler flag.")
@@ -98,7 +98,6 @@ if (YACMA_COMPILER_IS_CLANGXX OR YACMA_COMPILER_IS_INTELXX OR YACMA_COMPILER_IS_
     YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wlogical-op)
     YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wconversion)
     YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wdeprecated)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wdeprecatdasdsda)
     # This limit is supposed to be at least 1024 in C++11, but for some reason
     # clang sets this to 256, and gcc to 900.
     YACMA_CHECK_ENABLE_CXX_FLAG(-ftemplate-depth=1024)
