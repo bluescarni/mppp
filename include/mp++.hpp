@@ -871,6 +871,8 @@ public:
         // Destroy the dynamic storage.
         destroy_dynamic();
         // Init the static storage and copy over the data.
+        // NOTE: here the ctor makes sure the static limbs are zeroed
+        // out and we don't get stray limbs when copying below.
         ::new (static_cast<void *>(&m_st)) s_storage();
         g_st()._mp_size = signed_size;
         copy_limbs_no(tmp.data(), tmp.data() + dyn_size, g_st().m_limbs.data());
@@ -1038,6 +1040,33 @@ private:
     template <typename T, typename std::enable_if<is_supported_float<T>::value, int>::type = 0>
     static T conversion_impl(const s_int &n)
     {
+        // Handle zero.
+        if (!n._mp_size) {
+            return T(0);
+        }
+        if (std::numeric_limits<T>::has_infinity) {
+            // Optimization for single-limb integers.
+            // NOTE: the reasoning here is as follows. If the floating-point type has infinity,
+            // then its "range" is the whole real line. The C++ standard guarantees that:
+            // """
+            // A prvalue of an integer type or of an unscoped enumeration type can be converted to a prvalue of a
+            // floating point type. The result is exact if possible. If the value being converted is in the range
+            // of values that can be represented but the value cannot be represented exactly,
+            // it is an implementation-defined choice of either the next lower or higher representable value. If the
+            // value being converted is outside the range of values that can be represented, the behavior is undefined.
+            // """
+            // This seems to indicate that if the limb value "overflows" the finite range of the floating-point type, we
+            // will get either the max/min value or +-inf.
+            // In case this analysis is wrong, we could check for iec_559 instead. See the discussion:
+            // http://stackoverflow.com/questions/40694384/integer-to-float-conversions-with-ieee-fp
+            if (n._mp_size == 1) {
+                return static_cast<T>(n.m_limbs[0] & GMP_NUMB_MASK);
+            }
+            if (n._mp_size == -1) {
+                return -static_cast<T>(n.m_limbs[0] & GMP_NUMB_MASK);
+            }
+        }
+        // For all the other cases, just delegate to the GMP/MPFR routines.
         return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
     // Dynamic conversion to bool.
