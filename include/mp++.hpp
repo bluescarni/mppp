@@ -112,6 +112,9 @@ namespace mppp
 inline namespace detail
 {
 
+template <bool B, typename T = void>
+using enable_if_t = typename std::enable_if<B, T>::type;
+
 // TODO mpz struct checks -> TODO check about _mp_size as well.
 
 // mpz_t is an array of some struct.
@@ -141,8 +144,7 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 
 // This is a cache that is used by functions below in order to keep a pool of allocated mpzs, with the goal
 // of avoiding continuous (de)allocation when frequently creating/destroying mpzs.
-struct mpz_cache
-{
+struct mpz_cache {
     // Max mpz alloc size.
     static const unsigned max_size = 10u;
     // Max number of cache entries per size.
@@ -150,7 +152,7 @@ struct mpz_cache
     // Type definitions.
     using v_type = std::vector<std::vector<mpz_struct_t>>;
     using v_size_t = v_type::size_type;
-    mpz_cache():m_vec(v_size_t(max_size))
+    mpz_cache() : m_vec(v_size_t(max_size))
     {
     }
     void push(mpz_struct_t &m)
@@ -218,7 +220,7 @@ inline void mpz_clear_cache(mpz_struct_t &m)
 
 inline void mpz_init_cache(mpz_struct_t &m, std::size_t nlimbs)
 {
-    mpz_init_nlimbs(m,nlimbs);
+    mpz_init_nlimbs(m, nlimbs);
 }
 
 inline void mpz_clear_cache(mpz_struct_t &m)
@@ -237,7 +239,7 @@ inline void mpz_init_set_cache(mpz_struct_t &m0, const mpz_struct_t &m1)
 
 // Simple RAII holder for GMP integers.
 struct mpz_raii {
-    mpz_raii():fail_flag(false)
+    mpz_raii() : fail_flag(false)
     {
         ::mpz_init(&m_mpz);
         assert(m_mpz._mp_alloc >= 0);
@@ -435,8 +437,7 @@ struct static_int {
             copy_limbs_no(m.m_mpz._mp_d, m.m_mpz._mp_d + abs_size(), m_limbs.data());
         }
     }
-    template <typename Int,
-              typename std::enable_if<is_supported_integral<Int>::value && std::is_unsigned<Int>::value, int>::type = 0>
+    template <typename Int, enable_if_t<is_supported_integral<Int>::value && std::is_unsigned<Int>::value, int> = 0>
     bool attempt_1limb_ctor(Int n)
     {
         if (!n) {
@@ -452,8 +453,7 @@ struct static_int {
         }
         return false;
     }
-    template <typename Int,
-              typename std::enable_if<is_supported_integral<Int>::value && std::is_signed<Int>::value, int>::type = 0>
+    template <typename Int, enable_if_t<is_supported_integral<Int>::value && std::is_signed<Int>::value, int> = 0>
     bool attempt_1limb_ctor(Int n)
     {
         using uint_t = typename std::make_unsigned<Int>::type;
@@ -483,16 +483,15 @@ struct static_int {
     struct limits {
     };
     template <typename T>
-    struct limits<T, typename std::enable_if<std::is_integral<T>::value>::type> {
+    struct limits<T, enable_if_t<std::is_integral<T>::value>> {
         static const T max = std::numeric_limits<T>::max();
         static const T min = std::numeric_limits<T>::min();
     };
     // Ctor from unsigned integral types that are wider than unsigned long.
     // This requires special handling as the GMP api does not support unsigned long long natively.
-    template <typename Uint, typename std::enable_if<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
-                                                         && (limits<Uint>::max > limits<unsigned long>::max),
-                                                     int>::type
-                             = 0>
+    template <typename Uint, enable_if_t<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
+                                             && (limits<Uint>::max > limits<unsigned long>::max),
+                                         int> = 0>
     explicit static_int(Uint n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
@@ -524,10 +523,9 @@ struct static_int {
         ctor_from_mpz(mpz);
     }
     // Ctor from unsigned integral types that are not wider than unsigned long.
-    template <typename Uint, typename std::enable_if<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
-                                                         && (limits<Uint>::max <= limits<unsigned long>::max),
-                                                     int>::type
-                             = 0>
+    template <typename Uint, enable_if_t<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
+                                             && (limits<Uint>::max <= limits<unsigned long>::max),
+                                         int> = 0>
     explicit static_int(Uint n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
@@ -537,11 +535,10 @@ struct static_int {
         ctor_from_mpz(mpz);
     }
     // Ctor from signed integral types that are wider than long.
-    template <typename Int, typename std::enable_if<std::is_signed<Int>::value && is_supported_integral<Int>::value
-                                                        && (limits<Int>::max > limits<long>::max
-                                                            || limits<Int>::min < limits<long>::min),
-                                                    int>::type
-                            = 0>
+    template <typename Int,
+              enable_if_t<std::is_signed<Int>::value && is_supported_integral<Int>::value
+                              && (limits<Int>::max > limits<long>::max || limits<Int>::min < limits<long>::min),
+                          int> = 0>
     explicit static_int(Int n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
@@ -573,11 +570,10 @@ struct static_int {
         ctor_from_mpz(mpz);
     }
     // Ctor from signed integral types that are not wider than long.
-    template <typename Int, typename std::enable_if<std::is_signed<Int>::value && is_supported_integral<Int>::value
-                                                        && (limits<Int>::max <= limits<long>::max
-                                                            && limits<Int>::min >= limits<long>::min),
-                                                    int>::type
-                            = 0>
+    template <typename Int,
+              enable_if_t<std::is_signed<Int>::value && is_supported_integral<Int>::value
+                              && (limits<Int>::max <= limits<long>::max && limits<Int>::min >= limits<long>::min),
+                          int> = 0>
     explicit static_int(Int n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (attempt_1limb_ctor(n)) {
@@ -587,9 +583,8 @@ struct static_int {
         ctor_from_mpz(mpz);
     }
     // Ctor from float or double.
-    template <
-        typename Float,
-        typename std::enable_if<std::is_same<Float, float>::value || std::is_same<Float, double>::value, int>::type = 0>
+    template <typename Float,
+              enable_if_t<std::is_same<Float, float>::value || std::is_same<Float, double>::value, int> = 0>
     explicit static_int(Float f, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (mppp_unlikely(!std::isfinite(f))) {
@@ -692,7 +687,7 @@ public:
     }
     // Generic constructor from the interoperable basic C++ types. It will first try to construct
     // a static, if too many limbs are needed it will construct a dynamic instead.
-    template <typename T, typename std::enable_if<is_supported_interop<T>::value, int>::type = 0>
+    template <typename T, enable_if_t<is_supported_interop<T>::value, int> = 0>
     explicit integer_union(T x)
     {
         MPPP_MAYBE_TLS mpz_raii mpz;
@@ -925,7 +920,7 @@ public:
 private:
     // Enabler for generic ctor.
     template <typename T>
-    using generic_ctor_enabler = typename std::enable_if<is_supported_interop<T>::value, int>::type;
+    using generic_ctor_enabler = enable_if_t<is_supported_interop<T>::value, int>;
 
 public:
     template <typename T, generic_ctor_enabler<T> = 0>
@@ -970,15 +965,13 @@ private:
     template <typename T>
     using generic_conversion_enabler = generic_ctor_enabler<T>;
     template <typename T>
-    using uint_conversion_enabler =
-        typename std::enable_if<is_supported_integral<T>::value && std::is_unsigned<T>::value
-                                    && !std::is_same<bool, T>::value,
-                                int>::type;
+    using uint_conversion_enabler
+        = enable_if_t<is_supported_integral<T>::value && std::is_unsigned<T>::value && !std::is_same<bool, T>::value,
+                      int>;
     template <typename T>
-    using int_conversion_enabler =
-        typename std::enable_if<is_supported_integral<T>::value && std::is_signed<T>::value, int>::type;
+    using int_conversion_enabler = enable_if_t<is_supported_integral<T>::value && std::is_signed<T>::value, int>;
     // Static conversion to bool.
-    template <typename T, typename std::enable_if<std::is_same<T, bool>::value, int>::type = 0>
+    template <typename T, enable_if_t<std::is_same<T, bool>::value, int> = 0>
     static T conversion_impl(const s_int &n)
     {
         return n._mp_size != 0;
@@ -1037,7 +1030,7 @@ private:
         return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
     // Static conversion to floating-point.
-    template <typename T, typename std::enable_if<is_supported_float<T>::value, int>::type = 0>
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static T conversion_impl(const s_int &n)
     {
         // Handle zero.
@@ -1070,7 +1063,7 @@ private:
         return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
     // Dynamic conversion to bool.
-    template <typename T, typename std::enable_if<std::is_same<T, bool>::value, int>::type = 0>
+    template <typename T, enable_if_t<std::is_same<T, bool>::value, int> = 0>
     static T conversion_impl(const mpz_struct_t &m)
     {
         return mpz_sgn(&m) != 0;
@@ -1191,15 +1184,14 @@ private:
         return static_cast<T>(retval);
     }
     // Dynamic conversion to float/double.
-    template <typename T,
-              typename std::enable_if<std::is_same<T, float>::value || std::is_same<T, double>::value, int>::type = 0>
+    template <typename T, enable_if_t<std::is_same<T, float>::value || std::is_same<T, double>::value, int> = 0>
     static T conversion_impl(const mpz_struct_t &m)
     {
         return static_cast<T>(::mpz_get_d(&m));
     }
 #if defined(MPPP_WITH_LONG_DOUBLE)
     // Dynamic conversion to long double.
-    template <typename T, typename std::enable_if<std::is_same<T, long double>::value, int>::type = 0>
+    template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
     static T conversion_impl(const mpz_struct_t &m)
     {
         MPPP_MAYBE_TLS mpfr_raii mpfr;
