@@ -374,6 +374,12 @@ struct static_int {
     static const mpz_size_t s_size = SSize;
     // Special alloc value to signal static storage in the union.
     static const mpz_alloc_t s_alloc = -1;
+    // The largest number of limbs for which special optimisations are activated.
+    // This is important because the arithmetic optimisations rely on the unused limbs
+    // being zero, thus whenever we use mpn functions on a static int we need to
+    // take care of ensuring that this invariant is respected (see dtor_checks() and
+    // zero_unused_limbs(), for instance).
+    static const std::size_t opt_size = 2;
     // NOTE: init limbs to zero: in some few-limbs optimisations we operate on the whole limb
     // array regardless of the integer size, for performance reasons. If we didn't init to zero,
     // we would read from uninited storage and we would have wrong results as well.
@@ -395,7 +401,7 @@ struct static_int {
         }
         // Check that all limbs which do not participate in the value are zero, iff the SSize is small enough.
         // For small SSize, we might be using optimisations that require unused limbs to be zero.
-        if (SSize <= 2u) {
+        if (SSize <= opt_size) {
             const auto asize = static_cast<std::size_t>(abs_size());
             for (std::size_t i = asize; i < SSize; ++i) {
                 if (m_limbs[i]) {
@@ -415,8 +421,12 @@ struct static_int {
     // for few static limbs.
     void zero_unused_limbs()
     {
-        for (auto i = static_cast<std::size_t>(abs_size()); i < SSize; ++i) {
-            m_limbs[i] = 0u;
+        // Don't do anything if the static size is larger that the maximum size for which the
+        // few-limbs optimisations are activated.
+        if (SSize <= opt_size) {
+            for (auto i = static_cast<std::size_t>(abs_size()); i < SSize; ++i) {
+                m_limbs[i] = 0u;
+            }
         }
     }
     // Size in limbs (absolute value of the _mp_size member).
@@ -728,7 +738,7 @@ public:
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
     {
-        if (this == &other) {
+        if (mppp_unlikely(this == &other)) {
             return *this;
         }
         const bool s1 = is_static(), s2 = other.is_static();
@@ -756,7 +766,7 @@ public:
     // and other is dynamic, other is downgraded to a zero static.
     integer_union &operator=(integer_union &&other) noexcept
     {
-        if (this == &other) {
+        if (mppp_unlikely(this == &other)) {
             return *this;
         }
         const bool s1 = is_static(), s2 = other.is_static();
@@ -959,6 +969,8 @@ public:
         }
         return mpz_to_str(&m_int.g_dy());
     }
+    // NOTE: maybe provide a method to access the lower-level str conversion that writes to
+    // std::vector<char>?
 
 private:
     // Conversion operator.
@@ -1037,7 +1049,7 @@ private:
         if (!n._mp_size) {
             return T(0);
         }
-        if (std::numeric_limits<T>::has_infinity) {
+        if (std::numeric_limits<T>::is_iec559) {
             // Optimization for single-limb integers.
             // NOTE: the reasoning here is as follows. If the floating-point type has infinity,
             // then its "range" is the whole real line. The C++ standard guarantees that:
@@ -1049,8 +1061,8 @@ private:
             // value being converted is outside the range of values that can be represented, the behavior is undefined.
             // """
             // This seems to indicate that if the limb value "overflows" the finite range of the floating-point type, we
-            // will get either the max/min value or +-inf.
-            // In case this analysis is wrong, we could check for iec_559 instead. See the discussion:
+            // will get either the max/min finite value or +-inf. Additionally, the IEEE standard seems to indicate
+            // that an overflowing conversion will produce infinity:
             // http://stackoverflow.com/questions/40694384/integer-to-float-conversions-with-ieee-fp
             if (n._mp_size == 1) {
                 return static_cast<T>(n.m_limbs[0] & GMP_NUMB_MASK);
@@ -1265,8 +1277,6 @@ private:
         }
         return cur_idx + 1;
     }
-    // NOTE: here we do not need to zero the unused static limbs after using mpn functions, as this code is run
-    // only when no few-limbs optimisation are activated.
     // NOTE: this function (and its other overloads) will return true in case of success, false in case of failure
     // (i.e., the addition overflows and the static size is not enough).
     static bool static_add_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
@@ -1386,7 +1396,8 @@ private:
         auto rdata = &rop.m_limbs[0];
         auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
         // NOTE: both asizes have to be 0 or 1 here.
-        assert(asize1 <= 1 && asize2 <= 1);
+        assert((asize1 == 1 && data1[0] != 0u) || (asize1 == 0 && data1[0] == 0u));
+        assert((asize2 == 1 && data2[0] != 0u) || (asize2 == 0 && data2[0] == 0u));
         ::mp_limb_t tmp;
         if (sign1 == sign2) {
             // When the signs are identical, we can implement addition as a true addition.
@@ -1522,7 +1533,13 @@ private:
             asize2 = -asize2;
             sign2 = -1;
         }
-        return static_add_impl(rop, op1, op2, asize1, asize2, sign1, sign2, static_add_algo<s_int>{});
+        const bool retval = static_add_impl(rop, op1, op2, asize1, asize2, sign1, sign2, static_add_algo<s_int>{});
+        if (static_add_algo<s_int>::value == 0 && retval) {
+            // If we used the mpn functions and we actually wrote into rop, then
+            // make sure we zero out the unused limbs.
+            rop.zero_unused_limbs();
+        }
+        return retval;
     }
 
 public:
@@ -1608,7 +1625,7 @@ private:
                                                             ? 1
                                                             : ((SInt::s_size == 2 && have_dlimb_mul::value) ? 2 : 0)>;
     // mpn implementation.
-    // NOTE: this function (and its other overloads) returns 0 in case of success, otherwise it returns a hint
+    // NOTE: this function (and the other overloads) returns 0 in case of success, otherwise it returns a hint
     // about the size in limbs of the result.
     static std::size_t static_mul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1,
                                        mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 0> &)
@@ -1775,7 +1792,12 @@ private:
             asize2 = -asize2;
             sign2 = -1;
         }
-        return static_mul_impl(rop, op1, op2, asize1, asize2, sign1, sign2, static_mul_algo<s_int>{});
+        const std::size_t retval
+            = static_mul_impl(rop, op1, op2, asize1, asize2, sign1, sign2, static_mul_algo<s_int>{});
+        if (static_mul_algo<s_int>::value == 0 && retval == 0u) {
+            rop.zero_unused_limbs();
+        }
+        return retval;
     }
 
 public:
@@ -2043,8 +2065,12 @@ private:
             asize2 = -asize2;
             sign2 = -1;
         }
-        return static_addmul_impl(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
-                                  static_addmul_algo<s_int>{});
+        const std::size_t retval = static_addmul_impl(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
+                                                      static_addmul_algo<s_int>{});
+        if (static_addmul_algo<s_int>::value == 0 && retval == 0u) {
+            rop.zero_unused_limbs();
+        }
+        return retval;
     }
 
 public:
