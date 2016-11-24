@@ -64,6 +64,11 @@ NONIUS_BENCHMARK("gmp 1-1-limb unsigned vector accumulation",
                  [](nonius::chronometer meter) { uacc_gmp(meter, rng, 1); });
 NONIUS_BENCHMARK("gmp 1-1-limb signed vector accumulation", [](nonius::chronometer meter) { sacc_gmp(meter, rng, 1); });
 
+NONIUS_BENCHMARK("flint 1-1-limb unsigned vector addition",
+                 [](nonius::chronometer meter) { uadd_vec_fmpz(meter, rng, 1, 1); });
+NONIUS_BENCHMARK("flint 1-1-limb unsigned vector accumulation",
+                 [](nonius::chronometer meter) { uacc_fmpz(meter, rng, 1); });
+
 NONIUS_BENCHMARK("mppp 2-2-limb unsigned vector addition",
                  [](nonius::chronometer meter) { uadd_vec_mppp<integer>(meter, rng, 2, 2); });
 NONIUS_BENCHMARK("mppp 2-2-limb signed vector addition",
