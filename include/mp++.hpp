@@ -112,6 +112,7 @@ namespace mppp
 inline namespace detail
 {
 
+// Just a small helper, like C++14.
 template <bool B, typename T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
 
@@ -195,6 +196,9 @@ struct mpz_cache {
     v_type m_vec;
 };
 
+// NOTE: the cache will be used only if we have the thread_local keyword available.
+// Otherwise, we provide alternative implementations of the mpz_init_cache() and mpz_clear_cache()
+// that do not use any cache internally.
 #if defined(MPPP_HAVE_THREAD_LOCAL)
 
 inline mpz_cache &get_mpz_cache()
@@ -292,7 +296,7 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
 {
     assert(base >= 2 && base <= 62);
     const auto size_base = ::mpz_sizeinbase(mpz, base);
-    if (size_base > std::numeric_limits<std::size_t>::max() - 2u) {
+    if (mppp_unlikely(size_base > std::numeric_limits<std::size_t>::max() - 2u)) {
         throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
     }
     // Total max size is the size in base plus an optional sign and the null terminator.
@@ -881,6 +885,7 @@ public:
         ::new (static_cast<void *>(&m_st)) s_storage();
         g_st()._mp_size = signed_size;
         copy_limbs_no(tmp.data(), tmp.data() + dyn_size, g_st().m_limbs.data());
+        return true;
     }
     // NOTE: keep these public as we need them below.
     s_storage m_st;
@@ -959,7 +964,7 @@ public:
     }
     std::string to_string(int base = 10) const
     {
-        if (base < 2 || base > 62) {
+        if (mppp_unlikely(base < 2 || base > 62)) {
             throw std::invalid_argument("Invalid base for string conversion: the base must be between "
                                         "2 and 62, but a value of "
                                         + std::to_string(base) + " was provided instead.");
