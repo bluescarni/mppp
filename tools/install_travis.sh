@@ -16,12 +16,10 @@ if [[ "${BUILD_TYPE}" == "Debug" ]]; then
         ctest -V;
     fi
 elif [[ "${BUILD_TYPE}" == "Coverage" ]]; then
-    cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
+    cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="-Og --coverage" ../;
     make;
     ctest -V;
-    cd test;
-    wget https://codecov.io/bash -O codecov.sh;
-    bash codecov.sh -x ${GCOV_EXECUTABLE} -g "test/";
+    bash <(curl -s https://codecov.io/bash) -x $GCOV_EXECUTABLE
 elif [[ "${BUILD_TYPE}" == "Release" ]]; then
     cmake -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes ../;
     make;
