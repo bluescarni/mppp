@@ -765,3 +765,361 @@ TEST_CASE("addmul")
 {
     tuple_for_each(sizes{}, addmul_tester{});
 }
+
+struct div_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        mpz_raii m1, m2, m3, m4;
+        integer n1, n2, n3, n4;
+        // A few simple tests to start.
+        n3 = integer(12);
+        n4 = integer(5);
+        ::mpz_set_ui(&m3.m_mpz, 12);
+        ::mpz_set_ui(&m4.m_mpz, 5);
+        div(n1, n2, n3, n4);
+        ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE((lex_cast(n2) == lex_cast(m2)));
+        n3 = integer(-12);
+        ::mpz_set_si(&m3.m_mpz, -12);
+        div(n1, n2, n3, n4);
+        ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE((lex_cast(n2) == lex_cast(m2)));
+        n4 = integer(-5);
+        ::mpz_set_si(&m4.m_mpz, -5);
+        div(n1, n2, n3, n4);
+        ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE((lex_cast(n2) == lex_cast(m2)));
+        n3 = integer(12);
+        ::mpz_set_ui(&m3.m_mpz, 12);
+        div(n1, n2, n3, n4);
+        ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE((lex_cast(n2) == lex_cast(m2)));
+        // Random testing.
+        mpz_raii tmp;
+        std::uniform_int_distribution<int> sdist(0, 1);
+        auto random_xy = [&](unsigned x, unsigned y) {
+            for (int i = 0; i < ntries; ++i) {
+                random_integer(tmp, x, rng);
+                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                    n3.negate();
+                }
+                random_integer(tmp, y, rng);
+                ::mpz_set(&m4.m_mpz, &tmp.m_mpz);
+                n4 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m4.m_mpz, &m4.m_mpz);
+                    n4.negate();
+                }
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset rops every once in a while.
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
+                    n2 = integer{};
+                    ::mpz_set_ui(&m2.m_mpz, 0);
+                }
+                if (n4.sign() == 0) {
+                    // Skip if the denom is zero.
+                    continue;
+                }
+                div(n1, n2, n3, n4);
+                ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
+                if (lex_cast(n1) != lex_cast(m1)) {
+                    std::cout << "Size: " << S::value << '\n';
+                    std::cout << "i: " << i << '\n';
+                    std::cout << lex_cast(n3) << " and " << lex_cast(n4) << '\n';
+                    std::cout << lex_cast(n1) << " vs " << lex_cast(m1) << '\n';
+                }
+                if (lex_cast(n2) != lex_cast(m2)) {
+                    std::cout << lex_cast(n2) << " vs " << lex_cast(m2) << '\n';
+                }
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
+            }
+        };
+
+        random_xy(1, 0);
+        random_xy(0, 1);
+        random_xy(1, 1);
+
+        random_xy(0, 2);
+        random_xy(1, 2);
+        random_xy(2, 0);
+        random_xy(2, 1);
+        random_xy(2, 2);
+
+        random_xy(0, 3);
+        random_xy(1, 3);
+        random_xy(2, 3);
+        random_xy(3, 0);
+        random_xy(3, 1);
+        random_xy(3, 2);
+        random_xy(3, 3);
+
+        random_xy(0, 4);
+        random_xy(1, 4);
+        random_xy(2, 4);
+        random_xy(3, 4);
+        random_xy(4, 0);
+        random_xy(4, 1);
+        random_xy(4, 2);
+        random_xy(4, 3);
+        random_xy(4, 4);
+#if 0
+        // Start with zeroes.
+
+        addmul(n1, n2, n3);
+        ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        REQUIRE(n2.is_static());
+        REQUIRE(n3.is_static());
+        n1 = integer(12);
+        ::mpz_set_ui(&m1.m_mpz, 12);
+        addmul(n1, n2, n3);
+        ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        REQUIRE(n2.is_static());
+        REQUIRE(n3.is_static());
+        addmul(n1, n3, n2);
+        ::mpz_addmul(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        REQUIRE(n2.is_static());
+        REQUIRE(n3.is_static());
+
+        // Run a variety of tests with operands with x and y number of limbs.
+        auto random_xy = [&](unsigned x, unsigned y) {
+            for (int i = 0; i < ntries; ++i) {
+                random_integer(tmp, x, rng);
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                random_integer(tmp, y, rng);
+                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                    n3.negate();
+                }
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset rop every once in a while.
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
+                }
+                addmul(n1, n2, n3);
+                ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                // In-place variations.
+                random_integer(tmp, x, rng);
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                random_integer(tmp, y, rng);
+                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                    n3.negate();
+                }
+                addmul(n2, n2, n3);
+                ::mpz_addmul(&m2.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
+                random_integer(tmp, x, rng);
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                random_integer(tmp, y, rng);
+                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                    n3.negate();
+                }
+                addmul(n2, n3, n2);
+                ::mpz_addmul(&m2.m_mpz, &m3.m_mpz, &m2.m_mpz);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
+                random_integer(tmp, x, rng);
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                addmul(n2, n2, n2);
+                ::mpz_addmul(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
+                // Specific test for single-limb optimization.
+                if (S::value == 1u && x == 1u && y == 1u) {
+                    // Check when product succeeds but add fails.
+                    max_integer(tmp, 1);
+                    ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
+                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    ::mpz_set_ui(&m2.m_mpz, 2);
+                    n2 = integer(2);
+                    ::mpz_set_ui(&m3.m_mpz, 2);
+                    n3 = integer(2);
+                    addmul(n1, n2, n3);
+                    ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    // Prod cancels rop.
+                    std::uniform_int_distribution<int> idist(1, 40);
+                    int i2 = -idist(rng), i3 = idist(rng), i1 = -i2 * i3;
+                    n1 = integer(i1);
+                    n2 = integer(i2);
+                    n3 = integer(i3);
+                    addmul(n1, n2, n3);
+                    ::mpz_set_si(&m1.m_mpz, i1);
+                    ::mpz_set_si(&m2.m_mpz, i2);
+                    ::mpz_set_si(&m3.m_mpz, i3);
+                    ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    // Prod different sign from rop and larger in abs.
+                    i2 = -idist(rng), i3 = idist(rng), i1 = -i2 * i3 - 1;
+                    n1 = integer(i1);
+                    n2 = integer(i2);
+                    n3 = integer(i3);
+                    addmul(n1, n2, n3);
+                    ::mpz_set_si(&m1.m_mpz, i1);
+                    ::mpz_set_si(&m2.m_mpz, i2);
+                    ::mpz_set_si(&m3.m_mpz, i3);
+                    ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                // Make sure we test 2 x 1 when it succeeds.
+                if (S::value == 2u && x == 1u && y == 2u) {
+                    n1 = integer{1};
+                    ::mpz_set_ui(&m1.m_mpz, 1);
+                    ::mpz_set_ui(&m2.m_mpz, 1);
+                    n2 = integer(1);
+                    if (sdist(rng)) {
+                        n2.negate();
+                        ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    }
+                    random_integer(tmp, y, rng);
+                    ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    if (sdist(rng)) {
+                        n3.negate();
+                        ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                    }
+                    addmul(n1, n2, n3);
+                    ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                // SSize 2, diff signs, abs(rop) >= abs(prod), result size 1.
+                if (S::value == 2) {
+                    random_integer(tmp, 1, rng);
+                    ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
+                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    ::mpz_set_si(&m2.m_mpz, -1);
+                    n2 = integer(-1);
+                    std::uniform_int_distribution<int> idist(1, 40);
+                    auto i1 = idist(rng);
+                    ::mpz_set_si(&m3.m_mpz, i1);
+                    n3 = integer(i1);
+                    addmul(n1, n2, n3);
+                    ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                // Overflow in the addition.
+                if (S::value == 2) {
+                    max_integer(tmp, 2);
+                    ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
+                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    std::uniform_int_distribution<int> idist(1, 40);
+                    auto i1 = idist(rng);
+                    ::mpz_set_si(&m2.m_mpz, i1);
+                    n2 = integer(i1);
+                    i1 = idist(rng);
+                    ::mpz_set_si(&m3.m_mpz, i1);
+                    n3 = integer(i1);
+                    addmul(n1, n2, n3);
+                    ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                // SSize 2, diff signs, abs(rop) >= abs(prod), result size 2.
+                if (S::value == 2) {
+                    random_integer(tmp, 2, rng);
+                    ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
+                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    ::mpz_set_si(&m2.m_mpz, -1);
+                    n2 = integer(-1);
+                    std::uniform_int_distribution<int> idist(1, 40);
+                    auto i1 = idist(rng);
+                    ::mpz_set_si(&m3.m_mpz, i1);
+                    n3 = integer(i1);
+                    addmul(n1, n2, n3);
+                    ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                // SSize 2, diff signs, final result is zero.
+                if (S::value == 2) {
+                    std::uniform_int_distribution<int> idist(1, 40);
+                    auto i1 = idist(rng), i2 = idist(rng);
+                    ::mpz_set_si(&m1.m_mpz, i1 * i2);
+                    n1 = integer(i1 * i2);
+                    ::mpz_set_si(&m2.m_mpz, i1);
+                    n2 = integer(i1);
+                    ::mpz_set_si(&m3.m_mpz, -i2);
+                    n3 = integer(-i2);
+                    addmul(n1, n2, n3);
+                    ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+            }
+        };
+
+        random_xy(1, 0);
+        random_xy(0, 1);
+        random_xy(1, 1);
+
+        random_xy(0, 2);
+        random_xy(1, 2);
+        random_xy(2, 0);
+        random_xy(2, 1);
+        random_xy(2, 2);
+
+        random_xy(0, 3);
+        random_xy(1, 3);
+        random_xy(2, 3);
+        random_xy(3, 0);
+        random_xy(3, 1);
+        random_xy(3, 2);
+        random_xy(3, 3);
+
+        random_xy(0, 4);
+        random_xy(1, 4);
+        random_xy(2, 4);
+        random_xy(3, 4);
+        random_xy(4, 0);
+        random_xy(4, 1);
+        random_xy(4, 2);
+        random_xy(4, 3);
+        random_xy(4, 4);
+#endif
+    }
+};
+
+TEST_CASE("div")
+{
+    tuple_for_each(sizes{}, div_tester{});
+}

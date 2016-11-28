@@ -2096,6 +2096,194 @@ public:
     }
 
 private:
+    // Detect the presence of dual-limb division. This is currently possible only if:
+    // - we are on a 32bit build (with the usual constraints that the types have exactly 32/64 bits and no nails),
+    // - we are on a 64bit build and we have the 128bit int type available (plus usual constraints).
+    // MSVC currently does not provide any primitive for 128bit division.
+    using have_dlimb_div = std::integral_constant<bool,
+#if defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64)
+                                                  !GMP_NAIL_BITS && std::numeric_limits<::mp_limb_t>::digits == 64
+#elif GMP_NUMB_BITS == 32
+                                                  !GMP_NAIL_BITS
+                                                      && std::numeric_limits<std::uint_least64_t>::digits == 64
+                                                      && std::numeric_limits<::mp_limb_t>::digits == 32
+#else
+                                                  false
+#endif
+                                                  >;
+    // Selection of algorithm for static division:
+    // - for 1 limb, we can always do static division,
+    // - for 2 limbs, we need the dual limb division if avaiable,
+    // - otherwise we just use the mpn functions.
+    template <typename SInt>
+    using static_div_algo
+        = std::integral_constant<int, SInt::s_size == 1 ? 1 : ((SInt::s_size == 2 && have_dlimb_div::value) ? 2 : 0)>;
+    // 1-limb optimisation.
+    static void static_div_impl(s_int &q, s_int &r, const s_int &op1, const s_int &op2, mpz_size_t, mpz_size_t,
+                                int sign1, int sign2, const std::integral_constant<int, 1> &)
+    {
+        // NOTE: here we have to use GMP_NUMB_MASK because if s_size is 1 this implementation is *always*
+        // called, even if we have nail bits (whereas the optimisation for other operations currently kicks in
+        // only without nail bits). Thus, we need to discard from m_limbs[0] the nail bits before doing the division.
+        const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK),
+                          r_ = (op1.m_limbs[0] & GMP_NUMB_MASK) % (op2.m_limbs[0] & GMP_NUMB_MASK);
+        // Write q.
+        q._mp_size = (q_ != 0u);
+        if (sign1 != sign2) {
+            q._mp_size = -q._mp_size;
+        }
+        // NOTE: there should be no need here to mask.
+        q.m_limbs[0] = q_;
+        // Write r.
+        r._mp_size = (r_ != 0u);
+        // Following C++11, the sign of r is the sign of op1:
+        // http://stackoverflow.com/questions/13100711/operator-modulo-change-in-c-11
+        if (sign1 == -1) {
+            r._mp_size = -r._mp_size;
+        }
+        r.m_limbs[0] = r_;
+    }
+#if defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+    static void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
+                          ::mp_limb_t *MPPP_RESTRICT r2)
+    {
+        using dlimb_t = MPPP_UINT128;
+        const auto op1 = op11 + (dlimb_t(op12) << 64);
+        const auto op2 = op21 + (dlimb_t(op22) << 64);
+        const auto q = op1 / op2, r = op1 % op2;
+        *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+        *q2 = static_cast<::mp_limb_t>(q >> 64);
+        *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
+        *r2 = static_cast<::mp_limb_t>(r >> 64);
+    }
+#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
+    static void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
+                          ::mp_limb_t *MPPP_RESTRICT r2)
+    {
+        using dlimb_t = std::uint_least64_t;
+        const auto op1 = op11 + (dlimb_t(op12) << 32);
+        const auto op2 = op21 + (dlimb_t(op22) << 32);
+        const auto q = op1 / op2, r = op1 % op2;
+        *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+        *q2 = static_cast<::mp_limb_t>(q >> 32);
+        *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
+        *r2 = static_cast<::mp_limb_t>(r >> 32);
+    }
+#endif
+    // 2-limbs optimisation.
+    static void static_div_impl(s_int &q, s_int &r, const s_int &op1, const s_int &op2, mpz_size_t, mpz_size_t,
+                                int sign1, int sign2, const std::integral_constant<int, 2> &)
+    {
+        // Perform the division.
+        ::mp_limb_t q1, q2, r1, r2;
+        dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2, &r1, &r2);
+        // Write out.
+        q._mp_size = q2 ? 2 : (q1 ? 1 : 0);
+        if (sign1 != sign2) {
+            q._mp_size = -q._mp_size;
+        }
+        q.m_limbs[0] = q1;
+        q.m_limbs[1] = q2;
+        r._mp_size = r2 ? 2 : (r1 ? 1 : 0);
+        if (sign1 == -1) {
+            r._mp_size = -r._mp_size;
+        }
+        r.m_limbs[0] = r1;
+        r.m_limbs[1] = r2;
+    }
+    // mpn implementation.
+    static void static_div_impl(s_int &q, s_int &r, const s_int &op1, const s_int &op2, mpz_size_t asize1,
+                                mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 0> &)
+    {
+        // First we check if the divisor is larger than the dividend (in abs limb size), as the mpn function requires
+        // asize1 >= asize2.
+        if (asize2 > asize1) {
+            // Copy op1 into the remainder.
+            r = op1;
+            // Zero out q.
+            q._mp_size = 0;
+            return;
+        }
+        // We need to take care of potentially overlapping arguments. We know that q and r are distinct, but op1
+        // could overlap with q or r, and op2 could overlap with op1, q or r.
+        std::array<::mp_limb_t, SSize> op1_alt, op2_alt;
+        const ::mp_limb_t *data1 = op1.m_limbs.data();
+        const ::mp_limb_t *data2 = op2.m_limbs.data();
+        if (&op1 == &q || &op1 == &r) {
+            copy_limbs_no(data1, data1 + asize1, op1_alt.data());
+            data1 = op1_alt.data();
+        }
+        if (&op2 == &q || &op2 == &r || &op1 == &op2) {
+            copy_limbs_no(data2, data2 + asize2, op2_alt.data());
+            data2 = op2_alt.data();
+        }
+        // Proceed to the division.
+        ::mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1),
+                      data2, static_cast<::mp_size_t>(asize2));
+        // Complete the quotient: compute size and sign.
+        q._mp_size = asize1 - asize2 + 1;
+        while (q._mp_size && !(q.m_limbs[static_cast<std::size_t>(q._mp_size - 1)] & GMP_NUMB_MASK)) {
+            --q._mp_size;
+        }
+        if (sign1 != sign2) {
+            q._mp_size = -q._mp_size;
+        }
+        // Complete the remainder.
+        r._mp_size = asize2;
+        while (r._mp_size && !(r.m_limbs[static_cast<std::size_t>(r._mp_size - 1)] & GMP_NUMB_MASK)) {
+            --r._mp_size;
+        }
+        if (sign1 == -1) {
+            r._mp_size = -r._mp_size;
+        }
+    }
+    static void static_div(s_int &q, s_int &r, const s_int &op1, const s_int &op2)
+    {
+        mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
+        int sign1 = asize1 != 0, sign2 = asize2 != 0;
+        if (asize1 < 0) {
+            asize1 = -asize1;
+            sign1 = -1;
+        }
+        if (asize2 < 0) {
+            asize2 = -asize2;
+            sign2 = -1;
+        }
+        static_div_impl(q, r, op1, op2, asize1, asize2, sign1, sign2, static_div_algo<s_int>{});
+        if (static_div_algo<s_int>::value == 0) {
+            q.zero_unused_limbs();
+            r.zero_unused_limbs();
+        }
+    }
+
+public:
+    friend void div(mp_integer &q, mp_integer &r, const mp_integer &op1, const mp_integer &op2)
+    {
+        if (mppp_unlikely(&q == &r)) {
+            throw std::invalid_argument("when performing a division with remainder, the quotient 'q' and the "
+                                        "remainder 'r' must be distinct objects");
+        }
+        if (mppp_unlikely(op2.sign() == 0)) {
+            throw std::domain_error("division by zero");
+        }
+        const bool sq = q.is_static(), sr = r.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+        if (mppp_likely(sq && sr && s1 && s2)) {
+            static_div(q.m_int.g_st(), r.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
+            // Division can never fail.
+            return;
+        }
+        if (sq) {
+            q.m_int.promote();
+        }
+        if (sr) {
+            r.m_int.promote();
+        }
+        ::mpz_tdiv_qr(&q.m_int.g_dy(), &r.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    }
+
+private:
     integer_union<SSize> m_int;
 };
 }
