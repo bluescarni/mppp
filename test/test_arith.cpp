@@ -870,12 +870,12 @@ struct div_tester {
             // Error handling.
             n3 = integer(12);
             n4 = integer(0);
-            REQUIRE_THROWS_PREDICATE(div(n1, n2, n3, n4), zero_division_error, [](const zero_division_error &e) {
-                return std::string(e.what()) == "Integer division by zero";
+            REQUIRE_THROWS_PREDICATE(div(n1, n2, n3, n4), zero_division_error, [](const zero_division_error &ex) {
+                return std::string(ex.what()) == "Integer division by zero";
             });
-            REQUIRE_THROWS_PREDICATE(div(n1, n1, n3, n3), std::invalid_argument, [](const std::invalid_argument &e) {
-                return std::string(e.what()) == "When performing a division with remainder, the quotient 'q' and the "
-                                                "remainder 'r' must be distinct objects";
+            REQUIRE_THROWS_PREDICATE(div(n1, n1, n3, n3), std::invalid_argument, [](const std::invalid_argument &ex) {
+                return std::string(ex.what()) == "When performing a division with remainder, the quotient 'q' and the "
+                                                 "remainder 'r' must be distinct objects";
             });
         };
 
