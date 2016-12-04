@@ -18,10 +18,8 @@ add_library(mp++ INTERFACE)
 
 # TODO proper YACMA use of compiler id.
 if(MSVC)
-	# On MSVC, make sure that everything using mp++ uses the /bigobj flag
-	# and disables the min/max macros that wreck up the STL.
+	# On MSVC, make sure that everything using mp++ uses the /bigobj flag.
 	target_compile_options(mp++ INTERFACE "/bigobj")
-	target_compile_options(mp++ INTERFACE "-DNOMINMAX")
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
