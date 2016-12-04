@@ -9,11 +9,17 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_MACOSX_RPATH 1)
 endif()
 
+# Helper function to print out the autodetected flags.
+function(YACMA_REPORT_FLAGS)
+    message(STATUS "YACMA autodetected C++ flags: ${YACMA_CXX_FLAGS}")
+    message(STATUS "YACMA autodetected C++ debug flags: ${YACMA_CXX_FLAGS_DEBUG}")
+endfunction()
+
 # We don't want to execute all this every time CMake is run, as it is time expensive. We will set cache variables
 # on the first run and skip following CMake runs.
 if(YACMACompilerLinkerSettingsRun)
-    message(STATUS "YACMA C++ flags: ${YACMA_CXX_FLAGS}")
-    message(STATUS "YACMA C++ debug flags: ${YACMA_CXX_FLAGS_DEBUG}")
+    # Report the flags before exiting.
+    YACMA_REPORT_FLAGS()
     return()
 endif()
 
@@ -24,6 +30,7 @@ message(STATUS "The C++ compiler ID is: ${CMAKE_CXX_COMPILER_ID}")
 # Clang detection:
 # http://stackoverflow.com/questions/10046114/in-cmake-how-can-i-test-if-the-compiler-is-clang
 # http://www.cmake.org/cmake/help/v2.8.10/cmake.html#variable:CMAKE_LANG_COMPILER_ID
+# NOTE: we use MATCHES here because on OSX sometimes the compiler calls itself "AppleClang".
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     set(YACMA_COMPILER_IS_CLANGXX 1)
 endif()
@@ -43,16 +50,20 @@ endif()
 set(_YACMA_CXX_FLAGS "")
 set(_YACMA_CXX_FLAGS_DEBUG "")
 
-# Enable conditionally a CXX flags, is supported by the compiler.
+# Enable conditionally a CXX flags, if supported by the compiler.
 # This is for flags intended to be enabled in all configurations.
-macro(YACMA_CHECK_ENABLE_CXX_FLAG flag)
-    message(STATUS "Checking the availability of the compiler flag '${flag}'")
+# NOTE: we use macros and go through temporary private variables
+# because it's apparently impossible to append to an internal
+# CACHEd list.
+macro(_YACMA_CHECK_ENABLE_CXX_FLAG flag)
+    set(CMAKE_REQUIRED_QUIET TRUE)
     check_cxx_compiler_flag("${flag}" YACMA_CHECK_CXX_FLAG)
+    unset(CMAKE_REQUIRED_QUIET)
     if(YACMA_CHECK_CXX_FLAG)
-        message(STATUS "Enabling the '${flag}' compiler flag.")
+        message(STATUS "'${flag}': flag is supported by the compiler, enabling.")
         list(APPEND _YACMA_CXX_FLAGS "${flag}")
     else()
-        message(STATUS "Disabling the '${flag}' compiler flag.")
+        message(STATUS "'${flag}': flag is not supported by the compiler.")
     endif()
     # NOTE: check_cxx_compiler stores variables in the cache.
     unset(YACMA_CHECK_CXX_FLAG CACHE)
@@ -60,14 +71,15 @@ endmacro()
 
 # Enable conditionally a debug CXX flags, is supported by the compiler.
 # This is for flags intended to be enabled in debug mode.
-macro(YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG flag)
-    message(STATUS "Checking the availability of the debug compiler flag '${flag}'")
+macro(_YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG flag)
+    set(CMAKE_REQUIRED_QUIET TRUE)
     check_cxx_compiler_flag("${flag}" YACMA_CHECK_DEBUG_CXX_FLAG)
+    unset(CMAKE_REQUIRED_QUIET)
     if(YACMA_CHECK_DEBUG_CXX_FLAG)
-        message(STATUS "Enabling the '${flag}' debug compiler flag.")
+        message(STATUS "'${flag}': debug flag is supported by the compiler, enabling.")
         list(APPEND _YACMA_CXX_FLAGS_DEBUG "${flag}")
     else()
-        message(STATUS "Disabling the '${flag}' debug compiler flag.")
+        message(STATUS "'${flag}': debug flag is not supported by the compiler.")
     endif()
     unset(YACMA_CHECK_DEBUG_CXX_FLAG CACHE)
 endmacro()
@@ -77,54 +89,54 @@ endmacro()
 
 # Configuration bits specific for GCC.
 if(YACMA_COMPILER_IS_GNUCXX)
-    YACMA_CHECK_ENABLE_CXX_FLAG(-fdiagnostics-color=auto)
+    _YACMA_CHECK_ENABLE_CXX_FLAG(-fdiagnostics-color=auto)
 endif()
 
 # Configuration bits specific for clang.
 if(YACMA_COMPILER_IS_CLANGXX)
     # For now it seems like -Wshadow from clang behaves better than GCC's, just enable it here
     # for the time being.
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wshadow)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wshadow)
     # Clang is better at this flag than GCC.
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Werror)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Werror)
 endif()
 
 # Common configuration for GCC, clang and Intel.
 if (YACMA_COMPILER_IS_CLANGXX OR YACMA_COMPILER_IS_INTELXX OR YACMA_COMPILER_IS_GNUCXX)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wall)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wextra)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wnon-virtual-dtor)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wnoexcept)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wlogical-op)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wconversion)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wdeprecated)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wall)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wextra)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wnon-virtual-dtor)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wnoexcept)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wlogical-op)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wconversion)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wdeprecated)
     # This limit is supposed to be at least 1024 in C++11, but for some reason
     # clang sets this to 256, and gcc to 900.
-    YACMA_CHECK_ENABLE_CXX_FLAG(-ftemplate-depth=1024)
+    _YACMA_CHECK_ENABLE_CXX_FLAG(-ftemplate-depth=1024)
     # NOTE: this can be useful, but at the moment it triggers lots of warnings in type traits.
     # Keep it in mind for the next time we touch type traits.
-    # YACMA_CHECK_ENABLE_CXX_FLAG(-Wold-style-cast)
+    # _YACMA_CHECK_ENABLE_CXX_FLAG(-Wold-style-cast)
     # NOTE: disable this for now, as it results in a lot of clutter from Boost.
-    # YACMA_CHECK_ENABLE_CXX_FLAG(-Wzero-as-null-pointer-constant)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-pedantic-errors)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wdisabled-optimization)
-    YACMA_CHECK_ENABLE_CXX_FLAG(-fvisibility-inlines-hidden)
-    YACMA_CHECK_ENABLE_CXX_FLAG(-fvisibility=hidden)
+    # _YACMA_CHECK_ENABLE_CXX_FLAG(-Wzero-as-null-pointer-constant)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-pedantic-errors)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wdisabled-optimization)
+    _YACMA_CHECK_ENABLE_CXX_FLAG(-fvisibility-inlines-hidden)
+    _YACMA_CHECK_ENABLE_CXX_FLAG(-fvisibility=hidden)
     # This is useful when the compiler decides the template backtrace is too verbose.
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-ftemplate-backtrace-limit=0)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-fstack-protector-all)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-ftemplate-backtrace-limit=0)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-fstack-protector-all)
     # These became available in GCC from version 5.
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wodr)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wsuggest-final-types)
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wsuggest-final-methods)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wodr)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wsuggest-final-types)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wsuggest-final-methods)
 endif()
 
 # MSVC setup.
 if(YACMA_COMPILER_IS_MSVC)
     # Enable higher warning level than usual.
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(/W4)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(/W4)
     # Treat warnings as errors.
-    YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(/WX)
+    _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(/WX)
 endif()
 
 # Set the cache variables.
@@ -133,8 +145,7 @@ set(YACMA_CXX_FLAGS_DEBUG "${_YACMA_CXX_FLAGS_DEBUG}" CACHE INTERNAL "")
 set(YACMACompilerLinkerSettingsRun YES CACHE INTERNAL "")
 
 # Final report.
-message(STATUS "YACMA C++ flags: ${YACMA_CXX_FLAGS}")
-message(STATUS "YACMA C++ debug flags: ${YACMA_CXX_FLAGS_DEBUG}")
+YACMA_REPORT_FLAGS()
 
 # Mark as included.
 set(YACMACompilerLinkerSettingsIncluded YES)
