@@ -16,8 +16,7 @@ find_package(GMP REQUIRED)
 
 add_library(mp++ INTERFACE)
 
-# TODO proper YACMA use of compiler id.
-if(MSVC)
+if(YACMA_COMPILER_IS_MSVC)
 	# On MSVC, make sure that everything using mp++ uses the /bigobj flag.
 	target_compile_options(mp++ INTERFACE "/bigobj")
 endif()

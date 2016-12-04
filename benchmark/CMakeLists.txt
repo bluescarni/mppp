@@ -1,3 +1,5 @@
+include(YACMACompilerLinkerSettings)
+
 # Nonius needs support for threading.
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
@@ -12,7 +14,7 @@ macro(ADD_MPPP_BENCHMARK arg1)
     target_include_directories(${arg1} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
     target_compile_options(${arg1} PUBLIC "$<$<CONFIG:DEBUG>:${YACMA_CXX_FLAGS_DEBUG}>")
     target_compile_options(${arg1} PUBLIC "$<$<CONFIG:RELEASE>:${YACMA_CXX_FLAGS}>")
-    if(MSVC)
+    if(YACMA_COMPILER_IS_MSVC)
         # Disable the idiotic minmax macros on MSVC.
         target_compile_options(${arg1} PUBLIC "-DNOMINMAX")
     endif()

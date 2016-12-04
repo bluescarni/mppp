@@ -1,3 +1,5 @@
+include(YACMACompilerLinkerSettings)
+
 # We have some multithreaded tests, so let's activate threading support.
 set(THREADS_PREFER_PTHREAD_FLAG YES)
 find_package(Threads REQUIRED)
@@ -8,7 +10,7 @@ macro(ADD_MPPP_TESTCASE arg1)
     target_link_libraries(${arg1} mp++ Threads::Threads)
     target_compile_options(${arg1} PUBLIC "$<$<CONFIG:DEBUG>:${YACMA_CXX_FLAGS_DEBUG}>")
     target_compile_options(${arg1} PUBLIC "$<$<CONFIG:RELEASE>:${YACMA_CXX_FLAGS}>")
-    if(MSVC)
+    if(YACMA_COMPILER_IS_MSVC)
         # Disable the idiotic minmax macros on MSVC.
         target_compile_options(${arg1} PUBLIC "-DNOMINMAX")
     endif()
