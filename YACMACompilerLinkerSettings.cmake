@@ -9,7 +9,7 @@ message(STATUS "The C++ compiler ID is: ${CMAKE_CXX_COMPILER_ID}")
 # Clang detection:
 # http://stackoverflow.com/questions/10046114/in-cmake-how-can-i-test-if-the-compiler-is-clang
 # http://www.cmake.org/cmake/help/v2.8.10/cmake.html#variable:CMAKE_LANG_COMPILER_ID
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     set(YACMA_COMPILER_IS_CLANGXX 1)
 endif()
 
