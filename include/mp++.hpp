@@ -2329,6 +2329,115 @@ public:
     }
 
 private:
+    // Selection of the algorithm for static mul_2exp.
+    template <typename SInt>
+    using static_mul_2exp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
+    // mpn implementation.
+    static bool static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
+                                     const std::integral_constant<int, 0> &)
+    {
+        mpz_size_t asize = n._mp_size;
+        if (s == 0u || asize == 0) {
+            // If shift is zero, or the operand is zero, nothing to do and just return success.
+            return true;
+        }
+        int sign = asize != 0;
+        if (asize < 0) {
+            asize = -asize;
+            sign = -1;
+        }
+        // ls: number of entire limbs shifted.
+        // rs: effective shift that will be passed to the mpn function.
+        const auto ls = s / GMP_NUMB_BITS, rs = s % GMP_NUMB_BITS;
+        // At the very minimum, the new asize will be the old asize
+        // plus ls.
+        const mpz_size_t new_asize = asize + static_cast<mpz_size_t>(ls);
+        if (std::size_t(new_asize) < SSize) {
+            // In this case the operation will always succeed, and we can write directly into rop.
+            ::mp_limb_t ret = 0u;
+            if (rs) {
+                // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
+                // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() + ls >= n.m_limbs.data().
+                ret = ::mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), asize, unsigned(rs));
+                // Write bits spilling out.
+                rop.m_limbs[std::size_t(new_asize)] = ret;
+            } else {
+                // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
+                // These ranges are potentially overlapping.
+                copy_limbs(n.m_limbs.data(), n.m_limbs.data() + asize, rop.m_limbs.data() + ls);
+            }
+            // Zero the lower limbs vacated by the shift.
+            std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
+            // Set the size.
+            rop._mp_size = new_asize + (ret != 0u);
+            if (sign == -1) {
+                rop._mp_size = -rop._mp_size;
+            }
+            return true;
+        }
+        if (std::size_t(new_asize) == SSize) {
+            if (rs) {
+                // In this case the operation may fail, so we need to write to temporary storage.
+                std::array<::mp_limb_t, SSize> tmp;
+                if (::mpn_lshift(tmp.data(), n.m_limbs.data(), asize, unsigned(rs))) {
+                    return false;
+                }
+                // The shift was successful without spill over, copy the content from the tmp
+                // storage into rop.
+                copy_limbs_no(tmp.data(), tmp.data() + asize, rop.m_limbs.data() + ls);
+            } else {
+                // If we shifted by a multiple of the limb size, then we can write directly to rop.
+                copy_limbs(n.m_limbs.data(), n.m_limbs.data() + asize, rop.m_limbs.data() + ls);
+            }
+            // Zero the lower limbs vacated by the shift.
+            std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
+            // Set the size.
+            rop._mp_size = new_asize;
+            if (sign == -1) {
+                rop._mp_size = -rop._mp_size;
+            }
+            return true;
+        }
+        // Shift is too much, the size will overflow the static limit.
+        return false;
+    }
+    // 1-limb optimisation.
+    static bool static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
+                                     const std::integral_constant<int, 1> &)
+    {
+        const ::mp_limb_t l = n.m_limbs[0] & GMP_NUMB_MASK;
+        if (s == 0u || l == 0u) {
+            // If shift is zero, or the operand is zero, nothing to do and just return success.
+            return true;
+        }
+        if (s > GMP_NUMB_BITS || (l >> (GMP_NUMB_BITS - s))) {
+            // The two conditions:
+            // - if the shift is larger than the number of data bits, the operation will certainly
+            //   fail (as the operand is nonzero);
+            // - shifting by s would overflow  the single limb.
+            // NOTE: s is at least 1, so in the right shift above we never risk UB due to too much shift.
+            return false;
+        }
+        // Write out.
+        rop.m_limbs[0] = l << s;
+        // Size is the same as the input value.
+        rop._mp_size = n._mp_size;
+        return true;
+    }
+    static void static_mul_2exp(s_int &rop, const s_int &n, ::mp_bitcnt_t s)
+    {
+        static_mul_2exp_impl(rop, n, s, static_mul_2exp_algo<s_int>{});
+        if (static_mul_2exp_algo<s_int>::value == 0) {
+            rop.zero_unused_limbs();
+        }
+    }
+
+public:
+    friend void mul_2exp(mp_integer &rop, const mp_integer &n, ::mp_bitcnt_t s)
+    {
+    }
+
+private:
     integer_union<SSize> m_int;
 };
 }
