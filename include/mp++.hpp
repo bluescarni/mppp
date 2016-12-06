@@ -2341,6 +2341,7 @@ private:
             // If shift is zero, or the operand is zero, nothing to do and just return success.
             return true;
         }
+        // Finish setting up asize and sign.
         int sign = asize != 0;
         if (asize < 0) {
             asize = -asize;
@@ -2410,9 +2411,9 @@ private:
             // If shift is zero, or the operand is zero, nothing to do and just return success.
             return true;
         }
-        if (s > GMP_NUMB_BITS || (l >> (GMP_NUMB_BITS - s))) {
+        if (mppp_unlikely(s >= GMP_NUMB_BITS || (l >> (GMP_NUMB_BITS - s)))) {
             // The two conditions:
-            // - if the shift is larger than the number of data bits, the operation will certainly
+            // - if the shift is >= number of data bits, the operation will certainly
             //   fail (as the operand is nonzero);
             // - shifting by s would overflow  the single limb.
             // NOTE: s is at least 1, so in the right shift above we never risk UB due to too much shift.
@@ -2422,6 +2423,74 @@ private:
         rop.m_limbs[0] = l << s;
         // Size is the same as the input value.
         rop._mp_size = n._mp_size;
+        return true;
+    }
+    // 2-limb optimisation.
+    static bool static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
+                                     const std::integral_constant<int, 2> &)
+    {
+        mpz_size_t asize = n._mp_size;
+        if (s == 0u || asize == 0) {
+            return true;
+        }
+        int sign = asize != 0;
+        if (asize < 0) {
+            asize = -asize;
+            sign = -1;
+        }
+        // Too much shift, this can never work on a nonzero value.
+        static_assert(GMP_NUMB_BITS
+                          < std::numeric_limits<typename std::decay<decltype(GMP_NUMB_BITS)>::type>::max() / 2u,
+                      "Overflow error.");
+        if (mppp_unlikely(s >= 2u * GMP_NUMB_BITS)) {
+            return false;
+        }
+        if (s == GMP_NUMB_BITS) {
+            // This case can be dealt with moving lo into hi, but only if asize is 1.
+            if (mppp_unlikely(asize == 2)) {
+                // asize is 2, shift is too much.
+                return false;
+            }
+            rop.m_limbs[1u] = rop.m_limbs[0u];
+            rop.m_limbs[0u] = 0u;
+            // The size has to be 2.
+            rop._mp_size = 2;
+            if (sign == -1) {
+                rop._mp_size = -2;
+            }
+            return true;
+        }
+        // Temp hi lo limbs to store the result that will eventually go into rop.
+        ::mp_limb_t lo = n.m_limbs[0u], hi = n.m_limbs[1u];
+        if (s > GMP_NUMB_BITS) {
+            if (mppp_unlikely(asize == 2)) {
+                return false;
+            }
+            // Move lo to hi and set lo to zero.
+            hi = n.m_limbs[0u];
+            lo = 0u;
+            // Update the shift.
+            s = static_cast<::mp_bitcnt_t>(s - GMP_NUMB_BITS);
+        }
+        // Check that hi will not be shifted too much. Note that
+        // here and below s can never be zero, so we never shift too much.
+        assert(s > 0u && s < GMP_NUMB_BITS);
+        if (mppp_unlikely((hi & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - s))) {
+            return false;
+        }
+        // Shift hi and lo. hi gets the carry over from lo.
+        hi = ((hi & GMP_NUMB_MASK) << s) + ((lo & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - s));
+        // NOTE: here the result needs to be masked as well as the shift could
+        // end up writing in nail bits.
+        lo = ((lo & GMP_NUMB_MASK) << s) & GMP_NUMB_MASK;
+        // Write rop.
+        rop.m_limbs[0u] = lo;
+        rop.m_limbs[1u] = hi;
+        // asize is at least 1.
+        rop._mp_size = 1 + (hi != 0u);
+        if (sign == -1) {
+            rop._mp_size = -rop._mp_size;
+        }
         return true;
     }
     static void static_mul_2exp(s_int &rop, const s_int &n, ::mp_bitcnt_t s)
