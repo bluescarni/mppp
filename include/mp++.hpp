@@ -2333,13 +2333,14 @@ private:
     template <typename SInt>
     using static_mul_2exp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
     // mpn implementation.
-    static bool static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
-                                     const std::integral_constant<int, 0> &)
+    static std::size_t static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
+                                            const std::integral_constant<int, 0> &)
     {
         mpz_size_t asize = n._mp_size;
         if (s == 0u || asize == 0) {
-            // If shift is zero, or the operand is zero, nothing to do and just return success.
-            return true;
+            // If shift is zero, or the operand is zero, write n into rop and return success.
+            rop = n;
+            return 0u;
         }
         // Finish setting up asize and sign.
         int sign = asize != 0;
@@ -2374,14 +2375,14 @@ private:
             if (sign == -1) {
                 rop._mp_size = -rop._mp_size;
             }
-            return true;
+            return 0u;
         }
         if (std::size_t(new_asize) == SSize) {
             if (rs) {
                 // In this case the operation may fail, so we need to write to temporary storage.
                 std::array<::mp_limb_t, SSize> tmp;
                 if (::mpn_lshift(tmp.data(), n.m_limbs.data(), asize, unsigned(rs))) {
-                    return false;
+                    return SSize + 1u;
                 }
                 // The shift was successful without spill over, copy the content from the tmp
                 // storage into rop.
@@ -2397,19 +2398,21 @@ private:
             if (sign == -1) {
                 rop._mp_size = -rop._mp_size;
             }
-            return true;
+            return 0u;
         }
         // Shift is too much, the size will overflow the static limit.
-        return false;
+        // Return a hint for the size of the result.
+        return std::size_t(new_asize) + 1u;
     }
     // 1-limb optimisation.
-    static bool static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
-                                     const std::integral_constant<int, 1> &)
+    static std::size_t static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
+                                            const std::integral_constant<int, 1> &)
     {
         const ::mp_limb_t l = n.m_limbs[0] & GMP_NUMB_MASK;
         if (s == 0u || l == 0u) {
-            // If shift is zero, or the operand is zero, nothing to do and just return success.
-            return true;
+            // If shift is zero, or the operand is zero, write n into rop and return success.
+            rop = n;
+            return 0u;
         }
         if (mppp_unlikely(s >= GMP_NUMB_BITS || (l >> (GMP_NUMB_BITS - s)))) {
             // The two conditions:
@@ -2417,21 +2420,24 @@ private:
             //   fail (as the operand is nonzero);
             // - shifting by s would overflow  the single limb.
             // NOTE: s is at least 1, so in the right shift above we never risk UB due to too much shift.
-            return false;
+            // NOTE: for the size hint: s / nbits is the number of entire limbs shifted, +1 because the shifted
+            // limbs add to the current size (1), +1 because another limb might be needed.
+            return std::size_t(s) / GMP_NUMB_BITS + 2u;
         }
         // Write out.
         rop.m_limbs[0] = l << s;
         // Size is the same as the input value.
         rop._mp_size = n._mp_size;
-        return true;
+        return 0u;
     }
     // 2-limb optimisation.
-    static bool static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
-                                     const std::integral_constant<int, 2> &)
+    static std::size_t static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
+                                            const std::integral_constant<int, 2> &)
     {
         mpz_size_t asize = n._mp_size;
         if (s == 0u || asize == 0) {
-            return true;
+            rop = n;
+            return 0u;
         }
         int sign = asize != 0;
         if (asize < 0) {
@@ -2443,13 +2449,14 @@ private:
                           < std::numeric_limits<typename std::decay<decltype(GMP_NUMB_BITS)>::type>::max() / 2u,
                       "Overflow error.");
         if (mppp_unlikely(s >= 2u * GMP_NUMB_BITS)) {
-            return false;
+            // NOTE: this is the generic formula to estimate the final size.
+            return std::size_t(s) / GMP_NUMB_BITS + 1u + std::size_t(asize);
         }
         if (s == GMP_NUMB_BITS) {
             // This case can be dealt with moving lo into hi, but only if asize is 1.
             if (mppp_unlikely(asize == 2)) {
                 // asize is 2, shift is too much.
-                return false;
+                return 3u;
             }
             rop.m_limbs[1u] = rop.m_limbs[0u];
             rop.m_limbs[0u] = 0u;
@@ -2458,13 +2465,13 @@ private:
             if (sign == -1) {
                 rop._mp_size = -2;
             }
-            return true;
+            return 0u;
         }
         // Temp hi lo limbs to store the result that will eventually go into rop.
         ::mp_limb_t lo = n.m_limbs[0u], hi = n.m_limbs[1u];
         if (s > GMP_NUMB_BITS) {
             if (mppp_unlikely(asize == 2)) {
-                return false;
+                return std::size_t(s) / GMP_NUMB_BITS + 1u + std::size_t(asize);
             }
             // Move lo to hi and set lo to zero.
             hi = n.m_limbs[0u];
@@ -2476,7 +2483,7 @@ private:
         // here and below s can never be zero, so we never shift too much.
         assert(s > 0u && s < GMP_NUMB_BITS);
         if (mppp_unlikely((hi & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - s))) {
-            return false;
+            return 3u;
         }
         // Shift hi and lo. hi gets the carry over from lo.
         hi = ((hi & GMP_NUMB_MASK) << s) + ((lo & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - s));
@@ -2491,19 +2498,32 @@ private:
         if (sign == -1) {
             rop._mp_size = -rop._mp_size;
         }
-        return true;
+        return 0u;
     }
-    static void static_mul_2exp(s_int &rop, const s_int &n, ::mp_bitcnt_t s)
+    static std::size_t static_mul_2exp(s_int &rop, const s_int &n, ::mp_bitcnt_t s)
     {
-        static_mul_2exp_impl(rop, n, s, static_mul_2exp_algo<s_int>{});
-        if (static_mul_2exp_algo<s_int>::value == 0) {
+        const std::size_t retval = static_mul_2exp_impl(rop, n, s, static_mul_2exp_algo<s_int>{});
+        if (static_mul_2exp_algo<s_int>::value == 0 && retval == 0u) {
             rop.zero_unused_limbs();
         }
+        return retval;
     }
 
 public:
     friend void mul_2exp(mp_integer &rop, const mp_integer &n, ::mp_bitcnt_t s)
     {
+        const bool sr = rop.is_static(), sn = n.is_static();
+        std::size_t size_hint = 0u;
+        if (mppp_likely(sr && sn)) {
+            size_hint = static_mul_2exp(rop.m_int.g_st(), n.m_int.g_st(), s);
+            if (mppp_likely(size_hint == 0u)) {
+                return;
+            }
+        }
+        if (sr) {
+            rop.m_int.promote(size_hint);
+        }
+        ::mpz_mul_2exp(&rop.m_int.g_dy(), n.get_mpz_view(), s);
     }
 
 private:
