@@ -5,16 +5,22 @@ set -e
 # Echo each command
 set -x
 
-if [[ "${BUILD_TYPE}" == "Debug"]]; then
+if [[ "${BUILD_TYPE}" == "Debug" ]]; then
     cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes ../;
     make;
     ctest -V;
 elif [[ "${BUILD_TYPE}" == "DebugAS" ]]; then
     cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
+    make;
+    ctest -V;
 elif [[ "${BUILD_TYPE}" == "DebugTS" ]]; then
     cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="-fsanitize=thread" ../;
+    make;
+    ctest -V;
 elif [[ "${BUILD_TYPE}" == "DebugUBS" ]]; then
     cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="-fsanitize=undefined" ../;
+    make;
+    ctest -V;
 elif [[ "${BUILD_TYPE}" == "Coverage" ]]; then
     cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="-Og --coverage" ../;
     make;
