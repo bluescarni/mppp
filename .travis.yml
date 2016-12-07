@@ -18,21 +18,16 @@ addons:
     - graphviz-dev
     - cmake
     - cmake-data
+    - texlive
     - gcc-5
     - g++-5
-    - gcc-6
-    - g++-6
 
 matrix:
   include:
     - compiler: gcc
       env: BUILD_TYPE="Release"
     - compiler: gcc
-      env: BUILD_TYPE="DebugAS"
-    - compiler: gcc
-      env: BUILD_TYPE="DebugTS"
-    - compiler: gcc
-      env: BUILD_TYPE="DebugUBS"
+      env: BUILD_TYPE="Debug"
     - compiler: gcc
       env: BUILD_TYPE="Coverage"
     - compiler: clang
@@ -45,19 +40,15 @@ install:
           export MPPP_COMPILER=clang;
           export CC=clang-3.8;
           export CXX=clang++-3.8;
-      elif [[ "${BUILD_TYPE}" == "Coverage" ]]; then
+      elif [[ "${CC}" == "gcc" && "${BUILD_TYPE}" == "Coverage" ]]; then
           export MPPP_COMPILER=gcc;
           export CC=gcc-5;
           export CXX=g++-5;
           export GCOV_EXECUTABLE=gcov-5;
-      elif [[ "${CC}" == "gcc" && "${BUILD_TYPE}" == "Release" ]]; then
+      else
           export MPPP_COMPILER=gcc;
           export CC=gcc-4.8;
           export CXX=g++-4.8;
-      else
-          export MPPP_COMPILER=gcc;
-          export CC=gcc-6;
-          export CXX=g++-6;
       fi
 script:
     - mkdir build
