@@ -947,138 +947,151 @@ struct lshift_tester {
         mul_2exp(n1, n2, 2u);
         ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, 2u);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
-#if 0
-        mpz_raii m1, m2, m3, m4;
-        integer n1, n2, n3, n4;
-        // A few simple tests to start.
-        n3 = integer(12);
-        n4 = integer(5);
-        ::mpz_set_ui(&m3.m_mpz, 12);
-        ::mpz_set_ui(&m4.m_mpz, 5);
-        div(n1, n2, n3, n4);
-        ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
-        REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE((lex_cast(n2) == lex_cast(m2)));
-        n3 = integer(-12);
-        ::mpz_set_si(&m3.m_mpz, -12);
-        div(n1, n2, n3, n4);
-        ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
-        REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE((lex_cast(n2) == lex_cast(m2)));
-        n4 = integer(-5);
-        ::mpz_set_si(&m4.m_mpz, -5);
-        div(n1, n2, n3, n4);
-        ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
-        REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE((lex_cast(n2) == lex_cast(m2)));
-        n3 = integer(12);
-        ::mpz_set_ui(&m3.m_mpz, 12);
-        div(n1, n2, n3, n4);
-        ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
-        REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE((lex_cast(n2) == lex_cast(m2)));
         // Random testing.
         mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
-        auto random_xy = [&](unsigned x, unsigned y) {
+        auto random_x = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
-                // Helper to generate randomly dividend and divisor.
-                auto random_34 = [&]() {
-                    random_integer(tmp, x, rng);
-                    ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
-                    if (sdist(rng)) {
-                        ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                        n3.negate();
-                    }
-                    // Make sure divisor is not zero.
-                    do {
-                        random_integer(tmp, y, rng);
-                        ::mpz_set(&m4.m_mpz, &tmp.m_mpz);
-                        n4 = integer(mpz_to_str(&tmp.m_mpz));
-                        if (sdist(rng)) {
-                            ::mpz_neg(&m4.m_mpz, &m4.m_mpz);
-                            n4.negate();
-                        }
-                    } while (n4.sign() == 0);
-                };
-                random_34();
-                // Reset rops every once in a while.
+                // Half limb shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
                     ::mpz_set_ui(&m1.m_mpz, 0);
                 }
+                random_integer(tmp, x, rng);
+                std::uniform_int_distribution<unsigned> bdh(0u, GMP_NUMB_BITS / 2u);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                auto rbs = bdh(rng);
+                mul_2exp(n1, n2, rbs);
+                ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                // 1 limb shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
-                    n2 = integer{};
-                    ::mpz_set_ui(&m2.m_mpz, 0);
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
                 }
-                div(n1, n2, n3, n4);
-                ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
+                random_integer(tmp, x, rng);
+                std::uniform_int_distribution<unsigned> bd1(0u, GMP_NUMB_BITS);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                rbs = bd1(rng);
+                mul_2exp(n1, n2, rbs);
+                ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((lex_cast(n2) == lex_cast(m2)));
-                // In-place variations.
-                random_34();
-                div(n1, n3, n3, n4);
-                ::mpz_tdiv_qr(&m1.m_mpz, &m3.m_mpz, &m3.m_mpz, &m4.m_mpz);
+                // 1 and half limb shift.
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
+                }
+                random_integer(tmp, x, rng);
+                std::uniform_int_distribution<unsigned> bd1h(0u, GMP_NUMB_BITS + GMP_NUMB_BITS / 2u);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                rbs = bd1h(rng);
+                mul_2exp(n1, n2, rbs);
+                ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((lex_cast(n3) == lex_cast(m3)));
-                random_34();
-                div(n1, n4, n3, n4);
-                ::mpz_tdiv_qr(&m1.m_mpz, &m4.m_mpz, &m3.m_mpz, &m4.m_mpz);
+                // 2 limbs shift.
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
+                }
+                random_integer(tmp, x, rng);
+                std::uniform_int_distribution<unsigned> bd2(0u, GMP_NUMB_BITS * 2u);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                rbs = bd2(rng);
+                mul_2exp(n1, n2, rbs);
+                ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((lex_cast(n4) == lex_cast(m4)));
-                random_34();
-                div(n1, n2, n4, n4);
-                ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m4.m_mpz, &m4.m_mpz);
+                // 2 and half limbs shift.
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
+                }
+                random_integer(tmp, x, rng);
+                std::uniform_int_distribution<unsigned> bd2h(0u, GMP_NUMB_BITS * 2u + GMP_NUMB_BITS / 2u);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                rbs = bd2h(rng);
+                mul_2exp(n1, n2, rbs);
+                ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((lex_cast(n2) == lex_cast(m2)));
-                random_34();
-                div(n1, n4, n4, n4);
-                ::mpz_tdiv_qr(&m1.m_mpz, &m4.m_mpz, &m4.m_mpz, &m4.m_mpz);
+                // 3 limbs shift.
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
+                }
+                random_integer(tmp, x, rng);
+                std::uniform_int_distribution<unsigned> bd3(0u, GMP_NUMB_BITS * 3u);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                rbs = bd3(rng);
+                mul_2exp(n1, n2, rbs);
+                ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((lex_cast(n4) == lex_cast(m4)));
-                random_34();
-                div(n4, n2, n4, n4);
-                ::mpz_tdiv_qr(&m4.m_mpz, &m2.m_mpz, &m4.m_mpz, &m4.m_mpz);
-                REQUIRE((lex_cast(n4) == lex_cast(m4)));
-                REQUIRE((lex_cast(n2) == lex_cast(m2)));
+                // 3 and half limbs shift.
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
+                }
+                random_integer(tmp, x, rng);
+                std::uniform_int_distribution<unsigned> bd3h(0u, GMP_NUMB_BITS * 3u + GMP_NUMB_BITS / 2u);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                rbs = bd3h(rng);
+                mul_2exp(n1, n2, rbs);
+                ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                // 4 limbs shift.
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
+                }
+                random_integer(tmp, x, rng);
+                std::uniform_int_distribution<unsigned> bd4(0u, GMP_NUMB_BITS * 4u);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                rbs = bd4(rng);
+                mul_2exp(n1, n2, rbs);
+                ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
             }
-            // Error handling.
-            n3 = integer(12);
-            n4 = integer(0);
-            REQUIRE_THROWS_PREDICATE(div(n1, n2, n3, n4), zero_division_error, [](const zero_division_error &ex) {
-                return std::string(ex.what()) == "Integer division by zero";
-            });
-            REQUIRE_THROWS_PREDICATE(div(n1, n1, n3, n3), std::invalid_argument, [](const std::invalid_argument &ex) {
-                return std::string(ex.what()) == "When performing a division with remainder, the quotient 'q' and the "
-                                                 "remainder 'r' must be distinct objects";
-            });
         };
 
-        random_xy(0, 1);
-        random_xy(1, 1);
-
-        random_xy(0, 2);
-        random_xy(1, 2);
-        random_xy(2, 1);
-        random_xy(2, 2);
-
-        random_xy(0, 3);
-        random_xy(1, 3);
-        random_xy(2, 3);
-        random_xy(3, 1);
-        random_xy(3, 2);
-        random_xy(3, 3);
-
-        random_xy(0, 4);
-        random_xy(1, 4);
-        random_xy(2, 4);
-        random_xy(3, 4);
-        random_xy(4, 1);
-        random_xy(4, 2);
-        random_xy(4, 3);
-        random_xy(4, 4);
-#endif
+        random_x(0);
+        random_x(1);
+        random_x(2);
+        random_x(3);
+        random_x(4);
     }
 };
 

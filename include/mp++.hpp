@@ -2458,7 +2458,7 @@ private:
                 // asize is 2, shift is too much.
                 return 3u;
             }
-            rop.m_limbs[1u] = rop.m_limbs[0u];
+            rop.m_limbs[1u] = n.m_limbs[0u];
             rop.m_limbs[0u] = 0u;
             // The size has to be 2.
             rop._mp_size = 2;
