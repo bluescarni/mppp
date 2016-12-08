@@ -644,7 +644,10 @@ struct static_int {
         // is the dynamic one, we need to def construct a static view that we will never use.
         // NOTE: m_mpz needs to be zero inited because otherwise when using the move ctor we will
         // be reading from uninited memory.
-        static_mpz_view() : m_mpz{}
+        // NOTE: use round parentheses here in an attempt to shut a GCC warning that happens with curly
+        // braces - they should be equivalent, see:
+        // http://en.cppreference.com/w/cpp/language/value_initialization
+        static_mpz_view() : m_mpz()
         {
         }
         // NOTE: we use the const_cast to cast away the constness from the pointer to the limbs
