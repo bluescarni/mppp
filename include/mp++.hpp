@@ -2388,9 +2388,9 @@ private:
                 // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
                 // NOTE: we have to use move_backward here because the ranges are overlapping and they do not
                 // start at the same pointer (in which case we could've used copy_limbs()). Here we know ls is not zero:
-                // we don't have a remainder, and s == 0 was already handled above.
-                assert(ls);
-                std::move_backward(n.m_limbs.data(), n.m_limbs.data() + asize, rop.m_limbs.data() + ls + asize);
+                // we don't have a remainder, and s == 0 was already handled above. Hence, new_asize > asize.
+                assert(new_asize > asize);
+                std::move_backward(n.m_limbs.data(), n.m_limbs.data() + asize, rop.m_limbs.data() + new_asize);
             }
             // Zero the lower limbs vacated by the shift.
             std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
@@ -2413,8 +2413,8 @@ private:
                 copy_limbs_no(tmp.data(), tmp.data() + asize, rop.m_limbs.data() + ls);
             } else {
                 // If we shifted by a multiple of the limb size, then we can write directly to rop.
-                assert(ls);
-                std::move_backward(n.m_limbs.data(), n.m_limbs.data() + asize, rop.m_limbs.data() + ls + asize);
+                assert(new_asize > asize);
+                std::move_backward(n.m_limbs.data(), n.m_limbs.data() + asize, rop.m_limbs.data() + new_asize);
             }
             // Zero the lower limbs vacated by the shift.
             std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
