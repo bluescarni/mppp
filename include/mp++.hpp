@@ -910,6 +910,18 @@ struct zero_division_error final : std::domain_error {
     using std::domain_error::domain_error;
 };
 
+// NOTE: a few misc things:
+// - probably we can re-implement eventually the generic ctor/conversion on top of mp_integer
+//   rather than mpz (talking about the general case, not 1-limb optimisations here). There might be some
+//   efficiency gains to be had;
+// - re-visit at one point the issue of the estimators when we need to promote from static to dynamic
+//   in arithmetic ops. Currently they are not 100% optimal since they rely on the information coming out
+//   of the static implementation rather than computing the estimated size of rop themselves, for performance
+//   reasons (see comments);
+// - maybe the lshift/rshift optimisation for 2 limbs could use dlimb types if available?
+// - it seems like it might be possible to re-implement a bare-bone mpz api on top of the mpn primitives,
+//   with the goal of providing some form of error recovery in case of memory errors (e.g., throw instead
+//   of aborting). This is probably not an immediate concern though.
 template <std::size_t SSize>
 class mp_integer
 {
@@ -2371,8 +2383,11 @@ private:
                 rop.m_limbs[std::size_t(new_asize)] = ret;
             } else {
                 // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
-                // These ranges are potentially overlapping.
-                copy_limbs(n.m_limbs.data(), n.m_limbs.data() + asize, rop.m_limbs.data() + ls);
+                // NOTE: we have to use move_backward here because the ranges are overlapping and they do not
+                // start at the same pointer (in which case we could've used copy_limbs()). Here we know ls is not zero:
+                // we don't have a remainder, and s == 0 was already handled above.
+                assert(ls);
+                std::move_backward(n.m_limbs.data(), n.m_limbs.data() + asize, rop.m_limbs.data() + ls + asize);
             }
             // Zero the lower limbs vacated by the shift.
             std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
@@ -2395,7 +2410,8 @@ private:
                 copy_limbs_no(tmp.data(), tmp.data() + asize, rop.m_limbs.data() + ls);
             } else {
                 // If we shifted by a multiple of the limb size, then we can write directly to rop.
-                copy_limbs(n.m_limbs.data(), n.m_limbs.data() + asize, rop.m_limbs.data() + ls);
+                assert(ls);
+                std::move_backward(n.m_limbs.data(), n.m_limbs.data() + asize, rop.m_limbs.data() + ls + asize);
             }
             // Zero the lower limbs vacated by the shift.
             std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));

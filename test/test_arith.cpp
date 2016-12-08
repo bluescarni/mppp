@@ -965,6 +965,10 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                // Try in-place as well.
+                mul_2exp(n2, n2, rbs);
+                ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 1 limb shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
@@ -982,6 +986,9 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                mul_2exp(n2, n2, rbs);
+                ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 1 and half limb shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
@@ -999,6 +1006,9 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                mul_2exp(n2, n2, rbs);
+                ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 2 limbs shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
@@ -1016,6 +1026,9 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                mul_2exp(n2, n2, rbs);
+                ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 2 and half limbs shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
@@ -1033,6 +1046,9 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                mul_2exp(n2, n2, rbs);
+                ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 3 limbs shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
@@ -1050,6 +1066,9 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                mul_2exp(n2, n2, rbs);
+                ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 3 and half limbs shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
@@ -1067,6 +1086,9 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                mul_2exp(n2, n2, rbs);
+                ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 4 limbs shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
@@ -1084,6 +1106,9 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                mul_2exp(n2, n2, rbs);
+                ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 4 limbs and half shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
@@ -1101,6 +1126,9 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                mul_2exp(n2, n2, rbs);
+                ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // 5 limbs shift.
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     n1 = integer{};
@@ -1118,6 +1146,9 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                mul_2exp(n2, n2, rbs);
+                ::mpz_mul_2exp(&m2.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
             }
         };
 
