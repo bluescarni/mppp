@@ -47,6 +47,12 @@ see https://www.gnu.org/licenses/. */
 #include <utility>
 #include <vector>
 
+#if __GNU_MP_VERSION < 5
+
+#error Minimum supported GMP version is 5.
+
+#endif
+
 #if defined(MPPP_WITH_LONG_DOUBLE)
 
 #include <mpfr.h>
