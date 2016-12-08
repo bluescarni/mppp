@@ -1084,6 +1084,40 @@ struct lshift_tester {
                 mul_2exp(n1, n2, rbs);
                 ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                // 4 limbs and half shift.
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
+                }
+                random_integer(tmp, x, rng);
+                std::uniform_int_distribution<unsigned> bd4h(0u, GMP_NUMB_BITS * 4u + GMP_NUMB_BITS / 2u);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                rbs = bd4h(rng);
+                mul_2exp(n1, n2, rbs);
+                ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                // 5 limbs shift.
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    n1 = integer{};
+                    ::mpz_set_ui(&m1.m_mpz, 0);
+                }
+                random_integer(tmp, x, rng);
+                std::uniform_int_distribution<unsigned> bd5(0u, GMP_NUMB_BITS * 5u);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.negate();
+                }
+                rbs = bd5(rng);
+                mul_2exp(n1, n2, rbs);
+                ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, rbs);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
             }
         };
 
