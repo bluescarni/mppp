@@ -57,6 +57,12 @@ see https://www.gnu.org/licenses/. */
 
 #include <mpfr.h>
 
+#if MPFR_VERSION_MAJOR < 3
+
+#error Minimum supported MPFR version is 3.
+
+#endif
+
 #endif
 
 // Compiler configuration.
@@ -1289,6 +1295,11 @@ public:
         } else {
             ::mpz_neg(&m_int.g_dy(), &m_int.g_dy());
         }
+    }
+    friend void neg(mp_integer &rop, const mp_integer &n)
+    {
+        rop = n;
+        rop.negate();
     }
 
 private:
@@ -2549,6 +2560,77 @@ public:
             rop.m_int.promote(size_hint);
         }
         ::mpz_mul_2exp(&rop.m_int.g_dy(), n.get_mpz_view(), s);
+    }
+
+private:
+    // Selection of the algorithm for static tdiv_q_2exp.
+    template <typename SInt>
+    using static_tdiv_q_2exp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
+    // mpn implementation.
+    static void static_tdiv_q_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
+                                        const std::integral_constant<int, 0> &)
+    {
+        mpz_size_t asize = n._mp_size;
+        if (s == 0u || asize == 0) {
+            // If shift is zero, or the operand is zero, write n into rop and return.
+            rop = n;
+            return;
+        }
+        // Finish setting up asize and sign.
+        int sign = asize != 0;
+        if (asize < 0) {
+            asize = -asize;
+            sign = -1;
+        }
+        // ls: number of entire limbs shifted.
+        // rs: effective shift that will be passed to the mpn function.
+        const auto ls = s / GMP_NUMB_BITS, rs = s % GMP_NUMB_BITS;
+        if (ls >= std::size_t(asize)) {
+            // If we shift by a number of entire limbs equal to or larger than the asize,
+            // the result will be zero.
+            rop._mp_size = 0;
+            return;
+        }
+        // The maximum new asize will be the old asize minus ls.
+        const mpz_size_t new_asize = asize - static_cast<mpz_size_t>(ls);
+        if (rs) {
+            // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
+            // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() <= n.m_limbs.data() + ls.
+            ::mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, new_asize, unsigned(rs));
+        } else {
+            // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
+            // NOTE: std::move requires that the destination iterator is not within the input range.
+            // Here we are sure that ls > 0 because we don't have a remainder, and the zero shift case
+            // was already handled above.
+            assert(ls);
+            std::move(n.m_limbs.begin() + ls, n.m_limbs.begin() + asize, rop.m_limbs.begin());
+        }
+        // Set the size. We need to check if the top limb is zero.
+        rop._mp_size = new_asize - ((rop.m_limbs[std::size_t(new_asize - 1)] & GMP_NUMB_MASK) == 0u);
+        if (sign == -1) {
+            rop._mp_size = -rop._mp_size;
+        }
+    }
+    static void static_tdiv_q_2exp(s_int &rop, const s_int &n, ::mp_bitcnt_t s)
+    {
+        static_tdiv_q_2exp_impl(rop, n, s, static_tdiv_q_2exp_algo<s_int>{});
+        if (static_tdiv_q_2exp_algo<s_int>::value == 0) {
+            rop.zero_unused_limbs();
+        }
+    }
+
+public:
+    friend void tdiv_q_2exp(mp_integer &rop, const mp_integer &n, ::mp_bitcnt_t s)
+    {
+        const bool sr = rop.is_static(), sn = n.is_static();
+        if (mppp_likely(sr && sn)) {
+            static_tdiv_q_2exp(rop.m_int.g_st(), n.m_int.g_st(), s);
+            return;
+        }
+        if (sr) {
+            rop.m_int.promote();
+        }
+        ::mpz_tdiv_q_2exp(&rop.m_int.g_dy(), n.get_mpz_view(), s);
     }
 
 private:
