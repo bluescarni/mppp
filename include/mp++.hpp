@@ -2611,6 +2611,77 @@ private:
             rop._mp_size = -rop._mp_size;
         }
     }
+    // 1-limb optimisation.
+    static void static_tdiv_q_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
+                                        const std::integral_constant<int, 1> &)
+    {
+        const ::mp_limb_t l = n.m_limbs[0] & GMP_NUMB_MASK;
+        if (s == 0u || l == 0u) {
+            rop = n;
+            return;
+        }
+        if (s >= GMP_NUMB_BITS) {
+            // We are shifting by the limb's bit size or greater, the result will be zero.
+            rop._mp_size = 0;
+            rop.m_limbs[0] = 0u;
+            return;
+        }
+        // Compute the result.
+        const auto res = l >> s;
+        // Size is the original one or zero.
+        rop._mp_size = res ? n._mp_size : 0;
+        rop.m_limbs[0] = res;
+    }
+    // 2-limb optimisation.
+    static void static_tdiv_q_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
+                                        const std::integral_constant<int, 2> &)
+    {
+        mpz_size_t asize = n._mp_size;
+        if (s == 0u || asize == 0) {
+            rop = n;
+            return;
+        }
+        int sign = asize != 0;
+        if (asize < 0) {
+            asize = -asize;
+            sign = -1;
+        }
+        // If shift is too large, zero the result and return.
+        static_assert(GMP_NUMB_BITS
+                          < std::numeric_limits<typename std::decay<decltype(GMP_NUMB_BITS)>::type>::max() / 2u,
+                      "Overflow error.");
+        if (s >= 2u * GMP_NUMB_BITS) {
+            rop._mp_size = 0;
+            rop.m_limbs[0u] = 0u;
+            rop.m_limbs[1u] = 0u;
+            return;
+        }
+        if (s >= GMP_NUMB_BITS) {
+            // NOTE: here the effective shift < GMP_NUMB_BITS, otherwise it would have been caught
+            // in the check above.
+            const auto lo = (n.m_limbs[1u] & GMP_NUMB_MASK) >> (s - GMP_NUMB_BITS);
+            // The size could be zero or +-1, depending
+            // on the new content of m_limbs[0] and the previous
+            // sign of _mp_size.
+            rop._mp_size = lo ? sign : 0;
+            rop.m_limbs[0u] = lo;
+            rop.m_limbs[1u] = 0u;
+            return;
+        }
+        assert(s > 0u && s < GMP_NUMB_BITS);
+        // This represents the bits in hi that will be shifted down into lo.
+        // We move them up so we can add tmp to the new lo to account for them.
+        // NOTE: mask the final result to avoid spillover into potential nail bits.
+        const auto tmp = ((n.m_limbs[1u] & GMP_NUMB_MASK) << (GMP_NUMB_BITS - s)) & GMP_NUMB_MASK;
+        rop.m_limbs[0u] = ((n.m_limbs[0u] & GMP_NUMB_MASK) >> s) + tmp;
+        rop.m_limbs[1u] = (n.m_limbs[1u] & GMP_NUMB_MASK) >> s;
+        // The effective shift was less than 1 entire limb. The new asize must be the old one,
+        // or one less than that.
+        rop._mp_size = asize - ((rop.m_limbs[std::size_t(asize - 1)] & GMP_NUMB_MASK) == 0u);
+        if (sign == -1) {
+            rop._mp_size = -rop._mp_size;
+        }
+    }
     static void static_tdiv_q_2exp(s_int &rop, const s_int &n, ::mp_bitcnt_t s)
     {
         static_tdiv_q_2exp_impl(rop, n, s, static_tdiv_q_2exp_algo<s_int>{});
