@@ -1697,18 +1697,18 @@ private:
         ::mp_limb_t hi;
         if (asize2 == 1) {
             // NOTE: the 1-limb versions do not write the hi limb, we have to write it ourselves.
-            hi = ::mpn_mul_1(res_data, data1, asize1, data2[0]);
+            hi = ::mpn_mul_1(res_data, data1, static_cast<::mp_size_t>(asize1), data2[0]);
             res_data[asize1] = hi;
         } else if (asize1 == 1) {
-            hi = ::mpn_mul_1(res_data, data2, asize2, data1[0]);
+            hi = ::mpn_mul_1(res_data, data2, static_cast<::mp_size_t>(asize2), data1[0]);
             res_data[asize2] = hi;
         } else if (asize1 == asize2) {
-            ::mpn_mul_n(res_data, data1, data2, asize1);
+            ::mpn_mul_n(res_data, data1, data2, static_cast<::mp_size_t>(asize1));
             hi = res_data[2 * asize1 - 1];
         } else if (asize1 >= asize2) {
-            hi = ::mpn_mul(res_data, data1, asize1, data2, asize2);
+            hi = ::mpn_mul(res_data, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
         } else {
-            hi = ::mpn_mul(res_data, data2, asize2, data1, asize1);
+            hi = ::mpn_mul(res_data, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
         }
         // The actual size.
         const std::size_t asize = max_asize - unsigned(hi == 0u);
@@ -2392,7 +2392,8 @@ private:
             if (rs) {
                 // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
                 // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() + ls >= n.m_limbs.data().
-                ret = ::mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), asize, unsigned(rs));
+                ret = ::mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize),
+                                   unsigned(rs));
                 // Write bits spilling out.
                 rop.m_limbs[std::size_t(new_asize)] = ret;
             } else {
@@ -2416,7 +2417,7 @@ private:
             if (rs) {
                 // In this case the operation may fail, so we need to write to temporary storage.
                 std::array<::mp_limb_t, SSize> tmp;
-                if (::mpn_lshift(tmp.data(), n.m_limbs.data(), asize, unsigned(rs))) {
+                if (::mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
                     return SSize + 1u;
                 }
                 // The shift was successful without spill over, copy the content from the tmp
@@ -2596,7 +2597,7 @@ private:
         if (rs) {
             // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
             // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() <= n.m_limbs.data() + ls.
-            ::mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, new_asize, unsigned(rs));
+            ::mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize), unsigned(rs));
         } else {
             // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
             // NOTE: std::move requires that the destination iterator is not within the input range.
