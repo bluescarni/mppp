@@ -2706,6 +2706,77 @@ public:
     }
 
 private:
+    // Selection of the algorithm for static cmp.
+    template <typename SInt>
+    using static_cmp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
+    // mpn implementation.
+    static int static_cmp(const s_int &n1, const s_int &n2, const std::integral_constant<int, 0> &)
+    {
+        if (n1._mp_size < n2._mp_size) {
+            return -1;
+        }
+        if (n2._mp_size < n1._mp_size) {
+            return 1;
+        }
+        // The two sizes are equal, compare the absolute values.
+        const auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
+        const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize));
+        // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
+        return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
+    }
+    // 1-limb optimisation.
+    static int static_cmp(const s_int &n1, const s_int &n2, const std::integral_constant<int, 1> &)
+    {
+        if (n1._mp_size < n2._mp_size) {
+            return -1;
+        }
+        if (n2._mp_size < n1._mp_size) {
+            return 1;
+        }
+        int cmp_abs = (n1.m_limbs[0u] & GMP_NUMB_MASK) > (n2.m_limbs[0u] & GMP_NUMB_MASK);
+        if (!cmp_abs) {
+            cmp_abs = -static_cast<int>((n1.m_limbs[0u] & GMP_NUMB_MASK) < (n2.m_limbs[0u] & GMP_NUMB_MASK));
+        }
+        return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
+    }
+    // 2-limb optimisation.
+    static int static_cmp(const s_int &n1, const s_int &n2, const std::integral_constant<int, 2> &)
+    {
+        if (n1._mp_size < n2._mp_size) {
+            return -1;
+        }
+        if (n2._mp_size < n1._mp_size) {
+            return 1;
+        }
+        auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
+        while (asize != 0) {
+            --asize;
+            if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) > (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
+                return (n1._mp_size >= 0) ? 1 : -1;
+            }
+            if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) < (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
+                return (n1._mp_size >= 0) ? -1 : 1;
+            }
+        }
+        return 0;
+    }
+
+public:
+    friend int cmp(const mp_integer &op1, const mp_integer &op2)
+    {
+        const bool s1 = op1.is_static(), s2 = op2.is_static();
+        if (mppp_likely(s1 && s2)) {
+            return static_cmp(op1.m_int.g_st(), op2.m_int.g_st(), static_cmp_algo<s_int>{});
+        } else if (s1 && !s2) {
+            return ::mpz_cmp(op1.m_int.g_st().get_mpz_view(), &op2.m_int.g_dy());
+        } else if (!s1 && s2) {
+            return ::mpz_cmp(&op1.m_int.g_dy(), op2.m_int.g_st().get_mpz_view());
+        } else {
+            return ::mpz_cmp(&op1.m_int.g_dy(), &op2.m_int.g_dy());
+        }
+    }
+
+private:
     integer_union<SSize> m_int;
 };
 }

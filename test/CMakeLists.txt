@@ -22,3 +22,4 @@ endmacro()
 
 ADD_MPPP_TESTCASE(test_arith)
 ADD_MPPP_TESTCASE(test_basic)
+ADD_MPPP_TESTCASE(test_rel)

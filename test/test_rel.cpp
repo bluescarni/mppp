@@ -58,6 +58,17 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 
 static std::mt19937 rng;
 
+static inline bool check_cmp(int c1, int c2)
+{
+    if (c1 < 0) {
+        return c2 < 0;
+    }
+    if (c1 == 0) {
+        return c2 == 0;
+    }
+    return c2 > 0;
+}
+
 struct cmp_tester {
     template <typename S>
     inline void operator()(const S &) const
@@ -66,7 +77,7 @@ struct cmp_tester {
         // Start with all zeroes.
         mpz_raii m1, m2;
         integer n1, n2;
-        REQUIRE((cmp(n1, n2) == ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
+        REQUIRE(check_cmp(cmp(n1, n2), ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
         REQUIRE(n1.is_static());
         REQUIRE(n2.is_static());
         mpz_raii tmp;
@@ -75,26 +86,21 @@ struct cmp_tester {
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
+                ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
+                n1 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m1.m_mpz, &m1.m_mpz);
+                    n1.negate();
+                }
+                random_integer(tmp, y, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.negate();
                 }
-                random_integer(tmp, y, rng);
-                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
-                if (sdist(rng)) {
-                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                    n3.negate();
-                }
-                if (sdist(rng) && sdist(rng) && sdist(rng)) {
-                    // Reset rop every once in a while.
-                    n1 = integer{};
-                }
-                add(n1, n2, n3);
-                ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
-                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE(check_cmp(cmp(n1, n2), ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
+#if 0
                 // Various variations if in-place.
                 add(n1, n1, n2);
                 ::mpz_add(&m1.m_mpz, &m1.m_mpz, &m2.m_mpz);
@@ -173,6 +179,7 @@ struct cmp_tester {
                     ::mpz_add(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 }
+#endif
             }
         };
 
