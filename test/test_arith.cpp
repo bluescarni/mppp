@@ -37,14 +37,6 @@ see https://www.gnu.org/licenses/. */
 
 #include "test_utils.hpp"
 
-#if defined(_MSC_VER)
-
-// Disable some warnings on MSVC.
-#pragma warning(disable : 4459)
-#pragma warning(disable : 4127)
-
-#endif
-
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
