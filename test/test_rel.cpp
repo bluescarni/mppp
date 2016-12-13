@@ -100,86 +100,8 @@ struct cmp_tester {
                     n2.negate();
                 }
                 REQUIRE(check_cmp(cmp(n1, n2), ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
-#if 0
-                // Various variations if in-place.
-                add(n1, n1, n2);
-                ::mpz_add(&m1.m_mpz, &m1.m_mpz, &m2.m_mpz);
-                REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                add(n2, n1, n2);
-                ::mpz_add(&m2.m_mpz, &m1.m_mpz, &m2.m_mpz);
-                REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                add(n1, n1, n1);
-                ::mpz_add(&m1.m_mpz, &m1.m_mpz, &m1.m_mpz);
-                REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                // Test overflow when second size is larger than the other.
-                if (y > x) {
-                    random_integer(tmp, x, rng);
-                    ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
-                    if (sdist(rng)) {
-                        ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                        n2.negate();
-                    }
-                    max_integer(tmp, y);
-                    ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
-                    if (sdist(rng)) {
-                        ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                        n3.negate();
-                    }
-                    add(n1, n2, n3);
-                    ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
-                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                }
-                // Test subtraction of equal numbers.
-                if (x == y) {
-                    random_integer(tmp, x, rng);
-                    ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
-                    const bool neg = sdist(rng) == 1;
-                    if (neg) {
-                        ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                        n2.negate();
-                    }
-                    ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
-                    if (!neg) {
-                        ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                        n3.negate();
-                    }
-                    add(n1, n2, n3);
-                    ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
-                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                    REQUIRE((lex_cast(n1) == "0"));
-                }
-                // Test subtraction with equal top limbs.
-                if (x == y) {
-                    random_integer(tmp, x, rng);
-                    ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
-                    const bool neg = sdist(rng) == 1;
-                    if (neg) {
-                        ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                        n2.negate();
-                    }
-                    ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
-                    if (!neg) {
-                        ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                        n3.negate();
-                    }
-                    // Add 1 to bump up the lower limb.
-                    integer one(1);
-                    add(n2, n2, one);
-                    ::mpz_add_ui(&m2.m_mpz, &m2.m_mpz, 1u);
-                    add(n1, n2, n3);
-                    ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
-                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                    add(n1, n3, n2);
-                    ::mpz_add(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
-                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                }
-#endif
+                REQUIRE(check_cmp(cmp(n1, n1), ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
+                REQUIRE(check_cmp(cmp(n2, n2), ::mpz_cmp(&m2.m_mpz, &m2.m_mpz)));
             }
         };
 
