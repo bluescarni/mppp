@@ -129,26 +129,43 @@ inline namespace detail
 template <bool B, typename T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
 
-// TODO mpz struct checks -> TODO check about _mp_size as well.
-
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
 // Integral types used for allocation size and number of limbs.
 using mpz_alloc_t = decltype(std::declval<mpz_struct_t>()._mp_alloc);
 using mpz_size_t = decltype(std::declval<mpz_struct_t>()._mp_size);
 
+// Some misc tests to check that the mpz struct conforms to our expectations.
+// This is crucial for the implementation of the union integer type.
+struct expected_mpz_struct_t {
+    mpz_alloc_t _mp_alloc;
+    mpz_size_t _mp_size;
+    ::mp_limb_t *_mp_d;
+};
+
+static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_standard_layout<mpz_struct_t>::value
+                  && std::is_standard_layout<expected_mpz_struct_t>::value && offsetof(mpz_struct_t, _mp_alloc) == 0u
+                  && offsetof(mpz_struct_t, _mp_size) == offsetof(expected_mpz_struct_t, _mp_size)
+                  && offsetof(mpz_struct_t, _mp_d) == offsetof(expected_mpz_struct_t, _mp_d)
+                  && std::is_same<mpz_alloc_t, decltype(std::declval<mpz_struct_t>()._mp_alloc)>::value
+                  && std::is_same<mpz_size_t, decltype(std::declval<mpz_struct_t>()._mp_size)>::value
+                  && std::is_same<::mp_limb_t *, decltype(std::declval<mpz_struct_t>()._mp_d)>::value &&
+                  // mp_bitcnt_t is used in shift operators, so we double-check it is unsigned. If it is not
+                  // we might end up shifting by negative values, which is UB.
+                  std::is_unsigned<::mp_bitcnt_t>::value,
+              "Invalid mpz_t struct layout and/or GMP types.");
+
 // Helper function to init an mpz to zero with nlimbs preallocated limbs.
 inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 {
     // A bit of horrid overflow checking.
-    using ump_bitcnt_t = std::make_unsigned<::mp_bitcnt_t>::type;
     if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
         // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
         // to do anything else, as long as GMP does not provide error recovery.
         std::abort();
     }
     const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
-    if (mppp_unlikely(nbits > ump_bitcnt_t(std::numeric_limits<::mp_bitcnt_t>::max()))) {
+    if (mppp_unlikely(nbits > std::numeric_limits<::mp_bitcnt_t>::max())) {
         std::abort();
     }
     // NOTE: nbits == 0 is allowed.
