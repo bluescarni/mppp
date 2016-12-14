@@ -141,13 +141,13 @@ inline void sadd_vec_mppp(nonius::chronometer meter, std::mt19937 &rng, unsigned
     std::for_each(arr1.begin(), arr1.end(), [&rng, &sdist, N](Integer &i) {
         random_integer(i, N, rng, 2);
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     std::for_each(arr2.begin(), arr2.end(), [&rng, &sdist, M](Integer &i) {
         random_integer(i, M, rng, 2);
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     meter.measure([&arr1, &arr2, &arr3, size]() {
@@ -180,7 +180,7 @@ inline void sacc_mppp(nonius::chronometer meter, std::mt19937 &rng, unsigned N)
     std::for_each(arr.begin(), arr.end(), [&rng, &sdist, N, size](Integer &i) {
         random_integer(i, N, rng, size);
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     meter.measure([&arr, size]() {
@@ -217,13 +217,13 @@ inline void smul_vec_mppp_half(nonius::chronometer meter, std::mt19937 &rng)
     std::for_each(arr1.begin(), arr1.end(), [&rng, &sdist](Integer &i) {
         random_integer(i, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     std::for_each(arr2.begin(), arr2.end(), [&rng, &sdist](Integer &i) {
         random_integer(i, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     meter.measure([&arr1, &arr2, &arr3, size]() {
@@ -256,13 +256,13 @@ inline void smul_vec_mppp(nonius::chronometer meter, std::mt19937 &rng, unsigned
     std::for_each(arr1.begin(), arr1.end(), [&rng, N1, &sdist](Integer &i) {
         random_integer(i, N1, rng);
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     std::for_each(arr2.begin(), arr2.end(), [&rng, N2, &sdist](Integer &i) {
         random_integer(i, N2, rng);
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     meter.measure([&arr1, &arr2, &arr3, size]() {
@@ -299,13 +299,13 @@ inline void saddmul_vec_mppp_half(nonius::chronometer meter, std::mt19937 &rng)
     std::for_each(arr1.begin(), arr1.end(), [&rng, &sdist](Integer &i) {
         random_integer(i, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     std::for_each(arr2.begin(), arr2.end(), [&rng, &sdist](Integer &i) {
         random_integer(i, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     std::for_each(arr3.begin(), arr3.end(), [](Integer &i) { i = Integer(1); });
@@ -343,13 +343,13 @@ inline void saddmul_acc_mppp_half(nonius::chronometer meter, std::mt19937 &rng)
     std::for_each(arr1.begin(), arr1.end(), [&rng, &sdist](Integer &i) {
         random_integer(i, 1u, rng, ::mp_limb_t(1) << ((GMP_NUMB_BITS * 2) / 3));
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     std::for_each(arr2.begin(), arr2.end(), [&rng, &sdist](Integer &i) {
         random_integer(i, 1u, rng, ::mp_limb_t(1) << ((GMP_NUMB_BITS * 2) / 3));
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     meter.measure([&arr1, &arr2, size]() {
@@ -400,13 +400,13 @@ inline void saddmul_vec_mppp(nonius::chronometer meter, std::mt19937 &rng, unsig
     std::for_each(arr1.begin(), arr1.end(), [&rng, N1, &sdist](Integer &i) {
         random_integer(i, N1, rng);
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     std::for_each(arr2.begin(), arr2.end(), [&rng, N2, &sdist](Integer &i) {
         random_integer(i, N2, rng);
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     std::for_each(arr3.begin(), arr3.end(), [](Integer &i) { i = Integer(1); });
@@ -427,13 +427,13 @@ inline void saddmul_acc_mppp(nonius::chronometer meter, std::mt19937 &rng, unsig
     std::for_each(arr1.begin(), arr1.end(), [&rng, N1, size, &sdist](Integer &i) {
         random_integer(i, N1, rng, size);
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     std::for_each(arr2.begin(), arr2.end(), [&rng, N2, &sdist](Integer &i) {
         random_integer(i, N2, rng);
         if (sdist(rng)) {
-            i.negate();
+            i.neg();
         }
     });
     meter.measure([&arr1, &arr2, size]() {
@@ -528,6 +528,32 @@ inline void urshift_vec_mppp(nonius::chronometer meter, std::mt19937 &rng, unsig
     meter.measure([&arr1, &arr2, &barr, size]() {
         for (unsigned j = 0u; j < size; ++j) {
             tdiv_q_2exp(arr2[j], arr1[j], barr[j]);
+        }
+    });
+}
+
+template <typename Integer>
+inline void cmp_vec_mppp(nonius::chronometer meter, std::mt19937 &rng, unsigned N1, unsigned N2)
+{
+    const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
+    std::uniform_int_distribution<int> sdist(0, 1);
+    std::array<Integer, size> arr1, arr2;
+    std::array<volatile int, size> cmp_arr;
+    std::for_each(arr1.begin(), arr1.end(), [&rng, &sdist, N1](Integer &i) {
+        random_integer(i, N1, rng);
+        if (sdist(rng)) {
+            i.neg();
+        }
+    });
+    std::for_each(arr2.begin(), arr2.end(), [&rng, &sdist, N2](Integer &i) {
+        random_integer(i, N2, rng);
+        if (sdist(rng)) {
+            i.neg();
+        }
+    });
+    meter.measure([&arr1, &arr2, &cmp_arr, size]() {
+        for (unsigned j = 0u; j < size; ++j) {
+            cmp_arr[j] = cmp(arr1[j], arr2[j]);
         }
     });
 }
@@ -1019,6 +1045,34 @@ inline void urshift_vec_piranha(nonius::chronometer meter, std::mt19937 &rng, un
     });
 }
 
+inline void cmp_vec_piranha(nonius::chronometer meter, std::mt19937 &rng, unsigned N1, unsigned N2)
+{
+    const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
+    std::uniform_int_distribution<int> sdist(0, 1);
+    std::array<piranha::integer, size> arr1, arr2;
+    std::array<volatile int, size> cmp_arr;
+    mppp::mpz_raii tmp;
+    std::for_each(arr1.begin(), arr1.end(), [&rng, &tmp, &sdist, N1](piranha::integer &i) {
+        random_mpz(tmp, N1, rng);
+        i = piranha::integer(&tmp.m_mpz);
+        if (sdist(rng)) {
+            i.negate();
+        }
+    });
+    std::for_each(arr2.begin(), arr2.end(), [&rng, &tmp, &sdist, N2](piranha::integer &i) {
+        random_mpz(tmp, N2, rng);
+        i = piranha::integer(&tmp.m_mpz);
+        if (sdist(rng)) {
+            i.negate();
+        }
+    });
+    meter.measure([&arr1, &arr2, &cmp_arr, size]() {
+        for (unsigned j = 0u; j < size; ++j) {
+            cmp_arr[j] = arr1[j] < arr2[j];
+        }
+    });
+}
+
 // GMP.
 inline void uadd_vec_gmp(nonius::chronometer meter, std::mt19937 &rng, unsigned N, unsigned M)
 {
@@ -1250,6 +1304,31 @@ inline void urshift_vec_gmp(nonius::chronometer meter, std::mt19937 &rng, unsign
     });
 }
 
+inline void cmp_vec_gmp(nonius::chronometer meter, std::mt19937 &rng, unsigned N1, unsigned N2)
+{
+    const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
+    std::uniform_int_distribution<int> sdist(0, 1);
+    std::array<mppp::mpz_raii, size> arr1, arr2;
+    std::array<volatile int, size> cmp_arr;
+    std::for_each(arr1.begin(), arr1.end(), [&rng, &sdist, N1](mppp::mpz_raii &m) {
+        random_mpz(m, N1, rng);
+        if (sdist(rng)) {
+            ::mpz_neg(&m.m_mpz, &m.m_mpz);
+        }
+    });
+    std::for_each(arr2.begin(), arr2.end(), [&rng, &sdist, N2](mppp::mpz_raii &m) {
+        random_mpz(m, N2, rng);
+        if (sdist(rng)) {
+            ::mpz_neg(&m.m_mpz, &m.m_mpz);
+        }
+    });
+    meter.measure([&arr1, &arr2, &cmp_arr, size]() {
+        for (unsigned j = 0u; j < size; ++j) {
+            cmp_arr[j] = ::mpz_cmp(&arr1[j].m_mpz, &arr2[j].m_mpz);
+        }
+    });
+}
+
 // Flint.
 struct fmpz_raii {
     fmpz_raii()
@@ -1419,6 +1498,34 @@ inline void urshift_vec_fmpz(nonius::chronometer meter, std::mt19937 &rng, unsig
     meter.measure([&arr1, &arr2, &barr, size]() {
         for (unsigned j = 0u; j < size; ++j) {
             ::fmpz_tdiv_q_2exp(arr2[j].m_fmpz, arr1[j].m_fmpz, barr[j]);
+        }
+    });
+}
+
+inline void cmp_vec_fmpz(nonius::chronometer meter, std::mt19937 &rng, unsigned N1, unsigned N2)
+{
+    const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
+    std::uniform_int_distribution<int> sdist(0, 1);
+    std::array<fmpz_raii, size> arr1, arr2;
+    std::array<volatile int, size> cmp_arr;
+    mppp::mpz_raii m;
+    std::for_each(arr1.begin(), arr1.end(), [&rng, &sdist, &m, N1](fmpz_raii &f) {
+        random_mpz(m, N1, rng);
+        ::fmpz_set_str(f.m_fmpz, lex_cast(m).c_str(), 10);
+        if (sdist(rng)) {
+            ::fmpz_neg(f.m_fmpz, f.m_fmpz);
+        }
+    });
+    std::for_each(arr2.begin(), arr2.end(), [&rng, &sdist, &m, N2](fmpz_raii &f) {
+        random_mpz(m, N2, rng);
+        ::fmpz_set_str(f.m_fmpz, lex_cast(m).c_str(), 10);
+        if (sdist(rng)) {
+            ::fmpz_neg(f.m_fmpz, f.m_fmpz);
+        }
+    });
+    meter.measure([&arr1, &arr2, &cmp_arr, size]() {
+        for (unsigned j = 0u; j < size; ++j) {
+            cmp_arr[j] = ::fmpz_cmp(arr1[j].m_fmpz, arr2[j].m_fmpz);
         }
     });
 }

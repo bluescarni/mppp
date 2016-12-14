@@ -778,6 +778,25 @@ public:
             mpz_init_set_cache(m_dy, mpz.m_mpz);
         }
     }
+    explicit integer_union(const ::mpz_t n) : m_st()
+    {
+        // This is similar to what ctor_from_mpz does.
+        const auto asize = (n->_mp_size >= 0) ? n->_mp_size : -n->_mp_size;
+        if (std::size_t(asize) > SSize) {
+            // n is too big, need to promote.
+            // Destroy static.
+            g_st().~s_storage();
+            // Init dynamic.
+            ::new (static_cast<void *>(&m_dy)) d_storage;
+            mpz_init_set_cache(m_dy, *n);
+        } else {
+            // All this is noexcept.
+            // NOTE: m_st() inits to zero the whole array of static limbs, and we copy
+            // in only the used limbs.
+            g_st()._mp_size = n->_mp_size;
+            copy_limbs_no(n->_mp_d, n->_mp_d + asize, g_st().m_limbs.data());
+        }
+    }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
     {
@@ -1001,6 +1020,9 @@ public:
     {
     }
     explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
+    {
+    }
+    explicit mp_integer(const ::mpz_t n) : m_int(n)
     {
     }
     mp_integer &operator=(const mp_integer &other) = default;
@@ -1305,7 +1327,7 @@ public:
     {
         return mpz_view(*this);
     }
-    void negate()
+    void neg()
     {
         if (is_static()) {
             m_int.g_st()._mp_size = -m_int.g_st()._mp_size;
@@ -1316,7 +1338,13 @@ public:
     friend void neg(mp_integer &rop, const mp_integer &n)
     {
         rop = n;
-        rop.negate();
+        rop.neg();
+    }
+    friend mp_integer neg(const mp_integer &n)
+    {
+        mp_integer ret(n);
+        ret.neg();
+        return ret;
     }
 
 private:
@@ -2784,13 +2812,22 @@ public:
         const bool s1 = op1.is_static(), s2 = op2.is_static();
         if (mppp_likely(s1 && s2)) {
             return static_cmp(op1.m_int.g_st(), op2.m_int.g_st(), static_cmp_algo<s_int>{});
-        } else if (s1 && !s2) {
-            return ::mpz_cmp(op1.m_int.g_st().get_mpz_view(), &op2.m_int.g_dy());
-        } else if (!s1 && s2) {
-            return ::mpz_cmp(&op1.m_int.g_dy(), op2.m_int.g_st().get_mpz_view());
-        } else {
-            return ::mpz_cmp(&op1.m_int.g_dy(), &op2.m_int.g_dy());
         }
+        return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
+    }
+    friend void pow(mp_integer &rop, const mp_integer &base, unsigned long exp)
+    {
+        if (rop.is_static()) {
+            MPPP_MAYBE_TLS mpz_raii tmp;
+            ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
+            rop = mp_integer(&tmp.m_mpz);
+        } else {
+            ::mpz_pow_ui(&rop.m_int.g_dy(), base.get_mpz_view(), exp);
+        }
+    }
+    friend void abs(mp_integer &rop, const mp_integer &n)
+    {
+
     }
 
 private:

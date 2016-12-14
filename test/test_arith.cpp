@@ -75,14 +75,14 @@ struct add_tester {
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                    n3.negate();
+                    n3.neg();
                 }
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
@@ -108,14 +108,14 @@ struct add_tester {
                     n2 = integer(mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                        n2.negate();
+                        n2.neg();
                     }
                     max_integer(tmp, y);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = integer(mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                        n3.negate();
+                        n3.neg();
                     }
                     add(n1, n2, n3);
                     ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
@@ -129,13 +129,13 @@ struct add_tester {
                     const bool neg = sdist(rng) == 1;
                     if (neg) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                        n2.negate();
+                        n2.neg();
                     }
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = integer(mpz_to_str(&tmp.m_mpz));
                     if (!neg) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                        n3.negate();
+                        n3.neg();
                     }
                     add(n1, n2, n3);
                     ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
@@ -150,13 +150,13 @@ struct add_tester {
                     const bool neg = sdist(rng) == 1;
                     if (neg) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                        n2.negate();
+                        n2.neg();
                     }
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = integer(mpz_to_str(&tmp.m_mpz));
                     if (!neg) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                        n3.negate();
+                        n3.neg();
                     }
                     // Add 1 to bump up the lower limb.
                     integer one(1);
@@ -342,14 +342,14 @@ struct mul_tester {
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                    n3.negate();
+                    n3.neg();
                 }
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
@@ -364,14 +364,14 @@ struct mul_tester {
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                    n3.negate();
+                    n3.neg();
                 }
                 mul(n2, n2, n3);
                 ::mpz_mul(&m2.m_mpz, &m2.m_mpz, &m3.m_mpz);
@@ -381,14 +381,14 @@ struct mul_tester {
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                    n3.negate();
+                    n3.neg();
                 }
                 mul(n2, n3, n2);
                 ::mpz_mul(&m2.m_mpz, &m3.m_mpz, &m2.m_mpz);
@@ -398,7 +398,7 @@ struct mul_tester {
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 mul(n2, n2, n2);
                 ::mpz_mul(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
@@ -410,14 +410,14 @@ struct mul_tester {
                     ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                     n2 = integer(mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
-                        n2.negate();
+                        n2.neg();
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     }
                     random_integer(tmp, 1, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = integer(mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
-                        n3.negate();
+                        n3.neg();
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     }
                     mul(n1, n2, n3);
@@ -430,14 +430,14 @@ struct mul_tester {
                     ::mpz_set_ui(&m2.m_mpz, 1);
                     n2 = integer(1);
                     if (sdist(rng)) {
-                        n2.negate();
+                        n2.neg();
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     }
                     random_integer(tmp, y, rng);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = integer(mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
-                        n3.negate();
+                        n3.neg();
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     }
                     mul(n1, n2, n3);
@@ -451,14 +451,14 @@ struct mul_tester {
                     ::mpz_set_ui(&m2.m_mpz, 1);
                     n2 = integer(1);
                     if (sdist(rng)) {
-                        n2.negate();
+                        n2.neg();
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     }
                     random_integer(tmp, y, rng);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = integer(mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
-                        n3.negate();
+                        n3.neg();
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     }
                     mul(n1, n2, n3);
@@ -541,14 +541,14 @@ struct addmul_tester {
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                    n3.negate();
+                    n3.neg();
                 }
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
@@ -564,14 +564,14 @@ struct addmul_tester {
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                    n3.negate();
+                    n3.neg();
                 }
                 addmul(n2, n2, n3);
                 ::mpz_addmul(&m2.m_mpz, &m2.m_mpz, &m3.m_mpz);
@@ -581,14 +581,14 @@ struct addmul_tester {
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                    n3.negate();
+                    n3.neg();
                 }
                 addmul(n2, n3, n2);
                 ::mpz_addmul(&m2.m_mpz, &m3.m_mpz, &m2.m_mpz);
@@ -598,7 +598,7 @@ struct addmul_tester {
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 addmul(n2, n2, n2);
                 ::mpz_addmul(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
@@ -647,14 +647,14 @@ struct addmul_tester {
                     ::mpz_set_ui(&m2.m_mpz, 1);
                     n2 = integer(1);
                     if (sdist(rng)) {
-                        n2.negate();
+                        n2.neg();
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     }
                     random_integer(tmp, y, rng);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                     n3 = integer(mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
-                        n3.negate();
+                        n3.neg();
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     }
                     addmul(n1, n2, n3);
@@ -805,7 +805,7 @@ struct div_tester {
                     n3 = integer(mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                        n3.negate();
+                        n3.neg();
                     }
                     // Make sure divisor is not zero.
                     do {
@@ -814,7 +814,7 @@ struct div_tester {
                         n4 = integer(mpz_to_str(&tmp.m_mpz));
                         if (sdist(rng)) {
                             ::mpz_neg(&m4.m_mpz, &m4.m_mpz);
-                            n4.negate();
+                            n4.neg();
                         }
                     } while (n4.sign() == 0);
                 };
@@ -972,7 +972,7 @@ struct lshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd1(rng);
                 mul_2exp(n1, n2, rbs);
@@ -992,7 +992,7 @@ struct lshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd1h(rng);
                 mul_2exp(n1, n2, rbs);
@@ -1012,7 +1012,7 @@ struct lshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd2(rng);
                 mul_2exp(n1, n2, rbs);
@@ -1032,7 +1032,7 @@ struct lshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd2h(rng);
                 mul_2exp(n1, n2, rbs);
@@ -1052,7 +1052,7 @@ struct lshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd3(rng);
                 mul_2exp(n1, n2, rbs);
@@ -1072,7 +1072,7 @@ struct lshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd3h(rng);
                 mul_2exp(n1, n2, rbs);
@@ -1092,7 +1092,7 @@ struct lshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd4(rng);
                 mul_2exp(n1, n2, rbs);
@@ -1112,7 +1112,7 @@ struct lshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd4h(rng);
                 mul_2exp(n1, n2, rbs);
@@ -1132,7 +1132,7 @@ struct lshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd5(rng);
                 mul_2exp(n1, n2, rbs);
@@ -1227,7 +1227,7 @@ struct rshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd1(rng);
                 tdiv_q_2exp(n1, n2, rbs);
@@ -1247,7 +1247,7 @@ struct rshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd1h(rng);
                 tdiv_q_2exp(n1, n2, rbs);
@@ -1267,7 +1267,7 @@ struct rshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd2(rng);
                 tdiv_q_2exp(n1, n2, rbs);
@@ -1287,7 +1287,7 @@ struct rshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd2h(rng);
                 tdiv_q_2exp(n1, n2, rbs);
@@ -1307,7 +1307,7 @@ struct rshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd3(rng);
                 tdiv_q_2exp(n1, n2, rbs);
@@ -1327,7 +1327,7 @@ struct rshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd3h(rng);
                 tdiv_q_2exp(n1, n2, rbs);
@@ -1347,7 +1347,7 @@ struct rshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd4(rng);
                 tdiv_q_2exp(n1, n2, rbs);
@@ -1367,7 +1367,7 @@ struct rshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd4h(rng);
                 tdiv_q_2exp(n1, n2, rbs);
@@ -1387,7 +1387,7 @@ struct rshift_tester {
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.negate();
+                    n2.neg();
                 }
                 rbs = bd5(rng);
                 tdiv_q_2exp(n1, n2, rbs);
