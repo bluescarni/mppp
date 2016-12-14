@@ -50,7 +50,7 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 
 static std::mt19937 rng;
 
-struct pow_tester {
+struct abs_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
@@ -58,13 +58,17 @@ struct pow_tester {
         // Start with all zeroes.
         mpz_raii m1, m2;
         integer n1, n2;
-        ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, 0u);
-        pow(n1, n2, 0);
+        ::mpz_abs(&m1.m_mpz, &m2.m_mpz);
+        abs(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
+        // Test the other variants.
+        n1.abs();
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        REQUIRE((lex_cast(abs(n1)) == lex_cast(m1)));
         mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
-        std::uniform_int_distribution<unsigned> edist(0, 20);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
@@ -79,10 +83,12 @@ struct pow_tester {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
-                const unsigned ex = edist(rng);
-                ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, ex);
-                pow(n1, n2, ex);
+                ::mpz_abs(&m1.m_mpz, &m2.m_mpz);
+                abs(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((n1 == abs(n2)));
+                n2.abs();
+                REQUIRE((n1 == n2));
             }
         };
 
@@ -94,7 +100,7 @@ struct pow_tester {
     }
 };
 
-TEST_CASE("pow")
+TEST_CASE("abs")
 {
-    tuple_for_each(sizes{}, pow_tester{});
+    tuple_for_each(sizes{}, abs_tester{});
 }

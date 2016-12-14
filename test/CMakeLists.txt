@@ -20,6 +20,7 @@ macro(ADD_MPPP_TESTCASE arg1)
     add_test(${arg1} ${arg1})
 endmacro()
 
+ADD_MPPP_TESTCASE(test_abs)
 ADD_MPPP_TESTCASE(test_arith)
 ADD_MPPP_TESTCASE(test_basic)
 ADD_MPPP_TESTCASE(test_pow)

@@ -2825,9 +2825,26 @@ public:
             ::mpz_pow_ui(&rop.m_int.g_dy(), base.get_mpz_view(), exp);
         }
     }
+    void abs()
+    {
+        if (is_static()) {
+            if (m_int.g_st()._mp_size < 0) {
+                m_int.g_st()._mp_size = -m_int.g_st()._mp_size;
+            }
+        } else {
+            ::mpz_abs(&m_int.g_dy(), &m_int.g_dy());
+        }
+    }
     friend void abs(mp_integer &rop, const mp_integer &n)
     {
-
+        rop = n;
+        rop.abs();
+    }
+    friend mp_integer abs(const mp_integer &n)
+    {
+        mp_integer ret(n);
+        ret.abs();
+        return ret;
     }
 
 private:
