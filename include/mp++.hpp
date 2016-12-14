@@ -2846,6 +2846,39 @@ public:
         ret.abs();
         return ret;
     }
+    friend std::size_t hash(const mp_integer &n)
+    {
+        std::size_t asize;
+        mpz_size_t size;
+        const ::mp_limb_t *ptr;
+        if (n.m_int.is_static()) {
+            size = n.m_int.g_st()._mp_size;
+            asize = std::size_t((size >= 0) ? size : -size);
+            ptr = n.m_int.g_st().m_limbs.data();
+        } else {
+            size = n.m_int.g_dy()._mp_size;
+            asize = ::mpz_size(&n.m_int.g_dy());
+            ptr = n.m_int.g_dy()._mp_d;
+        }
+        // The hash of zero is zero.
+        if (!asize) {
+            return 0u;
+        }
+        // Init the retval as the signed size.
+        std::size_t retval = std::size_t(size);
+        // The hash combiner. This is lifted directly from Boost. See also:
+        // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
+        auto combine = [&retval](::mp_limb_t l) {
+            retval ^= (l & GMP_NUMB_MASK) + std::size_t(0x9e3779b9) + (retval << 6) + (retval >> 2);
+        };
+        // Combine with the first limb.
+        combine(ptr[0]);
+        // Do the rest.
+        for (std::size_t i = 1u; i < asize; ++i) {
+            combine(ptr[i]);
+        }
+        return retval;
+    }
 
 private:
     integer_union<SSize> m_int;
