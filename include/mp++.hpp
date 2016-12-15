@@ -2876,6 +2876,35 @@ public:
     }
 
 private:
+    static void nextprime_impl(mp_integer &rop, const mp_integer &n)
+    {
+        if (rop.is_static()) {
+            MPPP_MAYBE_TLS mpz_raii tmp;
+            ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
+            rop = mp_integer(&tmp.m_mpz);
+        } else {
+            ::mpz_nextprime(&rop.m_int.g_dy(), n.get_mpz_view());
+        }
+    }
+
+public:
+    // NOTE: nextprime on negative numbers always returns 2.
+    friend void nextprime(mp_integer &rop, const mp_integer &n)
+    {
+        nextprime_impl(rop, n);
+    }
+    friend mp_integer nextprime(const mp_integer &n)
+    {
+        mp_integer retval;
+        nextprime_impl(retval, n);
+        return retval;
+    }
+    void nextprime()
+    {
+        nextprime_impl(*this, *this);
+    }
+
+private:
     integer_union<SSize> m_int;
 };
 
@@ -2888,17 +2917,14 @@ inline std::size_t hash_wrapper(const mp_integer<SSize> &n)
 {
     return hash(n);
 }
-
 }
-
 }
 
 namespace std
 {
 
 template <size_t SSize>
-struct hash<mppp::mp_integer<SSize>>
-{
+struct hash<mppp::mp_integer<SSize>> {
     using argument_type = mppp::mp_integer<SSize>;
     using result_type = size_t;
     result_type operator()(const argument_type &n) const
@@ -2906,7 +2932,6 @@ struct hash<mppp::mp_integer<SSize>>
         return mppp::hash_wrapper(n);
     }
 };
-
 }
 
 #if defined(_MSC_VER)
