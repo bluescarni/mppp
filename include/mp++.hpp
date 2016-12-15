@@ -1934,6 +1934,7 @@ public:
     }
     int sign() const
     {
+        // NOTE: size is part of the common initial sequence.
         if (m_int.m_st._mp_size != 0) {
             return m_int.m_st._mp_size > 0 ? 1 : -1;
         } else {
@@ -1942,6 +1943,8 @@ public:
     }
     friend bool operator==(const mp_integer &a, const mp_integer &b)
     {
+        // NOTE: this can probably be improved by proceeding as with hashing: get out size/pointer to limbs
+        // and run the comparison on those, thus avoiding mpz_cmp. Write benchmark first.
         const bool sa = a.is_static(), sb = b.is_static();
         if (sa && sb) {
             return a.m_int.g_st()._mp_size == b.m_int.g_st()._mp_size
@@ -2849,14 +2852,13 @@ public:
     friend std::size_t hash(const mp_integer &n)
     {
         std::size_t asize;
-        mpz_size_t size;
+        // NOTE: size is part of the common initial sequence.
+        const mpz_size_t size = n.m_int.m_st._mp_size;
         const ::mp_limb_t *ptr;
         if (n.m_int.is_static()) {
-            size = n.m_int.g_st()._mp_size;
             asize = std::size_t((size >= 0) ? size : -size);
             ptr = n.m_int.g_st().m_limbs.data();
         } else {
-            size = n.m_int.g_dy()._mp_size;
             asize = ::mpz_size(&n.m_int.g_dy());
             ptr = n.m_int.g_dy()._mp_d;
         }
