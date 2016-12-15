@@ -867,7 +867,7 @@ public:
         assert(g_dy()._mp_alloc >= 0);
         assert(g_dy()._mp_d != nullptr);
         mpz_clear_cache(g_dy());
-        m_dy.~d_storage();
+        g_dy().~d_storage();
     }
     // Check storage type.
     bool is_static() const
