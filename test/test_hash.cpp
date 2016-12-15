@@ -64,39 +64,28 @@ struct hash_tester {
         REQUIRE(n2.is_static());
         n1.promote();
         REQUIRE(n1.is_dynamic());
-        REQUIRE((hash(n1) == hash(n1)));
-#if 0
-        ::mpz_abs(&m1.m_mpz, &m2.m_mpz);
-        abs(n1, n2);
-        REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE(n1.is_static());
-        // Test the other variants.
-        n1.abs();
-        REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE(n1.is_static());
-        REQUIRE((lex_cast(abs(n1)) == lex_cast(m1)));
+        REQUIRE((hash(n1) == hash(n2)));
+        n1 = integer{-12};
+        n2 = n1;
+        REQUIRE(n2.is_static());
+        n1.promote();
+        REQUIRE(n1.is_dynamic());
+        REQUIRE((hash(n1) == hash(n2)));
         mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
-                if (sdist(rng) && sdist(rng) && sdist(rng)) {
-                    // Reset rop every once in a while.
-                    n1 = integer{};
-                }
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n1 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
-                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.neg();
+                    n1.neg();
                 }
-                ::mpz_abs(&m1.m_mpz, &m2.m_mpz);
-                abs(n1, n2);
-                REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((n1 == abs(n2)));
-                n2.abs();
-                REQUIRE((n1 == n2));
+                n2 = n1;
+                if (n2.is_static()) {
+                    n1.promote();
+                }
+                REQUIRE((hash(n1) == hash(n2)));
             }
         };
 
@@ -105,7 +94,6 @@ struct hash_tester {
         random_xy(2);
         random_xy(3);
         random_xy(4);
-#endif
     }
 };
 
