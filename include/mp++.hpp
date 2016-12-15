@@ -2856,28 +2856,19 @@ public:
         const mpz_size_t size = n.m_int.m_st._mp_size;
         const ::mp_limb_t *ptr;
         if (n.m_int.is_static()) {
-            asize = std::size_t((size >= 0) ? size : -size);
+            asize = static_cast<std::size_t>((size >= 0) ? size : -size);
             ptr = n.m_int.g_st().m_limbs.data();
         } else {
             asize = ::mpz_size(&n.m_int.g_dy());
             ptr = n.m_int.g_dy()._mp_d;
         }
-        // The hash of zero is zero.
-        if (!asize) {
-            return 0u;
-        }
         // Init the retval as the signed size.
-        std::size_t retval = std::size_t(size);
-        // The hash combiner. This is lifted directly from Boost. See also:
-        // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
-        auto combine = [&retval](::mp_limb_t l) {
-            retval ^= (l & GMP_NUMB_MASK) + std::size_t(0x9e3779b9) + (retval << 6) + (retval >> 2);
-        };
-        // Combine with the first limb.
-        combine(ptr[0]);
-        // Do the rest.
-        for (std::size_t i = 1u; i < asize; ++i) {
-            combine(ptr[i]);
+        auto retval = static_cast<std::size_t>(size);
+        // Combine the limbs.
+        for (std::size_t i = 0u; i < asize; ++i) {
+            // The hash combiner. This is lifted directly from Boost. See also:
+            // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
+            retval ^= (ptr[i] & GMP_NUMB_MASK) + std::size_t(0x9e3779b9) + (retval << 6) + (retval >> 2);
         }
         return retval;
     }
@@ -2885,6 +2876,35 @@ public:
 private:
     integer_union<SSize> m_int;
 };
+
+inline namespace impl
+{
+
+// A small wrapper to avoid name clashing below, in the specialisation of std::hash.
+template <size_t SSize>
+inline std::size_t hash_wrapper(const mp_integer<SSize> &n)
+{
+    return hash(n);
+}
+
+}
+
+}
+
+namespace std
+{
+
+template <size_t SSize>
+struct hash<mppp::mp_integer<SSize>>
+{
+    using argument_type = mppp::mp_integer<SSize>;
+    using result_type = size_t;
+    result_type operator()(const argument_type &n) const
+    {
+        return mppp::hash_wrapper(n);
+    }
+};
+
 }
 
 #if defined(_MSC_VER)

@@ -27,6 +27,7 @@ GNU Lesser General Public License along with the mp++ library.  If not,
 see https://www.gnu.org/licenses/. */
 
 #include <cstddef>
+#include <functional>
 #include <gmp.h>
 #include <random>
 #include <tuple>
@@ -55,22 +56,27 @@ struct hash_tester {
     inline void operator()(const S &) const
     {
         using integer = mp_integer<S::value>;
+        const std::hash<integer> hasher;
         integer n1, n2;
         REQUIRE((hash(n1) == 0u));
+        REQUIRE((hasher(n1) == 0u));
         n1.promote();
         REQUIRE((hash(n1) == 0u));
+        REQUIRE((hasher(n1) == 0u));
         n1 = integer{12};
         n2 = n1;
         REQUIRE(n2.is_static());
         n1.promote();
         REQUIRE(n1.is_dynamic());
         REQUIRE((hash(n1) == hash(n2)));
+        REQUIRE((hasher(n1) == hash(n2)));
         n1 = integer{-12};
         n2 = n1;
         REQUIRE(n2.is_static());
         n1.promote();
         REQUIRE(n1.is_dynamic());
         REQUIRE((hash(n1) == hash(n2)));
+        REQUIRE((hash(n1) == hasher(n2)));
         mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
@@ -86,6 +92,7 @@ struct hash_tester {
                     n1.promote();
                 }
                 REQUIRE((hash(n1) == hash(n2)));
+                REQUIRE((hasher(n1) == hash(n2)));
             }
         };
 
