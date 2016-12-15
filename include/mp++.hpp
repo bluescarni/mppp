@@ -967,6 +967,8 @@ struct zero_division_error final : std::domain_error {
 // - it seems like it might be possible to re-implement a bare-bone mpz api on top of the mpn primitives,
 //   with the goal of providing some form of error recovery in case of memory errors (e.g., throw instead
 //   of aborting). This is probably not an immediate concern though.
+// - pow() can probably benefit for some specialised static implementation, especially in conjunction with
+//   mpn_sqr().
 template <std::size_t SSize>
 class mp_integer
 {
@@ -2865,7 +2867,7 @@ public:
         // Init the retval as the signed size.
         auto retval = static_cast<std::size_t>(size);
         // Combine the limbs.
-        for (std::size_t i = 0u; i < asize; ++i) {
+        for (std::size_t i = 0; i < asize; ++i) {
             // The hash combiner. This is lifted directly from Boost. See also:
             // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
             retval ^= (ptr[i] & GMP_NUMB_MASK) + std::size_t(0x9e3779b9) + (retval << 6) + (retval >> 2);
