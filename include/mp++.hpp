@@ -2920,6 +2920,65 @@ public:
     }
 
 private:
+    static void sqrt_impl(mp_integer &rop, const mp_integer &n)
+    {
+        if (mppp_unlikely(n.m_int.m_st._mp_size < 0)) {
+            throw std::domain_error("Cannot compute the square root of the negative number " + n.to_string());
+        }
+        const bool sr = rop.is_static(), sn = n.is_static();
+        if (mppp_likely(sr && sn)) {
+            s_int &rs = rop.m_int.g_st();
+            const s_int &ns = n.m_int.g_st();
+            // NOTE: we know this is not negative, from the check above.
+            const mpz_size_t size = ns._mp_size;
+            if (!size) {
+                // Special casing for zero.
+                rs._mp_size = 0;
+                rs.zero_unused_limbs();
+                return;
+            }
+            // In case of overlap we need to go through a tmp variable.
+            std::array<::mp_limb_t, SSize> tmp;
+            const bool overlap = (&rs == &ns);
+            auto out_ptr = overlap ? tmp.data() : rs.m_limbs.data();
+            ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
+            // Need to reconstruct the size of the output. Max size is ceil(size / 2).
+            mpz_size_t new_size = size / 2 + size % 2;
+            while (new_size && !(out_ptr[new_size - 1] & GMP_NUMB_MASK)) {
+                --new_size;
+            }
+            // Write out the result.
+            rs._mp_size = new_size;
+            if (overlap) {
+                copy_limbs_no(out_ptr, out_ptr + new_size, rs.m_limbs.data());
+            }
+            // Clear out unused limbs.
+            rs.zero_unused_limbs();
+            return;
+        }
+        if (sr) {
+            rop.promote();
+        }
+        ::mpz_sqrt(&rop.m_int.g_dy(), n.get_mpz_view());
+    }
+
+public:
+    void sqrt()
+    {
+        sqrt_impl(*this, *this);
+    }
+    friend void sqrt(mp_integer &rop, const mp_integer &n)
+    {
+        sqrt_impl(rop, n);
+    }
+    friend mp_integer sqrt(const mp_integer &n)
+    {
+        mp_integer retval;
+        sqrt_impl(retval, n);
+        return retval;
+    }
+
+private:
     integer_union<SSize> m_int;
 };
 

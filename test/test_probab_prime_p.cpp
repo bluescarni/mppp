@@ -81,10 +81,10 @@ struct probab_prime_p_tester {
         });
         n1 = integer(-123);
         REQUIRE_THROWS_PREDICATE(probab_prime_p(n1), std::invalid_argument, [](const std::invalid_argument &ex) {
-            return std::string(ex.what()) == "Cannot run primality tests on a negative number";
+            return std::string(ex.what()) == "Cannot run primality tests on the negative number -123";
         });
         REQUIRE_THROWS_PREDICATE(n1.probab_prime_p(), std::invalid_argument, [](const std::invalid_argument &ex) {
-            return std::string(ex.what()) == "Cannot run primality tests on a negative number";
+            return std::string(ex.what()) == "Cannot run primality tests on the negative number -123";
         });
     }
 };
