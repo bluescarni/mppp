@@ -2910,7 +2910,7 @@ public:
                                         + std::to_string(reps) + " was provided instead");
         }
         if (mppp_unlikely(sign() < 0)) {
-            throw std::invalid_argument("Cannot run primality tests on a negative number");
+            throw std::invalid_argument("Cannot run primality tests on the negative number " + to_string());
         }
         return ::mpz_probab_prime_p(get_mpz_view(), reps);
     }
