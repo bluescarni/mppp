@@ -24,3 +24,5 @@ on the following setups:
 * Clang 3.8 on GNU/Linux 64-bit,
 * MSVC15 on Windows, both 32-bit and 64-bit,
 * MinGW GCC 6 on Windows 64-bit.
+
+The Intel compiler ICC 17 is occasionally tested on GNU/Linux 64-bit.
