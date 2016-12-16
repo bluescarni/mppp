@@ -2903,6 +2903,21 @@ public:
     {
         nextprime_impl(*this, *this);
     }
+    int probab_prime_p(int reps = 25) const
+    {
+        if (mppp_unlikely(reps < 1)) {
+            throw std::invalid_argument("The number of primality tests must be at least 1, but a value of "
+                                        + std::to_string(reps) + " was provided instead");
+        }
+        if (mppp_unlikely(sign() < 0)) {
+            throw std::invalid_argument("Cannot run primality tests on a negative number");
+        }
+        return ::mpz_probab_prime_p(get_mpz_view(), reps);
+    }
+    friend int probab_prime_p(const mp_integer &n, int reps = 25)
+    {
+        return n.probab_prime_p(reps);
+    }
 
 private:
     integer_union<SSize> m_int;
