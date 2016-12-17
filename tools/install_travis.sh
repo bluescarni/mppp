@@ -16,7 +16,7 @@ if [[ "${BUILD_TYPE}" == "Debug" ]]; then
         ctest -V;
     fi
 elif [[ "${BUILD_TYPE}" == "Coverage" ]]; then
-    cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="-Og --coverage" ../;
+    cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
     make;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x $GCOV_EXECUTABLE
