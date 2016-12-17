@@ -141,6 +141,10 @@ struct sqrt_tester {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
                 sqrt(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));

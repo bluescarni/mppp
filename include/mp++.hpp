@@ -2942,11 +2942,9 @@ private:
             const bool overlap = (&rs == &ns);
             auto out_ptr = overlap ? tmp.data() : rs.m_limbs.data();
             ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
-            // Need to reconstruct the size of the output. Max size is ceil(size / 2).
-            mpz_size_t new_size = size / 2 + size % 2;
-            while (new_size && !(out_ptr[new_size - 1] & GMP_NUMB_MASK)) {
-                --new_size;
-            }
+            // Compute the size of the output (which is ceil(size / 2)).
+            const mpz_size_t new_size = size / 2 + size % 2;
+            assert(!new_size || (out_ptr[new_size - 1] & GMP_NUMB_MASK));
             // Write out the result.
             rs._mp_size = new_size;
             if (overlap) {
