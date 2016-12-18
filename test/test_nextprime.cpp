@@ -85,6 +85,10 @@ struct nextprime_tester {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_nextprime(&m1.m_mpz, &m2.m_mpz);
                 nextprime(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
