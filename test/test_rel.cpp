@@ -84,12 +84,20 @@ struct cmp_tester {
                     ::mpz_neg(&m1.m_mpz, &m1.m_mpz);
                     n1.neg();
                 }
+                if (n1.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n1.promote();
+                }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
+                }
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
                 }
                 REQUIRE(check_cmp(cmp(n1, n2), ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
                 REQUIRE(check_cmp(cmp(n1, n1), ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
