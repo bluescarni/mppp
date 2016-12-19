@@ -539,6 +539,10 @@ struct addmul_tester {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
@@ -546,6 +550,10 @@ struct addmul_tester {
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n3.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n3.promote();
+                }
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
@@ -562,6 +570,10 @@ struct addmul_tester {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
@@ -569,6 +581,10 @@ struct addmul_tester {
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n3.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n3.promote();
+                }
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
@@ -579,6 +595,10 @@ struct addmul_tester {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
@@ -590,12 +610,20 @@ struct addmul_tester {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
                 }
+                if (n3.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n3.promote();
+                }
                 addmul(n2, n3, n2);
                 ::mpz_addmul(&m2.m_mpz, &m3.m_mpz, &m2.m_mpz);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
@@ -807,6 +835,10 @@ struct div_tester {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                         n3.neg();
                     }
+                    if (n3.is_static() && sdist(rng)) {
+                        // Promote sometimes, if possible.
+                        n3.promote();
+                    }
                     // Make sure divisor is not zero.
                     do {
                         random_integer(tmp, y, rng);
@@ -815,6 +847,10 @@ struct div_tester {
                         if (sdist(rng)) {
                             ::mpz_neg(&m4.m_mpz, &m4.m_mpz);
                             n4.neg();
+                        }
+                        if (n4.is_static() && sdist(rng)) {
+                            // Promote sometimes, if possible.
+                            n4.promote();
                         }
                     } while (n4.sign() == 0);
                 };
@@ -952,6 +988,10 @@ struct lshift_tester {
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bdh(0u, GMP_NUMB_BITS / 2u);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 auto rbs = bdh(rng);
                 mul_2exp(n1, n2, rbs);
@@ -969,6 +1009,10 @@ struct lshift_tester {
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd1(0u, GMP_NUMB_BITS);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
@@ -989,6 +1033,10 @@ struct lshift_tester {
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd1h(0u, GMP_NUMB_BITS + GMP_NUMB_BITS / 2u);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
@@ -1009,6 +1057,10 @@ struct lshift_tester {
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd2(0u, GMP_NUMB_BITS * 2u);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
@@ -1029,6 +1081,10 @@ struct lshift_tester {
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd2h(0u, GMP_NUMB_BITS * 2u + GMP_NUMB_BITS / 2u);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
@@ -1049,6 +1105,10 @@ struct lshift_tester {
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd3(0u, GMP_NUMB_BITS * 3u);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
@@ -1069,6 +1129,10 @@ struct lshift_tester {
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd3h(0u, GMP_NUMB_BITS * 3u + GMP_NUMB_BITS / 2u);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
@@ -1089,6 +1153,10 @@ struct lshift_tester {
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd4(0u, GMP_NUMB_BITS * 4u);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
@@ -1109,6 +1177,10 @@ struct lshift_tester {
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd4h(0u, GMP_NUMB_BITS * 4u + GMP_NUMB_BITS / 2u);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
@@ -1129,6 +1201,10 @@ struct lshift_tester {
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd5(0u, GMP_NUMB_BITS * 5u);
                 n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
