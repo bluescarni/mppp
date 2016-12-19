@@ -3005,6 +3005,7 @@ public:
     bool odd_p() const
     {
         if (is_static()) {
+            // NOTE: as usual we assume that a zero static integer has all limbs set to zero.
             return (m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & ::mp_limb_t(1);
         }
         return mpz_odd_p(&m_int.g_dy());
