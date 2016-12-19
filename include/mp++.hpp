@@ -3002,6 +3002,25 @@ public:
         sqrt_impl(retval, n);
         return retval;
     }
+    bool odd_p() const
+    {
+        if (is_static()) {
+            return (m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & ::mp_limb_t(1);
+        }
+        return mpz_odd_p(&m_int.g_dy());
+    }
+    friend bool odd_p(const mp_integer &n)
+    {
+        return n.odd_p();
+    }
+    bool even_p() const
+    {
+        return !odd_p();
+    }
+    friend bool even_p(const mp_integer &n)
+    {
+        return n.even_p();
+    }
 
 private:
     integer_union<SSize> m_int;
