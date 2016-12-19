@@ -95,6 +95,9 @@ see https://www.gnu.org/licenses/. */
 #pragma warning(disable : 4127)
 #pragma warning(disable : 4804)
 
+// Checked iterators functionality.
+#include <iterator>
+
 #else
 
 #define mppp_likely(x) (x)
@@ -1970,9 +1973,15 @@ public:
         } else {
             ptr_b = b.m_int.g_dy()._mp_d;
         }
-        return std::equal(ptr_a, ptr_a + asize, ptr_b, [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) {
-            return (l1 & GMP_NUMB_BITS) == (l2 & GMP_NUMB_BITS);
-        });
+        auto limb_cmp
+            = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_BITS) == (l2 & GMP_NUMB_BITS); };
+#if defined(_MSC_VER)
+        return std::equal(stdext::make_checked_array_iterator(ptr_a, asize),
+                          stdext::make_checked_array_iterator(ptr_a, asize) + asize,
+                          stdext::make_checked_array_iterator(ptr_b, asize), limb_cmp);
+#else
+        return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
+#endif
     }
     friend bool operator!=(const mp_integer &a, const mp_integer &b)
     {
