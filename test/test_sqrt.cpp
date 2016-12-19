@@ -71,7 +71,7 @@ struct sqrt_tester {
         REQUIRE(n2.is_static());
         // Try one.
         n2 = integer{1};
-        ::mpz_set_ui(&m2.m_mpz,1u);
+        ::mpz_set_ui(&m2.m_mpz, 1u);
         ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
         sqrt(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -83,7 +83,7 @@ struct sqrt_tester {
         REQUIRE(n2.is_static());
         // Two.
         n2 = integer{2};
-        ::mpz_set_ui(&m2.m_mpz,2u);
+        ::mpz_set_ui(&m2.m_mpz, 2u);
         ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
         sqrt(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -95,7 +95,7 @@ struct sqrt_tester {
         REQUIRE(n2.is_static());
         // Four.
         n2 = integer{4};
-        ::mpz_set_ui(&m2.m_mpz,4u);
+        ::mpz_set_ui(&m2.m_mpz, 4u);
         ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
         sqrt(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -107,7 +107,7 @@ struct sqrt_tester {
         REQUIRE(n2.is_static());
         // Ten.
         n2 = integer{10};
-        ::mpz_set_ui(&m2.m_mpz,10u);
+        ::mpz_set_ui(&m2.m_mpz, 10u);
         ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
         sqrt(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -119,7 +119,7 @@ struct sqrt_tester {
         REQUIRE(n2.is_static());
         // Error testing.
         n2 = integer{-1};
-        REQUIRE_THROWS_PREDICATE(sqrt(n1,n2), std::domain_error, [](const std::domain_error &ex) {
+        REQUIRE_THROWS_PREDICATE(sqrt(n1, n2), std::domain_error, [](const std::domain_error &ex) {
             return std::string(ex.what()) == "Cannot compute the square root of the negative number -1";
         });
         REQUIRE_THROWS_PREDICATE(sqrt(integer{-2}), std::domain_error, [](const std::domain_error &ex) {

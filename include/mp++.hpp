@@ -119,7 +119,7 @@ see https://www.gnu.org/licenses/. */
 
 #endif
 
-#if !defined (MPPP_NAMESPACE)
+#if !defined(MPPP_NAMESPACE)
 
 #define MPPP_NAMESPACE mppp
 
@@ -1335,13 +1335,14 @@ public:
     {
         return mpz_view(*this);
     }
-    void neg()
+    mp_integer &neg()
     {
         if (is_static()) {
             m_int.g_st()._mp_size = -m_int.g_st()._mp_size;
         } else {
             ::mpz_neg(&m_int.g_dy(), &m_int.g_dy());
         }
+        return *this;
     }
     friend void neg(mp_integer &rop, const mp_integer &n)
     {
@@ -1951,19 +1952,27 @@ public:
     }
     friend bool operator==(const mp_integer &a, const mp_integer &b)
     {
-        // NOTE: this can probably be improved by proceeding as with hashing: get out size/pointer to limbs
-        // and run the comparison on those, thus avoiding mpz_cmp. Write benchmark first.
-        const bool sa = a.is_static(), sb = b.is_static();
-        if (sa && sb) {
-            return a.m_int.g_st()._mp_size == b.m_int.g_st()._mp_size
-                   && std::equal(a.m_int.g_st().m_limbs.begin(),
-                                 a.m_int.g_st().m_limbs.begin() + a.m_int.g_st().abs_size(),
-                                 b.m_int.g_st().m_limbs.begin(), [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) {
-                                     return (l1 & GMP_NUMB_BITS) == (l2 & GMP_NUMB_BITS);
-                                 });
-        } else {
-            return ::mpz_cmp(a.get_mpz_view(), b.get_mpz_view()) == 0;
+        const mp_size_t size_a = a.m_int.m_st._mp_size, size_b = b.m_int.m_st._mp_size;
+        if (size_a != size_b) {
+            return false;
         }
+        const ::mp_limb_t *ptr_a, *ptr_b;
+        std::size_t asize;
+        if (a.is_static()) {
+            ptr_a = a.m_int.g_st().m_limbs.data();
+            asize = static_cast<std::size_t>((size_a >= 0) ? size_a : -size_a);
+        } else {
+            ptr_a = a.m_int.g_dy()._mp_d;
+            asize = ::mpz_size(&a.m_int.g_dy());
+        }
+        if (b.is_static()) {
+            ptr_b = b.m_int.g_st().m_limbs.data();
+        } else {
+            ptr_b = b.m_int.g_dy()._mp_d;
+        }
+        return std::equal(ptr_a, ptr_a + asize, ptr_b, [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) {
+            return (l1 & GMP_NUMB_BITS) == (l2 & GMP_NUMB_BITS);
+        });
     }
     friend bool operator!=(const mp_integer &a, const mp_integer &b)
     {
@@ -2836,7 +2845,7 @@ public:
             ::mpz_pow_ui(&rop.m_int.g_dy(), base.get_mpz_view(), exp);
         }
     }
-    void abs()
+    mp_integer &abs()
     {
         if (is_static()) {
             if (m_int.g_st()._mp_size < 0) {
@@ -2845,6 +2854,7 @@ public:
         } else {
             ::mpz_abs(&m_int.g_dy(), &m_int.g_dy());
         }
+        return *this;
     }
     friend void abs(mp_integer &rop, const mp_integer &n)
     {
@@ -2905,9 +2915,10 @@ public:
         nextprime_impl(retval, n);
         return retval;
     }
-    void nextprime()
+    mp_integer &nextprime()
     {
         nextprime_impl(*this, *this);
+        return *this;
     }
     int probab_prime_p(int reps = 25) const
     {
@@ -2967,9 +2978,10 @@ private:
     }
 
 public:
-    void sqrt()
+    mp_integer &sqrt()
     {
         sqrt_impl(*this, *this);
+        return *this;
     }
     friend void sqrt(mp_integer &rop, const mp_integer &n)
     {
