@@ -119,7 +119,13 @@ see https://www.gnu.org/licenses/. */
 
 #endif
 
-namespace mppp
+#if !defined (MPPP_NAMESPACE)
+
+#define MPPP_NAMESPACE mppp
+
+#endif
+
+namespace MPPP_NAMESPACE
 {
 
 inline namespace detail
@@ -2996,12 +3002,12 @@ namespace std
 {
 
 template <size_t SSize>
-struct hash<mppp::mp_integer<SSize>> {
-    using argument_type = mppp::mp_integer<SSize>;
+struct hash<MPPP_NAMESPACE::mp_integer<SSize>> {
+    using argument_type = MPPP_NAMESPACE::mp_integer<SSize>;
     using result_type = size_t;
     result_type operator()(const argument_type &n) const
     {
-        return mppp::hash_wrapper(n);
+        return MPPP_NAMESPACE::hash_wrapper(n);
     }
 };
 }
