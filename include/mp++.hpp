@@ -2844,7 +2844,7 @@ public:
         }
         return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
     }
-    friend void pow(mp_integer &rop, const mp_integer &base, unsigned long exp)
+    friend void pow_ui(mp_integer &rop, const mp_integer &base, unsigned long exp)
     {
         if (rop.is_static()) {
             MPPP_MAYBE_TLS mpz_raii tmp;
@@ -2854,10 +2854,10 @@ public:
             ::mpz_pow_ui(&rop.m_int.g_dy(), base.get_mpz_view(), exp);
         }
     }
-    friend mp_integer pow(const mp_integer &base, unsigned long exp)
+    friend mp_integer pow_ui(const mp_integer &base, unsigned long exp)
     {
         mp_integer retval;
-        pow(retval, base, exp);
+        pow_ui(retval, base, exp);
         return retval;
     }
     mp_integer &abs()

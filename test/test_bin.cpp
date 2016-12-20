@@ -50,7 +50,7 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 
 static std::mt19937 rng;
 
-struct pow_tester {
+struct bin_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
@@ -58,10 +58,10 @@ struct pow_tester {
         // Start with all zeroes.
         mpz_raii m1, m2;
         integer n1, n2;
-        ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, 0u);
-        pow_ui(n1, n2, 0);
+        ::mpz_bin_ui(&m1.m_mpz, &m2.m_mpz, 0u);
+        bin_ui(n1, n2, 0);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE((lex_cast(pow_ui(n2, 0)) == lex_cast(m1)));
+        REQUIRE((lex_cast(bin_ui(n2, 0)) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
@@ -86,9 +86,9 @@ struct pow_tester {
                 }
                 const unsigned ex = edist(rng);
                 ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, ex);
-                pow_ui(n1, n2, ex);
+                pow(n1, n2, ex);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((lex_cast(pow_ui(n2, ex)) == lex_cast(m1)));
+                REQUIRE((lex_cast(pow(n2, ex)) == lex_cast(m1)));
             }
         };
 
@@ -100,7 +100,7 @@ struct pow_tester {
     }
 };
 
-TEST_CASE("pow")
+TEST_CASE("bin_ui")
 {
-    tuple_for_each(sizes{}, pow_tester{});
+    tuple_for_each(sizes{}, bin_tester{});
 }
