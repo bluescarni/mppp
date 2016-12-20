@@ -1389,7 +1389,9 @@ private:
     {
         auto rdata = &rop.m_limbs[0];
         auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
-        const auto size1 = op1._mp_size, size2 = op2._mp_size;
+        // NOTE: cannot trust the size member from op2, as op2 could've been negated if
+        // we are actually subtracting.
+        const auto size1 = op1._mp_size, size2 = (sign2 >= 0) ? asize2 : -asize2;
         // mpn functions require nonzero arguments.
         if (mppp_unlikely(!sign2)) {
             rop._mp_size = size1;
