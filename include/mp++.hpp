@@ -3047,6 +3047,22 @@ public:
             ::mpz_fac_ui(&rop.m_int.g_dy(), n);
         }
     }
+    friend void bin_ui(mp_integer &rop, const mp_integer &n, unsigned long k)
+    {
+        if (rop.is_static()) {
+            MPPP_MAYBE_TLS mpz_raii tmp;
+            ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
+            rop = mp_integer(&tmp.m_mpz);
+        } else {
+            ::mpz_bin_ui(&rop.m_int.g_dy(), n.get_mpz_view(), k);
+        }
+    }
+    friend mp_integer bin_ui(const mp_integer &n, unsigned long k)
+    {
+        mp_integer retval;
+        bin_ui(retval, n, k);
+        return retval;
+    }
 
 private:
     integer_union<SSize> m_int;

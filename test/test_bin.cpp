@@ -63,44 +63,31 @@ struct bin_tester {
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(bin_ui(n2, 0)) == lex_cast(m1)));
         REQUIRE(n1.is_static());
-        mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
-        std::uniform_int_distribution<unsigned> edist(0, 20);
-        // Run a variety of tests with operands with x number of limbs.
-        auto random_xy = [&](unsigned x) {
-            for (int i = 0; i < ntries; ++i) {
-                if (sdist(rng) && sdist(rng) && sdist(rng)) {
-                    // Reset rop every once in a while.
-                    n1 = integer{};
-                }
-                random_integer(tmp, x, rng);
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
-                if (sdist(rng)) {
-                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
-                    n2.neg();
-                }
-                if (n2.is_static() && sdist(rng)) {
-                    // Promote sometimes, if possible.
-                    n2.promote();
-                }
-                const unsigned ex = edist(rng);
-                ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, ex);
-                pow(n1, n2, ex);
-                REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((lex_cast(pow(n2, ex)) == lex_cast(m1)));
+        std::uniform_int_distribution<int> ndist(-20, 20);
+        std::uniform_int_distribution<unsigned> kdist(0, 20);
+        for (int i = 0; i < ntries; ++i) {
+            if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                // Reset rop every once in a while.
+                n1 = integer{};
             }
-        };
-
-        random_xy(0);
-        random_xy(1);
-        random_xy(2);
-        random_xy(3);
-        random_xy(4);
+            const auto n = ndist(rng);
+            const auto k = kdist(rng);
+            ::mpz_set_si(&m2.m_mpz, n);
+            n2 = integer(n);
+            if (n2.is_static() && sdist(rng)) {
+                // Promote sometimes, if possible.
+                n2.promote();
+            }
+            ::mpz_bin_ui(&m1.m_mpz, &m2.m_mpz, k);
+            bin_ui(n1, n2, k);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            REQUIRE((lex_cast(bin_ui(n2, k)) == lex_cast(m1)));
+        }
     }
 };
 
-TEST_CASE("bin_ui")
+TEST_CASE("bin")
 {
     tuple_for_each(sizes{}, bin_tester{});
 }
