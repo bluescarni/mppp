@@ -61,6 +61,7 @@ struct pow_tester {
         ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, 0u);
         pow(n1, n2, 0);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE((lex_cast(pow(n2, 0)) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
@@ -79,10 +80,15 @@ struct pow_tester {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 const unsigned ex = edist(rng);
                 ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, ex);
                 pow(n1, n2, ex);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(pow(n2, ex)) == lex_cast(m1)));
             }
         };
 

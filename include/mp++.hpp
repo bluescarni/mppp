@@ -301,7 +301,7 @@ struct mpz_raii {
     }
     mpz_struct_t m_mpz;
     // This is a failure flag that is used in the static integer ctors (it can be ignored
-    // for other uses of mpz_raii)
+    // for other uses of mpz_raii).
     bool fail_flag;
 };
 
@@ -2854,6 +2854,12 @@ public:
             ::mpz_pow_ui(&rop.m_int.g_dy(), base.get_mpz_view(), exp);
         }
     }
+    friend mp_integer pow(const mp_integer &base, unsigned long exp)
+    {
+        mp_integer retval;
+        pow(retval, base, exp);
+        return retval;
+    }
     mp_integer &abs()
     {
         if (is_static()) {
@@ -3021,6 +3027,25 @@ public:
     friend bool even_p(const mp_integer &n)
     {
         return n.even_p();
+    }
+    friend void fac_ui(mp_integer &rop, unsigned long n)
+    {
+        // NOTE: we put a limit here because the GMP function just crashes and burns
+        // if n is too large, and n does not even need to be that large.
+        constexpr auto max_fac = 1000000ull;
+        if (mppp_unlikely(n > max_fac)) {
+            throw std::invalid_argument(
+                "The value " + std::to_string(n)
+                + " is too large to be used as input for the factorial function (the maximum allowed value is "
+                + std::to_string(max_fac) + ")");
+        }
+        if (rop.is_static()) {
+            MPPP_MAYBE_TLS mpz_raii tmp;
+            ::mpz_fac_ui(&tmp.m_mpz, n);
+            rop = mp_integer(&tmp.m_mpz);
+        } else {
+            ::mpz_fac_ui(&rop.m_int.g_dy(), n);
+        }
     }
 
 private:
