@@ -77,12 +77,20 @@ struct add_tester {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
+                }
+                if (n3.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n3.promote();
                 }
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
@@ -304,6 +312,240 @@ TEST_CASE("add")
     tuple_for_each(sizes{}, add_tester{});
 }
 
+struct sub_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        // Start with all zeroes.
+        mpz_raii m1, m2, m3;
+        integer n1, n2, n3;
+        sub(n1, n2, n3);
+        ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        REQUIRE(n2.is_static());
+        REQUIRE(n3.is_static());
+        mpz_raii tmp;
+        std::uniform_int_distribution<int> sdist(0, 1);
+        // Run a variety of tests with operands with x and y number of limbs.
+        auto random_xy = [&](unsigned x, unsigned y) {
+            for (int i = 0; i < ntries; ++i) {
+                random_integer(tmp, x, rng);
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.neg();
+                }
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
+                random_integer(tmp, y, rng);
+                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                    n3.neg();
+                }
+                if (n3.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n3.promote();
+                }
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset rop every once in a while.
+                    n1 = integer{};
+                }
+                sub(n1, n2, n3);
+                ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                // Various variations if in-place.
+                sub(n1, n1, n2);
+                ::mpz_sub(&m1.m_mpz, &m1.m_mpz, &m2.m_mpz);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                sub(n2, n1, n2);
+                ::mpz_sub(&m2.m_mpz, &m1.m_mpz, &m2.m_mpz);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                sub(n1, n1, n1);
+                ::mpz_sub(&m1.m_mpz, &m1.m_mpz, &m1.m_mpz);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                if (y > x) {
+                    random_integer(tmp, x, rng);
+                    ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    if (sdist(rng)) {
+                        ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                        n2.neg();
+                    }
+                    max_integer(tmp, y);
+                    ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    if (sdist(rng)) {
+                        ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                        n3.neg();
+                    }
+                    sub(n1, n2, n3);
+                    ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                if (x == y) {
+                    random_integer(tmp, x, rng);
+                    ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    const bool neg = sdist(rng) == 1;
+                    if (neg) {
+                        ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                        n2.neg();
+                    }
+                    ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    if (!neg) {
+                        ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                        n3.neg();
+                    }
+                    sub(n1, n2, n3);
+                    ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                if (x == y) {
+                    random_integer(tmp, x, rng);
+                    ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    const bool neg = sdist(rng) == 1;
+                    if (neg) {
+                        ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                        n2.neg();
+                    }
+                    ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    if (!neg) {
+                        ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                        n3.neg();
+                    }
+                }
+            }
+        };
+
+        random_xy(1, 0);
+        random_xy(0, 1);
+        random_xy(1, 1);
+
+        random_xy(0, 2);
+        random_xy(1, 2);
+        random_xy(2, 0);
+        random_xy(2, 1);
+        random_xy(2, 2);
+
+        random_xy(0, 3);
+        random_xy(1, 3);
+        random_xy(2, 3);
+        random_xy(3, 0);
+        random_xy(3, 1);
+        random_xy(3, 2);
+        random_xy(3, 3);
+
+        random_xy(0, 4);
+        random_xy(1, 4);
+        random_xy(2, 4);
+        random_xy(3, 4);
+        random_xy(4, 0);
+        random_xy(4, 1);
+        random_xy(4, 2);
+        random_xy(4, 3);
+        random_xy(4, 4);
+
+        // Testing specific to the 2-limb optimisation.
+        if (S::value == 2u) {
+            max_integer(m2, 1u);
+            ::mpz_set_ui(&m3.m_mpz, 1u);
+            n2 = integer(::mp_limb_t(-1) & GMP_NUMB_MAX);
+            n3 = integer(1);
+            ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            sub(n1, n2, n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            ::mpz_sub(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            sub(n1, n3, n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            max_integer(m2, 2u);
+            ::mpz_set_ui(&m3.m_mpz, 1u);
+            ::mpz_mul_2exp(&m3.m_mpz, &m3.m_mpz, GMP_NUMB_BITS);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            sub(n1, n2, n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            ::mpz_sub(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            sub(n1, n3, n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            max_integer(m2, 2u);
+            ::mpz_set_ui(&m3.m_mpz, 1u);
+            ::mpz_mul_2exp(&m3.m_mpz, &m3.m_mpz, GMP_NUMB_BITS);
+            ::mpz_sub_ui(&m3.m_mpz, &m3.m_mpz, 1u);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            sub(n1, n2, n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            ::mpz_sub(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            sub(n1, n3, n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            max_integer(m2, 2u);
+            max_integer(m3, 1u);
+            ::mpz_mul_2exp(&m3.m_mpz, &m3.m_mpz, GMP_NUMB_BITS);
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            sub(n1, n2, n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            ::mpz_sub(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            sub(n1, n3, n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            sub(n1, n2, n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            ::mpz_sub(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            sub(n1, n3, n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            max_integer(m2, 2u);
+            max_integer(m3, 1u);
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            sub(n1, n2, n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            ::mpz_sub(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            sub(n1, n3, n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            n2 = integer(lex_cast(m2));
+            n3 = integer(lex_cast(m3));
+            ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            sub(n1, n2, n3);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            ::mpz_sub(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            sub(n1, n3, n2);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        }
+    }
+};
+
+TEST_CASE("sub")
+{
+    tuple_for_each(sizes{}, sub_tester{});
+}
+
 struct mul_tester {
     template <typename S>
     inline void operator()(const S &) const
@@ -344,12 +586,20 @@ struct mul_tester {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
+                }
+                if (n3.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n3.promote();
                 }
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
