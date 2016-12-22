@@ -3121,6 +3121,11 @@ private:
             }
             return;
         }
+#else
+        // Avoid compiler warnings for unused parameters.
+        (void)sign1;
+        (void)sign2;
+        (void)asize2;
 #endif
         // General implementation (via the mpz function).
         MPPP_MAYBE_TLS mpz_raii tmp;
