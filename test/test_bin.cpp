@@ -75,6 +75,10 @@ struct bin_tester {
             const auto k = kdist(rng);
             ::mpz_set_si(&m2.m_mpz, n);
             n2 = integer(n);
+            if (n1.is_static() && sdist(rng)) {
+                // Promote sometimes, if possible.
+                n1.promote();
+            }
             if (n2.is_static() && sdist(rng)) {
                 // Promote sometimes, if possible.
                 n2.promote();
