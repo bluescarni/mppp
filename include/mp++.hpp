@@ -2338,6 +2338,17 @@ private:
         *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
         *r2 = static_cast<::mp_limb_t>(r >> 64);
     }
+    // Without remainder.
+    static void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
+    {
+        using dlimb_t = MPPP_UINT128;
+        const auto op1 = op11 + (dlimb_t(op12) << 64);
+        const auto op2 = op21 + (dlimb_t(op22) << 64);
+        const auto q = op1 / op2;
+        *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+        *q2 = static_cast<::mp_limb_t>(q >> 64);
+    }
 #elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
     static void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                           ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
@@ -2351,6 +2362,16 @@ private:
         *q2 = static_cast<::mp_limb_t>(q >> 32);
         *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
         *r2 = static_cast<::mp_limb_t>(r >> 32);
+    }
+    static void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
+    {
+        using dlimb_t = std::uint_least64_t;
+        const auto op1 = op11 + (dlimb_t(op12) << 32);
+        const auto op2 = op21 + (dlimb_t(op22) << 32);
+        const auto q = op1 / op2;
+        *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+        *q2 = static_cast<::mp_limb_t>(q >> 32);
     }
 #endif
     // 2-limbs optimisation.
@@ -3070,6 +3091,117 @@ public:
     {
         mp_integer retval;
         bin_ui(retval, n, k);
+        return retval;
+    }
+
+private:
+    // Exact division.
+    // mpn implementation.
+    static void static_divexact_impl(s_int &q, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
+                                     int sign1, int sign2, const std::integral_constant<int, 0> &)
+    {
+        if (asize1 == 0) {
+            // Special casing if the numerator is zero (the mpn functions do not work with zero operands).
+            q._mp_size = 0;
+            return;
+        }
+        if (asize2 == 1) {
+            // Optimisation in case the dividend has only 1 limb.
+            // NOTE: overlapping arguments are fine here.
+            ::mpn_divexact_1(q.m_limbs.data(), op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
+            // Complete the quotient: compute size and sign.
+            q._mp_size = asize1 - asize2 + 1;
+            while (q._mp_size && !(q.m_limbs[static_cast<std::size_t>(q._mp_size - 1)] & GMP_NUMB_MASK)) {
+                --q._mp_size;
+            }
+            if (sign1 != sign2) {
+                q._mp_size = -q._mp_size;
+            }
+            return;
+        }
+        // General implementation (via the mpz function).
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_divexact(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
+        // Copy over from the tmp struct into q.
+        q._mp_size = tmp.m_mpz._mp_size;
+        copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + (q._mp_size >= 0 ? q._mp_size : -q._mp_size),
+                      q.m_limbs.data());
+    }
+    // 1-limb optimisation.
+    static void static_divexact_impl(s_int &q, const s_int &op1, const s_int &op2, mpz_size_t, mpz_size_t, int sign1,
+                                     int sign2, const std::integral_constant<int, 1> &)
+    {
+        const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK);
+        // Write q.
+        q._mp_size = (q_ != 0u);
+        if (sign1 != sign2) {
+            q._mp_size = -q._mp_size;
+        }
+        q.m_limbs[0] = q_;
+    }
+    // 2-limbs optimisation.
+    static void static_divexact_impl(s_int &q, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
+                                     int sign1, int sign2, const std::integral_constant<int, 2> &)
+    {
+        if (asize1 < 2 && asize2 < 2) {
+            // 1-limb optimisation.
+            const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0];
+            q._mp_size = (q_ != 0u);
+            if (sign1 != sign2) {
+                q._mp_size = -q._mp_size;
+            }
+            q.m_limbs[0] = q_;
+            q.m_limbs[1] = 0u;
+            return;
+        }
+        // General case.
+        ::mp_limb_t q1, q2;
+        dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
+        q._mp_size = q2 ? 2 : (q1 ? 1 : 0);
+        if (sign1 != sign2) {
+            q._mp_size = -q._mp_size;
+        }
+        q.m_limbs[0] = q1;
+        q.m_limbs[1] = q2;
+    }
+    static void static_divexact(s_int &q, const s_int &op1, const s_int &op2)
+    {
+        mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
+        int sign1 = asize1 != 0, sign2 = asize2 != 0;
+        if (asize1 < 0) {
+            asize1 = -asize1;
+            sign1 = -1;
+        }
+        if (asize2 < 0) {
+            asize2 = -asize2;
+            sign2 = -1;
+        }
+        assert(asize1 == 0 || asize2 <= asize1);
+        // NOTE: use static_div_algo for the algorithm selection.
+        static_divexact_impl(q, op1, op2, asize1, asize2, sign1, sign2, static_div_algo<s_int>{});
+        if (static_div_algo<s_int>::value == 0) {
+            q.zero_unused_limbs();
+        }
+    }
+
+public:
+    friend void divexact(mp_integer &rop, const mp_integer &n, const mp_integer &d)
+    {
+        const bool sr = rop.is_static(), s1 = n.is_static(), s2 = d.is_static();
+        if (mppp_likely(sr && s1 && s2)) {
+            static_divexact(rop.m_int.g_st(), n.m_int.g_st(), d.m_int.g_st());
+            // Division can never fail.
+            return;
+        }
+        if (sr) {
+            rop.m_int.promote();
+        }
+        ::mpz_divexact(&rop.m_int.g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    }
+    friend mp_integer divexact(const mp_integer &n, const mp_integer &d)
+    {
+        mp_integer retval;
+        divexact(retval, n, d);
         return retval;
     }
 
