@@ -2797,6 +2797,12 @@ private:
         }
         // The two sizes are equal, compare the absolute values.
         const auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
+        if (asize == 0) {
+            // Both operands are zero.
+            // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
+            // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
+            return 0;
+        }
         const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize));
         // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
         return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
