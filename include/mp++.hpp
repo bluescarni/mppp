@@ -3105,6 +3105,8 @@ private:
             q._mp_size = 0;
             return;
         }
+#if __GNU_MP_VERSION > 6 || (__GNU_MP_VERSION == 6 && __GNU_MP_VERSION_MINOR >= 1)
+        // NOTE: mpn_divexact_1() is available since GMP 6.1.0.
         if (asize2 == 1) {
             // Optimisation in case the dividend has only 1 limb.
             // NOTE: overlapping arguments are fine here.
@@ -3119,6 +3121,7 @@ private:
             }
             return;
         }
+#endif
         // General implementation (via the mpz function).
         MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpz_divexact(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
