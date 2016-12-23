@@ -65,6 +65,19 @@ matrix:
           - libmpfr-dev
           - cmake
           - cmake-data
+    - env: MPPP_BUILD="Coverage32GCC6"
+      compiler: gcc
+      os: linux
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          - george-edison55-precise-backports
+          packages:
+          - gcc-6
+          - g++-6
+          - cmake
+          - cmake-data
     - env: MPPP_BUILD="DebugClang38"
       compiler: clang
       os: linux
