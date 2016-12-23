@@ -108,6 +108,8 @@ struct cmp_tester {
                     n2.promote();
                 }
                 REQUIRE(check_cmp(cmp(n1, n2), ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
+                // Overlap.
+                REQUIRE(check_cmp(cmp(n1, n1), ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
             }
         };
 

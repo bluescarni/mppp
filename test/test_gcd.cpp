@@ -150,6 +150,13 @@ struct gcd_tester {
                 ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(gcd(n3, n2)) == lex_cast(m1)));
+                // Overlapping.
+                gcd(n1, n2, n2);
+                ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                gcd(n2, n2, n2);
+                ::mpz_gcd(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
             }
         };
 

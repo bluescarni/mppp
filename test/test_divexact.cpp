@@ -143,6 +143,15 @@ struct divexact_tester {
                 ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(divexact(n2, n3)) == lex_cast(m1)));
+                // Overlapping.
+                divexact(n1, n2, n2);
+                ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(divexact(n2, n2)) == lex_cast(m1)));
+                divexact(n2, n2, n2);
+                ::mpz_divexact(&m2.m_mpz, &m2.m_mpz, &m2.m_mpz);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
+                REQUIRE((lex_cast(divexact(n2, n2)) == lex_cast(m2)));
             }
         };
 

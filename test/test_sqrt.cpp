@@ -151,6 +151,11 @@ struct sqrt_tester {
                 REQUIRE((lex_cast(sqrt(n2)) == lex_cast(m1)));
                 n2.sqrt();
                 REQUIRE((lex_cast(n2) == lex_cast(m1)));
+                // Overlap.
+                n2 = integer(mpz_to_str(&m2.m_mpz));
+                ::mpz_sqrt(&m2.m_mpz, &m2.m_mpz);
+                sqrt(n2, n2);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
             }
         };
 

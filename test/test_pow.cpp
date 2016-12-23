@@ -89,6 +89,10 @@ struct pow_tester {
                 pow_ui(n1, n2, ex);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(pow_ui(n2, ex)) == lex_cast(m1)));
+                // Overlap.
+                ::mpz_pow_ui(&m2.m_mpz, &m2.m_mpz, ex);
+                pow_ui(n2, n2, ex);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
             }
         };
 
