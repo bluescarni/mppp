@@ -79,6 +79,14 @@ struct gcd_tester {
         gcd(n1, n2, n3);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
+        ::mpz_set_si(&m2.m_mpz, 8);
+        n2 = integer(8);
+        ::mpz_set_si(&m3.m_mpz, 0);
+        n3 = integer(0);
+        ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        gcd(n1, n2, n3);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
         ::mpz_set_si(&m2.m_mpz, 16);
         n2 = integer(16);
         ::mpz_set_si(&m3.m_mpz, -2);
@@ -106,31 +114,15 @@ struct gcd_tester {
         // Random testing.
         std::uniform_int_distribution<int> sdist(0, 1), mdist(1, 3);
         mpz_raii tmp;
-        auto random_xy = [&](unsigned x) {
+        auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
                     n1 = integer{};
                 }
                 random_integer(tmp, x, rng);
-                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
-                if (n3.sign() == 0) {
-                    continue;
-                }
-                if (sdist(rng)) {
-                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
-                    n3.neg();
-                }
-                if (n3.is_static() && sdist(rng)) {
-                    // Promote sometimes, if possible.
-                    n3.promote();
-                }
-                n2 = n3;
-                ::mpz_set(&m2.m_mpz, &m3.m_mpz);
-                const auto mult = mdist(rng);
-                mul(n2, n2, integer(mult));
-                ::mpz_mul_si(&m2.m_mpz, &m2.m_mpz, mult);
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
@@ -139,18 +131,55 @@ struct gcd_tester {
                     // Promote sometimes, if possible.
                     n2.promote();
                 }
+                random_integer(tmp, y, rng);
+                ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
+                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                    n3.neg();
+                }
+                if (n3.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n3.promote();
+                }
                 gcd(n1, n2, n3);
                 ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
+                gcd(n1, n3, n2);
+                ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(gcd(n3, n2)) == lex_cast(m1)));
             }
         };
 
-        random_xy(0);
-        random_xy(1);
-        random_xy(2);
-        random_xy(3);
-        random_xy(4);
+        random_xy(1, 0);
+        random_xy(0, 1);
+        random_xy(1, 1);
+
+        random_xy(0, 2);
+        random_xy(1, 2);
+        random_xy(2, 0);
+        random_xy(2, 1);
+        random_xy(2, 2);
+
+        random_xy(0, 3);
+        random_xy(1, 3);
+        random_xy(2, 3);
+        random_xy(3, 0);
+        random_xy(3, 1);
+        random_xy(3, 2);
+        random_xy(3, 3);
+
+        random_xy(0, 4);
+        random_xy(1, 4);
+        random_xy(2, 4);
+        random_xy(3, 4);
+        random_xy(4, 0);
+        random_xy(4, 1);
+        random_xy(4, 2);
+        random_xy(4, 3);
+        random_xy(4, 4);
     }
 };
 
