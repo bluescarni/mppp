@@ -53,32 +53,32 @@ matrix:
           - libmpfr-dev
           - cmake
           - cmake-data
-    - env: MPPP_BUILD="DebugClang39"
+    - env: MPPP_BUILD="DebugClang38"
       compiler: clang
       os: linux
       addons:
         apt:
           sources:
-          - llvm-toolchain-precise-3.9
+          - llvm-toolchain-precise-3.8
           - ubuntu-toolchain-r-test
           - george-edison55-precise-backports
           packages:
-          - clang
+          - clang-3.8
           - libgmp-dev
           - libmpfr-dev
           - cmake
           - cmake-data
-    - env: MPPP_BUILD="ReleaseClang39"
+    - env: MPPP_BUILD="ReleaseClang38"
       compiler: clang
       os: linux
       addons:
         apt:
           sources:
-          - llvm-toolchain-precise-3.9
+          - llvm-toolchain-precise-3.8
           - ubuntu-toolchain-r-test
           - george-edison55-precise-backports
           packages:
-          - clang
+          - clang-3.8
           - libgmp-dev
           - libmpfr-dev
           - cmake
