@@ -20,10 +20,8 @@ to manipulate arbitrarily-large integers but which, in practice, often end up st
 mp++ is written in modern C++, and it requires a C++11-capable compiler. Currently it is continuously tested
 on the following setups:
 
-* GCC 4.8/5 on GNU/Linux 64-bit,
-* GCC 6 on GNU/Linux 32-bit,
+* GCC 4.8 and later versions on GNU/Linux 32/64-bit,
 * Clang 3.8 on GNU/Linux 64-bit,
 * MSVC15 on Windows 32/64-bit,
-* MinGW GCC 6 on Windows 64-bit.
-
-The Intel compiler ICC 17 is occasionally tested on GNU/Linux 64-bit.
+* MinGW GCC 6 on Windows 64-bit,
+* Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).

@@ -122,7 +122,11 @@ see https://www.gnu.org/licenses/. */
 
 #endif
 
-#if !defined(MPPP_NAMESPACE)
+#if defined(MPPP_CUSTOM_NAMESPACE)
+
+#define MPPP_NAMESPACE MPPP_CUSTOM_NAMESPACE
+
+#else
 
 #define MPPP_NAMESPACE mppp
 
