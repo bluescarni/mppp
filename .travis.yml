@@ -2,16 +2,11 @@ language: cpp
 
 sudo: false
 
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    - george-edison55-precise-backports
-    packages:
-    - libgmp-dev
-    - libmpfr-dev
-    - cmake
-    - cmake-data
+# Do not build branches of the form "pr/*". By prefixing pull requests coming
+# from branches inside the repository with pr/, this avoids building both the
+# branch push _and_ the pull request.
+branches:
+  except: /pr\/.*/
 
 matrix:
   include:
@@ -20,23 +15,44 @@ matrix:
       os: linux
       addons:
         apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          - george-edison55-precise-backports
           packages:
           - g++-4.8
+          - libgmp-dev
+          - libmpfr-dev
+          - cmake
+          - cmake-data
     - env: MPPP_BUILD="DebugGCC48"
       compiler: gcc
       os: linux
       addons:
         apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          - george-edison55-precise-backports
           packages:
           - g++-4.8
+          - libgmp-dev
+          - libmpfr-dev
+          - cmake
+          - cmake-data
     - env: MPPP_BUILD="CoverageGCC5"
       compiler: gcc
       os: linux
       addons:
         apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          - george-edison55-precise-backports
           packages:
           - gcc-5
           - g++-5
+          - libgmp-dev
+          - libmpfr-dev
+          - cmake
+          - cmake-data
     - env: MPPP_BUILD="DebugClang39"
       compiler: clang
       os: linux
@@ -44,8 +60,14 @@ matrix:
         apt:
           sources:
           - llvm-toolchain-precise-3.9
+          - ubuntu-toolchain-r-test
+          - george-edison55-precise-backports
           packages:
           - clang-3.9
+          - libgmp-dev
+          - libmpfr-dev
+          - cmake
+          - cmake-data
     - env: MPPP_BUILD="ReleaseClang39"
       compiler: clang
       os: linux
@@ -53,8 +75,14 @@ matrix:
         apt:
           sources:
           - llvm-toolchain-precise-3.9
+          - ubuntu-toolchain-r-test
+          - george-edison55-precise-backports
           packages:
           - clang-3.9
+          - libgmp-dev
+          - libmpfr-dev
+          - cmake
+          - cmake-data
 
 script:
     - mkdir build
