@@ -36,11 +36,11 @@ The only mandatory dependency is the `GMP <http://www.gmplib.org>`__ library (GM
 The `MPIR <http://mpir.org/>`__ fork of GMP can also be used as a drop-in replacement for GMP.
 In order to interoperate with the ``long double`` C++ type, mp++ optionally depends
 on the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library (see the
-:ref:`configuration <index_configuration>` section below). In order to compile the benchmark suite, the
-`Boost <http://www.boost.org/>`__ C++ libraries are required.
+:ref:`configuration <index_configuration>` section below - MPFR 3 or a later version is required). In order to
+compile the benchmark suite, the `Boost <http://www.boost.org/>`__ C++ libraries are required.
 
-In order to use mp++, you only have to include the ``mp++.hpp`` header in your project and to link to the GMP
-library when compiling. E.g., on a Unix-like operating system with GCC you would compile your executable as:
+In order to use mp++, you only have to include the ``mp++.hpp`` header in your project and link to the GMP
+library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:
 
 .. code-block:: console
 
@@ -56,25 +56,21 @@ on the compiler command-line or in the source code **before** including the head
 
 * ``MPPP_WITH_LONG_DOUBLE``: if defined, mp++ will be able to interoperate with the ``long double`` C++ type (whereas
   normally floating-point interoperability is limited to the ``float`` and ``double`` types). This option requires
-  the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library (MPFR 3 and later versions are
-  supported).
+  the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library.
 * ``MPPP_CUSTOM_NAMESPACE``: by default, all classes and functions are located in the ``mppp`` namespace. If
   ``MPPP_CUSTOM_NAMESPACE`` is defined, the classes and functions will be located in the namespace specified by the
   value of the definition.
 
-.. .. doxygenclass:: mppp::mp_integer
-..    :members:
-
 Contents:
+---------
 
 .. toctree::
    :maxdepth: 2
 
-
+   mp_integer.rst
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

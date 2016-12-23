@@ -986,10 +986,82 @@ struct zero_division_error final : std::domain_error {
 // - gcd() can be improved (see notes).
 /// Multiprecision integer class.
 /**
- * \tparam SSize dasd asdadla
+ * This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP \p mpz_t type, with
+ * a small value optimisation: integers whose size is up to \p SSize limbs are stored directly in the storage
+ * occupied by the mp_integer object, without resorting to dynamic memory allocation. The value of \p SSize
+ * must be at least 1 and less than an implementation-defined upper limit.
+ *
+ * ## Memory management ##
+ * When the value of an mp_integer is stored directly within the object, the <em>storage type</em> of the integer is
+ * said to be <em>static</em>. When the limb size of the integer exceeds the maximum value \p SSize, the storage types
+ * becomes <em>dynamic</em>. The transition from static to dynamic storage happens transparently whenever the integer
+ * value becomes large enough. The demotion from dynamic to static storage usually needs to be requested explicitly.
  *
  * ## Interoperable types ##
- * dasdsa
+ * The class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and floating-point
+ * primitive types, and it provides overloaded airthmetic operators. Differently from the builtin types, however, this
+ * class does not allow any implicit conversion to/from other types (apart from \p bool): construction from and
+ * conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
+ * @code
+ * mp_integer<1> n = 5;
+ * @endcode
+ * will not work, and direct initialization should be used instead:
+ * @code
+ * mp_integer<1> n{5};
+ * @endcode
+ * The full list of interoperable builtin types is:
+ * - \p bool,
+ * - \p char, <tt>signed char</tt> and <tt>unsigned char</tt>,
+ * - \p short and <tt>unsigned short</tt>,
+ * - \p int and \p unsigned,
+ * - \p long and <tt>unsigned long</tt>,
+ * - <tt>long long</tt> and <tt>unsigned long long</tt>,
+ * - \p float, \p double and <tt>long double</tt> (<tt>long double</tt> requires the MPFR library).
+ *
+ * ## API basics ##
+ * Most of the functionality of the class is exposed via inline friend functions, with the general convention
+ * that the functions are named after the corresponding GMP functions minus the leading \p mpz_ prefix. For instance,
+ * the GMP call
+ * @code
+ * mpz_add(rop,a,b);
+ * @endcode
+ * that writes the result of <tt>a+b</tt> into \p rop becomes simply
+ * @code
+ * add(rop,a,b);
+ * @endcode
+ * where the add() function is resolved via argument-dependent lookup. Function calls with overlapping arguments
+ * are allowed, unless noted otherwise.
+ *
+ * Multiple overloads of the same functionality are often available.
+ * Binary functions in GMP are usually implemented via three-arguments functions, in which the first
+ * argument is a reference to the return value. The exponentiation function \p mpz_pow_ui(), for instance,
+ * takes three arguments: the return value, the base and the exponent. There are two overloads of the corresponding
+ * pow_ui() function:
+ * - a ternary overload semantically equivalent to \p mpz_pow_ui(),
+ * - a binary overload taking as inputs the base and the exponent, and returning the result
+ *   of the exponentiation.
+ *
+ * This allows to avoid having to set up a return value for one-off invocations of pow_ui() (the binary overload will
+ * do it for you). For example:
+ * @code
+ * mp_integer<1> r1, r2, n{3};
+ * pow_ui(r1,n,2);   // Ternary pow_ui(): computes n**2 and stores the result in r1.
+ * r2 = pow_ui(n,2); // Binary pow_ui(): returns n**2, which is then assigned to r2.
+ * @endcode
+ *
+ * In case of unary functions, there are often three overloads available:
+ * - a binary overload taking as first parameter a reference to the return value (GMP style),
+ * - a unary overload returning the result of the operation,
+ * - a nullary member function that modifies the calling object in-place.
+ *
+ * For instance, here are three possible ways of computing the absolute value:
+ * @code
+ * mp_integer<1> r1, r2, n{-5};
+ * abs(r1,n);   // Binary abs(): computes and stores the absolute value of n into r1.
+ * r2 = abs(n); // Unary abs(): returns the absolute value of n, which is then assigned to r2.
+ * n.abs();     // Member function abs(): replaces the value of n with its absolute value.
+ * @endcode
+ * Note that at this time only a small subset of the GMP API has been wrapped by mp_integer.
  */
 template <std::size_t SSize>
 class mp_integer
@@ -1041,7 +1113,7 @@ public:
     /// Move constructor.
     /**
      * The move constructor will leave \p other in an unspecified but valid state. The storage type
-     * of \p this will be the same as \p other's.
+     * of \p this will be the same as <tt>other</tt>'s.
      *
      * @param other the object that will be moved into \p this.
      */
@@ -1685,6 +1757,7 @@ private:
     }
 
 public:
+    /// Ternary add.
     friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
@@ -2908,6 +2981,7 @@ public:
         }
         return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
     }
+    /// Ternary exponentiation.
     friend void pow_ui(mp_integer &rop, const mp_integer &base, unsigned long exp)
     {
         if (rop.is_static()) {
@@ -2918,12 +2992,14 @@ public:
             ::mpz_pow_ui(&rop.m_int.g_dy(), base.get_mpz_view(), exp);
         }
     }
+    /// Binary exponentiation.
     friend mp_integer pow_ui(const mp_integer &base, unsigned long exp)
     {
         mp_integer retval;
         pow_ui(retval, base, exp);
         return retval;
     }
+    /// In-place absolute value.
     mp_integer &abs()
     {
         if (is_static()) {
@@ -2935,11 +3011,13 @@ public:
         }
         return *this;
     }
+    /// Binary absolute value.
     friend void abs(mp_integer &rop, const mp_integer &n)
     {
         rop = n;
         rop.abs();
     }
+    /// Unary absolute value.
     friend mp_integer abs(const mp_integer &n)
     {
         mp_integer ret(n);
