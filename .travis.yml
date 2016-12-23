@@ -74,6 +74,8 @@ matrix:
           - ubuntu-toolchain-r-test
           - george-edison55-precise-backports
           packages:
+          - gcc-multilib
+          - g++-multilib
           - gcc-6
           - gcc-6-multilib
           - g++-6
