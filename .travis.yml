@@ -38,6 +38,18 @@ matrix:
           - libmpfr-dev
           - cmake
           - cmake-data
+    - env: MPPP_BUILD="DebugGCC48DebugGMP"
+      compiler: gcc
+      os: linux
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          - george-edison55-precise-backports
+          packages:
+          - g++-4.8
+          - cmake
+          - cmake-data
     - env: MPPP_BUILD="CoverageGCC5"
       compiler: gcc
       os: linux

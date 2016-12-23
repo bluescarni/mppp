@@ -13,6 +13,17 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
     make -j2 VERBOSE=1;
     ctest -V;
+elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
+    # Download and compile locally GMP in debug mode.
+    wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2;
+    tar xjvf gmp-6.1.2.tar.bz2;
+    cd gmp-6.1.2;
+    CXX=g++-4.8 CC=gcc-4.8 ./configure --disable-shared --enable-assert --enable-alloca=debug --disable-assembly CFLAGS=-g;
+    make -j2;
+    cd ..;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 ../ -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a;
+    make -j2 VERBOSE=1;
+    ctest -V;
 elif [[ "${MPPP_BUILD}" == "CoverageGCC5" ]]; then
     CXX=g++-5 CC=gcc-5 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
     make -j2 VERBOSE=1;
