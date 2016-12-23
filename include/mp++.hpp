@@ -128,6 +128,7 @@ see https://www.gnu.org/licenses/. */
 
 #endif
 
+/// The root mp++ namespace.
 namespace MPPP_NAMESPACE
 {
 
@@ -979,6 +980,13 @@ struct zero_division_error final : std::domain_error {
 // - pow() can probably benefit for some specialised static implementation, especially in conjunction with
 //   mpn_sqr().
 // - gcd() can be improved (see notes).
+/// Multiprecision integer class.
+/**
+ * \tparam SSize dasd asdadla
+ *
+ * ## Interoperable types ##
+ * dasdsa
+ */
 template <std::size_t SSize>
 class mp_integer
 {
@@ -1014,8 +1022,25 @@ class mp_integer
     };
 
 public:
+    /// Default constructor.
+    /**
+     * The default constructor initialises an integer with static storage and value 0.
+     */
     mp_integer() = default;
+    /// Copy constructor.
+    /**
+     * The copy constructor deep-copies \p other into \p this, preserving the original storage type.
+     *
+     * @param other the object that will be copied into \p this.
+     */
     mp_integer(const mp_integer &other) = default;
+    /// Move constructor.
+    /**
+     * The move constructor will leave \p other in an unspecified but valid state. The storage type
+     * of \p this will be the same as \p other's.
+     *
+     * @param other the object that will be moved into \p this.
+     */
     mp_integer(mp_integer &&other) = default;
 
 private:
@@ -1024,6 +1049,10 @@ private:
     using generic_ctor_enabler = enable_if_t<is_supported_interop<T>::value, int>;
 
 public:
+    /// Generic constructor.
+    /**
+     * \tparam T dasdsa dasdas
+     */
     template <typename T, generic_ctor_enabler<T> = 0>
     explicit mp_integer(T x) : m_int(x)
     {
