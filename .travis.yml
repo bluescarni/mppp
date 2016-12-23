@@ -63,7 +63,7 @@ matrix:
           - ubuntu-toolchain-r-test
           - george-edison55-precise-backports
           packages:
-          - clang-3.9
+          - clang
           - libgmp-dev
           - libmpfr-dev
           - cmake
@@ -78,7 +78,7 @@ matrix:
           - ubuntu-toolchain-r-test
           - george-edison55-precise-backports
           packages:
-          - clang-3.9
+          - clang
           - libgmp-dev
           - libmpfr-dev
           - cmake
