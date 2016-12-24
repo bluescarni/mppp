@@ -1766,8 +1766,8 @@ private:
     // MSVC. Hence, we have this clunkier solution.
     template <typename, typename, typename = void>
     struct binary_op_type {};
-    template <>
-    struct binary_op_type<mp_integer,mp_integer> {
+    template <typename T>
+    struct binary_op_type<T,T, enable_if_t<std::is_same<T,mp_integer>::value>> {
         using type = mp_integer;
     };
     template <typename T, typename U>
