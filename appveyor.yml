@@ -18,16 +18,18 @@ environment:
 install:
 # Set path and download deps for MSVC.
 - if [%COMPILER%]==[MSVC15] set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
-- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_msvc_64.7z
-- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_msvc_32.7z
-- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] 7z x -oC:\ mppp_deps_msvc_64.7z > NUL
-- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] 7z x -oC:\ mppp_deps_msvc_32.7z > NUL
+- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mpir_msvc15_64.7z
+- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mpir_msvc15_32.7z
+- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] 7z x -oC:\ mpir_msvc15_64.7z > NUL
+- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] 7z x -oC:\ mpir_msvc15_32.7z > NUL
 # Same for MinGW.
 - if [%COMPILER%]==[MinGW] set PATH=C:\mingw64\bin;%PATH%
 - if [%COMPILER%]==[MinGW] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z
 - if [%COMPILER%]==[MinGW] 7z x -oC:\ x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z > NUL
-- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mppp_deps_mingw_64.7z
-- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ mppp_deps_mingw_64.7z > NUL
+- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/gmp_mingw_64.7z
+- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mpfr_mingw_64.7z
+- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ gmp_mingw_64.7z > NUL
+- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ mpfr_mingw_64.7z > NUL
 # Rename sh.exe as sh.exe in PATH interferes with MinGW.
 - if [%COMPILER%]==[MinGW] rename "C:\Program Files\Git\usr\bin\sh.exe" "sh2.exe"
 
@@ -35,10 +37,10 @@ build_script:
 - mkdir build
 - cd build
 
-- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] cmake -G "Visual Studio 14 2015" -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/mppp_deps_32/mpir -DGMP_LIBRARY=C:/mppp_deps_32/mpir/mpir.lib ..
-- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] cmake -G "Visual Studio 14 2015 Win64" -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/mppp_deps_64/mpir -DGMP_LIBRARY=C:/mppp_deps_64/mpir/mpir.lib ..
+- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] cmake -G "Visual Studio 14 2015" -DMPPP_MSVC_STATIC_RUNTIME=YES -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/mpir.lib ..
+- if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] cmake -G "Visual Studio 14 2015 Win64" -DMPPP_MSVC_STATIC_RUNTIME=YES -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/mpir.lib ..
 - if [%COMPILER%]==[MSVC15] cmake --build . --config %BUILD_TYPE% --target ALL_BUILD
-- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_LONG_DOUBLE=YES -DGMP_INCLUDE_DIR=C:/mppp_deps_64/gmp -DGMP_LIBRARY=C:/mppp_deps_64/gmp/libgmp.a -DMPFR_INCLUDE_DIR=C:/mppp_deps_64/mpfr -DMPFR_LIBRARY=C:/mppp_deps_64/mpfr/libmpfr.a ..
+- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_LONG_DOUBLE=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/libgmp.a -DMPFR_INCLUDE_DIR=C:/local/include -DMPFR_LIBRARY=C:/local/lib/libmpfr.a ..
 #- if [%COMPILER%]==[MinGW] cmake --build . --config %BUILD_TYPE% --target all
 - if [%COMPILER%]==[MinGW] mingw32-make -j2 VERBOSE=1
 

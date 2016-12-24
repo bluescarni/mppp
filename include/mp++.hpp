@@ -1761,8 +1761,17 @@ private:
         add(retval,op1,op2);
         return retval;
     }
+    // Machinery for the determination of the result of a binary operation.
+    // NOTE: we would use expr. SFINAE here, but it is not well supported in
+    // MSVC. Hence, we have this clunkier solution.
+    template <typename, typename, typename = void>
+    struct binary_op_type {};
+    template <>
+    struct binary_op_type<mp_integer,mp_integer> {
+        using type = mp_integer;
+    };
     template <typename T, typename U>
-    using add_t = decltype(dispatch_add_op(std::declval<const T &>(),std::declval<const U &>()));
+    using binary_op_t = typename binary_op_type<T,U>::type;
 
 public:
     /// Identity operator.
@@ -1775,7 +1784,7 @@ public:
     }
     /// Binary addition operator.
     template <typename T, typename U>
-    friend add_t<T,U> operator+(const T &op1, const U &op2)
+    friend binary_op_t<T,U> operator+(const T &op1, const U &op2)
     {
         return dispatch_add_op(op1,op2);
     }
