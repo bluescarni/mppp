@@ -1755,8 +1755,29 @@ private:
         }
         return retval;
     }
+    static mp_integer dispatch_add_op(const mp_integer &op1, const mp_integer &op2)
+    {
+        mp_integer retval;
+        add(retval,op1,op2);
+        return retval;
+    }
+    template <typename T, typename U>
+    using add_t = decltype(dispatch_add_op(std::declval<const T &>(),std::declval<const U &>()));
 
 public:
+    /// Identity operator.
+    /**
+     * @return a copy of \p this.
+     */
+    mp_integer operator+() const
+    {
+        return *this;
+    }
+    template <typename T, typename U>
+    friend add_t<T,U> operator+(const T &op1, const U &op2)
+    {
+        return dispatch_add_op(op1,op2);
+    }
     /// Ternary add.
     friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
@@ -1785,35 +1806,6 @@ public:
             rop.m_int.promote(SSize + 1u);
         }
         ::mpz_sub(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
-    }
-    mp_integer &operator+=(const mp_integer &other)
-    {
-        add(*this, *this, other);
-        return *this;
-    }
-    friend mp_integer operator+(const mp_integer &a, const mp_integer &b)
-    {
-        mp_integer retval;
-        add(retval, a, b);
-        return retval;
-    }
-    friend mp_integer operator+(const mp_integer &a, int n)
-    {
-        mp_integer retval;
-        const mp_integer b{n};
-        add(retval, a, b);
-        return retval;
-    }
-    mp_integer &operator-=(const mp_integer &other)
-    {
-        sub(*this, *this, other);
-        return *this;
-    }
-    friend mp_integer operator-(const mp_integer &a, const mp_integer &b)
-    {
-        mp_integer retval;
-        sub(retval, a, b);
-        return retval;
     }
 
 private:
