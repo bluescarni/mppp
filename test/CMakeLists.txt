@@ -8,11 +8,14 @@ unset(THREADS_PREFER_PTHREAD_FLAG)
 function(ADD_MPPP_TESTCASE arg1)
     add_executable(${arg1} ${arg1}.cpp)
     target_link_libraries(${arg1} mp++ Threads::Threads)
-    target_compile_options(${arg1} PUBLIC "$<$<CONFIG:DEBUG>:${YACMA_CXX_FLAGS_DEBUG}>")
-    target_compile_options(${arg1} PUBLIC "$<$<CONFIG:RELEASE>:${YACMA_CXX_FLAGS}>")
+    target_compile_options(${arg1} PUBLIC "$<$<CONFIG:DEBUG>:${YACMA_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${YACMA_CXX_FLAGS}>")
     if(YACMA_COMPILER_IS_MSVC)
-        # Disable the idiotic minmax macros on MSVC, and some annoying warnings.
-        target_compile_options(${arg1} PUBLIC "-DNOMINMAX" "/wd4459" "/wd4127")
+        # Disable the idiotic minmax macros on MSVC, some annoying warnings,
+        # and enable the bigobj option.
+        target_compile_options(${arg1} PUBLIC "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
+        if(MPPP_MSVC_STATIC_RUNTIME)
+            target_compile_options(${arg1} PUBLIC "$<$<CONFIG:DEBUG>:-MTd>" "$<$<CONFIG:RELEASE>:-MT>")
+        endif()
     endif()
     set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 11)
     set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)

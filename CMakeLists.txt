@@ -17,11 +17,10 @@ find_package(GMP REQUIRED)
 add_library(mp++ INTERFACE)
 
 if(YACMA_COMPILER_IS_MSVC)
-	# On MSVC, make sure that everything using mp++ uses the /bigobj flag.
-	target_compile_options(mp++ INTERFACE "/bigobj")
+    option(MPPP_MSVC_STATIC_RUNTIME "Use the MSVC static runtime instead of the shared runtime." OFF)
 endif()
 
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
+if(YACMA_COMPILER_IS_INTELXX)
     # NOTE: on MSVC we use the push/pop pragmas, but they do not seem to work on Intel (the pragmas
     # in icc influence the behaviour at instantiation point, not at definition point).
     target_compile_options(mp++ INTERFACE "-diag-disable" "3373,1682")
