@@ -1773,6 +1773,7 @@ public:
     {
         return *this;
     }
+    /// Binary addition operator.
     template <typename T, typename U>
     friend add_t<T,U> operator+(const T &op1, const U &op2)
     {
