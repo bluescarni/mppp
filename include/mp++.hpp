@@ -1758,20 +1758,21 @@ private:
     static mp_integer dispatch_add_op(const mp_integer &op1, const mp_integer &op2)
     {
         mp_integer retval;
-        add(retval,op1,op2);
+        add(retval, op1, op2);
         return retval;
     }
     // Machinery for the determination of the result of a binary operation.
     // NOTE: we would use expr. SFINAE here, but it is not well supported in
     // MSVC. Hence, we have this clunkier solution.
     template <typename, typename, typename = void>
-    struct binary_op_type {};
+    struct binary_op_type {
+    };
     template <typename T>
-    struct binary_op_type<T,T, enable_if_t<std::is_same<T,mp_integer>::value>> {
+    struct binary_op_type<T, T, enable_if_t<std::is_same<T, mp_integer>::value>> {
         using type = mp_integer;
     };
     template <typename T, typename U>
-    using binary_op_t = typename binary_op_type<T,U>::type;
+    using binary_op_t = typename binary_op_type<T, U>::type;
 
 public:
     /// Identity operator.
@@ -1784,9 +1785,9 @@ public:
     }
     /// Binary addition operator.
     template <typename T, typename U>
-    friend binary_op_t<T,U> operator+(const T &op1, const U &op2)
+    friend binary_op_t<T, U> operator+(const T &op1, const U &op2)
     {
-        return dispatch_add_op(op1,op2);
+        return dispatch_add_op(op1, op2);
     }
     /// Ternary add.
     friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
