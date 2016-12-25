@@ -136,7 +136,7 @@ see https://www.gnu.org/licenses/. */
 namespace MPPP_NAMESPACE
 {
 
-inline namespace detail
+inline namespace mppp_impl
 {
 
 // Just a small helper, like C++14.
@@ -1862,6 +1862,12 @@ public:
         }
         ::mpz_sub(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     }
+    mp_integer operator-() const
+    {
+        mp_integer retval{*this};
+        retval.neg();
+        return retval;
+    }
 
 private:
     // The double limb multiplication optimization is available in the following cases:
@@ -1906,7 +1912,7 @@ private:
         // - rop does not overlap with op1 and op2,
         // - SSize is large enough to hold the max size of the result.
         ::mp_limb_t *MPPP_RESTRICT res_data
-            = (rdata != data1 && rdata != data2 && max_asize <= SSize) ? rdata : &res[0];
+            = (rdata != data1 && rdata != data2 && max_asize <= SSize) ? rdata : res.data();
         // Proceed to the multiplication.
         ::mp_limb_t hi;
         if (asize2 == 1) {
@@ -3446,12 +3452,12 @@ private:
     integer_union<SSize> m_int;
 };
 
-inline namespace impl
+inline namespace mppp_impl
 {
 
 // A small wrapper to avoid name clashing below, in the specialisation of std::hash.
 template <size_t SSize>
-inline std::size_t hash_wrapper(const mp_integer<SSize> &n)
+inline std::size_t mp_integer_hash_wrapper(const mp_integer<SSize> &n)
 {
     return hash(n);
 }
@@ -3467,7 +3473,7 @@ struct hash<MPPP_NAMESPACE::mp_integer<SSize>> {
     using result_type = size_t;
     result_type operator()(const argument_type &n) const
     {
-        return MPPP_NAMESPACE::hash_wrapper(n);
+        return MPPP_NAMESPACE::mp_integer_hash_wrapper(n);
     }
 };
 }
