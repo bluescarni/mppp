@@ -1112,6 +1112,22 @@ class mp_integer
         using type = mp_integer;
     };
     template <typename T, typename U>
+    struct common_type<T, U, enable_if_t<std::is_same<T, mp_integer>::value && is_supported_integral<U>::value>> {
+        using type = mp_integer;
+    };
+    template <typename T, typename U>
+    struct common_type<T, U, enable_if_t<std::is_same<U, mp_integer>::value && is_supported_integral<T>::value>> {
+        using type = mp_integer;
+    };
+    template <typename T, typename U>
+    struct common_type<T, U, enable_if_t<std::is_same<T, mp_integer>::value && is_supported_float<U>::value>> {
+        using type = U;
+    };
+    template <typename T, typename U>
+    struct common_type<T, U, enable_if_t<std::is_same<U, mp_integer>::value && is_supported_float<T>::value>> {
+        using type = T;
+    };
+    template <typename T, typename U>
     using common_t = typename common_type<T, U>::type;
 
 public:
@@ -1778,6 +1794,28 @@ private:
         mp_integer retval;
         add(retval, op1, op2);
         return retval;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static mp_integer dispatch_binary_add(const mp_integer &op1, T n)
+    {
+        mp_integer retval{n};
+        add(retval, retval, op1);
+        return retval;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static mp_integer dispatch_binary_add(T n, const mp_integer &op2)
+    {
+        return dispatch_binary_add(op2, n);
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static T dispatch_binary_add(const mp_integer &op1, T x)
+    {
+        return static_cast<T>(op1) + x;
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static T dispatch_binary_add(T x, const mp_integer &op2)
+    {
+        return dispatch_binary_add(op2, x);
     }
 
 public:

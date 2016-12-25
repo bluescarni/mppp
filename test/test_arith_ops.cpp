@@ -50,8 +50,38 @@ struct add_tester {
     void operator()(const S &) const
     {
         using integer = mp_integer<S::value>;
-        integer n1, n2;
-        n1 + n2;
+        integer n1{1}, n2{-2};
+        REQUIRE((lex_cast(+n2) == "-2"));
+        REQUIRE((lex_cast(n1 + n2) == "-1"));
+        REQUIRE((std::is_same<decltype(n1 + n2), integer>::value));
+        REQUIRE((lex_cast(n1 + char(4)) == "5"));
+        REQUIRE((lex_cast(char(4) + n2) == "2"));
+        REQUIRE((std::is_same<decltype(n1 + char(4)), integer>::value));
+        REQUIRE((std::is_same<decltype(char(4) + n2), integer>::value));
+        REQUIRE((lex_cast(n1 + (unsigned char)(4)) == "5"));
+        REQUIRE((lex_cast((unsigned char)(4) + n2) == "2"));
+        REQUIRE((lex_cast(n1 + short(4)) == "5"));
+        REQUIRE((lex_cast(short(4) + n2) == "2"));
+        REQUIRE((lex_cast(n1 + 4) == "5"));
+        REQUIRE((lex_cast(4 + n2) == "2"));
+        REQUIRE((std::is_same<decltype(n1 + 4), integer>::value));
+        REQUIRE((std::is_same<decltype(4 + n2), integer>::value));
+        REQUIRE((lex_cast(n1 + 4u) == "5"));
+        REQUIRE((lex_cast(4u + n2) == "2"));
+        REQUIRE((n1 + 4.f == 5.f));
+        REQUIRE((4.f + n2 == 2.f));
+        REQUIRE((std::is_same<decltype(n1 + 4.f), float>::value));
+        REQUIRE((std::is_same<decltype(4.f + n2), float>::value));
+        REQUIRE((n1 + 4. == 5.));
+        REQUIRE((4. + n2 == 2.));
+        REQUIRE((std::is_same<decltype(n1 + 4.), double>::value));
+        REQUIRE((std::is_same<decltype(4. + n2), double>::value));
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        REQUIRE((n1 + 4.l == 5.l));
+        REQUIRE((4.l + n2 == 2.l));
+        REQUIRE((std::is_same<decltype(n1 + 4.l), long double>::value));
+        REQUIRE((std::is_same<decltype(4.l + n2), long double>::value));
+#endif
     }
 };
 
