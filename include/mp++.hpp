@@ -722,6 +722,7 @@ union integer_union {
     // Just a small helper, like C++14.
     template <bool B, typename T = void>
     using enable_if_t = typename std::enable_if<B, T>::type;
+
 public:
     using s_storage = static_int<SSize>;
     using d_storage = mpz_struct_t;
@@ -1127,19 +1128,23 @@ class mp_integer
         using type = mp_integer;
     };
     template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<std::is_same<T, mp_integer>::value && mppp_impl::is_supported_integral<U>::value>> {
+    struct common_type<T, U,
+                       enable_if_t<std::is_same<T, mp_integer>::value && mppp_impl::is_supported_integral<U>::value>> {
         using type = mp_integer;
     };
     template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<std::is_same<U, mp_integer>::value && mppp_impl::is_supported_integral<T>::value>> {
+    struct common_type<T, U,
+                       enable_if_t<std::is_same<U, mp_integer>::value && mppp_impl::is_supported_integral<T>::value>> {
         using type = mp_integer;
     };
     template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<std::is_same<T, mp_integer>::value && mppp_impl::is_supported_float<U>::value>> {
+    struct common_type<T, U,
+                       enable_if_t<std::is_same<T, mp_integer>::value && mppp_impl::is_supported_float<U>::value>> {
         using type = U;
     };
     template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<std::is_same<U, mp_integer>::value && mppp_impl::is_supported_float<T>::value>> {
+    struct common_type<T, U,
+                       enable_if_t<std::is_same<U, mp_integer>::value && mppp_impl::is_supported_float<T>::value>> {
         using type = T;
     };
     template <typename T, typename U>
@@ -1224,11 +1229,12 @@ private:
     template <typename T>
     using generic_conversion_enabler = generic_ctor_enabler<T>;
     template <typename T>
-    using uint_conversion_enabler
-        = enable_if_t<mppp_impl::is_supported_integral<T>::value && std::is_unsigned<T>::value && !std::is_same<bool, T>::value,
-                      int>;
+    using uint_conversion_enabler = enable_if_t<mppp_impl::is_supported_integral<T>::value && std::is_unsigned<T>::value
+                                                    && !std::is_same<bool, T>::value,
+                                                int>;
     template <typename T>
-    using int_conversion_enabler = enable_if_t<mppp_impl::is_supported_integral<T>::value && std::is_signed<T>::value, int>;
+    using int_conversion_enabler
+        = enable_if_t<mppp_impl::is_supported_integral<T>::value && std::is_signed<T>::value, int>;
     // Static conversion to bool.
     template <typename T, enable_if_t<std::is_same<T, bool>::value, int> = 0>
     static T conversion_impl(const s_int &n)
@@ -2617,7 +2623,11 @@ private:
     }
 
 public:
-    friend void div(mp_integer &q, mp_integer &r, const mp_integer &op1, const mp_integer &op2)
+    /// Truncated division.
+    /**
+     * mppp::zero_division_error.
+     */
+    friend void tdiv_qr(mp_integer &q, mp_integer &r, const mp_integer &op1, const mp_integer &op2)
     {
         if (mppp_unlikely(&q == &r)) {
             throw std::invalid_argument("When performing a division with remainder, the quotient 'q' and the "

@@ -1050,25 +1050,25 @@ struct div_tester {
         n4 = integer(5);
         ::mpz_set_ui(&m3.m_mpz, 12);
         ::mpz_set_ui(&m4.m_mpz, 5);
-        div(n1, n2, n3, n4);
+        tdiv_qr(n1, n2, n3, n4);
         ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2) == lex_cast(m2)));
         n3 = integer(-12);
         ::mpz_set_si(&m3.m_mpz, -12);
-        div(n1, n2, n3, n4);
+        tdiv_qr(n1, n2, n3, n4);
         ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2) == lex_cast(m2)));
         n4 = integer(-5);
         ::mpz_set_si(&m4.m_mpz, -5);
-        div(n1, n2, n3, n4);
+        tdiv_qr(n1, n2, n3, n4);
         ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2) == lex_cast(m2)));
         n3 = integer(12);
         ::mpz_set_ui(&m3.m_mpz, 12);
-        div(n1, n2, n3, n4);
+        tdiv_qr(n1, n2, n3, n4);
         ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2) == lex_cast(m2)));
@@ -1115,33 +1115,33 @@ struct div_tester {
                     n2 = integer{};
                     ::mpz_set_ui(&m2.m_mpz, 0);
                 }
-                div(n1, n2, n3, n4);
+                tdiv_qr(n1, n2, n3, n4);
                 ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 // In-place variations.
                 random_34();
-                div(n1, n3, n3, n4);
+                tdiv_qr(n1, n3, n3, n4);
                 ::mpz_tdiv_qr(&m1.m_mpz, &m3.m_mpz, &m3.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n3) == lex_cast(m3)));
                 random_34();
-                div(n1, n4, n3, n4);
+                tdiv_qr(n1, n4, n3, n4);
                 ::mpz_tdiv_qr(&m1.m_mpz, &m4.m_mpz, &m3.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n4) == lex_cast(m4)));
                 random_34();
-                div(n1, n2, n4, n4);
+                tdiv_qr(n1, n2, n4, n4);
                 ::mpz_tdiv_qr(&m1.m_mpz, &m2.m_mpz, &m4.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 random_34();
-                div(n1, n4, n4, n4);
+                tdiv_qr(n1, n4, n4, n4);
                 ::mpz_tdiv_qr(&m1.m_mpz, &m4.m_mpz, &m4.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n4) == lex_cast(m4)));
                 random_34();
-                div(n4, n2, n4, n4);
+                tdiv_qr(n4, n2, n4, n4);
                 ::mpz_tdiv_qr(&m4.m_mpz, &m2.m_mpz, &m4.m_mpz, &m4.m_mpz);
                 REQUIRE((lex_cast(n4) == lex_cast(m4)));
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
@@ -1149,13 +1149,15 @@ struct div_tester {
             // Error handling.
             n3 = integer(12);
             n4 = integer(0);
-            REQUIRE_THROWS_PREDICATE(div(n1, n2, n3, n4), zero_division_error, [](const zero_division_error &ex) {
+            REQUIRE_THROWS_PREDICATE(tdiv_qr(n1, n2, n3, n4), zero_division_error, [](const zero_division_error &ex) {
                 return std::string(ex.what()) == "Integer division by zero";
             });
-            REQUIRE_THROWS_PREDICATE(div(n1, n1, n3, n3), std::invalid_argument, [](const std::invalid_argument &ex) {
-                return std::string(ex.what()) == "When performing a division with remainder, the quotient 'q' and the "
-                                                 "remainder 'r' must be distinct objects";
-            });
+            REQUIRE_THROWS_PREDICATE(
+                tdiv_qr(n1, n1, n3, n3), std::invalid_argument, [](const std::invalid_argument &ex) {
+                    return std::string(ex.what())
+                           == "When performing a division with remainder, the quotient 'q' and the "
+                              "remainder 'r' must be distinct objects";
+                });
         };
 
         random_xy(0, 1);
