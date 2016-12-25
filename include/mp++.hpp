@@ -967,6 +967,10 @@ public:
 };
 }
 
+/// Exception to signal division by zero.
+/**
+ * This exception inherits all members (including constructors) from \p std::domain_error.
+ */
 struct zero_division_error final : std::domain_error {
     using std::domain_error::domain_error;
 };
@@ -1144,7 +1148,7 @@ class mp_integer
 public:
     /// Default constructor.
     /**
-     * The default constructor initialises an integer with static storage and value 0.
+     * The default constructor initialises an integer with static storage type and value 0.
      */
     mp_integer() = default;
     /// Copy constructor.

@@ -67,7 +67,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   mp_integer.rst
+   reference.rst
 
 Indices and tables
 ==================
