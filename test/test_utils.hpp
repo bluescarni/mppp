@@ -139,19 +139,19 @@ inline std::string lex_cast(const T &x)
     return oss.str();
 }
 
-inline std::string lex_cast(const mppp::mpz_raii &m)
+inline std::string lex_cast(const mppp::mppp_impl::mpz_raii &m)
 {
-    return mppp::mpz_to_str(&m.m_mpz);
+    return mppp::mppp_impl::mpz_to_str(&m.m_mpz);
 }
 
 // Set mpz to random value with n limbs. Top limb is divided by div.
-inline void random_integer(mppp::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
+inline void random_integer(mppp::mppp_impl::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
 {
     if (!n) {
         ::mpz_set_ui(&m.m_mpz, 0);
         return;
     }
-    static thread_local mppp::mpz_raii tmp;
+    static thread_local mppp::mppp_impl::mpz_raii tmp;
     std::uniform_int_distribution<::mp_limb_t> dist(0u, std::numeric_limits<::mp_limb_t>::max());
     // Set the first limb.
     ::mpz_set_str(&m.m_mpz, lex_cast((dist(rng) & GMP_NUMB_MASK) / div).c_str(), 10);
@@ -163,13 +163,13 @@ inline void random_integer(mppp::mpz_raii &m, unsigned n, std::mt19937 &rng, ::m
 }
 
 // Set mpz to the max value with n limbs.
-inline void max_integer(mppp::mpz_raii &m, unsigned n)
+inline void max_integer(mppp::mppp_impl::mpz_raii &m, unsigned n)
 {
     if (!n) {
         ::mpz_set_ui(&m.m_mpz, 0);
         return;
     }
-    static thread_local mppp::mpz_raii tmp;
+    static thread_local mppp::mppp_impl::mpz_raii tmp;
     // Set the first limb.
     ::mpz_set_str(&m.m_mpz, lex_cast(::mp_limb_t(-1) & GMP_NUMB_MASK).c_str(), 10);
     for (unsigned i = 1u; i < n; ++i) {
