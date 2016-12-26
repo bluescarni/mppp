@@ -794,8 +794,8 @@ public:
     explicit integer_union(const ::mpz_t n) : m_st()
     {
         // This is similar to what ctor_from_mpz does.
-        const auto asize = (n->_mp_size >= 0) ? n->_mp_size : -n->_mp_size;
-        if (std::size_t(asize) > SSize) {
+        const auto asize = ::mpz_size(n);
+        if (asize > SSize) {
             // n is too big, need to promote.
             // Destroy static.
             g_st().~s_storage();
