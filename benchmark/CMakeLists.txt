@@ -22,7 +22,7 @@ function(ADD_MPPP_BENCHMARK arg1)
     set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 11)
     set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
     set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
-function()
+endfunction()
 
 ADD_MPPP_BENCHMARK(bench_add_1)
 ADD_MPPP_BENCHMARK(bench_add_2)
