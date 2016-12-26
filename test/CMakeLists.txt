@@ -24,6 +24,7 @@ function(ADD_MPPP_TESTCASE arg1)
 endfunction()
 
 ADD_MPPP_TESTCASE(test_abs)
+ADD_MPPP_TESTCASE(test_add_ui)
 ADD_MPPP_TESTCASE(test_arith)
 ADD_MPPP_TESTCASE(test_arith_ops)
 ADD_MPPP_TESTCASE(test_basic)
