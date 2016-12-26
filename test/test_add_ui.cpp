@@ -122,12 +122,29 @@ struct add_ui_tester {
                 if (S::value == 2 && x == 2) {
                     // Tests specific for 2-limb optimisation.
                     n2 = integer{GMP_NUMB_MAX};
+                    if (sdist(rng)) {
+                        ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                        n2.neg();
+                    }
+                    if (n2.is_static() && sdist(rng)) {
+                        // Promote sometimes, if possible.
+                        n2.promote();
+                    }
                     mul_2exp(n2,n2,GMP_NUMB_BITS);
                     add(n2,n2,integer{GMP_NUMB_MAX});
                     ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+                    add_ui(n1, n2, 0);
+                    ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     add_ui(n1, n2, 1);
                     ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 1);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    add_ui(n1, n2, 123);
+                    ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    add_ui(n2, n2, 1);
+                    ::mpz_add_ui(&m2.m_mpz, &m2.m_mpz, 1);
+                    REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 }
             }
         };

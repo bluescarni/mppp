@@ -2003,7 +2003,8 @@ public:
                                    const std::integral_constant<int, 1> &)
     {
         using mppp_impl::limb_add_overflow;
-        const auto l1 = op1.m_limbs[0], l2 = static_cast<::mp_limb_t>(op2);
+        const auto l1 = op1.m_limbs[0];
+        const auto l2 = static_cast<::mp_limb_t>(op2);
         ::mp_limb_t tmp;
         if (sign1 >= 0) {
             // True unsigned addition.
