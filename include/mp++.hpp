@@ -1216,10 +1216,7 @@ public:
                                         "2 and 62, but a value of "
                                         + std::to_string(base) + " was provided instead.");
         }
-        if (is_static()) {
-            return mpz_to_str(m_int.g_st().get_mpz_view());
-        }
-        return mppp_impl::mpz_to_str(&m_int.g_dy());
+        return mppp_impl::mpz_to_str(get_mpz_view());
     }
     // NOTE: maybe provide a method to access the lower-level str conversion that writes to
     // std::vector<char>?
