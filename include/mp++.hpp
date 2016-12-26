@@ -1083,6 +1083,8 @@ class mp_integer
     using is_supported_integral = mppp_impl::is_supported_integral<T>;
     template <typename T>
     using is_supported_float = mppp_impl::is_supported_float<T>;
+    template <typename T>
+    using is_supported_interop = mppp_impl::is_supported_interop<T>;
     // The underlying static int.
     using s_int = mppp_impl::static_int<SSize>;
     // mpz view class.
@@ -1129,27 +1131,26 @@ class mp_integer
         using type = mp_integer;
     };
     template <typename T, typename U>
-    struct common_type<T, U,
-                       enable_if_t<std::is_same<T, mp_integer>::value && is_supported_integral<U>::value>> {
+    struct common_type<T, U, enable_if_t<std::is_same<T, mp_integer>::value && is_supported_integral<U>::value>> {
         using type = mp_integer;
     };
     template <typename T, typename U>
-    struct common_type<T, U,
-                       enable_if_t<std::is_same<U, mp_integer>::value && is_supported_integral<T>::value>> {
+    struct common_type<T, U, enable_if_t<std::is_same<U, mp_integer>::value && is_supported_integral<T>::value>> {
         using type = mp_integer;
     };
     template <typename T, typename U>
-    struct common_type<T, U,
-                       enable_if_t<std::is_same<T, mp_integer>::value && is_supported_float<U>::value>> {
+    struct common_type<T, U, enable_if_t<std::is_same<T, mp_integer>::value && is_supported_float<U>::value>> {
         using type = U;
     };
     template <typename T, typename U>
-    struct common_type<T, U,
-                       enable_if_t<std::is_same<U, mp_integer>::value && is_supported_float<T>::value>> {
+    struct common_type<T, U, enable_if_t<std::is_same<U, mp_integer>::value && is_supported_float<T>::value>> {
         using type = T;
     };
     template <typename T, typename U>
     using common_t = typename common_type<T, U>::type;
+    // Enabler for in-place arithmetic ops.
+    template <typename T>
+    using in_place_enabler = enable_if_t<is_supported_interop<T>::value || std::is_same<T, mp_integer>::value, int>;
 
 public:
     /// Default constructor.
@@ -1176,7 +1177,10 @@ public:
 private:
     // Enabler for generic ctor.
     template <typename T>
-    using generic_ctor_enabler = enable_if_t<mppp_impl::is_supported_interop<T>::value, int>;
+    using generic_ctor_enabler = enable_if_t<is_supported_interop<T>::value, int>;
+    // Enabler for generic assignment.
+    template <typename T>
+    using generic_assignment_enabler = generic_ctor_enabler<T>;
 
 public:
     /// Generic constructor.
@@ -1198,6 +1202,12 @@ public:
     }
     mp_integer &operator=(const mp_integer &other) = default;
     mp_integer &operator=(mp_integer &&other) = default;
+    template <typename T, generic_assignment_enabler<T> = 0>
+    mp_integer &operator=(const T &x)
+    {
+        *this = mp_integer{x};
+        return *this;
+    }
     bool is_static() const
     {
         return m_int.is_static();
@@ -1227,12 +1237,11 @@ private:
     template <typename T>
     using generic_conversion_enabler = generic_ctor_enabler<T>;
     template <typename T>
-    using uint_conversion_enabler = enable_if_t<is_supported_integral<T>::value && std::is_unsigned<T>::value
-                                                    && !std::is_same<bool, T>::value,
-                                                int>;
+    using uint_conversion_enabler
+        = enable_if_t<is_supported_integral<T>::value && std::is_unsigned<T>::value && !std::is_same<bool, T>::value,
+                      int>;
     template <typename T>
-    using int_conversion_enabler
-        = enable_if_t<is_supported_integral<T>::value && std::is_signed<T>::value, int>;
+    using int_conversion_enabler = enable_if_t<is_supported_integral<T>::value && std::is_signed<T>::value, int>;
     // Static conversion to bool.
     template <typename T, enable_if_t<std::is_same<T, bool>::value, int> = 0>
     static T conversion_impl(const s_int &n)
@@ -1839,22 +1848,53 @@ private:
     {
         return dispatch_binary_add(op2, x);
     }
+    // Dispatching for in-place add.
+    static void dispatch_in_place_add(mp_integer &retval, const mp_integer &n)
+    {
+        add(retval, retval, n);
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static void dispatch_in_place_add(mp_integer &retval, const T &n)
+    {
+        add(retval, retval, mp_integer{n});
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static void dispatch_in_place_add(mp_integer &retval, const T &x)
+    {
+        retval = static_cast<T>(retval) + x;
+    }
+    // Dispatching for the binary subtraction operator.
+    static mp_integer dispatch_binary_sub(const mp_integer &op1, const mp_integer &op2)
+    {
+        mp_integer retval;
+        sub(retval, op1, op2);
+        return retval;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static mp_integer dispatch_binary_sub(const mp_integer &op1, T n)
+    {
+        mp_integer retval{n};
+        sub(retval, retval, op1);
+        return retval.neg();
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static mp_integer dispatch_binary_sub(T n, const mp_integer &op2)
+    {
+        auto retval = dispatch_binary_sub(op2, n);
+        return retval.neg();
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static T dispatch_binary_sub(const mp_integer &op1, T x)
+    {
+        return static_cast<T>(op1) - x;
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static T dispatch_binary_sub(T x, const mp_integer &op2)
+    {
+        return -dispatch_binary_sub(op2, x);
+    }
 
 public:
-    /// Identity operator.
-    /**
-     * @return a copy of \p this.
-     */
-    mp_integer operator+() const
-    {
-        return *this;
-    }
-    /// Binary addition operator.
-    template <typename T, typename U>
-    friend common_t<T, U> operator+(const T &op1, const U &op2)
-    {
-        return dispatch_binary_add(op1, op2);
-    }
     /// Ternary add.
     friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
@@ -1870,6 +1910,28 @@ public:
         }
         ::mpz_add(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     }
+    /// Identity operator.
+    /**
+     * @return a copy of \p this.
+     */
+    mp_integer operator+() const
+    {
+        return *this;
+    }
+    /// Binary addition operator.
+    template <typename T, typename U>
+    friend common_t<T, U> operator+(const T &op1, const U &op2)
+    {
+        return dispatch_binary_add(op1, op2);
+    }
+    /// In-place addition.
+    template <typename T, in_place_enabler<T> = 0>
+    mp_integer &operator+=(const T &op)
+    {
+        dispatch_in_place_add(*this, op);
+        return *this;
+    }
+    /// Ternary subtraction.
     friend void sub(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
@@ -1884,11 +1946,28 @@ public:
         }
         ::mpz_sub(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     }
+    /// Negated copy.
+    /**
+     * @return a negated copy of \p this.
+     */
     mp_integer operator-() const
     {
         mp_integer retval{*this};
         retval.neg();
         return retval;
+    }
+    /// Binary subtraction operator.
+    template <typename T, typename U>
+    friend common_t<T, U> operator-(const T &op1, const U &op2)
+    {
+        return dispatch_binary_sub(op1, op2);
+    }
+    /// In-place subtraction.
+    template <typename T, in_place_enabler<T> = 0>
+    mp_integer &operator-=(const T &op)
+    {
+        dispatch_in_place_sub(*this, op);
+        return *this;
     }
 
 private:

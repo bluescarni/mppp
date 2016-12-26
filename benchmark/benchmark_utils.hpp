@@ -1115,7 +1115,8 @@ inline void uacc_gmp(nonius::chronometer meter, std::mt19937 &rng, unsigned N)
 {
     const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
     std::array<mppp::mppp_impl::mpz_raii, size> arr;
-    std::for_each(arr.begin(), arr.end(), [&rng, N, size](mppp::mppp_impl::mpz_raii &m) { random_mpz(m, N, rng, size); });
+    std::for_each(arr.begin(), arr.end(),
+                  [&rng, N, size](mppp::mppp_impl::mpz_raii &m) { random_mpz(m, N, rng, size); });
     mppp::mppp_impl::mpz_raii c;
     meter.measure([&arr, size, &c]() {
         ::mpz_set(&c.m_mpz, &arr[0].m_mpz);
@@ -1149,10 +1150,12 @@ inline void umul_vec_gmp_half(nonius::chronometer meter, std::mt19937 &rng)
 {
     const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
     std::array<mppp::mppp_impl::mpz_raii, size> arr1, arr2, arr3;
-    std::for_each(arr1.begin(), arr1.end(),
-                  [&rng](mppp::mppp_impl::mpz_raii &m) { random_mpz(m, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2)); });
-    std::for_each(arr2.begin(), arr2.end(),
-                  [&rng](mppp::mppp_impl::mpz_raii &m) { random_mpz(m, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2)); });
+    std::for_each(arr1.begin(), arr1.end(), [&rng](mppp::mppp_impl::mpz_raii &m) {
+        random_mpz(m, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
+    });
+    std::for_each(arr2.begin(), arr2.end(), [&rng](mppp::mppp_impl::mpz_raii &m) {
+        random_mpz(m, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
+    });
     meter.measure([&arr1, &arr2, &arr3, size]() {
         for (unsigned j = 0u; j < size; ++j) {
             ::mpz_mul(&arr3[j].m_mpz, &arr1[j].m_mpz, &arr2[j].m_mpz);
@@ -1243,8 +1246,9 @@ inline void ulshift_vec_gmp_half(nonius::chronometer meter, std::mt19937 &rng)
     const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
     std::array<mppp::mppp_impl::mpz_raii, size> arr1, arr2;
     std::array<::mp_bitcnt_t, size> barr;
-    std::for_each(arr1.begin(), arr1.end(),
-                  [&rng](mppp::mppp_impl::mpz_raii &m) { random_mpz(m, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2)); });
+    std::for_each(arr1.begin(), arr1.end(), [&rng](mppp::mppp_impl::mpz_raii &m) {
+        random_mpz(m, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
+    });
     std::for_each(barr.begin(), barr.end(), [&rng](::mp_bitcnt_t &s) {
         s = std::uniform_int_distribution<::mp_bitcnt_t>(0u, GMP_NUMB_BITS / 2 - 1u)(rng);
     });
@@ -1276,8 +1280,9 @@ inline void urshift_vec_gmp_half(nonius::chronometer meter, std::mt19937 &rng)
     const unsigned size = MPPP_BENCHMARK_VEC_SIZE;
     std::array<mppp::mppp_impl::mpz_raii, size> arr1, arr2;
     std::array<::mp_bitcnt_t, size> barr;
-    std::for_each(arr1.begin(), arr1.end(),
-                  [&rng](mppp::mppp_impl::mpz_raii &m) { random_mpz(m, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2)); });
+    std::for_each(arr1.begin(), arr1.end(), [&rng](mppp::mppp_impl::mpz_raii &m) {
+        random_mpz(m, 1u, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
+    });
     std::for_each(barr.begin(), barr.end(), [&rng](::mp_bitcnt_t &s) {
         s = std::uniform_int_distribution<::mp_bitcnt_t>(0u, GMP_NUMB_BITS / 2 - 1u)(rng);
     });

@@ -50,6 +50,7 @@ struct add_tester {
     void operator()(const S &) const
     {
         using integer = mp_integer<S::value>;
+        // Binary add.
         integer n1{1}, n2{-2};
         REQUIRE((lex_cast(+n2) == "-2"));
         REQUIRE((lex_cast(n1 + n2) == "-1"));
@@ -82,6 +83,28 @@ struct add_tester {
         REQUIRE((std::is_same<decltype(n1 + 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l + n2), long double>::value));
 #endif
+        // In-place add.
+        integer retval{1};
+        retval += n1;
+        REQUIRE((lex_cast(retval) == "2"));
+        retval += 1;
+        REQUIRE((lex_cast(retval) == "3"));
+        retval += short(-1);
+        REQUIRE((lex_cast(retval) == "2"));
+        retval += (signed char)(-1);
+        REQUIRE((lex_cast(retval) == "1"));
+        retval += (long long)(-5);
+        REQUIRE((lex_cast(retval) == "-4"));
+        retval += (unsigned long long)(20);
+        REQUIRE((lex_cast(retval) == "16"));
+        retval += 2.5f;
+        REQUIRE((lex_cast(retval) == "18"));
+        retval += -3.5;
+        REQUIRE((lex_cast(retval) == "14"));
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        retval += -1.5l;
+        REQUIRE((lex_cast(retval) == "12"));
+#endif
     }
 };
 
@@ -97,37 +120,35 @@ struct sub_tester {
         using integer = mp_integer<S::value>;
         integer n1{1}, n2{-2};
         REQUIRE((lex_cast(-n2) == "2"));
-#if 0
-        REQUIRE((lex_cast(n1 + n2) == "-1"));
-        REQUIRE((std::is_same<decltype(n1 + n2), integer>::value));
-        REQUIRE((lex_cast(n1 + char(4)) == "5"));
-        REQUIRE((lex_cast(char(4) + n2) == "2"));
-        REQUIRE((std::is_same<decltype(n1 + char(4)), integer>::value));
-        REQUIRE((std::is_same<decltype(char(4) + n2), integer>::value));
-        REQUIRE((lex_cast(n1 + (unsigned char)(4)) == "5"));
-        REQUIRE((lex_cast((unsigned char)(4) + n2) == "2"));
-        REQUIRE((lex_cast(n1 + short(4)) == "5"));
-        REQUIRE((lex_cast(short(4) + n2) == "2"));
-        REQUIRE((lex_cast(n1 + 4) == "5"));
-        REQUIRE((lex_cast(4 + n2) == "2"));
-        REQUIRE((std::is_same<decltype(n1 + 4), integer>::value));
-        REQUIRE((std::is_same<decltype(4 + n2), integer>::value));
-        REQUIRE((lex_cast(n1 + 4u) == "5"));
-        REQUIRE((lex_cast(4u + n2) == "2"));
-        REQUIRE((n1 + 4.f == 5.f));
-        REQUIRE((4.f + n2 == 2.f));
-        REQUIRE((std::is_same<decltype(n1 + 4.f), float>::value));
-        REQUIRE((std::is_same<decltype(4.f + n2), float>::value));
-        REQUIRE((n1 + 4. == 5.));
-        REQUIRE((4. + n2 == 2.));
-        REQUIRE((std::is_same<decltype(n1 + 4.), double>::value));
-        REQUIRE((std::is_same<decltype(4. + n2), double>::value));
+        REQUIRE((lex_cast(n1 - n2) == "3"));
+        REQUIRE((std::is_same<decltype(n1 - n2), integer>::value));
+        REQUIRE((lex_cast(n1 - char(4)) == "-3"));
+        REQUIRE((lex_cast(char(4) - n2) == "6"));
+        REQUIRE((std::is_same<decltype(n1 - char(4)), integer>::value));
+        REQUIRE((std::is_same<decltype(char(4) - n2), integer>::value));
+        REQUIRE((lex_cast(n1 - (unsigned char)(4)) == "-3"));
+        REQUIRE((lex_cast((unsigned char)(4) - n2) == "6"));
+        REQUIRE((lex_cast(n1 - short(4)) == "-3"));
+        REQUIRE((lex_cast(short(4) - n2) == "6"));
+        REQUIRE((lex_cast(n1 - 4) == "-3"));
+        REQUIRE((lex_cast(4 - n2) == "6"));
+        REQUIRE((std::is_same<decltype(n1 - 4), integer>::value));
+        REQUIRE((std::is_same<decltype(4 - n2), integer>::value));
+        REQUIRE((lex_cast(n1 - 4u) == "-3"));
+        REQUIRE((lex_cast(4u - n2) == "6"));
+        REQUIRE((n1 - 4.f == -3.f));
+        REQUIRE((4.f - n2 == 6.f));
+        REQUIRE((std::is_same<decltype(n1 - 4.f), float>::value));
+        REQUIRE((std::is_same<decltype(4.f - n2), float>::value));
+        REQUIRE((n1 - 4. == -3.));
+        REQUIRE((4. - n2 == 6.));
+        REQUIRE((std::is_same<decltype(n1 - 4.), double>::value));
+        REQUIRE((std::is_same<decltype(4. - n2), double>::value));
 #if defined(MPPP_WITH_LONG_DOUBLE)
-        REQUIRE((n1 + 4.l == 5.l));
-        REQUIRE((4.l + n2 == 2.l));
-        REQUIRE((std::is_same<decltype(n1 + 4.l), long double>::value));
-        REQUIRE((std::is_same<decltype(4.l + n2), long double>::value));
-#endif
+        REQUIRE((n1 - 4.l == -3.l));
+        REQUIRE((4.l - n2 == 6.l));
+        REQUIRE((std::is_same<decltype(n1 - 4.l), long double>::value));
+        REQUIRE((std::is_same<decltype(4.l - n2), long double>::value));
 #endif
     }
 };
