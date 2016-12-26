@@ -46,6 +46,12 @@ library when compiling. E.g., on a Unix-like operating system with GCC, you woul
 
    $ g++ -std=c++11 my_executable.cpp -lgmp
 
+If you require interoperability with ``long double``, link in the MPFR library as well:
+
+.. code-block:: console
+
+   $ g++ -std=c++11 my_executable.cpp -lmpfr -lgmp
+
 .. _index_configuration:
 
 Configuration
