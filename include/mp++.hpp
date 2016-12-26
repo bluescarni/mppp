@@ -1562,12 +1562,12 @@ private:
         // mpn functions require nonzero arguments.
         if (mppp_unlikely(!sign2)) {
             rop._mp_size = size1;
-            copy_limbs(data1, data1 + asize1, &rop.m_limbs[0]);
+            copy_limbs(data1, data1 + asize1, rdata);
             return true;
         }
         if (mppp_unlikely(!sign1)) {
             rop._mp_size = size2;
-            copy_limbs(data2, data2 + asize2, &rop.m_limbs[0]);
+            copy_limbs(data2, data2 + asize2, rdata);
             return true;
         }
         // Check, for op1 and op2, whether:
@@ -1605,7 +1605,7 @@ private:
                     assert(asize1 < s_int::s_size);
                     rop._mp_size = size1 + sign1;
                     // NOTE: there should be no need to use GMP_NUMB_MASK here.
-                    rdata[asize1] = 1;
+                    rdata[asize1] = 1u;
                 } else {
                     // Without carry, the size is unchanged.
                     rop._mp_size = size1;
@@ -1622,7 +1622,7 @@ private:
                 if (cy) {
                     assert(asize2 < s_int::s_size);
                     rop._mp_size = size2 + sign2;
-                    rdata[asize2] = 1;
+                    rdata[asize2] = 1u;
                 } else {
                     rop._mp_size = size2;
                 }
