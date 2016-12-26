@@ -1684,6 +1684,7 @@ private:
             rdata[0] = tmp;
         } else {
             // When the signs differ, we need to implement addition as a subtraction.
+            // NOTE: this also includes the case in which only one of the operands is zero.
             if (data1[0] >= data2[0]) {
                 // op1 is not smaller than op2.
                 tmp = data1[0] - data2[0];
@@ -1763,6 +1764,7 @@ private:
             rdata[1] = hi2;
         } else {
             // When the signs differ, we need to implement addition as a subtraction.
+            // NOTE: this also includes the case in which only one of the operands is zero.
             if (asize1 > asize2 || (asize1 == asize2 && compare_limbs_2(data1, data2, asize1) >= 0)) {
                 // op1 is >= op2 in absolute value.
                 const auto lo = data1[0] - data2[0];
