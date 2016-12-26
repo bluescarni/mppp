@@ -719,10 +719,6 @@ struct static_int {
 // {static_int,mpz} union.
 template <std::size_t SSize>
 union integer_union {
-    // Just a small helper, like C++14.
-    template <bool B, typename T = void>
-    using enable_if_t = typename std::enable_if<B, T>::type;
-
 public:
     using s_storage = static_int<SSize>;
     using d_storage = mpz_struct_t;
@@ -757,7 +753,7 @@ public:
     }
     // Generic constructor from the interoperable basic C++ types. It will first try to construct
     // a static, if too many limbs are needed it will construct a dynamic instead.
-    template <typename T, enable_if_t<is_supported_interop<T>::value, int> = 0>
+    template <typename T, typename std::enable_if<is_supported_interop<T>::value, int>::type = 0>
     explicit integer_union(T x)
     {
         MPPP_MAYBE_TLS mpz_raii mpz;
@@ -1079,9 +1075,14 @@ class mp_integer
     // Import these typedefs for ease of use.
     using mpz_size_t = mppp_impl::mpz_size_t;
     using mpz_raii = mppp_impl::mpz_raii;
+    using mpz_struct_t = mppp_impl::mpz_struct_t;
 #if defined(MPPP_WITH_LONG_DOUBLE)
     using mpfr_raii = mppp_impl::mpfr_raii;
 #endif
+    template <typename T>
+    using is_supported_integral = mppp_impl::is_supported_integral<T>;
+    template <typename T>
+    using is_supported_float = mppp_impl::is_supported_float<T>;
     // The underlying static int.
     using s_int = mppp_impl::static_int<SSize>;
     // mpz view class.
@@ -1099,18 +1100,18 @@ class mp_integer
         mpz_view(mpz_view &&) = default;
         mpz_view &operator=(const mpz_view &) = delete;
         mpz_view &operator=(mpz_view &&) = delete;
-        operator const mppp_impl::mpz_struct_t *() const
+        operator const mpz_struct_t *() const
         {
             return get();
         }
-        const mppp_impl::mpz_struct_t *get() const
+        const mpz_struct_t *get() const
         {
             return m_ptr;
         }
 
     private:
         static_mpz_view m_static_view;
-        const mppp_impl::mpz_struct_t *m_ptr;
+        const mpz_struct_t *m_ptr;
     };
     // Machinery for the determination of the result of a binary operation.
     // NOTE: this metaprogramming could be done more cleanly, using expr. SFINAE,
@@ -1129,22 +1130,22 @@ class mp_integer
     };
     template <typename T, typename U>
     struct common_type<T, U,
-                       enable_if_t<std::is_same<T, mp_integer>::value && mppp_impl::is_supported_integral<U>::value>> {
+                       enable_if_t<std::is_same<T, mp_integer>::value && is_supported_integral<U>::value>> {
         using type = mp_integer;
     };
     template <typename T, typename U>
     struct common_type<T, U,
-                       enable_if_t<std::is_same<U, mp_integer>::value && mppp_impl::is_supported_integral<T>::value>> {
+                       enable_if_t<std::is_same<U, mp_integer>::value && is_supported_integral<T>::value>> {
         using type = mp_integer;
     };
     template <typename T, typename U>
     struct common_type<T, U,
-                       enable_if_t<std::is_same<T, mp_integer>::value && mppp_impl::is_supported_float<U>::value>> {
+                       enable_if_t<std::is_same<T, mp_integer>::value && is_supported_float<U>::value>> {
         using type = U;
     };
     template <typename T, typename U>
     struct common_type<T, U,
-                       enable_if_t<std::is_same<U, mp_integer>::value && mppp_impl::is_supported_float<T>::value>> {
+                       enable_if_t<std::is_same<U, mp_integer>::value && is_supported_float<T>::value>> {
         using type = T;
     };
     template <typename T, typename U>
@@ -1226,12 +1227,12 @@ private:
     template <typename T>
     using generic_conversion_enabler = generic_ctor_enabler<T>;
     template <typename T>
-    using uint_conversion_enabler = enable_if_t<mppp_impl::is_supported_integral<T>::value && std::is_unsigned<T>::value
+    using uint_conversion_enabler = enable_if_t<is_supported_integral<T>::value && std::is_unsigned<T>::value
                                                     && !std::is_same<bool, T>::value,
                                                 int>;
     template <typename T>
     using int_conversion_enabler
-        = enable_if_t<mppp_impl::is_supported_integral<T>::value && std::is_signed<T>::value, int>;
+        = enable_if_t<is_supported_integral<T>::value && std::is_signed<T>::value, int>;
     // Static conversion to bool.
     template <typename T, enable_if_t<std::is_same<T, bool>::value, int> = 0>
     static T conversion_impl(const s_int &n)
@@ -1260,7 +1261,7 @@ private:
             throw std::overflow_error("");
         }
         // In multilimb case, forward to mpz.
-        return conversion_impl<T>(*static_cast<const mppp_impl::mpz_struct_t *>(n.get_mpz_view()));
+        return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
     // Static conversion to signed ints.
     template <typename T, int_conversion_enabler<T> = 0>
@@ -1289,10 +1290,10 @@ private:
             return static_cast<T>(candidate);
         }
         // Forward to mpz.
-        return conversion_impl<T>(*static_cast<const mppp_impl::mpz_struct_t *>(n.get_mpz_view()));
+        return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
     // Static conversion to floating-point.
-    template <typename T, enable_if_t<mppp_impl::is_supported_float<T>::value, int> = 0>
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static T conversion_impl(const s_int &n)
     {
         // Handle zero.
@@ -1322,17 +1323,17 @@ private:
             }
         }
         // For all the other cases, just delegate to the GMP/MPFR routines.
-        return conversion_impl<T>(*static_cast<const mppp_impl::mpz_struct_t *>(n.get_mpz_view()));
+        return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
     // Dynamic conversion to bool.
     template <typename T, enable_if_t<std::is_same<T, bool>::value, int> = 0>
-    static T conversion_impl(const mppp_impl::mpz_struct_t &m)
+    static T conversion_impl(const mpz_struct_t &m)
     {
         return mpz_sgn(&m) != 0;
     }
     // Dynamic conversion to unsigned ints.
     template <typename T, uint_conversion_enabler<T> = 0>
-    static T conversion_impl(const mppp_impl::mpz_struct_t &m)
+    static T conversion_impl(const mpz_struct_t &m)
     {
         if (mpz_sgn(&m) < 0) {
             // Cannot convert negative values into unsigned ints.
@@ -1397,7 +1398,7 @@ private:
     }
     // Dynamic conversion to signed ints.
     template <typename T, int_conversion_enabler<T> = 0>
-    static T conversion_impl(const mppp_impl::mpz_struct_t &m)
+    static T conversion_impl(const mpz_struct_t &m)
     {
         if (::mpz_fits_slong_p(&m)) {
             const auto sl = ::mpz_get_si(&m);
@@ -1447,14 +1448,14 @@ private:
     }
     // Dynamic conversion to float/double.
     template <typename T, enable_if_t<std::is_same<T, float>::value || std::is_same<T, double>::value, int> = 0>
-    static T conversion_impl(const mppp_impl::mpz_struct_t &m)
+    static T conversion_impl(const mpz_struct_t &m)
     {
         return static_cast<T>(::mpz_get_d(&m));
     }
 #if defined(MPPP_WITH_LONG_DOUBLE)
     // Dynamic conversion to long double.
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
-    static T conversion_impl(const mppp_impl::mpz_struct_t &m)
+    static T conversion_impl(const mpz_struct_t &m)
     {
         MPPP_MAYBE_TLS mpfr_raii mpfr;
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
@@ -1816,24 +1817,24 @@ private:
         add(retval, op1, op2);
         return retval;
     }
-    template <typename T, enable_if_t<mppp_impl::is_supported_integral<T>::value, int> = 0>
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
     static mp_integer dispatch_binary_add(const mp_integer &op1, T n)
     {
         mp_integer retval{n};
         add(retval, retval, op1);
         return retval;
     }
-    template <typename T, enable_if_t<mppp_impl::is_supported_integral<T>::value, int> = 0>
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
     static mp_integer dispatch_binary_add(T n, const mp_integer &op2)
     {
         return dispatch_binary_add(op2, n);
     }
-    template <typename T, enable_if_t<mppp_impl::is_supported_float<T>::value, int> = 0>
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static T dispatch_binary_add(const mp_integer &op1, T x)
     {
         return static_cast<T>(op1) + x;
     }
-    template <typename T, enable_if_t<mppp_impl::is_supported_float<T>::value, int> = 0>
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static T dispatch_binary_add(T x, const mp_integer &op2)
     {
         return dispatch_binary_add(op2, x);
