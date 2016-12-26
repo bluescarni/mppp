@@ -966,7 +966,8 @@ public:
 
 /// Exception to signal division by zero.
 /**
- * This exception inherits all members (including constructors) from \p std::domain_error.
+ * This exception inherits all members (including constructors) from \p std::domain_error. It will be thrown
+ * when a division by zero involving an mp_integer is attempted.
  */
 struct zero_division_error final : std::domain_error {
     using std::domain_error::domain_error;
@@ -1184,9 +1185,6 @@ private:
 
 public:
     /// Generic constructor.
-    /**
-     * \tparam T dasdsa dasdas
-     */
     template <typename T, generic_ctor_enabler<T> = 0>
     explicit mp_integer(T x) : m_int(x)
     {
@@ -1745,7 +1743,7 @@ private:
             // the lo limbs of op1 and op2.
             //
             // Add the hi and lo limbs.
-            const ::mp_limb_t a = data1[0], b = data2[0], c = data1[1], d = data2[1];
+            const auto a = data1[0], b = data2[0], c = data1[1], d = data2[1];
             ::mp_limb_t lo, hi1, hi2;
             const ::mp_limb_t cy_lo = limb_add_overflow(a, b, &lo), cy_hi1 = limb_add_overflow(c, d, &hi1),
                               cy_hi2 = limb_add_overflow(hi1, cy_lo, &hi2);
