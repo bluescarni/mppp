@@ -1933,6 +1933,29 @@ public:
         dispatch_in_place_add(*this, op);
         return *this;
     }
+    /// Prefix increment.
+    /**
+     * Increment \p this by one.
+     *
+     * @return reference to \p this after the increment.
+     */
+    mp_integer &operator++()
+    {
+        add_ui(*this,*this,1u);
+        return *this;
+    }
+    /// Suffix increment.
+    /**
+     * Increment \p this by one and return a copy of \p this as it was before the increment.
+     *
+     * @return a copy of \p this before the increment.
+     */
+    mp_integer operator++(int)
+    {
+        mp_integer retval(*this);
+        ++(*this);
+        return retval;
+    }
     /// Ternary subtraction.
     friend void sub(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {

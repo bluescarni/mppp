@@ -39,6 +39,7 @@ see https://www.gnu.org/licenses/. */
 #include "catch.hpp"
 
 using namespace mppp;
+using namespace mppp::mppp_impl;
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -105,6 +106,44 @@ struct add_tester {
         retval += -1.5l;
         REQUIRE((lex_cast(retval) == "12"));
 #endif
+        // Increment ops.
+        retval = integer{0};
+        REQUIRE((lex_cast(++retval) == "1"));
+        REQUIRE((lex_cast(++retval) == "2"));
+        REQUIRE((std::is_same<decltype(++retval),integer &>::value));
+        retval = integer{-2};
+        ++retval;
+        REQUIRE((lex_cast(retval) == "-1"));
+        ++retval;
+        REQUIRE((lex_cast(retval) == "0"));
+        ++retval;
+        REQUIRE((lex_cast(retval) == "1"));
+        REQUIRE((lex_cast(retval++) == "1"));
+        REQUIRE((lex_cast(retval++) == "2"));
+        REQUIRE((lex_cast(retval++) == "3"));
+        // Couple of tests at the boundaries
+        mpz_raii tmp;
+        retval = integer{GMP_NUMB_MAX};
+        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        ++retval;
+        ::mpz_add_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        REQUIRE((lex_cast(retval) == lex_cast(tmp)));
+        retval = integer{GMP_NUMB_MAX};
+        mul_2exp(retval, retval, GMP_NUMB_BITS);
+        add(retval, retval, integer{GMP_NUMB_MAX});
+        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        retval++;
+        ::mpz_add_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        REQUIRE((lex_cast(retval) == lex_cast(tmp)));
+        retval = integer{GMP_NUMB_MAX};
+        mul_2exp(retval, retval, GMP_NUMB_BITS);
+        add(retval, retval, integer{GMP_NUMB_MAX});
+        mul_2exp(retval, retval, GMP_NUMB_BITS);
+        add(retval, retval, integer{GMP_NUMB_MAX});
+        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        retval++;
+        ::mpz_add_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        REQUIRE((lex_cast(retval) == lex_cast(tmp)));
     }
 };
 
