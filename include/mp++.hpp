@@ -1008,10 +1008,12 @@ struct zero_division_error final : std::domain_error {
  * conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
  * @code
  * mp_integer<1> n = 5;
+ * int m = n;
  * @endcode
- * will not work, and direct initialization should be used instead:
+ * will not work, and direct initialization and explicit casting should be used instead:
  * @code
  * mp_integer<1> n{5};
+ * int m = static_cast<int>(n);
  * @endcode
  * The full list of interoperable builtin types is:
  * - \p bool,
@@ -1066,6 +1068,10 @@ struct zero_division_error final : std::domain_error {
  * n.abs();     // Member function abs(): replaces the value of n with its absolute value.
  * @endcode
  * Note that at this time only a small subset of the GMP API has been wrapped by mp_integer.
+ *
+ * ## Overloaded operators ##
+ *
+ * ## Interfacing with GMP ##
  */
 template <std::size_t SSize>
 class mp_integer
@@ -1117,13 +1123,11 @@ class mp_integer
         const mpz_struct_t *m_ptr;
     };
     // Machinery for the determination of the result of a binary operation.
-    // NOTE: this metaprogramming could be done more cleanly, using expr. SFINAE,
-    // moving out this selector struct, etc. However there are various compiler bugs, in MSVC
-    // and GCC as well, that prevent some of the possible alternatives. See, e.g., here on why
-    // it does not work to move out this struct:
-    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78925
-    // MSVC suffers from similar issues regarding ADL in conjunction with inline friend function templates.
-    // This construction seems to work on all the compilers we support.
+    // NOTE: this metaprogramming could be done more cleanly using expr. SFINAE
+    // on the internal dispatching functions, but this generates an error in MSVC about
+    // the operator being defined twice. My impression is that this is an MSVC problem at the
+    // intersection between SFINAE and friend function templates (GCC and clang work fine).
+    // We adopt this construction as a workaround.
     template <typename, typename, typename = void>
     struct common_type {
     };
