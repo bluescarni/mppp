@@ -1875,13 +1875,15 @@ private:
     {
         mp_integer retval{n};
         sub(retval, retval, op1);
-        return retval.neg();
+        retval.neg();
+        return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
     static mp_integer dispatch_binary_sub(T n, const mp_integer &op2)
     {
         auto retval = dispatch_binary_sub(op2, n);
-        return retval.neg();
+        retval.neg();
+        return retval;
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static T dispatch_binary_sub(const mp_integer &op1, T x)
@@ -1931,6 +1933,46 @@ public:
         dispatch_in_place_add(*this, op);
         return *this;
     }
+    /// Ternary subtraction.
+    friend void sub(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
+    {
+        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+        if (mppp_likely(sr && s1 && s2)) {
+            // Optimise the case of all statics.
+            if (mppp_likely(static_addsub<false>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st()))) {
+                return;
+            }
+        }
+        if (sr) {
+            rop.m_int.promote(SSize + 1u);
+        }
+        ::mpz_sub(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    }
+    /// Negated copy.
+    /**
+     * @return a negated copy of \p this.
+     */
+    mp_integer operator-() const
+    {
+        mp_integer retval{*this};
+        retval.neg();
+        return retval;
+    }
+    /// Binary subtraction operator.
+    template <typename T, typename U>
+    friend common_t<T, U> operator-(const T &op1, const U &op2)
+    {
+        return dispatch_binary_sub(op1, op2);
+    }
+    /// In-place subtraction.
+    template <typename T, in_place_enabler<T> = 0>
+    mp_integer &operator-=(const T &op)
+    {
+        dispatch_in_place_sub(*this, op);
+        return *this;
+    }
+
+private:
     // Metaprogramming for selecting the algorithm for static addition with ui. The selection happens via
     // an std::integral_constant with 3 possible values:
     // - 0 (default case): use the GMP mpn functions,
@@ -1956,7 +1998,7 @@ public:
             return true;
         }
         if (mppp_unlikely(!sign1)) {
-            rop._mp_size = (l2 != 0);
+            rop._mp_size = (l2 != 0u);
             rdata[0] = l2;
             return true;
         }
@@ -2090,6 +2132,9 @@ public:
         }
         return retval;
     }
+
+public:
+    /// Ternary add with <tt>unsigned long</tt>.
     friend void add_ui(mp_integer &rop, const mp_integer &op1, unsigned long op2)
     {
         if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
@@ -2110,44 +2155,6 @@ public:
             rop.m_int.promote(SSize + 1u);
         }
         ::mpz_add_ui(&rop.m_int.g_dy(), op1.get_mpz_view(), op2);
-    }
-    /// Ternary subtraction.
-    friend void sub(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
-    {
-        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
-        if (mppp_likely(sr && s1 && s2)) {
-            // Optimise the case of all statics.
-            if (mppp_likely(static_addsub<false>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st()))) {
-                return;
-            }
-        }
-        if (sr) {
-            rop.m_int.promote(SSize + 1u);
-        }
-        ::mpz_sub(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
-    }
-    /// Negated copy.
-    /**
-     * @return a negated copy of \p this.
-     */
-    mp_integer operator-() const
-    {
-        mp_integer retval{*this};
-        retval.neg();
-        return retval;
-    }
-    /// Binary subtraction operator.
-    template <typename T, typename U>
-    friend common_t<T, U> operator-(const T &op1, const U &op2)
-    {
-        return dispatch_binary_sub(op1, op2);
-    }
-    /// In-place subtraction.
-    template <typename T, in_place_enabler<T> = 0>
-    mp_integer &operator-=(const T &op)
-    {
-        dispatch_in_place_sub(*this, op);
-        return *this;
     }
 
 private:

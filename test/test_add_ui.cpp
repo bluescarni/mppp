@@ -137,8 +137,8 @@ struct add_ui_tester {
                         // Promote sometimes, if possible.
                         n2.promote();
                     }
-                    mul_2exp(n2,n2,GMP_NUMB_BITS);
-                    add(n2,n2,integer{GMP_NUMB_MAX});
+                    mul_2exp(n2, n2, GMP_NUMB_BITS);
+                    add(n2, n2, integer{GMP_NUMB_MAX});
                     ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
                     add_ui(n1, n2, 0);
                     ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
