@@ -110,7 +110,14 @@ struct add_ui_tester {
                     // Promote sometimes, if possible.
                     n2.promote();
                 }
-                auto rul = uldist(rng);
+                add_ui(n1, n2, 0);
+                ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                const auto rul = uldist(rng);
+                add_ui(n1, integer{}, rul);
+                mpz_raii empty;
+                ::mpz_add_ui(&m1.m_mpz, &empty.m_mpz, rul);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 add_ui(n1, n2, rul);
                 ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, rul);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
