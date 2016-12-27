@@ -1998,7 +1998,8 @@ private:
             return true;
         }
         if (mppp_unlikely(!sign1)) {
-            rop._mp_size = (l2 != 0u);
+            // NOTE: this has to be 1 because l2 == 0 is handled above.
+            rop._mp_size = 1;
             rdata[0] = l2;
             return true;
         }
