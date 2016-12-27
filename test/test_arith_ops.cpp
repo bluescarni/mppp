@@ -259,3 +259,69 @@ TEST_CASE("sub")
 {
     tuple_for_each(sizes{}, sub_tester{});
 }
+
+struct mul_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        integer n1{1}, n2{-2};
+        REQUIRE((lex_cast(n1 * n2) == "-2"));
+        REQUIRE((std::is_same<decltype(n1 * n2), integer>::value));
+        REQUIRE((lex_cast(n1 * char(4)) == "4"));
+        REQUIRE((lex_cast(char(4) * n2) == "-8"));
+        REQUIRE((std::is_same<decltype(n1 * char(4)), integer>::value));
+        REQUIRE((std::is_same<decltype(char(4) * n2), integer>::value));
+        REQUIRE((lex_cast(n1 * (unsigned char)(4)) == "4"));
+        REQUIRE((lex_cast((unsigned char)(4) * n2) == "-8"));
+        REQUIRE((lex_cast(n1 * short(4)) == "4"));
+        REQUIRE((lex_cast(short(4) * n2) == "-8"));
+        REQUIRE((lex_cast(n1 * 4) == "4"));
+        REQUIRE((lex_cast(4 * n2) == "-8"));
+        REQUIRE((std::is_same<decltype(n1 * 4), integer>::value));
+        REQUIRE((std::is_same<decltype(4 * n2), integer>::value));
+        REQUIRE((lex_cast(n1 * 4u) == "4"));
+        REQUIRE((lex_cast(4u * n2) == "-8"));
+        REQUIRE((n1 * 4.f == 4.f));
+        REQUIRE((4.f * n2 == -8.f));
+        REQUIRE((std::is_same<decltype(n1 * 4.f), float>::value));
+        REQUIRE((std::is_same<decltype(4.f * n2), float>::value));
+        REQUIRE((n1 * 4. == 4.));
+        REQUIRE((4. * n2 == -8.));
+        REQUIRE((std::is_same<decltype(n1 * 4.), double>::value));
+        REQUIRE((std::is_same<decltype(4. * n2), double>::value));
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        REQUIRE((n1 * 4.l == 4.l));
+        REQUIRE((4.l * n2 == -8.l));
+        REQUIRE((std::is_same<decltype(n1 * 4.l), long double>::value));
+        REQUIRE((std::is_same<decltype(4.l * n2), long double>::value));
+#endif
+        // In-place add.
+        integer retval{1};
+        retval *= n1;
+        REQUIRE((lex_cast(retval) == "1"));
+        retval *= 1;
+        REQUIRE((lex_cast(retval) == "1"));
+        retval *= short(-1);
+        REQUIRE((lex_cast(retval) == "-1"));
+        retval *= (signed char)(-1);
+        REQUIRE((lex_cast(retval) == "1"));
+        retval *= (long long)(-5);
+        REQUIRE((lex_cast(retval) == "-5"));
+        retval *= (unsigned long long)(20);
+        REQUIRE((lex_cast(retval) == "-100"));
+        retval *= 2.5f;
+        REQUIRE((lex_cast(retval) == "-250"));
+        retval *= -3.5;
+        REQUIRE((lex_cast(retval) == "875"));
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        retval *= -1.5l;
+        REQUIRE((lex_cast(retval) == "-1312"));
+#endif
+    }
+};
+
+TEST_CASE("mul")
+{
+    tuple_for_each(sizes{}, mul_tester{});
+}

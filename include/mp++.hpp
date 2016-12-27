@@ -2426,6 +2426,54 @@ private:
         }
         return retval;
     }
+    // Dispatching for the binary multiplication operator.
+    static mp_integer dispatch_binary_mul(const mp_integer &op1, const mp_integer &op2)
+    {
+        mp_integer retval;
+        mul(retval, op1, op2);
+        return retval;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static mp_integer dispatch_binary_mul(const mp_integer &op1, T n)
+    {
+        // NOTE: with respect to addition, here we separate the retval
+        // from the operands. Having a separate destination is generally better
+        // for multiplication.
+        mp_integer retval;
+        mul(retval, op1, mp_integer{n});
+        return retval;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static mp_integer dispatch_binary_mul(T n, const mp_integer &op2)
+    {
+        return dispatch_binary_mul(op2, n);
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static T dispatch_binary_mul(const mp_integer &op1, T x)
+    {
+        return static_cast<T>(op1) * x;
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static T dispatch_binary_mul(T x, const mp_integer &op2)
+    {
+        return dispatch_binary_mul(op2, x);
+    }
+    // Dispatching for in-place multiplication.
+    static void dispatch_in_place_mul(mp_integer &retval, const mp_integer &n)
+    {
+        mul(retval, retval, n);
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static void dispatch_in_place_mul(mp_integer &retval, const T &n)
+    {
+        mul(retval, retval, mp_integer{n});
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static void dispatch_in_place_mul(mp_integer &retval, const T &x)
+    {
+        retval = static_cast<T>(retval) * x;
+    }
+
 
 public:
     friend void mul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
@@ -2448,23 +2496,18 @@ public:
         }
         ::mpz_mul(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     }
-    mp_integer &operator*=(const mp_integer &other)
+    /// Binary multiplication operator.
+    template <typename T, typename U>
+    friend common_t<T, U> operator*(const T &op1, const U &op2)
     {
-        mul(*this, *this, other);
+        return dispatch_binary_mul(op1, op2);
+    }
+    /// In-place multiplication.
+    template <typename T, in_place_enabler<T> = 0>
+    mp_integer &operator*=(const T &op)
+    {
+        dispatch_in_place_mul(*this, op);
         return *this;
-    }
-    friend mp_integer operator*(const mp_integer &a, const mp_integer &b)
-    {
-        mp_integer retval;
-        mul(retval, a, b);
-        return retval;
-    }
-    friend mp_integer operator*(const mp_integer &a, int n)
-    {
-        mp_integer retval;
-        const mp_integer b{n};
-        mul(retval, a, b);
-        return retval;
     }
     int sign() const
     {
