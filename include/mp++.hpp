@@ -1895,6 +1895,21 @@ private:
     {
         return -dispatch_binary_sub(op2, x);
     }
+    // Dispatching for in-place sub.
+    static void dispatch_in_place_sub(mp_integer &retval, const mp_integer &n)
+    {
+        sub(retval, retval, n);
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static void dispatch_in_place_sub(mp_integer &retval, const T &n)
+    {
+        sub(retval, retval, mp_integer{n});
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static void dispatch_in_place_sub(mp_integer &retval, const T &x)
+    {
+        retval = static_cast<T>(retval) - x;
+    }
 
 public:
     /// Ternary add.
@@ -1941,7 +1956,7 @@ public:
      */
     mp_integer &operator++()
     {
-        add_ui(*this,*this,1u);
+        add_ui(*this, *this, 1u);
         return *this;
     }
     /// Suffix increment.
@@ -1993,6 +2008,32 @@ public:
     {
         dispatch_in_place_sub(*this, op);
         return *this;
+    }
+    /// Prefix decrement.
+    /**
+     * Decrement \p this by one.
+     *
+     * @return reference to \p this after the decrement.
+     */
+    mp_integer &operator--()
+    {
+        // NOTE: this should be written in terms of sub_ui(), once implemented.
+        neg();
+        add_ui(*this, *this, 1u);
+        neg();
+        return *this;
+    }
+    /// Suffix decrement.
+    /**
+     * Decrement \p this by one and return a copy of \p this as it was before the decrement.
+     *
+     * @return a copy of \p this before the decrement.
+     */
+    mp_integer operator--(int)
+    {
+        mp_integer retval(*this);
+        --(*this);
+        return retval;
     }
 
 private:

@@ -110,7 +110,7 @@ struct add_tester {
         retval = integer{0};
         REQUIRE((lex_cast(++retval) == "1"));
         REQUIRE((lex_cast(++retval) == "2"));
-        REQUIRE((std::is_same<decltype(++retval),integer &>::value));
+        REQUIRE((std::is_same<decltype(++retval), integer &>::value));
         retval = integer{-2};
         ++retval;
         REQUIRE((lex_cast(retval) == "-1"));
@@ -189,6 +189,69 @@ struct sub_tester {
         REQUIRE((std::is_same<decltype(n1 - 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l - n2), long double>::value));
 #endif
+        // In-place add.
+        integer retval{1};
+        retval -= n1;
+        REQUIRE((lex_cast(retval) == "0"));
+        retval -= 1;
+        REQUIRE((lex_cast(retval) == "-1"));
+        retval -= short(-1);
+        REQUIRE((lex_cast(retval) == "0"));
+        retval -= (signed char)(-1);
+        REQUIRE((lex_cast(retval) == "1"));
+        retval -= (long long)(-5);
+        REQUIRE((lex_cast(retval) == "6"));
+        retval -= (unsigned long long)(20);
+        REQUIRE((lex_cast(retval) == "-14"));
+        retval -= 2.5f;
+        REQUIRE((lex_cast(retval) == "-16"));
+        retval -= -3.5;
+        REQUIRE((lex_cast(retval) == "-12"));
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        retval -= -1.5l;
+        REQUIRE((lex_cast(retval) == "-10"));
+#endif
+        // Increment ops.
+        retval = integer{0};
+        REQUIRE((lex_cast(--retval) == "-1"));
+        REQUIRE((lex_cast(--retval) == "-2"));
+        REQUIRE((std::is_same<decltype(--retval), integer &>::value));
+        retval = integer{2};
+        --retval;
+        REQUIRE((lex_cast(retval) == "1"));
+        --retval;
+        REQUIRE((lex_cast(retval) == "0"));
+        --retval;
+        REQUIRE((lex_cast(retval) == "-1"));
+        REQUIRE((lex_cast(retval--) == "-1"));
+        REQUIRE((lex_cast(retval--) == "-2"));
+        REQUIRE((lex_cast(retval--) == "-3"));
+        // Couple of tests at the boundaries
+        mpz_raii tmp;
+        retval = integer{GMP_NUMB_MAX};
+        retval.neg();
+        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        --retval;
+        ::mpz_sub_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        REQUIRE((lex_cast(retval) == lex_cast(tmp)));
+        retval = integer{GMP_NUMB_MAX};
+        mul_2exp(retval, retval, GMP_NUMB_BITS);
+        add(retval, retval, integer{GMP_NUMB_MAX});
+        retval.neg();
+        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        retval--;
+        ::mpz_sub_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        REQUIRE((lex_cast(retval) == lex_cast(tmp)));
+        retval = integer{GMP_NUMB_MAX};
+        mul_2exp(retval, retval, GMP_NUMB_BITS);
+        add(retval, retval, integer{GMP_NUMB_MAX});
+        mul_2exp(retval, retval, GMP_NUMB_BITS);
+        add(retval, retval, integer{GMP_NUMB_MAX});
+        retval.neg();
+        ::mpz_set(&tmp.m_mpz, retval.get_mpz_view());
+        retval--;
+        ::mpz_sub_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
+        REQUIRE((lex_cast(retval) == lex_cast(tmp)));
     }
 };
 
