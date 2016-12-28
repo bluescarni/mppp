@@ -494,25 +494,25 @@ struct shift_tester {
             REQUIRE_THROWS_PREDICATE(
                 ret << std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
                     return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<unsigned long long>::max())
+                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
                                   + ": the value is too large";
                 });
             REQUIRE_THROWS_PREDICATE(
                 ret <<= std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
                     return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<unsigned long long>::max())
+                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
                                   + ": the value is too large";
                 });
             REQUIRE_THROWS_PREDICATE(
                 ret >> std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
                     return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<unsigned long long>::max())
+                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
                                   + ": the value is too large";
                 });
             REQUIRE_THROWS_PREDICATE(
                 ret >>= std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
                     return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<unsigned long long>::max())
+                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
                                   + ": the value is too large";
                 });
         }
