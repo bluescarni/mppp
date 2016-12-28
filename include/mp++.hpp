@@ -3568,7 +3568,7 @@ private:
         }
         return 0;
     }
-    // Relational operators.
+    // Equality operator.
     static bool dispatch_equality(const mp_integer &a, const mp_integer &b)
     {
         const mp_size_t size_a = a.m_int.m_st._mp_size, size_b = b.m_int.m_st._mp_size;
@@ -3602,7 +3602,7 @@ private:
     template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
     static bool dispatch_equality(const mp_integer &a, T n)
     {
-        return a == mp_integer{n};
+        return dispatch_equality(a,mp_integer{n});
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
     static bool dispatch_equality(T n, const mp_integer &a)
@@ -3618,6 +3618,56 @@ private:
     static bool dispatch_equality(T x, const mp_integer &a)
     {
         return dispatch_equality(a,x);
+    }
+    // Less-than operator.
+    static bool dispatch_less_than(const mp_integer &a, const mp_integer &b)
+    {
+        return cmp(a,b) < 0;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    static bool dispatch_less_than(const mp_integer &a, T n)
+    {
+        return dispatch_less_than(a,mp_integer{n});
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    static bool dispatch_less_than(T n, const mp_integer &a)
+    {
+        return dispatch_greater_than(a,mp_integer{n});
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    static bool dispatch_less_than(const mp_integer &a, T x)
+    {
+        return static_cast<T>(a) < x;
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    static bool dispatch_less_than(T x, const mp_integer &a)
+    {
+        return dispatch_greater_than(a,x);
+    }
+    // Greater-than operator.
+    static bool dispatch_greater_than(const mp_integer &a, const mp_integer &b)
+    {
+        return cmp(a,b) > 0;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    static bool dispatch_greater_than(const mp_integer &a, T n)
+    {
+        return dispatch_greater_than(a,mp_integer{n});
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    static bool dispatch_greater_than(T n, const mp_integer &a)
+    {
+        return dispatch_less_than(a,mp_integer{n});
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    static bool dispatch_greater_than(const mp_integer &a, T x)
+    {
+        return static_cast<T>(a) > x;
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    static bool dispatch_greater_than(T x, const mp_integer &a)
+    {
+        return dispatch_less_than(a,x);
     }
     // The enabler for relational operators.
     template <typename T, typename U>

@@ -91,9 +91,9 @@ struct abs_tester {
                 ::mpz_abs(&m1.m_mpz, &m2.m_mpz);
                 abs(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((n1 == abs(n2)));
+                REQUIRE((lex_cast(n1) == lex_cast(abs(n2))));
                 n2.abs();
-                REQUIRE((n1 == n2));
+                REQUIRE((lex_cast(n1) == lex_cast(n2)));
             }
         };
 

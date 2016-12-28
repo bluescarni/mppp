@@ -93,9 +93,9 @@ struct nextprime_tester {
                 ::mpz_nextprime(&m1.m_mpz, &m2.m_mpz);
                 nextprime(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((n1 == nextprime(n2)));
+                REQUIRE((lex_cast(n1) == lex_cast(nextprime(n2))));
                 n2.nextprime();
-                REQUIRE((n1 == n2));
+                REQUIRE((lex_cast(n1) == lex_cast(n2)));
             }
         };
 
