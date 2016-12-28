@@ -421,10 +421,6 @@ TEST_CASE("div")
     tuple_for_each(sizes{}, div_tester{});
 }
 
-// There's a bad interaction between the stream operator and the bit shift overloads in MSVC, which leads
-// to ICE. Let's disable the tests for now.
-#if !defined(_MSC_VER)
-
 struct shift_tester {
     template <typename S>
     void operator()(const S &) const
@@ -523,8 +519,6 @@ TEST_CASE("shift")
 {
     tuple_for_each(sizes{}, shift_tester{});
 }
-
-#endif
 
 struct mod_tester {
     template <typename S>

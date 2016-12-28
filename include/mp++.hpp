@@ -1158,9 +1158,14 @@ class mp_integer
     // Enabler for in-place arithmetic ops.
     template <typename T>
     using in_place_enabler = enable_if_t<is_supported_interop<T>::value || std::is_same<T, mp_integer>::value, int>;
-    // Common metaprogramming for bit shifting operators.
+// Common metaprogramming for bit shifting operators.
+#if defined(_MSC_VER)
+    template <typename T>
+    using shift_op_enabler = enable_if_t<std::is_integral<T>::value, mp_integer>;
+#else
     template <typename T>
     using shift_op_enabler = enable_if_t<std::is_integral<T>::value, int>;
+#endif
     template <typename T, enable_if_t<std::is_unsigned<T>::value, int> = 0>
     static ::mp_bitcnt_t cast_to_bitcnt(T n)
     {
@@ -3334,16 +3339,27 @@ public:
         }
         ::mpz_mul_2exp(&rop.m_int.g_dy(), n.get_mpz_view(), s);
     }
+#if defined(_MSC_VER)
+    template <typename T>
+    friend shift_op_enabler<T> operator<<(const mp_integer &n, T shift)
+#else
+    /// Left shift.
     template <typename T, shift_op_enabler<T> = 0>
     friend mp_integer operator<<(const mp_integer &n, T shift)
+#endif
     {
         const auto s = cast_to_bitcnt(shift);
         mp_integer retval;
         mul_2exp(retval, n, s);
         return retval;
     }
+#if defined(_MSC_VER)
+    template <typename T>
+    shift_op_enabler<T> &operator<<=(T shift)
+#else
     template <typename T, shift_op_enabler<T> = 0>
     mp_integer &operator<<=(T shift)
+#endif
     {
         const auto s = cast_to_bitcnt(shift);
         mul_2exp(*this, *this, s);
@@ -3491,16 +3507,27 @@ public:
         }
         ::mpz_tdiv_q_2exp(&rop.m_int.g_dy(), n.get_mpz_view(), s);
     }
+#if defined(_MSC_VER)
+    template <typename T>
+    friend shift_op_enabler<T> operator>>(const mp_integer &n, T shift)
+#else
+    /// Left shift.
     template <typename T, shift_op_enabler<T> = 0>
     friend mp_integer operator>>(const mp_integer &n, T shift)
+#endif
     {
         const auto s = cast_to_bitcnt(shift);
         mp_integer retval;
         tdiv_q_2exp(retval, n, s);
         return retval;
     }
+#if defined(_MSC_VER)
+    template <typename T>
+    shift_op_enabler<T> &operator>>=(T shift)
+#else
     template <typename T, shift_op_enabler<T> = 0>
     mp_integer &operator>>=(T shift)
+#endif
     {
         const auto s = cast_to_bitcnt(shift);
         tdiv_q_2exp(*this, *this, s);
@@ -3599,79 +3626,84 @@ private:
         return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
 #endif
     }
-    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
     static bool dispatch_equality(const mp_integer &a, T n)
     {
-        return dispatch_equality(a,mp_integer{n});
+        return dispatch_equality(a, mp_integer{n});
     }
-    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
     static bool dispatch_equality(T n, const mp_integer &a)
     {
-        return dispatch_equality(a,n);
+        return dispatch_equality(a, n);
     }
-    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static bool dispatch_equality(const mp_integer &a, T x)
     {
         return static_cast<T>(a) == x;
     }
-    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static bool dispatch_equality(T x, const mp_integer &a)
     {
-        return dispatch_equality(a,x);
+        return dispatch_equality(a, x);
     }
     // Less-than operator.
     static bool dispatch_less_than(const mp_integer &a, const mp_integer &b)
     {
-        return cmp(a,b) < 0;
+        return cmp(a, b) < 0;
     }
-    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
     static bool dispatch_less_than(const mp_integer &a, T n)
     {
-        return dispatch_less_than(a,mp_integer{n});
+        return dispatch_less_than(a, mp_integer{n});
     }
-    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
     static bool dispatch_less_than(T n, const mp_integer &a)
     {
-        return dispatch_greater_than(a,mp_integer{n});
+        return dispatch_greater_than(a, mp_integer{n});
     }
-    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static bool dispatch_less_than(const mp_integer &a, T x)
     {
         return static_cast<T>(a) < x;
     }
-    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static bool dispatch_less_than(T x, const mp_integer &a)
     {
-        return dispatch_greater_than(a,x);
+        return dispatch_greater_than(a, x);
     }
     // Greater-than operator.
     static bool dispatch_greater_than(const mp_integer &a, const mp_integer &b)
     {
-        return cmp(a,b) > 0;
+        return cmp(a, b) > 0;
     }
-    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
     static bool dispatch_greater_than(const mp_integer &a, T n)
     {
-        return dispatch_greater_than(a,mp_integer{n});
+        return dispatch_greater_than(a, mp_integer{n});
     }
-    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
     static bool dispatch_greater_than(T n, const mp_integer &a)
     {
-        return dispatch_less_than(a,mp_integer{n});
+        return dispatch_less_than(a, mp_integer{n});
     }
-    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static bool dispatch_greater_than(const mp_integer &a, T x)
     {
         return static_cast<T>(a) > x;
     }
-    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
     static bool dispatch_greater_than(T x, const mp_integer &a)
     {
-        return dispatch_less_than(a,x);
+        return dispatch_less_than(a, x);
     }
-    // The enabler for relational operators.
+// The enabler for relational operators.
+#if defined(_MSC_VER)
     template <typename T, typename U>
-    using rel_enabler = enable_if_t<!std::is_same<void,common_t<T,U>>::value,int>;
+    using rel_enabler = enable_if_t<!std::is_same<void, common_t<T, U>>::value, bool>;
+#else
+    template <typename T, typename U>
+    using rel_enabler = enable_if_t<!std::is_same<void, common_t<T, U>>::value, int>;
+#endif
 
 public:
     friend int cmp(const mp_integer &op1, const mp_integer &op2)
@@ -3682,33 +3714,63 @@ public:
         }
         return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
     }
-    template <typename T, typename U, rel_enabler<T,U> = 0>
+#if defined(_MSC_VER)
+    template <typename T, typename U>
+    friend rel_enabler<T, U> operator==(const T &a, const U &b)
+#else
+    template <typename T, typename U, rel_enabler<T, U> = 0>
     friend bool operator==(const T &a, const U &b)
+#endif
     {
-        return dispatch_equality(a,b);
+        return dispatch_equality(a, b);
     }
-    template <typename T, typename U, rel_enabler<T,U> = 0>
+#if defined(_MSC_VER)
+    template <typename T, typename U>
+    friend rel_enabler<T, U> operator!=(const T &a, const U &b)
+#else
+    template <typename T, typename U, rel_enabler<T, U> = 0>
     friend bool operator!=(const T &a, const U &b)
+#endif
     {
         return !(a == b);
     }
-    template <typename T, typename U, rel_enabler<T,U> = 0>
+#if defined(_MSC_VER)
+    template <typename T, typename U>
+    friend rel_enabler<T, U> operator<(const T &a, const U &b)
+#else
+    template <typename T, typename U, rel_enabler<T, U> = 0>
     friend bool operator<(const T &a, const U &b)
+#endif
     {
-        return dispatch_less_than(a,b);
+        return dispatch_less_than(a, b);
     }
-    template <typename T, typename U, rel_enabler<T,U> = 0>
+#if defined(_MSC_VER)
+    template <typename T, typename U>
+    friend rel_enabler<T, U> operator>=(const T &a, const U &b)
+#else
+    template <typename T, typename U, rel_enabler<T, U> = 0>
     friend bool operator>=(const T &a, const U &b)
+#endif
     {
         return !(a < b);
     }
-    template <typename T, typename U, rel_enabler<T,U> = 0>
+#if defined(_MSC_VER)
+    template <typename T, typename U>
+    friend rel_enabler<T, U> operator>(const T &a, const U &b)
+#else
+    template <typename T, typename U, rel_enabler<T, U> = 0>
     friend bool operator>(const T &a, const U &b)
+#endif
     {
-        return dispatch_greater_than(a,b);
+        return dispatch_greater_than(a, b);
     }
-    template <typename T, typename U, rel_enabler<T,U> = 0>
+#if defined(_MSC_VER)
+    template <typename T, typename U>
+    friend rel_enabler<T, U> operator<=(const T &a, const U &b)
+#else
+    template <typename T, typename U, rel_enabler<T, U> = 0>
     friend bool operator<=(const T &a, const U &b)
+#endif
     {
         return !(a > b);
     }
