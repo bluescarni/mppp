@@ -192,7 +192,7 @@ struct sub_tester {
         REQUIRE((std::is_same<decltype(n1 - 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l - n2), long double>::value));
 #endif
-        // In-place add.
+        // In-place sub.
         integer retval{1};
         retval -= n1;
         REQUIRE((lex_cast(retval) == "0"));
@@ -299,7 +299,7 @@ struct mul_tester {
         REQUIRE((std::is_same<decltype(n1 * 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l * n2), long double>::value));
 #endif
-        // In-place add.
+        // In-place mul.
         integer retval{1};
         retval *= n1;
         REQUIRE((lex_cast(retval) == "1"));
@@ -365,7 +365,7 @@ struct div_tester {
         REQUIRE((std::is_same<decltype(n1 / 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l / n2), long double>::value));
 #endif
-        // In-place add.
+        // In-place div.
         integer retval{2};
         retval /= n1;
         REQUIRE((lex_cast(retval) == "0"));
@@ -525,3 +525,68 @@ TEST_CASE("shift")
 }
 
 #endif
+
+struct mod_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        integer n1{4}, n2{-2};
+        REQUIRE((lex_cast(n1 % n2) == "0"));
+        REQUIRE((std::is_same<decltype(n1 % n2), integer>::value));
+        REQUIRE((lex_cast(n1 % char(3)) == "1"));
+        REQUIRE((lex_cast(char(3) % n2) == "1"));
+        REQUIRE((std::is_same<decltype(n1 % char(4)), integer>::value));
+        REQUIRE((std::is_same<decltype(char(4) % n2), integer>::value));
+        REQUIRE((lex_cast(-n1 % (unsigned char)(3)) == "-1"));
+        REQUIRE((lex_cast((unsigned char)(3) % n2) == "1"));
+        REQUIRE((lex_cast(n1 % short(3)) == "1"));
+        REQUIRE((lex_cast(-short(3) % n2) == "-1"));
+        REQUIRE((lex_cast(n1 % -3) == "1"));
+        REQUIRE((lex_cast(3 % -n2) == "1"));
+        REQUIRE((std::is_same<decltype(n1 % 4), integer>::value));
+        REQUIRE((std::is_same<decltype(4 % n2), integer>::value));
+        REQUIRE((lex_cast(n1 % 3u) == "1"));
+        REQUIRE((lex_cast(3u % n2) == "1"));
+        REQUIRE((lex_cast(0u % n2) == "0"));
+        // In-place mod.
+        integer retval{-2};
+        retval %= n1;
+        REQUIRE((lex_cast(retval) == "-2"));
+        retval = 3;
+        retval %= 2;
+        REQUIRE((lex_cast(retval) == "1"));
+        retval = -3;
+        retval %= short(2);
+        REQUIRE((lex_cast(retval) == "-1"));
+        retval %= (signed char)(-1);
+        REQUIRE((lex_cast(retval) == "0"));
+        retval = 26;
+        retval %= (long long)(-5);
+        REQUIRE((lex_cast(retval) == "1"));
+        retval = -19;
+        retval %= (unsigned long long)(7);
+        REQUIRE((lex_cast(retval) == "-5"));
+        // Error checking.
+        REQUIRE_THROWS_PREDICATE(integer{1} % integer{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(integer{1} % 0, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(1 % integer{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(retval %= integer{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(retval %= 0, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+    }
+};
+
+TEST_CASE("mod")
+{
+    tuple_for_each(sizes{}, mod_tester{});
+}

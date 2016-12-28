@@ -3069,6 +3069,46 @@ private:
     {
         retval = static_cast<T>(retval) / x;
     }
+    // Enablers for modulo operators. They are special because they don't accept floating-point.
+    template <typename T, typename U>
+    using common_mod_t
+        = enable_if_t<!std::is_floating_point<T>::value && !std::is_floating_point<U>::value, common_t<T, U>>;
+    template <typename T>
+    using in_place_mod_enabler
+        = enable_if_t<is_supported_integral<T>::value || std::is_same<T, mp_integer>::value, int>;
+    // Dispatching for the binary modulo operator.
+    static mp_integer dispatch_binary_mod(const mp_integer &op1, const mp_integer &op2)
+    {
+        mp_integer q, retval;
+        tdiv_qr(q, retval, op1, op2);
+        return retval;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static mp_integer dispatch_binary_mod(const mp_integer &op1, T n)
+    {
+        mp_integer q, retval;
+        tdiv_qr(q, retval, op1, mp_integer{n});
+        return retval;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static mp_integer dispatch_binary_mod(T n, const mp_integer &op2)
+    {
+        mp_integer q, retval;
+        tdiv_qr(q, retval, mp_integer{n}, op2);
+        return retval;
+    }
+    // Dispatching for in-place mod.
+    static void dispatch_in_place_mod(mp_integer &retval, const mp_integer &n)
+    {
+        mp_integer q;
+        tdiv_qr(q, retval, retval, n);
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static void dispatch_in_place_mod(mp_integer &retval, const T &n)
+    {
+        mp_integer q;
+        tdiv_qr(q, retval, retval, mp_integer{n});
+    }
 
 public:
     /// Truncated division.
@@ -3109,6 +3149,19 @@ public:
     mp_integer &operator/=(const T &op)
     {
         dispatch_in_place_div(*this, op);
+        return *this;
+    }
+    /// Binary modulo operator.
+    template <typename T, typename U>
+    friend common_mod_t<T, U> operator%(const T &op1, const U &op2)
+    {
+        return dispatch_binary_mod(op1, op2);
+    }
+    /// In-place modulo operator.
+    template <typename T, in_place_mod_enabler<T> = 0>
+    mp_integer &operator%=(const T &op)
+    {
+        dispatch_in_place_mod(*this, op);
         return *this;
     }
 
