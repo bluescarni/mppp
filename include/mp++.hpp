@@ -1165,7 +1165,7 @@ class mp_integer
     static ::mp_bitcnt_t cast_to_bitcnt(T n)
     {
         if (mppp_unlikely(n > std::numeric_limits<::mp_bitcnt_t>::max())) {
-            throw std::domain_error("A too large bit shift value of " + std::to_string(n) + " was requested");
+            throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
         }
         return static_cast<::mp_bitcnt_t>(n);
     }
