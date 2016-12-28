@@ -651,7 +651,7 @@ struct static_int {
     explicit static_int(Float f, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (mppp_unlikely(!std::isfinite(f))) {
-            throw std::invalid_argument("Cannot init integer from non-finite floating-point value.");
+            throw std::invalid_argument("Cannot init integer from non-finite floating-point value");
         }
         ::mpz_set_d(&mpz.m_mpz, static_cast<double>(f));
         ctor_from_mpz(mpz);
@@ -661,7 +661,7 @@ struct static_int {
     explicit static_int(long double x, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
     {
         if (!std::isfinite(x)) {
-            throw std::invalid_argument("Cannot init integer from non-finite floating-point value.");
+            throw std::invalid_argument("Cannot init integer from non-finite floating-point value");
         }
         MPPP_MAYBE_TLS mpfr_raii mpfr;
         // NOTE: static checks for overflows are done above.
@@ -2474,7 +2474,6 @@ private:
         retval = static_cast<T>(retval) * x;
     }
 
-
 public:
     friend void mul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
@@ -2997,6 +2996,54 @@ private:
             r.zero_unused_limbs();
         }
     }
+    // Dispatching for the binary division operator.
+    static mp_integer dispatch_binary_div(const mp_integer &op1, const mp_integer &op2)
+    {
+        mp_integer retval, r;
+        tdiv_qr(retval, r, op1, op2);
+        return retval;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static mp_integer dispatch_binary_div(const mp_integer &op1, T n)
+    {
+        mp_integer retval, r;
+        tdiv_qr(retval, r, op1, mp_integer{n});
+        return retval;
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static mp_integer dispatch_binary_div(T n, const mp_integer &op2)
+    {
+        mp_integer retval, r;
+        tdiv_qr(retval, r, mp_integer{n}, op2);
+        return retval;
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static T dispatch_binary_div(const mp_integer &op1, T x)
+    {
+        return static_cast<T>(op1) / x;
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static T dispatch_binary_div(T x, const mp_integer &op2)
+    {
+        return x / static_cast<T>(op2);
+    }
+    // Dispatching for in-place div.
+    static void dispatch_in_place_div(mp_integer &retval, const mp_integer &n)
+    {
+        mp_integer r;
+        tdiv_qr(retval, r, retval, n);
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+    static void dispatch_in_place_div(mp_integer &retval, const T &n)
+    {
+        mp_integer r;
+        tdiv_qr(retval, r, retval, mp_integer{n});
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+    static void dispatch_in_place_div(mp_integer &retval, const T &x)
+    {
+        retval = static_cast<T>(retval) / x;
+    }
 
 public:
     /// Truncated division.
@@ -3025,6 +3072,19 @@ public:
             r.m_int.promote();
         }
         ::mpz_tdiv_qr(&q.m_int.g_dy(), &r.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    }
+    /// Binary division operator.
+    template <typename T, typename U>
+    friend common_t<T, U> operator/(const T &op1, const U &op2)
+    {
+        return dispatch_binary_div(op1, op2);
+    }
+    /// In-place division.
+    template <typename T, in_place_enabler<T> = 0>
+    mp_integer &operator/=(const T &op)
+    {
+        dispatch_in_place_div(*this, op);
+        return *this;
     }
 
 private:

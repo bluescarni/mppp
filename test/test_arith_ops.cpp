@@ -28,6 +28,8 @@ see https://www.gnu.org/licenses/. */
 
 #include <cstddef>
 #include <gmp.h>
+#include <stdexcept>
+#include <string>
 #include <tuple>
 #include <type_traits>
 
@@ -324,4 +326,96 @@ struct mul_tester {
 TEST_CASE("mul")
 {
     tuple_for_each(sizes{}, mul_tester{});
+}
+
+struct div_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        integer n1{4}, n2{-2};
+        REQUIRE((lex_cast(n1 / n2) == "-2"));
+        REQUIRE((std::is_same<decltype(n1 / n2), integer>::value));
+        REQUIRE((lex_cast(n1 / char(4)) == "1"));
+        REQUIRE((lex_cast(char(4) / n2) == "-2"));
+        REQUIRE((std::is_same<decltype(n1 / char(4)), integer>::value));
+        REQUIRE((std::is_same<decltype(char(4) / n2), integer>::value));
+        REQUIRE((lex_cast(n1 / (unsigned char)(4)) == "1"));
+        REQUIRE((lex_cast((unsigned char)(4) / n2) == "-2"));
+        REQUIRE((lex_cast(n1 / short(4)) == "1"));
+        REQUIRE((lex_cast(short(4) / n2) == "-2"));
+        REQUIRE((lex_cast(n1 / 4) == "1"));
+        REQUIRE((lex_cast(4 / n2) == "-2"));
+        REQUIRE((std::is_same<decltype(n1 / 4), integer>::value));
+        REQUIRE((std::is_same<decltype(4 / n2), integer>::value));
+        REQUIRE((lex_cast(n1 / 4u) == "1"));
+        REQUIRE((lex_cast(4u / n2) == "-2"));
+        REQUIRE((n1 / 4.f == 1.f));
+        REQUIRE((4.f / n2 == -2.f));
+        REQUIRE((std::is_same<decltype(n1 / 4.f), float>::value));
+        REQUIRE((std::is_same<decltype(4.f / n2), float>::value));
+        REQUIRE((n1 / 4. == 1.));
+        REQUIRE((4. / n2 == -2.));
+        REQUIRE((std::is_same<decltype(n1 / 4.), double>::value));
+        REQUIRE((std::is_same<decltype(4. / n2), double>::value));
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        REQUIRE((n1 / 4.l == 1.l));
+        REQUIRE((4.l / n2 == -2.l));
+        REQUIRE((std::is_same<decltype(n1 / 4.l), long double>::value));
+        REQUIRE((std::is_same<decltype(4.l / n2), long double>::value));
+#endif
+        // In-place add.
+        integer retval{2};
+        retval /= n1;
+        REQUIRE((lex_cast(retval) == "0"));
+        retval = 2;
+        retval /= 1;
+        REQUIRE((lex_cast(retval) == "2"));
+        retval /= short(-1);
+        REQUIRE((lex_cast(retval) == "-2"));
+        retval /= (signed char)(-1);
+        REQUIRE((lex_cast(retval) == "2"));
+        retval /= (long long)(-5);
+        REQUIRE((lex_cast(retval) == "0"));
+        retval = -20;
+        retval /= (unsigned long long)(20);
+        REQUIRE((lex_cast(retval) == "-1"));
+        retval /= 2.5f;
+        REQUIRE((lex_cast(retval) == "0"));
+        retval = 10;
+        retval *= -3.5;
+        REQUIRE((lex_cast(retval) == lex_cast(integer{10. * -3.5})));
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        retval *= -1.5l;
+        REQUIRE((lex_cast(retval) == lex_cast(integer{10. * -3.5 * -1.5l})));
+#endif
+        // Error checking.
+        REQUIRE_THROWS_PREDICATE(integer{1} / integer{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(integer{1} / 0, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(1 / integer{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(retval /= integer{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(retval /= 0, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        if (std::numeric_limits<double>::is_iec559) {
+            REQUIRE((integer{4} / 0. == std::numeric_limits<double>::infinity()));
+            REQUIRE((integer{-4} / 0. == -std::numeric_limits<double>::infinity()));
+            REQUIRE_THROWS_PREDICATE(retval /= 0., std::invalid_argument, [](const std::invalid_argument &ex) {
+                return std::string(ex.what()) == "Cannot init integer from non-finite floating-point value";
+            });
+        }
+    }
+};
+
+TEST_CASE("div")
+{
+    tuple_for_each(sizes{}, div_tester{});
 }
