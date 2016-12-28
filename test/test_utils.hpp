@@ -111,14 +111,12 @@ inline namespace impl
 {
 
 template <typename T>
-struct is_mp_integer
-{
+struct is_mp_integer {
     static const bool value = false;
 };
 
 template <std::size_t SSize>
-struct is_mp_integer<mppp::mp_integer<SSize>>
-{
+struct is_mp_integer<mppp::mp_integer<SSize>> {
     static const bool value = true;
 };
 

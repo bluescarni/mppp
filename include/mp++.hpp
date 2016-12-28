@@ -1243,10 +1243,6 @@ public:
     {
         return m_int.is_dynamic();
     }
-    friend std::ostream &operator<<(std::ostream &os, const mp_integer &n)
-    {
-        return os << n.to_string();
-    }
     std::string to_string(int base = 10) const
     {
         if (mppp_unlikely(base < 2 || base > 62)) {
@@ -3979,6 +3975,13 @@ public:
 private:
     mppp_impl::integer_union<SSize> m_int;
 };
+
+/// Streaming operator for mppp::mp_integer.
+template <std::size_t SSize>
+inline std::ostream &operator<<(std::ostream &os, const mp_integer<SSize> &n)
+{
+    return os << n.to_string();
+}
 
 namespace mppp_impl
 {
