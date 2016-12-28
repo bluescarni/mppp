@@ -2563,7 +2563,7 @@ public:
             ptr_b = b.m_int.g_dy()._mp_d;
         }
         auto limb_cmp
-            = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_BITS) == (l2 & GMP_NUMB_BITS); };
+            = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
 #if defined(_MSC_VER)
         return std::equal(stdext::make_checked_array_iterator(ptr_a, asize),
                           stdext::make_checked_array_iterator(ptr_a, asize) + asize,

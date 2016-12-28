@@ -103,6 +103,13 @@ struct cmp_tester {
                 REQUIRE(check_cmp(cmp(n1, n2), ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
                 REQUIRE(check_cmp(cmp(n1, n1), ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
                 REQUIRE(check_cmp(cmp(n2, n2), ::mpz_cmp(&m2.m_mpz, &m2.m_mpz)));
+                REQUIRE((n1 == n1));
+                REQUIRE((n2 == n2));
+                if (::mpz_cmp(&m1.m_mpz, &m2.m_mpz)) {
+                    REQUIRE((n1 != n2));
+                } else {
+                    REQUIRE((n1 == n2));
+                }
                 n2 = n1;
                 ::mpz_set(&m2.m_mpz, &m1.m_mpz);
                 if (sdist(rng) && n2.is_static()) {
@@ -113,6 +120,8 @@ struct cmp_tester {
                 REQUIRE(check_cmp(cmp(n1, n1), ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
             }
         };
+
+        random_xy(0, 0);
 
         random_xy(1, 0);
         random_xy(0, 1);
