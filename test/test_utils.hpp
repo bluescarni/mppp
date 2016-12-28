@@ -110,6 +110,18 @@ void tuple_for_each(Tuple &&t, const F &f)
 inline namespace impl
 {
 
+template <typename T>
+struct is_mp_integer
+{
+    static const bool value = false;
+};
+
+template <std::size_t SSize>
+struct is_mp_integer<mppp::mp_integer<SSize>>
+{
+    static const bool value = true;
+};
+
 template <typename T, typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, int>::type = 0>
 inline long long lex_cast_tr(T n)
 {
@@ -122,8 +134,14 @@ inline unsigned long long lex_cast_tr(T n)
     return static_cast<unsigned long long>(n);
 }
 
-template <typename T, typename std::enable_if<!std::is_integral<T>::value, int>::type = 0>
-inline const T &lex_cast_tr(const T &x)
+template <typename T, typename std::enable_if<is_mp_integer<T>::value, int>::type = 0>
+inline std::string lex_cast_tr(const T &x)
+{
+    return x.to_string();
+}
+
+template <typename T, typename std::enable_if<std::is_floating_point<T>::value, int>::type = 0>
+inline T lex_cast_tr(const T &x)
 {
     return x;
 }
