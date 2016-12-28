@@ -1528,6 +1528,15 @@ public:
         }
         return ::mpz_size(&m_int.g_dy());
     }
+    int sign() const
+    {
+        // NOTE: size is part of the common initial sequence.
+        if (m_int.m_st._mp_size != 0) {
+            return m_int.m_st._mp_size > 0 ? 1 : -1;
+        } else {
+            return 0;
+        }
+    }
     mpz_view get_mpz_view() const
     {
         return mpz_view(*this);
@@ -2532,49 +2541,6 @@ public:
     {
         dispatch_in_place_mul(*this, op);
         return *this;
-    }
-    int sign() const
-    {
-        // NOTE: size is part of the common initial sequence.
-        if (m_int.m_st._mp_size != 0) {
-            return m_int.m_st._mp_size > 0 ? 1 : -1;
-        } else {
-            return 0;
-        }
-    }
-    friend bool operator==(const mp_integer &a, const mp_integer &b)
-    {
-        const mp_size_t size_a = a.m_int.m_st._mp_size, size_b = b.m_int.m_st._mp_size;
-        if (size_a != size_b) {
-            return false;
-        }
-        const ::mp_limb_t *ptr_a, *ptr_b;
-        std::size_t asize;
-        if (a.is_static()) {
-            ptr_a = a.m_int.g_st().m_limbs.data();
-            asize = static_cast<std::size_t>((size_a >= 0) ? size_a : -size_a);
-        } else {
-            ptr_a = a.m_int.g_dy()._mp_d;
-            asize = ::mpz_size(&a.m_int.g_dy());
-        }
-        if (b.is_static()) {
-            ptr_b = b.m_int.g_st().m_limbs.data();
-        } else {
-            ptr_b = b.m_int.g_dy()._mp_d;
-        }
-        auto limb_cmp
-            = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
-#if defined(_MSC_VER)
-        return std::equal(stdext::make_checked_array_iterator(ptr_a, asize),
-                          stdext::make_checked_array_iterator(ptr_a, asize) + asize,
-                          stdext::make_checked_array_iterator(ptr_b, asize), limb_cmp);
-#else
-        return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
-#endif
-    }
-    friend bool operator!=(const mp_integer &a, const mp_integer &b)
-    {
-        return !(a == b);
     }
 
 private:
@@ -3602,6 +3568,60 @@ private:
         }
         return 0;
     }
+    // Relational operators.
+    static bool dispatch_equality(const mp_integer &a, const mp_integer &b)
+    {
+        const mp_size_t size_a = a.m_int.m_st._mp_size, size_b = b.m_int.m_st._mp_size;
+        if (size_a != size_b) {
+            return false;
+        }
+        const ::mp_limb_t *ptr_a, *ptr_b;
+        std::size_t asize;
+        if (a.is_static()) {
+            ptr_a = a.m_int.g_st().m_limbs.data();
+            asize = static_cast<std::size_t>((size_a >= 0) ? size_a : -size_a);
+        } else {
+            ptr_a = a.m_int.g_dy()._mp_d;
+            asize = ::mpz_size(&a.m_int.g_dy());
+        }
+        if (b.is_static()) {
+            ptr_b = b.m_int.g_st().m_limbs.data();
+        } else {
+            ptr_b = b.m_int.g_dy()._mp_d;
+        }
+        auto limb_cmp
+            = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
+#if defined(_MSC_VER)
+        return std::equal(stdext::make_checked_array_iterator(ptr_a, asize),
+                          stdext::make_checked_array_iterator(ptr_a, asize) + asize,
+                          stdext::make_checked_array_iterator(ptr_b, asize), limb_cmp);
+#else
+        return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
+#endif
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    static bool dispatch_equality(const mp_integer &a, T n)
+    {
+        return a == mp_integer{n};
+    }
+    template <typename T, enable_if_t<is_supported_integral<T>::value,int> = 0>
+    static bool dispatch_equality(T n, const mp_integer &a)
+    {
+        return dispatch_equality(a,n);
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    static bool dispatch_equality(const mp_integer &a, T x)
+    {
+        return static_cast<T>(a) == x;
+    }
+    template <typename T, enable_if_t<is_supported_float<T>::value,int> = 0>
+    static bool dispatch_equality(T x, const mp_integer &a)
+    {
+        return dispatch_equality(a,x);
+    }
+    // The enabler for relational operators.
+    template <typename T, typename U>
+    using rel_enabler = enable_if_t<!std::is_same<void,common_t<T,U>>::value,int>;
 
 public:
     friend int cmp(const mp_integer &op1, const mp_integer &op2)
@@ -3611,6 +3631,36 @@ public:
             return static_cmp(op1.m_int.g_st(), op2.m_int.g_st(), static_cmp_algo<s_int>{});
         }
         return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
+    }
+    template <typename T, typename U, rel_enabler<T,U> = 0>
+    friend bool operator==(const T &a, const U &b)
+    {
+        return dispatch_equality(a,b);
+    }
+    template <typename T, typename U, rel_enabler<T,U> = 0>
+    friend bool operator!=(const T &a, const U &b)
+    {
+        return !(a == b);
+    }
+    template <typename T, typename U, rel_enabler<T,U> = 0>
+    friend bool operator<(const T &a, const U &b)
+    {
+        return dispatch_less_than(a,b);
+    }
+    template <typename T, typename U, rel_enabler<T,U> = 0>
+    friend bool operator>=(const T &a, const U &b)
+    {
+        return !(a < b);
+    }
+    template <typename T, typename U, rel_enabler<T,U> = 0>
+    friend bool operator>(const T &a, const U &b)
+    {
+        return dispatch_greater_than(a,b);
+    }
+    template <typename T, typename U, rel_enabler<T,U> = 0>
+    friend bool operator<=(const T &a, const U &b)
+    {
+        return !(a > b);
     }
     /// Ternary exponentiation.
     friend void pow_ui(mp_integer &rop, const mp_integer &base, unsigned long exp)
