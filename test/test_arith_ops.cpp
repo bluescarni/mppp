@@ -28,6 +28,7 @@ see https://www.gnu.org/licenses/. */
 
 #include <cstddef>
 #include <gmp.h>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -418,4 +419,103 @@ struct div_tester {
 TEST_CASE("div")
 {
     tuple_for_each(sizes{}, div_tester{});
+}
+
+struct shift_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        integer ret;
+        REQUIRE((lex_cast(ret << 0) == "0"));
+        REQUIRE((lex_cast(ret << 1u) == "0"));
+        REQUIRE((lex_cast(ret << short(2)) == "0"));
+        ret = 1;
+        REQUIRE((lex_cast(ret << 1) == "2"));
+        REQUIRE((lex_cast(ret << 2ll) == "4"));
+        ret.neg();
+        REQUIRE((lex_cast(ret << 3ull) == "-8"));
+        REQUIRE((lex_cast(ret <<= 3ull) == "-8"));
+        REQUIRE((lex_cast(ret <<= char(1)) == "-16"));
+        REQUIRE((lex_cast(ret <<= (signed char)(0)) == "-16"));
+        REQUIRE((lex_cast(ret >> 0) == "-16"));
+        REQUIRE((lex_cast(ret >> 1) == "-8"));
+        REQUIRE((lex_cast(ret >>= 1ul) == "-8"));
+        REQUIRE((lex_cast(ret >>= short(1)) == "-4"));
+        REQUIRE((lex_cast(ret >> 128) == "0"));
+        // Error handling.
+        REQUIRE_THROWS_PREDICATE(ret << -1, std::domain_error, [](const std::domain_error &ex) {
+            return std::string(ex.what()) == "Cannot bit shift by -1: negative values are not supported";
+        });
+        REQUIRE_THROWS_PREDICATE(ret <<= -2, std::domain_error, [](const std::domain_error &ex) {
+            return std::string(ex.what()) == "Cannot bit shift by -2: negative values are not supported";
+        });
+        REQUIRE_THROWS_PREDICATE(ret >> -1, std::domain_error, [](const std::domain_error &ex) {
+            return std::string(ex.what()) == "Cannot bit shift by -1: negative values are not supported";
+        });
+        REQUIRE_THROWS_PREDICATE(ret >>= -2, std::domain_error, [](const std::domain_error &ex) {
+            return std::string(ex.what()) == "Cannot bit shift by -2: negative values are not supported";
+        });
+        if (std::numeric_limits<unsigned long long>::max() > std::numeric_limits<::mp_bitcnt_t>::max()) {
+            REQUIRE_THROWS_PREDICATE(ret << std::numeric_limits<unsigned long long>::max(), std::domain_error,
+                                     [](const std::domain_error &ex) {
+                                         return std::string(ex.what())
+                                                == "Cannot bit shift by "
+                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                                       + ": the value is too large";
+                                     });
+            REQUIRE_THROWS_PREDICATE(ret <<= std::numeric_limits<unsigned long long>::max(), std::domain_error,
+                                     [](const std::domain_error &ex) {
+                                         return std::string(ex.what())
+                                                == "Cannot bit shift by "
+                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                                       + ": the value is too large";
+                                     });
+            REQUIRE_THROWS_PREDICATE(ret >> std::numeric_limits<unsigned long long>::max(), std::domain_error,
+                                     [](const std::domain_error &ex) {
+                                         return std::string(ex.what())
+                                                == "Cannot bit shift by "
+                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                                       + ": the value is too large";
+                                     });
+            REQUIRE_THROWS_PREDICATE(ret >>= std::numeric_limits<unsigned long long>::max(), std::domain_error,
+                                     [](const std::domain_error &ex) {
+                                         return std::string(ex.what())
+                                                == "Cannot bit shift by "
+                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                                       + ": the value is too large";
+                                     });
+        }
+        if ((unsigned long long)std::numeric_limits<long long>::max() > std::numeric_limits<::mp_bitcnt_t>::max()) {
+            REQUIRE_THROWS_PREDICATE(
+                ret << std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                  + ": the value is too large";
+                });
+            REQUIRE_THROWS_PREDICATE(
+                ret <<= std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                  + ": the value is too large";
+                });
+            REQUIRE_THROWS_PREDICATE(
+                ret >> std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                  + ": the value is too large";
+                });
+            REQUIRE_THROWS_PREDICATE(
+                ret >>= std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                  + ": the value is too large";
+                });
+        }
+    }
+};
+
+TEST_CASE("shift")
+{
+    tuple_for_each(sizes{}, shift_tester{});
 }

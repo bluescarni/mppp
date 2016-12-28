@@ -1072,6 +1072,8 @@ struct zero_division_error final : std::domain_error {
  * ## Overloaded operators ##
  *
  * ## Interfacing with GMP ##
+ *
+ * ## Internals ##
  */
 template <std::size_t SSize>
 class mp_integer
@@ -1156,6 +1158,29 @@ class mp_integer
     // Enabler for in-place arithmetic ops.
     template <typename T>
     using in_place_enabler = enable_if_t<is_supported_interop<T>::value || std::is_same<T, mp_integer>::value, int>;
+    // Common metaprogramming for bit shifting operators.
+    template <typename T>
+    using shift_op_enabler = enable_if_t<std::is_integral<T>::value, int>;
+    template <typename T, enable_if_t<std::is_unsigned<T>::value, int> = 0>
+    static ::mp_bitcnt_t cast_to_bitcnt(T n)
+    {
+        if (mppp_unlikely(n > std::numeric_limits<::mp_bitcnt_t>::max())) {
+            throw std::domain_error("A too large bit shift value of " + std::to_string(n) + " was requested");
+        }
+        return static_cast<::mp_bitcnt_t>(n);
+    }
+    template <typename T, enable_if_t<std::is_signed<T>::value, int> = 0>
+    static ::mp_bitcnt_t cast_to_bitcnt(T n)
+    {
+        if (mppp_unlikely(n < T(0))) {
+            throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": negative values are not supported");
+        }
+        if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(n)
+                          > std::numeric_limits<::mp_bitcnt_t>::max())) {
+            throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
+        }
+        return static_cast<::mp_bitcnt_t>(n);
+    }
 
 public:
     /// Default constructor.
@@ -3290,6 +3315,21 @@ public:
         }
         ::mpz_mul_2exp(&rop.m_int.g_dy(), n.get_mpz_view(), s);
     }
+    template <typename T, shift_op_enabler<T> = 0>
+    friend mp_integer operator<<(const mp_integer &n, T shift)
+    {
+        const auto s = cast_to_bitcnt(shift);
+        mp_integer retval;
+        mul_2exp(retval, n, s);
+        return retval;
+    }
+    template <typename T, shift_op_enabler<T> = 0>
+    mp_integer &operator<<=(T shift)
+    {
+        const auto s = cast_to_bitcnt(shift);
+        mul_2exp(*this, *this, s);
+        return *this;
+    }
 
 private:
     // Selection of the algorithm for static tdiv_q_2exp.
@@ -3431,6 +3471,21 @@ public:
             rop.m_int.promote();
         }
         ::mpz_tdiv_q_2exp(&rop.m_int.g_dy(), n.get_mpz_view(), s);
+    }
+    template <typename T, shift_op_enabler<T> = 0>
+    friend mp_integer operator>>(const mp_integer &n, T shift)
+    {
+        const auto s = cast_to_bitcnt(shift);
+        mp_integer retval;
+        tdiv_q_2exp(retval, n, s);
+        return retval;
+    }
+    template <typename T, shift_op_enabler<T> = 0>
+    mp_integer &operator>>=(T shift)
+    {
+        const auto s = cast_to_bitcnt(shift);
+        tdiv_q_2exp(*this, *this, s);
+        return *this;
     }
 
 private:
