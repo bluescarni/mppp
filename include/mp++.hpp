@@ -1205,10 +1205,10 @@ private:
             // Store the upper limb.
             const auto limb_copy = m_int.g_st().m_limbs[SSize - 1u];
             // Make sure the upper limb contains something.
-            // NOTE: This is necessary because this method
-            // is used while building an integer during generic construction, and it might be possible that the current
-            // top limb is zero. If that is the case, the promotion below triggers an assertion failure when destroying
-            // the static int.
+            // NOTE: This is necessary because this method is used while building an integer during generic
+            // construction, and it might be possible that the current top limb is zero. If that is the case,
+            // the promotion below triggers an assertion failure when destroying
+            // the static int in debug mode.
             m_int.g_st().m_limbs[SSize - 1u] = 1u;
             // There's no space for the extra limb. Promote the integer and move on.
             m_int.promote(SSize + 1u);
@@ -1217,14 +1217,16 @@ private:
         }
         if (m_int.g_dy()._mp_alloc == asize) {
             // There is not enough space for the extra limb, we need to reallocate.
-            // NOTE: in principle it might be possible that we need to make sure the top limb is not zero, as the
-            // GMP function call might check that in debug mode. In practice it does not look like a problem, but
-            // keep it in mind.
+            // NOTE: same as above, make sure the top limb contains something. mpz_realloc2() seems not to care,
+            // but better safe than sorry.
+            const auto limb_copy = m_int.g_dy()._mp_d[asize - 1];
+            m_int.g_dy()._mp_d[asize - 1] = 1u;
             ::mpz_realloc2(&m_int.g_dy(), static_cast<::mp_bitcnt_t>(asize) * 2u * GMP_NUMB_BITS);
             if (mppp_unlikely(m_int.g_dy()._mp_alloc / 2 != asize)) {
                 // This means that there was some overflow in the determination of the bit size above.
                 std::abort();
             }
+            m_int.g_dy()._mp_d[asize - 1] = limb_copy;
         }
         // Write the extra limb, update the size.
         ++m_int.g_dy()._mp_size;
