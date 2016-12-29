@@ -1161,8 +1161,11 @@ class mp_integer
     // Enabler for in-place arithmetic ops.
     template <typename T>
     using in_place_enabler = enable_if_t<is_supported_interop<T>::value || std::is_same<T, mp_integer>::value, int>;
-// Common metaprogramming for bit shifting operators.
 #if defined(_MSC_VER)
+    // Common metaprogramming for bit shifting operators.
+    // NOTE: here and elsewhere we special case MSVC because we need to alter the SFINAE style, as the usual
+    // approach (i.e., default template int argument) results in ICEs in MSVC. Instead, on MSCV we use SFINAE
+    // on the return type.
     template <typename T>
     using shift_op_enabler = enable_if_t<std::is_integral<T>::value, mp_integer>;
 #else
@@ -3599,6 +3602,7 @@ private:
         return 0;
     }
     // Equality operator.
+    // NOTE: special implementation instead of using cmp, this should be faster.
     static bool dispatch_equality(const mp_integer &a, const mp_integer &b)
     {
         const mp_size_t size_a = a.m_int.m_st._mp_size, size_b = b.m_int.m_st._mp_size;
