@@ -594,6 +594,9 @@ struct rel_tester {
 
         REQUIRE(n1 != n2);
         REQUIRE(n1 == n1);
+        REQUIRE(integer{} == integer{});
+        REQUIRE(integer{} == 0);
+        REQUIRE(0 == integer{});
         REQUIRE(n1 == 4);
         REQUIRE(4u == n1);
         REQUIRE(n1 != 3);
@@ -646,6 +649,9 @@ struct rel_tester {
 
         REQUIRE(n2 <= n1);
         REQUIRE(n1 <= n1);
+        REQUIRE(integer{} <= integer{});
+        REQUIRE(integer{} <= 0);
+        REQUIRE(0 <= integer{});
         REQUIRE(-2 <= n2);
         REQUIRE(n2 <= -2);
         REQUIRE(n2 <= 0);
@@ -669,6 +675,9 @@ struct rel_tester {
 
         REQUIRE(n1 >= n2);
         REQUIRE(n1 >= n1);
+        REQUIRE(integer{} >= integer{});
+        REQUIRE(integer{} >= 0);
+        REQUIRE(0 >= integer{});
         REQUIRE(-2 >= n2);
         REQUIRE(n2 >= -2);
         REQUIRE(0 >= n2);
