@@ -409,10 +409,11 @@ struct div_tester {
         if (std::numeric_limits<double>::is_iec559) {
             REQUIRE((integer{4} / 0. == std::numeric_limits<double>::infinity()));
             REQUIRE((integer{-4} / 0. == -std::numeric_limits<double>::infinity()));
-            REQUIRE_THROWS_PREDICATE(retval /= 0., std::invalid_argument, [](const std::invalid_argument &ex) {
+            REQUIRE_THROWS_PREDICATE(retval /= 0., std::invalid_argument, [&retval](const std::invalid_argument &ex) {
                 return std::string(ex.what())
                        == "Cannot init integer from the non-finite floating-point value "
-                              + std::to_string(std::numeric_limits<double>::infinity());
+                              + (retval.sign() > 0 ? std::to_string(std::numeric_limits<double>::infinity())
+                                                   : std::to_string(-std::numeric_limits<double>::infinity()));
             });
         }
     }
