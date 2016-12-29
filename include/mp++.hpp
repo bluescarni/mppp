@@ -284,7 +284,7 @@ inline void mpz_init_set_cache(mpz_struct_t &m0, const mpz_struct_t &m1)
 
 // Simple RAII holder for GMP integers.
 struct mpz_raii {
-    mpz_raii() : fail_flag(false)
+    mpz_raii()
     {
         ::mpz_init(&m_mpz);
         assert(m_mpz._mp_alloc >= 0);
@@ -302,9 +302,6 @@ struct mpz_raii {
         ::mpz_clear(&m_mpz);
     }
     mpz_struct_t m_mpz;
-    // This is a failure flag that is used in the static integer ctors (it can be ignored
-    // for other uses of mpz_raii).
-    bool fail_flag;
 };
 
 #if defined(MPPP_WITH_LONG_DOUBLE)
@@ -488,192 +485,6 @@ struct static_int {
     {
         return _mp_size >= 0 ? _mp_size : -_mp_size;
     }
-    // Construct from mpz. If the size in limbs is too large, it will set a failure flag
-    // into m, to signal that the operation failed.
-    void ctor_from_mpz(mpz_raii &m)
-    {
-        if (m.m_mpz._mp_size > s_size || m.m_mpz._mp_size < -s_size) {
-            _mp_size = 0;
-            m.fail_flag = true;
-        } else {
-            // All this is noexcept.
-            _mp_size = m.m_mpz._mp_size;
-            copy_limbs_no(m.m_mpz._mp_d, m.m_mpz._mp_d + abs_size(), m_limbs.data());
-        }
-    }
-    template <typename Int, enable_if_t<is_supported_integral<Int>::value && std::is_unsigned<Int>::value, int> = 0>
-    bool attempt_1limb_ctor(Int n)
-    {
-        if (!n) {
-            _mp_size = 0;
-            return true;
-        }
-        // This contraption is to avoid a compiler warning when Int is bool: in that case cast it to unsigned,
-        // otherwise use the original value.
-        if ((std::is_same<bool, Int>::value ? unsigned(n) : n) <= GMP_NUMB_MAX) {
-            _mp_size = 1;
-            m_limbs[0] = static_cast<::mp_limb_t>(n);
-            return true;
-        }
-        return false;
-    }
-    template <typename Int, enable_if_t<is_supported_integral<Int>::value && std::is_signed<Int>::value, int> = 0>
-    bool attempt_1limb_ctor(Int n)
-    {
-        using uint_t = typename std::make_unsigned<Int>::type;
-        if (!n) {
-            _mp_size = 0;
-            return true;
-        }
-        if (n > 0 && uint_t(n) <= GMP_NUMB_MAX) {
-            // If n is positive and fits in a limb, just cast it.
-            _mp_size = 1;
-            m_limbs[0] = static_cast<::mp_limb_t>(n);
-            return true;
-        }
-        // For the negative case, we cast to long long and we check against
-        // guaranteed limits for taking the absolute value of n.
-        const long long lln = n;
-        if (lln < 0 && lln >= -9223372036854775807ll && (unsigned long long)(-lln) <= GMP_NUMB_MAX) {
-            _mp_size = -1;
-            m_limbs[0] = static_cast<::mp_limb_t>(-lln);
-            return true;
-        }
-        return false;
-    }
-    // NOTE: this wrapper around std::numeric_limits is to work around an MSVC bug (it is seemingly
-    // unable to deal with constexpr functions in a SFINAE context).
-    template <typename T, typename = void>
-    struct limits {
-    };
-    template <typename T>
-    struct limits<T, enable_if_t<std::is_integral<T>::value>> {
-        static const T max = std::numeric_limits<T>::max();
-        static const T min = std::numeric_limits<T>::min();
-    };
-    // Ctor from unsigned integral types that are wider than unsigned long.
-    // This requires special handling as the GMP api does not support unsigned long long natively.
-    template <typename Uint, enable_if_t<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
-                                             && (limits<Uint>::max > limits<unsigned long>::max),
-                                         int> = 0>
-    explicit static_int(Uint n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
-    {
-        if (attempt_1limb_ctor(n)) {
-            return;
-        }
-        constexpr auto ulmax = std::numeric_limits<unsigned long>::max();
-        if (n <= ulmax) {
-            // The value fits unsigned long, just cast it.
-            ::mpz_set_ui(&mpz.m_mpz, static_cast<unsigned long>(n));
-        } else {
-            // Init the shifter.
-            MPPP_MAYBE_TLS mpz_raii shifter;
-            ::mpz_set_ui(&shifter.m_mpz, 1u);
-            // Set output to the lowest UL limb of n.
-            ::mpz_set_ui(&mpz.m_mpz, static_cast<unsigned long>(n & ulmax));
-            // Move the limbs of n to the right.
-            // NOTE: this is ok because we tested above that n is wider than unsigned long, so its bit
-            // width must be larger than unsigned long's.
-            n >>= std::numeric_limits<unsigned long>::digits;
-            while (n) {
-                // Increase the shifter.
-                ::mpz_mul_2exp(&shifter.m_mpz, &shifter.m_mpz, std::numeric_limits<unsigned long>::digits);
-                // Add the current lowest UL limb of n to the output, after having multiplied it
-                // by the shitfer.
-                ::mpz_addmul_ui(&mpz.m_mpz, &shifter.m_mpz, static_cast<unsigned long>(n & ulmax));
-                n >>= std::numeric_limits<unsigned long>::digits;
-            }
-        }
-        ctor_from_mpz(mpz);
-    }
-    // Ctor from unsigned integral types that are not wider than unsigned long.
-    template <typename Uint, enable_if_t<is_supported_integral<Uint>::value && std::is_unsigned<Uint>::value
-                                             && (limits<Uint>::max <= limits<unsigned long>::max),
-                                         int> = 0>
-    explicit static_int(Uint n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
-    {
-        if (attempt_1limb_ctor(n)) {
-            return;
-        }
-        ::mpz_set_ui(&mpz.m_mpz, static_cast<unsigned long>(n));
-        ctor_from_mpz(mpz);
-    }
-    // Ctor from signed integral types that are wider than long.
-    template <typename Int,
-              enable_if_t<std::is_signed<Int>::value && is_supported_integral<Int>::value
-                              && (limits<Int>::max > limits<long>::max || limits<Int>::min < limits<long>::min),
-                          int> = 0>
-    explicit static_int(Int n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
-    {
-        if (attempt_1limb_ctor(n)) {
-            return;
-        }
-        constexpr auto lmax = std::numeric_limits<long>::max(), lmin = std::numeric_limits<long>::min();
-        if (n <= lmax && n >= lmin) {
-            // The value fits long, just cast it.
-            ::mpz_set_si(&mpz.m_mpz, static_cast<long>(n));
-        } else {
-            // A temporary variable for the accumulation of the result in the loop below.
-            // Needed because GMP does not have mpz_addmul_si().
-            MPPP_MAYBE_TLS mpz_raii tmp;
-            // The rest is as above, with the following differences:
-            // - use % instead of bit masking and division instead of bit shift,
-            // - proceed by chunks of 30 bits, as that's the highest power of 2 portably
-            //   representable by long.
-            MPPP_MAYBE_TLS mpz_raii shifter;
-            ::mpz_set_ui(&shifter.m_mpz, 1u);
-            ::mpz_set_si(&mpz.m_mpz, static_cast<long>(n % (1l << 30)));
-            n /= (1l << 30);
-            while (n) {
-                ::mpz_mul_2exp(&shifter.m_mpz, &shifter.m_mpz, 30);
-                ::mpz_set_si(&tmp.m_mpz, static_cast<long>(n % (1l << 30)));
-                ::mpz_addmul(&mpz.m_mpz, &shifter.m_mpz, &tmp.m_mpz);
-                n /= (1l << 30);
-            }
-        }
-        ctor_from_mpz(mpz);
-    }
-    // Ctor from signed integral types that are not wider than long.
-    template <typename Int,
-              enable_if_t<std::is_signed<Int>::value && is_supported_integral<Int>::value
-                              && (limits<Int>::max <= limits<long>::max && limits<Int>::min >= limits<long>::min),
-                          int> = 0>
-    explicit static_int(Int n, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
-    {
-        if (attempt_1limb_ctor(n)) {
-            return;
-        }
-        ::mpz_set_si(&mpz.m_mpz, static_cast<long>(n));
-        ctor_from_mpz(mpz);
-    }
-    // Ctor from float or double.
-    template <typename Float,
-              enable_if_t<std::is_same<Float, float>::value || std::is_same<Float, double>::value, int> = 0>
-    explicit static_int(Float f, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
-    {
-        if (mppp_unlikely(!std::isfinite(f))) {
-            throw std::invalid_argument("Cannot init integer from non-finite floating-point value");
-        }
-        ::mpz_set_d(&mpz.m_mpz, static_cast<double>(f));
-        ctor_from_mpz(mpz);
-    }
-#if defined(MPPP_WITH_LONG_DOUBLE)
-    // Ctor from long double.
-    explicit static_int(long double x, mpz_raii &mpz) : _mp_alloc(s_alloc), m_limbs()
-    {
-        if (!std::isfinite(x)) {
-            throw std::invalid_argument("Cannot init integer from non-finite floating-point value");
-        }
-        MPPP_MAYBE_TLS mpfr_raii mpfr;
-        // NOTE: static checks for overflows are done above.
-        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
-        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
-        ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
-        ::mpfr_get_z(&mpz.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
-        ctor_from_mpz(mpz);
-    }
-#endif
-
     class static_mpz_view
     {
     public:
