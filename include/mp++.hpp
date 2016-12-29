@@ -752,26 +752,6 @@ public:
             ::new (static_cast<void *>(&other.m_st)) s_storage();
         }
     }
-    explicit integer_union(const char *s, int base) : m_st()
-    {
-        MPPP_MAYBE_TLS mpz_raii mpz;
-        if (::mpz_set_str(&mpz.m_mpz, s, base)) {
-            throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
-                                        + std::to_string(base) + ".");
-        }
-        assert(!mpz.fail_flag);
-        g_st().ctor_from_mpz(mpz);
-        // Check if the construction succeeded.
-        if (mpz.fail_flag) {
-            // Reset the fail_flag.
-            mpz.fail_flag = false;
-            // Destroy static.
-            g_st().~s_storage();
-            // Init dynamic.
-            ::new (static_cast<void *>(&m_dy)) d_storage;
-            mpz_init_set_cache(m_dy, mpz.m_mpz);
-        }
-    }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
     {
@@ -1325,8 +1305,14 @@ public:
     {
         dispatch_generic_ctor(x);
     }
-    explicit mp_integer(const char *s, int base = 10) : m_int(s, base)
+    explicit mp_integer(const char *s, int base = 10) : m_int()
     {
+        MPPP_MAYBE_TLS mpz_raii mpz;
+        if (::mpz_set_str(&mpz.m_mpz, s, base)) {
+            throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
+                                        + std::to_string(base) + ".");
+        }
+        dispatch_mpz_ctor(&mpz.m_mpz);
     }
     explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
     {
