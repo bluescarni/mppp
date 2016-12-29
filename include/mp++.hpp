@@ -123,6 +123,7 @@ see https://www.gnu.org/licenses/. */
 
 #endif
 
+// Namespace setup.
 #if defined(MPPP_CUSTOM_NAMESPACE)
 
 #define MPPP_NAMESPACE MPPP_CUSTOM_NAMESPACE
@@ -834,13 +835,12 @@ struct zero_division_error final : std::domain_error {
 template <std::size_t SSize>
 class mp_integer
 {
-
-    using s_storage = mppp_impl::static_int<SSize>;
-    using d_storage = mppp_impl::mpz_struct_t;
     // Just a small helper, like C++14.
     template <bool B, typename T = void>
     using enable_if_t = typename std::enable_if<B, T>::type;
     // Import these typedefs for ease of use.
+    using s_storage = mppp_impl::static_int<SSize>;
+    using d_storage = mppp_impl::mpz_struct_t;
     using mpz_size_t = mppp_impl::mpz_size_t;
     using mpz_raii = mppp_impl::mpz_raii;
     using mpz_struct_t = mppp_impl::mpz_struct_t;
@@ -854,7 +854,7 @@ class mp_integer
     template <typename T>
     using is_supported_interop = mppp_impl::is_supported_interop<T>;
     // The underlying static int.
-    using s_int = mppp_impl::static_int<SSize>;
+    using s_int = s_storage;
     // mpz view class.
     class mpz_view
     {
