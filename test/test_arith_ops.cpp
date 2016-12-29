@@ -584,3 +584,115 @@ TEST_CASE("mod")
 {
     tuple_for_each(sizes{}, mod_tester{});
 }
+
+struct rel_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        integer n1{4}, n2{-2};
+
+        REQUIRE(n1 != n2);
+        REQUIRE(n1 == n1);
+        REQUIRE(n1 == 4);
+        REQUIRE(4u == n1);
+        REQUIRE(n1 != 3);
+        REQUIRE((signed char)-3 != n1);
+        REQUIRE(4ull == n1);
+        REQUIRE(-2 == n2);
+        REQUIRE(n2 == short(-2));
+        REQUIRE(-2.f == n2);
+        REQUIRE(n2 == -2.f);
+        REQUIRE(-3.f != n2);
+        REQUIRE(n2 != -3.f);
+        REQUIRE(-2. == n2);
+        REQUIRE(n2 == -2.);
+        REQUIRE(-3. != n2);
+        REQUIRE(n2 != -3.);
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        REQUIRE(-2.l == n2);
+        REQUIRE(n2 == -2.l);
+        REQUIRE(-3.l != n2);
+        REQUIRE(n2 != -3.l);
+#endif
+
+        REQUIRE(n2 < n1);
+        REQUIRE(n2 < 0);
+        REQUIRE(-3 < n2);
+        REQUIRE(n2 < 0u);
+        REQUIRE(-3ll < n2);
+        REQUIRE(n2 < 0.f);
+        REQUIRE(-3.f < n2);
+        REQUIRE(n2 < 0.);
+        REQUIRE(-3. < n2);
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        REQUIRE(n2 < 0.l);
+        REQUIRE(-3.l < n2);
+#endif
+
+        REQUIRE(n1 > n2);
+        REQUIRE(0 > n2);
+        REQUIRE(n2 > -3);
+        REQUIRE(0u > n2);
+        REQUIRE(n2 > -3ll);
+        REQUIRE(0.f > n2);
+        REQUIRE(n2 > -3.f);
+        REQUIRE(0. > n2);
+        REQUIRE(n2 > -3.);
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        REQUIRE(0.l > n2);
+        REQUIRE(n2 > -3.l);
+#endif
+
+        REQUIRE(n2 <= n1);
+        REQUIRE(n1 <= n1);
+        REQUIRE(-2 <= n2);
+        REQUIRE(n2 <= -2);
+        REQUIRE(n2 <= 0);
+        REQUIRE(-3 <= n2);
+        REQUIRE(n2 <= 0u);
+        REQUIRE(-3ll <= n2);
+        REQUIRE(n2 <= 0.f);
+        REQUIRE(-3.f <= n2);
+        REQUIRE(-2.f <= n2);
+        REQUIRE(n2 <= -2.f);
+        REQUIRE(n2 <= 0.);
+        REQUIRE(-3. <= n2);
+        REQUIRE(-2. <= n2);
+        REQUIRE(n2 <= -2.);
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        REQUIRE(n2 <= 0.l);
+        REQUIRE(-3.l <= n2);
+        REQUIRE(-2.l <= n2);
+        REQUIRE(n2 <= -2.l);
+#endif
+
+        REQUIRE(n1 >= n2);
+        REQUIRE(n1 >= n1);
+        REQUIRE(-2 >= n2);
+        REQUIRE(n2 >= -2);
+        REQUIRE(0 >= n2);
+        REQUIRE(n2 >= -3);
+        REQUIRE(0u >= n2);
+        REQUIRE(n2 >= -3ll);
+        REQUIRE(0.f >= n2);
+        REQUIRE(n2 >= -3.f);
+        REQUIRE(-2.f >= n2);
+        REQUIRE(n2 >= -2.f);
+        REQUIRE(0. >= n2);
+        REQUIRE(n2 >= -3.);
+        REQUIRE(-2. >= n2);
+        REQUIRE(n2 >= -2.);
+#if defined(MPPP_WITH_LONG_DOUBLE)
+        REQUIRE(0.l >= n2);
+        REQUIRE(n2 >= -3.l);
+        REQUIRE(-2.l >= n2);
+        REQUIRE(n2 >= -2.l);
+#endif
+    }
+};
+
+TEST_CASE("rel")
+{
+    tuple_for_each(sizes{}, rel_tester{});
+}
