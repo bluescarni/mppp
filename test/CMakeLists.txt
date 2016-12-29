@@ -39,7 +39,3 @@ ADD_MPPP_TESTCASE(test_pow)
 ADD_MPPP_TESTCASE(test_probab_prime_p)
 ADD_MPPP_TESTCASE(test_rel)
 ADD_MPPP_TESTCASE(test_sqrt)
-
-if(YACMA_COMPILER_IS_MSVC)
-  ADD_MPPP_TESTCASE(test_msvc)
-endif()
