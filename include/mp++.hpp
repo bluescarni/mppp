@@ -995,15 +995,18 @@ struct zero_division_error final : std::domain_error {
  * occupied by the mp_integer object, without resorting to dynamic memory allocation. The value of \p SSize
  * must be at least 1 and less than an implementation-defined upper limit.
  *
- * ## Memory management ##
  * When the value of an mp_integer is stored directly within the object, the <em>storage type</em> of the integer is
  * said to be <em>static</em>. When the limb size of the integer exceeds the maximum value \p SSize, the storage types
  * becomes <em>dynamic</em>. The transition from static to dynamic storage happens transparently whenever the integer
  * value becomes large enough. The demotion from dynamic to static storage usually needs to be requested explicitly.
+ * For values of \p SSize of 1 and 2, optimised implementations of basic arithmetic operations are employed,
+ * if supported by the target architecture and if the storage type is static. For larger values of \p SSize,
+ * the \p mpn_ low-level functions of the GMP API are used if the storage type is static. If the storage type is
+ * dynamic, the usual \p mpz_ functions from the GMP API are used.
  *
  * ## Interoperable types ##
  * The class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and floating-point
- * primitive types, and it provides overloaded airthmetic operators. Differently from the builtin types, however, this
+ * primitive types, and it provides overloaded arithmetic operators. Differently from the builtin types, however, this
  * class does not allow any implicit conversion to/from other types (apart from \p bool): construction from and
  * conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
  * @code
@@ -1024,7 +1027,7 @@ struct zero_division_error final : std::domain_error {
  * - <tt>long long</tt> and <tt>unsigned long long</tt>,
  * - \p float, \p double and <tt>long double</tt> (<tt>long double</tt> requires the MPFR library).
  *
- * ## API basics ##
+ * ## API ##
  * Most of the functionality of the class is exposed via inline friend functions, with the general convention
  * that the functions are named after the corresponding GMP functions minus the leading \p mpz_ prefix. For instance,
  * the GMP call
@@ -3084,7 +3087,7 @@ private:
 public:
     /// Truncated division.
     /**
-     * mppp::zero_division_error.
+     * @throws mppp::zero_division_error dadas.
      */
     friend void tdiv_qr(mp_integer &q, mp_integer &r, const mp_integer &op1, const mp_integer &op2)
     {
