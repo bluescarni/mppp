@@ -751,26 +751,6 @@ public:
             ::new (static_cast<void *>(&other.m_st)) s_storage();
         }
     }
-    // Generic constructor from the interoperable basic C++ types. It will first try to construct
-    // a static, if too many limbs are needed it will construct a dynamic instead.
-    template <typename T, typename std::enable_if<is_supported_interop<T>::value, int>::type = 0>
-    explicit integer_union(T x)
-    {
-        MPPP_MAYBE_TLS mpz_raii mpz;
-        assert(!mpz.fail_flag);
-        // Attempt static storage construction.
-        ::new (static_cast<void *>(&m_st)) s_storage(x, mpz);
-        // Check if too many limbs were generated.
-        if (mpz.fail_flag) {
-            // Reset the fail_flag.
-            mpz.fail_flag = false;
-            // Destroy static.
-            g_st().~s_storage();
-            // Init dynamic.
-            ::new (static_cast<void *>(&m_dy)) d_storage;
-            mpz_init_set_cache(m_dy, mpz.m_mpz);
-        }
-    }
     explicit integer_union(const char *s, int base) : m_st()
     {
         MPPP_MAYBE_TLS mpz_raii mpz;
@@ -789,25 +769,6 @@ public:
             // Init dynamic.
             ::new (static_cast<void *>(&m_dy)) d_storage;
             mpz_init_set_cache(m_dy, mpz.m_mpz);
-        }
-    }
-    explicit integer_union(const ::mpz_t n) : m_st()
-    {
-        // This is similar to what ctor_from_mpz does.
-        const auto asize = ::mpz_size(n);
-        if (asize > SSize) {
-            // n is too big, need to promote.
-            // Destroy static.
-            g_st().~s_storage();
-            // Init dynamic.
-            ::new (static_cast<void *>(&m_dy)) d_storage;
-            mpz_init_set_cache(m_dy, *n);
-        } else {
-            // All this is noexcept.
-            // NOTE: m_st() inits to zero the whole array of static limbs, and we copy
-            // in only the used limbs.
-            g_st()._mp_size = n->_mp_size;
-            copy_limbs_no(n->_mp_d, n->_mp_d + asize, g_st().m_limbs.data());
         }
     }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
@@ -1081,6 +1042,9 @@ struct zero_division_error final : std::domain_error {
 template <std::size_t SSize>
 class mp_integer
 {
+
+    using s_storage = mppp_impl::static_int<SSize>;
+    using d_storage = mppp_impl::mpz_struct_t;
     // Just a small helper, like C++14.
     template <bool B, typename T = void>
     using enable_if_t = typename std::enable_if<B, T>::type;
@@ -1222,12 +1186,127 @@ private:
     // Enabler for generic assignment.
     template <typename T>
     using generic_assignment_enabler = generic_ctor_enabler<T>;
+    // Add a limb at the top of the integer (that is, the new limb will be the new most
+    // significant limb). Requires a non-negative integer.
+    void push_limb(::mp_limb_t l)
+    {
+        const auto asize = m_int.m_st._mp_size;
+        assert(asize >= 0);
+        if (is_static()) {
+            if (std::size_t(asize) < SSize) {
+                // If there's space for an extra limb, write it, update the size,
+                // and return.
+                ++m_int.g_st()._mp_size;
+                m_int.g_st().m_limbs[std::size_t(asize)] = l;
+                return;
+            }
+            // There's no space for the extra limb. Promote the integer and move on.
+            m_int.promote(SSize + 1u);
+        }
+        if (m_int.g_dy()._mp_alloc == asize) {
+            // There is not enough space for the extra limb, we need to reallocate.
+            ::mpz_realloc2(&m_int.g_dy(), static_cast<::mp_bitcnt_t>(asize) * 2u * GMP_NUMB_BITS);
+            if (mppp_unlikely(m_int.g_dy()._mp_alloc / 2 != asize)) {
+                // This means that there was some overflow in the determination of the bit size above.
+                std::abort();
+            }
+        }
+        // Write the extra limb, update the size.
+        ++m_int.g_dy()._mp_size;
+        m_int.g_dy()._mp_d[asize] = l;
+    }
+    // This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
+    // If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
+    // little helper in order to avoid compiler warnings.
+    template <typename T, enable_if_t<(GMP_NUMB_BITS < std::numeric_limits<T>::digits), int> = 0>
+    static void checked_rshift(T &n)
+    {
+        n >>= GMP_NUMB_BITS;
+    }
+    template <typename T, enable_if_t<(GMP_NUMB_BITS >= std::numeric_limits<T>::digits), int> = 0>
+    static void checked_rshift(T &)
+    {
+        assert(false);
+    }
+    // Dispatch for generic constructor.
+    template <typename T, enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value, int> = 0>
+    void dispatch_generic_ctor(T n)
+    {
+        auto nu = static_cast<unsigned long long>(n);
+        while (nu) {
+            push_limb(static_cast<::mp_limb_t>(nu & GMP_NUMB_MASK));
+            if (GMP_NUMB_BITS >= std::numeric_limits<unsigned long long>::digits) {
+                break;
+            }
+            checked_rshift(nu);
+        }
+    }
+    template <typename T, enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
+    void dispatch_generic_ctor(T n)
+    {
+        const auto nu = static_cast<unsigned long long>(n);
+        if (n >= T(0)) {
+            dispatch_generic_ctor(nu);
+        } else {
+            dispatch_generic_ctor(-nu);
+            neg();
+        }
+    }
+    template <typename T, enable_if_t<std::is_same<T, float>::value || std::is_same<T, double>::value, int> = 0>
+    void dispatch_generic_ctor(T x)
+    {
+        if (mppp_unlikely(!std::isfinite(x))) {
+            throw std::invalid_argument("Cannot init integer from the non-finite floating-point value "
+                                        + std::to_string(x));
+        }
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
+        dispatch_mpz_ctor(&tmp.m_mpz);
+    }
+#if defined(MPPP_WITH_LONG_DOUBLE)
+    template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
+    void dispatch_generic_ctor(T x)
+    {
+        if (mppp_unlikely(!std::isfinite(x))) {
+            throw std::invalid_argument("Cannot init integer from the non-finite floating-point value "
+                                        + std::to_string(x));
+        }
+        MPPP_MAYBE_TLS mpfr_raii mpfr;
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        // NOTE: static checks for overflows are done above.
+        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
+        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
+        ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
+        ::mpfr_get_z(&tmp.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
+        dispatch_mpz_ctor(&tmp.m_mpz);
+    }
+#endif
+    // Ctor from mpz_t.
+    void dispatch_mpz_ctor(const ::mpz_t n)
+    {
+        const auto asize = ::mpz_size(n);
+        if (asize > SSize) {
+            // Too big, need to promote.
+            // Destroy static.
+            m_int.g_st().~s_storage();
+            // Init dynamic.
+            ::new (static_cast<void *>(&m_int.m_dy)) d_storage;
+            mppp_impl::mpz_init_set_cache(m_int.m_dy, *n);
+        } else {
+            // All this is noexcept.
+            // NOTE: m_st() inits to zero the whole array of static limbs, and we copy
+            // in only the used limbs.
+            m_int.g_st()._mp_size = n->_mp_size;
+            mppp_impl::copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+        }
+    }
 
 public:
     /// Generic constructor.
     template <typename T, generic_ctor_enabler<T> = 0>
-    explicit mp_integer(T x) : m_int(x)
+    explicit mp_integer(T x) : m_int()
     {
+        dispatch_generic_ctor(x);
     }
     explicit mp_integer(const char *s, int base = 10) : m_int(s, base)
     {
@@ -1235,8 +1314,9 @@ public:
     explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
     {
     }
-    explicit mp_integer(const ::mpz_t n) : m_int(n)
+    explicit mp_integer(const ::mpz_t n) : m_int()
     {
+        dispatch_mpz_ctor(n);
     }
     mp_integer &operator=(const mp_integer &other) = default;
     mp_integer &operator=(mp_integer &&other) = default;
