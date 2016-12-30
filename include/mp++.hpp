@@ -1052,6 +1052,18 @@ private:
     template <typename T, enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
+        // NOTE: here we are using cast + unary minus to extract the abs value of n as an unsigned long long. See:
+        // http://stackoverflow.com/questions/4536095/unary-minus-and-signed-to-unsigned-conversion
+        // When operating on a negative value, this technique is not 100% portable: it requires an implementation
+        // of signed integers such that the absolute value of the minimum (negative) value is not greater than
+        // the maximum value of the unsigned counterpart. This is guaranteed on all computer architectures in use today,
+        // but in theory there could be architectures where the assumption is not respected. See for instance the
+        // discussion here:
+        // http://stackoverflow.com/questions/11372044/unsigned-vs-signed-range-guarantees
+        // Note that in any case we never run into UB, the only consequence is that for very large negative values
+        // we could init the integer with the wrong value. We should be able to test for this in the unit tests.
+        // Let's keep this in mind in the remote case this ever becomes a problem. In such case, we would probably need
+        // to specialise the implementation for negative values to use bit shifting and modulo operations.
         const auto nu = static_cast<unsigned long long>(n);
         if (n >= T(0)) {
             dispatch_generic_ctor(nu);
@@ -1521,7 +1533,8 @@ private:
         // NOTE: the reason we check this is that we do not want to run into the situation in which we have written
         // something into rop (via the mpn functions below), only to realize later that the computation overflows.
         // This would be bad because, in case of overlapping arguments, it would destroy one or two operands without
-        // possibility of recovering. The alternative would be to do the computation in some local buffer and then copy
+        // possibility of recovering. The alternative would be to do the computation in some local buffer and then
+        // copy
         // it out, but that is rather costly. Note that this means that in principle a computation that could fit in
         // static storage ends up triggering a promotion.
         const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
@@ -2148,7 +2161,8 @@ public:
         if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
             // For the optimised version below to kick in we need to be sure we can safely convert
             // unsigned long to an ::mp_limb_t, modulo nail bits. This because in the optimised version
-            // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an mp_integer.
+            // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an
+            // mp_integer.
             add(rop, op1, mp_integer{op2});
             return;
         }
@@ -2449,8 +2463,8 @@ public:
     }
 
 private:
-    // Selection of the algorithm for addmul: if optimised algorithms exist for both add and mul, then use the optimised
-    // addmul algos. Otherwise, use the mpn one.
+    // Selection of the algorithm for addmul: if optimised algorithms exist for both add and mul, then use the
+    // optimised addmul algos. Otherwise, use the mpn one.
     template <typename SInt>
     using static_addmul_algo
         = std::integral_constant<int,
@@ -2702,8 +2716,8 @@ private:
                                 mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 0> &)
     {
         using mppp_impl::copy_limbs_no;
-        // First we check if the divisor is larger than the dividend (in abs limb size), as the mpn function requires
-        // asize1 >= asize2.
+        // First we check if the divisor is larger than the dividend (in abs limb size), as the mpn function
+        // requires asize1 >= asize2.
         if (asize2 > asize1) {
             // Copy op1 into the remainder.
             r = op1;
@@ -2765,7 +2779,8 @@ private:
     {
         // NOTE: here we have to use GMP_NUMB_MASK because if s_size is 1 this implementation is *always*
         // called, even if we have nail bits (whereas the optimisation for other operations currently kicks in
-        // only without nail bits). Thus, we need to discard from m_limbs[0] the nail bits before doing the division.
+        // only without nail bits). Thus, we need to discard from m_limbs[0] the nail bits before doing the
+        // division.
         const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK),
                           r_ = (op1.m_limbs[0] & GMP_NUMB_MASK) % (op2.m_limbs[0] & GMP_NUMB_MASK);
         // Write q.
@@ -3076,8 +3091,8 @@ private:
             } else {
                 // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
                 // NOTE: we have to use move_backward here because the ranges are overlapping and they do not
-                // start at the same pointer (in which case we could've used copy_limbs()). Here we know ls is not zero:
-                // we don't have a remainder, and s == 0 was already handled above. Hence, new_asize > asize.
+                // start at the same pointer (in which case we could've used copy_limbs()). Here we know ls is not
+                // zero: we don't have a remainder, and s == 0 was already handled above. Hence, new_asize > asize.
                 assert(new_asize > asize);
                 std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
             }
