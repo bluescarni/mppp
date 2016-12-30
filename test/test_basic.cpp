@@ -27,6 +27,7 @@ GNU Lesser General Public License along with the mp++ library.  If not,
 see https://www.gnu.org/licenses/. */
 
 #include <atomic>
+#include <cmath>
 #include <cstddef>
 #include <gmp.h>
 #include <iostream>
@@ -344,7 +345,8 @@ using is_convertible = std::integral_constant<bool, std::is_same<decltype(test_s
 template <typename Integer, typename T>
 static inline bool roundtrip_conversion(const T &x)
 {
-    return static_cast<T>(Integer{x}) == x;
+    Integer tmp{x};
+    return (static_cast<T>(tmp) == x) && (lex_cast(x) == lex_cast(tmp));
 }
 
 struct no_conv {
@@ -430,4 +432,62 @@ struct int_convert_tester {
 TEST_CASE("integral conversions")
 {
     tuple_for_each(sizes{}, int_convert_tester{});
+}
+
+struct fp_convert_tester {
+    template <typename S>
+    struct runner {
+        template <typename Float>
+        void operator()(const Float &) const
+        {
+            using integer = mp_integer<S::value>;
+            REQUIRE((is_convertible<integer, Float>::value));
+            REQUIRE(static_cast<Float>(integer{0}) == Float(0));
+            REQUIRE(static_cast<Float>(integer{1}) == Float(1));
+            REQUIRE(static_cast<Float>(integer{-1}) == Float(-1));
+            REQUIRE(static_cast<Float>(integer{12}) == Float(12));
+            REQUIRE(static_cast<Float>(integer{-12}) == Float(-12));
+            if (std::numeric_limits<Float>::is_iec559) {
+                // Try with large numbers.
+                REQUIRE(std::abs(
+                            static_cast<Float>(integer{"1000000000000000000000000000000"})
+                            - Float(1E30))
+                            / Float(1E30)
+                        <= std::numeric_limits<Float>::epsilon() * 1000.);
+                REQUIRE(static_cast<Float>(integer{std::numeric_limits<Float>::max()})
+                        == std::numeric_limits<Float>::max());
+                REQUIRE(static_cast<Float>(integer{-std::numeric_limits<Float>::max()})
+                        == -std::numeric_limits<Float>::max());
+            }
+            // Random testing.
+            std::atomic<bool> fail(false);
+            auto f = [&fail](unsigned n) {
+                std::uniform_real_distribution<Float> dist(Float(-100), Float(100));
+                std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
+                for (auto i = 0; i < ntries; ++i) {
+                    const auto tmp = dist(eng);
+                    if (static_cast<Float>(integer{tmp}) != std::trunc(tmp)) {
+                        fail.store(false);
+                    }
+                }
+            };
+            std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+            t0.join();
+            t1.join();
+            t2.join();
+            t3.join();
+            REQUIRE(!fail.load());
+            mt_rng_seed += 4u;
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(fp_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("floating-point conversions")
+{
+    tuple_for_each(sizes{}, fp_convert_tester{});
 }
