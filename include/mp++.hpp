@@ -235,7 +235,6 @@ struct mpz_cache {
             }
         }
     }
-
     v_type m_vec;
 };
 
@@ -1131,6 +1130,7 @@ public:
     {
         dispatch_generic_ctor(x);
     }
+    /// Constructor from C string.
     explicit mp_integer(const char *s, int base = 10) : m_int()
     {
         MPPP_MAYBE_TLS mpz_raii mpz;
@@ -1140,33 +1140,42 @@ public:
         }
         dispatch_mpz_ctor(&mpz.m_mpz);
     }
+    /// Constructor from C++ string.
     explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
     {
     }
+    /// Constructor from \p mpz_t.
     explicit mp_integer(const ::mpz_t n) : m_int()
     {
         dispatch_mpz_ctor(n);
     }
+    /// Copy assignment operator.
     mp_integer &operator=(const mp_integer &other) = default;
+    /// Move assignment operator.
     mp_integer &operator=(mp_integer &&other) = default;
+    /// Generic assignment operator.
     template <typename T, generic_assignment_enabler<T> = 0>
     mp_integer &operator=(const T &x)
     {
         *this = mp_integer{x};
         return *this;
     }
+    /// Test for static storage.
     bool is_static() const
     {
         return m_int.is_static();
     }
+    /// Check for dynamic storage.
     bool is_dynamic() const
     {
         return m_int.is_dynamic();
     }
+    /// Stream operator for mp_integer.
     friend std::ostream &operator<<(std::ostream &os, const mp_integer &n)
     {
         return os << n.to_string();
     }
+    /// Conversion to string.
     std::string to_string(int base = 10) const
     {
         if (mppp_unlikely(base < 2 || base > 62)) {
@@ -1354,6 +1363,7 @@ private:
     }
 
 public:
+    /// Generic conversion operator.
     template <typename T, generic_conversion_enabler<T> = 0>
     explicit operator T() const
     {
@@ -1364,6 +1374,7 @@ public:
         }
         return retval.second;
     }
+    /// Promote to dynamic storage.
     void promote()
     {
         if (is_dynamic()) {
@@ -1372,10 +1383,12 @@ public:
         }
         m_int.promote();
     }
+    /// Size in bits.
     std::size_t nbits() const
     {
         return ::mpz_sizeinbase(get_mpz_view(), 2);
     }
+    /// Size in limbs.
     std::size_t size() const
     {
         if (is_static()) {
@@ -1383,6 +1396,7 @@ public:
         }
         return ::mpz_size(&m_int.g_dy());
     }
+    /// Sign.
     int sign() const
     {
         // NOTE: size is part of the common initial sequence.
@@ -1392,10 +1406,12 @@ public:
             return 0;
         }
     }
+    /// Get \p mpz_t view.
     mpz_view get_mpz_view() const
     {
         return mpz_view(*this);
     }
+    /// Negate in-place.
     mp_integer &neg()
     {
         if (is_static()) {
@@ -1405,11 +1421,13 @@ public:
         }
         return *this;
     }
+    /// Binary negation.
     friend void neg(mp_integer &rop, const mp_integer &n)
     {
         rop = n;
         rop.neg();
     }
+    /// Unary negation.
     friend mp_integer neg(const mp_integer &n)
     {
         mp_integer ret(n);
