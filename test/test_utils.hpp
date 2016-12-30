@@ -201,7 +201,7 @@ inline void max_integer(mppp::mppp_impl::mpz_raii &m, unsigned n)
     {                                                                                                                  \
         bool thrown_checked = false;                                                                                   \
         try {                                                                                                          \
-            expr;                                                                                                      \
+            (void)expr;                                                                                                \
         } catch (const exc &e) {                                                                                       \
             if (pred(e)) {                                                                                             \
                 thrown_checked = true;                                                                                 \
