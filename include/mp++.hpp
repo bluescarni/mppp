@@ -1026,12 +1026,12 @@ private:
     // This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
     // If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
     // little helper in order to avoid compiler warnings.
-    template <typename T, enable_if_t<(GMP_NUMB_BITS < std::numeric_limits<T>::digits), int> = 0>
+    template <typename T, enable_if_t<(GMP_NUMB_BITS < unsigned(std::numeric_limits<T>::digits)), int> = 0>
     static void checked_rshift(T &n)
     {
         n >>= GMP_NUMB_BITS;
     }
-    template <typename T, enable_if_t<(GMP_NUMB_BITS >= std::numeric_limits<T>::digits), int> = 0>
+    template <typename T, enable_if_t<(GMP_NUMB_BITS >= unsigned(std::numeric_limits<T>::digits)), int> = 0>
     static void checked_rshift(T &)
     {
         assert(false);
@@ -1043,7 +1043,7 @@ private:
         auto nu = static_cast<unsigned long long>(n);
         while (nu) {
             push_limb(static_cast<::mp_limb_t>(nu & GMP_NUMB_MASK));
-            if (GMP_NUMB_BITS >= std::numeric_limits<unsigned long long>::digits) {
+            if (GMP_NUMB_BITS >= unsigned(std::numeric_limits<unsigned long long>::digits)) {
                 break;
             }
             checked_rshift(nu);
