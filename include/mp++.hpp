@@ -38,6 +38,7 @@ see https://www.gnu.org/licenses/. */
 #include <cstdlib>
 #include <functional>
 #include <gmp.h>
+#include <initializer_list>
 #include <iostream>
 #include <limits>
 #include <new>
@@ -1177,81 +1178,142 @@ public:
     // std::vector<char>?
 
 private:
-    // Conversion operator.
+    // Implementation of the conversion operator.
     template <typename T>
     using generic_conversion_enabler = generic_ctor_enabler<T>;
-    template <typename T>
-    using uint_conversion_enabler
-        = enable_if_t<is_supported_integral<T>::value && std::is_unsigned<T>::value && !std::is_same<bool, T>::value,
-                      int>;
-    template <typename T>
-    using int_conversion_enabler = enable_if_t<is_supported_integral<T>::value && std::is_signed<T>::value, int>;
-    // Static conversion to bool.
-    template <typename T, enable_if_t<std::is_same<T, bool>::value, int> = 0>
-    static T conversion_impl(const s_int &n)
+    // Try to convert this to an unsigned long long. The abs value of this will be considered for the conversion.
+    // Requires nonzero this.
+    std::pair<bool, unsigned long long> convert_to_ull() const
     {
-        return n._mp_size != 0;
+        const auto asize = size();
+        assert(asize);
+        // Get the pointer to the limbs.
+        const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
+        // Init retval with the first limb.
+        auto retval = static_cast<unsigned long long>(ptr[0] & GMP_NUMB_MASK);
+        // Add the other limbs, if any.
+        unsigned long long shift = GMP_NUMB_BITS;
+        constexpr unsigned ull_bits = std::numeric_limits<unsigned long long>::digits;
+        for (std::size_t i = 1u; i < asize; ++i, shift += GMP_NUMB_BITS) {
+            if (shift >= ull_bits) {
+                // We need to shift left the current limb. If the shift is too large, we run into UB
+                // and it also means that the value does not fit in unsigned long long (and, by extension,
+                // in any other unsigned integral type).
+                return {false, 0ull};
+            }
+            const auto l = static_cast<unsigned long long>(ptr[i] & GMP_NUMB_MASK);
+            if (l >> (ull_bits - shift)) {
+                // Shifting the current limb is well-defined from the point of view of the language, but the result
+                // wraps around: the value does not fit in unsigned long long.
+                // NOTE: I suspect this branch can be triggered on common architectures only with nail builds.
+                return {false, 0ull};
+            }
+            // This will not overflow, as there is no carry from retval and l << shift is fine.
+            retval += l << shift;
+        }
+        return {true, retval};
     }
-    // Static conversion to unsigned ints.
-    template <typename T, uint_conversion_enabler<T> = 0>
-    static T conversion_impl(const s_int &n)
+    // Conversion to bool.
+    template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
+    {
+        return {true, m_int.m_st._mp_size != 0};
+    }
+    // Conversion to unsigned ints, excluding bool.
+    template <
+        typename T,
+        enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value && !std::is_same<bool, T>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
-        if (!n._mp_size) {
-            return T(0);
+        if (!m_int.m_st._mp_size) {
+            return {true, T(0)};
         }
-        if (n._mp_size == 1) {
-            // Single-limb, positive value case.
-            if ((n.m_limbs[0] & GMP_NUMB_MASK) > std::numeric_limits<T>::max()) {
-                // TODO error message.
-                throw std::overflow_error("");
-            }
-            return static_cast<T>(n.m_limbs[0] & GMP_NUMB_MASK);
+        // Handle negative size.
+        if (m_int.m_st._mp_size < 0) {
+            return {false, T(0)};
         }
-        if (n._mp_size < 0) {
-            // Negative values cannot be converted to unsigned ints.
-            // TODO error message.
-            throw std::overflow_error("");
+        // Attempt conversion to ull.
+        const auto candidate = convert_to_ull();
+        if (!candidate.first) {
+            return {false, T(0)};
         }
-        // In multilimb case, forward to mpz.
-        return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
+        if (candidate.second > std::numeric_limits<T>::max()) {
+            // The value exceeds the limit of T.
+            return {false, T(0)};
+        }
+        // The conversion to the target unsigned integral type is fine.
+        return {true, static_cast<T>(candidate.second)};
     }
-    // Static conversion to signed ints.
-    template <typename T, int_conversion_enabler<T> = 0>
-    static T conversion_impl(const s_int &n)
+    // Conversion to signed ints.
+    template <typename T, enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
     {
-        using uint_t = typename std::make_unsigned<T>::type;
+        using uT = typename std::make_unsigned<T>::type;
         // Handle zero.
-        if (!n._mp_size) {
-            return T(0);
+        if (!m_int.m_st._mp_size) {
+            return {true, T(0)};
         }
-        if (n._mp_size == 1) {
-            // Single-limb, positive value case.
-            if ((n.m_limbs[0] & GMP_NUMB_MASK) > uint_t(std::numeric_limits<T>::max())) {
-                // TODO error message.
-                throw std::overflow_error("");
+        // Attempt conversion to ull.
+        const auto candidate = convert_to_ull();
+        if (!candidate.first) {
+            return {false, T(0)};
+        }
+        if (m_int.m_st._mp_size > 0) {
+            // If the value is positive, we check that the candidate does not exceed the
+            // max value of the type.
+            if (candidate.second > uT(std::numeric_limits<T>::max())) {
+                return {false, T(0)};
             }
-            return static_cast<T>(n.m_limbs[0] & GMP_NUMB_MASK);
-        }
-        if (n._mp_size == -1 && (n.m_limbs[0] & GMP_NUMB_MASK) <= 9223372036854775807ull) {
-            // Handle negative single limb only if we are in the safe range of long long.
-            const auto candidate = -static_cast<long long>(n.m_limbs[0] & GMP_NUMB_MASK);
-            if (candidate < std::numeric_limits<T>::min()) {
-                // TODO error message.
-                throw std::overflow_error("");
+            return {true, T(candidate.second)};
+        } else {
+            // For negative values, we need to establish if the value fits the negative range of the
+            // target type, and we must make sure to take the negative of the candidate correctly.
+            // NOTE: see the comments in the generic ctor about the portability of this technique
+            // for computing the absolute value.
+            constexpr auto min_abs = -static_cast<unsigned long long>(std::numeric_limits<T>::min());
+            constexpr auto max = static_cast<unsigned long long>(std::numeric_limits<T>::max());
+            if (candidate.second > min_abs) {
+                // The value is too small.
+                return {false, T(0)};
             }
-            return static_cast<T>(candidate);
+            // The abs of min might be greater than max. The idea then is that we decrease the magnitude
+            // of the candidate to the safe negation range via division, we negate it and then we recover the
+            // original candidate value. If the abs of min is not greater than max, ceil_ratio will be 1, r will be zero
+            // and everything will still work.
+            constexpr auto ceil_ratio = min_abs / max + unsigned((min_abs % max) != 0u);
+            const unsigned long long q = candidate.second / ceil_ratio, r = candidate.second % ceil_ratio;
+            auto retval = static_cast<T>(-static_cast<T>(q));
+            static_assert(ceil_ratio <= uT(std::numeric_limits<T>::max()), "Overflow error.");
+            retval = static_cast<T>(retval * static_cast<T>(ceil_ratio));
+            retval = static_cast<T>(retval - static_cast<T>(r));
+            return {true, retval};
         }
-        // Forward to mpz.
-        return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
     }
-    // Static conversion to floating-point.
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T conversion_impl(const s_int &n)
+    // Implementation of the conversion to floating-point through GMP/MPFR routines.
+    template <typename T, enable_if_t<std::is_same<T, float>::value || std::is_same<T, double>::value, int> = 0>
+    static std::pair<bool, T> mpz_float_conversion(const mpz_struct_t &m)
+    {
+        return {true, static_cast<T>(::mpz_get_d(&m))};
+    }
+#if defined(MPPP_WITH_LONG_DOUBLE)
+    template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
+    static std::pair<bool, T> mpz_float_conversion(const mpz_struct_t &m)
+    {
+        MPPP_MAYBE_TLS mpfr_raii mpfr;
+        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
+        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
+        ::mpfr_set_z(&mpfr.m_mpfr, &m, MPFR_RNDN);
+        return {true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN)};
+    }
+#endif
+    // Conversion to floating-point.
+    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
-        if (!n._mp_size) {
-            return T(0);
+        if (!m_int.m_st._mp_size) {
+            return {true, T(0)};
         }
         if (std::numeric_limits<T>::is_iec559) {
             // Optimization for single-limb integers.
@@ -1268,163 +1330,29 @@ private:
             // will get either the max/min finite value or +-inf. Additionally, the IEEE standard seems to indicate
             // that an overflowing conversion will produce infinity:
             // http://stackoverflow.com/questions/40694384/integer-to-float-conversions-with-ieee-fp
-            if (n._mp_size == 1) {
-                return static_cast<T>(n.m_limbs[0] & GMP_NUMB_MASK);
+            // Get the pointer to the limbs.
+            const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
+            if (m_int.m_st._mp_size == 1) {
+                return {true, static_cast<T>(ptr[0] & GMP_NUMB_MASK)};
             }
-            if (n._mp_size == -1) {
-                return -static_cast<T>(n.m_limbs[0] & GMP_NUMB_MASK);
+            if (m_int.m_st._mp_size == -1) {
+                return {true, -static_cast<T>(ptr[0] & GMP_NUMB_MASK)};
             }
         }
         // For all the other cases, just delegate to the GMP/MPFR routines.
-        return conversion_impl<T>(*static_cast<const mpz_struct_t *>(n.get_mpz_view()));
+        return mpz_float_conversion<T>(*static_cast<const mpz_struct_t *>(get_mpz_view()));
     }
-    // Dynamic conversion to bool.
-    template <typename T, enable_if_t<std::is_same<T, bool>::value, int> = 0>
-    static T conversion_impl(const mpz_struct_t &m)
-    {
-        return mpz_sgn(&m) != 0;
-    }
-    // Dynamic conversion to unsigned ints.
-    template <typename T, uint_conversion_enabler<T> = 0>
-    static T conversion_impl(const mpz_struct_t &m)
-    {
-        if (mpz_sgn(&m) < 0) {
-            // Cannot convert negative values into unsigned ints.
-            // TODO error message.
-            throw std::overflow_error("");
-        }
-        if (::mpz_fits_ulong_p(&m)) {
-            // Go through GMP if possible.
-            const auto ul = ::mpz_get_ui(&m);
-            if (ul <= std::numeric_limits<T>::max()) {
-                return static_cast<T>(ul);
-            }
-            // TODO error message.
-            throw std::overflow_error("");
-        }
-        // We are now in a situation in which m does not fit in ulong. The only hope is that it does
-        // fit in ulonglong. We will try to build one operating in 32-bit chunks.
-        unsigned long long retval = 0u;
-        // q will be a copy of m that will be right-shifted down in chunks.
-        MPPP_MAYBE_TLS mpz_raii q;
-        ::mpz_set(&q.m_mpz, &m);
-        // Init the multiplier for use in the loop below.
-        unsigned long long multiplier = 1u;
-        // Handy shortcut.
-        constexpr auto ull_max = std::numeric_limits<unsigned long long>::max();
-        while (true) {
-            // NOTE: mpz_get_ui() already gives the lower bits of q, select the first 32 bits.
-            unsigned long long ull = ::mpz_get_ui(&q.m_mpz) & ((1ull << 32) - 1ull);
-            // Overflow check.
-            if (ull > ull_max / multiplier) {
-                // TODO message.
-                throw std::overflow_error("");
-            }
-            // Shift up the current 32 bits being considered.
-            ull *= multiplier;
-            // Overflow check.
-            if (retval > ull_max - ull) {
-                // TODO message.
-                throw std::overflow_error("");
-            }
-            // Add the current 32 bits to the result.
-            retval += ull;
-            // Shift down q.
-            ::mpz_tdiv_q_2exp(&q.m_mpz, &q.m_mpz, 32);
-            // The iteration will stop when q becomes zero.
-            if (!mpz_sgn(&q.m_mpz)) {
-                break;
-            }
-            // Overflow check.
-            if (multiplier > ull_max / (1ull << 32)) {
-                // TODO message.
-                throw std::overflow_error("");
-            }
-            // Update the multiplier.
-            multiplier *= 1ull << 32;
-        }
-        if (retval > std::numeric_limits<T>::max()) {
-            // TODO error message.
-            throw std::overflow_error("");
-        }
-        return static_cast<T>(retval);
-    }
-    // Dynamic conversion to signed ints.
-    template <typename T, int_conversion_enabler<T> = 0>
-    static T conversion_impl(const mpz_struct_t &m)
-    {
-        if (::mpz_fits_slong_p(&m)) {
-            const auto sl = ::mpz_get_si(&m);
-            if (sl >= std::numeric_limits<T>::min() && sl <= std::numeric_limits<T>::max()) {
-                return static_cast<T>(sl);
-            }
-            // TODO error message.
-            throw std::overflow_error("");
-        }
-        // The same approach as for the unsigned case, just slightly more complicated because
-        // of the presence of the sign.
-        long long retval = 0;
-        MPPP_MAYBE_TLS mpz_raii q;
-        ::mpz_set(&q.m_mpz, &m);
-        const bool sign = mpz_sgn(&q.m_mpz) > 0;
-        long long multiplier = sign ? 1 : -1;
-        // Shortcuts.
-        constexpr auto ll_max = std::numeric_limits<long long>::max();
-        constexpr auto ll_min = std::numeric_limits<long long>::min();
-        while (true) {
-            auto ll = static_cast<long long>(::mpz_get_ui(&q.m_mpz) & ((1ull << 32) - 1ull));
-            if ((sign && ll && multiplier > ll_max / ll) || (!sign && ll && multiplier < ll_min / ll)) {
-                // TODO error message.
-                throw std::overflow_error("1");
-            }
-            ll *= multiplier;
-            if ((sign && retval > ll_max - ll) || (!sign && retval < ll_min - ll)) {
-                // TODO error message.
-                throw std::overflow_error("2");
-            }
-            retval += ll;
-            ::mpz_tdiv_q_2exp(&q.m_mpz, &q.m_mpz, 32);
-            if (!mpz_sgn(&q.m_mpz)) {
-                break;
-            }
-            if ((sign && multiplier > ll_max / (1ll << 32)) || (!sign && multiplier < ll_min / (1ll << 32))) {
-                // TODO error message.
-                throw std::overflow_error("3");
-            }
-            multiplier *= 1ll << 32;
-        }
-        if (retval > std::numeric_limits<T>::max() || retval < std::numeric_limits<T>::min()) {
-            // TODO error message.
-            throw std::overflow_error("4");
-        }
-        return static_cast<T>(retval);
-    }
-    // Dynamic conversion to float/double.
-    template <typename T, enable_if_t<std::is_same<T, float>::value || std::is_same<T, double>::value, int> = 0>
-    static T conversion_impl(const mpz_struct_t &m)
-    {
-        return static_cast<T>(::mpz_get_d(&m));
-    }
-#if defined(MPPP_WITH_LONG_DOUBLE)
-    // Dynamic conversion to long double.
-    template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
-    static T conversion_impl(const mpz_struct_t &m)
-    {
-        MPPP_MAYBE_TLS mpfr_raii mpfr;
-        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
-        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
-        ::mpfr_set_z(&mpfr.m_mpfr, &m, MPFR_RNDN);
-        return ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN);
-    }
-#endif
+
 public:
     template <typename T, generic_conversion_enabler<T> = 0>
     explicit operator T() const
     {
-        if (is_static()) {
-            return conversion_impl<T>(m_int.g_st());
+        const auto retval = dispatch_conversion<T>();
+        if (!retval.first) {
+            // TODO error message.
+            throw std::overflow_error("");
         }
-        return conversion_impl<T>(m_int.g_dy());
+        return retval.second;
     }
     void promote()
     {
