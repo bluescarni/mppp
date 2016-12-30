@@ -1011,6 +1011,8 @@ private:
             // There is not enough space for the extra limb, we need to reallocate.
             // NOTE: same as above, make sure the top limb contains something. mpz_realloc2() seems not to care,
             // but better safe than sorry.
+            // NOTE: in practice this is never hit on current architectures: the only case we end up here is initing
+            // with a 64bit integer when the limb is 32bit, but in that case we already promoted to size 2 above.
             const auto limb_copy = m_int.g_dy()._mp_d[asize - 1];
             m_int.g_dy()._mp_d[asize - 1] = 1u;
             ::mpz_realloc2(&m_int.g_dy(), static_cast<::mp_bitcnt_t>(asize) * 2u * GMP_NUMB_BITS);
@@ -1077,8 +1079,8 @@ private:
     void dispatch_generic_ctor(T x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
-            throw std::invalid_argument("Cannot init integer from the non-finite floating-point value "
-                                        + std::to_string(x));
+            throw std::domain_error("Cannot init integer from the non-finite floating-point value "
+                                    + std::to_string(x));
         }
         MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
@@ -1089,8 +1091,8 @@ private:
     void dispatch_generic_ctor(T x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
-            throw std::invalid_argument("Cannot init integer from the non-finite floating-point value "
-                                        + std::to_string(x));
+            throw std::domain_error("Cannot init integer from the non-finite floating-point value "
+                                    + std::to_string(x));
         }
         MPPP_MAYBE_TLS mpfr_raii mpfr;
         MPPP_MAYBE_TLS mpz_raii tmp;
@@ -1170,9 +1172,9 @@ public:
         if (mppp_unlikely(base < 2 || base > 62)) {
             throw std::invalid_argument("Invalid base for string conversion: the base must be between "
                                         "2 and 62, but a value of "
-                                        + std::to_string(base) + " was provided instead.");
+                                        + std::to_string(base) + " was provided instead");
         }
-        return mppp_impl::mpz_to_str(get_mpz_view());
+        return mppp_impl::mpz_to_str(get_mpz_view(), base);
     }
     // NOTE: maybe provide a method to access the lower-level str conversion that writes to
     // std::vector<char>?

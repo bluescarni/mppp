@@ -33,6 +33,7 @@ see https://www.gnu.org/licenses/. */
 #include <limits>
 #include <random>
 #include <stdexcept>
+#include <string>
 #include <thread>
 #include <tuple>
 #include <type_traits>
@@ -57,6 +58,7 @@ see https://www.gnu.org/licenses/. */
 static int ntries = 1000;
 
 using namespace mppp;
+using namespace mppp::mppp_impl;
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
@@ -143,7 +145,50 @@ struct fp_ctor_tester {
         {
             using integer = mp_integer<S::value>;
             REQUIRE((std::is_constructible<integer, Float>::value));
-            REQUIRE(lex_cast(Float(0)) == lex_cast(integer{Float(0)}));
+            if (std::numeric_limits<Float>::is_iec559) {
+                REQUIRE_THROWS_PREDICATE(integer{std::numeric_limits<Float>::infinity()}, std::domain_error,
+                                         [](const std::domain_error &ex) {
+                                             return ex.what()
+                                                    == "Cannot init integer from the non-finite floating-point value "
+                                                           + std::to_string(std::numeric_limits<Float>::infinity());
+                                         });
+                REQUIRE_THROWS_PREDICATE(integer{-std::numeric_limits<Float>::infinity()}, std::domain_error,
+                                         [](const std::domain_error &ex) {
+                                             return ex.what()
+                                                    == "Cannot init integer from the non-finite floating-point value "
+                                                           + std::to_string(-std::numeric_limits<Float>::infinity());
+                                         });
+                REQUIRE_THROWS_PREDICATE(integer{std::numeric_limits<Float>::quiet_NaN()}, std::domain_error,
+                                         [](const std::domain_error &ex) {
+                                             return ex.what()
+                                                    == "Cannot init integer from the non-finite floating-point value "
+                                                           + std::to_string(std::numeric_limits<Float>::quiet_NaN());
+                                         });
+            }
+            REQUIRE(lex_cast(integer{Float(0)}) == "0");
+            REQUIRE(lex_cast(integer{Float(1.5)}) == "1");
+            REQUIRE(lex_cast(integer{Float(-1.5)}) == "-1");
+            REQUIRE(lex_cast(integer{Float(123.9)}) == "123");
+            REQUIRE(lex_cast(integer{Float(-123.9)}) == "-123");
+            // Random testing.
+            std::atomic<bool> fail(false);
+            auto f = [&fail](unsigned n) {
+                std::uniform_real_distribution<Float> dist(Float(-100), Float(100));
+                std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
+                for (auto i = 0; i < ntries; ++i) {
+                    auto tmp = dist(eng);
+                    if (lex_cast(integer{std::trunc(tmp)}) != lex_cast(integer{tmp})) {
+                        fail.store(false);
+                    }
+                }
+            };
+            std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+            t0.join();
+            t1.join();
+            t2.join();
+            t3.join();
+            REQUIRE(!fail.load());
+            mt_rng_seed += 4u;
         }
     };
     template <typename S>
@@ -200,6 +245,86 @@ struct string_ctor_tester {
 TEST_CASE("string constructor")
 {
     tuple_for_each(sizes{}, string_ctor_tester{});
+}
+
+struct mpz_ctor_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        mpz_raii m;
+        REQUIRE(lex_cast(integer{&m.m_mpz}) == "0");
+        ::mpz_set_si(&m.m_mpz, 1234);
+        REQUIRE(lex_cast(integer{&m.m_mpz}) == "1234");
+        ::mpz_set_si(&m.m_mpz, -1234);
+        REQUIRE(lex_cast(integer{&m.m_mpz}) == "-1234");
+        ::mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        REQUIRE(lex_cast(integer{&m.m_mpz})
+                == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
+        ::mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        REQUIRE(lex_cast(integer{&m.m_mpz})
+                == "-3218372891372987328917389127389217398271983712987398127398172389712937819237");
+        // Random testing.
+        std::atomic<bool> fail(false);
+        auto f = [&fail](unsigned n) {
+            std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
+                                                     std::numeric_limits<long>::max());
+            std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
+            for (auto i = 0; i < ntries; ++i) {
+                mpz_raii mpz;
+                auto tmp = dist(eng);
+                ::mpz_set_si(&mpz.m_mpz, tmp);
+                if (lex_cast(integer{&mpz.m_mpz}) != lex_cast(tmp)) {
+                    fail.store(false);
+                }
+            }
+        };
+        std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+        t0.join();
+        t1.join();
+        t2.join();
+        t3.join();
+        REQUIRE(!fail.load());
+        mt_rng_seed += 4u;
+    }
+};
+
+TEST_CASE("mpz_t constructor")
+{
+    tuple_for_each(sizes{}, mpz_ctor_tester{});
+}
+
+struct to_string_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        REQUIRE(integer{}.to_string() == "0");
+        REQUIRE(integer{1}.to_string() == "1");
+        REQUIRE(integer{-1}.to_string() == "-1");
+        REQUIRE(integer{123}.to_string() == "123");
+        REQUIRE(integer{-123}.to_string() == "-123");
+        REQUIRE(integer{123}.to_string(3) == "11120");
+        REQUIRE(integer{-123}.to_string(3) == "-11120");
+        REQUIRE_THROWS_PREDICATE((integer{}.to_string(1)), std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "Invalid base for string conversion: the base must be between "
+                                             "2 and 62, but a value of 1 was provided instead";
+        });
+        REQUIRE_THROWS_PREDICATE(
+            (integer{}.to_string(-12)), std::invalid_argument, [](const std::invalid_argument &ia) {
+                return std::string(ia.what()) == "Invalid base for string conversion: the base must be between "
+                                                 "2 and 62, but a value of -12 was provided instead";
+            });
+        REQUIRE_THROWS_PREDICATE((integer{}.to_string(63)), std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "Invalid base for string conversion: the base must be between "
+                                             "2 and 62, but a value of 63 was provided instead";
+        });
+    }
+};
+
+TEST_CASE("to_string")
+{
+    tuple_for_each(sizes{}, to_string_tester{});
 }
 
 struct yes {
