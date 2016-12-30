@@ -1181,6 +1181,12 @@ private:
     // Implementation of the conversion operator.
     template <typename T>
     using generic_conversion_enabler = generic_ctor_enabler<T>;
+    // Conversion to bool.
+    template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
+    {
+        return {true, m_int.m_st._mp_size != 0};
+    }
     // Try to convert this to an unsigned long long. The abs value of this will be considered for the conversion.
     // Requires nonzero this.
     std::pair<bool, unsigned long long> convert_to_ull() const
@@ -1213,12 +1219,6 @@ private:
         }
         return {true, retval};
     }
-    // Conversion to bool.
-    template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
-    {
-        return {true, m_int.m_st._mp_size != 0};
-    }
     // Conversion to unsigned ints, excluding bool.
     template <
         typename T,
@@ -1229,17 +1229,18 @@ private:
         if (!m_int.m_st._mp_size) {
             return {true, T(0)};
         }
-        // Handle negative size.
+        // Handle negative value.
         if (m_int.m_st._mp_size < 0) {
             return {false, T(0)};
         }
         // Attempt conversion to ull.
         const auto candidate = convert_to_ull();
         if (!candidate.first) {
+            // The conversion to ull failed.
             return {false, T(0)};
         }
         if (candidate.second > std::numeric_limits<T>::max()) {
-            // The value exceeds the limit of T.
+            // The conversion to ull succeeded, but the value exceeds the limit of T.
             return {false, T(0)};
         }
         // The conversion to the target unsigned integral type is fine.
@@ -1249,6 +1250,10 @@ private:
     template <typename T, enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
+        // NOTE: here we will assume that unsigned long long can represent the absolute value of any
+        // machine integer. This is not necessarily the case on any possible implementation, but it holds
+        // true on any current architecture. See the comments below and in the generic constructor regarding
+        // the method of computing the absolute value of a negative int.
         using uT = typename std::make_unsigned<T>::type;
         // Handle zero.
         if (!m_int.m_st._mp_size) {
@@ -1257,6 +1262,7 @@ private:
         // Attempt conversion to ull.
         const auto candidate = convert_to_ull();
         if (!candidate.first) {
+            // The conversion to ull failed: the value is too large to be represented by any integer type.
             return {false, T(0)};
         }
         if (m_int.m_st._mp_size > 0) {
@@ -1265,7 +1271,7 @@ private:
             if (candidate.second > uT(std::numeric_limits<T>::max())) {
                 return {false, T(0)};
             }
-            return {true, T(candidate.second)};
+            return {true, static_cast<T>(candidate.second)};
         } else {
             // For negative values, we need to establish if the value fits the negative range of the
             // target type, and we must make sure to take the negative of the candidate correctly.
@@ -1317,6 +1323,7 @@ private:
         }
         if (std::numeric_limits<T>::is_iec559) {
             // Optimization for single-limb integers.
+            //
             // NOTE: the reasoning here is as follows. If the floating-point type has infinity,
             // then its "range" is the whole real line. The C++ standard guarantees that:
             // """
@@ -1330,6 +1337,7 @@ private:
             // will get either the max/min finite value or +-inf. Additionally, the IEEE standard seems to indicate
             // that an overflowing conversion will produce infinity:
             // http://stackoverflow.com/questions/40694384/integer-to-float-conversions-with-ieee-fp
+            //
             // Get the pointer to the limbs.
             const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
             if (m_int.m_st._mp_size == 1) {
