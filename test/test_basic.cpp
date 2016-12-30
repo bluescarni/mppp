@@ -47,7 +47,6 @@ see https://www.gnu.org/licenses/. */
 
 // TODO:
 // - assignment ops, copy/move ctors.
-// - fp ctors.
 // - string ctors / conversion.
 // - streaming.
 // - utility funcs.
@@ -371,6 +370,29 @@ struct int_convert_tester {
             REQUIRE(roundtrip_conversion<integer>(max - Int(3)));
             REQUIRE(roundtrip_conversion<integer>(min + Int(42)));
             REQUIRE(roundtrip_conversion<integer>(max - Int(42)));
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) - 1), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) - 2), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) - 3), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) - 123), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) + 1), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) + 2), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) + 3), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) + 123), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            // Try with large integers that should trigger a specific error, at least on some platforms.
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) * max * max * max * max), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            if (min != Int(0)) {
+                REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) * min * min * min * min), std::overflow_error,
+                                         [](const std::overflow_error &) { return true; });
+            }
             std::atomic<bool> fail(false);
             auto f = [&fail, min, max](unsigned n) {
                 std::uniform_int_distribution<Int> dist(min, max);

@@ -45,6 +45,7 @@ see https://www.gnu.org/licenses/. */
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <typeinfo>
 #include <utility>
 #include <vector>
 
@@ -1368,9 +1369,9 @@ public:
     explicit operator T() const
     {
         const auto retval = dispatch_conversion<T>();
-        if (!retval.first) {
-            // TODO error message.
-            throw std::overflow_error("");
+        if (mppp_unlikely(!retval.first)) {
+            throw std::overflow_error("Conversion of the integer " + to_string() + " to the type " + typeid(T).name()
+                                      + " results in overflow");
         }
         return retval.second;
     }
