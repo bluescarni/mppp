@@ -3735,17 +3735,20 @@ private:
     }
 
 public:
-    // NOTE: nextprime on negative numbers always returns 2.
+    /// Compute next prime number (binary version).
     friend void nextprime(mp_integer &rop, const mp_integer &n)
     {
+        // NOTE: nextprime on negative numbers always returns 2.
         nextprime_impl(rop, n);
     }
+    /// Compute next prime number (unary version).
     friend mp_integer nextprime(const mp_integer &n)
     {
         mp_integer retval;
         nextprime_impl(retval, n);
         return retval;
     }
+    /// Compute next prime number in-place version.
     mp_integer &nextprime()
     {
         nextprime_impl(*this, *this);
