@@ -33,6 +33,7 @@ see https://www.gnu.org/licenses/. */
 #include <iostream>
 #include <limits>
 #include <random>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -49,7 +50,7 @@ see https://www.gnu.org/licenses/. */
 // TODO:
 // - assignment ops, copy/move ctors.
 // - string ctors / conversion.
-// - streaming.
+// - neg.
 // - utility funcs.
 // - promote() in tests.
 // - need comprehensive testing for all the special cases for limbs (1 vs 1, 1 vs 2, 2 vs 1, 2 vs 2),
@@ -239,6 +240,8 @@ struct string_ctor_tester {
         REQUIRE(lex_cast(integer{"-0b11", 0}) == "-3");
         REQUIRE(lex_cast(integer{"110", 2}) == "6");
         REQUIRE(lex_cast(integer{"-110", 2}) == "-6");
+        REQUIRE(lex_cast(integer{"1120211201", 3}) == "31231");
+        REQUIRE(lex_cast(integer{"-1120211201", 3}) == "-31231");
     }
 };
 
@@ -325,6 +328,34 @@ struct to_string_tester {
 TEST_CASE("to_string")
 {
     tuple_for_each(sizes{}, to_string_tester{});
+}
+
+struct stream_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        {
+            std::ostringstream oss;
+            oss << integer{};
+            REQUIRE(oss.str() == "0");
+        }
+        {
+            std::ostringstream oss;
+            oss << integer{123};
+            REQUIRE(oss.str() == "123");
+        }
+        {
+            std::ostringstream oss;
+            oss << integer{-123};
+            REQUIRE(oss.str() == "-123");
+        }
+    }
+};
+
+TEST_CASE("stream")
+{
+    tuple_for_each(sizes{}, stream_tester{});
 }
 
 struct yes {
@@ -449,9 +480,10 @@ struct fp_convert_tester {
             REQUIRE(static_cast<Float>(integer{-12}) == Float(-12));
             if (std::numeric_limits<Float>::is_iec559) {
                 // Try with large numbers.
-                REQUIRE(std::abs(
-                            static_cast<Float>(integer{"1000000000000000000000000000000"})
-                            - Float(1E30))
+                REQUIRE(std::abs(static_cast<Float>(integer{"1000000000000000000000000000000"}) - Float(1E30))
+                            / Float(1E30)
+                        <= std::numeric_limits<Float>::epsilon() * 1000.);
+                REQUIRE(std::abs(static_cast<Float>(integer{"-1000000000000000000000000000000"}) + Float(1E30))
                             / Float(1E30)
                         <= std::numeric_limits<Float>::epsilon() * 1000.);
                 REQUIRE(static_cast<Float>(integer{std::numeric_limits<Float>::max()})
