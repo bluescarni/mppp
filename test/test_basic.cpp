@@ -47,15 +47,6 @@ see https://www.gnu.org/licenses/. */
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-// TODO:
-// - assignment ops, copy/move ctors.
-// - string ctors / conversion.
-// - neg.
-// - utility funcs.
-// - promote() in tests.
-// - need comprehensive testing for all the special cases for limbs (1 vs 1, 1 vs 2, 2 vs 1, 2 vs 2),
-//   with all the corner cases around upper limits for limbs.
-
 static int ntries = 1000;
 
 using namespace mppp;
@@ -295,6 +286,120 @@ struct mpz_ctor_tester {
 TEST_CASE("mpz_t constructor")
 {
     tuple_for_each(sizes{}, mpz_ctor_tester{});
+}
+
+struct copy_move_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        integer n;
+        REQUIRE(n.is_static());
+        n = 123;
+        REQUIRE(n.is_static());
+        integer m{n};
+        REQUIRE(n.is_static());
+        REQUIRE(m.is_static());
+        REQUIRE(n == 123);
+        REQUIRE(m == 123);
+        m.promote();
+        REQUIRE(m.is_dynamic());
+        integer m2{std::move(m)};
+        REQUIRE(m2.is_dynamic());
+        REQUIRE(m.is_static());
+        REQUIRE(m == 0);
+        m = 123;
+        integer m3{std::move(m)};
+        REQUIRE(m3 == 123);
+        REQUIRE(m.is_static());
+        REQUIRE(m3.is_static());
+        m3.promote();
+        integer m4{m3};
+        REQUIRE(m3 == 123);
+        REQUIRE(m4 == 123);
+        REQUIRE(m3.is_dynamic());
+        REQUIRE(m4.is_dynamic());
+        m4 = m4;
+        REQUIRE(m4.is_dynamic());
+        REQUIRE(m4 == 123);
+        m4 = std::move(m4);
+        REQUIRE(m4.is_dynamic());
+        REQUIRE(m4 == 123);
+        integer m5{12}, m6{-10};
+        m5 = m6;
+        REQUIRE(m5.is_static());
+        REQUIRE(m5 == -10);
+        m5 = m4;
+        REQUIRE(m5.is_dynamic());
+        REQUIRE(m5 == 123);
+        m4 = m6;
+        REQUIRE(m4.is_static());
+        REQUIRE(m4 == -10);
+        m4.promote();
+        m5 = m4;
+        REQUIRE(m5.is_dynamic());
+        REQUIRE(m5 == -10);
+        m4 = std::move(m5);
+        REQUIRE(m4.is_dynamic());
+        REQUIRE(m4 == -10);
+        m4 = integer{-1};
+        REQUIRE(m4.is_static());
+        REQUIRE(m4 == -1);
+        m4.promote();
+        m5 = 10;
+        m5.promote();
+        m4 = std::move(m5);
+        REQUIRE(m4.is_dynamic());
+        REQUIRE(m4 == 10);
+        m5 = -1;
+        m5 = std::move(m4);
+        REQUIRE(m4.is_static());
+        REQUIRE(m4 == 0);
+        REQUIRE(m5.is_dynamic());
+        REQUIRE(m5 == 10);
+    }
+};
+
+TEST_CASE("copy and move")
+{
+    tuple_for_each(sizes{}, copy_move_tester{});
+}
+
+struct promdem_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        integer n;
+        REQUIRE(n.promote());
+        REQUIRE(n.sign() == 0);
+        REQUIRE(n.is_dynamic());
+        REQUIRE(!n.promote());
+        REQUIRE(n.demote());
+        REQUIRE(n.sign() == 0);
+        REQUIRE(n.is_static());
+        REQUIRE(!n.demote());
+        n = -5;
+        REQUIRE(n.promote());
+        REQUIRE(n == -5);
+        REQUIRE(n.is_dynamic());
+        REQUIRE(!n.promote());
+        REQUIRE(n.demote());
+        REQUIRE(n == -5);
+        REQUIRE(n.is_static());
+        REQUIRE(!n.demote());
+        n = integer{"312321983721983791287392817328917398217398712938719273981273"};
+        if (n.size() > S::value) {
+            REQUIRE(n.is_dynamic());
+            REQUIRE(!n.demote());
+            REQUIRE(n.is_dynamic());
+        }
+    }
+};
+
+TEST_CASE("promote and demote")
+{
+    tuple_for_each(sizes{}, promdem_tester{});
 }
 
 struct to_string_tester {

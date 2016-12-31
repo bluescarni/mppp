@@ -1376,13 +1376,21 @@ public:
         return retval.second;
     }
     /// Promote to dynamic storage.
-    void promote()
+    bool promote()
+    {
+        if (is_static()) {
+            m_int.promote();
+            return true;
+        }
+        return false;
+    }
+    /// Demote to static storage.
+    bool demote()
     {
         if (is_dynamic()) {
-            // TODO throw.
-            throw std::invalid_argument("");
+            return m_int.demote();
         }
-        m_int.promote();
+        return false;
     }
     /// Size in bits.
     std::size_t nbits() const
