@@ -650,3 +650,39 @@ TEST_CASE("floating-point conversions")
 {
     tuple_for_each(sizes{}, fp_convert_tester{});
 }
+
+struct sizes_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        integer n;
+        REQUIRE(n.nbits() == 0u);
+        REQUIRE(n.size() == 0u);
+        n = 1;
+        REQUIRE(n.nbits() == 1u);
+        REQUIRE(n.size() == 1u);
+        n = -1;
+        REQUIRE(n.nbits() == 1u);
+        REQUIRE(n.size() == 1u);
+        n = 3;
+        REQUIRE(n.nbits() == 2u);
+        REQUIRE(n.size() == 1u);
+        n = -3;
+        REQUIRE(n.nbits() == 2u);
+        REQUIRE(n.size() == 1u);
+        n = 1;
+        n <<= GMP_NUMB_BITS;
+        REQUIRE(n.nbits() == GMP_NUMB_BITS + 1);
+        REQUIRE(n.size() == 2u);
+        n = -1;
+        n <<= GMP_NUMB_BITS;
+        REQUIRE(n.nbits() == GMP_NUMB_BITS + 1);
+        REQUIRE(n.size() == 2u);
+    }
+};
+
+TEST_CASE("sizes")
+{
+    tuple_for_each(sizes{}, sizes_tester{});
+}

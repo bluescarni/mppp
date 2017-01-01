@@ -1466,6 +1466,17 @@ private:
 
 public:
     /// Generic conversion operator.
+    /**
+     * \b NOTE: this operator is enabled only if \p T is an interoperable type.
+     *
+     * This operator will convert \p this to the type \p T. Conversion to \p bool yields \p false if \p this is zero,
+     * \p true otherwise. Conversion to other integral types yields the exact result, if representable by the target
+     * type \p T. Conversion to floating-point types might yield inexact values and infinities.
+     *
+     * @return \p this converted to \p T.
+     *
+     * @throws std::overflow_error if \p T is an integral type and the value of \p this cannot be represented by \p T.
+     */
     template <typename T, generic_conversion_enabler<T> = 0>
     explicit operator T() const
     {
@@ -1477,6 +1488,12 @@ public:
         return retval.second;
     }
     /// Promote to dynamic storage.
+    /**
+     * This method will promote the storage type of \p this from static to dynamic.
+     *
+     * @return \p false if the storage type of \p this is already dynamic and no promotion takes place, \p true
+     * otherwise.
+     */
     bool promote()
     {
         if (is_static()) {
@@ -1486,6 +1503,12 @@ public:
         return false;
     }
     /// Demote to static storage.
+    /**
+     * This method will demote the storage type of \p this from dynamic to static.
+     *
+     * @return \p false if the storage type of \p this is already static and no demotion takes place, or if the current
+     * value of \p this does not fit in static storage, \p true otherwise.
+     */
     bool demote()
     {
         if (is_dynamic()) {
@@ -1494,11 +1517,17 @@ public:
         return false;
     }
     /// Size in bits.
+    /**
+     * @return the number of bits needed to represent \p this.
+     */
     std::size_t nbits() const
     {
-        return ::mpz_sizeinbase(get_mpz_view(), 2);
+        return m_int.m_st._mp_size ? ::mpz_sizeinbase(get_mpz_view(), 2) : 0u;
     }
     /// Size in limbs.
+    /**
+     * @return the number of limbs needed to represent \p this.
+     */
     std::size_t size() const
     {
         if (is_static()) {
@@ -1507,6 +1536,9 @@ public:
         return ::mpz_size(&m_int.g_dy());
     }
     /// Sign.
+    /**
+     * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
+     */
     int sign() const
     {
         // NOTE: size is part of the common initial sequence.
@@ -1516,12 +1548,36 @@ public:
             return 0;
         }
     }
-    /// Get \p mpz_t view.
+    /// Get an \p mpz_t view.
+    /**
+     * This method will return an object of an unspecified type \p mpz_view which is implicitly convertible
+     * to a const pointer to an \p mpz struct (and which can thus be used as a <tt>const mpz_t</tt>
+     * parameter in GMP functions). In addition to the implicit conversion operator, the \p mpz struct pointer
+     * can also be retrieved via the <tt>get()</tt> method of the \p mpz_view class.
+     * The pointee will represent a GMP integer whose value is equal to \p this.
+     *
+     * It is important to keep in mind the following facts about the returned \p mpz_view object:
+     * - \p mpz_view objects can only be move-constructed (the other constructors and the assignment operators
+     *   are disabled);
+     * - the returned object and the pointer returned by its <tt>get()</tt> method might reference internal data
+     *   belonging to \p this, and they can thus be used safely only during the lifetime of \p this;
+     * - the lifetime of the pointer returned by the <tt>get()</tt> method is tied to the lifetime of the \p mpz_view
+     *   object (that is, if the \p mpz_view object is destroyed, any pointer previously returned by <tt>get()</tt>
+     *   becomes invalid);
+     * - any modification to \p this will also invalidate the view and the pointer.
+     *
+     * @return an \p mpz view of \p this.
+     */
     mpz_view get_mpz_view() const
     {
         return mpz_view(*this);
     }
     /// Negate in-place.
+    /**
+     * This method will set \p this to <tt>-this</tt>.
+     *
+     * @return a reference to \p this.
+     */
     mp_integer &neg()
     {
         if (is_static()) {
@@ -1532,12 +1588,23 @@ public:
         return *this;
     }
     /// Binary negation.
+    /**
+     * This method will set \p rop to <tt>-n</tt>.
+     *
+     * @param rop the return value.
+     * @param n the integer that will be negated.
+     */
     friend void neg(mp_integer &rop, const mp_integer &n)
     {
         rop = n;
         rop.neg();
     }
     /// Unary negation.
+    /**
+     * @param n the integer that will be negated.
+     *
+     * @return <tt>-n</tt>.
+     */
     friend mp_integer neg(const mp_integer &n)
     {
         mp_integer ret(n);
@@ -1935,6 +2002,13 @@ private:
 
 public:
     /// Ternary add.
+    /**
+     * This function will set \p rop to <tt>op1 + op2</tt>.
+     *
+     * @param rop the return value.
+     * @param op1 the first addend.
+     * @param op2 the second addend.
+     */
     friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
