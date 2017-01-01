@@ -200,29 +200,47 @@ struct string_ctor_tester {
     void operator()(const S &) const
     {
         using integer = mp_integer<S::value>;
+        REQUIRE_THROWS_PREDICATE((integer{"", 1}), std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what())
+                   == "In the constructor from string, a base of 1"
+                      " was specified, but the only valid values are 0 and any value in the [2,62] range";
+        });
+        REQUIRE_THROWS_PREDICATE((integer{"", -10}), std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what())
+                   == "In the constructor from string, a base of -10"
+                      " was specified, but the only valid values are 0 and any value in the [2,62] range";
+        });
+        REQUIRE_THROWS_PREDICATE((integer{"", 63}), std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what())
+                   == "In the constructor from string, a base of 63"
+                      " was specified, but the only valid values are 0 and any value in the [2,62] range";
+        });
+        REQUIRE_THROWS_PREDICATE((integer{"00x00abba", 0}), std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "The string '00x00abba' is not a valid integer any supported base";
+        });
         REQUIRE_THROWS_PREDICATE(integer{""}, std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '' is not a valid integer in base 10.";
+            return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
         });
         REQUIRE_THROWS_PREDICATE((integer{"", 2}), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '' is not a valid integer in base 2.";
+            return std::string(ia.what()) == "The string '' is not a valid integer in base 2";
         });
         REQUIRE_THROWS_PREDICATE((integer{"--31"}), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '--31' is not a valid integer in base 10.";
+            return std::string(ia.what()) == "The string '--31' is not a valid integer in base 10";
         });
         REQUIRE_THROWS_PREDICATE((integer{"-+31"}), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '-+31' is not a valid integer in base 10.";
+            return std::string(ia.what()) == "The string '-+31' is not a valid integer in base 10";
         });
         REQUIRE_THROWS_PREDICATE((integer{"-31a"}), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '-31a' is not a valid integer in base 10.";
+            return std::string(ia.what()) == "The string '-31a' is not a valid integer in base 10";
         });
         REQUIRE_THROWS_PREDICATE((integer{"+a31"}), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '+a31' is not a valid integer in base 10.";
+            return std::string(ia.what()) == "The string '+a31' is not a valid integer in base 10";
         });
         REQUIRE_THROWS_PREDICATE((integer{"+a31"}), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '+a31' is not a valid integer in base 10.";
+            return std::string(ia.what()) == "The string '+a31' is not a valid integer in base 10";
         });
         REQUIRE_THROWS_PREDICATE((integer{"1E45", 12}), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '1E45' is not a valid integer in base 12.";
+            return std::string(ia.what()) == "The string '1E45' is not a valid integer in base 12";
         });
         REQUIRE(lex_cast(integer{"123"}) == "123");
         REQUIRE(lex_cast(integer{"-123"}) == "-123");
@@ -233,6 +251,9 @@ struct string_ctor_tester {
         REQUIRE(lex_cast(integer{"-110", 2}) == "-6");
         REQUIRE(lex_cast(integer{"1120211201", 3}) == "31231");
         REQUIRE(lex_cast(integer{"-1120211201", 3}) == "-31231");
+        REQUIRE(lex_cast(integer{"0x7b", 0}) == "123");
+        REQUIRE(lex_cast(integer{"-0x3039", 0}) == "-12345");
+        REQUIRE(lex_cast(integer{"-0225377", 0}) == "-76543");
     }
 };
 

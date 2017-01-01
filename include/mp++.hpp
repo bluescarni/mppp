@@ -1126,18 +1126,54 @@ private:
 
 public:
     /// Generic constructor.
+    /**
+     * **NOTE**: this constructor is enabled only if \p T is one of the interoperable types.
+     *
+     * This constructor will initialize an integer with the value of \p x. The initialization is always
+     * successful if \p T is an integral type (construction from \p bool yields 1 for \p true, 0 for \p false).
+     * If \p T is a floating-point type, the construction will fail if \p x is not finite. Construction from a
+     * floating-point type yields the truncated counterpart of the input value.
+     *
+     * @param x value that will be used to initialize \p this.
+     *
+     * @throws std::domain_error if \p x is a non-finite floating-point value.
+     */
     template <typename T, generic_ctor_enabler<T> = 0>
     explicit mp_integer(T x) : m_int()
     {
         dispatch_generic_ctor(x);
     }
     /// Constructor from C string.
+    /**
+     * This constructor will initialize \p this from the null-terminated string \p s, which must represent
+     * an integer value in base \p base. The expected format is the same as specified by the \p mpz_set_str()
+     * GMP function. \p base may vary from 2 to 62, or be zero. In the latter case, the base is inferred
+     * from the leading characters of the string.
+     *
+     * @param s the input string.
+     * @param base the base used in the string representation.
+     *
+     * @throws std::invalid_argument if the \p base parameter is invalid or if \p s is not a valid string representation
+     * of an integer in the specified base.
+     *
+     * @see https://gmplib.org/manual/Assigning-Integers.html
+     */
     explicit mp_integer(const char *s, int base = 10) : m_int()
     {
+        if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
+            throw std::invalid_argument(
+                "In the constructor from string, a base of " + std::to_string(base)
+                + " was specified, but the only valid values are 0 and any value in the [2,62] range");
+        }
         MPPP_MAYBE_TLS mpz_raii mpz;
-        if (::mpz_set_str(&mpz.m_mpz, s, base)) {
-            throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
-                                        + std::to_string(base) + ".");
+        if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
+            if (base) {
+                throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
+                                            + std::to_string(base));
+            } else {
+                throw std::invalid_argument(std::string("The string '") + s
+                                            + "' is not a valid integer any supported base");
+            }
         }
         dispatch_mpz_ctor(&mpz.m_mpz);
     }
