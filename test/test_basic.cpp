@@ -254,6 +254,7 @@ struct string_ctor_tester {
         REQUIRE(lex_cast(integer{"0x7b", 0}) == "123");
         REQUIRE(lex_cast(integer{"-0x3039", 0}) == "-12345");
         REQUIRE(lex_cast(integer{"-0225377", 0}) == "-76543");
+        REQUIRE(lex_cast(integer{"512", 0}) == "512");
     }
 };
 

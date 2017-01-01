@@ -1127,7 +1127,7 @@ private:
 public:
     /// Generic constructor.
     /**
-     * **NOTE**: this constructor is enabled only if \p T is one of the interoperable types.
+     * \b NOTE: this constructor is enabled only if \p T is one of the interoperable types.
      *
      * This constructor will initialize an integer with the value of \p x. The initialization is always
      * successful if \p T is an integral type (construction from \p bool yields 1 for \p true, 0 for \p false).
@@ -1177,42 +1177,107 @@ public:
         }
         dispatch_mpz_ctor(&mpz.m_mpz);
     }
-    /// Constructor from C++ string.
+    /// Constructor from C++ string (equivalent to the constructor from C string).
     explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
     {
     }
     /// Constructor from \p mpz_t.
+    /**
+     * This constructor will initialize \p this with the value of the GMP integer \p n.
+     *
+     * \b NOTE: it is up to the user to ensure that \p n has been correctly initialized. Calling this constructor
+     * with an uninitialized \p n is undefined behaviour.
+     *
+     * @param n the input GMP integer.
+     */
     explicit mp_integer(const ::mpz_t n) : m_int()
     {
         dispatch_mpz_ctor(n);
     }
     /// Copy assignment operator.
+    /**
+     * This operator will perform a deep copy of \p other, preserving its storage type as well.
+     *
+     * @param other the assignment argument.
+     *
+     * @return a reference to \p this.
+     */
     mp_integer &operator=(const mp_integer &other) = default;
     /// Move assignment operator.
+    /**
+     * After the move, \p other will be in an unspecified but valid state, and the storage type of \p this will be
+     * \p other's original storage type.
+     *
+     * @param other the assignment argument.
+     *
+     * @return a reference to \p this.
+     */
     mp_integer &operator=(mp_integer &&other) = default;
     /// Generic assignment operator.
+    /**
+     * \b NOTE: this assignment operator is enabled only if \p T is an interoperable type.
+     *
+     * The body of this operator is equivalent to:
+     * @code
+     * return *this = mp_integer{x};
+     * @endcode
+     * That is, a temporary integer is constructed from \p x and it is then move-assigned to \p this.
+     *
+     * @param x the assignment argument.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the generic constructor.
+     */
     template <typename T, generic_assignment_enabler<T> = 0>
     mp_integer &operator=(const T &x)
     {
-        *this = mp_integer{x};
-        return *this;
+        return *this = mp_integer{x};
     }
     /// Test for static storage.
+    /**
+     * @return \p true if the storage type is static, \p false otherwise.
+     */
     bool is_static() const
     {
         return m_int.is_static();
     }
     /// Check for dynamic storage.
+    /**
+     * @return \p true if the storage type is dynamic, \p false otherwise.
+     */
     bool is_dynamic() const
     {
         return m_int.is_dynamic();
     }
     /// Stream operator for mp_integer.
+    /**
+     * This operator will print to the stream \p os the mp_integer \p n in base 10. Internally it uses the
+     * mp_integer::to_string() method.
+     *
+     * @param os the target stream.
+     * @param n the input integer.
+     *
+     * @return a reference to \p os.
+     *
+     * @throws unspecified any exception thrown by mp_integer::to_string().
+     */
     friend std::ostream &operator<<(std::ostream &os, const mp_integer &n)
     {
         return os << n.to_string();
     }
     /// Conversion to string.
+    /**
+     * This method will convert \p this into a string in base \p base using the GMP function \p mpz_get_str().
+     *
+     * @param base the desired base.
+     *
+     * @return a string representation of \p this.
+     *
+     * @throws std::invalid_argument if \p base is smaller than 2 or greater than 62.
+     *
+     * @see https://gmplib.org/manual/Converting-Integers.html
+     */
     std::string to_string(int base = 10) const
     {
         if (mppp_unlikely(base < 2 || base > 62)) {
