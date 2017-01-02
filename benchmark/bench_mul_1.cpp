@@ -57,6 +57,8 @@ NONIUS_BENCHMARK("mppp 2-2-limb signed vector multiplication",
 
 NONIUS_BENCHMARK("flint half-limb unsigned vector multiplication",
                  [](nonius::chronometer meter) { umul_vec_fmpz_half(meter, rng); });
+NONIUS_BENCHMARK("flint half-limb unsigned vector multiplication",
+                 [](nonius::chronometer meter) { umul_vec_fmpz_half(meter, rng); });
 
 NONIUS_BENCHMARK("piranha half-limb unsigned vector multiplication",
                  [](nonius::chronometer meter) { umul_vec_piranha_half(meter, rng); });
