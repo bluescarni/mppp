@@ -3563,7 +3563,7 @@ public:
     }
 #if defined(_MSC_VER)
     template <typename T>
-    friend shift_op_enabler<T> operator<<(const mp_integer &n, T shift)
+    friend shift_op_enabler<T> operator<<(const mp_integer &n, T s)
 #else
     /// Left shift operator.
     /**
@@ -3584,7 +3584,7 @@ public:
     }
 #if defined(_MSC_VER)
     template <typename T>
-    shift_op_enabler<T> &operator<<=(T shift)
+    shift_op_enabler<T> &operator<<=(T s)
 #else
     /// In-place left shift operator.
     /**
@@ -3754,7 +3754,7 @@ public:
     }
 #if defined(_MSC_VER)
     template <typename T>
-    friend shift_op_enabler<T> operator>>(const mp_integer &n, T shift)
+    friend shift_op_enabler<T> operator>>(const mp_integer &n, T s)
 #else
     /// Right shift operator.
     /**
@@ -3775,7 +3775,7 @@ public:
     }
 #if defined(_MSC_VER)
     template <typename T>
-    shift_op_enabler<T> &operator>>=(T shift)
+    shift_op_enabler<T> &operator>>=(T s)
 #else
     /// In-place right shift operator.
     /**
