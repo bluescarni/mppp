@@ -759,7 +759,7 @@ struct zero_division_error final : std::domain_error {
  * the \p mpn_ low-level functions of the GMP API are used if the storage type is static. If the storage type is
  * dynamic, the usual \p mpz_ functions from the GMP API are used.
  *
- * ## Interoperable types ##
+ * # Interoperable types #
  * The class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and floating-point
  * primitive types, and it provides overloaded arithmetic operators. Differently from the builtin types, however, this
  * class does not allow any implicit conversion to/from other types (apart from \p bool): construction from and
@@ -782,7 +782,7 @@ struct zero_division_error final : std::domain_error {
  * - <tt>long long</tt> and <tt>unsigned long long</tt>,
  * - \p float, \p double and <tt>long double</tt> (<tt>long double</tt> requires the MPFR library).
  *
- * ## API ##
+ * # API #
  * Most of the functionality of the class is exposed via inline friend functions, with the general convention
  * that the functions are named after the corresponding GMP functions minus the leading \p mpz_ prefix. For instance,
  * the GMP call
@@ -827,11 +827,48 @@ struct zero_division_error final : std::domain_error {
  * @endcode
  * Note that at this time only a small subset of the GMP API has been wrapped by mp_integer.
  *
- * ## Overloaded operators ##
+ * # Overloaded operators #
  *
- * ## Interfacing with GMP ##
+ * This class provides overloaded operators for the basic arithmetic operations, including bit shifting.
+ * The binary operators are implemented as inline friend functions, the in-place operators are implemented as
+ * member functions. The overloaded operators are resolved via argument-dependent lookup whenever at least
+ * one argument is of type mp_integer, and the other argument is either another mp_integer or an instance
+ * of an interoperable type.
  *
- * ## Internals ##
+ * For the common arithmetic operations (\p +, \p -, \p * and \p /), the type promotion
+ * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
+ * is a C++ integral, the result will be of type mp_integer, if the other argument is a C++ floating-point the result
+ * will a floating-point type. For example:
+ * @code
+ * mp_integer<1> n1{1}, n2{2};
+ * auto res1 = n1 + n2; // res1 is an mp_integer
+ * auto res2 = n1 * 2; // res1 is an mp_integer
+ * auto res3 = 2 - n2; // res1 is an mp_integer
+ * auto res4 = n1 / 2.f // res4 is a float
+ * auto res5 = 12. / n1 // res5 is a double
+ * @endcode
+ *
+ * The modulo operator \p % and the bit shifting operators \p << and \p >> accept only mp_integer and interoperable
+ * integral types as arguments, and they always return mp_integer as result.
+ *
+ * # Interfacing with GMP #
+ *
+ * The class provides facilities to interface with the GMP library. Specifically, the class features:
+ * - a constructor from the GMP integer type \p mpz_t,
+ * - an \p mpz_view class, an instance of which can be requested via the mp_integer::get_mpz_view() method,
+ *   which allows to use mp_integer in the GMP API as a drop-in replacement for <tt>const mpz_t</tt> function
+ *   arguments.
+ *
+ * The \p mpz_view class represent a read-only view of an mp_integer object which is implicitly convertible to the type
+ * <tt>const mpz_t</tt> and which is thus usable as an argument to GMP functions. For example:
+ * @code
+ * mpz_t m;
+ * mpz_init_set_si(m,1); // Create an mpz_t with the value 1.
+ * mp_integer<1> n{1}; // Initialize an mp_integer with the value 1.
+ * mpz_add(m,m,n.get_mpz_view()); // Compute the result of n + m and store it in m,
+ *                                // using the GMP API.
+ * @endcode
+ * See the documentation of mp_integer::get_mpz_view() for more details about the \p mpz_view class.
  */
 template <std::size_t SSize>
 class mp_integer
@@ -1183,7 +1220,8 @@ public:
     }
     /// Constructor from \p mpz_t.
     /**
-     * This constructor will initialize \p this with the value of the GMP integer \p n.
+     * This constructor will initialize \p this with the value of the GMP integer \p n. The storage type of \p this
+     * will be static if \p n fits in the static storage, otherwise it will be dynamic.
      *
      * \b NOTE: it is up to the user to ensure that \p n has been correctly initialized. Calling this constructor
      * with an uninitialized \p n is undefined behaviour.
@@ -1518,7 +1556,7 @@ public:
     }
     /// Size in bits.
     /**
-     * @return the number of bits needed to represent \p this.
+     * @return the number of bits needed to represent \p this. If \p this is zero, zero will be returned.
      */
     std::size_t nbits() const
     {
@@ -1526,7 +1564,7 @@ public:
     }
     /// Size in limbs.
     /**
-     * @return the number of limbs needed to represent \p this.
+     * @return the number of limbs needed to represent \p this. If \p this is zero, zero will be returned.
      */
     std::size_t size() const
     {
@@ -1552,8 +1590,8 @@ public:
     /**
      * This method will return an object of an unspecified type \p mpz_view which is implicitly convertible
      * to a const pointer to an \p mpz struct (and which can thus be used as a <tt>const mpz_t</tt>
-     * parameter in GMP functions). In addition to the implicit conversion operator, the \p mpz struct pointer
-     * can also be retrieved via the <tt>get()</tt> method of the \p mpz_view class.
+     * parameter in GMP functions). In addition to the implicit conversion operator, the <tt>const mpz_t</tt>
+     * object can also be retrieved via the <tt>get()</tt> method of the \p mpz_view class.
      * The pointee will represent a GMP integer whose value is equal to \p this.
      *
      * It is important to keep in mind the following facts about the returned \p mpz_view object:
