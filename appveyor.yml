@@ -40,7 +40,7 @@ build_script:
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] cmake -G "Visual Studio 14 2015" -DMPPP_MSVC_STATIC_RUNTIME=YES -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/mpir.lib ..
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] cmake -G "Visual Studio 14 2015 Win64" -DMPPP_MSVC_STATIC_RUNTIME=YES -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/mpir.lib ..
 - if [%COMPILER%]==[MSVC15] cmake --build . --config %BUILD_TYPE% --target ALL_BUILD
-- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_CXX_FLAGS="-D_GLIBCXX_CONCEPT_CHECKS" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_LONG_DOUBLE=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/libgmp.a -DMPFR_INCLUDE_DIR=C:/local/include -DMPFR_LIBRARY=C:/local/lib/libmpfr.a ..
+- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_LONG_DOUBLE=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/libgmp.a -DMPFR_INCLUDE_DIR=C:/local/include -DMPFR_LIBRARY=C:/local/lib/libmpfr.a ..
 #- if [%COMPILER%]==[MinGW] cmake --build . --config %BUILD_TYPE% --target all
 - if [%COMPILER%]==[MinGW] mingw32-make -j2 VERBOSE=1
 
