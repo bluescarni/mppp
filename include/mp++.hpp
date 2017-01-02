@@ -506,9 +506,29 @@ struct static_int {
         // of an mpz:
         // https://gmplib.org/manual/Integer-Special-Functions.html#Integer-Special-Functions
         explicit static_mpz_view(const static_int &n)
+#if defined(__INTEL_COMPILER)
+        // NOTE: the Intel compiler apparently has a problem with the use of const_cast below, as it seems
+        // to lead to a view with garbage data in some situations. I suspect that the compiler misinterprets
+        // the const_cast in such a way that some write operation is optimized out or skipped.
+        // As a workaround, we create a full copy of n instead of just a view.
+        {
+            ::mpz_init(&m_mpz);
+            if (n._mp_size) {
+                const auto asize = n._mp_size > 0 ? n._mp_size : -n._mp_size;
+                auto ptr = ::mpz_limbs_write(&m_mpz, static_cast<::mp_size_t>(asize));
+                copy_limbs_no(n.m_limbs.data(), n.m_limbs.data() + asize, ptr);
+                ::mpz_limbs_finish(&m_mpz, static_cast<::mp_size_t>(n._mp_size));
+            }
+        }
+        ~static_mpz_view()
+        {
+            ::mpz_clear(&m_mpz);
+        }
+#else
             : m_mpz{s_size, n._mp_size, const_cast<::mp_limb_t *>(n.m_limbs.data())}
         {
         }
+#endif
         static_mpz_view(const static_mpz_view &) = delete;
         static_mpz_view(static_mpz_view &&) = default;
         static_mpz_view &operator=(const static_mpz_view &) = delete;
