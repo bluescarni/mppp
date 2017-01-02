@@ -760,7 +760,8 @@ struct zero_division_error final : std::domain_error {
  * dynamic, the usual \p mpz_ functions from the GMP API are used.
  *
  * # Interoperable types #
- * The class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and floating-point
+ * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
+ * floating-point
  * primitive types, and it provides overloaded arithmetic operators. Differently from the builtin types, however, this
  * class does not allow any implicit conversion to/from other types (apart from \p bool): construction from and
  * conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
@@ -783,7 +784,7 @@ struct zero_division_error final : std::domain_error {
  * - \p float, \p double and <tt>long double</tt> (<tt>long double</tt> requires the MPFR library).
  *
  * # API #
- * Most of the functionality of the class is exposed via inline friend functions, with the general convention
+ * Most of the functionality of this class is exposed via inline friend functions, with the general convention
  * that the functions are named after the corresponding GMP functions minus the leading \p mpz_ prefix. For instance,
  * the GMP call
  * @code
@@ -838,7 +839,7 @@ struct zero_division_error final : std::domain_error {
  * For the common arithmetic operations (\p +, \p -, \p * and \p /), the type promotion
  * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
  * is a C++ integral, the result will be of type mp_integer, if the other argument is a C++ floating-point the result
- * will a floating-point type. For example:
+ * will be of the same floating-point type. For example:
  * @code
  * mp_integer<1> n1{1}, n2{2};
  * auto res1 = n1 + n2; // res1 is an mp_integer
@@ -848,12 +849,19 @@ struct zero_division_error final : std::domain_error {
  * auto res5 = 12. / n1 // res5 is a double
  * @endcode
  *
- * The modulo operator \p % and the bit shifting operators \p << and \p >> accept only mp_integer and interoperable
- * integral types as arguments, and they always return mp_integer as result.
+ * The modulo operator \p % accepts only mp_integer and interoperable integral types as arguments, and it always returns
+ * mp_integer as result. The bit shifting operators \p << and \p >> accept only interoperable integral types as
+ * shift arguments, and they always return mp_integer as result.
+ *
+ * The relational operators, \p ==, \p !=, \p <, \p >, \p <= and \p >= will promote the arguments to a common type
+ * before
+ * comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
+ * promoted to mp_integer if they are both integral types, otherwise they are promoted to the type of the floating-point
+ * argument).
  *
  * # Interfacing with GMP #
  *
- * The class provides facilities to interface with the GMP library. Specifically, the class features:
+ * This class provides facilities to interface with the GMP library. Specifically, mp_integer features:
  * - a constructor from the GMP integer type \p mpz_t,
  * - an \p mpz_view class, an instance of which can be requested via the mp_integer::get_mpz_view() method,
  *   which allows to use mp_integer in the GMP API as a drop-in replacement for <tt>const mpz_t</tt> function
@@ -961,10 +969,10 @@ class mp_integer
     // approach (i.e., default template int argument) results in ICEs in MSVC. Instead, on MSCV we use SFINAE
     // on the return type.
     template <typename T>
-    using shift_op_enabler = enable_if_t<std::is_integral<T>::value, mp_integer>;
+    using shift_op_enabler = enable_if_t<is_supported_integral<T>::value, mp_integer>;
 #else
     template <typename T>
-    using shift_op_enabler = enable_if_t<std::is_integral<T>::value, int>;
+    using shift_op_enabler = enable_if_t<is_supported_integral<T>::value, int>;
 #endif
     template <typename T, enable_if_t<std::is_unsigned<T>::value, int> = 0>
     static ::mp_bitcnt_t cast_to_bitcnt(T n)
@@ -3314,16 +3322,31 @@ public:
         return *this;
     }
     /// Binary modulo operator.
+    /**
+     * @param n the dividend.
+     * @param d the divisor.
+     *
+     * @return <tt>n % d</tt>.
+     *
+     * @throws zero_division_error if \p d is zero.
+     */
     template <typename T, typename U>
-    friend common_mod_t<T, U> operator%(const T &op1, const U &op2)
+    friend common_mod_t<T, U> operator%(const T &n, const U &d)
     {
-        return dispatch_binary_mod(op1, op2);
+        return dispatch_binary_mod(n, d);
     }
     /// In-place modulo operator.
+    /**
+     * @param d the divisor.
+     *
+     * @return a reference to \p this..
+     *
+     * @throws zero_division_error if \p d is zero.
+     */
     template <typename T, in_place_mod_enabler<T> = 0>
-    mp_integer &operator%=(const T &op)
+    mp_integer &operator%=(const T &d)
     {
-        dispatch_in_place_mod(*this, op);
+        dispatch_in_place_mod(*this, d);
         return *this;
     }
 
@@ -3515,6 +3538,14 @@ private:
     }
 
 public:
+    /// Ternary left shift.
+    /**
+     * This function will set \p rop to \p n multiplied by <tt>2**s</tt>.
+     *
+     * @param rop the return value.
+     * @param n the multiplicand.
+     * @param s the bit shift value.
+     */
     friend void mul_2exp(mp_integer &rop, const mp_integer &n, ::mp_bitcnt_t s)
     {
         const bool sr = rop.is_static(), sn = n.is_static();
@@ -3534,26 +3565,40 @@ public:
     template <typename T>
     friend shift_op_enabler<T> operator<<(const mp_integer &n, T shift)
 #else
-    /// Left shift.
+    /// Left shift operator.
+    /**
+     * @param n the multiplicand.
+     * @param s the bit shift value.
+     *
+     * @return \p n times <tt>2**s</tt>.
+     *
+     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+     */
     template <typename T, shift_op_enabler<T> = 0>
-    friend mp_integer operator<<(const mp_integer &n, T shift)
+    friend mp_integer operator<<(const mp_integer &n, T s)
 #endif
     {
-        const auto s = cast_to_bitcnt(shift);
         mp_integer retval;
-        mul_2exp(retval, n, s);
+        mul_2exp(retval, n, cast_to_bitcnt(s));
         return retval;
     }
 #if defined(_MSC_VER)
     template <typename T>
     shift_op_enabler<T> &operator<<=(T shift)
 #else
+    /// In-place left shift operator.
+    /**
+     * @param s the bit shift value.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+     */
     template <typename T, shift_op_enabler<T> = 0>
-    mp_integer &operator<<=(T shift)
+    mp_integer &operator<<=(T s)
 #endif
     {
-        const auto s = cast_to_bitcnt(shift);
-        mul_2exp(*this, *this, s);
+        mul_2exp(*this, *this, cast_to_bitcnt(s));
         return *this;
     }
 
@@ -3686,6 +3731,15 @@ private:
     }
 
 public:
+    /// Ternary right shift.
+    /**
+     * This function will set \p rop to \p n divided by <tt>2**s</tt>. \p rop will be the truncated result of the
+     * division.
+     *
+     * @param rop the return value.
+     * @param n the dividend.
+     * @param s the bit shift value.
+     */
     friend void tdiv_q_2exp(mp_integer &rop, const mp_integer &n, ::mp_bitcnt_t s)
     {
         const bool sr = rop.is_static(), sn = n.is_static();
@@ -3702,26 +3756,40 @@ public:
     template <typename T>
     friend shift_op_enabler<T> operator>>(const mp_integer &n, T shift)
 #else
-    /// Left shift.
+    /// Right shift operator.
+    /**
+     * @param n the dividend.
+     * @param s the bit shift value.
+     *
+     * @return \p n divided by <tt>2**s</tt>. The result will be truncated.
+     *
+     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+     */
     template <typename T, shift_op_enabler<T> = 0>
-    friend mp_integer operator>>(const mp_integer &n, T shift)
+    friend mp_integer operator>>(const mp_integer &n, T s)
 #endif
     {
-        const auto s = cast_to_bitcnt(shift);
         mp_integer retval;
-        tdiv_q_2exp(retval, n, s);
+        tdiv_q_2exp(retval, n, cast_to_bitcnt(s));
         return retval;
     }
 #if defined(_MSC_VER)
     template <typename T>
     shift_op_enabler<T> &operator>>=(T shift)
 #else
+    /// In-place right shift operator.
+    /**
+     * @param s the bit shift value.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+     */
     template <typename T, shift_op_enabler<T> = 0>
-    mp_integer &operator>>=(T shift)
+    mp_integer &operator>>=(T s)
 #endif
     {
-        const auto s = cast_to_bitcnt(shift);
-        tdiv_q_2exp(*this, *this, s);
+        tdiv_q_2exp(*this, *this, cast_to_bitcnt(s));
         return *this;
     }
 
@@ -3898,6 +3966,14 @@ private:
 #endif
 
 public:
+    /// Comparison function for mp_integer.
+    /**
+     * @param op1 first argument.
+     * @param op2 second argument.
+     *
+     * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
+     * <tt>op1 > op2</tt>.
+     */
     friend int cmp(const mp_integer &op1, const mp_integer &op2)
     {
         const bool s1 = op1.is_static(), s2 = op2.is_static();
@@ -3908,65 +3984,114 @@ public:
     }
 #if defined(_MSC_VER)
     template <typename T, typename U>
-    friend rel_enabler<T, U> operator==(const T &a, const U &b)
+    friend rel_enabler<T, U> operator==(const T &op1, const U &op2)
 #else
+    /// Equality operator.
+    /**
+     * @param op1 first argument.
+     * @param op2 second argument.
+     *
+     * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
+     */
     template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator==(const T &a, const U &b)
+    friend bool operator==(const T &op1, const U &op2)
 #endif
     {
-        return dispatch_equality(a, b);
+        return dispatch_equality(op1, op2);
     }
 #if defined(_MSC_VER)
     template <typename T, typename U>
-    friend rel_enabler<T, U> operator!=(const T &a, const U &b)
+    friend rel_enabler<T, U> operator!=(const T &op1, const U &op2)
 #else
+    /// Inequality operator.
+    /**
+     * @param op1 first argument.
+     * @param op2 second argument.
+     *
+     * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
+     */
     template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator!=(const T &a, const U &b)
+    friend bool operator!=(const T &op1, const U &op2)
 #endif
     {
-        return !(a == b);
+        return !(op1 == op2);
     }
 #if defined(_MSC_VER)
     template <typename T, typename U>
-    friend rel_enabler<T, U> operator<(const T &a, const U &b)
+    friend rel_enabler<T, U> operator<(const T &op1, const U &op2)
 #else
+    /// Less-than operator.
+    /**
+     * @param op1 first argument.
+     * @param op2 second argument.
+     *
+     * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
+     */
     template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator<(const T &a, const U &b)
+    friend bool operator<(const T &op1, const U &op2)
 #endif
     {
-        return dispatch_less_than(a, b);
+        return dispatch_less_than(op1, op2);
     }
 #if defined(_MSC_VER)
     template <typename T, typename U>
-    friend rel_enabler<T, U> operator>=(const T &a, const U &b)
+    friend rel_enabler<T, U> operator>=(const T &op1, const U &op2)
 #else
+    /// Greater-than or equal operator.
+    /**
+     * @param op1 first argument.
+     * @param op2 second argument.
+     *
+     * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
+     */
     template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator>=(const T &a, const U &b)
+    friend bool operator>=(const T &op1, const U &op2)
 #endif
     {
-        return !(a < b);
+        return !(op1 < op2);
     }
 #if defined(_MSC_VER)
     template <typename T, typename U>
-    friend rel_enabler<T, U> operator>(const T &a, const U &b)
+    friend rel_enabler<T, U> operator>(const T &op1, const U &op2)
 #else
+    /// Greater-than operator.
+    /**
+     * @param op1 first argument.
+     * @param op2 second argument.
+     *
+     * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
+     */
     template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator>(const T &a, const U &b)
+    friend bool operator>(const T &op1, const U &op2)
 #endif
     {
-        return dispatch_greater_than(a, b);
+        return dispatch_greater_than(op1, op2);
     }
 #if defined(_MSC_VER)
     template <typename T, typename U>
-    friend rel_enabler<T, U> operator<=(const T &a, const U &b)
+    friend rel_enabler<T, U> operator<=(const T &op1, const U &op2)
 #else
+    /// Less-than or equal operator.
+    /**
+     * @param op1 first argument.
+     * @param op2 second argument.
+     *
+     * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
+     */
     template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator<=(const T &a, const U &b)
+    friend bool operator<=(const T &op1, const U &op2)
 #endif
     {
-        return !(a > b);
+        return !(op1 > op2);
     }
     /// Ternary exponentiation.
+    /**
+     * This function will set \p rop to <tt>base**exp</tt>.
+     *
+     * @param rop the return value.
+     * @param base the base.
+     * @param exp the exponent.
+     */
     friend void pow_ui(mp_integer &rop, const mp_integer &base, unsigned long exp)
     {
         if (rop.is_static()) {
@@ -3978,6 +4103,12 @@ public:
         }
     }
     /// Binary exponentiation.
+    /**
+     * @param base the base.
+     * @param exp the exponent.
+     *
+     * @return <tt>base**exp</tt>.
+     */
     friend mp_integer pow_ui(const mp_integer &base, unsigned long exp)
     {
         mp_integer retval;
@@ -3985,6 +4116,11 @@ public:
         return retval;
     }
     /// In-place absolute value.
+    /**
+     * This method will set \p this to its absolute value.
+     *
+     * @return reference to \p this.
+     */
     mp_integer &abs()
     {
         if (is_static()) {
@@ -3997,18 +4133,37 @@ public:
         return *this;
     }
     /// Binary absolute value.
+    /**
+     * This function will set \p rop to the absolute value of \p n.
+     *
+     * @param rop the return value.
+     * @param n the argument.
+     */
     friend void abs(mp_integer &rop, const mp_integer &n)
     {
         rop = n;
         rop.abs();
     }
     /// Unary absolute value.
+    /**
+     * @param n the argument.
+     *
+     * @return the absolute value of \p n.
+     */
     friend mp_integer abs(const mp_integer &n)
     {
         mp_integer ret(n);
         ret.abs();
         return ret;
     }
+    /// Hash value.
+    /**
+     * This function will return a hash value for \p n. The hash value depends only on the value of \p n.
+     *
+     * @param n mp_integer whose hash value will be computed.
+     *
+     * @return a hash value for \p n.
+     */
     friend std::size_t hash(const mp_integer &n)
     {
         std::size_t asize;
@@ -4047,24 +4202,53 @@ private:
 
 public:
     /// Compute next prime number (binary version).
+    /**
+     * This function will set \p rop to the first prime number greater than \p n.
+     * Note that for negative values of \p n this function always returns 2.
+     *
+     * @param rop the return value.
+     * @param n the mp_integer argument.
+     */
     friend void nextprime(mp_integer &rop, const mp_integer &n)
     {
         // NOTE: nextprime on negative numbers always returns 2.
         nextprime_impl(rop, n);
     }
     /// Compute next prime number (unary version).
+    /**
+     * @param n the mp_integer argument.
+     *
+     * @return the first prime number greater than \p n.
+     */
     friend mp_integer nextprime(const mp_integer &n)
     {
         mp_integer retval;
         nextprime_impl(retval, n);
         return retval;
     }
-    /// Compute next prime number in-place version.
+    /// Compute next prime number (in-place version).
+    /**
+     * This method will set \p this to the first prime number greater than the current value.
+     *
+     * @return a reference to \p this.
+     */
     mp_integer &nextprime()
     {
         nextprime_impl(*this, *this);
         return *this;
     }
+    /// Test primality.
+    /**
+     * This method will run a series of probabilistic tests to determine if \p this is a prime number.
+     * It will return \p 2 if \p this is definitely a prime, \p 1 if \p this is probably a prime and \p 0 if \p this
+     * is definitely not-prime.
+     *
+     * @param reps the number of tests to run.
+     *
+     * @return an integer indicating if \p this is a prime.
+     *
+     * @throws std::invalid_argument if \p reps is less than 1 or if \p this is negative.
+     */
     int probab_prime_p(int reps = 25) const
     {
         if (mppp_unlikely(reps < 1)) {
@@ -4076,6 +4260,17 @@ public:
         }
         return ::mpz_probab_prime_p(get_mpz_view(), reps);
     }
+    /// Test primality.
+    /**
+     * This is the free-function version of mp_integer::probab_prime_p().
+     *
+     * @param n the mp_integer whose primality will be tested.
+     * @param reps the number of tests to run.
+     *
+     * @return an integer indicating if \p this is a prime.
+     *
+     * @throws unspecified any exception thrown by mp_integer::probab_prime_p().
+     */
     friend int probab_prime_p(const mp_integer &n, int reps = 25)
     {
         return n.probab_prime_p(reps);
@@ -4124,21 +4319,50 @@ private:
     }
 
 public:
+    /// Integer square root (in-place version).
+    /**
+     * This method will set \p this to its integer square root.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::domain_error if \p this is negative.
+     */
     mp_integer &sqrt()
     {
         sqrt_impl(*this, *this);
         return *this;
     }
+    /// Integer square root (binary version).
+    /**
+     * This method will set \p rop to the integer square root of \p n.
+     *
+     * @param rop the return value.
+     * @param n the mp_integer whose integer square root will be computed.
+     *
+     * @throws std::domain_error if \p n is negative.
+     */
     friend void sqrt(mp_integer &rop, const mp_integer &n)
     {
         sqrt_impl(rop, n);
     }
+    /// Integer square root (unary version).
+    /**
+     * @param n the mp_integer whose integer square root will be computed.
+     *
+     * @return the integer square root of \p n.
+     *
+     * @throws std::domain_error if \p n is negative.
+     */
     friend mp_integer sqrt(const mp_integer &n)
     {
         mp_integer retval;
         sqrt_impl(retval, n);
         return retval;
     }
+    /// Test if value is odd.
+    /**
+     * @return \p true if \p this is odd, \p false otherwise.
+     */
     bool odd_p() const
     {
         if (is_static()) {
@@ -4147,18 +4371,43 @@ public:
         }
         return mpz_odd_p(&m_int.g_dy());
     }
+    /// Test if integer is odd.
+    /**
+     * @param n the argument.
+     *
+     * @return \p true if \p n is odd, \p false otherwise.
+     */
     friend bool odd_p(const mp_integer &n)
     {
         return n.odd_p();
     }
+    /// Test if value is even.
+    /**
+     * @return \p true if \p this is even, \p false otherwise.
+     */
     bool even_p() const
     {
         return !odd_p();
     }
+    /// Test if integer is even.
+    /**
+     * @param n the argument.
+     *
+     * @return \p true if \p n is even, \p false otherwise.
+     */
     friend bool even_p(const mp_integer &n)
     {
         return n.even_p();
     }
+    /// Factorial.
+    /**
+     * This function will set \p rop to the factorial of \p n.
+     *
+     * @param rop the return value.
+     * @param n the argument for the factorial.
+     *
+     * @throws std::invalid_argument if \p n is larger than an implementation-defined limit.
+     */
     friend void fac_ui(mp_integer &rop, unsigned long n)
     {
         // NOTE: we put a limit here because the GMP function just crashes and burns
@@ -4178,6 +4427,15 @@ public:
             ::mpz_fac_ui(&rop.m_int.g_dy(), n);
         }
     }
+    /// Binomial coefficient (ternary version).
+    /**
+     * This function will set \p rop to the binomial coefficient of \p n and \p k. Negative values of \p n are
+     * supported.
+     *
+     * @param rop the return value.
+     * @param n the top argument.
+     * @param k the bottom argument.
+     */
     friend void bin_ui(mp_integer &rop, const mp_integer &n, unsigned long k)
     {
         if (rop.is_static()) {
@@ -4188,6 +4446,13 @@ public:
             ::mpz_bin_ui(&rop.m_int.g_dy(), n.get_mpz_view(), k);
         }
     }
+    /// Binomial coefficient (binary version).
+    /**
+     * @param n the top argument.
+     * @param k the bottom argument.
+     *
+     * @return the binomial coefficient of \p n and \p k.
+     */
     friend mp_integer bin_ui(const mp_integer &n, unsigned long k)
     {
         mp_integer retval;
@@ -4295,6 +4560,16 @@ private:
     }
 
 public:
+    /// Exact division (ternary version).
+    /**
+     * This function will set \p rop to the quotient of \p n and \p d.
+     *
+     * \b NOTE: if \p d does not divide \p n exactly, the behaviour will be undefined.
+     *
+     * @param rop the return value.
+     * @param n the dividend.
+     * @param d the divisor.
+     */
     friend void divexact(mp_integer &rop, const mp_integer &n, const mp_integer &d)
     {
         const bool sr = rop.is_static(), s1 = n.is_static(), s2 = d.is_static();
@@ -4308,6 +4583,15 @@ public:
         }
         ::mpz_divexact(&rop.m_int.g_dy(), n.get_mpz_view(), d.get_mpz_view());
     }
+    /// Exact division (binary version).
+    /**
+     * \b NOTE: if \p d does not divide \p n exactly, the behaviour will be undefined.
+     *
+     * @param n the dividend.
+     * @param d the divisor.
+     *
+     * @return the quotient of \p n and \p d.
+     */
     friend mp_integer divexact(const mp_integer &n, const mp_integer &d)
     {
         mp_integer retval;
@@ -4366,6 +4650,15 @@ private:
     }
 
 public:
+    /// GCD (ternary version).
+    /**
+     * This function will set \p rop to the GCD of \p op1 and \p op2. The result is always positive.
+     * If both operands are zero, zero is returned.
+     *
+     * @param rop the return value.
+     * @param op1 the first operand.
+     * @param op2 the second operand.
+     */
     friend void gcd(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
@@ -4379,6 +4672,13 @@ public:
         }
         ::mpz_gcd(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     }
+    /// GCD (binary version).
+    /**
+     * @param op1 the first operand.
+     * @param op2 the second operand.
+     *
+     * @return the GCD of \p op1 and \p op2.
+     */
     friend mp_integer gcd(const mp_integer &op1, const mp_integer &op2)
     {
         mp_integer retval;
@@ -4405,10 +4705,19 @@ inline std::size_t hash_wrapper(const mp_integer<SSize> &n)
 namespace std
 {
 
+/// Specialisation of \p std::hash for mppp::mp_integer.
 template <size_t SSize>
 struct hash<MPPP_NAMESPACE::mp_integer<SSize>> {
-    using argument_type = MPPP_NAMESPACE::mp_integer<SSize>;
-    using result_type = size_t;
+    /// The argument type.
+    typedef MPPP_NAMESPACE::mp_integer<SSize> argument_type;
+    /// The result type.
+    typedef size_t result_type;
+    /// Call operator.
+    /**
+     * @param n the mppp::mp_integer whose hash will be returned.
+     *
+     * @return the hash value of \p n, as calculated by mppp::mp_integer::hash().
+     */
     result_type operator()(const argument_type &n) const
     {
         return MPPP_NAMESPACE::mppp_impl::hash_wrapper(n);
