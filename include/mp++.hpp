@@ -1244,7 +1244,7 @@ public:
     /// Move assignment operator.
     /**
      * After the move, \p other will be in an unspecified but valid state, and the storage type of \p this will be
-     * \p other's original storage type.
+     * <tt>other</tt>'s original storage type.
      *
      * @param other the assignment argument.
      *
@@ -2044,8 +2044,8 @@ public:
      * This function will set \p rop to <tt>op1 + op2</tt>.
      *
      * @param rop the return value.
-     * @param op1 the first addend.
-     * @param op2 the second addend.
+     * @param op1 the first argument.
+     * @param op2 the second argument.
      */
     friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
@@ -2070,12 +2070,26 @@ public:
         return *this;
     }
     /// Binary addition operator.
+    /**
+     * @param op1 the first argument.
+     * @param op2 the second argument.
+     *
+     * @return <tt>op1 + op2</tt>.
+     */
     template <typename T, typename U>
     friend common_t<T, U> operator+(const T &op1, const U &op2)
     {
         return dispatch_binary_add(op1, op2);
     }
-    /// In-place addition.
+    /// In-place addition operator.
+    /**
+     * @param op the addend.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
+     * is a floating-point type.
+     */
     template <typename T, in_place_enabler<T> = 0>
     mp_integer &operator+=(const T &op)
     {
@@ -2106,6 +2120,13 @@ public:
         return retval;
     }
     /// Ternary subtraction.
+    /**
+     * This function will set \p rop to <tt>op1 - op2</tt>.
+     *
+     * @param rop the return value.
+     * @param op1 the first argument.
+     * @param op2 the second argument.
+     */
     friend void sub(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
@@ -2131,12 +2152,26 @@ public:
         return retval;
     }
     /// Binary subtraction operator.
+    /**
+     * @param op1 the first argument.
+     * @param op2 the second argument.
+     *
+     * @return <tt>op1 - op2</tt>.
+     */
     template <typename T, typename U>
     friend common_t<T, U> operator-(const T &op1, const U &op2)
     {
         return dispatch_binary_sub(op1, op2);
     }
-    /// In-place subtraction.
+    /// In-place subtraction operator.
+    /**
+     * @param op the subtrahend.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
+     * is a floating-point type.
+     */
     template <typename T, in_place_enabler<T> = 0>
     mp_integer &operator-=(const T &op)
     {
@@ -2334,6 +2369,13 @@ private:
 
 public:
     /// Ternary add with <tt>unsigned long</tt>.
+    /**
+     * This function will set \p rop to <tt>op1 + op2</tt>.
+     *
+     * @param rop the return value.
+     * @param op1 the first argument.
+     * @param op2 the second argument.
+     */
     friend void add_ui(mp_integer &rop, const mp_integer &op1, unsigned long op2)
     {
         if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
@@ -2606,6 +2648,14 @@ private:
     }
 
 public:
+    /// Ternary multiplication.
+    /**
+     * This function will set \p rop to <tt>op1 * op2</tt>.
+     *
+     * @param rop the return value.
+     * @param op1 the first argument.
+     * @param op2 the second argument.
+     */
     friend void mul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
@@ -2627,12 +2677,26 @@ public:
         ::mpz_mul(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     }
     /// Binary multiplication operator.
+    /**
+     * @param op1 the first argument.
+     * @param op2 the second argument.
+     *
+     * @return <tt>op1 * op2</tt>.
+     */
     template <typename T, typename U>
     friend common_t<T, U> operator*(const T &op1, const U &op2)
     {
         return dispatch_binary_mul(op1, op2);
     }
-    /// In-place multiplication.
+    /// In-place multiplication operator.
+    /**
+     * @param op the multiplicand.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
+     * is a floating-point type.
+     */
     template <typename T, in_place_enabler<T> = 0>
     mp_integer &operator*=(const T &op)
     {
@@ -2850,6 +2914,14 @@ private:
     }
 
 public:
+    /// Ternary multiply–accumulate.
+    /**
+     * This function will set \p rop to <tt>rop + op1 * op2</tt>.
+     *
+     * @param rop the return value.
+     * @param op1 the first argument.
+     * @param op2 the second argument.
+     */
     friend void addmul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
@@ -3175,22 +3247,31 @@ private:
     }
 
 public:
-    /// Truncated division.
+    /// Ternary truncated division.
     /**
-     * @throws mppp::zero_division_error dadas.
+     * This function will set \p q to the truncated quotient <tt>n / d</tt> and \p r to
+     * <tt>n % d</tt>. The remainder \p r has the same sign as \p n. \p q and \p r must be two distinct objects.
+     *
+     * @param q the quotient.
+     * @param r the remainder.
+     * @param n the dividend.
+     * @param d the divisor.
+     *
+     * @throws std::invalid_argument if \p q and \p r are the same object.
+     * @throws zero_division_error if \p d is zero.
      */
-    friend void tdiv_qr(mp_integer &q, mp_integer &r, const mp_integer &op1, const mp_integer &op2)
+    friend void tdiv_qr(mp_integer &q, mp_integer &r, const mp_integer &n, const mp_integer &d)
     {
         if (mppp_unlikely(&q == &r)) {
             throw std::invalid_argument("When performing a division with remainder, the quotient 'q' and the "
                                         "remainder 'r' must be distinct objects");
         }
-        if (mppp_unlikely(op2.sign() == 0)) {
+        if (mppp_unlikely(d.sign() == 0)) {
             throw zero_division_error("Integer division by zero");
         }
-        const bool sq = q.is_static(), sr = r.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+        const bool sq = q.is_static(), sr = r.is_static(), s1 = n.is_static(), s2 = d.is_static();
         if (mppp_likely(sq && sr && s1 && s2)) {
-            static_div(q.m_int.g_st(), r.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
+            static_div(q.m_int.g_st(), r.m_int.g_st(), n.m_int.g_st(), d.m_int.g_st());
             // Division can never fail.
             return;
         }
@@ -3200,19 +3281,36 @@ public:
         if (sr) {
             r.m_int.promote();
         }
-        ::mpz_tdiv_qr(&q.m_int.g_dy(), &r.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+        ::mpz_tdiv_qr(&q.m_int.g_dy(), &r.m_int.g_dy(), n.get_mpz_view(), d.get_mpz_view());
     }
     /// Binary division operator.
+    /**
+     * @param n the dividend.
+     * @param d the divisor.
+     *
+     * @return <tt>n / d</tt>. The result is truncated if only integral types are involved in the division.
+     *
+     * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
+     */
     template <typename T, typename U>
-    friend common_t<T, U> operator/(const T &op1, const U &op2)
+    friend common_t<T, U> operator/(const T &n, const U &d)
     {
-        return dispatch_binary_div(op1, op2);
+        return dispatch_binary_div(n, d);
     }
-    /// In-place division.
+    /// In-place division operator.
+    /**
+     * @param d the divisor.
+     *
+     * @return a reference to \p this. The result is truncated.
+     *
+     * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
+     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
+     * is a floating-point type.
+     */
     template <typename T, in_place_enabler<T> = 0>
-    mp_integer &operator/=(const T &op)
+    mp_integer &operator/=(const T &d)
     {
-        dispatch_in_place_div(*this, op);
+        dispatch_in_place_div(*this, d);
         return *this;
     }
     /// Binary modulo operator.

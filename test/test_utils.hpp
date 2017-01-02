@@ -200,14 +200,17 @@ inline void max_integer(mppp::mppp_impl::mpz_raii &m, unsigned n)
 #define REQUIRE_THROWS_PREDICATE(expr, exc, pred)                                                                      \
     {                                                                                                                  \
         bool thrown_checked = false;                                                                                   \
+        bool pred_checked = false;                                                                                     \
         try {                                                                                                          \
             (void)(expr);                                                                                              \
         } catch (const exc &e) {                                                                                       \
+            thrown_checked = true;                                                                                     \
             if (pred(e)) {                                                                                             \
-                thrown_checked = true;                                                                                 \
+                pred_checked = true;                                                                                   \
             }                                                                                                          \
         }                                                                                                              \
         REQUIRE(thrown_checked);                                                                                       \
+        REQUIRE(pred_checked);                                                                                         \
     }
 
 #endif

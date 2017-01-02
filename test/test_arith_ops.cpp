@@ -109,6 +109,15 @@ struct add_tester {
         retval += -1.5l;
         REQUIRE((lex_cast(retval) == "12"));
 #endif
+        if (std::numeric_limits<double>::is_iec559) {
+            retval = 1;
+            REQUIRE_THROWS_PREDICATE(retval += std::numeric_limits<double>::infinity(), std::domain_error,
+                                     [](const std::domain_error &ex) {
+                                         return std::string(ex.what())
+                                                == "Cannot init integer from the non-finite floating-point value "
+                                                       + std::to_string(std::numeric_limits<double>::infinity());
+                                     });
+        }
         // Increment ops.
         retval = integer{0};
         REQUIRE((lex_cast(++retval) == "1"));
@@ -214,6 +223,15 @@ struct sub_tester {
         retval -= -1.5l;
         REQUIRE((lex_cast(retval) == "-10"));
 #endif
+        if (std::numeric_limits<double>::is_iec559) {
+            retval = 1;
+            REQUIRE_THROWS_PREDICATE(retval -= std::numeric_limits<double>::infinity(), std::domain_error,
+                                     [](const std::domain_error &ex) {
+                                         return std::string(ex.what())
+                                                == "Cannot init integer from the non-finite floating-point value "
+                                                       + std::to_string(-std::numeric_limits<double>::infinity());
+                                     });
+        }
         // Increment ops.
         retval = integer{0};
         REQUIRE((lex_cast(--retval) == "-1"));
@@ -321,6 +339,15 @@ struct mul_tester {
         retval *= -1.5l;
         REQUIRE((lex_cast(retval) == "-1312"));
 #endif
+        if (std::numeric_limits<double>::is_iec559) {
+            retval = 1;
+            REQUIRE_THROWS_PREDICATE(retval *= std::numeric_limits<double>::infinity(), std::domain_error,
+                                     [](const std::domain_error &ex) {
+                                         return std::string(ex.what())
+                                                == "Cannot init integer from the non-finite floating-point value "
+                                                       + std::to_string(std::numeric_limits<double>::infinity());
+                                     });
+        }
     }
 };
 
