@@ -520,17 +520,24 @@ struct static_int {
                 ::mpz_limbs_finish(&m_mpz, static_cast<::mp_size_t>(n._mp_size));
             }
         }
+        static_mpz_view(static_mpz_view &&other)
+        {
+            m_mpz = other.m_mpz;
+            other.m_mpz._mp_d = nullptr;
+        }
         ~static_mpz_view()
         {
-            ::mpz_clear(&m_mpz);
+            if (m_mpz._mp_d) {
+                ::mpz_clear(&m_mpz);
+            }
         }
 #else
             : m_mpz{s_size, n._mp_size, const_cast<::mp_limb_t *>(n.m_limbs.data())}
         {
         }
+        static_mpz_view(static_mpz_view &&) = default;
 #endif
         static_mpz_view(const static_mpz_view &) = delete;
-        static_mpz_view(static_mpz_view &&) = default;
         static_mpz_view &operator=(const static_mpz_view &) = delete;
         static_mpz_view &operator=(static_mpz_view &&) = delete;
         operator const mpz_struct_t *() const
