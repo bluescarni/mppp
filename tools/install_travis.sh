@@ -52,5 +52,5 @@ elif [[ "${MPPP_BUILD}" == "ICC" ]]; then
     set +x;
     docker login -u=bluescarni -p=${DOCKER_CLOUD_PWD};
     set -x;
-    docker pull bluescarni/icc_ci:v1;
+    docker pull ${DOCKER_IMAGE};
 fi

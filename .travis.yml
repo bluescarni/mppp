@@ -116,11 +116,10 @@ matrix:
     #       - libmpfr-dev
     #       - cmake
     #       - cmake-data
-    - env: MPPP_BUILD="ICC"
+    - env: MPPP_BUILD="ICC" DOCKER_IMAGE=bluescarni/icc_ci:v1
       sudo: required
       services:
       - docker
-      env: DOCKER_IMAGE=bluescarni/icc_ci:v1
 script:
     - mkdir build
     - cd build
