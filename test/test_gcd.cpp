@@ -1,4 +1,4 @@
-/* Copyright 2009-2016 Francesco Biscani (bluescarni@gmail.com)
+/* Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
 
 This file is part of the mp++ library.
 
