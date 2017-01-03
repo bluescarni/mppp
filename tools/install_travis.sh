@@ -74,6 +74,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
         exit 1;
     fi
     cd ../sphinx;
+    pip install --user sphinx
     export SPHINX_OUTPUT=`make html SPHINXBUILD=/home/travis/.local/bin/sphinx-build 2>&1 >/dev/null`;
     if [[ "${SPHINX_OUTPUT}" != "" ]]; then
         echo "Sphinx encountered some problem:";
