@@ -1221,6 +1221,12 @@ public:
         dispatch_mpz_ctor(&mpz.m_mpz);
     }
     /// Constructor from C++ string (equivalent to the constructor from C string).
+    /**
+     * @param s the input string.
+     * @param base the base used in the string representation.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
     explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
     {
     }
