@@ -4683,10 +4683,24 @@ public:
         gcd(retval, op1, op2);
         return retval;
     }
+    /// Return a reference to the internal union.
+    /**
+     * This method returns a reference to the union used internally to implement the mp_integer class.
+     * This method is meant for debug purposes and subject to changes in future versions.
+     *
+     * @return a reference to the internal union member.
+     */
     mppp_impl::integer_union<SSize> &_get_union()
     {
         return m_int;
     }
+    /// Return a const reference to the internal union.
+    /**
+     * This method returns a const reference to the union used internally to implement the mp_integer class.
+     * This method is meant for debug purposes and subject to changes in future versions.
+     *
+     * @return a const reference to the internal union member.
+     */
     const mppp_impl::integer_union<SSize> &_get_union() const
     {
         return m_int;
