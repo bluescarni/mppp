@@ -48,9 +48,36 @@ elif [[ "${MPPP_BUILD}" == "ReleaseClang38" ]]; then
     CXX=clang++-3.8 CC=clang-3.8 cmake -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes ../;
     make -j2 VERBOSE=1;
     ctest -V;
-elif [[ "${MPPP_BUILD}" == "ICC" ]]; then
-    set +x;
-    docker login -u=bluescarni -p=${DOCKER_CLOUD_PWD};
-    set -x;
-    docker pull ${DOCKER_IMAGE};
+# elif [[ "${MPPP_BUILD}" == "ICC" ]]; then
+#     set +x;
+#     docker login -u=bluescarni -p=${DOCKER_CLOUD_PWD};
+#     set -x;
+#     docker pull ${DOCKER_IMAGE};
+elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
+    # Install a recent version of Doxygen locally.
+    wget "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.13.src.tar.gz";
+    tar xzf doxygen-1.8.13.src.tar.gz;
+    cd doxygen-1.8.13;
+    mkdir build;
+    cd build;
+    CC=gcc-5 CXX=g++-5 cmake -DCMAKE_INSTALL_PREFIX=/home/travis/.local ../;
+    make -j2;
+    make install;
+    cd ..;
+    cd ..;
+    cd ..;
+    cd doc/doxygen;
+    export DOXYGEN_OUTPUT=`/home/travis/.local/bin/doxygen 2>&1 >/dev/null`;
+    if [[ "${DOXYGEN_OUTPUT}" != "" ]]; then
+        echo "Doxygen encountered some problem:";
+        echo "${DOXYGEN_OUTPUT}";
+        exit 1;
+    fi
+    cd ../sphinx;
+    export SPHINX_OUTPUT=`make html SPHINXBUILD=/home/travis/.local/bin/sphinx-build 2>&1 >/dev/null`;
+    if [[ "${SPHINX_OUTPUT}" != "" ]]; then
+        echo "Sphinx encountered some problem:";
+        echo "${SPHINX_OUTPUT}";
+        exit 1;
+    fi
 fi
