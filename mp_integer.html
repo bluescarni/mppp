@@ -128,7 +128,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/mp_integer.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/mp_integer.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -144,7 +144,7 @@
 <dt>
 <span class="target" id="mp++classmppp_1_1mp__integer"></span><em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp10mp_integerE">
-<span id="mppp::mp_integer"></span><em class="property">class </em></dt>
+<span id="mppp::mp_integer"></span><em class="property">class </em><code class="descclassname">mppp::</code><code class="descname">mp_integer</code><a class="headerlink" href="#_CPPv2N4mppp10mp_integerE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Multiprecision integer class. </p>
 <p>This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP <code class="docutils literal"><span class="pre">mpz_t</span></code> type, with a small value optimisation: integers whose size is up to <code class="docutils literal"><span class="pre">SSize</span></code> limbs are stored directly in the storage occupied by the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> object, without resorting to dynamic memory allocation. The value of <code class="docutils literal"><span class="pre">SSize</span></code> must be at least 1 and less than an implementation-defined upper limit.</p>
 <p>When the value of an <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> is stored directly within the object, the <em>storage type</em> of the integer is said to be <em>static</em>. When the limb size of the integer exceeds the maximum value <code class="docutils literal"><span class="pre">SSize</span></code>, the storage types becomes <em>dynamic</em>. The transition from static to dynamic storage happens transparently whenever the integer value becomes large enough. The demotion from dynamic to static storage usually needs to be requested explicitly. For values of <code class="docutils literal"><span class="pre">SSize</span></code> of 1 and 2, optimised implementations of basic arithmetic operations are employed, if supported by the target architecture and if the storage type is static. For larger values of <code class="docutils literal"><span class="pre">SSize</span></code>, the <code class="docutils literal"><span class="pre">mpn_</span></code> low-level functions of the GMP API are used if the storage type is static. If the storage type is dynamic, the usual <code class="docutils literal"><span class="pre">mpz_</span></code> functions from the GMP API are used.</p>
@@ -230,14 +230,14 @@
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer10mp_integerEv">
-<span id="mppp::mp_integer::mp_integer"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a7354ac1e0a2a56c3351953219c5a4082"></span><code class="descclassname">mppp::mp_integer::</code><code class="descname">mp_integer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::mp_integer"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a7354ac1e0a2a56c3351953219c5a4082"></span><code class="descname">mp_integer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default constructor. </p>
 <p>The default constructor initialises an integer with static storage type and value 0. </p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer10mp_integerERK10mp_integer">
-<span id="mppp::mp_integer::mp_integer__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a5bbee3a5263b9c01642173d62f8bb196"></span><code class="descclassname">mppp::mp_integer::</code><code class="descname">mp_integer</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp10mp_integer10mp_integerEv" title="mppp::mp_integer::mp_integer">mp_integer</a> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerERK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::mp_integer__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a5bbee3a5263b9c01642173d62f8bb196"></span><code class="descname">mp_integer</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp10mp_integer10mp_integerEv" title="mppp::mp_integer::mp_integer">mp_integer</a> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerERK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy constructor. </p>
 <p>The copy constructor deep-copies <code class="docutils literal"><span class="pre">other</span></code> into <code class="docutils literal"><span class="pre">this</span></code>, preserving the original storage type.</p>
 <p><dl class="docutils">
@@ -252,7 +252,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer10mp_integerERR10mp_integer">
-<span id="mppp::mp_integer::mp_integer__mp_integerRR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a9812e5d6af15524570657e36936ef266"></span><code class="descclassname">mppp::mp_integer::</code><code class="descname">mp_integer</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp10mp_integer10mp_integerEv" title="mppp::mp_integer::mp_integer">mp_integer</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerERR10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::mp_integer__mp_integerRR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a9812e5d6af15524570657e36936ef266"></span><code class="descname">mp_integer</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp10mp_integer10mp_integerEv" title="mppp::mp_integer::mp_integer">mp_integer</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerERR10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move constructor. </p>
 <p>The move constructor will leave <code class="docutils literal"><span class="pre">other</span></code> in an unspecified but valid state. The storage type of <code class="docutils literal"><span class="pre">this</span></code> will be the same as <code class="docutils literal"><span class="pre">other</span></code>&#8216;s.</p>
 <p><dl class="docutils">
@@ -269,7 +269,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, generic_ctor_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2N4mppp10mp_integer10mp_integerE1T">
-<span id="mppp::mp_integer::mp_integer__T"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aab3e9601d5fea9d13d6b212af53f6eee"></span><code class="descclassname">mppp::mp_integer::</code><code class="descname">mp_integer</code><span class="sig-paren">(</span>T <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerE1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::mp_integer__T"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aab3e9601d5fea9d13d6b212af53f6eee"></span><code class="descname">mp_integer</code><span class="sig-paren">(</span>T <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerE1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generic constructor. </p>
 <p><strong>NOTE:</strong> this constructor is enabled only if <code class="docutils literal"><span class="pre">T</span></code> is one of the interoperable types.</p>
 <p>This constructor will initialize an integer with the value of <code class="docutils literal"><span class="pre">x</span></code>. The initialization is always successful if <code class="docutils literal"><span class="pre">T</span></code> is an integral type (construction from <code class="docutils literal"><span class="pre">bool</span></code> yields 1 for <code class="docutils literal"><span class="pre">true</span></code>, 0 for <code class="docutils literal"><span class="pre">false</span></code>). If <code class="docutils literal"><span class="pre">T</span></code> is a floating-point type, the construction will fail if <code class="docutils literal"><span class="pre">x</span></code> is not finite. Construction from a floating-point type yields the truncated counterpart of the input value.</p>
@@ -290,7 +290,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer10mp_integerEPKci">
-<span id="mppp::mp_integer::mp_integer__cCP.i"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac91f598987148a5706fcfc92a4a9fdac"></span><code class="descclassname">mppp::mp_integer::</code><code class="descname">mp_integer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerEPKci" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::mp_integer__cCP.i"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac91f598987148a5706fcfc92a4a9fdac"></span><code class="descname">mp_integer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerEPKci" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor from C string. </p>
 <p>This constructor will initialize <code class="docutils literal"><span class="pre">this</span></code> from the null-terminated string <code class="docutils literal"><span class="pre">s</span></code>, which must represent an integer value in base <code class="docutils literal"><span class="pre">base</span></code>. The expected format is the same as specified by the <code class="docutils literal"><span class="pre">mpz_set_str()</span></code> GMP function. <code class="docutils literal"><span class="pre">base</span></code> may vary from 2 to 62, or be zero. In the latter case, the base is inferred from the leading characters of the string.</p>
 <p><dl class="docutils">
@@ -313,7 +313,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer10mp_integerERKNSt6stringEi">
-<span id="mppp::mp_integer::mp_integer__ssCR.i"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a4ca61d4876f75f3de21d03d23f652004"></span><code class="descclassname">mppp::mp_integer::</code><code class="descname">mp_integer</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerERKNSt6stringEi" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::mp_integer__ssCR.i"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a4ca61d4876f75f3de21d03d23f652004"></span><code class="descname">mp_integer</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerERKNSt6stringEi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor from C++ string (equivalent to the constructor from C string). </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
@@ -333,7 +333,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer10mp_integerEK5mpz_t">
-<span id="mppp::mp_integer::mp_integer__mpz_tC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ade57b8774cb7197cd3350f3f1a434d52"></span><code class="descclassname">mppp::mp_integer::</code><code class="descname">mp_integer</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::mp_integer__mpz_tC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ade57b8774cb7197cd3350f3f1a434d52"></span><code class="descname">mp_integer</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10mp_integerEK5mpz_t" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
 <p>This constructor will initialize <code class="docutils literal"><span class="pre">this</span></code> with the value of the GMP integer <code class="docutils literal"><span class="pre">n</span></code>. The storage type of <code class="docutils literal"><span class="pre">this</span></code> will be static if <code class="docutils literal"><span class="pre">n</span></code> fits in the static storage, otherwise it will be dynamic.</p>
 <p><strong>NOTE:</strong> it is up to the user to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this constructor with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> is undefined behaviour.</p>
@@ -349,7 +349,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integeraSERK10mp_integer">
-<span id="mppp::mp_integer::assign-operator__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac166758f51d6d7240624e2e19e47693d"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integeraSERK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::assign-operator__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac166758f51d6d7240624e2e19e47693d"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integeraSERK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy assignment operator. </p>
 <p>This operator will perform a deep copy of <code class="docutils literal"><span class="pre">other</span></code>, preserving its storage type as well.</p>
 <p><dl class="docutils">
@@ -366,7 +366,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integeraSERR10mp_integer">
-<span id="mppp::mp_integer::assign-operator__mp_integerRR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ab554b69f9b90a853bce74bbdc660a28e"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integeraSERR10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::assign-operator__mp_integerRR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ab554b69f9b90a853bce74bbdc660a28e"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integeraSERR10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move assignment operator. </p>
 <p>After the move, <code class="docutils literal"><span class="pre">other</span></code> will be in an unspecified but valid state, and the storage type of <code class="docutils literal"><span class="pre">this</span></code> will be <code class="docutils literal"><span class="pre">other</span></code>&#8216;s original storage type.</p>
 <p><dl class="docutils">
@@ -385,7 +385,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, generic_assignment_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2N4mppp10mp_integeraSERK1T">
-<span id="mppp::mp_integer::assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a01310c763f9bb7d333d86d144d0fea8e"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integeraSERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a01310c763f9bb7d333d86d144d0fea8e"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integeraSERK1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generic assignment operator. </p>
 <p><strong>NOTE:</strong> this assignment operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> is an interoperable type.</p>
 <p>The body of this operator is equivalent to: <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="n">this</span> <span class="o">=</span> <span class="n">mp_integer</span><span class="p">{</span><span class="n">x</span><span class="p">};</span>
@@ -411,7 +411,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer9is_staticEv">
-<span id="mppp::mp_integer::is_staticC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a24a519c1e12c63e885d2f4834d3be68f"></span>bool <code class="descclassname">mppp::mp_integer::</code><code class="descname">is_static</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer9is_staticEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::is_staticC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a24a519c1e12c63e885d2f4834d3be68f"></span>bool <code class="descname">is_static</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer9is_staticEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test for static storage. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -422,7 +422,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer10is_dynamicEv">
-<span id="mppp::mp_integer::is_dynamicC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a4291e282795b21b8a36a4dbbf946ae25"></span>bool <code class="descclassname">mppp::mp_integer::</code><code class="descname">is_dynamic</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer10is_dynamicEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::is_dynamicC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a4291e282795b21b8a36a4dbbf946ae25"></span>bool <code class="descname">is_dynamic</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer10is_dynamicEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check for dynamic storage. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -433,7 +433,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer9to_stringEi">
-<span id="mppp::mp_integer::to_string__iC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a44ff4d52c9d0216801f521870bb921c0"></span>std::string <code class="descclassname">mppp::mp_integer::</code><code class="descname">to_string</code><span class="sig-paren">(</span>int <em>base</em> = 10<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer9to_stringEi" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::to_string__iC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a44ff4d52c9d0216801f521870bb921c0"></span>std::string <code class="descname">to_string</code><span class="sig-paren">(</span>int <em>base</em> = 10<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer9to_stringEi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Conversion to string. </p>
 <p>This method will convert <code class="docutils literal"><span class="pre">this</span></code> into a string in base <code class="docutils literal"><span class="pre">base</span></code> using the GMP function <code class="docutils literal"><span class="pre">mpz_get_str()</span></code>.</p>
 <p><dl class="docutils">
@@ -459,7 +459,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, generic_conversion_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2NK4mppp10mp_integercv1TEv">
-<span id="mppp::mp_integer::castto-T-operatorC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ad7a003134d2ef2312e85131f780c4946"></span><code class="descclassname">mppp::mp_integer::</code><code class="descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integercv1TEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::castto-T-operatorC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ad7a003134d2ef2312e85131f780c4946"></span><code class="descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integercv1TEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generic conversion operator. </p>
 <p><strong>NOTE:</strong> this operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> is an interoperable type.</p>
 <p>This operator will convert <code class="docutils literal"><span class="pre">this</span></code> to the type <code class="docutils literal"><span class="pre">T</span></code>. Conversion to <code class="docutils literal"><span class="pre">bool</span></code> yields <code class="docutils literal"><span class="pre">false</span></code> if <code class="docutils literal"><span class="pre">this</span></code> is zero, <code class="docutils literal"><span class="pre">true</span></code> otherwise. Conversion to other integral types yields the exact result, if representable by the target type <code class="docutils literal"><span class="pre">T</span></code>. Conversion to floating-point types might yield inexact values and infinities.</p>
@@ -477,7 +477,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer7promoteEv">
-<span id="mppp::mp_integer::promote"></span><span class="target" id="mp++classmppp_1_1mp__integer_1af18648a14a792ff12dc508125eff7714"></span>bool <code class="descclassname">mppp::mp_integer::</code><code class="descname">promote</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer7promoteEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::promote"></span><span class="target" id="mp++classmppp_1_1mp__integer_1af18648a14a792ff12dc508125eff7714"></span>bool <code class="descname">promote</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer7promoteEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Promote to dynamic storage. </p>
 <p>This method will promote the storage type of <code class="docutils literal"><span class="pre">this</span></code> from static to dynamic.</p>
 <p><dl class="docutils">
@@ -489,7 +489,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer6demoteEv">
-<span id="mppp::mp_integer::demote"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a7a59f7c0ddf4c5939ce7f7249bb3ad90"></span>bool <code class="descclassname">mppp::mp_integer::</code><code class="descname">demote</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer6demoteEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::demote"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a7a59f7c0ddf4c5939ce7f7249bb3ad90"></span>bool <code class="descname">demote</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer6demoteEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Demote to static storage. </p>
 <p>This method will demote the storage type of <code class="docutils literal"><span class="pre">this</span></code> from dynamic to static.</p>
 <p><dl class="docutils">
@@ -501,7 +501,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer5nbitsEv">
-<span id="mppp::mp_integer::nbitsC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1acb5524e25c7f364051bb5d3857b1f21f"></span>std::size_t <code class="descclassname">mppp::mp_integer::</code><code class="descname">nbits</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer5nbitsEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::nbitsC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1acb5524e25c7f364051bb5d3857b1f21f"></span>std::size_t <code class="descname">nbits</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer5nbitsEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Size in bits. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -512,7 +512,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer4sizeEv">
-<span id="mppp::mp_integer::sizeC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a6cb5d83fa57cbc9042ec247a8a8ea46a"></span>std::size_t <code class="descclassname">mppp::mp_integer::</code><code class="descname">size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer4sizeEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::sizeC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a6cb5d83fa57cbc9042ec247a8a8ea46a"></span>std::size_t <code class="descname">size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer4sizeEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Size in limbs. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -523,7 +523,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer4signEv">
-<span id="mppp::mp_integer::signC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa9a555f288f1153e57d4b11fb3f145cf"></span>int <code class="descclassname">mppp::mp_integer::</code><code class="descname">sign</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer4signEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::signC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa9a555f288f1153e57d4b11fb3f145cf"></span>int <code class="descname">sign</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer4signEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sign. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -534,7 +534,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer12get_mpz_viewEv">
-<span id="mppp::mp_integer::get_mpz_viewC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aaea6b849d829e76086fbeba66fee1337"></span>mpz_view <code class="descclassname">mppp::mp_integer::</code><code class="descname">get_mpz_view</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer12get_mpz_viewEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::get_mpz_viewC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aaea6b849d829e76086fbeba66fee1337"></span>mpz_view <code class="descname">get_mpz_view</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer12get_mpz_viewEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an <code class="docutils literal"><span class="pre">mpz_t</span></code> view. </p>
 <p>This method will return an object of an unspecified type <code class="docutils literal"><span class="pre">mpz_view</span></code> which is implicitly convertible to a const pointer to an <code class="docutils literal"><span class="pre">mpz</span></code> struct (and which can thus be used as a <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> parameter in GMP functions). In addition to the implicit conversion operator, the <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> object can also be retrieved via the <code class="docutils literal"><span class="pre">get()</span></code> method of the <code class="docutils literal"><span class="pre">mpz_view</span></code> class. The pointee will represent a GMP integer whose value is equal to <code class="docutils literal"><span class="pre">this</span></code>.</p>
 <p>It is important to keep in mind the following facts about the returned <code class="docutils literal"><span class="pre">mpz_view</span></code> object:<ul class="simple">
@@ -553,7 +553,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer3negEv">
-<span id="mppp::mp_integer::neg"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a902f748104522a58f9a41cdc8355dbe5"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">neg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer3negEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::neg"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a902f748104522a58f9a41cdc8355dbe5"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">neg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer3negEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Negate in-place. </p>
 <p>This method will set <code class="docutils literal"><span class="pre">this</span></code> to <code class="docutils literal"><span class="pre">-this</span></code>.</p>
 <p><dl class="docutils">
@@ -565,7 +565,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integerplEv">
-<span id="mppp::mp_integer::add-operatorC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a0346e69c2267177be4ceee53507cee82"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> <code class="descclassname">mppp::mp_integer::</code><code class="descname">operator+</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integerplEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::add-operatorC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a0346e69c2267177be4ceee53507cee82"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> <code class="descname">operator+</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integerplEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identity operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -578,7 +578,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, in_place_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2N4mppp10mp_integerpLERK1T">
-<span id="mppp::mp_integer::add-assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a08982b7fea3fc3510a01537ba4f7f0cd"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator+=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerpLERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::add-assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a08982b7fea3fc3510a01537ba4f7f0cd"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator+=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerpLERK1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>In-place addition operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -599,7 +599,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integerppEv">
-<span id="mppp::mp_integer::inc-operator"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ab59bace88e3bb525729741722b6dfddb"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator++</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerppEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::inc-operator"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ab59bace88e3bb525729741722b6dfddb"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator++</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerppEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prefix increment. </p>
 <p>Increment <code class="docutils literal"><span class="pre">this</span></code> by one.</p>
 <p><dl class="docutils">
@@ -611,7 +611,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integerppEi">
-<span id="mppp::mp_integer::inc-operator__i"></span><span class="target" id="mp++classmppp_1_1mp__integer_1af068ad45e35103ddcff3e47f754424fc"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> <code class="descclassname">mppp::mp_integer::</code><code class="descname">operator++</code><span class="sig-paren">(</span>int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerppEi" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::inc-operator__i"></span><span class="target" id="mp++classmppp_1_1mp__integer_1af068ad45e35103ddcff3e47f754424fc"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> <code class="descname">operator++</code><span class="sig-paren">(</span>int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerppEi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Suffix increment. </p>
 <p>Increment <code class="docutils literal"><span class="pre">this</span></code> by one and return a copy of <code class="docutils literal"><span class="pre">this</span></code> as it was before the increment.</p>
 <p><dl class="docutils">
@@ -623,7 +623,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integermiEv">
-<span id="mppp::mp_integer::sub-operatorC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1afbb22f4a502aba22abd8e80d6e504660"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> <code class="descclassname">mppp::mp_integer::</code><code class="descname">operator-</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integermiEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::sub-operatorC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1afbb22f4a502aba22abd8e80d6e504660"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> <code class="descname">operator-</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integermiEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Negated copy. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -636,7 +636,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, in_place_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2N4mppp10mp_integermIERK1T">
-<span id="mppp::mp_integer::sub-assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1adf948884125604bbe4ecaed039ebdc4e"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator-=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integermIERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::sub-assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1adf948884125604bbe4ecaed039ebdc4e"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator-=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integermIERK1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>In-place subtraction operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -657,7 +657,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integermmEv">
-<span id="mppp::mp_integer::dec-operator"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aba37db6ac25aea4874b35a15becfc1d4"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator--</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integermmEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::dec-operator"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aba37db6ac25aea4874b35a15becfc1d4"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator--</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integermmEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prefix decrement. </p>
 <p>Decrement <code class="docutils literal"><span class="pre">this</span></code> by one.</p>
 <p><dl class="docutils">
@@ -669,7 +669,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integermmEi">
-<span id="mppp::mp_integer::dec-operator__i"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aedb0c0008d8d2dab7849ae0ec33d222e"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> <code class="descclassname">mppp::mp_integer::</code><code class="descname">operator--</code><span class="sig-paren">(</span>int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integermmEi" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::dec-operator__i"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aedb0c0008d8d2dab7849ae0ec33d222e"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> <code class="descname">operator--</code><span class="sig-paren">(</span>int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integermmEi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Suffix decrement. </p>
 <p>Decrement <code class="docutils literal"><span class="pre">this</span></code> by one and return a copy of <code class="docutils literal"><span class="pre">this</span></code> as it was before the decrement.</p>
 <p><dl class="docutils">
@@ -683,7 +683,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, in_place_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2N4mppp10mp_integermLERK1T">
-<span id="mppp::mp_integer::mul-assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a1ee4c146f26a787ac58cb83c988eeaa0"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator*=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integermLERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::mul-assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a1ee4c146f26a787ac58cb83c988eeaa0"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator*=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integermLERK1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>In-place multiplication operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -706,7 +706,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, in_place_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2N4mppp10mp_integerdVERK1T">
-<span id="mppp::mp_integer::div-assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa0de449356099b21d522383b816deee3"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator/=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerdVERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::div-assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa0de449356099b21d522383b816deee3"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator/=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerdVERK1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>In-place division operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -730,7 +730,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, in_place_mod_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2N4mppp10mp_integerrMERK1T">
-<span id="mppp::mp_integer::mod-assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1abf98f8995e11f8b8a8a76e71fa33b067"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator%=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerrMERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::mod-assign-operator__TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1abf98f8995e11f8b8a8a76e71fa33b067"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator%=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerrMERK1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>In-place modulo operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -753,7 +753,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, shift_op_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2N4mppp10mp_integerlSE1T">
-<span id="mppp::mp_integer::lshift-assign-operator__T"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a6a557db52761f34d11bb26aa7327441e"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator&lt;&lt;=</code><span class="sig-paren">(</span>T <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerlSE1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::lshift-assign-operator__T"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a6a557db52761f34d11bb26aa7327441e"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator&lt;&lt;=</code><span class="sig-paren">(</span>T <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerlSE1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>In-place left shift operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -776,7 +776,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, shift_op_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2N4mppp10mp_integerrSE1T">
-<span id="mppp::mp_integer::rshift-assign-operator__T"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a3b5ec57c32b3ca8fe788b496f1c6a2f3"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">operator&gt;&gt;=</code><span class="sig-paren">(</span>T <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerrSE1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::rshift-assign-operator__T"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a3b5ec57c32b3ca8fe788b496f1c6a2f3"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">operator&gt;&gt;=</code><span class="sig-paren">(</span>T <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integerrSE1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>In-place right shift operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -797,7 +797,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer3absEv">
-<span id="mppp::mp_integer::abs"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aefb1bb36658f0142ace086c63f0c1e62"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">abs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer3absEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::abs"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aefb1bb36658f0142ace086c63f0c1e62"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">abs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer3absEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>In-place absolute value. </p>
 <p>This method will set <code class="docutils literal"><span class="pre">this</span></code> to its absolute value.</p>
 <p><dl class="docutils">
@@ -809,7 +809,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer9nextprimeEv">
-<span id="mppp::mp_integer::nextprime"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ae75ea34040586a5feb96c5440d2b412b"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">nextprime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer9nextprimeEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::nextprime"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ae75ea34040586a5feb96c5440d2b412b"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">nextprime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer9nextprimeEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute next prime number (in-place version). </p>
 <p>This method will set <code class="docutils literal"><span class="pre">this</span></code> to the first prime number greater than the current value.</p>
 <p><dl class="docutils">
@@ -821,7 +821,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer14probab_prime_pEi">
-<span id="mppp::mp_integer::probab_prime_p__iC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a2ecd20fc837c9fbd7ca991feb95363c5"></span>int <code class="descclassname">mppp::mp_integer::</code><code class="descname">probab_prime_p</code><span class="sig-paren">(</span>int <em>reps</em> = 25<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer14probab_prime_pEi" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::probab_prime_p__iC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a2ecd20fc837c9fbd7ca991feb95363c5"></span>int <code class="descname">probab_prime_p</code><span class="sig-paren">(</span>int <em>reps</em> = 25<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer14probab_prime_pEi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test primality. </p>
 <p>This method will run a series of probabilistic tests to determine if <code class="docutils literal"><span class="pre">this</span></code> is a prime number. It will return <code class="docutils literal"><span class="pre">2</span></code> if <code class="docutils literal"><span class="pre">this</span></code> is definitely a prime, <code class="docutils literal"><span class="pre">1</span></code> if <code class="docutils literal"><span class="pre">this</span></code> is probably a prime and <code class="docutils literal"><span class="pre">0</span></code> if <code class="docutils literal"><span class="pre">this</span></code> is definitely not-prime.</p>
 <p><dl class="docutils">
@@ -843,7 +843,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer4sqrtEv">
-<span id="mppp::mp_integer::sqrt"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ad6dd8308e13db9a868396a5cc1f9fbf0"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer4sqrtEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::sqrt"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ad6dd8308e13db9a868396a5cc1f9fbf0"></span><a class="reference internal" href="#_CPPv2N4mppp10mp_integerE" title="mppp::mp_integer">mp_integer</a> &amp;<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer4sqrtEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integer square root (in-place version). </p>
 <p>This method will set <code class="docutils literal"><span class="pre">this</span></code> to its integer square root.</p>
 <p><dl class="docutils">
@@ -860,7 +860,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer5odd_pEv">
-<span id="mppp::mp_integer::odd_pC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ad91c0265fec0a5cc5665d6fa39d7c367"></span>bool <code class="descclassname">mppp::mp_integer::</code><code class="descname">odd_p</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer5odd_pEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::odd_pC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ad91c0265fec0a5cc5665d6fa39d7c367"></span>bool <code class="descname">odd_p</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer5odd_pEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test if value is odd. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -871,7 +871,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer6even_pEv">
-<span id="mppp::mp_integer::even_pC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aff4c26973a60fdb13ca733e7877b54f0"></span>bool <code class="descclassname">mppp::mp_integer::</code><code class="descname">even_p</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer6even_pEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::even_pC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aff4c26973a60fdb13ca733e7877b54f0"></span>bool <code class="descname">even_p</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer6even_pEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test if value is even. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -882,7 +882,7 @@
 
 <dl class="function">
 <dt id="_CPPv2N4mppp10mp_integer10_get_unionEv">
-<span id="mppp::mp_integer::_get_union"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac1cc8760d544641a0c0eabd4f68e5828"></span>mppp_impl::integer_union&lt;SSize&gt; &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">_get_union</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10_get_unionEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::_get_union"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac1cc8760d544641a0c0eabd4f68e5828"></span>mppp_impl::integer_union&lt;SSize&gt; &amp;<code class="descname">_get_union</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10_get_unionEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a reference to the internal union. </p>
 <p>This method returns a reference to the union used internally to implement the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> class. This method is meant for debug purposes and subject to changes in future versions.</p>
 <p><dl class="docutils">
@@ -894,7 +894,7 @@
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp10mp_integer10_get_unionEv">
-<span id="mppp::mp_integer::_get_unionC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a2f1d93c41ac2b57881a09a39af223e9b"></span><em class="property">const</em> mppp_impl::integer_union&lt;SSize&gt; &amp;<code class="descclassname">mppp::mp_integer::</code><code class="descname">_get_union</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer10_get_unionEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mp_integer::_get_unionC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a2f1d93c41ac2b57881a09a39af223e9b"></span><em class="property">const</em> mppp_impl::integer_union&lt;SSize&gt; &amp;<code class="descname">_get_union</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer10_get_unionEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a const reference to the internal union. </p>
 <p>This method returns a const reference to the union used internally to implement the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> class. This method is meant for debug purposes and subject to changes in future versions.</p>
 <p><dl class="docutils">
@@ -909,7 +909,7 @@
 <p class="breathe-sectiondef-title rubric">Friends</p>
 <dl class="function">
 <dt id="_CPPv2lsRNSt7ostreamERK10mp_integer">
-<span id="lshift-operator__osR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1abd8dcf542bf7e232bdae9bd7ad3d1ce7"></span>std::ostream &amp;<code class="descclassname"></code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span>std::ostream &amp;<em>os</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2lsRNSt7ostreamERK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="lshift-operator__osR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1abd8dcf542bf7e232bdae9bd7ad3d1ce7"></span>std::ostream &amp;<code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span>std::ostream &amp;<em>os</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2lsRNSt7ostreamERK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stream operator for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a>. </p>
 <p>This operator will print to the stream <code class="docutils literal"><span class="pre">os</span></code> the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> <code class="docutils literal"><span class="pre">n</span></code> in base 10. Internally it uses the <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a44ff4d52c9d0216801f521870bb921c0"><span class="std std-ref">mp_integer::to_string()</span></a> method.</p>
 <p><dl class="docutils">
@@ -932,7 +932,7 @@
 
 <dl class="function">
 <dt id="_CPPv23negR10mp_integerRK10mp_integer">
-<span id="neg__mp_integerR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac0e3feee7ea6fe09f6bbf55e2b4f004e"></span>void <code class="descclassname"></code><code class="descname">neg</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23negR10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="neg__mp_integerR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac0e3feee7ea6fe09f6bbf55e2b4f004e"></span>void <code class="descname">neg</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23negR10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary negation. </p>
 <p>This method will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">-n</span></code>.</p>
 <p><dl class="docutils">
@@ -948,7 +948,7 @@
 
 <dl class="function">
 <dt id="_CPPv23negRK10mp_integer">
-<span id="neg__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa16af02bf463abfad2ecd6eff9e51a87"></span>mp_integer <code class="descclassname"></code><code class="descname">neg</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23negRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="neg__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa16af02bf463abfad2ecd6eff9e51a87"></span>mp_integer <code class="descname">neg</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23negRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unary negation. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -964,7 +964,7 @@
 
 <dl class="function">
 <dt id="_CPPv23addR10mp_integerRK10mp_integerRK10mp_integer">
-<span id="add__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a5b71854e924730f62da03c77b1eaeae2"></span>void <code class="descclassname"></code><code class="descname">add</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23addR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="add__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a5b71854e924730f62da03c77b1eaeae2"></span>void <code class="descname">add</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23addR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ternary add. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">+</span> <span class="pre">op2</span></code>.</p>
 <p><dl class="docutils">
@@ -983,7 +983,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2plRK1TRK1U">
-<span id="add-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a26cad8b55dd4f168ea18fc13eba7625b"></span>common_t&lt;T, U&gt; <code class="descclassname"></code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2plRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="add-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a26cad8b55dd4f168ea18fc13eba7625b"></span>common_t&lt;T, U&gt; <code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2plRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary addition operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1000,7 +1000,7 @@
 
 <dl class="function">
 <dt id="_CPPv23subR10mp_integerRK10mp_integerRK10mp_integer">
-<span id="sub__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a69edb625257e7c83b8def5aed14c91d6"></span>void <code class="descclassname"></code><code class="descname">sub</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23subR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="sub__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a69edb625257e7c83b8def5aed14c91d6"></span>void <code class="descname">sub</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23subR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ternary subtraction. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">-</span> <span class="pre">op2</span></code>.</p>
 <p><dl class="docutils">
@@ -1019,7 +1019,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2miRK1TRK1U">
-<span id="sub-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a189e6a7960af40d12506db99d7b32f70"></span>common_t&lt;T, U&gt; <code class="descclassname"></code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2miRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="sub-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a189e6a7960af40d12506db99d7b32f70"></span>common_t&lt;T, U&gt; <code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2miRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary subtraction operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1036,7 +1036,7 @@
 
 <dl class="function">
 <dt id="_CPPv26add_uiR10mp_integerRK10mp_integerm">
-<span id="add_ui__mp_integerR.mp_integerCR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a00247339df4f51c30cf2abc0c0d4e265"></span>void <code class="descclassname"></code><code class="descname">add_ui</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, unsigned long <em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26add_uiR10mp_integerRK10mp_integerm" title="Permalink to this definition">¶</a><br /></dt>
+<span id="add_ui__mp_integerR.mp_integerCR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a00247339df4f51c30cf2abc0c0d4e265"></span>void <code class="descname">add_ui</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, unsigned long <em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26add_uiR10mp_integerRK10mp_integerm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ternary add with <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span></code>. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">+</span> <span class="pre">op2</span></code>.</p>
 <p><dl class="docutils">
@@ -1053,7 +1053,7 @@
 
 <dl class="function">
 <dt id="_CPPv23mulR10mp_integerRK10mp_integerRK10mp_integer">
-<span id="mul__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1acb9a5936e8219c35f795b0011d72032d"></span>void <code class="descclassname"></code><code class="descname">mul</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23mulR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mul__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1acb9a5936e8219c35f795b0011d72032d"></span>void <code class="descname">mul</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23mulR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ternary multiplication. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">*</span> <span class="pre">op2</span></code>.</p>
 <p><dl class="docutils">
@@ -1072,7 +1072,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2mlRK1TRK1U">
-<span id="mul-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a068c436c68c530782a4a2192eb905577"></span>common_t&lt;T, U&gt; <code class="descclassname"></code><code class="descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2mlRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mul-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a068c436c68c530782a4a2192eb905577"></span>common_t&lt;T, U&gt; <code class="descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2mlRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary multiplication operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1089,7 +1089,7 @@
 
 <dl class="function">
 <dt id="_CPPv26addmulR10mp_integerRK10mp_integerRK10mp_integer">
-<span id="addmul__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aef60ade1e411f1e5cefe0c3ca86adbf7"></span>void <code class="descclassname"></code><code class="descname">addmul</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26addmulR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="addmul__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aef60ade1e411f1e5cefe0c3ca86adbf7"></span>void <code class="descname">addmul</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26addmulR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ternary multiply–accumulate. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">rop</span> <span class="pre">+</span> <span class="pre">op1</span> <span class="pre">*</span> <span class="pre">op2</span></code>.</p>
 <p><dl class="docutils">
@@ -1106,7 +1106,7 @@
 
 <dl class="function">
 <dt id="_CPPv27tdiv_qrR10mp_integerR10mp_integerRK10mp_integerRK10mp_integer">
-<span id="tdiv_qr__mp_integerR.mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa559800b0d25dd89e2c9af9ed4a4f8df"></span>void <code class="descclassname"></code><code class="descname">tdiv_qr</code><span class="sig-paren">(</span>mp_integer &amp;<em>q</em>, mp_integer &amp;<em>r</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, <em class="property">const</em> mp_integer &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27tdiv_qrR10mp_integerR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="tdiv_qr__mp_integerR.mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa559800b0d25dd89e2c9af9ed4a4f8df"></span>void <code class="descname">tdiv_qr</code><span class="sig-paren">(</span>mp_integer &amp;<em>q</em>, mp_integer &amp;<em>r</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, <em class="property">const</em> mp_integer &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27tdiv_qrR10mp_integerR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ternary truncated division. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">q</span></code> to the truncated quotient <code class="docutils literal"><span class="pre">n</span> <span class="pre">/</span> <span class="pre">d</span></code> and <code class="docutils literal"><span class="pre">r</span></code> to <code class="docutils literal"><span class="pre">n</span> <span class="pre">%</span> <span class="pre">d</span></code>. The remainder <code class="docutils literal"><span class="pre">r</span></code> has the same sign as <code class="docutils literal"><span class="pre">n</span></code>. <code class="docutils literal"><span class="pre">q</span></code> and <code class="docutils literal"><span class="pre">r</span></code> must be two distinct objects.</p>
 <p><dl class="docutils">
@@ -1132,7 +1132,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2dvRK1TRK1U">
-<span id="div-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a3d53b543cd48875c58623644935b5fea"></span>common_t&lt;T, U&gt; <code class="descclassname"></code><code class="descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>n</em>, <em class="property">const</em> U &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2dvRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="div-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a3d53b543cd48875c58623644935b5fea"></span>common_t&lt;T, U&gt; <code class="descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>n</em>, <em class="property">const</em> U &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2dvRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary division operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1156,7 +1156,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2rmRK1TRK1U">
-<span id="mod-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a530fbdd0bc604743f5a6024db7d952ea"></span>common_mod_t&lt;T, U&gt; <code class="descclassname"></code><code class="descname">operator%</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>n</em>, <em class="property">const</em> U &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2rmRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mod-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a530fbdd0bc604743f5a6024db7d952ea"></span>common_mod_t&lt;T, U&gt; <code class="descname">operator%</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>n</em>, <em class="property">const</em> U &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2rmRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary modulo operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1178,7 +1178,7 @@
 
 <dl class="function">
 <dt id="_CPPv28mul_2expR10mp_integerRK10mp_integer11mp_bitcnt_t">
-<span id="mul_2exp__mp_integerR.mp_integerCR.mp_bitcnt_t"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a788d256d0a66f0aefc370c53d6a81a7a"></span>void <code class="descclassname"></code><code class="descname">mul_2exp</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, mp_bitcnt_t <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28mul_2expR10mp_integerRK10mp_integer11mp_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mul_2exp__mp_integerR.mp_integerCR.mp_bitcnt_t"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a788d256d0a66f0aefc370c53d6a81a7a"></span>void <code class="descname">mul_2exp</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, mp_bitcnt_t <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28mul_2expR10mp_integerRK10mp_integer11mp_bitcnt_t" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ternary left shift. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">n</span></code> multiplied by <code class="docutils literal"><span class="pre">2**s</span></code>.</p>
 <p><dl class="docutils">
@@ -1197,7 +1197,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, shift_op_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2lsRK10mp_integer1T">
-<span id="lshift-operator__mp_integerCR.T"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a90405a1785f3ed5a08602b1de674a6cc"></span>mp_integer <code class="descclassname"></code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em>, T <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2lsRK10mp_integer1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="lshift-operator__mp_integerCR.T"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a90405a1785f3ed5a08602b1de674a6cc"></span>mp_integer <code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em>, T <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2lsRK10mp_integer1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>Left shift operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1219,7 +1219,7 @@
 
 <dl class="function">
 <dt id="_CPPv211tdiv_q_2expR10mp_integerRK10mp_integer11mp_bitcnt_t">
-<span id="tdiv_q_2exp__mp_integerR.mp_integerCR.mp_bitcnt_t"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a0595f2a8d55ed847eb7effd18e73c1fa"></span>void <code class="descclassname"></code><code class="descname">tdiv_q_2exp</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, mp_bitcnt_t <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211tdiv_q_2expR10mp_integerRK10mp_integer11mp_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="tdiv_q_2exp__mp_integerR.mp_integerCR.mp_bitcnt_t"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a0595f2a8d55ed847eb7effd18e73c1fa"></span>void <code class="descname">tdiv_q_2exp</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, mp_bitcnt_t <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211tdiv_q_2expR10mp_integerRK10mp_integer11mp_bitcnt_t" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ternary right shift. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">n</span></code> divided by <code class="docutils literal"><span class="pre">2**s</span></code>. <code class="docutils literal"><span class="pre">rop</span></code> will be the truncated result of the division.</p>
 <p><dl class="docutils">
@@ -1238,7 +1238,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, shift_op_enabler&lt; T &gt; = 0&gt;</dt>
 <dt id="_CPPv2rsRK10mp_integer1T">
-<span id="rshift-operator__mp_integerCR.T"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a98289359023c0c35545bce1e830095a3"></span>mp_integer <code class="descclassname"></code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em>, T <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2rsRK10mp_integer1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="rshift-operator__mp_integerCR.T"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a98289359023c0c35545bce1e830095a3"></span>mp_integer <code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em>, T <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2rsRK10mp_integer1T" title="Permalink to this definition">¶</a></dt>
 <dd><p>Right shift operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1260,7 +1260,7 @@
 
 <dl class="function">
 <dt id="_CPPv23cmpRK10mp_integerRK10mp_integer">
-<span id="cmp__mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ad6b64af245a47ede5ed7d8aaf25c2837"></span>int <code class="descclassname"></code><code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23cmpRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="cmp__mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ad6b64af245a47ede5ed7d8aaf25c2837"></span>int <code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23cmpRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison function for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1279,7 +1279,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U, rel_enabler&lt; T, U &gt; = 0&gt;</dt>
 <dt id="_CPPv2eqRK1TRK1U">
-<span id="eq-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac29e79b650b2c97f2ca569bf4f848812"></span>bool <code class="descclassname"></code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2eqRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="eq-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac29e79b650b2c97f2ca569bf4f848812"></span>bool <code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2eqRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Equality operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1298,7 +1298,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U, rel_enabler&lt; T, U &gt; = 0&gt;</dt>
 <dt id="_CPPv2neRK1TRK1U">
-<span id="neq-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1acff50d5e505ab645606b42f1105edac0"></span>bool <code class="descclassname"></code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2neRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="neq-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1acff50d5e505ab645606b42f1105edac0"></span>bool <code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2neRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inequality operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1317,7 +1317,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U, rel_enabler&lt; T, U &gt; = 0&gt;</dt>
 <dt id="_CPPv2ltRK1TRK1U">
-<span id="lt-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a3b7ba9c91a38f89cda168194377e1f3a"></span>bool <code class="descclassname"></code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2ltRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="lt-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a3b7ba9c91a38f89cda168194377e1f3a"></span>bool <code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2ltRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Less-than operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1336,7 +1336,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U, rel_enabler&lt; T, U &gt; = 0&gt;</dt>
 <dt id="_CPPv2geRK1TRK1U">
-<span id="gte-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a04275962fd456cf9fe5f7bba3c7d5f7f"></span>bool <code class="descclassname"></code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2geRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="gte-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a04275962fd456cf9fe5f7bba3c7d5f7f"></span>bool <code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2geRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Greater-than or equal operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1355,7 +1355,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U, rel_enabler&lt; T, U &gt; = 0&gt;</dt>
 <dt id="_CPPv2gtRK1TRK1U">
-<span id="gt-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ae55357bd4da2238fd732d5884e9ed2ed"></span>bool <code class="descclassname"></code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2gtRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="gt-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ae55357bd4da2238fd732d5884e9ed2ed"></span>bool <code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2gtRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Greater-than operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1374,7 +1374,7 @@
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U, rel_enabler&lt; T, U &gt; = 0&gt;</dt>
 <dt id="_CPPv2leRK1TRK1U">
-<span id="lte-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a9f87804e8d85bfc4cb81744af39ec852"></span>bool <code class="descclassname"></code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2leRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="lte-operator__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a9f87804e8d85bfc4cb81744af39ec852"></span>bool <code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2leRK1TRK1U" title="Permalink to this definition">¶</a></dt>
 <dd><p>Less-than or equal operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1391,7 +1391,7 @@
 
 <dl class="function">
 <dt id="_CPPv26pow_uiR10mp_integerRK10mp_integerm">
-<span id="pow_ui__mp_integerR.mp_integerCR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a3fdda8d1f4c0e3f5986f47411646fe78"></span>void <code class="descclassname"></code><code class="descname">pow_ui</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>base</em>, unsigned long <em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26pow_uiR10mp_integerRK10mp_integerm" title="Permalink to this definition">¶</a><br /></dt>
+<span id="pow_ui__mp_integerR.mp_integerCR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a3fdda8d1f4c0e3f5986f47411646fe78"></span>void <code class="descname">pow_ui</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>base</em>, unsigned long <em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26pow_uiR10mp_integerRK10mp_integerm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ternary exponentiation. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">base**exp</span></code>.</p>
 <p><dl class="docutils">
@@ -1408,7 +1408,7 @@
 
 <dl class="function">
 <dt id="_CPPv26pow_uiRK10mp_integerm">
-<span id="pow_ui__mp_integerCR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1acb43aedb7c011ecd421fc452c3329ba3"></span>mp_integer <code class="descclassname"></code><code class="descname">pow_ui</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>base</em>, unsigned long <em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26pow_uiRK10mp_integerm" title="Permalink to this definition">¶</a><br /></dt>
+<span id="pow_ui__mp_integerCR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1acb43aedb7c011ecd421fc452c3329ba3"></span>mp_integer <code class="descname">pow_ui</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>base</em>, unsigned long <em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26pow_uiRK10mp_integerm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary exponentiation. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1425,7 +1425,7 @@
 
 <dl class="function">
 <dt id="_CPPv23absR10mp_integerRK10mp_integer">
-<span id="abs__mp_integerR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a580904fcc3bdca4261460d1355c40875"></span>void <code class="descclassname"></code><code class="descname">abs</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23absR10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="abs__mp_integerR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a580904fcc3bdca4261460d1355c40875"></span>void <code class="descname">abs</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23absR10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary absolute value. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the absolute value of <code class="docutils literal"><span class="pre">n</span></code>.</p>
 <p><dl class="docutils">
@@ -1441,7 +1441,7 @@
 
 <dl class="function">
 <dt id="_CPPv23absRK10mp_integer">
-<span id="abs__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa9e6153ad7bd9fa27523ef733e1153b4"></span>mp_integer <code class="descclassname"></code><code class="descname">abs</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23absRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="abs__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa9e6153ad7bd9fa27523ef733e1153b4"></span>mp_integer <code class="descname">abs</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23absRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unary absolute value. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1457,7 +1457,7 @@
 
 <dl class="function">
 <dt id="_CPPv24hashRK10mp_integer">
-<span id="hash__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a9aa93afc398095ff4f1001f11b473c3b"></span>std::size_t <code class="descclassname"></code><code class="descname">hash</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv24hashRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="hash__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a9aa93afc398095ff4f1001f11b473c3b"></span>std::size_t <code class="descname">hash</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv24hashRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hash value. </p>
 <p>This function will return a hash value for <code class="docutils literal"><span class="pre">n</span></code>. The hash value depends only on the value of <code class="docutils literal"><span class="pre">n</span></code>.</p>
 <p><dl class="docutils">
@@ -1474,7 +1474,7 @@
 
 <dl class="function">
 <dt id="_CPPv29nextprimeR10mp_integerRK10mp_integer">
-<span id="nextprime__mp_integerR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ae5e01e122b655414c3d8761b2aa2621f"></span>void <code class="descclassname"></code><code class="descname">nextprime</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29nextprimeR10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="nextprime__mp_integerR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ae5e01e122b655414c3d8761b2aa2621f"></span>void <code class="descname">nextprime</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29nextprimeR10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute next prime number (binary version). </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the first prime number greater than <code class="docutils literal"><span class="pre">n</span></code>. Note that for negative values of <code class="docutils literal"><span class="pre">n</span></code> this function always returns 2.</p>
 <p><dl class="docutils">
@@ -1490,7 +1490,7 @@
 
 <dl class="function">
 <dt id="_CPPv29nextprimeRK10mp_integer">
-<span id="nextprime__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac34d6f57380154c37497fff229e7c9c4"></span>mp_integer <code class="descclassname"></code><code class="descname">nextprime</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29nextprimeRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="nextprime__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac34d6f57380154c37497fff229e7c9c4"></span>mp_integer <code class="descname">nextprime</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29nextprimeRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute next prime number (unary version). </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1506,7 +1506,7 @@
 
 <dl class="function">
 <dt id="_CPPv214probab_prime_pRK10mp_integeri">
-<span id="probab_prime_p__mp_integerCR.i"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a49ab29946ca33fa1994892028f664eb1"></span>int <code class="descclassname"></code><code class="descname">probab_prime_p</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em>, int <em>reps</em> = 25<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv214probab_prime_pRK10mp_integeri" title="Permalink to this definition">¶</a><br /></dt>
+<span id="probab_prime_p__mp_integerCR.i"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a49ab29946ca33fa1994892028f664eb1"></span>int <code class="descname">probab_prime_p</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em>, int <em>reps</em> = 25<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv214probab_prime_pRK10mp_integeri" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test primality. </p>
 <p>This is the free-function version of <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a2ecd20fc837c9fbd7ca991feb95363c5"><span class="std std-ref">mp_integer::probab_prime_p()</span></a>.</p>
 <p><dl class="docutils">
@@ -1529,7 +1529,7 @@
 
 <dl class="function">
 <dt id="_CPPv24sqrtR10mp_integerRK10mp_integer">
-<span id="sqrt__mp_integerR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a54659bd44e96bfdc50e3985c37664af9"></span>void <code class="descclassname"></code><code class="descname">sqrt</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv24sqrtR10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="sqrt__mp_integerR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a54659bd44e96bfdc50e3985c37664af9"></span>void <code class="descname">sqrt</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv24sqrtR10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integer square root (binary version). </p>
 <p>This method will set <code class="docutils literal"><span class="pre">rop</span></code> to the integer square root of <code class="docutils literal"><span class="pre">n</span></code>.</p>
 <p><dl class="docutils">
@@ -1550,7 +1550,7 @@
 
 <dl class="function">
 <dt id="_CPPv24sqrtRK10mp_integer">
-<span id="sqrt__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a53118c88fb159d8e8a8db36fbf440c35"></span>mp_integer <code class="descclassname"></code><code class="descname">sqrt</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv24sqrtRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="sqrt__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a53118c88fb159d8e8a8db36fbf440c35"></span>mp_integer <code class="descname">sqrt</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv24sqrtRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integer square root (unary version). </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1571,7 +1571,7 @@
 
 <dl class="function">
 <dt id="_CPPv25odd_pRK10mp_integer">
-<span id="odd_p__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ab0f9c4a50d6fcfaa4a35a86f4f17df12"></span>bool <code class="descclassname"></code><code class="descname">odd_p</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv25odd_pRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="odd_p__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ab0f9c4a50d6fcfaa4a35a86f4f17df12"></span>bool <code class="descname">odd_p</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv25odd_pRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test if integer is odd. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1587,7 +1587,7 @@
 
 <dl class="function">
 <dt id="_CPPv26even_pRK10mp_integer">
-<span id="even_p__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1adee59b44be34a0071c759e44adea9bdf"></span>bool <code class="descclassname"></code><code class="descname">even_p</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26even_pRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="even_p__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1adee59b44be34a0071c759e44adea9bdf"></span>bool <code class="descname">even_p</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26even_pRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test if integer is even. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1603,7 +1603,7 @@
 
 <dl class="function">
 <dt id="_CPPv26fac_uiR10mp_integerm">
-<span id="fac_ui__mp_integerR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1abc8fcd9090b94b24b6684af97191f7a3"></span>void <code class="descclassname"></code><code class="descname">fac_ui</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, unsigned long <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26fac_uiR10mp_integerm" title="Permalink to this definition">¶</a><br /></dt>
+<span id="fac_ui__mp_integerR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1abc8fcd9090b94b24b6684af97191f7a3"></span>void <code class="descname">fac_ui</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, unsigned long <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26fac_uiR10mp_integerm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Factorial. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the factorial of <code class="docutils literal"><span class="pre">n</span></code>.</p>
 <p><dl class="docutils">
@@ -1624,7 +1624,7 @@
 
 <dl class="function">
 <dt id="_CPPv26bin_uiR10mp_integerRK10mp_integerm">
-<span id="bin_ui__mp_integerR.mp_integerCR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a220b5475ee65174436ac170278371f3e"></span>void <code class="descclassname"></code><code class="descname">bin_ui</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26bin_uiR10mp_integerRK10mp_integerm" title="Permalink to this definition">¶</a><br /></dt>
+<span id="bin_ui__mp_integerR.mp_integerCR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a220b5475ee65174436ac170278371f3e"></span>void <code class="descname">bin_ui</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26bin_uiR10mp_integerRK10mp_integerm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binomial coefficient (ternary version). </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the binomial coefficient of <code class="docutils literal"><span class="pre">n</span></code> and <code class="docutils literal"><span class="pre">k</span></code>. Negative values of <code class="docutils literal"><span class="pre">n</span></code> are supported.</p>
 <p><dl class="docutils">
@@ -1641,7 +1641,7 @@
 
 <dl class="function">
 <dt id="_CPPv26bin_uiRK10mp_integerm">
-<span id="bin_ui__mp_integerCR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a0f89d751571bd63d6308f3dfbecdd1c1"></span>mp_integer <code class="descclassname"></code><code class="descname">bin_ui</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26bin_uiRK10mp_integerm" title="Permalink to this definition">¶</a><br /></dt>
+<span id="bin_ui__mp_integerCR.unsigned-l"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a0f89d751571bd63d6308f3dfbecdd1c1"></span>mp_integer <code class="descname">bin_ui</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26bin_uiRK10mp_integerm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binomial coefficient (binary version). </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1658,7 +1658,7 @@
 
 <dl class="function">
 <dt id="_CPPv28divexactR10mp_integerRK10mp_integerRK10mp_integer">
-<span id="divexact__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a1954da82f9a2461ecd743a7b6855beb6"></span>void <code class="descclassname"></code><code class="descname">divexact</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, <em class="property">const</em> mp_integer &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28divexactR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="divexact__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a1954da82f9a2461ecd743a7b6855beb6"></span>void <code class="descname">divexact</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, <em class="property">const</em> mp_integer &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28divexactR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exact division (ternary version). </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the quotient of <code class="docutils literal"><span class="pre">n</span></code> and <code class="docutils literal"><span class="pre">d</span></code>.</p>
 <p><strong>NOTE:</strong> if <code class="docutils literal"><span class="pre">d</span></code> does not divide <code class="docutils literal"><span class="pre">n</span></code> exactly, the behaviour will be undefined.</p>
@@ -1676,7 +1676,7 @@
 
 <dl class="function">
 <dt id="_CPPv28divexactRK10mp_integerRK10mp_integer">
-<span id="divexact__mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a50ce618674f5c8b843940e9e40cb6bdd"></span>mp_integer <code class="descclassname"></code><code class="descname">divexact</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em>, <em class="property">const</em> mp_integer &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28divexactRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="divexact__mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a50ce618674f5c8b843940e9e40cb6bdd"></span>mp_integer <code class="descname">divexact</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em>, <em class="property">const</em> mp_integer &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28divexactRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exact division (binary version). </p>
 <p><strong>NOTE:</strong> if <code class="docutils literal"><span class="pre">d</span></code> does not divide <code class="docutils literal"><span class="pre">n</span></code> exactly, the behaviour will be undefined.</p>
 <p><dl class="docutils">
@@ -1694,7 +1694,7 @@
 
 <dl class="function">
 <dt id="_CPPv23gcdR10mp_integerRK10mp_integerRK10mp_integer">
-<span id="gcd__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a39704db76ff2d6d7a3cafdb178c2af5b"></span>void <code class="descclassname"></code><code class="descname">gcd</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23gcdR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="gcd__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a39704db76ff2d6d7a3cafdb178c2af5b"></span>void <code class="descname">gcd</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23gcdR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>GCD (ternary version). </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the GCD of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. The result is always positive. If both operands are zero, zero is returned.</p>
 <p><dl class="docutils">
@@ -1711,7 +1711,7 @@
 
 <dl class="function">
 <dt id="_CPPv23gcdRK10mp_integerRK10mp_integer">
-<span id="gcd__mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1af939e47f855cb49168e8dc41a5b7c22a"></span>mp_integer <code class="descclassname"></code><code class="descname">gcd</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23gcdRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a><br /></dt>
+<span id="gcd__mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1af939e47f855cb49168e8dc41a5b7c22a"></span>mp_integer <code class="descname">gcd</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23gcdRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>GCD (binary version). </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
