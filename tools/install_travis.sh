@@ -81,4 +81,41 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
         echo "${SPHINX_OUTPUT}";
         exit 1;
     fi
+    echo "Sphinx ran successfully";
+    if [[ "${TRAVIS_PULL_REQUEST}" != "false" ]]; then
+        echo "Testing a pull request, the generated documentation will not be uploaded.";
+        exit 0;
+    fi
+    if [[ "${TRAVIS_BRANCH}" != "master" ]]; then
+        echo "Branch is not master, the generated documentation will not be uploaded.";
+        exit 0;
+    fi
+    # Move out the resulting documentation.
+    mv _build/html /home/travis/sphinx;
+    # Checkout a new copy of the repo, for pushing to gh-pages.
+    cd ../../../;
+    git config --global push.default simple
+    git config --global user.name "Travis CI"
+    git config --global user.email "bluescarni@gmail.com"
+    set +x
+    git clone "https://${GH_TOKEN}@github.com/bluescarni/mppp.git" mppp_gh_pages -q
+    set -x
+    cd mppp_gh_pages
+    git checkout -b gh-pages --track origin/gh-pages;
+    git rm -fr sphinx;
+    mv /home/travis/sphinx .;
+    git add sphinx;
+    # We assume here that a failure in commit means that there's nothing
+    # to commit.
+    git commit -m "Update Sphinx documentation, commit ${TRAVIS_COMMIT} [skip ci]." || exit 0
+    PUSH_COUNTER=0
+    until git push -q
+    do
+        git pull -q
+        PUSH_COUNTER=$((PUSH_COUNTER + 1))
+        if [ "$PUSH_COUNTER" -gt 3 ]; then
+            echo "Push failed, aborting.";
+            exit 1;
+        fi
+    done
 fi
