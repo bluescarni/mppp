@@ -102,7 +102,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     set -x
     cd mppp_gh_pages
     git checkout -b gh-pages --track origin/gh-pages;
-    git ls-files|xargs git rm -fr;
+    git rm -fr *;
     mv /home/travis/sphinx/* .;
     git add *;
     # We assume here that a failure in commit means that there's nothing
