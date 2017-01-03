@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to mp++’s documentation! &mdash; mp++ 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="mp++ 0.1 documentation" href="#"/>
+        <link rel="next" title="Reference" href="reference.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> mp++
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">mp++</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>Welcome to mp++&#8217;s documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-mp-s-documentation">
+<h1>Welcome to mp++&#8217;s documentation!<a class="headerlink" href="#welcome-to-mp-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>mp++ is a small C++11 header-only library for multiprecision integer arithmetic. Based
+on the well-known <a class="reference external" href="http://www.gmplib.org">GMP</a> library, mp++ places a strong emphasis on
+optimising operations on small values. When operating on small operands, mp++ will:</p>
+<ul class="simple">
+<li>avoid heap memory allocations as much as possible, and</li>
+<li>use optimised implementations of basic operations (instead of calling GMP functions).</li>
+</ul>
+<p>The combination of these two techniques results in a performance increase up to ~3x, on small operands,
+with respect to GMP. The price to pay is a small overhead when operating on large operands.</p>
+<p>mp++ was created to cater to the requirements of computer algebra systems, which typically need to be able
+to manipulate arbitrarily-large integers but which, in practice, often end up storing many small integers
+(e.g., as coefficients in a polynomial).</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>mp++ is written in modern C++, and it requires a C++11-capable compiler. It is known to run
+on the following setups:</p>
+<ul class="simple">
+<li>GCC 4.8 and later versions on GNU/Linux 32/64-bit,</li>
+<li>Clang 3.8 on GNU/Linux 64-bit,</li>
+<li>MSVC15 on Windows 32/64-bit,</li>
+<li>MinGW GCC 6 on Windows 64-bit,</li>
+<li>Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).</li>
+</ul>
+<p>The only mandatory dependency is the <a class="reference external" href="http://www.gmplib.org">GMP</a> library (GMP 5 and later versions are supported).
+The <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP can also be used as a drop-in replacement for GMP.
+In order to interoperate with the <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> C++ type, mp++ optionally depends
+on the <a class="reference external" href="http://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library (see the
+<a class="reference internal" href="#index-configuration"><span class="std std-ref">configuration</span></a> section below - MPFR 3 or a later version is required). In order to
+compile the benchmark suite, the <a class="reference external" href="http://www.boost.org/">Boost</a> C++ libraries are required.</p>
+<p>In order to use mp++, you only have to include the <code class="docutils literal"><span class="pre">mp++.hpp</span></code> header in your project and link to the GMP
+library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 my_executable.cpp -lgmp
+</pre></div>
+</div>
+<p>If you require interoperability with <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code>, link in the MPFR library as well:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 my_executable.cpp -lmpfr -lgmp
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuration">
+<span id="index-configuration"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>The library has a few configuration switches in the form of preprocessor definitions. These can be set
+on the compiler command-line or in the source code <strong>before</strong> including the headers. The switches are:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">MPPP_WITH_LONG_DOUBLE</span></code>: if defined, mp++ will be able to interoperate with the <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> C++ type (whereas
+normally floating-point interoperability is limited to the <code class="docutils literal"><span class="pre">float</span></code> and <code class="docutils literal"><span class="pre">double</span></code> types). This option requires
+the <a class="reference external" href="http://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library.</li>
+<li><code class="docutils literal"><span class="pre">MPPP_CUSTOM_NAMESPACE</span></code>: by default, all classes and functions are located in the <code class="docutils literal"><span class="pre">mppp</span></code> namespace. If
+<code class="docutils literal"><span class="pre">MPPP_CUSTOM_NAMESPACE</span></code> is defined, the classes and functions will be located in the namespace specified by the
+value of the definition.</li>
+</ul>
+</div>
+<div class="section" id="contents">
+<h2>Contents:<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mp_integer.html">The <code class="docutils literal"><span class="pre">mp_integer</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="reference.html" class="btn btn-neutral float-right" title="Reference" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Francesco Biscani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
