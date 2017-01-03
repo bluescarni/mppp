@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; mp++ 0.1 documentation</title>
+  <title>Installation &mdash; mp++ 0.1 documentation</title>
   
 
   
@@ -32,8 +32,10 @@
   
         <link rel="index" title="Index"
               href="genindex.html"/>
-        <link rel="search" title="Search" href="#"/>
-    <link rel="top" title="mp++ 0.1 documentation" href="index.html"/> 
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="mp++ 0.1 documentation" href="index.html"/>
+        <link rel="next" title="Configuration" href="configuration.html"/>
+        <link rel="prev" title="Welcome to mp++’s documentation!" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -68,7 +70,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -82,8 +84,8 @@
           
             
             
-                <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
@@ -113,7 +115,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -121,8 +123,12 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li></li>
+    <li>Installation</li>
       <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/installation.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
   </ul>
@@ -131,23 +137,47 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>mp++ is written in modern C++, and it requires a C++11-capable compiler. It is known to run
+on the following setups:</p>
+<ul class="simple">
+<li>GCC 4.8 and later versions on GNU/Linux 32/64-bit,</li>
+<li>Clang 3.8 on GNU/Linux 64-bit,</li>
+<li>MSVC15 on Windows 32/64-bit,</li>
+<li>MinGW GCC 6 on Windows 64-bit,</li>
+<li>Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).</li>
+</ul>
+<p>The only mandatory dependency is the <a class="reference external" href="http://www.gmplib.org">GMP</a> library (GMP 5 and later versions are supported).
+The <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP can also be used as a drop-in replacement for GMP.
+In order to interoperate with the <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> C++ type, mp++ optionally depends
+on the <a class="reference external" href="http://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library (see the
+<a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">configuration</span></a> section - MPFR 3 or a later version is required). In order to
+compile the benchmark suite, the <a class="reference external" href="http://www.boost.org/">Boost</a> C++ libraries are required.</p>
+<p>In order to use mp++, you only have to include the <code class="docutils literal"><span class="pre">mp++.hpp</span></code> header in your project and link to the GMP
+library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 my_executable.cpp -lgmp
+</pre></div>
+</div>
+<p>If you require interoperability with <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code>, link in the MPFR library as well:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 my_executable.cpp -lmpfr -lgmp
+</pre></div>
+</div>
+</div>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="configuration.html" class="btn btn-neutral float-right" title="Configuration" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to mp++’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -186,7 +216,6 @@
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
       <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-      <script type="text/javascript" src="_static/searchtools.js"></script>
 
   
 
@@ -202,14 +231,7 @@
           SphinxRtdTheme.StickyNav.enable();
       });
   </script>
-  
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
    
-
 
 </body>
 </html>
