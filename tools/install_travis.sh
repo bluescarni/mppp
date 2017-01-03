@@ -48,4 +48,9 @@ elif [[ "${MPPP_BUILD}" == "ReleaseClang38" ]]; then
     CXX=clang++-3.8 CC=clang-3.8 cmake -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes ../;
     make -j2 VERBOSE=1;
     ctest -V;
+elif [[ "${MPPP_BUILD}" == "ICC" ]]; then
+    set +x;
+    docker login -u=bluescarni -p=${DOCKER_CLOUD_PWD};
+    set -x;
+    docker pull bluescarni/icc_ci:v1;
 fi
