@@ -487,13 +487,13 @@ struct static_int {
     {
         return _mp_size >= 0 ? _mp_size : -_mp_size;
     }
-    class static_mpz_view
-    {
-    public:
+    struct static_mpz_view {
         // NOTE: this is needed when we have the variant view in the integer class: if the active view
         // is the dynamic one, we need to def construct a static view that we will never use.
         // NOTE: m_mpz needs to be zero inited because otherwise when using the move ctor we will
-        // be reading from uninited memory.
+        // be reading from uninited memory, and because m_mpz might be actually a real mpz_t object
+        // on the Intel compiler (in which case a zero _mp_d prevents invalid calls to mpz_clear() in
+        // the dtor).
         // NOTE: use round parentheses here in an attempt to shut a GCC warning that happens with curly
         // braces - they should be equivalent, see:
         // http://en.cppreference.com/w/cpp/language/value_initialization
@@ -514,20 +514,28 @@ struct static_int {
         {
             ::mpz_init(&m_mpz);
             if (n._mp_size) {
+                // If n is not zero, we need to copy over the limbs from n. We use mpz_limbs_write() to allocate
+                // enough space.
                 const auto asize = n._mp_size > 0 ? n._mp_size : -n._mp_size;
                 auto ptr = ::mpz_limbs_write(&m_mpz, static_cast<::mp_size_t>(asize));
                 copy_limbs_no(n.m_limbs.data(), n.m_limbs.data() + asize, ptr);
+                // This will update the size of m_mpz.
                 ::mpz_limbs_finish(&m_mpz, static_cast<::mp_size_t>(n._mp_size));
             }
         }
         static_mpz_view(static_mpz_view &&other)
         {
+            // Upon move construction, we do a shallow copy and set _mp_d to null in other.
+            // NOTE: as stated elsewhere, in all supported versions of GMP _mp_d always points
+            // to something, even when lazy initialization is involved. Thus, we can use a null _mp_d
+            // to indicate that the view does not contain a proper mpz_t object.
             m_mpz = other.m_mpz;
             other.m_mpz._mp_d = nullptr;
         }
         ~static_mpz_view()
         {
             if (m_mpz._mp_d) {
+                // Clean up only if this object contains a proper mpz_t object.
                 ::mpz_clear(&m_mpz);
             }
         }
@@ -544,8 +552,6 @@ struct static_int {
         {
             return &m_mpz;
         }
-
-    private:
         mpz_struct_t m_mpz;
     };
     static_mpz_view get_mpz_view() const
@@ -929,18 +935,19 @@ class mp_integer
     // The underlying static int.
     using s_int = s_storage;
     // mpz view class.
-    class mpz_view
-    {
+    struct mpz_view {
         using static_mpz_view = typename s_int::static_mpz_view;
-
-    public:
         explicit mpz_view(const mp_integer &n)
             : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : static_mpz_view{}),
               m_ptr(n.is_static() ? m_static_view : &(n.m_int.g_dy()))
         {
         }
         mpz_view(const mpz_view &) = delete;
-        mpz_view(mpz_view &&) = default;
+        mpz_view(mpz_view &&other)
+            : m_static_view(std::move(other.m_static_view)),
+              m_ptr(m_static_view.m_mpz._mp_d ? m_static_view : other.m_ptr)
+        {
+        }
         mpz_view &operator=(const mpz_view &) = delete;
         mpz_view &operator=(mpz_view &&) = delete;
         operator const mpz_struct_t *() const
@@ -951,8 +958,6 @@ class mp_integer
         {
             return m_ptr;
         }
-
-    private:
         static_mpz_view m_static_view;
         const mpz_struct_t *m_ptr;
     };
@@ -4711,6 +4716,14 @@ public:
         mp_integer retval;
         gcd(retval, op1, op2);
         return retval;
+    }
+    mppp_impl::integer_union<SSize> &_get_union()
+    {
+        return m_int;
+    }
+    const mppp_impl::integer_union<SSize> &_get_union() const
+    {
+        return m_int;
     }
 
 private:
