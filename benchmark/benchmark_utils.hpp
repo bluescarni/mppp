@@ -32,6 +32,7 @@ see https://www.gnu.org/licenses/. */
 #include <algorithm>
 #include <array>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <cstdlib>
 #include <gmp.h>
 #include <limits>
 #include <locale>
@@ -117,6 +118,37 @@ inline void random_integer(Integer &m, unsigned n, std::mt19937 &rng, ::mp_limb_
 }
 
 // Various test functions.
+
+template <typename T, typename = void>
+struct ctor_dist_type {
+    using type = std::uniform_int_distribution<T>;
+};
+
+template <typename T>
+struct ctor_dist_type<T, typename std::enable_if<std::is_floating_point<T>::value>::type> {
+    using type = std::uniform_real_distribution<T>;
+};
+
+// Bench for construction/destruction from primitive types.
+template <typename T, typename Integer>
+inline void bench_ctor(nonius::chronometer meter, std::mt19937 &rng, T min = std::numeric_limits<T>::min(),
+                       T max = std::numeric_limits<T>::max())
+{
+    constexpr unsigned vsize = 1000u;
+    typename ctor_dist_type<T>::type dist(min, max);
+    auto ptr = static_cast<Integer *>(std::malloc(sizeof(Integer) * vsize));
+    std::array<T, vsize> randoms;
+    std::generate(randoms.begin(), randoms.end(), [&dist, &rng]() { return dist(rng); });
+    meter.measure([ptr, &randoms]() {
+        for (auto i = 0u; i < vsize; ++i) {
+            ::new (ptr + i) Integer(randoms[i]);
+        }
+        for (auto i = 0u; i < vsize; ++i) {
+            (ptr + i)->~Integer();
+        }
+    });
+    std::free(ptr);
+}
 
 #define MPPP_BENCHMARK_VEC_SIZE 100u
 
@@ -1071,8 +1103,7 @@ inline void uadd_vec_cpp_int(nonius::chronometer meter, std::mt19937 &rng, unsig
     });
     meter.measure([&arr1, &arr2, &arr3, size]() {
         for (auto j = 0u; j < size; ++j) {
-            //arr3[j] = arr1[j] + arr2[j];
-            add(arr3[j], arr1[j], arr2[j]);
+            arr3[j] = arr1[j] + arr2[j];
         }
     });
 }
