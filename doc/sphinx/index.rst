@@ -29,6 +29,7 @@ Contents:
    installation.rst
    configuration.rst
    reference.rst
+   benchmarks.rst
 
 Indices and tables
 ==================
