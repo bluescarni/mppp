@@ -6,10 +6,18 @@ find_package(Threads REQUIRED)
 unset(THREADS_PREFER_PTHREAD_FLAG)
 
 # Nonius also depends on Boost.
-find_package(Boost REQUIRED)
+find_package(Boost 1.55.0 REQUIRED )
+
+if(MPPP_BENCHMARK_FLINT)
+  find_package(FLINT REQUIRED)
+endif()
 
 function(ADD_MPPP_BENCHMARK arg1)
     add_executable(${arg1} ${arg1}.cpp)
+    if(MPPP_BENCHMARK_FLINT)
+      target_link_libraries(${arg1} FLINT::FLINT)
+      target_compile_options(${arg1} PUBLIC "-DMPPP_BENCHMARK_FLINT")
+    endif()
     target_link_libraries(${arg1} mp++ Threads::Threads Boost::boost)
     target_include_directories(${arg1} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
     target_compile_options(${arg1} PUBLIC "$<$<CONFIG:DEBUG>:${YACMA_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${YACMA_CXX_FLAGS}>")

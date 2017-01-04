@@ -46,10 +46,10 @@ NONIUS_BENCHMARK("gmp 1-1-limb cmp", [](nonius::chronometer meter) { cmp_vec_gmp
 NONIUS_BENCHMARK("gmp 2-2-limb cmp", [](nonius::chronometer meter) { cmp_vec_gmp(meter, rng, 2, 2); });
 NONIUS_BENCHMARK("gmp 3-3-limb cmp", [](nonius::chronometer meter) { cmp_vec_gmp(meter, rng, 3, 3); });
 
-NONIUS_BENCHMARK("piranha 1-1-limb cmp", [](nonius::chronometer meter) { cmp_vec_piranha(meter, rng, 1, 1); });
-NONIUS_BENCHMARK("piranha 2-2-limb cmp", [](nonius::chronometer meter) { cmp_vec_piranha(meter, rng, 2, 2); });
-NONIUS_BENCHMARK("piranha 3-3-limb cmp", [](nonius::chronometer meter) { cmp_vec_piranha(meter, rng, 3, 3); });
+#if defined(MPPP_BENCHMARK_FLINT)
 
 NONIUS_BENCHMARK("flint 1-1-limb cmp", [](nonius::chronometer meter) { cmp_vec_fmpz(meter, rng, 1, 1); });
 NONIUS_BENCHMARK("flint 2-2-limb cmp", [](nonius::chronometer meter) { cmp_vec_fmpz(meter, rng, 2, 2); });
 NONIUS_BENCHMARK("flint 3-3-limb cmp", [](nonius::chronometer meter) { cmp_vec_fmpz(meter, rng, 3, 3); });
+
+#endif

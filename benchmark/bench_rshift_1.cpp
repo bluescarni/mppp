@@ -45,13 +45,6 @@ NONIUS_BENCHMARK("mppp 1-limb unsigned vector rshift",
 NONIUS_BENCHMARK("mppp 2-limb unsigned vector rshift",
                  [](nonius::chronometer meter) { urshift_vec_mppp<integer>(meter, rng, 2); });
 
-NONIUS_BENCHMARK("piranha half-limb unsigned vector rshift",
-                 [](nonius::chronometer meter) { urshift_vec_piranha_half(meter, rng); });
-NONIUS_BENCHMARK("piranha 1-limb unsigned vector rshift",
-                 [](nonius::chronometer meter) { urshift_vec_piranha(meter, rng, 1); });
-NONIUS_BENCHMARK("piranha 2-limb unsigned vector rshift",
-                 [](nonius::chronometer meter) { urshift_vec_piranha(meter, rng, 2); });
-
 NONIUS_BENCHMARK("gmp half-limb unsigned vector rshift",
                  [](nonius::chronometer meter) { urshift_vec_gmp_half(meter, rng); });
 NONIUS_BENCHMARK("gmp 1-limb unsigned vector rshift",
@@ -59,9 +52,13 @@ NONIUS_BENCHMARK("gmp 1-limb unsigned vector rshift",
 NONIUS_BENCHMARK("gmp 2-limb unsigned vector rshift",
                  [](nonius::chronometer meter) { urshift_vec_gmp(meter, rng, 2); });
 
+#if defined(MPPP_BENCHMARK_FLINT)
+
 NONIUS_BENCHMARK("flint half-limb unsigned vector rshift",
                  [](nonius::chronometer meter) { urshift_vec_fmpz_half(meter, rng); });
 NONIUS_BENCHMARK("flint 1-limb unsigned vector rshift",
                  [](nonius::chronometer meter) { urshift_vec_fmpz(meter, rng, 1); });
 NONIUS_BENCHMARK("flint 2-limb unsigned vector rshift",
                  [](nonius::chronometer meter) { urshift_vec_fmpz(meter, rng, 2); });
+
+#endif

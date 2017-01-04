@@ -45,13 +45,6 @@ NONIUS_BENCHMARK("mppp 2-2-limb unsigned vector division",
 NONIUS_BENCHMARK("mppp 3-3-limb unsigned vector division",
                  [](nonius::chronometer meter) { udiv_vec_mppp<integer>(meter, rng, 3, 3); });
 
-NONIUS_BENCHMARK("piranha 1-1-limb unsigned vector division",
-                 [](nonius::chronometer meter) { udiv_vec_piranha(meter, rng, 1, 1); });
-NONIUS_BENCHMARK("piranha 2-2-limb unsigned vector division",
-                 [](nonius::chronometer meter) { udiv_vec_piranha(meter, rng, 2, 2); });
-NONIUS_BENCHMARK("piranha 3-3-limb unsigned vector division",
-                 [](nonius::chronometer meter) { udiv_vec_piranha(meter, rng, 3, 3); });
-
 NONIUS_BENCHMARK("gmp 1-1-limb unsigned vector division",
                  [](nonius::chronometer meter) { udiv_vec_gmp(meter, rng, 1, 1); });
 NONIUS_BENCHMARK("gmp 2-2-limb unsigned vector division",
@@ -59,9 +52,13 @@ NONIUS_BENCHMARK("gmp 2-2-limb unsigned vector division",
 NONIUS_BENCHMARK("gmp 3-3-limb unsigned vector division",
                  [](nonius::chronometer meter) { udiv_vec_gmp(meter, rng, 3, 3); });
 
+#if defined(MPPP_BENCHMARK_FLINT)
+
 NONIUS_BENCHMARK("fmpz 1-1-limb unsigned vector division",
                  [](nonius::chronometer meter) { udiv_vec_fmpz(meter, rng, 1, 1); });
 NONIUS_BENCHMARK("fmpz 2-2-limb unsigned vector division",
                  [](nonius::chronometer meter) { udiv_vec_fmpz(meter, rng, 2, 2); });
 NONIUS_BENCHMARK("fmpz 3-3-limb unsigned vector division",
                  [](nonius::chronometer meter) { udiv_vec_fmpz(meter, rng, 3, 3); });
+
+#endif

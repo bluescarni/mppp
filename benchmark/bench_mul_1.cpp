@@ -55,27 +55,14 @@ NONIUS_BENCHMARK("mppp 2-1-limb signed vector multiplication",
 NONIUS_BENCHMARK("mppp 2-2-limb signed vector multiplication",
                  [](nonius::chronometer meter) { smul_vec_mppp<integer>(meter, rng, 2, 2); });
 
+#if defined(MPPP_BENCHMARK_FLINT)
+
 NONIUS_BENCHMARK("flint half-limb unsigned vector multiplication",
                  [](nonius::chronometer meter) { umul_vec_fmpz_half(meter, rng); });
 NONIUS_BENCHMARK("flint half-limb signed vector multiplication",
                  [](nonius::chronometer meter) { umul_vec_fmpz_half(meter, rng); });
 
-NONIUS_BENCHMARK("piranha half-limb unsigned vector multiplication",
-                 [](nonius::chronometer meter) { umul_vec_piranha_half(meter, rng); });
-NONIUS_BENCHMARK("piranha half-limb signed vector multiplication",
-                 [](nonius::chronometer meter) { smul_vec_piranha_half(meter, rng); });
-NONIUS_BENCHMARK("piranha 1-1-limb unsigned vector multiplication",
-                 [](nonius::chronometer meter) { umul_vec_piranha(meter, rng, 1, 1); });
-NONIUS_BENCHMARK("piranha 2-1-limb unsigned vector multiplication",
-                 [](nonius::chronometer meter) { umul_vec_piranha(meter, rng, 2, 1); });
-NONIUS_BENCHMARK("piranha 2-2-limb unsigned vector multiplication",
-                 [](nonius::chronometer meter) { umul_vec_piranha(meter, rng, 2, 2); });
-NONIUS_BENCHMARK("piranha 1-1-limb signed vector multiplication",
-                 [](nonius::chronometer meter) { smul_vec_piranha(meter, rng, 1, 1); });
-NONIUS_BENCHMARK("piranha 2-1-limb signed vector multiplication",
-                 [](nonius::chronometer meter) { smul_vec_piranha(meter, rng, 2, 1); });
-NONIUS_BENCHMARK("piranha 2-2-limb signed vector multiplication",
-                 [](nonius::chronometer meter) { smul_vec_piranha(meter, rng, 2, 2); });
+#endif
 
 NONIUS_BENCHMARK("gmp half-limb unsigned vector multiplication",
                  [](nonius::chronometer meter) { umul_vec_gmp_half(meter, rng); });
