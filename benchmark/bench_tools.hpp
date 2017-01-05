@@ -30,11 +30,11 @@ see https://www.gnu.org/licenses/. */
 #define MPPP_BENCH_TOOLS_HPP
 
 #include <algorithm>
-#include <array>
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
 #include <gmp.h>
+#include <iterator>
 #include <limits>
 #include <mp++.hpp>
 #include <random>
@@ -66,9 +66,9 @@ inline std::string bs_impl(Str &&s, F &&f, unsigned ntrials, Args &&... args)
     for (auto i = 0u; i < ntrials; ++i) {
         auto start = std::chrono::high_resolution_clock::now();
         f();
-        double elapsed
-            = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start)
-                  .count();
+        auto elapsed = static_cast<double>(
+            std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start)
+                .count());
         retval += std::to_string(elapsed);
         if (i != ntrials - 1u) {
             retval += ",";
@@ -134,6 +134,7 @@ struct bench_ctor {
     bench_ctor(std::mt19937 &rng, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
     {
         typename ctor_dist_type<T>::type dist(min, max);
+        m_randoms.resize(vsize);
         std::generate(m_randoms.begin(), m_randoms.end(), [&dist, &rng]() { return dist(rng); });
         m_ptr = static_cast<Integer *>(std::malloc(sizeof(Integer) * vsize));
         if (!m_ptr) {
@@ -154,7 +155,7 @@ struct bench_ctor {
         }
     }
     Integer *m_ptr;
-    std::array<T, vsize> m_randoms;
+    std::vector<T> m_randoms;
 };
 
 // Conversion benchmark.
@@ -245,7 +246,7 @@ inline void random_integer(Integer &m, unsigned n, std::mt19937 &rng, ::mp_limb_
 template <typename Integer>
 struct uadd_vec_mppp {
     static constexpr unsigned size = MPPP_BENCHMARK_VEC_SIZE;
-    uadd_vec_mppp(std::mt19937 &rng, unsigned N, unsigned M)
+    uadd_vec_mppp(std::mt19937 &rng, unsigned N, unsigned M) : m_arr1(size), m_arr2(size), m_arr3(size)
     {
         std::for_each(m_arr1.begin(), m_arr1.end(), [&rng, N](Integer &i) { random_integer(i, N, rng, 2); });
         std::for_each(m_arr2.begin(), m_arr2.end(), [&rng, M](Integer &i) { random_integer(i, M, rng, 2); });
@@ -256,15 +257,15 @@ struct uadd_vec_mppp {
             add(m_arr3[j], m_arr1[j], m_arr2[j]);
         }
     }
-    std::array<Integer, size> m_arr1;
-    std::array<Integer, size> m_arr2;
-    mutable std::array<Integer, size> m_arr3;
+    std::vector<Integer> m_arr1;
+    std::vector<Integer> m_arr2;
+    mutable std::vector<Integer> m_arr3;
 };
 
 // GMP benchmarking.
 struct uadd_vec_gmp {
     static constexpr unsigned size = MPPP_BENCHMARK_VEC_SIZE;
-    uadd_vec_gmp(std::mt19937 &rng, unsigned N, unsigned M)
+    uadd_vec_gmp(std::mt19937 &rng, unsigned N, unsigned M) : m_arr1(size), m_arr2(size), m_arr3(size)
     {
         std::for_each(m_arr1.begin(), m_arr1.end(),
                       [&rng, N](mppp::mppp_impl::mpz_raii &m) { random_mpz(m, N, rng, 2); });
@@ -277,9 +278,9 @@ struct uadd_vec_gmp {
             ::mpz_add(&m_arr3[j].m_mpz, &m_arr1[j].m_mpz, &m_arr2[j].m_mpz);
         }
     }
-    std::array<mppp::mppp_impl::mpz_raii, size> m_arr1;
-    std::array<mppp::mppp_impl::mpz_raii, size> m_arr2;
-    mutable std::array<mppp::mppp_impl::mpz_raii, size> m_arr3;
+    std::vector<mppp::mppp_impl::mpz_raii> m_arr1;
+    std::vector<mppp::mppp_impl::mpz_raii> m_arr2;
+    mutable std::vector<mppp::mppp_impl::mpz_raii> m_arr3;
 };
 
 #if defined(MPPP_BENCHMARK_FLINT)
@@ -299,7 +300,7 @@ struct fmpz_raii {
 
 struct uadd_vec_fmpz {
     static constexpr unsigned size = MPPP_BENCHMARK_VEC_SIZE;
-    uadd_vec_fmpz(std::mt19937 &rng, unsigned N, unsigned M)
+    uadd_vec_fmpz(std::mt19937 &rng, unsigned N, unsigned M) : m_arr1(size), m_arr2(size), m_arr3(size)
     {
         mppp::mppp_impl::mpz_raii m;
         std::for_each(m_arr1.begin(), m_arr1.end(), [&rng, N, &m](fmpz_raii &f) {
@@ -317,9 +318,9 @@ struct uadd_vec_fmpz {
             ::fmpz_add(m_arr3[j].m_fmpz, m_arr1[j].m_fmpz, m_arr2[j].m_fmpz);
         }
     }
-    std::array<fmpz_raii, size> m_arr1;
-    std::array<fmpz_raii, size> m_arr2;
-    mutable std::array<fmpz_raii, size> m_arr3;
+    std::vector<fmpz_raii> m_arr1;
+    std::vector<fmpz_raii> m_arr2;
+    mutable std::vector<fmpz_raii> m_arr3;
 };
 
 #endif
@@ -330,7 +331,7 @@ struct uadd_vec_fmpz {
 template <typename Integer>
 struct uadd_vec_boost {
     static constexpr unsigned size = MPPP_BENCHMARK_VEC_SIZE;
-    uadd_vec_boost(std::mt19937 &rng, unsigned N, unsigned M)
+    uadd_vec_boost(std::mt19937 &rng, unsigned N, unsigned M) : m_arr1(size), m_arr2(size), m_arr3(size)
     {
         mppp::mppp_impl::mpz_raii m;
         std::for_each(m_arr1.begin(), m_arr1.end(), [&rng, N, &m](Integer &n) {
@@ -348,9 +349,9 @@ struct uadd_vec_boost {
             m_arr3[j] = m_arr1[j] + m_arr2[j];
         }
     }
-    std::array<Integer, size> m_arr1;
-    std::array<Integer, size> m_arr2;
-    mutable std::array<Integer, size> m_arr3;
+    std::vector<Integer> m_arr1;
+    std::vector<Integer> m_arr2;
+    mutable std::vector<Integer> m_arr3;
 };
 
 #endif
