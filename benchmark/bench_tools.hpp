@@ -96,11 +96,12 @@ inline void benchmark_suite(const std::string &name, Args &&... args)
          "    g = sns.barplot(data=df,palette='muted')\n"
          "    for l in g.get_xticklabels():\n"
          "        l.set_rotation(45)\n"
-         "    g.set_title('" + name + "')\n"
-         "    g.set_ylabel('Total runtime (μs)')\n"
-         "    g.get_figure().set_size_inches(10,7.5)\n"
-         "    g.get_figure().tight_layout()\n"
-         "    g.get_figure().savefig('"
+         "    g.set_title('"
+         + name + "')\n"
+                  "    g.set_ylabel('Total runtime (μs)')\n"
+                  "    g.get_figure().set_size_inches(10,7.5)\n"
+                  "    g.get_figure().tight_layout()\n"
+                  "    g.get_figure().savefig('"
          + name + ".svg')\n";
     std::ofstream of(name + ".py", std::ios_base::trunc);
     of << s;

@@ -10,7 +10,8 @@ include(YACMACompilerLinkerSettings)
 
 option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
-option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE)." OFF)
+option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires Boost)." OFF)
+option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
 option(MPPP_WITH_LONG_DOUBLE "Enable interoperability with long double (requires MPFR)." OFF)
 
 find_package(GMP REQUIRED)
