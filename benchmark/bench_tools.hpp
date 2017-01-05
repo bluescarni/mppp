@@ -91,6 +91,8 @@ inline void benchmark_suite(const std::string &name, Args &&... args)
     s += bs_impl(std::forward<Args>(args)...) + "]\n";
     s += "    return pandas.DataFrame(dict(data))\n\n";
     s += u8"if __name__ == '__main__':\n"
+         "    import matplotlib as mpl\n"
+         "    mpl.use('Agg')\n"
          "    import seaborn as sns\n"
          "    df = get_data()\n"
          "    g = sns.barplot(data=df,palette='muted')\n"
