@@ -1,5 +1,9 @@
 version: '{build}'
 
+branches:
+  except:
+    - /pr\/.+/
+
 environment:
   global:
     PLATFORMTOOLSET: "v140"
