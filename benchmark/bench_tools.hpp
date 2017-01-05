@@ -39,6 +39,7 @@ see https://www.gnu.org/licenses/. */
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace mppp_bench
 {
@@ -147,6 +148,25 @@ struct bench_ctor {
     }
     Integer *m_ptr;
     std::array<T, vsize> m_randoms;
+};
+
+// Conversion benchmark.
+template <typename T, typename Integer>
+struct bench_conv {
+    static constexpr unsigned vsize = 10000u;
+    bench_conv(std::mt19937 &rng, T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max())
+    {
+        typename ctor_dist_type<T>::type dist(min, max);
+        m_randoms.resize(vsize);
+        std::generate(m_randoms.begin(), m_randoms.end(), [&dist, &rng]() { return Integer{dist(rng)}; });
+    }
+    void operator()() const
+    {
+        for (const auto &n : m_randoms) {
+            volatile T tmp = static_cast<T>(n);
+        }
+    }
+    std::vector<Integer> m_randoms;
 };
 }
 
