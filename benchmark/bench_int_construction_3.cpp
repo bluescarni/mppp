@@ -38,7 +38,7 @@ see https://www.gnu.org/licenses/. */
 
 using namespace mppp;
 using namespace mppp_bench;
-using integer = mp_integer<2>;
+using integer = mp_integer<3>;
 
 #if defined(MPPP_BENCHMARK_BOOST)
 namespace bmp = boost::multiprecision;
@@ -52,7 +52,7 @@ int main()
 {
     constexpr auto ntrials = 1000u;
     benchmark_suite(
-        "bench_construction_2", "mp++ long", bench_ctor<long, integer>{rng}, ntrials, "mp++ ulong",
+        "bench_int_construction_3", "mp++ long", bench_ctor<long, integer>{rng}, ntrials, "mp++ ulong",
         bench_ctor<unsigned long, integer>{rng}, ntrials, "mp++ long long", bench_ctor<long long, integer>{rng},
         ntrials, "mp++ ulong long", bench_ctor<unsigned long long, integer>{rng}, ntrials
 #if defined(MPPP_BENCHMARK_BOOST)
