@@ -74,6 +74,8 @@ static inline std::pair<std::vector<T>, std::vector<T>> get_init_vectors()
 
 int main()
 {
+    // Warm up.
+    for (auto volatile counter = 0ull; counter < 1000000000ull; ++counter) {}
     {
         std::cout << "\n\nBenchmarking mp++.";
         simple_timer st1;

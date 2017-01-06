@@ -74,6 +74,8 @@ static inline std::tuple<std::vector<T>, std::vector<T>, std::vector<T>> get_ini
 
 int main()
 {
+    // Warm up.
+    for (auto volatile counter = 0ull; counter < 1000000000ull; ++counter) {}
     {
         std::cout << "\n\nBenchmarking mp++.";
         simple_timer st1;
