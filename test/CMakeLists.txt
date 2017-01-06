@@ -17,6 +17,11 @@ function(ADD_MPPP_TESTCASE arg1)
             target_compile_options(${arg1} PUBLIC "$<$<CONFIG:DEBUG>:-MTd>" "$<$<CONFIG:RELEASE>:-MT>")
         endif()
     endif()
+    if(YACMA_COMPILER_IS_INTELXX)
+        # NOTE: on MSVC we use the push/pop pragmas, but they do not seem to work on Intel (the pragmas
+        # in icc influence the behaviour at instantiation point, not at definition point).
+        target_compile_options(${arg1} PUBLIC "-diag-disable" "3373,1682")
+    endif()
     if(MINGW)
         # In MinGW some tests generate big object files.
       target_compile_options(${arg1} PUBLIC "-Wa,-mbig-obj")
