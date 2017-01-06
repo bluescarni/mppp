@@ -29,7 +29,7 @@ see https://www.gnu.org/licenses/. */
 #include <algorithm>
 #include <iostream>
 #include <mp++.hpp>
-#include <utility>
+#include <tuple>
 #include <vector>
 
 #include "simple_timer.hpp"
@@ -62,14 +62,14 @@ using integer = mp_integer<1>;
 constexpr auto size = 30000000ul;
 
 template <typename T>
-static inline std::pair<std::vector<T>, std::vector<T>> get_init_vectors()
+static inline std::tuple<std::vector<T>, std::vector<T>, std::vector<T>> get_init_vectors()
 {
     simple_timer st;
-    std::vector<T> v1(size), v2(size);
+    std::vector<T> v1(size), v2(size), v3(size);
     std::fill(v1.begin(), v1.end(), T(2));
     std::fill(v2.begin(), v2.end(), T(2));
     std::cout << "\nInit runtime: ";
-    return std::make_pair(std::move(v1), std::move(v2));
+    return std::make_tuple(std::move(v1), std::move(v2), std::move(v3));
 }
 
 int main()
@@ -82,7 +82,10 @@ int main()
             simple_timer st2;
             integer ret(0);
             for (auto i = 0ul; i < size; ++i) {
-                addmul(ret, p.first[i], p.second[i]);
+                mul(std::get<2>(p)[i], std::get<0>(p)[i], std::get<1>(p)[i]);
+            }
+            for (auto i = 0ul; i < size; ++i) {
+                add(ret, ret, std::get<2>(p)[i]);
             }
             std::cout << ret << '\n';
             std::cout << "\nArithmetic runtime: ";
@@ -98,7 +101,10 @@ int main()
             simple_timer st2;
             cpp_int ret(0);
             for (auto i = 0ul; i < size; ++i) {
-                ret += p.first[i] * p.second[i];
+                std::get<2>(p)[i] = std::get<0>(p)[i] * std::get<1>(p)[i];
+            }
+            for (auto i = 0ul; i < size; ++i) {
+                ret += std::get<2>(p)[i];
             }
             std::cout << ret << '\n';
             std::cout << "\nArithmetic runtime: ";
@@ -113,7 +119,11 @@ int main()
             simple_timer st2;
             mpz_int ret(0);
             for (auto i = 0ul; i < size; ++i) {
-                ::mpz_addmul(ret.backend().data(), p.first[i].backend().data(), p.second[i].backend().data());
+                ::mpz_mul(std::get<2>(p)[i].backend().data(), std::get<0>(p)[i].backend().data(),
+                          std::get<1>(p)[i].backend().data());
+            }
+            for (auto i = 0ul; i < size; ++i) {
+                ::mpz_add(ret.backend().data(), ret.backend().data(), std::get<2>(p)[i].backend().data());
             }
             std::cout << ret << '\n';
             std::cout << "\nArithmetic runtime: ";
@@ -130,7 +140,11 @@ int main()
             simple_timer st2;
             fmpzxx ret(0);
             for (auto i = 0ul; i < size; ++i) {
-                ::fmpz_addmul(ret._data().inner, p.first[i]._data().inner, p.second[i]._data().inner);
+                ::fmpz_mul(std::get<2>(p)[i]._data().inner, std::get<0>(p)[i]._data().inner,
+                           std::get<1>(p)[i]._data().inner);
+            }
+            for (auto i = 0ul; i < size; ++i) {
+                ::fmpz_add(ret._data().inner, ret._data().inner, std::get<2>(p)[i]._data().inner);
             }
             std::cout << ret << '\n';
             std::cout << "\nArithmetic runtime: ";

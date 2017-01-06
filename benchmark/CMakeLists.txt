@@ -44,3 +44,8 @@ function(ADD_MPPP_BENCHMARK arg1)
 endfunction()
 
 ADD_MPPP_BENCHMARK(bench_dot_product_1)
+ADD_MPPP_BENCHMARK(bench_dot_product_2)
+ADD_MPPP_BENCHMARK(bench_dot_product_3)
+ADD_MPPP_BENCHMARK(bench_vec_mul_1)
+ADD_MPPP_BENCHMARK(bench_vec_mul_2)
+ADD_MPPP_BENCHMARK(bench_vec_mul_3)

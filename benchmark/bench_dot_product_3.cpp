@@ -57,7 +57,7 @@ using mpz_int = boost::multiprecision::mpz_int;
 using fmpzxx = flint::fmpzxx;
 #endif
 
-using integer = mp_integer<1>;
+using integer = mp_integer<3>;
 
 constexpr auto size = 30000000ul;
 
