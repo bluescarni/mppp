@@ -132,7 +132,7 @@ matrix:
           - g++-5
           - cmake
           - cmake-data
-          - python3-pip
+          - python-pip
     # - env: MPPP_BUILD="ICC" DOCKER_IMAGE="bluescarni/icc_ci:v1"
     #   sudo: required
     #   services:
