@@ -43,6 +43,12 @@ public:
     simple_timer() : m_start(std::chrono::high_resolution_clock::now())
     {
     }
+    double elapsed() const
+    {
+        return static_cast<double>(
+            std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_start)
+                .count());
+    }
     ~simple_timer()
     {
         std::cout << "Elapsed time: "
