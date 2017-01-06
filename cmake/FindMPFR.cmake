@@ -43,7 +43,7 @@ find_package_handle_standard_args(MPFR DEFAULT_MSG MPFR_INCLUDE_DIR MPFR_LIBRARY
 mark_as_advanced(MPFR_INCLUDE_DIR MPFR_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
-if(NOT TARGET MPFR::MPFR)
+if(MPFR_FOUND AND NOT TARGET MPFR::MPFR)
 	add_library(MPFR::MPFR UNKNOWN IMPORTED)
     set_target_properties(MPFR::MPFR PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPFR_INCLUDE_DIR}")
     set_target_properties(MPFR::MPFR PROPERTIES

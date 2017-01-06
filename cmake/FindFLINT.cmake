@@ -43,7 +43,7 @@ find_package_handle_standard_args(FLINT DEFAULT_MSG FLINT_INCLUDE_DIR FLINT_LIBR
 mark_as_advanced(FLINT_INCLUDE_DIR FLINT_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
-if(NOT TARGET FLINT::FLINT)
+if(FLINT_FOUND AND NOT TARGET FLINT::FLINT)
 	add_library(FLINT::FLINT UNKNOWN IMPORTED)
     set_target_properties(FLINT::FLINT PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${FLINT_INCLUDE_DIR}")
     set_target_properties(FLINT::FLINT PROPERTIES

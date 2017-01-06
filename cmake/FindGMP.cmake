@@ -43,7 +43,7 @@ find_package_handle_standard_args(GMP DEFAULT_MSG GMP_INCLUDE_DIR GMP_LIBRARY)
 mark_as_advanced(GMP_INCLUDE_DIR GMP_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
-if(NOT TARGET GMP::GMP)
+if(GMP_FOUND AND NOT TARGET GMP::GMP)
 	add_library(GMP::GMP UNKNOWN IMPORTED)
     set_target_properties(GMP::GMP PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${GMP_INCLUDE_DIR}")
     set_target_properties(GMP::GMP PROPERTIES
