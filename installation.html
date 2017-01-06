@@ -93,6 +93,11 @@
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#dot-product">Dot product</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#vector-multiplication">Vector multiplication</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -152,8 +157,8 @@ on the following setups:</p>
 The <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP can also be used as a drop-in replacement for GMP.
 In order to interoperate with the <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> C++ type, mp++ optionally depends
 on the <a class="reference external" href="http://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library (see the
-<a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">configuration</span></a> section - MPFR 3 or a later version is required). In order to
-compile the benchmark suite, the <a class="reference external" href="http://www.boost.org/">Boost</a> C++ libraries are required.</p>
+<a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">configuration</span></a> section - MPFR 3 or a later version is required).
+The benchmark suite depends optionally on <a class="reference external" href="http://www.boost.org/">Boost</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a>.</p>
 <p>In order to use mp++, you only have to include the <code class="docutils literal"><span class="pre">mp++.hpp</span></code> header in your project and link to the GMP
 library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:</p>
 <div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 my_executable.cpp -lgmp
@@ -184,7 +189,7 @@ library when compiling. E.g., on a Unix-like operating system with GCC, you woul
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Francesco Biscani.
+        &copy; Copyright 2016-2017, Francesco Biscani.
 
     </p>
   </div>

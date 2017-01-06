@@ -14,8 +14,8 @@ The only mandatory dependency is the `GMP <http://www.gmplib.org>`__ library (GM
 The `MPIR <http://mpir.org/>`__ fork of GMP can also be used as a drop-in replacement for GMP.
 In order to interoperate with the ``long double`` C++ type, mp++ optionally depends
 on the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library (see the
-:ref:`configuration <configuration>` section - MPFR 3 or a later version is required). In order to
-compile the benchmark suite, the `Boost <http://www.boost.org/>`__ C++ libraries are required.
+:ref:`configuration <configuration>` section - MPFR 3 or a later version is required).
+The benchmark suite depends optionally on `Boost <http://www.boost.org/>`__ and `FLINT <http://flintlib.org/>`__.
 
 In order to use mp++, you only have to include the ``mp++.hpp`` header in your project and link to the GMP
 library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:

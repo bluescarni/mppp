@@ -92,6 +92,11 @@
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#dot-product">Dot product</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#vector-multiplication">Vector multiplication</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -145,7 +150,7 @@ optimising operations on small values. When operating on small operands, mp++ wi
 <li>avoid heap memory allocations as much as possible, and</li>
 <li>use optimised implementations of basic operations (instead of calling GMP functions).</li>
 </ul>
-<p>The combination of these two techniques results in a performance increase up to ~3x, on small operands,
+<p>The combination of these two techniques results in a performance increase, on small operands,
 with respect to GMP. The price to pay is a small overhead when operating on large operands.</p>
 <p>mp++ was created to cater to the requirements of computer algebra systems, which typically need to be able
 to manipulate arbitrarily-large integers but which, in practice, often end up storing many small integers
@@ -160,6 +165,11 @@ to manipulate arbitrarily-large integers but which, in practice, often end up st
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mp_integer.html">The <code class="docutils literal"><span class="pre">mp_integer</span></code> class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#dot-product">Dot product</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#vector-multiplication">Vector multiplication</a></li>
 </ul>
 </li>
 </ul>
@@ -191,7 +201,7 @@ to manipulate arbitrarily-large integers but which, in practice, often end up st
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, Francesco Biscani.
+        &copy; Copyright 2016-2017, Francesco Biscani.
 
     </p>
   </div>
