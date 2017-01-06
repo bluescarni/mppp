@@ -10,6 +10,8 @@ include(YACMACompilerLinkerSettings)
 
 option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
+option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires Boost)." OFF)
+option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
 option(MPPP_WITH_LONG_DOUBLE "Enable interoperability with long double (requires MPFR)." OFF)
 
 find_package(GMP REQUIRED)
@@ -18,12 +20,6 @@ add_library(mp++ INTERFACE)
 
 if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_STATIC_RUNTIME "Use the MSVC static runtime instead of the shared runtime." OFF)
-endif()
-
-if(YACMA_COMPILER_IS_INTELXX)
-    # NOTE: on MSVC we use the push/pop pragmas, but they do not seem to work on Intel (the pragmas
-    # in icc influence the behaviour at instantiation point, not at definition point).
-    target_compile_options(mp++ INTERFACE "-diag-disable" "3373,1682")
 endif()
 
 if(MPPP_WITH_LONG_DOUBLE)
