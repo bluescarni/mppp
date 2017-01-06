@@ -13,7 +13,7 @@ optimising operations on small values. When operating on small operands, mp++ wi
 * avoid heap memory allocations as much as possible, and
 * use optimised implementations of basic operations (instead of calling GMP functions).
 
-The combination of these two techniques results in a performance increase up to ~3x, on small operands,
+The combination of these two techniques results in a performance increase, on small operands,
 with respect to GMP. The price to pay is a small overhead when operating on large operands.
 
 mp++ was created to cater to the requirements of computer algebra systems, which typically need to be able
