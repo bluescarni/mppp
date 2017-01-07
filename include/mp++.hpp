@@ -739,6 +739,10 @@ struct zero_division_error final : std::domain_error {
 // - pow() can probably benefit for some specialised static implementation, especially in conjunction with
 //   mpn_sqr().
 // - gcd() can be improved (see notes).
+// - the pattern we follow when no mpn primitives are available is to use a static thread local instance of mpz_t
+//   to perform the computation with mpz_ functions and then assign the result to rop. We could probably benefit
+//   from a true assignment operator from mpz_t instead of cting an integer from mpz_t and assigning it (which
+//   is what we are doing now).
 /// Multiprecision integer class.
 /**
  * This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP \p mpz_t type, with
