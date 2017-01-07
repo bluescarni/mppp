@@ -859,6 +859,8 @@ struct zero_division_error final : std::domain_error {
  *
  * This class provides facilities to interface with the GMP library. Specifically, mp_integer features:
  * - a constructor from the GMP integer type \p mpz_t,
+ * - an mp_integer::get_mpz_t() method that promotes \p this to dynamic storage and returns a pointer to the internal
+ *   \p mpz_t instance,
  * - an \p mpz_view class, an instance of which can be requested via the mp_integer::get_mpz_view() method,
  *   which allows to use mp_integer in the GMP API as a drop-in replacement for <tt>const mpz_t</tt> function
  *   arguments.
@@ -1601,12 +1603,14 @@ public:
     /// Get an \p mpz_t view.
     /**
      * This method will return an object of an unspecified type \p mpz_view which is implicitly convertible
-     * to a const pointer to an \p mpz struct (and which can thus be used as a <tt>const mpz_t</tt>
+     * to a const pointer to an \p mpz_t struct (and which can thus be used as a <tt>const mpz_t</tt>
      * parameter in GMP functions). In addition to the implicit conversion operator, the <tt>const mpz_t</tt>
      * object can also be retrieved via the <tt>get()</tt> method of the \p mpz_view class.
-     * The pointee will represent a GMP integer whose value is equal to \p this.
+     * The view provides a read-only GMP-compatible representation of the integer stored in \p this.
      *
-     * It is important to keep in mind the following facts about the returned \p mpz_view object:
+     * \b NOTE: it is important to keep in mind the following facts about the returned \p mpz_view object:
+     * - \p mpz_view objects are strictly read-only: it is impossible to alter \p this through an \p mpz_view, and
+     *   \p mpz_view objects can be used in the GMP API only where a <tt>const mpz_t</tt> parameter is expected;
      * - \p mpz_view objects can only be move-constructed (the other constructors and the assignment operators
      *   are disabled);
      * - the returned object and the pointer returned by its <tt>get()</tt> method might reference internal data
@@ -4692,7 +4696,6 @@ public:
     /// Return a reference to the internal union.
     /**
      * This method returns a reference to the union used internally to implement the mp_integer class.
-     * This method is meant for debug purposes and subject to changes in future versions.
      *
      * @return a reference to the internal union member.
      */
@@ -4703,13 +4706,28 @@ public:
     /// Return a const reference to the internal union.
     /**
      * This method returns a const reference to the union used internally to implement the mp_integer class.
-     * This method is meant for debug purposes and subject to changes in future versions.
      *
      * @return a const reference to the internal union member.
      */
     const mppp_impl::integer_union<SSize> &_get_union() const
     {
         return m_int;
+    }
+    /// Get a pointer to the dynamic storage.
+    /**
+     * This method will first promote \p this to dynamic storage (if \p this is not already employing dynamic storage),
+     * and it will then return a pointer to the internal \p mpz_t structure. The returned pointer can be used as an
+     * argument for the functions of the GMP API.
+     *
+     * \b NOTE: the returned pointer is tied to the lifetime of \p this. Calling demote() or assigning an mp_integer
+     * with static storage to \p this will invalidate the returned pointer.
+     *
+     * @return a pointer to the internal \p mpz_t structure.
+     */
+    std::remove_extent<::mpz_t>::type *get_mpz_t()
+    {
+        promote();
+        return &m_int.g_dy();
     }
 
 private:
