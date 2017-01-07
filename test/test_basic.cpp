@@ -394,11 +394,11 @@ struct promdem_tester {
         using integer = mp_integer<S::value>;
         integer n;
         REQUIRE(n.promote());
-        REQUIRE(n.sign() == 0);
+        REQUIRE(n.sgn() == 0);
         REQUIRE(n.is_dynamic());
         REQUIRE(!n.promote());
         REQUIRE(n.demote());
-        REQUIRE(n.sign() == 0);
+        REQUIRE(n.sgn() == 0);
         REQUIRE(n.is_static());
         REQUIRE(!n.demote());
         n = -5;
@@ -422,6 +422,37 @@ struct promdem_tester {
 TEST_CASE("promote and demote")
 {
     tuple_for_each(sizes{}, promdem_tester{});
+}
+
+struct sign_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = mp_integer<S::value>;
+        integer n;
+        REQUIRE(n.sgn() == 0);
+        REQUIRE(sgn(n) == 0);
+        n.promote();
+        REQUIRE(n.sgn() == 0);
+        REQUIRE(sgn(n) == 0);
+        n = 12;
+        REQUIRE(n.sgn() == 1);
+        REQUIRE(sgn(n) == 1);
+        n.promote();
+        REQUIRE(n.sgn() == 1);
+        REQUIRE(sgn(n) == 1);
+        n = -34;
+        REQUIRE(n.sgn() == -1);
+        REQUIRE(sgn(n) == -1);
+        n.promote();
+        REQUIRE(n.sgn() == -1);
+        REQUIRE(sgn(n) == -1);
+    }
+};
+
+TEST_CASE("sign")
+{
+    tuple_for_each(sizes{}, sign_tester{});
 }
 
 struct to_string_tester {

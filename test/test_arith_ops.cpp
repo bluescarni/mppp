@@ -439,8 +439,8 @@ struct div_tester {
             REQUIRE_THROWS_PREDICATE(retval /= 0., std::domain_error, [&retval](const std::domain_error &ex) {
                 return std::string(ex.what())
                        == "Cannot init integer from the non-finite floating-point value "
-                              + (retval.sign() > 0 ? std::to_string(std::numeric_limits<double>::infinity())
-                                                   : std::to_string(-std::numeric_limits<double>::infinity()));
+                              + (retval.sgn() > 0 ? std::to_string(std::numeric_limits<double>::infinity())
+                                                  : std::to_string(-std::numeric_limits<double>::infinity()));
             });
         }
     }

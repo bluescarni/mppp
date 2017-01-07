@@ -116,7 +116,7 @@ struct divexact_tester {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
                 n3 = integer(mpz_to_str(&tmp.m_mpz));
-                if (n3.sign() == 0) {
+                if (n3.sgn() == 0) {
                     continue;
                 }
                 if (sdist(rng)) {

@@ -1595,7 +1595,7 @@ public:
     /**
      * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
      */
-    int sign() const
+    int sgn() const
     {
         // NOTE: size is part of the common initial sequence.
         if (m_int.m_st._mp_size != 0) {
@@ -1603,6 +1603,16 @@ public:
         } else {
             return 0;
         }
+    }
+    /// Sign function.
+    /**
+     * @param n the mp_integer whose sign will be computed.
+     *
+     * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
+     */
+    friend int sgn(const mp_integer &n)
+    {
+        return n.sgn();
     }
     /// Get an \p mpz_t view.
     /**
@@ -3286,7 +3296,7 @@ public:
             throw std::invalid_argument("When performing a division with remainder, the quotient 'q' and the "
                                         "remainder 'r' must be distinct objects");
         }
-        if (mppp_unlikely(d.sign() == 0)) {
+        if (mppp_unlikely(d.sgn() == 0)) {
             throw zero_division_error("Integer division by zero");
         }
         const bool sq = q.is_static(), sr = r.is_static(), s1 = n.is_static(), s2 = d.is_static();
@@ -4267,7 +4277,7 @@ public:
             throw std::invalid_argument("The number of primality tests must be at least 1, but a value of "
                                         + std::to_string(reps) + " was provided instead");
         }
-        if (mppp_unlikely(sign() < 0)) {
+        if (mppp_unlikely(sgn() < 0)) {
             throw std::invalid_argument("Cannot run primality tests on the negative number " + to_string());
         }
         return ::mpz_probab_prime_p(get_mpz_view(), reps);

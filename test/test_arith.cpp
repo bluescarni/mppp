@@ -1103,7 +1103,7 @@ struct div_tester {
                             // Promote sometimes, if possible.
                             n4.promote();
                         }
-                    } while (n4.sign() == 0);
+                    } while (n4.sgn() == 0);
                 };
                 random_34();
                 // Reset rops every once in a while.
