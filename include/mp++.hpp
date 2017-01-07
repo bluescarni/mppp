@@ -879,6 +879,12 @@ struct zero_division_error final : std::domain_error {
  *                                // using the GMP API.
  * @endcode
  * See the documentation of mp_integer::get_mpz_view() for more details about the \p mpz_view class.
+ *
+ * # Hashing #
+ *
+ * This class provides an mp_integer::hash() function to compute a hash value for an integer. A specialisation
+ * of the standard \p std::hash functor is also provided, so that it is possible to use mp_integer in standard
+ * unordered associative containers out of the box.
  */
 template <std::size_t SSize>
 class mp_integer
