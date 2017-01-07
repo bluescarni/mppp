@@ -12,7 +12,8 @@ When operating on small operands, mp++ will:
 * use optimised implementations of basic operations (instead of calling GMP functions).
 
 The combination of these two techniques results in a performance increase, on small operands,
-with respect to GMP. The price to pay is a small overhead when operating on large operands.
+with respect to GMP (see the [benchmarks](https://bluescarni.github.io/mppp/benchmarks.html) section of the
+documentation). The price to pay is a small overhead when operating on large operands.
 
 mp++ was created to cater to the requirements of computer algebra systems, which typically need to be able
 to manipulate arbitrarily-large integers but which, in practice, often end up storing many small integers
@@ -27,4 +28,4 @@ on the following setups:
 * MinGW GCC 6 on Windows 64-bit,
 * Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).
 
-The documentation is available [here](http://bluescarni.github.io/mppp/).
+The documentation is available [here](https://bluescarni.github.io/mppp/).
