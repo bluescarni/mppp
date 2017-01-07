@@ -151,7 +151,8 @@ optimising operations on small values. When operating on small operands, mp++ wi
 <li>use optimised implementations of basic operations (instead of calling GMP functions).</li>
 </ul>
 <p>The combination of these two techniques results in a performance increase, on small operands,
-with respect to GMP. The price to pay is a small overhead when operating on large operands.</p>
+with respect to GMP (see the <a class="reference internal" href="benchmarks.html#benchmarks"><span class="std std-ref">benchmark</span></a> section). The price to pay is a
+small overhead when operating on large operands.</p>
 <p>mp++ was created to cater to the requirements of computer algebra systems, which typically need to be able
 to manipulate arbitrarily-large integers but which, in practice, often end up storing many small integers
 (e.g., as coefficients in a polynomial).</p>

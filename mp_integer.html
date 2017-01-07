@@ -222,6 +222,7 @@
 <p><em>Interfacing with GMP</em></p>
 <p>This class provides facilities to interface with the GMP library. Specifically, <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> features:<ul class="simple">
 <li>a constructor from the GMP integer type <code class="docutils literal"><span class="pre">mpz_t</span></code>,</li>
+<li>an <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a838018dde1f7c7f142a496ae716a53cc"><span class="std std-ref">mp_integer::get_mpz_t()</span></a> method that promotes <code class="docutils literal"><span class="pre">this</span></code> to dynamic storage and returns a pointer to the internal <code class="docutils literal"><span class="pre">mpz_t</span></code> instance,</li>
 <li>an <code class="docutils literal"><span class="pre">mpz_view</span></code> class, an instance of which can be requested via the <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1aaea6b849d829e76086fbeba66fee1337"><span class="std std-ref">mp_integer::get_mpz_view()</span></a> method, which allows to use <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> in the GMP API as a drop-in replacement for <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> function arguments.</li>
 </ul>
 </p>
@@ -232,7 +233,9 @@
                                <span class="o">//</span> <span class="n">using</span> <span class="n">the</span> <span class="n">GMP</span> <span class="n">API</span><span class="o">.</span>
 </pre></div>
 </div>
- See the documentation of <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1aaea6b849d829e76086fbeba66fee1337"><span class="std std-ref">mp_integer::get_mpz_view()</span></a> for more details about the <code class="docutils literal"><span class="pre">mpz_view</span></code> class. </p>
+ See the documentation of <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1aaea6b849d829e76086fbeba66fee1337"><span class="std std-ref">mp_integer::get_mpz_view()</span></a> for more details about the <code class="docutils literal"><span class="pre">mpz_view</span></code> class.</p>
+<p><em>Hashing</em></p>
+<p>This class provides an <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a9aa93afc398095ff4f1001f11b473c3b"><span class="std std-ref">mp_integer::hash()</span></a> function to compute a hash value for an integer. A specialisation of the standard <code class="docutils literal"><span class="pre">std::hash</span></code> functor is also provided, so that it is possible to use <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> in standard unordered associative containers out of the box. </p>
 <div class="breathe-sectiondef container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
@@ -529,8 +532,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2NK4mppp10mp_integer4signEv">
-<span id="mppp::mp_integer::signC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa9a555f288f1153e57d4b11fb3f145cf"></span>int <code class="descname">sign</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer4signEv" title="Permalink to this definition">¶</a></dt>
+<dt id="_CPPv2NK4mppp10mp_integer3sgnEv">
+<span id="mppp::mp_integer::sgnC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ae7d58df878c6390947e9547c4c26cc31"></span>int <code class="descname">sgn</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer3sgnEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sign. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -543,8 +546,9 @@
 <dt id="_CPPv2NK4mppp10mp_integer12get_mpz_viewEv">
 <span id="mppp::mp_integer::get_mpz_viewC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aaea6b849d829e76086fbeba66fee1337"></span>mpz_view <code class="descname">get_mpz_view</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer12get_mpz_viewEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an <code class="docutils literal"><span class="pre">mpz_t</span></code> view. </p>
-<p>This method will return an object of an unspecified type <code class="docutils literal"><span class="pre">mpz_view</span></code> which is implicitly convertible to a const pointer to an <code class="docutils literal"><span class="pre">mpz</span></code> struct (and which can thus be used as a <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> parameter in GMP functions). In addition to the implicit conversion operator, the <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> object can also be retrieved via the <code class="docutils literal"><span class="pre">get()</span></code> method of the <code class="docutils literal"><span class="pre">mpz_view</span></code> class. The pointee will represent a GMP integer whose value is equal to <code class="docutils literal"><span class="pre">this</span></code>.</p>
-<p>It is important to keep in mind the following facts about the returned <code class="docutils literal"><span class="pre">mpz_view</span></code> object:<ul class="simple">
+<p>This method will return an object of an unspecified type <code class="docutils literal"><span class="pre">mpz_view</span></code> which is implicitly convertible to a const pointer to an <code class="docutils literal"><span class="pre">mpz_t</span></code> struct (and which can thus be used as a <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> parameter in GMP functions). In addition to the implicit conversion operator, the <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> object can also be retrieved via the <code class="docutils literal"><span class="pre">get()</span></code> method of the <code class="docutils literal"><span class="pre">mpz_view</span></code> class. The view provides a read-only GMP-compatible representation of the integer stored in <code class="docutils literal"><span class="pre">this</span></code>.</p>
+<p><strong>NOTE:</strong> it is important to keep in mind the following facts about the returned <code class="docutils literal"><span class="pre">mpz_view</span></code> object:<ul class="simple">
+<li><code class="docutils literal"><span class="pre">mpz_view</span></code> objects are strictly read-only: it is impossible to alter <code class="docutils literal"><span class="pre">this</span></code> through an <code class="docutils literal"><span class="pre">mpz_view</span></code>, and <code class="docutils literal"><span class="pre">mpz_view</span></code> objects can be used in the GMP API only where a <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> parameter is expected;</li>
 <li><code class="docutils literal"><span class="pre">mpz_view</span></code> objects can only be move-constructed (the other constructors and the assignment operators are disabled);</li>
 <li>the returned object and the pointer returned by its <code class="docutils literal"><span class="pre">get()</span></code> method might reference internal data belonging to <code class="docutils literal"><span class="pre">this</span></code>, and they can thus be used safely only during the lifetime of <code class="docutils literal"><span class="pre">this</span></code>;</li>
 <li>the lifetime of the pointer returned by the <code class="docutils literal"><span class="pre">get()</span></code> method is tied to the lifetime of the <code class="docutils literal"><span class="pre">mpz_view</span></code> object (that is, if the <code class="docutils literal"><span class="pre">mpz_view</span></code> object is destroyed, any pointer previously returned by <code class="docutils literal"><span class="pre">get()</span></code> becomes invalid);</li>
@@ -891,7 +895,7 @@
 <dt id="_CPPv2N4mppp10mp_integer10_get_unionEv">
 <span id="mppp::mp_integer::_get_union"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ac1cc8760d544641a0c0eabd4f68e5828"></span>mppp_impl::integer_union&lt;SSize&gt; &amp;<code class="descname">_get_union</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer10_get_unionEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a reference to the internal union. </p>
-<p>This method returns a reference to the union used internally to implement the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> class. This method is meant for debug purposes and subject to changes in future versions.</p>
+<p>This method returns a reference to the union used internally to implement the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> class.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to the internal union member. </dd>
@@ -903,10 +907,23 @@
 <dt id="_CPPv2NK4mppp10mp_integer10_get_unionEv">
 <span id="mppp::mp_integer::_get_unionC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a2f1d93c41ac2b57881a09a39af223e9b"></span><em class="property">const</em> mppp_impl::integer_union&lt;SSize&gt; &amp;<code class="descname">_get_union</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer10_get_unionEv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a const reference to the internal union. </p>
-<p>This method returns a const reference to the union used internally to implement the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> class. This method is meant for debug purposes and subject to changes in future versions.</p>
+<p>This method returns a const reference to the union used internally to implement the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> class.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a const reference to the internal union member. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp10mp_integer9get_mpz_tEv">
+<span id="mppp::mp_integer::get_mpz_t"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a838018dde1f7c7f142a496ae716a53cc"></span>std::remove_extent&lt;mpz_t&gt;::type *<code class="descname">get_mpz_t</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10mp_integer9get_mpz_tEv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a pointer to the dynamic storage. </p>
+<p>This method will first promote <code class="docutils literal"><span class="pre">this</span></code> to dynamic storage (if <code class="docutils literal"><span class="pre">this</span></code> is not already employing dynamic storage), and it will then return a pointer to the internal <code class="docutils literal"><span class="pre">mpz_t</span></code> structure. The returned pointer can be used as an argument for the functions of the GMP API.</p>
+<p><strong>NOTE:</strong> the returned pointer is tied to the lifetime of <code class="docutils literal"><span class="pre">this</span></code>. Calling <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a7a59f7c0ddf4c5939ce7f7249bb3ad90"><span class="std std-ref">demote()</span></a> or assigning an <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> with static storage to <code class="docutils literal"><span class="pre">this</span></code> will invalidate the returned pointer.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a pointer to the internal <code class="docutils literal"><span class="pre">mpz_t</span></code> structure. </dd>
 </dl>
 </p>
 </dd></dl>
@@ -931,6 +948,22 @@
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a44ff4d52c9d0216801f521870bb921c0"><span class="std std-ref">mp_integer::to_string()</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv23sgnRK10mp_integer">
+<span id="sgn__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ad665a1752430eeb5be998576249ee2d4"></span>int <code class="descname">sgn</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23sgnRK10mp_integer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sign function. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>0 if <code class="docutils literal"><span class="pre">this</span></code> is zero, 1 if <code class="docutils literal"><span class="pre">this</span></code> is positive, -1 if <code class="docutils literal"><span class="pre">this</span></code> is negative. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> whose sign will be computed.</li>
 </ul>
 </dd>
 </dl>

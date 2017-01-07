@@ -153,13 +153,16 @@ on the following setups:</p>
 <li>MinGW GCC 6 on Windows 64-bit,</li>
 <li>Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).</li>
 </ul>
+<p>mp++ has been written, tested and benchmarked on x86 processors, but it does not contain any architecture-specific code
+and thus it should run on any architecture supported by GMP (as long as a decent C++11 compiler is available).</p>
 <p>The only mandatory dependency is the <a class="reference external" href="http://www.gmplib.org">GMP</a> library (GMP 5 and later versions are supported).
 The <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP can also be used as a drop-in replacement for GMP.
 In order to interoperate with the <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> C++ type, mp++ optionally depends
 on the <a class="reference external" href="http://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library (see the
 <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">configuration</span></a> section - MPFR 3 or a later version is required).
 The benchmark suite depends optionally on <a class="reference external" href="http://www.boost.org/">Boost</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a>.</p>
-<p>In order to use mp++, you only have to include the <code class="docutils literal"><span class="pre">mp++.hpp</span></code> header in your project and link to the GMP
+<p>Releases of mp++ can be downloaded from <a class="reference external" href="https://github.com/bluescarni/mppp/releases">github</a>.
+In order to use mp++, you only have to include the <code class="docutils literal"><span class="pre">include/mp++.hpp</span></code> header in your project and link to the GMP
 library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:</p>
 <div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 my_executable.cpp -lgmp
 </pre></div>
