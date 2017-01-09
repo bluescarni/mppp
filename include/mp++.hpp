@@ -4749,6 +4749,47 @@ public:
         promote();
         return &m_int.g_dy();
     }
+    /// Test if the value is zero.
+    /**
+     * @return \p true if the value represented by \p this is zero, \p false otherwise.
+     */
+    bool is_zero() const
+    {
+        return m_int.m_st._mp_size == 0;
+    }
+    /// Test if an mppp::mp_integer is zero.
+    /**
+     * @param n the mppp::mp_integer to be tested.
+     *
+     * @return \p true if \p n is zero, \p false otherwise.
+     */
+    friend bool is_zero(const mp_integer &n)
+    {
+        return n.is_zero();
+    }
+    /// Test if the value is equal to one.
+    /**
+     * @return \p true if the value represented by \p this is 1, \p false otherwise.
+     */
+    bool is_one() const
+    {
+        if (m_int.m_st._mp_size != 1) {
+            return false;
+        }
+        // Get the pointer to the limbs.
+        const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
+        return (ptr[0] & GMP_NUMB_MASK) == 1u;
+    }
+    /// Test if an mppp::mp_integer is equal to one.
+    /**
+     * @param n the mppp::mp_integer to be tested.
+     *
+     * @return \p true if \p n is equal to 1, \p false otherwise.
+     */
+    friend bool is_one(const mp_integer &n)
+    {
+        return n.is_one();
+    }
 
 private:
     mppp_impl::integer_union<SSize> m_int;
