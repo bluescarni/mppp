@@ -8,31 +8,32 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRE
 
 include(YACMACompilerLinkerSettings)
 
+# Assemble the flags.
+set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
+set(MPPP_CXX_FLAGS_RELEASE ${YACMA_CXX_FLAGS})
+
 option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
 option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires Boost)." OFF)
 option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
 option(MPPP_WITH_LONG_DOUBLE "Enable interoperability with long double (requires MPFR)." OFF)
-
-find_package(GMP REQUIRED)
-
-add_library(mp++ INTERFACE)
-
 if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_STATIC_RUNTIME "Use the MSVC static runtime instead of the shared runtime." OFF)
 endif()
 
+find_package(GMP REQUIRED)
+
+# Setup of the mp++ interface library.
+add_library(mp++ INTERFACE)
 if(MPPP_WITH_LONG_DOUBLE)
     find_package(MPFR REQUIRED)
     target_compile_definitions(mp++ INTERFACE MPPP_WITH_LONG_DOUBLE)
     target_link_libraries(mp++ INTERFACE MPFR::MPFR)
 endif()
-
 # mp++ depends on GMP.
 # NOTE: depend on GMP *after* optionally depending on MPFR, as the order
 # of the libraries matters on some platforms.
 target_link_libraries(mp++ INTERFACE GMP::GMP)
-
 target_include_directories(mp++ INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)

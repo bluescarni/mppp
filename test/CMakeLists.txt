@@ -1,30 +1,29 @@
-include(YACMACompilerLinkerSettings)
-
 # We have some multithreaded tests, so let's activate threading support.
-set(THREADS_PREFER_PTHREAD_FLAG YES)
-find_package(Threads REQUIRED)
-unset(THREADS_PREFER_PTHREAD_FLAG)
+include(YACMAThreadingSetup)
+
+list(APPEND MPPP_CXX_FLAGS_DEBUG ${YACMA_THREADING_CXX_FLAGS})
+list(APPEND MPPP_CXX_FLAGS_RELEASE ${YACMA_THREADING_CXX_FLAGS})
 
 function(ADD_MPPP_TESTCASE arg1)
     add_executable(${arg1} ${arg1}.cpp)
     target_link_libraries(${arg1} mp++ Threads::Threads)
-    target_compile_options(${arg1} PUBLIC "$<$<CONFIG:DEBUG>:${YACMA_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${YACMA_CXX_FLAGS}>")
+    target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
     if(YACMA_COMPILER_IS_MSVC)
         # Disable the idiotic minmax macros on MSVC, some annoying warnings,
         # and enable the bigobj option.
-        target_compile_options(${arg1} PUBLIC "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
+        target_compile_options(${arg1} PRIVATE "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
         if(MPPP_MSVC_STATIC_RUNTIME)
-            target_compile_options(${arg1} PUBLIC "$<$<CONFIG:DEBUG>:-MTd>" "$<$<CONFIG:RELEASE>:-MT>")
+            target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:-MTd>" "$<$<CONFIG:RELEASE>:-MT>")
         endif()
     endif()
     if(YACMA_COMPILER_IS_INTELXX)
         # NOTE: on MSVC we use the push/pop pragmas, but they do not seem to work on Intel (the pragmas
         # in icc influence the behaviour at instantiation point, not at definition point).
-        target_compile_options(${arg1} PUBLIC "-diag-disable" "3373,1682")
+        target_compile_options(${arg1} PRIVATE "-diag-disable" "3373,1682")
     endif()
     if(MINGW)
         # In MinGW some tests generate big object files.
-      target_compile_options(${arg1} PUBLIC "-Wa,-mbig-obj")
+      target_compile_options(${arg1} PRIVATE "-Wa,-mbig-obj")
     endif()
     set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 11)
     set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
