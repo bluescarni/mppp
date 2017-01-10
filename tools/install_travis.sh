@@ -28,7 +28,7 @@ elif [[ "${MPPP_BUILD}" == "CoverageGCC5" ]]; then
     CXX=g++-5 CC=gcc-5 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
     make -j2 VERBOSE=1;
     ctest -V;
-    bash <(curl -s https://codecov.io/bash) -x gcov-5
+    bash <(curl -s https://codecov.io/bash) -x gcov-5;
 elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2;
     tar xjvf gmp-6.1.2.tar.bz2;
@@ -39,7 +39,7 @@ elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -D_GLIBCXX_CONCEPT_CHECKS" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a ../;
     make -j2 VERBOSE=1;
     ctest -V;
-    bash <(curl -s https://codecov.io/bash) -x gcov-6
+    bash <(curl -s https://codecov.io/bash) -x gcov-6;
 elif [[ "${MPPP_BUILD}" == "DebugClang38" ]]; then
     CXX=clang++-3.8 CC=clang-3.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes ../;
     make -j2 VERBOSE=1;
