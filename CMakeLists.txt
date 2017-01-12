@@ -11,6 +11,11 @@ include(YACMACompilerLinkerSettings)
 # Assemble the flags.
 set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
 set(MPPP_CXX_FLAGS_RELEASE ${YACMA_CXX_FLAGS})
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND YACMA_COMPILER_IS_CLANGXX)
+  message(STATUS "Clang compiler on OSX detected, setting the standard library to 'libc++'.")
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-stdlib=libc++")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-stdlib=libc++")
+endif()
 
 option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
