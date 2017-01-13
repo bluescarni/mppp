@@ -16,6 +16,23 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND YACMA_COMPILER_IS_CLANGXX)
   list(APPEND MPPP_CXX_FLAGS_DEBUG "-stdlib=libc++")
   list(APPEND MPPP_CXX_FLAGS_RELEASE "-stdlib=libc++")
 endif()
+if(YACMA_COMPILER_IS_MSVC)
+  # Disable the idiotic minmax macros on MSVC, some annoying warnings,
+  # and enable the bigobj option.
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
+endif()
+if(YACMA_COMPILER_IS_INTELXX)
+  # NOTE: on MSVC we use the push/pop pragmas, but they do not seem to work on Intel (the pragmas
+  # in icc influence the behaviour at instantiation point, not at definition point).
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-diag-disable" "3373,1682")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-diag-disable" "3373,1682")
+endif()
+if(MINGW)
+  # In MinGW some tests generate big object files.
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-Wa,-mbig-obj")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-Wa,-mbig-obj")
+endif()
 
 option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
