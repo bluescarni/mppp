@@ -32,7 +32,8 @@ The mp++ timings have been taken using a single 64bit limb for the small-value o
 multiply-add primitives of each library are used for the accumulation of the dot product.
 
 .. figure:: _static/bench_dot_product_1.svg
-   :width: 100%
+   :width: 60%
+   :align: center
 
 It can be immediately seen how the initialisation cost for the ``mpz_int`` class is much higher than for the other
 integer types. This is due to the fact that the GMP API always uses dynamically-allocated memory, even for small values.
@@ -54,7 +55,8 @@ employed), and it also increases the pressure on the memory subsystem (due to th
 into a vector rather than accumulating them directly into a scalar).
 
 .. figure:: _static/bench_vec_mul_1.svg
-   :width: 100%
+   :width: 60%
+   :align: center
 
 This time mp++ is more than 5 times faster than GMP in the arithmetic portion of the benchmark, while still maintaining
 a performance advantage over ``cpp_int`` and FLINT.

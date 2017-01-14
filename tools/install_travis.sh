@@ -74,7 +74,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
         exit 1;
     fi
     cd ../sphinx;
-    pip install --user docutils==0.12 sphinx==1.4.8 breathe requests[security] sphinx_rtd_theme
+    pip install --user docutils==0.12 sphinx==1.4.8 breathe requests[security] sphinx_bootstrap_theme
     export SPHINX_OUTPUT=`make html SPHINXBUILD=/home/travis/.local/bin/sphinx-build 2>&1 >/dev/null`;
     if [[ "${SPHINX_OUTPUT}" != "" ]]; then
         echo "Sphinx encountered some problem:";
