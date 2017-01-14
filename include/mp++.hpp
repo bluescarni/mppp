@@ -725,9 +725,6 @@ struct zero_division_error final : std::domain_error {
 };
 
 // NOTE: a few misc things:
-// - probably we can re-implement eventually the generic ctor/conversion on top of mp_integer
-//   rather than mpz (talking about the general case, not 1-limb optimisations here). There might be some
-//   efficiency gains to be had;
 // - re-visit at one point the issue of the estimators when we need to promote from static to dynamic
 //   in arithmetic ops. Currently they are not 100% optimal since they rely on the information coming out
 //   of the static implementation rather than computing the estimated size of rop themselves, for performance
