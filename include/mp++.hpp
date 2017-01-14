@@ -879,7 +879,7 @@ struct zero_division_error final : std::domain_error {
  *
  * # Hashing #
  *
- * This class provides an mp_integer::hash() function to compute a hash value for an integer. A specialisation
+ * This class provides an hash() function to compute a hash value for an integer. A specialisation
  * of the standard \p std::hash functor is also provided, so that it is possible to use mp_integer in standard
  * unordered associative containers out of the box.
  */
