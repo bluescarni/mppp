@@ -840,8 +840,8 @@ struct zero_division_error final : std::domain_error {
  * @code
  * mp_integer<1> n1{1}, n2{2};
  * auto res1 = n1 + n2; // res1 is an mp_integer
- * auto res2 = n1 * 2; // res1 is an mp_integer
- * auto res3 = 2 - n2; // res1 is an mp_integer
+ * auto res2 = n1 * 2; // res2 is an mp_integer
+ * auto res3 = 2 - n2; // res3 is an mp_integer
  * auto res4 = n1 / 2.f // res4 is a float
  * auto res5 = 12. / n1 // res5 is a double
  * @endcode
