@@ -762,12 +762,12 @@ struct zero_division_error final : std::domain_error {
  * primitive types, and it provides overloaded arithmetic operators. Differently from the builtin types, however, this
  * class does not allow any implicit conversion to/from other types (apart from \p bool): construction from and
  * conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
- * @code
+ * @code{.cpp}
  * mp_integer<1> n = 5;
  * int m = n;
  * @endcode
  * will not work, and direct initialization and explicit casting should be used instead:
- * @code
+ * @code{.cpp}
  * mp_integer<1> n{5};
  * int m = static_cast<int>(n);
  * @endcode
@@ -784,11 +784,11 @@ struct zero_division_error final : std::domain_error {
  * Most of the functionality of this class is exposed via inline friend functions, with the general convention
  * that the functions are named after the corresponding GMP functions minus the leading \p mpz_ prefix. For instance,
  * the GMP call
- * @code
+ * @code{.cpp}
  * mpz_add(rop,a,b);
  * @endcode
  * that writes the result of <tt>a+b</tt> into \p rop becomes simply
- * @code
+ * @code{.cpp}
  * add(rop,a,b);
  * @endcode
  * where the add() function is resolved via argument-dependent lookup. Function calls with overlapping arguments
@@ -805,7 +805,7 @@ struct zero_division_error final : std::domain_error {
  *
  * This allows to avoid having to set up a return value for one-off invocations of pow_ui() (the binary overload will
  * do it for you). For example:
- * @code
+ * @code{.cpp}
  * mp_integer<1> r1, r2, n{3};
  * pow_ui(r1,n,2);   // Ternary pow_ui(): computes n**2 and stores the result in r1.
  * r2 = pow_ui(n,2); // Binary pow_ui(): returns n**2, which is then assigned to r2.
@@ -817,7 +817,7 @@ struct zero_division_error final : std::domain_error {
  * - a nullary member function that modifies the calling object in-place.
  *
  * For instance, here are three possible ways of computing the absolute value:
- * @code
+ * @code{.cpp}
  * mp_integer<1> r1, r2, n{-5};
  * abs(r1,n);   // Binary abs(): computes and stores the absolute value of n into r1.
  * r2 = abs(n); // Unary abs(): returns the absolute value of n, which is then assigned to r2.
@@ -837,7 +837,7 @@ struct zero_division_error final : std::domain_error {
  * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
  * is a C++ integral, the result will be of type mp_integer, if the other argument is a C++ floating-point the result
  * will be of the same floating-point type. For example:
- * @code
+ * @code{.cpp}
  * mp_integer<1> n1{1}, n2{2};
  * auto res1 = n1 + n2; // res1 is an mp_integer
  * auto res2 = n1 * 2; // res2 is an mp_integer
@@ -868,7 +868,7 @@ struct zero_division_error final : std::domain_error {
  *
  * The \p mpz_view class represent a read-only view of an mp_integer object which is implicitly convertible to the type
  * <tt>const mpz_t</tt> and which is thus usable as an argument to GMP functions. For example:
- * @code
+ * @code{.cpp}
  * mpz_t m;
  * mpz_init_set_si(m,1); // Create an mpz_t with the value 1.
  * mp_integer<1> n{1}; // Initialize an mp_integer with the value 1.
@@ -879,7 +879,7 @@ struct zero_division_error final : std::domain_error {
  *
  * # Hashing #
  *
- * This class provides an hash() function to compute a hash value for an integer. A specialisation
+ * This class provides a hash() function to compute a hash value for an integer. A specialisation
  * of the standard \p std::hash functor is also provided, so that it is possible to use mp_integer in standard
  * unordered associative containers out of the box.
  */
@@ -1277,7 +1277,7 @@ public:
      * \b NOTE: this assignment operator is enabled only if \p T is an interoperable type.
      *
      * The body of this operator is equivalent to:
-     * @code
+     * @code{.cpp}
      * return *this = mp_integer{x};
      * @endcode
      * That is, a temporary integer is constructed from \p x and it is then move-assigned to \p this.
