@@ -161,12 +161,15 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
                   && std::is_standard_layout<expected_mpz_struct_t>::value && offsetof(mpz_struct_t, _mp_alloc) == 0u
                   && offsetof(mpz_struct_t, _mp_size) == offsetof(expected_mpz_struct_t, _mp_size)
                   && offsetof(mpz_struct_t, _mp_d) == offsetof(expected_mpz_struct_t, _mp_d)
-                  && std::is_same<mpz_alloc_t, decltype(std::declval<mpz_struct_t>()._mp_alloc)>::value
-                  && std::is_same<mpz_size_t, decltype(std::declval<mpz_struct_t>()._mp_size)>::value
                   && std::is_same<::mp_limb_t *, decltype(std::declval<mpz_struct_t>()._mp_d)>::value &&
                   // mp_bitcnt_t is used in shift operators, so we double-check it is unsigned. If it is not
                   // we might end up shifting by negative values, which is UB.
-                  std::is_unsigned<::mp_bitcnt_t>::value,
+                  std::is_unsigned<::mp_bitcnt_t>::value &&
+                  // The mpn functions accept sizes as ::mp_size_t, but we generally represent sizes as mpz_size_t.
+                  // We need then to make sure we can always cast safely mpz_size_t to ::mp_size_t. Inspection
+                  // of the gmp.h header seems to indicate that mpz_size_t is never larger than ::mp_size_t.
+                  std::numeric_limits<mpz_size_t>::min() >= std::numeric_limits<::mp_size_t>::min() &&
+                  std::numeric_limits<mpz_size_t>::max() <= std::numeric_limits<::mp_size_t>::max(),
               "Invalid mpz_t struct layout and/or GMP types.");
 
 // Helper function to init an mpz to zero with nlimbs preallocated limbs.
