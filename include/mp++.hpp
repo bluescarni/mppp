@@ -168,8 +168,8 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
                   // The mpn functions accept sizes as ::mp_size_t, but we generally represent sizes as mpz_size_t.
                   // We need then to make sure we can always cast safely mpz_size_t to ::mp_size_t. Inspection
                   // of the gmp.h header seems to indicate that mpz_size_t is never larger than ::mp_size_t.
-                  std::numeric_limits<mpz_size_t>::min() >= std::numeric_limits<::mp_size_t>::min() &&
-                  std::numeric_limits<mpz_size_t>::max() <= std::numeric_limits<::mp_size_t>::max(),
+                  std::numeric_limits<mpz_size_t>::min() >= std::numeric_limits<::mp_size_t>::min()
+                  && std::numeric_limits<mpz_size_t>::max() <= std::numeric_limits<::mp_size_t>::max(),
               "Invalid mpz_t struct layout and/or GMP types.");
 
 // Helper function to init an mpz to zero with nlimbs preallocated limbs.
@@ -1006,6 +1006,8 @@ class mp_integer
     }
 
 public:
+    /// Alias for the template parameter \p SSize.
+    static constexpr std::size_t ssize = SSize;
     /// Default constructor.
     /**
      * The default constructor initialises an integer with static storage type and value 0.
@@ -4794,6 +4796,9 @@ public:
 private:
     mppp_impl::integer_union<SSize> m_int;
 };
+
+template <std::size_t SSize>
+constexpr std::size_t mp_integer<SSize>::ssize;
 
 namespace mppp_impl
 {
