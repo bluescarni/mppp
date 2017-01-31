@@ -710,6 +710,8 @@ struct sizes_tester {
         n <<= GMP_NUMB_BITS;
         REQUIRE(n.nbits() == GMP_NUMB_BITS + 1);
         REQUIRE(n.size() == 2u);
+        // Static data member.
+        REQUIRE(integer::ssize == S::value);
     }
 };
 
