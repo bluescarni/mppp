@@ -4769,18 +4769,28 @@ public:
     {
         return n.is_zero();
     }
+
+private:
+    // Implementation of is_one()/is_negative_one().
+    template <int One>
+    bool is_one_impl() const
+    {
+        if (m_int.m_st._mp_size != One) {
+            return false;
+        }
+        // Get the pointer to the limbs.
+        const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
+        return (ptr[0] & GMP_NUMB_MASK) == 1u;
+    }
+
+public:
     /// Test if the value is equal to one.
     /**
      * @return \p true if the value represented by \p this is 1, \p false otherwise.
      */
     bool is_one() const
     {
-        if (m_int.m_st._mp_size != 1) {
-            return false;
-        }
-        // Get the pointer to the limbs.
-        const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
-        return (ptr[0] & GMP_NUMB_MASK) == 1u;
+        return is_one_impl<1>();
     }
     /// Test if an mppp::mp_integer is equal to one.
     /**
@@ -4791,6 +4801,24 @@ public:
     friend bool is_one(const mp_integer &n)
     {
         return n.is_one();
+    }
+    /// Test if the value is equal to minus one.
+    /**
+     * @return \p true if the value represented by \p this is -1, \p false otherwise.
+     */
+    bool is_negative_one() const
+    {
+        return is_one_impl<-1>();
+    }
+    /// Test if an mppp::mp_integer is equal to minus one.
+    /**
+     * @param n the mppp::mp_integer to be tested.
+     *
+     * @return \p true if \p n is equal to -1, \p false otherwise.
+     */
+    friend bool is_negative_one(const mp_integer &n)
+    {
+        return n.is_negative_one();
     }
 
 private:
