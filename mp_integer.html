@@ -949,6 +949,26 @@
 </p>
 </dd></dl>
 
+<dl class="function">
+<dt id="_CPPv2NK4mppp10mp_integer15is_negative_oneEv">
+<span id="mppp::mp_integer::is_negative_oneC"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a2d34786e208468d1e04c24ddd99f880d"></span>bool <code class="descname">is_negative_one</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp10mp_integer15is_negative_oneEv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if the value is equal to minus one. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><code class="docutils literal"><span class="pre">true</span></code> if the value represented by <code class="docutils literal"><span class="pre">this</span></code> is -1, <code class="docutils literal"><span class="pre">false</span></code> otherwise. </dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef container">
+<p class="breathe-sectiondef-title rubric">Public Static Attributes</p>
+<dl class="member">
+<dt id="_CPPv2N4mppp10mp_integer5ssizeE">
+<span id="mppp::mp_integer::ssize__std::s"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a696550214e9a637fb712abfa2dddccd7"></span><em class="property">constexpr</em> std::size_t <code class="descname">ssize</code><a class="headerlink" href="#_CPPv2N4mppp10mp_integer5ssizeE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for the template parameter <code class="docutils literal"><span class="pre">SSize</span></code>. </p>
+</dd></dl>
+
 </div>
 <div class="breathe-sectiondef container">
 <p class="breathe-sectiondef-title rubric">Friends</p>
@@ -1485,6 +1505,58 @@
 </dd></dl>
 
 <dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T, pow_enabler&lt; T &gt; = 0&gt;</dt>
+<dt id="_CPPv23powR10mp_integerRK10mp_integerRK1T">
+<span id="pow__mp_integerR.mp_integerCR.TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a8228e6088cdcbd15f957073abc8c72dd"></span>void <code class="descname">pow</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>base</em>, <em class="property">const</em> T &amp;<em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23powR10mp_integerRK10mp_integerRK1T" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic ternary exponentiation. </p>
+<p><strong>NOTE:</strong> this function is enabled only if <code class="docutils literal"><span class="pre">T</span></code> is <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a> or an integral interoperable type for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>.</p>
+<p>This function will raise <code class="docutils literal"><span class="pre">base</span></code> to the integral power <code class="docutils literal"><span class="pre">exp</span></code>, and place the result in <code class="docutils literal"><span class="pre">rop</span></code>. In case of a negative exponent, the result will be zero unless the absolute value of <code class="docutils literal"><span class="pre">base</span></code> is 1.</p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal"><span class="pre">base</span></code>: the base. </li>
+<li><code class="docutils literal"><span class="pre">exp</span></code>: the exponent.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal"><span class="pre">exp</span></code> is non-negative and outside the range of <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span></code>. </li>
+<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#mp++structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal"><span class="pre">base</span></code> is zero and <code class="docutils literal"><span class="pre">exp</span></code> is negative. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T, pow_enabler&lt; T &gt; = 0&gt;</dt>
+<dt id="_CPPv23powRK10mp_integerRK1T">
+<span id="pow__mp_integerCR.TCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ae9f030ced209b7d9f02b9930f531e2c2"></span>mp_integer <code class="descname">pow</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>base</em>, <em class="property">const</em> T &amp;<em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23powRK10mp_integerRK1T" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic binary exponentiation. </p>
+<p><strong>NOTE:</strong> this function is enabled only if <code class="docutils literal"><span class="pre">T</span></code> is <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a> or an integral interoperable type for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>.</p>
+<p>This function will raise <code class="docutils literal"><span class="pre">base</span></code> to the integral power <code class="docutils literal"><span class="pre">exp</span></code>, and return the result. In case of a negative exponent, the result will be zero unless the absolute value of <code class="docutils literal"><span class="pre">base</span></code> is 1.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><code class="docutils literal"><span class="pre">base**exp</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">base</span></code>: the base. </li>
+<li><code class="docutils literal"><span class="pre">exp</span></code>: the exponent.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a8228e6088cdcbd15f957073abc8c72dd"><span class="std std-ref">mp_integer::pow(mp_integer &amp;, const mp_integer &amp;, const T &amp;)</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv23absR10mp_integerRK10mp_integer">
 <span id="abs__mp_integerR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a580904fcc3bdca4261460d1355c40875"></span>void <code class="descname">abs</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23absR10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binary absolute value. </p>
@@ -1810,6 +1882,22 @@
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">n</span></code> is equal to 1, <code class="docutils literal"><span class="pre">false</span></code> otherwise. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a> to be tested.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv215is_negative_oneRK10mp_integer">
+<span id="is_negative_one__mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a01d230423a3ce5cce628928dd90ab9ee"></span>bool <code class="descname">is_negative_one</code><span class="sig-paren">(</span><em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv215is_negative_oneRK10mp_integer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if an <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a> is equal to minus one. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">n</span></code> is equal to -1, <code class="docutils literal"><span class="pre">false</span></code> otherwise. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">n</span></code>: the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a> to be tested.</li>
