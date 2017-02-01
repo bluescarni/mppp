@@ -4201,7 +4201,7 @@ private:
     template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
     static bool exp_is_odd(const T &exp)
     {
-        return static_cast<bool>(exp % T(2));
+        return (exp % T(2)) != T(0);
     }
     static bool exp_is_odd(const mp_integer &exp)
     {
