@@ -4218,6 +4218,10 @@ private:
     }
 
 public:
+#if defined(_MSC_VER)
+    template <typename T>
+    friend pow_enabler_1<T> pow(mp_integer &rop, const mp_integer &base, const T &exp)
+#else
     /// Generic ternary exponentiation.
     /**
      * \b NOTE: this function is enabled only if \p T is mppp::mp_integer or an integral interoperable
@@ -4233,11 +4237,6 @@ public:
      * @throws std::overflow_error if \p exp is non-negative and outside the range of <tt>unsigned long</tt>.
      * @throws zero_division_error if \p base is zero and \p exp is negative.
      */
-
-#if defined(_MSC_VER)
-    template <typename T>
-    friend pow_enabler_1<T> pow(mp_integer &rop, const mp_integer &base, const T &exp)
-#else
     template <typename T, pow_enabler<T> = 0>
     friend void pow(mp_integer &rop, const mp_integer &base, const T &exp)
 #endif
@@ -4263,6 +4262,10 @@ public:
             rop = 0;
         }
     }
+#if defined(_MSC_VER)
+    template <typename T>
+    friend pow_enabler_2<T> pow(const mp_integer &base, const T &exp)
+#else
     /// Generic binary exponentiation.
     /**
      * \b NOTE: this function is enabled only if \p T is mppp::mp_integer or an integral interoperable
@@ -4278,10 +4281,6 @@ public:
      *
      * @throws unspecified any exception thrown by mp_integer::pow(mp_integer &, const mp_integer &, const T &).
      */
-#if defined(_MSC_VER)
-    template <typename T>
-    friend pow_enabler_2<T> pow(const mp_integer &base, const T &exp)
-#else
     template <typename T, pow_enabler<T> = 0>
     friend mp_integer pow(const mp_integer &base, const T &exp)
 #endif
