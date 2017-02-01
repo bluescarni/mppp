@@ -4145,6 +4145,132 @@ public:
         pow_ui(retval, base, exp);
         return retval;
     }
+
+private:
+    // Various machinery for the implementation of pow().
+    template <typename T>
+    using pow_enabler = enable_if_t<is_supported_integral<T>::value || std::is_same<mp_integer, T>::value, int>;
+    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+    static bool exp_nonnegative(const T &exp)
+    {
+        return exp >= T(0);
+    }
+    static bool exp_nonnegative(const mp_integer &exp)
+    {
+        return exp.sgn() >= 0;
+    }
+    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+    static unsigned long exp_to_ulong(const T &exp)
+    {
+        assert(exp >= T(0));
+        // NOTE: make_unsigned<T>::type is T if T is already unsigned.
+        if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(exp)
+                          > std::numeric_limits<unsigned long>::max())) {
+            throw std::overflow_error("Cannot convert the integral exponent " + std::to_string(exp)
+                                      + " to unsigned long: the value is too large.");
+        }
+        return static_cast<unsigned long>(exp);
+    }
+    static unsigned long exp_to_ulong(const mp_integer &exp)
+    {
+        try {
+            return static_cast<unsigned long>(exp);
+        } catch (const std::overflow_error &) {
+            // Rewrite the error message.
+            throw std::overflow_error("Cannot convert the integral exponent " + exp.to_string()
+                                      + " to unsigned long: the value is too large.");
+        }
+    }
+    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+    static bool base_is_zero(const T &base)
+    {
+        return base == T(0);
+    }
+    static bool base_is_zero(const mp_integer &base)
+    {
+        return base.is_zero();
+    }
+    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+    static bool exp_is_odd(const T &exp)
+    {
+        return static_cast<bool>(exp % T(2));
+    }
+    static bool exp_is_odd(const mp_integer &exp)
+    {
+        return exp.odd_p();
+    }
+    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+    static std::string exp_to_string(const T &exp)
+    {
+        return std::to_string(exp);
+    }
+    static std::string exp_to_string(const mp_integer &exp)
+    {
+        return exp.to_string();
+    }
+
+public:
+    /// Generic ternary exponentiation.
+    /**
+     * \b NOTE: this function is enabled only if \p T is mppp::mp_integer or an integral interoperable
+     * type for mppp::mp_integer.
+     *
+     * This function will raise \p base to the integral power \p exp, and place the result in \p rop.
+     * In case of a negative exponent, the result will be zero unless the absolute value of \p base is 1.
+     *
+     * @param rop the return value.
+     * @param base the base.
+     * @param exp the exponent.
+     *
+     * @throws std::overflow_error if \p exp is non-negative and outside the range of <tt>unsigned long</tt>.
+     * @throws zero_division_error if \p base is zero and \p exp is negative.
+     */
+    template <typename T, pow_enabler<T> = 0>
+    friend void pow(mp_integer &rop, const mp_integer &base, const T &exp)
+    {
+        if (exp_nonnegative(exp)) {
+            pow_ui(rop, base, exp_to_ulong(exp));
+        } else if (mppp_unlikely(base_is_zero(base))) {
+            // 0**-n is a division by zero.
+            throw zero_division_error("cannot raise zero to the negative power " + exp_to_string(exp));
+        } else if (base.is_one()) {
+            // 1**n == 1.
+            rop = 1;
+        } else if (base.is_negative_one()) {
+            if (exp_is_odd(exp)) {
+                // 1**(-2n-1) == -1.
+                rop = -1;
+            } else {
+                // 1**(-2n) == 1.
+                rop = 1;
+            }
+        } else {
+            // m**-n == 1 / m**n == 0.
+            rop = 0;
+        }
+    }
+    /// Generic binary exponentiation.
+    /**
+     * \b NOTE: this function is enabled only if \p T is mppp::mp_integer or an integral interoperable
+     * type for mppp::mp_integer.
+     *
+     * This function will raise \p base to the integral power \p exp, and return the result.
+     * In case of a negative exponent, the result will be zero unless the absolute value of \p base is 1.
+     *
+     * @param base the base.
+     * @param exp the exponent.
+     *
+     * @return <tt>base**exp</tt>.
+     *
+     * @throws unspecified any exception thrown by mp_integer::pow(mp_integer &, const mp_integer &, const T &).
+     */
+    template <typename T, pow_enabler<T> = 0>
+    friend mp_integer pow(const mp_integer &base, const T &exp)
+    {
+        mp_integer retval;
+        pow(retval, base, exp);
+        return retval;
+    }
     /// In-place absolute value.
     /**
      * This method will set \p this to its absolute value.

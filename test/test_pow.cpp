@@ -28,7 +28,9 @@ see https://www.gnu.org/licenses/. */
 
 #include <cstddef>
 #include <gmp.h>
+#include <limits>
 #include <random>
+#include <stdexcept>
 #include <tuple>
 #include <type_traits>
 
@@ -102,6 +104,89 @@ struct pow_tester {
         random_xy(2);
         random_xy(3);
         random_xy(4);
+
+        // Tests for the convenience pow() overloads.
+        integer ret;
+        REQUIRE(pow(integer{0}, 0) == 1);
+        pow(ret, integer{0}, 0);
+        REQUIRE(ret == 1);
+        REQUIRE(pow(integer{4}, 2) == 16);
+        pow(ret, integer{4}, 2);
+        REQUIRE(ret == 16);
+        ret.promote();
+        REQUIRE(pow(integer{4}, char(0)) == 1);
+        REQUIRE(pow(integer{4}, 3ull) == 64);
+        REQUIRE(pow(integer{4}, integer{4}) == 256);
+        REQUIRE(pow(integer{-4}, 2) == 16);
+        pow(ret, integer{-4}, 2);
+        REQUIRE(ret == 16);
+        ret.demote();
+        REQUIRE(pow(integer{-4}, char(0)) == 1);
+        REQUIRE(pow(integer{-4}, 3ull) == -64);
+        REQUIRE(pow(integer{-4}, integer{4}) == 256);
+        if (std::numeric_limits<unsigned long long>::max() > std::numeric_limits<unsigned long>::max()) {
+            REQUIRE_THROWS_PREDICATE(pow(integer{-4}, std::numeric_limits<unsigned long long>::max()),
+                                     std::overflow_error, [](const std::overflow_error &oe) {
+                                         return oe.what()
+                                                == "Cannot convert the integral exponent "
+                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                                       + " to unsigned long: the value is too large.";
+                                     });
+            REQUIRE_THROWS_PREDICATE(pow(integer{-4}, integer{std::numeric_limits<unsigned long long>::max()}),
+                                     std::overflow_error, [](const std::overflow_error &oe) {
+                                         return oe.what()
+                                                == "Cannot convert the integral exponent "
+                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                                       + " to unsigned long: the value is too large.";
+                                     });
+            REQUIRE_THROWS_PREDICATE(pow(ret, integer{-4}, std::numeric_limits<unsigned long long>::max()),
+                                     std::overflow_error, [](const std::overflow_error &oe) {
+                                         return oe.what()
+                                                == "Cannot convert the integral exponent "
+                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                                       + " to unsigned long: the value is too large.";
+                                     });
+            REQUIRE_THROWS_PREDICATE(pow(ret, integer{-4}, integer{std::numeric_limits<unsigned long long>::max()}),
+                                     std::overflow_error, [](const std::overflow_error &oe) {
+                                         return oe.what()
+                                                == "Cannot convert the integral exponent "
+                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
+                                                       + " to unsigned long: the value is too large.";
+                                     });
+        }
+        REQUIRE_THROWS_PREDICATE(pow(integer{0}, -1), zero_division_error, [](const zero_division_error &zde) {
+            return zde.what() == std::string("cannot raise zero to the negative power -1");
+        });
+        REQUIRE_THROWS_PREDICATE(pow(integer{0}, -2ll), zero_division_error, [](const zero_division_error &zde) {
+            return zde.what() == std::string("cannot raise zero to the negative power -2");
+        });
+        REQUIRE_THROWS_PREDICATE(pow(integer{0}, integer{-25}), zero_division_error,
+                                 [](const zero_division_error &zde) {
+                                     return zde.what() == std::string("cannot raise zero to the negative power -25");
+                                 });
+        // 1 to negative exp.
+        REQUIRE(pow(integer{1}, -1) == 1);
+        REQUIRE(pow(integer{1}, char(-2)) == 1);
+        pow(ret, integer{1}, char(-2));
+        REQUIRE(ret == 1);
+        ret.promote();
+        REQUIRE(pow(integer{1}, -3ll) == 1);
+        REQUIRE(pow(integer{1}, integer{-4ll}) == 1);
+        // -1 to negative exp.
+        REQUIRE(pow(integer{-1}, -1) == -1);
+        REQUIRE(pow(integer{-1}, char(-2)) == 1);
+        pow(ret, integer{-1}, char(-3));
+        REQUIRE(ret == -1);
+        ret.demote();
+        REQUIRE(pow(integer{-1}, -3ll) == -1);
+        REQUIRE(pow(integer{-1}, integer{-4ll}) == 1);
+        // n to negative exp.
+        REQUIRE(pow(integer{2}, -1) == 0);
+        REQUIRE(pow(integer{-3}, char(-2)) == 0);
+        REQUIRE(pow(integer{4}, -3ll) == 0);
+        pow(ret, integer{4}, -3);
+        REQUIRE(ret == 0);
+        REQUIRE(pow(integer{-5}, integer{-4}) == 0);
     }
 };
 
