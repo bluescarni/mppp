@@ -4147,9 +4147,17 @@ public:
     }
 
 private:
-    // Various machinery for the implementation of pow().
+#if defined(_MSC_VER)
+    // MSVC workaround.
+    template <typename T>
+    using pow_enabler_1 = enable_if_t<is_supported_integral<T>::value || std::is_same<mp_integer, T>::value>;
+    template <typename T>
+    using pow_enabler_2
+        = enable_if_t<is_supported_integral<T>::value || std::is_same<mp_integer, T>::value, mp_integer>;
+#else
     template <typename T>
     using pow_enabler = enable_if_t<is_supported_integral<T>::value || std::is_same<mp_integer, T>::value, int>;
+#endif
     template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
     static bool exp_nonnegative(const T &exp)
     {
@@ -4225,8 +4233,14 @@ public:
      * @throws std::overflow_error if \p exp is non-negative and outside the range of <tt>unsigned long</tt>.
      * @throws zero_division_error if \p base is zero and \p exp is negative.
      */
+
+#if defined(_MSC_VER)
+    template <typename T>
+    friend pow_enabler_1<T> pow(mp_integer &rop, const mp_integer &base, const T &exp)
+#else
     template <typename T, pow_enabler<T> = 0>
     friend void pow(mp_integer &rop, const mp_integer &base, const T &exp)
+#endif
     {
         if (exp_nonnegative(exp)) {
             pow_ui(rop, base, exp_to_ulong(exp));
@@ -4264,8 +4278,13 @@ public:
      *
      * @throws unspecified any exception thrown by mp_integer::pow(mp_integer &, const mp_integer &, const T &).
      */
+#if defined(_MSC_VER)
+    template <typename T>
+    friend pow_enabler_2<T> pow(const mp_integer &base, const T &exp)
+#else
     template <typename T, pow_enabler<T> = 0>
     friend mp_integer pow(const mp_integer &base, const T &exp)
+#endif
     {
         mp_integer retval;
         pow(retval, base, exp);
