@@ -6118,11 +6118,11 @@ namespace Catch {
 
 #if defined ( CATCH_PLATFORM_WINDOWS ) /////////////////////////////////////////
 
-#define NOMINMAX
+//#define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #undef WIN32_LEAN_AND_MEAN
-#undef NOMINMAX
+//#undef NOMINMAX
 
 namespace Catch {
 
@@ -11001,4 +11001,3 @@ int main (int argc, char * const argv[]) {
 using Catch::Detail::Approx;
 
 #endif // TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
-

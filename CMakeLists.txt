@@ -17,9 +17,10 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND YACMA_COMPILER_IS_CLANGXX)
   list(APPEND MPPP_CXX_FLAGS_RELEASE "-stdlib=libc++")
 endif()
 if(YACMA_COMPILER_IS_MSVC)
-  # Disable some annoying warnings and enable the bigobj option.
-  list(APPEND MPPP_CXX_FLAGS_DEBUG "/wd4459" "/wd4127" "/bigobj")
-  list(APPEND MPPP_CXX_FLAGS_RELEASE "/wd4459" "/wd4127" "/bigobj")
+  # Disable the idiotic minmax macros on MSVC, some annoying warnings,
+  # and enable the bigobj option.
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
 endif()
 if(YACMA_COMPILER_IS_INTELXX)
   # NOTE: on MSVC we use the push/pop pragmas, but they do not seem to work on Intel (the pragmas
@@ -31,6 +32,9 @@ if(MINGW)
   # In MinGW some tests generate big object files.
   list(APPEND MPPP_CXX_FLAGS_DEBUG "-Wa,-mbig-obj")
   list(APPEND MPPP_CXX_FLAGS_RELEASE "-Wa,-mbig-obj")
+  # Recent version of catch cause problems when this flag is used.
+  message(STATUS "Removing the '-fstack-protector-all' flag on MinGW debug builds.")
+  list(REMOVE_ITEM MPPP_CXX_FLAGS_DEBUG "-fstack-protector-all")
 endif()
 
 option(MPPP_BUILD_TESTS "Build unit tests." OFF)
