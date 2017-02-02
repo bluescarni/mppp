@@ -17,10 +17,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND YACMA_COMPILER_IS_CLANGXX)
   list(APPEND MPPP_CXX_FLAGS_RELEASE "-stdlib=libc++")
 endif()
 if(YACMA_COMPILER_IS_MSVC)
-  # Disable the idiotic minmax macros on MSVC, some annoying warnings,
-  # and enable the bigobj option.
-  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
-  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
+  # Disable some annoying warnings and enable the bigobj option.
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "/wd4459" "/wd4127" "/bigobj")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "/wd4459" "/wd4127" "/bigobj")
 endif()
 if(YACMA_COMPILER_IS_INTELXX)
   # NOTE: on MSVC we use the push/pop pragmas, but they do not seem to work on Intel (the pragmas

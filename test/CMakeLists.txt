@@ -4,6 +4,12 @@ include(YACMAThreadingSetup)
 list(APPEND MPPP_CXX_FLAGS_DEBUG ${YACMA_THREADING_CXX_FLAGS})
 list(APPEND MPPP_CXX_FLAGS_RELEASE ${YACMA_THREADING_CXX_FLAGS})
 
+if(MINGW)
+    # Recent version of catch cause problems when this flag is used.
+    message(STATUS "Removing the '-fstack-protector-all' on MinGW debug builds.")
+    list(REMOVE_ITEM MPPP_CXX_FLAGS_DEBUG "-fstack-protector-all")
+endif()
+
 function(ADD_MPPP_TESTCASE arg1)
     add_executable(${arg1} ${arg1}.cpp)
     target_link_libraries(${arg1} mp++ Threads::Threads)
