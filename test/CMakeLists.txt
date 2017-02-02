@@ -6,7 +6,7 @@ list(APPEND MPPP_CXX_FLAGS_RELEASE ${YACMA_THREADING_CXX_FLAGS})
 
 if(MINGW)
     # Recent version of catch cause problems when this flag is used.
-    message(STATUS "Removing the '-fstack-protector-all' on MinGW debug builds.")
+    message(STATUS "Removing the '-fstack-protector-all' flag on MinGW debug builds.")
     list(REMOVE_ITEM MPPP_CXX_FLAGS_DEBUG "-fstack-protector-all")
 endif()
 
