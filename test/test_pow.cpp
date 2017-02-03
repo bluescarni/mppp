@@ -197,14 +197,18 @@ struct pow_tester {
         REQUIRE((std::is_same<float, decltype(pow(0.f, integer{}))>::value));
         REQUIRE((std::is_same<double, decltype(pow(integer{}, 0.))>::value));
         REQUIRE((std::is_same<double, decltype(pow(0., integer{}))>::value));
+#if defined(MPPP_WITH_LONG_DOUBLE)
         REQUIRE((std::is_same<long double, decltype(pow(integer{}, 0.l))>::value));
         REQUIRE((std::is_same<long double, decltype(pow(0.l, integer{}))>::value));
+#endif
         REQUIRE(pow(integer{2}, 4.5f) == std::pow(2.f, 4.5f));
         REQUIRE(pow(4.5f, integer{-2}) == std::pow(4.5f, -2.f));
         REQUIRE(pow(integer{2}, 4.5) == std::pow(2., 4.5));
         REQUIRE(pow(4.5, integer{-2}) == std::pow(4.5, -2.));
+#if defined(MPPP_WITH_LONG_DOUBLE)
         REQUIRE(pow(integer{2}, 4.5l) == std::pow(2.l, 4.5l));
         REQUIRE(pow(4.5l, integer{-2}) == std::pow(4.5l, -2.l));
+#endif
     }
 };
 
