@@ -4147,11 +4147,6 @@ public:
     }
 
 private:
-    template <typename T, typename U>
-    using pow_t = enable_if_t<(is_supported_interop<T>::value && std::is_same<mp_integer, U>::value)
-                                  || (is_supported_interop<U>::value && std::is_same<mp_integer, T>::value)
-                                  || (std::is_same<mp_integer, T>::value && std::is_same<mp_integer, U>::value),
-                              decltype(std::declval<const T &>() + std::declval<const U &>())>;
     template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
     static bool exp_nonnegative(const T &exp)
     {
@@ -4279,7 +4274,7 @@ public:
      * @throws zero_division_error if \p base and \p exp are integrals and \p base is zero and \p exp is negative.
      */
     template <typename T, typename U>
-    friend pow_t<T, U> pow(const T &base, const U &exp)
+    friend common_t<T, U> pow(const T &base, const U &exp)
     {
         return pow_impl(base, exp);
     }
