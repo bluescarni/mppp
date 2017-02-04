@@ -4625,10 +4625,17 @@ public:
 
 private:
     template <typename T, typename U>
-    using binomial_enabler = enable_if_t<(std::is_same<mp_integer, T>::value && std::is_same<mp_integer, U>::value)
-                                             || (std::is_same<mp_integer, T>::value && is_supported_integral<U>::value)
-                                             || (std::is_same<mp_integer, U>::value && is_supported_integral<T>::value),
-                                         int>;
+    using binomial_enabler_impl
+        = std::integral_constant<bool, (std::is_same<mp_integer, T>::value && std::is_same<mp_integer, U>::value)
+                                           || (std::is_same<mp_integer, T>::value && is_supported_integral<U>::value)
+                                           || (std::is_same<mp_integer, U>::value && is_supported_integral<T>::value)>;
+#if defined(_MSC_VER)
+    template <typename T, typename U>
+    using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, mp_integer>;
+#else
+    template <typename T, typename U>
+    using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, int>;
+#endif
     template <typename T>
     static mp_integer binomial_impl(const mp_integer &n, const T &k)
     {
@@ -4665,6 +4672,10 @@ private:
     }
 
 public:
+#if defined(_MSC_VER)
+    template <typename T, typename U>
+    friend binomial_enabler<T, U> binomial(const T &n, const U &k)
+#else
     /// Generic binomial coefficient.
     /**
      * \b NOTE: this function is enabled only in the following cases:
@@ -4687,6 +4698,7 @@ public:
      */
     template <typename T, typename U, binomial_enabler<T, U> = 0>
     friend mp_integer binomial(const T &n, const U &k)
+#endif
     {
         return binomial_impl(n, k);
     }
