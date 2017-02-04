@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Add convenience overloads for the computation of the binomial
+  coefficient. [Francesco Biscani]
+
 - Add convenience overloads for pow(). [Francesco Biscani]
 
 - Add functions to test if an integer is equal to -1. [Francesco

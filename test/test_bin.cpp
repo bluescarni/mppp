@@ -28,7 +28,9 @@ see https://www.gnu.org/licenses/. */
 
 #include <cstddef>
 #include <gmp.h>
+#include <limits>
 #include <random>
+#include <stdexcept>
 #include <tuple>
 #include <type_traits>
 
@@ -95,4 +97,57 @@ struct bin_tester {
 TEST_CASE("bin")
 {
     tuple_for_each(sizes{}, bin_tester{});
+}
+
+struct binomial_tester {
+    template <typename T>
+    void operator()(const T &) const
+    {
+        using int_type = mp_integer<T::value>;
+        int_type n;
+        REQUIRE(binomial(n, 0) == 1);
+        REQUIRE(binomial(n, 1) == 0);
+        n = 1;
+        REQUIRE(binomial(n, 1) == 1);
+        n = 5;
+        REQUIRE(binomial(n, 3) == 10);
+        n = -5;
+        REQUIRE(binomial(n, int_type(4)) == 70);
+        // Random tests.
+        std::uniform_int_distribution<int> ud(-1000, 1000);
+        std::uniform_int_distribution<int> promote_dist(0, 1);
+        mpz_raii m;
+        for (int i = 0; i < ntries; ++i) {
+            auto tmp1 = ud(rng), tmp2 = ud(rng);
+            n = tmp1;
+            if (promote_dist(rng) && n.is_static()) {
+                n.promote();
+            }
+            if (tmp2 < 0) {
+                // NOTE: we cannot check this case with GMP, defer to some tests below.
+                CHECK_NOTHROW(binomial(n, tmp2));
+                continue;
+            }
+            ::mpz_set_si(&m.m_mpz, static_cast<long>(tmp1));
+            ::mpz_bin_ui(&m.m_mpz, &m.m_mpz, static_cast<unsigned long>(tmp2));
+            REQUIRE(binomial(n, tmp2).to_string() == lex_cast(m));
+        }
+        REQUIRE_THROWS_AS(binomial(n, std::numeric_limits<unsigned long>::max() + int_type(1)), std::overflow_error);
+        REQUIRE_THROWS_AS(binomial(-int_type{std::numeric_limits<unsigned long>::max()} + 1,
+                                   -2 * int_type{std::numeric_limits<unsigned long>::max()}),
+                          std::overflow_error);
+        // Negative k.
+        REQUIRE(binomial(int_type{-3}, -4) == -3);
+        REQUIRE(binomial(int_type{-3}, -10) == -36);
+        REQUIRE(binomial(int_type{-3}, -1) == 0);
+        REQUIRE(binomial(int_type{3}, -1) == 0);
+        REQUIRE(binomial(int_type{10}, -1) == 0);
+        REQUIRE(binomial(int_type{-3}, -3) == 1);
+        REQUIRE(binomial(int_type{-1}, -1) == 1);
+    }
+};
+
+TEST_CASE("binomial")
+{
+    tuple_for_each(sizes{}, binomial_tester{});
 }

@@ -4163,7 +4163,7 @@ private:
         // NOTE: make_unsigned<T>::type is T if T is already unsigned.
         if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(exp)
                           > std::numeric_limits<unsigned long>::max())) {
-            throw std::overflow_error("Cannot convert the integral exponent " + std::to_string(exp)
+            throw std::overflow_error("Cannot convert the integral value " + std::to_string(exp)
                                       + " to unsigned long: the value is too large.");
         }
         return static_cast<unsigned long>(exp);
@@ -4174,7 +4174,7 @@ private:
             return static_cast<unsigned long>(exp);
         } catch (const std::overflow_error &) {
             // Rewrite the error message.
-            throw std::overflow_error("Cannot convert the integral exponent " + exp.to_string()
+            throw std::overflow_error("Cannot convert the integral value " + exp.to_string()
                                       + " to unsigned long: the value is too large.");
         }
     }
@@ -4621,6 +4621,86 @@ public:
         mp_integer retval;
         bin_ui(retval, n, k);
         return retval;
+    }
+
+private:
+    template <typename T, typename U>
+    using binomial_enabler_impl
+        = std::integral_constant<bool, (std::is_same<mp_integer, T>::value && std::is_same<mp_integer, U>::value)
+                                           || (std::is_same<mp_integer, T>::value && is_supported_integral<U>::value)
+                                           || (std::is_same<mp_integer, U>::value && is_supported_integral<T>::value)>;
+#if defined(_MSC_VER)
+    template <typename T, typename U>
+    using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, mp_integer>;
+#else
+    template <typename T, typename U>
+    using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, int>;
+#endif
+    template <typename T>
+    static mp_integer binomial_impl(const mp_integer &n, const T &k)
+    {
+        // NOTE: here we re-use some helper methods used in the implementation of pow().
+        if (exp_nonnegative(k)) {
+            return bin_ui(n, exp_to_ulong(k));
+        }
+        // This is the case k < 0, handled according to:
+        // http://arxiv.org/abs/1105.3689/
+        if (n.sgn() >= 0) {
+            // n >= 0, k < 0.
+            return mp_integer{};
+        }
+        // n < 0, k < 0.
+        if (k <= n) {
+            // The formula is: (-1)**(n-k) * binomial(-k-1,n-k).
+            // Cache n-k.
+            const mp_integer nmk{n - k};
+            mp_integer tmp{k};
+            ++tmp;
+            tmp.neg();
+            auto retval = bin_ui(tmp, exp_to_ulong(nmk));
+            if (nmk.odd_p()) {
+                retval.neg();
+            }
+            return retval;
+        }
+        return mp_integer{};
+    }
+    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+    static mp_integer binomial_impl(const T &n, const mp_integer &k)
+    {
+        return binomial_impl(mp_integer{n}, k);
+    }
+
+public:
+#if defined(_MSC_VER)
+    template <typename T, typename U>
+    friend binomial_enabler<T, U> binomial(const T &n, const U &k)
+#else
+    /// Generic binomial coefficient.
+    /**
+     * \b NOTE: this function is enabled only in the following cases:
+     * - \p T and \p U are both mppp::mp_integer,
+     * - \p T is an mppp::mp_integer and \p U is an integral interoperable type for mppp::mp_integer,
+     * - \p U is an mppp::mp_integer and \p T is an integral interoperable type for mppp::mp_integer.
+     *
+     * This function will compute the binomial coefficient \f$ {{n}\choose{k}} \f$, supporting integral input values.
+     * The implementation can handle positive and negative values for both the top and the bottom argument. Internally,
+     * the mp_integer::bin_ui() function will be employed.
+     *
+     * See http://arxiv.org/abs/1105.3689/.
+     *
+     * @param n the top argument.
+     * @param k the bottom argument.
+     *
+     * @return \f$ {{n}\choose{k}} \f$.
+     *
+     * @throws std::overflow_error if \p k is greater than an implementation-defined value.
+     */
+    template <typename T, typename U, binomial_enabler<T, U> = 0>
+    friend mp_integer binomial(const T &n, const U &k)
+#endif
+    {
+        return binomial_impl(n, k);
     }
 
 private:
