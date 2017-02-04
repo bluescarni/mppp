@@ -4147,17 +4147,6 @@ public:
     }
 
 private:
-#if defined(_MSC_VER)
-    // MSVC workaround.
-    template <typename T>
-    using pow_enabler_1 = enable_if_t<is_supported_integral<T>::value || std::is_same<mp_integer, T>::value>;
-    template <typename T>
-    using pow_enabler_2
-        = enable_if_t<is_supported_integral<T>::value || std::is_same<mp_integer, T>::value, mp_integer>;
-#else
-    template <typename T>
-    using pow_enabler = enable_if_t<is_supported_integral<T>::value || std::is_same<mp_integer, T>::value, int>;
-#endif
     template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
     static bool exp_nonnegative(const T &exp)
     {
@@ -4216,31 +4205,12 @@ private:
     {
         return exp.to_string();
     }
-
-public:
-#if defined(_MSC_VER)
-    template <typename T>
-    friend pow_enabler_1<T> pow(mp_integer &rop, const mp_integer &base, const T &exp)
-#else
-    /// Generic ternary exponentiation.
-    /**
-     * \b NOTE: this function is enabled only if \p T is mppp::mp_integer or an integral interoperable
-     * type for mppp::mp_integer.
-     *
-     * This function will raise \p base to the integral power \p exp, and place the result in \p rop.
-     * In case of a negative exponent, the result will be zero unless the absolute value of \p base is 1.
-     *
-     * @param rop the return value.
-     * @param base the base.
-     * @param exp the exponent.
-     *
-     * @throws std::overflow_error if \p exp is non-negative and outside the range of <tt>unsigned long</tt>.
-     * @throws zero_division_error if \p base is zero and \p exp is negative.
-     */
-    template <typename T, pow_enabler<T> = 0>
-    friend void pow(mp_integer &rop, const mp_integer &base, const T &exp)
-#endif
+    // Implementation of pow().
+    // mp_integer -- integral overload.
+    template <typename T, enable_if_t<std::is_same<T, mp_integer>::value || std::is_integral<T>::value, int> = 0>
+    static mp_integer pow_impl(const mp_integer &base, const T &exp)
     {
+        mp_integer rop;
         if (exp_nonnegative(exp)) {
             pow_ui(rop, base, exp_to_ulong(exp));
         } else if (mppp_unlikely(base_is_zero(base))) {
@@ -4261,33 +4231,52 @@ public:
             // m**-n == 1 / m**n == 0.
             rop = 0;
         }
+        return rop;
     }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend pow_enabler_2<T> pow(const mp_integer &base, const T &exp)
-#else
+    // C++ integral -- mp_integer overload.
+    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+    static mp_integer pow_impl(const T &base, const mp_integer &exp)
+    {
+        return pow_impl(mp_integer{base}, exp);
+    }
+    // mp_integer -- FP overload.
+    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    static T pow_impl(const mp_integer &base, const T &exp)
+    {
+        return std::pow(static_cast<T>(base), exp);
+    }
+    // FP -- mp_integer overload.
+    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    static T pow_impl(const T &base, const mp_integer &exp)
+    {
+        return std::pow(base, static_cast<T>(exp));
+    }
+
+public:
     /// Generic binary exponentiation.
     /**
-     * \b NOTE: this function is enabled only if \p T is mppp::mp_integer or an integral interoperable
-     * type for mppp::mp_integer.
+     * \b NOTE: this function is enabled only if at least one argument is an mppp::mp_integer
+     * and the other argument is either an mppp::mp_integer or an interoperable type for mppp::mp_integer.
      *
-     * This function will raise \p base to the integral power \p exp, and return the result.
-     * In case of a negative exponent, the result will be zero unless the absolute value of \p base is 1.
+     * This function will raise \p base to the power \p exp, and return the result. If one of the arguments
+     * is a floating-point value, then the result will be computed via <tt>std::pow()</tt> and it will also be a
+     * floating-point value. Otherwise, the result is computed via mppp::mp_integer::pow_ui() and its type is
+     * mppp::mp_integer. In case of a negative integral exponent and integral base, the result will be zero unless
+     * the absolute value of \p base is 1.
      *
      * @param base the base.
      * @param exp the exponent.
      *
      * @return <tt>base**exp</tt>.
      *
-     * @throws unspecified any exception thrown by mp_integer::pow(mp_integer &, const mp_integer &, const T &).
+     * @throws std::overflow_error if \p base and \p exp are integrals and \p exp is non-negative and outside the range
+     * of <tt>unsigned long</tt>.
+     * @throws zero_division_error if \p base and \p exp are integrals and \p base is zero and \p exp is negative.
      */
-    template <typename T, pow_enabler<T> = 0>
-    friend mp_integer pow(const mp_integer &base, const T &exp)
-#endif
+    template <typename T, typename U>
+    friend common_t<T, U> pow(const T &base, const U &exp)
     {
-        mp_integer retval;
-        pow(retval, base, exp);
-        return retval;
+        return pow_impl(base, exp);
     }
     /// In-place absolute value.
     /**
