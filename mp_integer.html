@@ -1765,6 +1765,38 @@
 </dd></dl>
 
 <dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U, binomial_enabler&lt; T, U &gt; = 0&gt;</dt>
+<dt id="_CPPv28binomialRK1TRK1U">
+<span id="binomial__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a139dd58e56d4cf06d23c25347a2d745d"></span>mp_integer <code class="descname">binomial</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>n</em>, <em class="property">const</em> U &amp;<em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28binomialRK1TRK1U" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic binomial coefficient. </p>
+<p><strong>NOTE:</strong> this function is enabled only in the following cases:<ul class="simple">
+<li><code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> are both <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>,</li>
+<li><code class="docutils literal"><span class="pre">T</span></code> is an <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a> and <code class="docutils literal"><span class="pre">U</span></code> is an integral interoperable type for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>,</li>
+<li><code class="docutils literal"><span class="pre">U</span></code> is an <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a> and <code class="docutils literal"><span class="pre">T</span></code> is an integral interoperable type for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>.</li>
+</ul>
+</p>
+<p>This function will compute the binomial coefficient <span class="math">\( {{n}\choose{k}} \)</span>, supporting integral input values. The implementation can handle positive and negative values for both the top and the bottom argument. Internally, the <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a220b5475ee65174436ac170278371f3e"><span class="std std-ref">mp_integer::bin_ui()</span></a> function will be employed.</p>
+<p>See <a class="reference external" href="http://arxiv.org/abs/1105.3689/">http://arxiv.org/abs/1105.3689/</a>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><span class="math">\( {{n}\choose{k}} \)</span>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the top argument. </li>
+<li><code class="docutils literal"><span class="pre">k</span></code>: the bottom argument.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal"><span class="pre">k</span></code> is greater than an implementation-defined value. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv28divexactR10mp_integerRK10mp_integerRK10mp_integer">
 <span id="divexact__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a1954da82f9a2461ecd743a7b6855beb6"></span>void <code class="descname">divexact</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>n</em>, <em class="property">const</em> mp_integer &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28divexactR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exact division (ternary version). </p>
