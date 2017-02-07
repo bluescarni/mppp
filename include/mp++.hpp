@@ -1391,7 +1391,7 @@ public:
     {
         return m_int.is_dynamic();
     }
-    /// Stream operator for mp_integer.
+    /// Output stream operator for mp_integer.
     /**
      * This operator will print to the stream \p os the mp_integer \p n in base 10. Internally it uses the
      * mp_integer::to_string() method.
@@ -1406,6 +1406,24 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const mp_integer &n)
     {
         return os << n.to_string();
+    }
+    /// Input stream operator for mp_integer.
+    /**
+     * Equivalent to extracting a line from the stream and then assigning it to \p n.
+     *
+     * @param is input stream.
+     * @param n integer to which the contents of the stream will be assigned.
+     *
+     * @return reference to \p is.
+     *
+     * @throws unspecified any exception thrown by the constructor from string of mp_integer.
+     */
+    friend std::istream &operator>>(std::istream &is, mp_integer &n)
+    {
+        MPPP_MAYBE_TLS std::string tmp_str;
+        std::getline(is, tmp_str);
+        n = mp_integer{tmp_str};
+        return is;
     }
     /// Conversion to string.
     /**
