@@ -434,25 +434,25 @@ inline std::string mpz_to_str(const mpz_struct_t *mpz, int base = 10)
 // Type trait to check if T is a supported integral type.
 template <typename T>
 using is_supported_integral
-    = std::integral_constant<bool, std::is_same<T, bool>::value || std::is_same<T, char>::value
-                                       || std::is_same<T, signed char>::value || std::is_same<T, unsigned char>::value
-                                       || std::is_same<T, short>::value || std::is_same<T, unsigned short>::value
-                                       || std::is_same<T, int>::value || std::is_same<T, unsigned>::value
-                                       || std::is_same<T, long>::value || std::is_same<T, unsigned long>::value
-                                       || std::is_same<T, long long>::value
-                                       || std::is_same<T, unsigned long long>::value>;
+    = std::integral_constant<bool, disjunction<std::is_same<T, bool>, std::is_same<T, char>,
+                                               std::is_same<T, signed char>, std::is_same<T, unsigned char>,
+                                               std::is_same<T, short>, std::is_same<T, unsigned short>,
+                                               std::is_same<T, int>, std::is_same<T, unsigned>, std::is_same<T, long>,
+                                               std::is_same<T, unsigned long>, std::is_same<T, long long>,
+                                               std::is_same<T, unsigned long long>>::value>;
 
 // Type trait to check if T is a supported floating-point type.
 template <typename T>
-using is_supported_float = std::integral_constant<bool, std::is_same<T, float>::value || std::is_same<T, double>::value
+using is_supported_float = std::integral_constant<bool, disjunction<std::is_same<T, float>, std::is_same<T, double>
 #if defined(MPPP_WITH_LONG_DOUBLE)
-                                                            || std::is_same<T, long double>::value
+                                                                    ,
+                                                                    std::is_same<T, long double>
 #endif
-                                                  >;
+                                                                    >::value>;
 
 template <typename T>
 using is_supported_interop
-    = std::integral_constant<bool, is_supported_integral<T>::value || is_supported_float<T>::value>;
+    = std::integral_constant<bool, disjunction<is_supported_integral<T>, is_supported_float<T>>::value>;
 
 // Small wrapper to copy limbs.
 inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_limb_t *out)
@@ -2211,6 +2211,8 @@ public:
         dispatch_in_place_add(*this, op);
         return *this;
     }
+
+private:
 #if defined(_MSC_VER)
     template <typename T>
     using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, T &>;
@@ -2218,14 +2220,37 @@ public:
     template <typename T>
     using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
 #endif
+
+public:
 #if defined(_MSC_VER)
     template <typename T>
     friend in_place_lenabler<T> operator+=(T &x, const mp_integer &n)
 #else
+    /// In-place addition for interoperable types.
+    /**
+     * \b NOTE: this operator is enabled only if \p T is an interoperable type for mppp::mp_integer.
+     *
+     * The body of this operator is equivalent to:
+     * @code{.cpp}
+     * return x = static_cast<T>(x + n);
+     * @endcode
+     *
+     * That is, the result of the corresponding binary operator is cast back to \p T and assigned to \p x.
+     *
+     * @param x the first argument.
+     * @param n the second argument.
+     *
+     * @return a reference to \p x.
+     *
+     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+     */
     template <typename T, in_place_lenabler<T> = 0>
     friend T &operator+=(T &x, const mp_integer &n)
 #endif
     {
+        // NOTE: if x is an integral, then the static cast is a generic conversion from
+        // mp_integer to the integral, which can fail because of overflow. Otherwise, the
+        // static cast is a redundant cast to float of x + n, which is already a float.
         return x = static_cast<T>(x + n);
     }
     /// Prefix increment.
