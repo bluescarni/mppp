@@ -259,100 +259,10 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
     assert(std::make_unsigned<mpz_size_t>::type(rop._mp_alloc) >= nlimbs);
 }
 
-// This is a cache that is used by functions below in order to keep a pool of allocated mpzs, with the goal
-// of avoiding continuous (de)allocation when frequently creating/destroying mpzs.
-struct mpz_cache {
-    // Max mpz alloc size.
-    static const unsigned max_size = 10u;
-    // Max number of cache entries per size.
-    static const unsigned max_entries = 100u;
-    // Type definitions.
-    using v_type = std::vector<std::vector<mpz_struct_t>>;
-    using v_size_t = v_type::size_type;
-    mpz_cache() : m_vec(v_size_t(max_size))
-    {
-    }
-    void push(mpz_struct_t &m)
-    {
-        // NOTE: here we are assuming always nonegative mp_alloc.
-        assert(m._mp_alloc >= 0);
-        const auto size = static_cast<std::make_unsigned<mpz_size_t>::type>(m._mp_alloc);
-        if (!size || size > max_size || m_vec[static_cast<v_size_t>(size - 1u)].size() >= max_entries) {
-            // If the allocated size is zero, too large, or we have reached the max number of entries,
-            // don't cache it. Just clear it.
-            ::mpz_clear(&m);
-        } else {
-            // Add it to the cache.
-            m_vec[static_cast<v_size_t>(size - 1u)].emplace_back(m);
-        }
-    }
-    void pop(mpz_struct_t &retval, std::size_t size)
-    {
-        if (!size || size > max_size || !m_vec[static_cast<v_size_t>(size - 1u)].size()) {
-            // If the size is zero, too large, or we don't have entries for the specified
-            // size, init a new mpz.
-            mpz_init_nlimbs(retval, size);
-        } else {
-            // If we have cache entries, use them: pop the last one
-            // for the current size.
-            retval = m_vec[static_cast<v_size_t>(size - 1u)].back();
-            m_vec[static_cast<v_size_t>(size - 1u)].pop_back();
-        }
-    }
-    ~mpz_cache()
-    {
-        // On destruction, deallocate all the cached mpzs.
-        for (auto &v : m_vec) {
-            for (auto &m : v) {
-                ::mpz_clear(&m);
-            }
-        }
-    }
-    v_type m_vec;
-};
-
-// NOTE: the cache will be used only if we have the thread_local keyword available.
-// Otherwise, we provide alternative implementations of the mpz_init_cache() and mpz_clear_cache()
-// that do not use any cache internally.
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-
-inline mpz_cache &get_mpz_cache()
-{
-    static thread_local mpz_cache cache;
-    return cache;
-}
-
-// NOTE: contrary to the GMP functions, this one does *not* init to zero:
-// after init, m will have whatever value was contained in the cached mpz.
-inline void mpz_init_cache(mpz_struct_t &m, std::size_t nlimbs)
-{
-    get_mpz_cache().pop(m, nlimbs);
-}
-
-// Clear m (might move its value into the cache).
-inline void mpz_clear_cache(mpz_struct_t &m)
-{
-    get_mpz_cache().push(m);
-}
-
-#else
-
-inline void mpz_init_cache(mpz_struct_t &m, std::size_t nlimbs)
-{
-    mpz_init_nlimbs(m, nlimbs);
-}
-
-inline void mpz_clear_cache(mpz_struct_t &m)
-{
-    ::mpz_clear(&m);
-}
-
-#endif
-
 // Combined init+set.
-inline void mpz_init_set_cache(mpz_struct_t &m0, const mpz_struct_t &m1)
+inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
 {
-    mpz_init_cache(m0, ::mpz_size(&m1));
+    mpz_init_nlimbs(m0, ::mpz_size(&m1));
     ::mpz_set(&m0, &m1);
 }
 
@@ -615,7 +525,7 @@ public:
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
             ::new (static_cast<void *>(&m_dy)) d_storage;
-            mpz_init_set_cache(m_dy, other.g_dy());
+            mpz_init_set_nlimbs(m_dy, other.g_dy());
             assert(m_dy._mp_alloc >= 0);
         }
     }
@@ -648,7 +558,7 @@ public:
             // Construct the dynamic struct.
             ::new (static_cast<void *>(&m_dy)) d_storage;
             // Init + assign the mpz.
-            mpz_init_set_cache(m_dy, other.g_dy());
+            mpz_init_set_nlimbs(m_dy, other.g_dy());
             assert(m_dy._mp_alloc >= 0);
         } else if (!s1 && s2) {
             // Destroy the dynamic this.
@@ -702,7 +612,7 @@ public:
         assert(!is_static());
         assert(g_dy()._mp_alloc >= 0);
         assert(g_dy()._mp_d != nullptr);
-        mpz_clear_cache(g_dy());
+        ::mpz_clear(&g_dy());
         g_dy().~d_storage();
     }
     // Check storage type.
@@ -745,11 +655,11 @@ public:
         if (nlimbs == 0u) {
             // If nlimbs is zero, we will allocate exactly the needed
             // number of limbs to represent this.
-            mpz_init_set_cache(tmp_mpz, *v);
+            mpz_init_set_nlimbs(tmp_mpz, *v);
         } else {
             // Otherwise, we preallocate nlimbs and then set tmp_mpz
             // to the value of this.
-            mpz_init_cache(tmp_mpz, nlimbs);
+            mpz_init_nlimbs(tmp_mpz, nlimbs);
             ::mpz_set(&tmp_mpz, v);
         }
         // Destroy static.
@@ -1248,7 +1158,7 @@ private:
             m_int.g_st().~s_storage();
             // Init dynamic.
             ::new (static_cast<void *>(&m_int.m_dy)) d_storage;
-            mppp_impl::mpz_init_set_cache(m_int.m_dy, *n);
+            mppp_impl::mpz_init_set_nlimbs(m_int.m_dy, *n);
         } else {
             // All this is noexcept.
             // NOTE: m_st() inits to zero the whole array of static limbs, and we copy
