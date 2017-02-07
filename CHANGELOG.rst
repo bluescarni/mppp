@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Add in-place arithmetic operators with interoperable types on the
+  left-hand side. [Francesco Biscani]
+
 - Add convenience overloads for the computation of the binomial
   coefficient. [Francesco Biscani]
 
