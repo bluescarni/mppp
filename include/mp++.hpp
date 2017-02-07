@@ -2235,7 +2235,7 @@ public:
      * return x = static_cast<T>(x + n);
      * @endcode
      *
-     * That is, the result of the corresponding binary operator is cast back to \p T and assigned to \p x.
+     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
      *
      * @param x the first argument.
      * @param n the second argument.
@@ -2334,6 +2334,34 @@ public:
     {
         dispatch_in_place_sub(*this, op);
         return *this;
+    }
+#if defined(_MSC_VER)
+    template <typename T>
+    friend in_place_lenabler<T> operator-=(T &x, const mp_integer &n)
+#else
+    /// In-place subtraction for interoperable types.
+    /**
+     * \b NOTE: this operator is enabled only if \p T is an interoperable type for mppp::mp_integer.
+     *
+     * The body of this operator is equivalent to:
+     * @code{.cpp}
+     * return x = static_cast<T>(x - n);
+     * @endcode
+     *
+     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
+     *
+     * @param x the first argument.
+     * @param n the second argument.
+     *
+     * @return a reference to \p x.
+     *
+     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+     */
+    template <typename T, in_place_lenabler<T> = 0>
+    friend T &operator-=(T &x, const mp_integer &n)
+#endif
+    {
+        return x = static_cast<T>(x - n);
     }
     /// Prefix decrement.
     /**
@@ -2859,6 +2887,34 @@ public:
     {
         dispatch_in_place_mul(*this, op);
         return *this;
+    }
+#if defined(_MSC_VER)
+    template <typename T>
+    friend in_place_lenabler<T> operator*=(T &x, const mp_integer &n)
+#else
+    /// In-place multiplication for interoperable types.
+    /**
+     * \b NOTE: this operator is enabled only if \p T is an interoperable type for mppp::mp_integer.
+     *
+     * The body of this operator is equivalent to:
+     * @code{.cpp}
+     * return x = static_cast<T>(x * n);
+     * @endcode
+     *
+     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
+     *
+     * @param x the first argument.
+     * @param n the second argument.
+     *
+     * @return a reference to \p x.
+     *
+     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+     */
+    template <typename T, in_place_lenabler<T> = 0>
+    friend T &operator*=(T &x, const mp_integer &n)
+#endif
+    {
+        return x = static_cast<T>(x * n);
     }
 
 private:
@@ -3469,6 +3525,35 @@ public:
     {
         dispatch_in_place_div(*this, d);
         return *this;
+    }
+#if defined(_MSC_VER)
+    template <typename T>
+    friend in_place_lenabler<T> operator/=(T &x, const mp_integer &n)
+#else
+    /// In-place division for interoperable types.
+    /**
+     * \b NOTE: this operator is enabled only if \p T is an interoperable type for mppp::mp_integer.
+     *
+     * The body of this operator is equivalent to:
+     * @code{.cpp}
+     * return x = static_cast<T>(x / n);
+     * @endcode
+     *
+     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
+     *
+     * @param x the first argument.
+     * @param n the second argument.
+     *
+     * @return a reference to \p x.
+     *
+     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer or by
+     * mppp::mp_integer::operator/().
+     */
+    template <typename T, in_place_lenabler<T> = 0>
+    friend T &operator/=(T &x, const mp_integer &n)
+#endif
+    {
+        return x = static_cast<T>(x / n);
     }
     /// Binary modulo operator.
     /**

@@ -119,8 +119,26 @@ struct add_tester {
                                      });
         }
         // In-place with interop on the lhs.
-        int nl = 1;
-        nl += integer{0};
+        short nl = 1;
+        nl += integer{1};
+        REQUIRE((std::is_same<short &, decltype(nl += integer{1})>::value));
+        REQUIRE(nl == 2);
+        nl += integer{-3};
+        REQUIRE(nl == -1);
+        unsigned long long unl = 1;
+        unl += integer{1};
+        REQUIRE(unl == 2);
+        REQUIRE_THROWS_AS(unl += integer{-3}, std::overflow_error);
+        REQUIRE_THROWS_AS(unl += integer{std::numeric_limits<unsigned long long>::max()}, std::overflow_error);
+        double dl = 1.2;
+        dl += integer{1};
+        REQUIRE(dl == 1.2 + 1.);
+        REQUIRE((std::is_same<double &, decltype(dl += integer{1})>::value));
+        if (std::numeric_limits<double>::is_iec559) {
+            dl = std::numeric_limits<double>::infinity();
+            dl += integer{1};
+            REQUIRE(dl == std::numeric_limits<double>::infinity());
+        }
         // Increment ops.
         retval = integer{0};
         REQUIRE((lex_cast(++retval) == "1"));
@@ -235,7 +253,27 @@ struct sub_tester {
                                                        + std::to_string(-std::numeric_limits<double>::infinity());
                                      });
         }
-        // Increment ops.
+        // In-place with interop on the lhs.
+        short nl = 1;
+        nl -= integer{1};
+        REQUIRE((std::is_same<short &, decltype(nl -= integer{1})>::value));
+        REQUIRE(nl == 0);
+        nl -= integer{-3};
+        REQUIRE(nl == 3);
+        unsigned long long unl = 1;
+        unl -= integer{1};
+        REQUIRE(unl == 0);
+        REQUIRE_THROWS_AS(unl -= integer{1}, std::overflow_error);
+        double dl = 1.2;
+        dl -= integer{1};
+        REQUIRE(dl == 1.2 - 1.);
+        REQUIRE((std::is_same<double &, decltype(dl -= integer{1})>::value));
+        if (std::numeric_limits<double>::is_iec559) {
+            dl = std::numeric_limits<double>::infinity();
+            dl -= integer{1};
+            REQUIRE(dl == std::numeric_limits<double>::infinity());
+        }
+        // Decrement ops.
         retval = integer{0};
         REQUIRE((lex_cast(--retval) == "-1"));
         REQUIRE((lex_cast(--retval) == "-2"));
@@ -351,6 +389,26 @@ struct mul_tester {
                                                        + std::to_string(std::numeric_limits<double>::infinity());
                                      });
         }
+        // In-place with interop on the lhs.
+        short nl = 1;
+        nl *= integer{3};
+        REQUIRE((std::is_same<short &, decltype(nl *= integer{1})>::value));
+        REQUIRE(nl == 3);
+        nl *= integer{-3};
+        REQUIRE(nl == -9);
+        unsigned long long unl = 1;
+        unl *= integer{2};
+        REQUIRE(unl == 2);
+        REQUIRE_THROWS_AS(unl *= integer{-1}, std::overflow_error);
+        double dl = 1.2;
+        dl *= integer{2};
+        REQUIRE(dl == 1.2 * 2.);
+        REQUIRE((std::is_same<double &, decltype(dl *= integer{1})>::value));
+        if (std::numeric_limits<double>::is_iec559) {
+            dl = std::numeric_limits<double>::infinity();
+            dl *= integer{2};
+            REQUIRE(dl == std::numeric_limits<double>::infinity());
+        }
     }
 };
 
@@ -414,12 +472,33 @@ struct div_tester {
         retval /= 2.5f;
         REQUIRE((lex_cast(retval) == "0"));
         retval = 10;
-        retval *= -3.5;
-        REQUIRE((lex_cast(retval) == lex_cast(integer{10. * -3.5})));
+        retval /= -3.5;
+        REQUIRE((lex_cast(retval) == lex_cast(integer{10. / -3.5})));
 #if defined(MPPP_WITH_LONG_DOUBLE)
-        retval *= -1.5l;
-        REQUIRE((lex_cast(retval) == lex_cast(integer{10. * -3.5 * -1.5l})));
+        retval /= -1.5l;
+        REQUIRE((lex_cast(retval) == lex_cast(integer{10. / -3.5 / -1.5l})));
 #endif
+        // In-place with interop on the lhs.
+        short nl = 12;
+        nl /= integer{3};
+        REQUIRE((std::is_same<short &, decltype(nl /= integer{1})>::value));
+        REQUIRE(nl == 4);
+        nl /= integer{-2};
+        REQUIRE(nl == -2);
+        REQUIRE_THROWS_AS(nl /= integer{}, zero_division_error);
+        unsigned long long unl = 24;
+        unl /= integer{2};
+        REQUIRE(unl == 12);
+        REQUIRE_THROWS_AS(unl /= integer{-1}, std::overflow_error);
+        double dl = 1.2;
+        dl /= integer{2};
+        REQUIRE(dl == 1.2 / 2.);
+        REQUIRE((std::is_same<double &, decltype(dl /= integer{1})>::value));
+        if (std::numeric_limits<double>::is_iec559) {
+            dl = std::numeric_limits<double>::infinity();
+            dl /= integer{2};
+            REQUIRE(dl == std::numeric_limits<double>::infinity());
+        }
         // Error checking.
         REQUIRE_THROWS_PREDICATE(integer{1} / integer{0}, zero_division_error, [](const zero_division_error &ex) {
             return std::string(ex.what()) == "Integer division by zero";
