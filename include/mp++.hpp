@@ -2211,12 +2211,20 @@ public:
         dispatch_in_place_add(*this, op);
         return *this;
     }
+#if defined(_MSC_VER)
     template <typename T>
-    using add_t = decltype(std::declval<const T &>() + std::declval<const mp_integer &>());
+    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, T &>;
+#else
     template <typename T>
-    using in_place_lenabler = enable_if_t<conjunction<negation<std::is_const<T>>, is_detected<add_t, T>>::value, int>;
+    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
+#endif
+#if defined(_MSC_VER)
+    template <typename T>
+    friend in_place_lenabler<T> operator+=(T &x, const mp_integer &n)
+#else
     template <typename T, in_place_lenabler<T> = 0>
     friend T &operator+=(T &x, const mp_integer &n)
+#endif
     {
         return x = static_cast<T>(x + n);
     }
