@@ -143,6 +143,75 @@ namespace MPPP_NAMESPACE
 namespace mppp_impl
 {
 
+// A bunch of useful utilities from C++14/C++17.
+
+// http://en.cppreference.com/w/cpp/types/void_t
+template <typename... Ts>
+struct make_void {
+    typedef void type;
+};
+
+template <typename... Ts>
+using void_t = typename make_void<Ts...>::type;
+
+// http://en.cppreference.com/w/cpp/experimental/is_detected
+template <class Default, class AlwaysVoid, template <class...> class Op, class... Args>
+struct detector {
+    using value_t = std::false_type;
+    using type = Default;
+};
+
+template <class Default, template <class...> class Op, class... Args>
+struct detector<Default, void_t<Op<Args...>>, Op, Args...> {
+    using value_t = std::true_type;
+    using type = Op<Args...>;
+};
+
+// http://en.cppreference.com/w/cpp/experimental/nonesuch
+struct nonesuch {
+    nonesuch() = delete;
+    ~nonesuch() = delete;
+    nonesuch(nonesuch const &) = delete;
+    void operator=(nonesuch const &) = delete;
+};
+
+template <template <class...> class Op, class... Args>
+using is_detected = typename detector<nonesuch, void, Op, Args...>::value_t;
+
+template <template <class...> class Op, class... Args>
+using detected_t = typename detector<nonesuch, void, Op, Args...>::type;
+
+// http://en.cppreference.com/w/cpp/types/conjunction
+template <class...>
+struct conjunction : std::true_type {
+};
+
+template <class B1>
+struct conjunction<B1> : B1 {
+};
+
+template <class B1, class... Bn>
+struct conjunction<B1, Bn...> : std::conditional<B1::value != false, conjunction<Bn...>, B1>::type {
+};
+
+// http://en.cppreference.com/w/cpp/types/disjunction
+template <class...>
+struct disjunction : std::false_type {
+};
+
+template <class B1>
+struct disjunction<B1> : B1 {
+};
+
+template <class B1, class... Bn>
+struct disjunction<B1, Bn...> : std::conditional<B1::value != false, B1, disjunction<Bn...>>::type {
+};
+
+// http://en.cppreference.com/w/cpp/types/negation
+template <class B>
+struct negation : std::integral_constant<bool, !B::value> {
+};
+
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
 // Integral types used for allocation size and number of limbs.
@@ -907,6 +976,14 @@ class mp_integer
     using is_supported_float = mppp_impl::is_supported_float<T>;
     template <typename T>
     using is_supported_interop = mppp_impl::is_supported_interop<T>;
+    template <template <class...> class Op, class... Args>
+    using is_detected = mppp_impl::is_detected<Op, Args...>;
+    template <typename... Args>
+    using conjunction = mppp_impl::conjunction<Args...>;
+    template <typename... Args>
+    using disjunction = mppp_impl::disjunction<Args...>;
+    template <typename T>
+    using negation = mppp_impl::negation<T>;
     // The underlying static int.
     using s_int = s_storage;
     // mpz view class.
@@ -2133,6 +2210,15 @@ public:
     {
         dispatch_in_place_add(*this, op);
         return *this;
+    }
+    template <typename T>
+    using add_t = decltype(std::declval<const T &>() + std::declval<const mp_integer &>());
+    template <typename T>
+    using in_place_lenabler = enable_if_t<conjunction<negation<std::is_const<T>>, is_detected<add_t, T>>::value, int>;
+    template <typename T, in_place_lenabler<T> = 0>
+    friend T &operator+=(T &x, const mp_integer &n)
+    {
+        return x = static_cast<T>(x + n);
     }
     /// Prefix increment.
     /**

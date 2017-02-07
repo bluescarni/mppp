@@ -118,6 +118,9 @@ struct add_tester {
                                                        + std::to_string(std::numeric_limits<double>::infinity());
                                      });
         }
+        // In-place with interop on the lhs.
+        int nl = 1;
+        nl += integer{0};
         // Increment ops.
         retval = integer{0};
         REQUIRE((lex_cast(++retval) == "1"));
