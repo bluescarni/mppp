@@ -975,7 +975,7 @@
 <dl class="function">
 <dt id="_CPPv2lsRNSt7ostreamERK10mp_integer">
 <span id="lshift-operator__osR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1abd8dcf542bf7e232bdae9bd7ad3d1ce7"></span>std::ostream &amp;<code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span>std::ostream &amp;<em>os</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2lsRNSt7ostreamERK10mp_integer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stream operator for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a>. </p>
+<dd><p>Output stream operator for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a>. </p>
 <p>This operator will print to the stream <code class="docutils literal"><span class="pre">os</span></code> the <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> <code class="docutils literal"><span class="pre">n</span></code> in base 10. Internally it uses the <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a44ff4d52c9d0216801f521870bb921c0"><span class="std std-ref">mp_integer::to_string()</span></a> method.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -989,6 +989,29 @@
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a44ff4d52c9d0216801f521870bb921c0"><span class="std std-ref">mp_integer::to_string()</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2rsRNSt7istreamER10mp_integer">
+<span id="rshift-operator__isR.mp_integerR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1aa2aa7c55047cca7dce63938a1f6bf6d1"></span>std::istream &amp;<code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span>std::istream &amp;<em>is</em>, mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2rsRNSt7istreamER10mp_integer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input stream operator for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a>. </p>
+<p>Equivalent to extracting a line from the stream and then assigning it to <code class="docutils literal"><span class="pre">n</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>reference to <code class="docutils literal"><span class="pre">is</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">is</span></code>: input stream. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: integer to which the contents of the stream will be assigned.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string of <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -1080,6 +1103,36 @@
 </dd></dl>
 
 <dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T, in_place_lenabler&lt; T &gt; = 0&gt;</dt>
+<dt id="_CPPv2pLR1TRK10mp_integer">
+<span id="add-assign-operator__TR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1af1816b5da4d95b902265b84445d82a77"></span>T &amp;<code class="descname">operator+=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2pLR1TRK10mp_integer" title="Permalink to this definition">¶</a></dt>
+<dd><p>In-place addition for interoperable types. </p>
+<p><strong>NOTE:</strong> this operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> is an interoperable type for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>.</p>
+<p>The body of this operator is equivalent to: <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">x</span> <span class="o">=</span> <span class="n">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">n</span><span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<p>That is, the result of the corresponding binary operation is cast back to <code class="docutils literal"><span class="pre">T</span></code> and assigned to <code class="docutils literal"><span class="pre">x</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">x</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">x</span></code>: the first argument. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: the second argument.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the conversion operator of <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv23subR10mp_integerRK10mp_integerRK10mp_integer">
 <span id="sub__mp_integerR.mp_integerCR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a69edb625257e7c83b8def5aed14c91d6"></span>void <code class="descname">sub</code><span class="sig-paren">(</span>mp_integer &amp;<em>rop</em>, <em class="property">const</em> mp_integer &amp;<em>op1</em>, <em class="property">const</em> mp_integer &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv23subR10mp_integerRK10mp_integerRK10mp_integer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ternary subtraction. </p>
@@ -1109,6 +1162,36 @@
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">op1</span></code>: the first argument. </li>
 <li><code class="docutils literal"><span class="pre">op2</span></code>: the second argument.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T, in_place_lenabler&lt; T &gt; = 0&gt;</dt>
+<dt id="_CPPv2mIR1TRK10mp_integer">
+<span id="sub-assign-operator__TR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1ace77778f863c105fea009927ef80a1a2"></span>T &amp;<code class="descname">operator-=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2mIR1TRK10mp_integer" title="Permalink to this definition">¶</a></dt>
+<dd><p>In-place subtraction for interoperable types. </p>
+<p><strong>NOTE:</strong> this operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> is an interoperable type for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>.</p>
+<p>The body of this operator is equivalent to: <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">x</span> <span class="o">=</span> <span class="n">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">n</span><span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<p>That is, the result of the corresponding binary operation is cast back to <code class="docutils literal"><span class="pre">T</span></code> and assigned to <code class="docutils literal"><span class="pre">x</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">x</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">x</span></code>: the first argument. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: the second argument.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the conversion operator of <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -1162,6 +1245,36 @@
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">op1</span></code>: the first argument. </li>
 <li><code class="docutils literal"><span class="pre">op2</span></code>: the second argument.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T, in_place_lenabler&lt; T &gt; = 0&gt;</dt>
+<dt id="_CPPv2mLR1TRK10mp_integer">
+<span id="mul-assign-operator__TR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a508b02570a977b40b7152c2464312dd0"></span>T &amp;<code class="descname">operator*=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2mLR1TRK10mp_integer" title="Permalink to this definition">¶</a></dt>
+<dd><p>In-place multiplication for interoperable types. </p>
+<p><strong>NOTE:</strong> this operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> is an interoperable type for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>.</p>
+<p>The body of this operator is equivalent to: <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">x</span> <span class="o">=</span> <span class="n">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">n</span><span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<p>That is, the result of the corresponding binary operation is cast back to <code class="docutils literal"><span class="pre">T</span></code> and assigned to <code class="docutils literal"><span class="pre">x</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">x</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">x</span></code>: the first argument. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: the second argument.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the conversion operator of <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -1227,6 +1340,36 @@
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><a class="reference internal" href="exceptions.html#mp++structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal"><span class="pre">d</span></code> is zero and only integral types are involved in the division. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T, in_place_lenabler&lt; T &gt; = 0&gt;</dt>
+<dt id="_CPPv2dVR1TRK10mp_integer">
+<span id="div-assign-operator__TR.mp_integerCR"></span><span class="target" id="mp++classmppp_1_1mp__integer_1a4cc8f6ab02edcd3600d5a5f5458cca5c"></span>T &amp;<code class="descname">operator/=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> mp_integer &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2dVR1TRK10mp_integer" title="Permalink to this definition">¶</a></dt>
+<dd><p>In-place division for interoperable types. </p>
+<p><strong>NOTE:</strong> this operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> is an interoperable type for <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a>.</p>
+<p>The body of this operator is equivalent to: <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">x</span> <span class="o">=</span> <span class="n">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">n</span><span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<p>That is, the result of the corresponding binary operation is cast back to <code class="docutils literal"><span class="pre">T</span></code> and assigned to <code class="docutils literal"><span class="pre">x</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">x</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">x</span></code>: the first argument. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: the second argument.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the conversion operator of <a class="reference internal" href="#mp++classmppp_1_1mp__integer"><span class="std std-ref">mppp::mp_integer</span></a> or by <a class="reference internal" href="#mp++classmppp_1_1mp__integer_1a3d53b543cd48875c58623644935b5fea"><span class="std std-ref">mppp::mp_integer::operator/()</span></a>. </li>
 </ul>
 </dd>
 </dl>
