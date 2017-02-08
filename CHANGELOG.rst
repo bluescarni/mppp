@@ -7,6 +7,11 @@ Changelog
 New
 ~~~
 
+- Add input stream operator. [Francesco Biscani]
+
+- Add in-place arithmetic operators with interoperable types on the
+  left-hand side. [Francesco Biscani]
+
 - Add convenience overloads for the computation of the binomial
   coefficient. [Francesco Biscani]
 
@@ -17,6 +22,11 @@ New
 
 - Add a static member to mp_integer storing the static size. [Francesco
   Biscani]
+
+Changes
+~~~~~~~
+
+- Remove the allocation cache. [Francesco Biscani]
 
 Fix
 ~~~

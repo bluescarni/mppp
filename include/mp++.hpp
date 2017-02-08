@@ -143,6 +143,75 @@ namespace MPPP_NAMESPACE
 namespace mppp_impl
 {
 
+// A bunch of useful utilities from C++14/C++17.
+
+// http://en.cppreference.com/w/cpp/types/void_t
+template <typename... Ts>
+struct make_void {
+    typedef void type;
+};
+
+template <typename... Ts>
+using void_t = typename make_void<Ts...>::type;
+
+// http://en.cppreference.com/w/cpp/experimental/is_detected
+template <class Default, class AlwaysVoid, template <class...> class Op, class... Args>
+struct detector {
+    using value_t = std::false_type;
+    using type = Default;
+};
+
+template <class Default, template <class...> class Op, class... Args>
+struct detector<Default, void_t<Op<Args...>>, Op, Args...> {
+    using value_t = std::true_type;
+    using type = Op<Args...>;
+};
+
+// http://en.cppreference.com/w/cpp/experimental/nonesuch
+struct nonesuch {
+    nonesuch() = delete;
+    ~nonesuch() = delete;
+    nonesuch(nonesuch const &) = delete;
+    void operator=(nonesuch const &) = delete;
+};
+
+template <template <class...> class Op, class... Args>
+using is_detected = typename detector<nonesuch, void, Op, Args...>::value_t;
+
+template <template <class...> class Op, class... Args>
+using detected_t = typename detector<nonesuch, void, Op, Args...>::type;
+
+// http://en.cppreference.com/w/cpp/types/conjunction
+template <class...>
+struct conjunction : std::true_type {
+};
+
+template <class B1>
+struct conjunction<B1> : B1 {
+};
+
+template <class B1, class... Bn>
+struct conjunction<B1, Bn...> : std::conditional<B1::value != false, conjunction<Bn...>, B1>::type {
+};
+
+// http://en.cppreference.com/w/cpp/types/disjunction
+template <class...>
+struct disjunction : std::false_type {
+};
+
+template <class B1>
+struct disjunction<B1> : B1 {
+};
+
+template <class B1, class... Bn>
+struct disjunction<B1, Bn...> : std::conditional<B1::value != false, B1, disjunction<Bn...>>::type {
+};
+
+// http://en.cppreference.com/w/cpp/types/negation
+template <class B>
+struct negation : std::integral_constant<bool, !B::value> {
+};
+
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
 // Integral types used for allocation size and number of limbs.
@@ -190,100 +259,10 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
     assert(std::make_unsigned<mpz_size_t>::type(rop._mp_alloc) >= nlimbs);
 }
 
-// This is a cache that is used by functions below in order to keep a pool of allocated mpzs, with the goal
-// of avoiding continuous (de)allocation when frequently creating/destroying mpzs.
-struct mpz_cache {
-    // Max mpz alloc size.
-    static const unsigned max_size = 10u;
-    // Max number of cache entries per size.
-    static const unsigned max_entries = 100u;
-    // Type definitions.
-    using v_type = std::vector<std::vector<mpz_struct_t>>;
-    using v_size_t = v_type::size_type;
-    mpz_cache() : m_vec(v_size_t(max_size))
-    {
-    }
-    void push(mpz_struct_t &m)
-    {
-        // NOTE: here we are assuming always nonegative mp_alloc.
-        assert(m._mp_alloc >= 0);
-        const auto size = static_cast<std::make_unsigned<mpz_size_t>::type>(m._mp_alloc);
-        if (!size || size > max_size || m_vec[static_cast<v_size_t>(size - 1u)].size() >= max_entries) {
-            // If the allocated size is zero, too large, or we have reached the max number of entries,
-            // don't cache it. Just clear it.
-            ::mpz_clear(&m);
-        } else {
-            // Add it to the cache.
-            m_vec[static_cast<v_size_t>(size - 1u)].emplace_back(m);
-        }
-    }
-    void pop(mpz_struct_t &retval, std::size_t size)
-    {
-        if (!size || size > max_size || !m_vec[static_cast<v_size_t>(size - 1u)].size()) {
-            // If the size is zero, too large, or we don't have entries for the specified
-            // size, init a new mpz.
-            mpz_init_nlimbs(retval, size);
-        } else {
-            // If we have cache entries, use them: pop the last one
-            // for the current size.
-            retval = m_vec[static_cast<v_size_t>(size - 1u)].back();
-            m_vec[static_cast<v_size_t>(size - 1u)].pop_back();
-        }
-    }
-    ~mpz_cache()
-    {
-        // On destruction, deallocate all the cached mpzs.
-        for (auto &v : m_vec) {
-            for (auto &m : v) {
-                ::mpz_clear(&m);
-            }
-        }
-    }
-    v_type m_vec;
-};
-
-// NOTE: the cache will be used only if we have the thread_local keyword available.
-// Otherwise, we provide alternative implementations of the mpz_init_cache() and mpz_clear_cache()
-// that do not use any cache internally.
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-
-inline mpz_cache &get_mpz_cache()
-{
-    static thread_local mpz_cache cache;
-    return cache;
-}
-
-// NOTE: contrary to the GMP functions, this one does *not* init to zero:
-// after init, m will have whatever value was contained in the cached mpz.
-inline void mpz_init_cache(mpz_struct_t &m, std::size_t nlimbs)
-{
-    get_mpz_cache().pop(m, nlimbs);
-}
-
-// Clear m (might move its value into the cache).
-inline void mpz_clear_cache(mpz_struct_t &m)
-{
-    get_mpz_cache().push(m);
-}
-
-#else
-
-inline void mpz_init_cache(mpz_struct_t &m, std::size_t nlimbs)
-{
-    mpz_init_nlimbs(m, nlimbs);
-}
-
-inline void mpz_clear_cache(mpz_struct_t &m)
-{
-    ::mpz_clear(&m);
-}
-
-#endif
-
 // Combined init+set.
-inline void mpz_init_set_cache(mpz_struct_t &m0, const mpz_struct_t &m1)
+inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
 {
-    mpz_init_cache(m0, ::mpz_size(&m1));
+    mpz_init_nlimbs(m0, ::mpz_size(&m1));
     ::mpz_set(&m0, &m1);
 }
 
@@ -365,25 +344,25 @@ inline std::string mpz_to_str(const mpz_struct_t *mpz, int base = 10)
 // Type trait to check if T is a supported integral type.
 template <typename T>
 using is_supported_integral
-    = std::integral_constant<bool, std::is_same<T, bool>::value || std::is_same<T, char>::value
-                                       || std::is_same<T, signed char>::value || std::is_same<T, unsigned char>::value
-                                       || std::is_same<T, short>::value || std::is_same<T, unsigned short>::value
-                                       || std::is_same<T, int>::value || std::is_same<T, unsigned>::value
-                                       || std::is_same<T, long>::value || std::is_same<T, unsigned long>::value
-                                       || std::is_same<T, long long>::value
-                                       || std::is_same<T, unsigned long long>::value>;
+    = std::integral_constant<bool, disjunction<std::is_same<T, bool>, std::is_same<T, char>,
+                                               std::is_same<T, signed char>, std::is_same<T, unsigned char>,
+                                               std::is_same<T, short>, std::is_same<T, unsigned short>,
+                                               std::is_same<T, int>, std::is_same<T, unsigned>, std::is_same<T, long>,
+                                               std::is_same<T, unsigned long>, std::is_same<T, long long>,
+                                               std::is_same<T, unsigned long long>>::value>;
 
 // Type trait to check if T is a supported floating-point type.
 template <typename T>
-using is_supported_float = std::integral_constant<bool, std::is_same<T, float>::value || std::is_same<T, double>::value
+using is_supported_float = std::integral_constant<bool, disjunction<std::is_same<T, float>, std::is_same<T, double>
 #if defined(MPPP_WITH_LONG_DOUBLE)
-                                                            || std::is_same<T, long double>::value
+                                                                    ,
+                                                                    std::is_same<T, long double>
 #endif
-                                                  >;
+                                                                    >::value>;
 
 template <typename T>
 using is_supported_interop
-    = std::integral_constant<bool, is_supported_integral<T>::value || is_supported_float<T>::value>;
+    = std::integral_constant<bool, disjunction<is_supported_integral<T>, is_supported_float<T>>::value>;
 
 // Small wrapper to copy limbs.
 inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_limb_t *out)
@@ -546,7 +525,7 @@ public:
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
             ::new (static_cast<void *>(&m_dy)) d_storage;
-            mpz_init_set_cache(m_dy, other.g_dy());
+            mpz_init_set_nlimbs(m_dy, other.g_dy());
             assert(m_dy._mp_alloc >= 0);
         }
     }
@@ -579,7 +558,7 @@ public:
             // Construct the dynamic struct.
             ::new (static_cast<void *>(&m_dy)) d_storage;
             // Init + assign the mpz.
-            mpz_init_set_cache(m_dy, other.g_dy());
+            mpz_init_set_nlimbs(m_dy, other.g_dy());
             assert(m_dy._mp_alloc >= 0);
         } else if (!s1 && s2) {
             // Destroy the dynamic this.
@@ -633,7 +612,7 @@ public:
         assert(!is_static());
         assert(g_dy()._mp_alloc >= 0);
         assert(g_dy()._mp_d != nullptr);
-        mpz_clear_cache(g_dy());
+        ::mpz_clear(&g_dy());
         g_dy().~d_storage();
     }
     // Check storage type.
@@ -676,11 +655,11 @@ public:
         if (nlimbs == 0u) {
             // If nlimbs is zero, we will allocate exactly the needed
             // number of limbs to represent this.
-            mpz_init_set_cache(tmp_mpz, *v);
+            mpz_init_set_nlimbs(tmp_mpz, *v);
         } else {
             // Otherwise, we preallocate nlimbs and then set tmp_mpz
             // to the value of this.
-            mpz_init_cache(tmp_mpz, nlimbs);
+            mpz_init_nlimbs(tmp_mpz, nlimbs);
             ::mpz_set(&tmp_mpz, v);
         }
         // Destroy static.
@@ -907,6 +886,14 @@ class mp_integer
     using is_supported_float = mppp_impl::is_supported_float<T>;
     template <typename T>
     using is_supported_interop = mppp_impl::is_supported_interop<T>;
+    template <template <class...> class Op, class... Args>
+    using is_detected = mppp_impl::is_detected<Op, Args...>;
+    template <typename... Args>
+    using conjunction = mppp_impl::conjunction<Args...>;
+    template <typename... Args>
+    using disjunction = mppp_impl::disjunction<Args...>;
+    template <typename T>
+    using negation = mppp_impl::negation<T>;
     // The underlying static int.
     using s_int = s_storage;
     // mpz view class.
@@ -1171,7 +1158,7 @@ private:
             m_int.g_st().~s_storage();
             // Init dynamic.
             ::new (static_cast<void *>(&m_int.m_dy)) d_storage;
-            mppp_impl::mpz_init_set_cache(m_int.m_dy, *n);
+            mppp_impl::mpz_init_set_nlimbs(m_int.m_dy, *n);
         } else {
             // All this is noexcept.
             // NOTE: m_st() inits to zero the whole array of static limbs, and we copy
@@ -1314,7 +1301,7 @@ public:
     {
         return m_int.is_dynamic();
     }
-    /// Stream operator for mp_integer.
+    /// Output stream operator for mp_integer.
     /**
      * This operator will print to the stream \p os the mp_integer \p n in base 10. Internally it uses the
      * mp_integer::to_string() method.
@@ -1329,6 +1316,24 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const mp_integer &n)
     {
         return os << n.to_string();
+    }
+    /// Input stream operator for mp_integer.
+    /**
+     * Equivalent to extracting a line from the stream and then assigning it to \p n.
+     *
+     * @param is input stream.
+     * @param n integer to which the contents of the stream will be assigned.
+     *
+     * @return reference to \p is.
+     *
+     * @throws unspecified any exception thrown by the constructor from string of mp_integer.
+     */
+    friend std::istream &operator>>(std::istream &is, mp_integer &n)
+    {
+        MPPP_MAYBE_TLS std::string tmp_str;
+        std::getline(is, tmp_str);
+        n = mp_integer{tmp_str};
+        return is;
     }
     /// Conversion to string.
     /**
@@ -2134,6 +2139,48 @@ public:
         dispatch_in_place_add(*this, op);
         return *this;
     }
+
+private:
+#if defined(_MSC_VER)
+    template <typename T>
+    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, T &>;
+#else
+    template <typename T>
+    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
+#endif
+
+public:
+#if defined(_MSC_VER)
+    template <typename T>
+    friend in_place_lenabler<T> operator+=(T &x, const mp_integer &n)
+#else
+    /// In-place addition for interoperable types.
+    /**
+     * \b NOTE: this operator is enabled only if \p T is an interoperable type for mppp::mp_integer.
+     *
+     * The body of this operator is equivalent to:
+     * @code{.cpp}
+     * return x = static_cast<T>(x + n);
+     * @endcode
+     *
+     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
+     *
+     * @param x the first argument.
+     * @param n the second argument.
+     *
+     * @return a reference to \p x.
+     *
+     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+     */
+    template <typename T, in_place_lenabler<T> = 0>
+    friend T &operator+=(T &x, const mp_integer &n)
+#endif
+    {
+        // NOTE: if x is an integral, then the static cast is a generic conversion from
+        // mp_integer to the integral, which can fail because of overflow. Otherwise, the
+        // static cast is a redundant cast to float of x + n, which is already a float.
+        return x = static_cast<T>(x + n);
+    }
     /// Prefix increment.
     /**
      * Increment \p this by one.
@@ -2215,6 +2262,34 @@ public:
     {
         dispatch_in_place_sub(*this, op);
         return *this;
+    }
+#if defined(_MSC_VER)
+    template <typename T>
+    friend in_place_lenabler<T> operator-=(T &x, const mp_integer &n)
+#else
+    /// In-place subtraction for interoperable types.
+    /**
+     * \b NOTE: this operator is enabled only if \p T is an interoperable type for mppp::mp_integer.
+     *
+     * The body of this operator is equivalent to:
+     * @code{.cpp}
+     * return x = static_cast<T>(x - n);
+     * @endcode
+     *
+     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
+     *
+     * @param x the first argument.
+     * @param n the second argument.
+     *
+     * @return a reference to \p x.
+     *
+     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+     */
+    template <typename T, in_place_lenabler<T> = 0>
+    friend T &operator-=(T &x, const mp_integer &n)
+#endif
+    {
+        return x = static_cast<T>(x - n);
     }
     /// Prefix decrement.
     /**
@@ -2740,6 +2815,34 @@ public:
     {
         dispatch_in_place_mul(*this, op);
         return *this;
+    }
+#if defined(_MSC_VER)
+    template <typename T>
+    friend in_place_lenabler<T> operator*=(T &x, const mp_integer &n)
+#else
+    /// In-place multiplication for interoperable types.
+    /**
+     * \b NOTE: this operator is enabled only if \p T is an interoperable type for mppp::mp_integer.
+     *
+     * The body of this operator is equivalent to:
+     * @code{.cpp}
+     * return x = static_cast<T>(x * n);
+     * @endcode
+     *
+     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
+     *
+     * @param x the first argument.
+     * @param n the second argument.
+     *
+     * @return a reference to \p x.
+     *
+     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+     */
+    template <typename T, in_place_lenabler<T> = 0>
+    friend T &operator*=(T &x, const mp_integer &n)
+#endif
+    {
+        return x = static_cast<T>(x * n);
     }
 
 private:
@@ -3350,6 +3453,35 @@ public:
     {
         dispatch_in_place_div(*this, d);
         return *this;
+    }
+#if defined(_MSC_VER)
+    template <typename T>
+    friend in_place_lenabler<T> operator/=(T &x, const mp_integer &n)
+#else
+    /// In-place division for interoperable types.
+    /**
+     * \b NOTE: this operator is enabled only if \p T is an interoperable type for mppp::mp_integer.
+     *
+     * The body of this operator is equivalent to:
+     * @code{.cpp}
+     * return x = static_cast<T>(x / n);
+     * @endcode
+     *
+     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
+     *
+     * @param x the first argument.
+     * @param n the second argument.
+     *
+     * @return a reference to \p x.
+     *
+     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer or by
+     * mppp::mp_integer::operator/().
+     */
+    template <typename T, in_place_lenabler<T> = 0>
+    friend T &operator/=(T &x, const mp_integer &n)
+#endif
+    {
+        return x = static_cast<T>(x / n);
     }
     /// Binary modulo operator.
     /**
