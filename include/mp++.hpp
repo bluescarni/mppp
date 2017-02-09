@@ -940,26 +940,26 @@ class mp_integer
         using type = mp_integer;
     };
     template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<std::is_same<T, mp_integer>::value && is_supported_integral<U>::value>> {
+    struct common_type<T, U, enable_if_t<conjunction<std::is_same<T, mp_integer>, is_supported_integral<U>>::value>> {
         using type = mp_integer;
     };
     template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<std::is_same<U, mp_integer>::value && is_supported_integral<T>::value>> {
+    struct common_type<T, U, enable_if_t<conjunction<std::is_same<U, mp_integer>, is_supported_integral<T>>::value>> {
         using type = mp_integer;
     };
     template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<std::is_same<T, mp_integer>::value && is_supported_float<U>::value>> {
+    struct common_type<T, U, enable_if_t<conjunction<std::is_same<T, mp_integer>, is_supported_float<U>>::value>> {
         using type = U;
     };
     template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<std::is_same<U, mp_integer>::value && is_supported_float<T>::value>> {
+    struct common_type<T, U, enable_if_t<conjunction<std::is_same<U, mp_integer>, is_supported_float<T>>::value>> {
         using type = T;
     };
     template <typename T, typename U>
     using common_t = typename common_type<T, U>::type;
     // Enabler for in-place arithmetic ops.
     template <typename T>
-    using in_place_enabler = enable_if_t<is_supported_interop<T>::value || std::is_same<T, mp_integer>::value, int>;
+    using in_place_enabler = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, mp_integer>>::value, int>;
 #if defined(_MSC_VER)
     // Common metaprogramming for bit shifting operators.
     // NOTE: here and elsewhere we special case MSVC because we need to alter the SFINAE style, as the usual
@@ -1084,7 +1084,7 @@ private:
         assert(false);
     }
     // Dispatch for generic constructor.
-    template <typename T, enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
         auto nu = static_cast<unsigned long long>(n);
@@ -1096,7 +1096,7 @@ private:
             checked_rshift(nu);
         }
     }
-    template <typename T, enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
         // NOTE: here we are using cast + unary minus to extract the abs value of n as an unsigned long long. See:
@@ -1119,7 +1119,7 @@ private:
             neg();
         }
     }
-    template <typename T, enable_if_t<std::is_same<T, float>::value || std::is_same<T, double>::value, int> = 0>
+    template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     void dispatch_generic_ctor(T x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
@@ -1402,9 +1402,9 @@ private:
         return {true, retval};
     }
     // Conversion to unsigned ints, excluding bool.
-    template <
-        typename T,
-        enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value && !std::is_same<bool, T>::value, int> = 0>
+    template <typename T,
+              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>, negation<std::is_same<bool, T>>>::value,
+                          int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
@@ -1429,7 +1429,7 @@ private:
         return {true, static_cast<T>(candidate.second)};
     }
     // Conversion to signed ints.
-    template <typename T, enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
         // NOTE: here we will assume that unsigned long long can represent the absolute value of any
@@ -1479,7 +1479,7 @@ private:
         }
     }
     // Implementation of the conversion to floating-point through GMP/MPFR routines.
-    template <typename T, enable_if_t<std::is_same<T, float>::value || std::is_same<T, double>::value, int> = 0>
+    template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     static std::pair<bool, T> mpz_float_conversion(const mpz_struct_t &m)
     {
         return {true, static_cast<T>(::mpz_get_d(&m))};
@@ -3349,10 +3349,11 @@ private:
     // Enablers for modulo operators. They are special because they don't accept floating-point.
     template <typename T, typename U>
     using common_mod_t
-        = enable_if_t<!std::is_floating_point<T>::value && !std::is_floating_point<U>::value, common_t<T, U>>;
+        = enable_if_t<conjunction<negation<std::is_floating_point<T>>, negation<std::is_floating_point<U>>>::value,
+                      common_t<T, U>>;
     template <typename T>
     using in_place_mod_enabler
-        = enable_if_t<is_supported_integral<T>::value || std::is_same<T, mp_integer>::value, int>;
+        = enable_if_t<disjunction<is_supported_integral<T>, std::is_same<T, mp_integer>>::value, int>;
     // Dispatching for the binary modulo operator.
     static mp_integer dispatch_binary_mod(const mp_integer &op1, const mp_integer &op2)
     {
@@ -4339,7 +4340,7 @@ private:
     }
     // Implementation of pow().
     // mp_integer -- integral overload.
-    template <typename T, enable_if_t<std::is_same<T, mp_integer>::value || std::is_integral<T>::value, int> = 0>
+    template <typename T, enable_if_t<disjunction<std::is_same<T, mp_integer>, std::is_integral<T>>::value, int> = 0>
     static mp_integer pow_impl(const mp_integer &base, const T &exp)
     {
         mp_integer rop;
@@ -4757,10 +4758,10 @@ public:
 
 private:
     template <typename T, typename U>
-    using binomial_enabler_impl
-        = std::integral_constant<bool, (std::is_same<mp_integer, T>::value && std::is_same<mp_integer, U>::value)
-                                           || (std::is_same<mp_integer, T>::value && is_supported_integral<U>::value)
-                                           || (std::is_same<mp_integer, U>::value && is_supported_integral<T>::value)>;
+    using binomial_enabler_impl = std::
+        integral_constant<bool, disjunction<conjunction<std::is_same<mp_integer, T>, std::is_same<mp_integer, U>>,
+                                            conjunction<std::is_same<mp_integer, T>, is_supported_integral<U>>,
+                                            conjunction<std::is_same<mp_integer, U>, is_supported_integral<T>>>::value>;
 #if defined(_MSC_VER)
     template <typename T, typename U>
     using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, mp_integer>;
