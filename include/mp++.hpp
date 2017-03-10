@@ -725,16 +725,16 @@ struct zero_division_error final : std::domain_error {
 /// Multiprecision integer class.
 /**
  * This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP \p mpz_t type, with
- * a small value optimisation: integers whose size is up to *SSize* limbs are stored directly in the storage
- * occupied by the mp_integer object, without resorting to dynamic memory allocation. The value of *SSize*
+ * a small value optimisation: integers whose size is up to \p SSize limbs are stored directly in the storage
+ * occupied by the mp_integer object, without resorting to dynamic memory allocation. The value of \p SSize
  * must be at least 1 and less than an implementation-defined upper limit.
  *
  * When the value of an mp_integer is stored directly within the object, the <em>storage type</em> of the integer is
- * said to be <em>static</em>. When the limb size of the integer exceeds the maximum value *SSize*, the storage types
+ * said to be <em>static</em>. When the limb size of the integer exceeds the maximum value \p SSize, the storage types
  * becomes <em>dynamic</em>. The transition from static to dynamic storage happens transparently whenever the integer
  * value becomes large enough. The demotion from dynamic to static storage usually needs to be requested explicitly.
- * For values of *SSize* of 1 and 2, optimised implementations of basic arithmetic operations are employed,
- * if supported by the target architecture and if the storage type is static. For larger values of *SSize*,
+ * For values of \p SSize of 1 and 2, optimised implementations of basic arithmetic operations are employed,
+ * if supported by the target architecture and if the storage type is static. For larger values of \p SSize,
  * the \p mpn_ low-level functions of the GMP API are used if the storage type is static. If the storage type is
  * dynamic, the usual \p mpz_ functions from the GMP API are used.
  *
