@@ -29,4 +29,4 @@ on the following setups:
 
 The Intel compiler ICC 17 on GNU/Linux 64-bit is tested occasionally.
 
-The documentation is available [here](https://bluescarni.github.io/mppp/).
+mp++ is [MPL2](https://www.mozilla.org/en-US/MPL/2.0/FAQ/)-licensed. The documentation is available [here](https://bluescarni.github.io/mppp/).
