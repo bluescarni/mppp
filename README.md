@@ -25,7 +25,8 @@ on the following setups:
 * GCC 4.8 and later versions on GNU/Linux 32/64-bit,
 * Clang 3.8 on GNU/Linux 64-bit,
 * MSVC15 on Windows 32/64-bit,
-* MinGW GCC 6 on Windows 64-bit,
-* Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).
+* MinGW GCC 6 on Windows 64-bit.
+
+The Intel compiler ICC 17 on GNU/Linux 64-bit is tested occasionally.
 
 The documentation is available [here](https://bluescarni.github.io/mppp/).
