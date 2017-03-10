@@ -26,6 +26,8 @@ New
 Changes
 ~~~~~~~
 
+- Change the license to MPL2. [Francesco Biscani]
+
 - Remove the allocation cache. [Francesco Biscani]
 
 Fix

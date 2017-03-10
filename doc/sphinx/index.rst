@@ -21,19 +21,11 @@ mp++ was created to cater to the requirements of computer algebra systems, which
 to manipulate arbitrarily-large integers but which, in practice, often end up storing many small integers
 (e.g., as coefficients in a polynomial).
 
-Contents:
----------
+mp++ is released under the `MPL2 <https://www.mozilla.org/en-US/MPL/2.0/FAQ/>`__ license.
 
 .. toctree::
-   :maxdepth: 2
 
    installation.rst
    configuration.rst
    reference.rst
    benchmarks.rst
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`search`
