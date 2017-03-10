@@ -131,21 +131,22 @@ todo_include_todos = False
 #     'collapse_navigation': False
 # }
 
-import sphinx_bootstrap_theme
-
-html_theme = 'bootstrap'
-html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'relations.html',
+        'searchbox.html',
+        'donate.html',
+    ]
+}
 
 html_theme_options = {
-    # Global TOC depth for "site" navbar tab. (Default: 1)
-    # Switching to -1 shows all levels.
-    'globaltoc_depth': 2,
-
-    # Bootswatch (http://bootswatch.com/) theme.
-    #
-    # Options are nothing (default) or the name of a valid theme
-    # such as "amelia" or "cosmo".
-    'bootswatch_theme': "cosmo",
+    'github_user': 'bluescarni',
+    'github_repo': 'mppp',
+    'github_banner': True,
+    'fixed_sidebar' : True,
+    'description' : 'Multiprecision for C++'
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
