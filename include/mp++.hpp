@@ -5012,7 +5012,7 @@ public:
      * \verbatim embed:rst:leading-asterisk
      * .. warning::
      *
-     *    If *d* does not divide *n* exactly, the behaviour will be undefined.
+     *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
      * \endverbatim
      *
      * @param rop the return value.
