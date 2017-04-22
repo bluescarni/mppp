@@ -228,11 +228,11 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
     if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
         // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
         // to do anything else, as long as GMP does not provide error recovery.
-        std::abort();
+        std::abort(); // LCOV_EXCL_LINE
     }
     const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
     if (mppp_unlikely(nbits > std::numeric_limits<::mp_bitcnt_t>::max())) {
-        std::abort();
+        std::abort(); // LCOV_EXCL_LINE
     }
     // NOTE: nbits == 0 is allowed.
     ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
@@ -299,7 +299,7 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
     assert(base >= 2 && base <= 62);
     const auto size_base = ::mpz_sizeinbase(mpz, base);
     if (mppp_unlikely(size_base > std::numeric_limits<std::size_t>::max() - 2u)) {
-        throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
+        throw std::overflow_error("Too many digits in the conversion of mpz_t to string."); // LCOV_EXCL_LINE
     }
     // Total max size is the size in base plus an optional sign and the null terminator.
     const auto total_size = size_base + 2u;
@@ -308,7 +308,7 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
     out.resize(static_cast<std::vector<char>::size_type>(total_size));
     // Overflow check.
     if (mppp_unlikely(out.size() != total_size)) {
-        throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
+        throw std::overflow_error("Too many digits in the conversion of mpz_t to string."); // LCOV_EXCL_LINE
     }
     ::mpz_get_str(out.data(), base, mpz);
 }
@@ -402,6 +402,7 @@ struct static_int {
     static_int &operator=(static_int &&) = default;
     bool dtor_checks() const
     {
+        // LCOV_EXCL_START
         const auto asize = abs_size();
         // Check the value of the alloc member.
         if (_mp_alloc != s_alloc) {
@@ -425,6 +426,7 @@ struct static_int {
             return false;
         }
         return true;
+        // LCOV_EXCL_STOP
     }
     ~static_int()
     {
@@ -4889,7 +4891,11 @@ public:
      * The implementation can handle positive and negative values for both the top and the bottom argument. Internally,
      * the mp_integer::bin_ui() function will be employed.
      *
-     * See http://arxiv.org/abs/1105.3689/.
+     * \verbatim embed:rst:leading-asterisk
+     * .. seealso::
+     *
+     *    http://arxiv.org/abs/1105.3689/
+     * \endverbatim
      *
      * @param n the top argument.
      * @param k the bottom argument.
