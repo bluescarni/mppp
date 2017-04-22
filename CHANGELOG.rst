@@ -1,8 +1,8 @@
 Changelog
 =========
 
-%%version%% (unreleased)
-------------------------
+0.2 (unreleased)
+----------------
 
 New
 ~~~
@@ -29,6 +29,8 @@ Changes
 - Change the license to MPL2. [Francesco Biscani]
 
 - Remove the allocation cache. [Francesco Biscani]
+
+- Remove the custom namespace option. [Francesco Biscani]
 
 Fix
 ~~~

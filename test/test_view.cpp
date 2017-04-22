@@ -55,8 +55,10 @@ struct view_tester {
     {
         using integer = mp_integer<S::value>;
         integer n;
+        const integer &nc = static_cast<const integer &>(n);
         REQUIRE((mpz_sgn(n.get_mpz_view().get()) == 0));
         REQUIRE(n.get_mpz_view().get()->_mp_d == n._get_union().g_st().m_limbs.data());
+        REQUIRE(n.get_mpz_view().get()->_mp_d == nc._get_union().g_st().m_limbs.data());
         {
             auto v = n.get_mpz_view();
             REQUIRE(v.m_ptr == v.m_static_view);
@@ -67,6 +69,7 @@ struct view_tester {
         {
             auto v = n.get_mpz_view();
             REQUIRE(v.m_ptr == &n._get_union().g_dy());
+            REQUIRE(v.m_ptr == &nc._get_union().g_dy());
         }
         n = 1;
         REQUIRE((mpz_cmp_ui(n.get_mpz_view().get(), 1u) == 0));
@@ -81,6 +84,7 @@ struct view_tester {
         {
             auto v = n.get_mpz_view();
             REQUIRE(v.m_ptr == &n._get_union().g_dy());
+            REQUIRE(v.m_ptr == &nc._get_union().g_dy());
         }
         n = -1;
         REQUIRE((mpz_cmp_ui(n.get_mpz_view().get(), 1u) < 0));
