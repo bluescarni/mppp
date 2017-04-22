@@ -105,19 +105,8 @@
 
 #endif
 
-// Namespace setup.
-#if defined(MPPP_CUSTOM_NAMESPACE)
-
-#define MPPP_NAMESPACE MPPP_CUSTOM_NAMESPACE
-
-#else
-
-#define MPPP_NAMESPACE mppp
-
-#endif
-
 /// The root mp++ namespace.
-namespace MPPP_NAMESPACE
+namespace mppp
 {
 
 namespace mppp_impl
@@ -5279,9 +5268,9 @@ namespace std
 
 /// Specialisation of \p std::hash for mppp::mp_integer.
 template <size_t SSize>
-struct hash<MPPP_NAMESPACE::mp_integer<SSize>> {
+struct hash<mppp::mp_integer<SSize>> {
     /// The argument type.
-    typedef MPPP_NAMESPACE::mp_integer<SSize> argument_type;
+    typedef mppp::mp_integer<SSize> argument_type;
     /// The result type.
     typedef size_t result_type;
     /// Call operator.
@@ -5292,7 +5281,7 @@ struct hash<MPPP_NAMESPACE::mp_integer<SSize>> {
      */
     result_type operator()(const argument_type &n) const
     {
-        return MPPP_NAMESPACE::mppp_impl::hash_wrapper(n);
+        return mppp::mppp_impl::hash_wrapper(n);
     }
 };
 }
