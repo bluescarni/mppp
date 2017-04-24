@@ -58,8 +58,14 @@
 #include <Winnt.h>
 // clang-format on
 
+// clang-cl supports __builtin_expect().
+#if defined(__clang__)
+#define mppp_likely(x) __builtin_expect(!!(x), 1)
+#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
+#else
 #define mppp_likely(x) (x)
 #define mppp_unlikely(x) (x)
+#endif
 #define MPPP_RESTRICT __restrict
 
 // Disable some warnings for MSVC.
@@ -82,6 +88,8 @@
 #if defined(__SIZEOF_INT128__)
 #define MPPP_UINT128 __uint128_t
 #endif
+
+#else
 
 #define mppp_likely(x) (x)
 #define mppp_unlikely(x) (x)
