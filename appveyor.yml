@@ -10,11 +10,8 @@ environment:
 
   matrix:
     - BUILD_TYPE: MSVC15_32
-    #   COMPILER: MSVC15
-    #   PLATFORM: Win32
-    # - BUILD_TYPE: Debug
-    #   COMPILER: MSVC15
-    #   PLATFORM: x64
+    - BUILD_TYPE: MSVC15_64
+    - BUILD_TYPE: MSVC15_clang_32
     - BUILD_TYPE: MSVC15_clang_64
     # - BUILD_TYPE: Debug
     #   COMPILER: MinGW
@@ -25,6 +22,18 @@ install:
 - if [%BUILD_TYPE%]==[MSVC15_32] conda config --add channels conda-forge --force
 - if [%BUILD_TYPE%]==[MSVC15_32] conda create -y --name mppp cmake mpir mpfr
 - if [%BUILD_TYPE%]==[MSVC15_32] call activate mppp
+
+- if [%BUILD_TYPE%]==[MSVC15_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
+- if [%BUILD_TYPE%]==[MSVC15_64] conda config --add channels conda-forge --force
+- if [%BUILD_TYPE%]==[MSVC15_64] conda create -y --name mppp cmake mpir mpfr
+- if [%BUILD_TYPE%]==[MSVC15_64] call activate mppp
+
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] set PATH=C:\Miniconda36\Scripts;%PATH%
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] conda config --add channels conda-forge --force
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] conda create -y --name mppp cmake ninja clangdev mpir mpfr
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] call activate mppp
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] clang-cl -v
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --add channels conda-forge --force
@@ -49,6 +58,12 @@ build_script:
 
 - if [%BUILD_TYPE%]==[MSVC15_32] cmake .. -G "Visual Studio 14 2015" -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes
 - if [%BUILD_TYPE%]==[MSVC15_32] cmake --build . --config Debug
+
+- if [%BUILD_TYPE%]==[MSVC15_64] cmake .. -G "Visual Studio 14 2015 Win64" -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes
+- if [%BUILD_TYPE%]==[MSVC15_64] cmake --build . --config Debug
+
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] cmake --build . --config Debug
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake --build . --config Debug
