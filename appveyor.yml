@@ -15,9 +15,7 @@ environment:
     # - BUILD_TYPE: Debug
     #   COMPILER: MSVC15
     #   PLATFORM: x64
-    - BUILD_TYPE: Debug
-      COMPILER: MSVC15Clang
-      PLATFORM: x64
+    - COMPILER: MSVC15Clang64
     # - BUILD_TYPE: Debug
     #   COMPILER: MinGW
     #   PLATFORM: x64
@@ -26,11 +24,17 @@ install:
 # Set path and download deps for MSVC.
 - if [%COMPILER%]==[MSVC15] set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mpir_msvc15_64.7z
-- if [%COMPILER%]==[MSVC15Clang] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mpir_msvc15_64.7z
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mpir_msvc15_32.7z
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] 7z x -oC:\ mpir_msvc15_64.7z > NUL
-- if [%COMPILER%]==[MSVC15Clang] if [%PLATFORM%]==[x64] 7z x -oC:\ mpir_msvc15_64.7z > NUL
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] 7z x -oC:\ mpir_msvc15_32.7z > NUL
+
+- if [%BUILD_TYPE%]==[MSVC15Clang64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
+- if [%BUILD_TYPE%]==[MSVC15Clang64] conda config --add channels conda-forge --force
+- if [%BUILD_TYPE%]==[MSVC15Clang64] conda create -y --name mppp cmake ninja clangdev mpir mpfr
+- if [%BUILD_TYPE%]==[MSVC15Clang64] call activate mppp
+- if [%BUILD_TYPE%]==[MSVC15Clang64] clang-cl -v
+- if [%BUILD_TYPE%]==[MSVC15Clang64] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
 # Same for MinGW.
 - if [%COMPILER%]==[MinGW] set PATH=C:\mingw64\bin;%PATH%
 - if [%COMPILER%]==[MinGW] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z
@@ -48,9 +52,11 @@ build_script:
 
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[Win32] cmake -G "Visual Studio 14 2015" -DMPPP_MSVC_STATIC_RUNTIME=YES -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/mpir.lib ..
 - if [%COMPILER%]==[MSVC15] if [%PLATFORM%]==[x64] cmake -G "Visual Studio 14 2015 Win64" -DMPPP_MSVC_STATIC_RUNTIME=YES -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/mpir.lib ..
-- if [%COMPILER%]==[MSVC15Clang] if [%PLATFORM%]==[x64] cmake -TLLVM-vs2014 -G "Visual Studio 14 2015 Win64" -DMPPP_MSVC_STATIC_RUNTIME=YES -DMPPP_BUILD_TESTS=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/mpir.lib ..
 - if [%COMPILER%]==[MSVC15] cmake --build . --config %BUILD_TYPE% --target ALL_BUILD
-- if [%COMPILER%]==[MSVC15Clang] cmake --build . --config %BUILD_TYPE% --target ALL_BUILD
+
+- if [%BUILD_TYPE%]==[MSVC15Clang64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_LONG_DOUBLE=yes
+- if [%BUILD_TYPE%]==[MSVC15Clang64] cmake --build . --config Debug
+
 - if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_LONG_DOUBLE=YES -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/libgmp.a -DMPFR_INCLUDE_DIR=C:/local/include -DMPFR_LIBRARY=C:/local/lib/libmpfr.a ..
 #- if [%COMPILER%]==[MinGW] cmake --build . --config %BUILD_TYPE% --target all
 - if [%COMPILER%]==[MinGW] mingw32-make -j2 VERBOSE=1
