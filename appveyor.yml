@@ -15,7 +15,7 @@ environment:
     # - BUILD_TYPE: Debug
     #   COMPILER: MSVC15
     #   PLATFORM: x64
-    - COMPILER: MSVC15Clang64
+    - BUILD_TYPE: MSVC15Clang64
     # - BUILD_TYPE: Debug
     #   COMPILER: MinGW
     #   PLATFORM: x64
