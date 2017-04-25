@@ -68,6 +68,18 @@ static std::mt19937::result_type mt_rng_seed(0u);
 struct no_const {
 };
 
+template <typename T, typename std::enable_if<!(std::is_same<char,T>::value || std::is_same<signed char,T>::value || std::is_same<unsigned char,T>::value),int>::type = 0>
+static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
+{
+    return std::uniform_int_distribution<T>(min,max);
+}
+
+template <typename T, typename std::enable_if<std::is_same<char,T>::value || std::is_same<signed char,T>::value || std::is_same<unsigned char,T>::value,int>::type = 0>
+static inline std::uniform_int_distribution<int> get_int_dist(T min, T max)
+{
+    return std::uniform_int_distribution<int>(min,max);
+}
+
 struct int_ctor_tester {
     template <typename S>
     struct runner {
@@ -82,10 +94,10 @@ struct int_ctor_tester {
             REQUIRE(lex_cast(max) == lex_cast(integer{max}));
             std::atomic<bool> fail(false);
             auto f = [&fail, min, max](unsigned n) {
-                std::uniform_int_distribution<Int> dist(min, max);
+                auto dist = get_int_dist(min,max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
-                    auto tmp = dist(eng);
+                    auto tmp = static_cast<Int>(dist(eng));
                     if (lex_cast(tmp) != lex_cast(integer{tmp})) {
                         fail.store(false);
                     }
@@ -607,10 +619,10 @@ struct int_convert_tester {
             }
             std::atomic<bool> fail(false);
             auto f = [&fail, min, max](unsigned n) {
-                std::uniform_int_distribution<Int> dist(min, max);
+                auto dist = get_int_dist(min,max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
-                    if (!roundtrip_conversion<integer>(dist(eng))) {
+                    if (!roundtrip_conversion<integer>(static_cast<Int>(dist(eng)))) {
                         fail.store(false);
                     }
                 }

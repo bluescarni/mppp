@@ -1,5 +1,6 @@
 # We have some multithreaded tests, so let's activate threading support.
 include(YACMAThreadingSetup)
+include(YACMACompilerLinkerSettings)
 
 list(APPEND MPPP_CXX_FLAGS_DEBUG ${YACMA_THREADING_CXX_FLAGS})
 list(APPEND MPPP_CXX_FLAGS_RELEASE ${YACMA_THREADING_CXX_FLAGS})
@@ -11,9 +12,11 @@ function(ADD_MPPP_TESTCASE arg1)
     if(YACMA_COMPILER_IS_MSVC AND MPPP_MSVC_STATIC_RUNTIME)
       target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:-MTd>" "$<$<CONFIG:RELEASE>:-MT>")
     endif()
-    set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 11)
-    set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
-    set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
+    if(NOT (YACMA_COMPILER_IS_MSVC AND YACMA_COMPILER_IS_CLANGXX))
+      set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 11)
+      set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
+      set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
+    endif()
     add_test(${arg1} ${arg1})
 endfunction()
 
