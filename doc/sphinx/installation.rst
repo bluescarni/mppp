@@ -7,6 +7,7 @@ on the following setups:
 * GCC 4.8 and later versions on GNU/Linux 32/64-bit,
 * Clang 3.8 on GNU/Linux 64-bit,
 * MSVC 2015 on Windows 32/64-bit,
+* Clang 3.9 on Windows 32/64-bit (with the ``clang-cl`` driver for MSVC),
 * MinGW GCC 6 on Windows 64-bit,
 * Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).
 
@@ -26,7 +27,7 @@ The benchmark suite depends optionally on `Boost <http://www.boost.org/>`__ and 
 
 Releases of mp++ can be downloaded from `github <https://github.com/bluescarni/mppp/releases>`__.
 In order to use mp++, you only have to include the ``include/mp++.hpp`` header in your project and link to the GMP
-library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:
+(or MPIR) library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:
 
 .. code-block:: console
 
