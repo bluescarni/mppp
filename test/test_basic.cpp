@@ -71,16 +71,24 @@ struct no_const {
 // NOTE: char types are not supported in uniform_int_distribution by the standard.
 // Use a small wrapper to get an int distribution instead, with the min max limits
 // from the char type. We will be casting back when using the distribution.
-template <typename T, typename std::enable_if<!(std::is_same<char,T>::value || std::is_same<signed char,T>::value || std::is_same<unsigned char,T>::value),int>::type = 0>
+template <typename T, typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                                || std::is_same<unsigned char, T>::value),
+                                              int>::type
+                      = 0>
 static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
 {
-    return std::uniform_int_distribution<T>(min,max);
+    return std::uniform_int_distribution<T>(min, max);
 }
 
-template <typename T, typename std::enable_if<std::is_same<char,T>::value || std::is_same<signed char,T>::value || std::is_same<unsigned char,T>::value,int>::type = 0>
-static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value,int,unsigned>::type> get_int_dist(T min, T max)
+template <typename T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                                  || std::is_same<unsigned char, T>::value,
+                                              int>::type
+                      = 0>
+static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
+get_int_dist(T min, T max)
 {
-    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value,int,unsigned>::type>(min,max);
+    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>(min,
+                                                                                                                   max);
 }
 
 struct int_ctor_tester {
@@ -97,7 +105,7 @@ struct int_ctor_tester {
             REQUIRE(lex_cast(max) == lex_cast(integer{max}));
             std::atomic<bool> fail(false);
             auto f = [&fail, min, max](unsigned n) {
-                auto dist = get_int_dist(min,max);
+                auto dist = get_int_dist(min, max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
                     auto tmp = static_cast<Int>(dist(eng));
@@ -622,7 +630,7 @@ struct int_convert_tester {
             }
             std::atomic<bool> fail(false);
             auto f = [&fail, min, max](unsigned n) {
-                auto dist = get_int_dist(min,max);
+                auto dist = get_int_dist(min, max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
                     if (!roundtrip_conversion<integer>(static_cast<Int>(dist(eng)))) {
