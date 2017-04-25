@@ -78,9 +78,9 @@ static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
 }
 
 template <typename T, typename std::enable_if<std::is_same<char,T>::value || std::is_same<signed char,T>::value || std::is_same<unsigned char,T>::value,int>::type = 0>
-static inline std::uniform_int_distribution<int> get_int_dist(T min, T max)
+static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value,int,unsigned>::type> get_int_dist(T min, T max)
 {
-    return std::uniform_int_distribution<int>(min,max);
+    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value,int,unsigned>::type>(min,max);
 }
 
 struct int_ctor_tester {
