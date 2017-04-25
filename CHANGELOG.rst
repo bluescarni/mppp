@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Support the clang-cl compiler on Windows. [Francesco Biscani]
+
 - Add input stream operator. [Francesco Biscani]
 
 - Add in-place arithmetic operators with interoperable types on the
@@ -36,5 +38,3 @@ Fix
 ~~~
 
 - Fix operators example in the documentation. [Francesco Biscani]
-
-

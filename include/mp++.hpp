@@ -48,19 +48,9 @@
 #endif
 
 // Compiler configuration.
-#if defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
-
-#define mppp_likely(x) __builtin_expect(!!(x), 1)
-#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
-#define MPPP_RESTRICT __restrict
-
-// NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
-// http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
-#if defined(__SIZEOF_INT128__)
-#define MPPP_UINT128 __uint128_t
-#endif
-
-#elif defined(_MSC_VER)
+// NOTE: check for MSVC first, as clang-cl does defined both __clang__ and _MSC_VER,
+// and we want to configure it as MSVC.
+#if defined(_MSC_VER)
 
 // Disable clang-format here, as the include order seems to matter.
 // clang-format off
@@ -68,8 +58,14 @@
 #include <Winnt.h>
 // clang-format on
 
+// clang-cl supports __builtin_expect().
+#if defined(__clang__)
+#define mppp_likely(x) __builtin_expect(!!(x), 1)
+#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
+#else
 #define mppp_likely(x) (x)
 #define mppp_unlikely(x) (x)
+#endif
 #define MPPP_RESTRICT __restrict
 
 // Disable some warnings for MSVC.
@@ -80,6 +76,18 @@
 
 // Checked iterators functionality.
 #include <iterator>
+
+#elif defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
+
+#define mppp_likely(x) __builtin_expect(!!(x), 1)
+#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
+#define MPPP_RESTRICT __restrict
+
+// NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
+// http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
+#if defined(__SIZEOF_INT128__)
+#define MPPP_UINT128 __uint128_t
+#endif
 
 #else
 
@@ -4091,7 +4099,7 @@ private:
             = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
 #if defined(_MSC_VER)
         return std::equal(stdext::make_checked_array_iterator(ptr_a, asize),
-                          stdext::make_checked_array_iterator(ptr_a, asize) + asize,
+                          stdext::make_checked_array_iterator(ptr_a, asize, asize),
                           stdext::make_checked_array_iterator(ptr_b, asize), limb_cmp);
 #else
         return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
