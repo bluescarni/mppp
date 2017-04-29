@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Exceptions &#8212; mp++ 0.1 documentation</title>
+    <title>Changelog &#8212; mp++ 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -27,8 +27,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Benchmarks" href="benchmarks.html" />
-    <link rel="prev" title="The mp_integer class" href="mp_integer.html" />
+    <link rel="prev" title="Benchmarks" href="benchmarks.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -63,24 +62,24 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mp_integer.html">The <code class="docutils literal"><span class="pre">mp_integer</span></code> class</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#unreleased">0.2 (unreleased)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#new">New</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changes">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fix">Fix</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="reference.html">Reference</a><ul>
-      <li>Previous: <a href="mp_integer.html" title="previous chapter">The <code class="docutils literal"><span class="pre">mp_integer</span></code> class</a></li>
-      <li>Next: <a href="benchmarks.html" title="next chapter">Benchmarks</a></li>
-  </ul></li>
+      <li>Previous: <a href="benchmarks.html" title="previous chapter">Benchmarks</a></li>
   </ul></li>
 </ul>
 </div>
@@ -100,16 +99,41 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="exceptions">
-<h1>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="_CPPv2N4mppp19zero_division_errorE">
-<span id="mppp::zero_division_error"></span><span class="target" id="mp++structmppp_1_1zero__division__error"></span><em class="property">struct </em><code class="descclassname">mppp::</code><code class="descname">zero_division_error</code><a class="headerlink" href="#_CPPv2N4mppp19zero_division_errorE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Exception to signal division by zero. </p>
-<p>This exception inherits all members (including constructors) from <code class="docutils literal"><span class="pre">std::domain_error</span></code>. It will be thrown when a division by zero involving an <a class="reference internal" href="mp_integer.html#mp++classmppp_1_1mp__integer"><span class="std std-ref">mp_integer</span></a> is attempted. </p>
-<p>Inherits from std::domain_error</p>
-</dd></dl>
-
+  <div class="section" id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="unreleased">
+<h2>0.2 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="new">
+<h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Support the <code class="docutils literal"><span class="pre">clang-cl</span></code> compiler on Windows. [Francesco Biscani]</li>
+<li>Add input stream operator. [Francesco Biscani]</li>
+<li>Add in-place arithmetic operators with interoperable types on the
+left-hand side. [Francesco Biscani]</li>
+<li>Add convenience overloads for the computation of the binomial
+coefficient. [Francesco Biscani]</li>
+<li>Add convenience overloads for <code class="docutils literal"><span class="pre">pow()</span></code>. [Francesco Biscani]</li>
+<li>Add functions to test if an integer is equal to -1. [Francesco
+Biscani]</li>
+<li>Add a static member to <code class="docutils literal"><span class="pre">mp_integer</span></code> storing the static size. [Francesco
+Biscani]</li>
+</ul>
+</div>
+<div class="section" id="changes">
+<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Change the license to MPL2. [Francesco Biscani]</li>
+<li>Remove the allocation cache. [Francesco Biscani]</li>
+<li>Remove the custom namespace option. [Francesco Biscani]</li>
+</ul>
+</div>
+<div class="section" id="fix">
+<h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fix operators example in the documentation. [Francesco Biscani]</li>
+</ul>
+</div>
+</div>
 </div>
 
 
@@ -126,7 +150,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/exceptions.rst.txt"
+      <a href="_sources/changelog.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
