@@ -8,7 +8,7 @@ Welcome to mp++'s documentation!
 
 mp++ is a small C++11 header-only library for multiprecision integer arithmetic. Based
 on the well-known `GMP <http://www.gmplib.org>`__ library, mp++ places a strong emphasis on
-optimising operations on small values. When operating on small operands, mp++ will:
+optimising operations on small values. When dealing with small operands, mp++ will:
 
 * avoid heap memory allocations as much as possible, and
 * use optimised implementations of basic operations (instead of calling GMP functions).
