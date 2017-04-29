@@ -7,7 +7,7 @@ Changelog
 New
 ~~~
 
-- Support the clang-cl compiler on Windows. [Francesco Biscani]
+- Support the ``clang-cl`` compiler on Windows. [Francesco Biscani]
 
 - Add input stream operator. [Francesco Biscani]
 
@@ -17,12 +17,12 @@ New
 - Add convenience overloads for the computation of the binomial
   coefficient. [Francesco Biscani]
 
-- Add convenience overloads for pow(). [Francesco Biscani]
+- Add convenience overloads for ``pow()``. [Francesco Biscani]
 
 - Add functions to test if an integer is equal to -1. [Francesco
   Biscani]
 
-- Add a static member to mp_integer storing the static size. [Francesco
+- Add a static member to ``mp_integer`` storing the static size. [Francesco
   Biscani]
 
 Changes
