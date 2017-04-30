@@ -938,24 +938,24 @@ class mp_integer
     template <typename, typename, typename = void>
     struct common_type {
     };
+    template <typename Enable>
+    struct common_type<mp_integer, mp_integer, Enable> {
+        using type = mp_integer;
+    };
+    template <typename U>
+    struct common_type<mp_integer, U, enable_if_t<is_supported_integral<U>::value>> {
+        using type = mp_integer;
+    };
     template <typename T>
-    struct common_type<T, T, enable_if_t<std::is_same<T, mp_integer>::value>> {
+    struct common_type<T, mp_integer, enable_if_t<is_supported_integral<T>::value>> {
         using type = mp_integer;
     };
-    template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<conjunction<std::is_same<T, mp_integer>, is_supported_integral<U>>::value>> {
-        using type = mp_integer;
-    };
-    template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<conjunction<std::is_same<U, mp_integer>, is_supported_integral<T>>::value>> {
-        using type = mp_integer;
-    };
-    template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<conjunction<std::is_same<T, mp_integer>, is_supported_float<U>>::value>> {
+    template <typename U>
+    struct common_type<mp_integer, U, enable_if_t<is_supported_float<U>::value>> {
         using type = U;
     };
-    template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<conjunction<std::is_same<U, mp_integer>, is_supported_float<T>>::value>> {
+    template <typename T>
+    struct common_type<T, mp_integer, enable_if_t<is_supported_float<T>::value>> {
         using type = T;
     };
     template <typename T, typename U>
