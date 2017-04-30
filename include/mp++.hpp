@@ -113,6 +113,13 @@
 
 #endif
 
+// Concepts setup.
+#if __cpp_concepts >= 201507
+
+#define MPPP_HAVE_CONCEPTS
+
+#endif
+
 /// The root mp++ namespace.
 namespace mppp
 {
@@ -676,10 +683,20 @@ public:
 };
 }
 
+#if defined(MPPP_HAVE_CONCEPTS) && !defined(MPPP_DOXYGEN_INVOKED)
+
+template <typename T>
+concept bool CppInteroperable = mppp_impl::is_supported_interop<T>::value;
+
+#endif
+
 /// Exception to signal division by zero.
 /**
- * This exception inherits all members (including constructors) from \p std::domain_error. It will be thrown
- * when a division by zero involving an mp_integer is attempted.
+ * \rststar
+ * This exception inherits all members (including constructors) from ``std::domain_error``. It will be thrown
+ * when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
+ * represent infinities.
+ * \endrststar
  */
 struct zero_division_error final : std::domain_error {
     using std::domain_error::domain_error;
@@ -703,78 +720,69 @@ struct zero_division_error final : std::domain_error {
 //   is what we are doing now).
 /// Multiprecision integer class.
 /**
- * This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP \p mpz_t type, with
- * a small value optimisation: integers whose size is up to \p SSize limbs are stored directly in the storage
- * occupied by the mp_integer object, without resorting to dynamic memory allocation. The value of \p SSize
- * must be at least 1 and less than an implementation-defined upper limit.
+ * \rststar
+ * This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
+ * a small value optimisation: integers whose size is up to ``SSize`` limbs are stored directly in the storage
+ * occupied by the :cpp:class:`~mppp::mp_integer` object, without resorting to dynamic memory allocation. The value of
+ * ``SSize`` must be at least 1 and less than an implementation-defined upper limit.
  *
- * When the value of an mp_integer is stored directly within the object, the <em>storage type</em> of the integer is
- * said to be <em>static</em>. When the limb size of the integer exceeds the maximum value \p SSize, the storage types
- * becomes <em>dynamic</em>. The transition from static to dynamic storage happens transparently whenever the integer
+ * When the value of an :cpp:class:`~mppp::mp_integer` is stored directly within the object, the *storage type* of the
+ * integer is said to be *static*. When the limb size of the integer exceeds the maximum value ``SSize``, the storage
+ * types becomes *dynamic*. The transition from static to dynamic storage happens transparently whenever the integer
  * value becomes large enough. The demotion from dynamic to static storage usually needs to be requested explicitly.
- * For values of \p SSize of 1 and 2, optimised implementations of basic arithmetic operations are employed,
- * if supported by the target architecture and if the storage type is static. For larger values of \p SSize,
- * the \p mpn_ low-level functions of the GMP API are used if the storage type is static. If the storage type is
- * dynamic, the usual \p mpz_ functions from the GMP API are used.
+ * For values of ``SSize`` of 1 and 2, optimised implementations of basic arithmetic operations are employed,
+ * if supported by the target architecture and if the storage type is static. For larger values of ``SSize``,
+ * the ``mpn_`` low-level functions of the GMP API are used if the storage type is static. If the storage type is
+ * dynamic, the usual ``mpz_`` functions from the GMP API are used.
  *
- * # Interoperable types #
  * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
- * floating-point
- * primitive types, and it provides overloaded arithmetic operators. Differently from the builtin types, however, this
- * class does not allow any implicit conversion to/from other types (apart from \p bool): construction from and
- * conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
- * \verbatim embed:rst:leading-asterisk
+ * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list),
+ * and it provides overloaded arithmetic operators. Differently from the builtin types,
+ * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
+ * from and  conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
+ *
  * .. code-block:: c++
  *
  *    mp_integer<1> n = 5;
  *    int m = n;
- * \endverbatim
+ *
  * will not work, and direct initialization and explicit casting should be used instead:
- * \verbatim embed:rst:leading-asterisk
+ *
  * .. code-block:: c++
  *
  *    mp_integer<1> n{5};
  *    int m = static_cast<int>(n);
- * \endverbatim
- * The full list of interoperable builtin types is:
- * - \p bool,
- * - \p char, <tt>signed char</tt> and <tt>unsigned char</tt>,
- * - \p short and <tt>unsigned short</tt>,
- * - \p int and \p unsigned,
- * - \p long and <tt>unsigned long</tt>,
- * - <tt>long long</tt> and <tt>unsigned long long</tt>,
- * - \p float, \p double and <tt>long double</tt> (<tt>long double</tt> requires the MPFR library).
  *
- * # API #
- * Most of the functionality of this class is exposed via inline friend functions, with the general convention
- * that the functions are named after the corresponding GMP functions minus the leading \p mpz_ prefix. For instance,
- * the GMP call
- * \verbatim embed:rst:leading-asterisk
+ * Most of the functionality of this class is exposed via plain :ref:`functions <mp_integer_functions>`, with the
+ * general convention that the functions are named after the corresponding GMP functions minus the leading ``mpz_``
+ * prefix. For instance, the GMP call
+ *
  * .. code-block:: c++
  *
  *    mpz_add(rop,a,b);
- * \endverbatim
- * that writes the result of <tt>a + b</tt> into \p rop becomes simply
- * \verbatim embed:rst:leading-asterisk
+ *
+ * that writes the result of ``a + b`` into ``rop`` becomes simply
+ *
  * .. code-block:: c++
  *
  *    add(rop,a,b);
- * \endverbatim
- * where the add() function is resolved via argument-dependent lookup. Function calls with overlapping arguments
+ *
+ * where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
  * are allowed, unless noted otherwise.
  *
  * Multiple overloads of the same functionality are often available.
  * Binary functions in GMP are usually implemented via three-arguments functions, in which the first
- * argument is a reference to the return value. The exponentiation function \p mpz_pow_ui(), for instance,
+ * argument is a reference to the return value. The exponentiation function ``mpz_pow_ui()``, for instance,
  * takes three arguments: the return value, the base and the exponent. There are two overloads of the corresponding
- * pow_ui() function:
- * - a ternary overload semantically equivalent to \p mpz_pow_ui(),
- * - a binary overload taking as inputs the base and the exponent, and returning the result
+ * :ref:`exponentiation <mp_integer_exponentiation>` function:
+ *
+ * * a ternary overload semantically equivalent to ``mpz_pow_ui()``,
+ * * a binary overload taking as inputs the base and the exponent, and returning the result
  *   of the exponentiation.
  *
- * This allows to avoid having to set up a return value for one-off invocations of pow_ui() (the binary overload will
- * do it for you). For example:
- * \verbatim embed:rst:leading-asterisk
+ * This allows to avoid having to set up a return value for one-off invocations of ``pow_ui()`` (the binary overload
+ * will do it for you). For example:
+ *
  * .. code-block:: c++
  *
  *    mp_integer<1> r1, r2, n{3};
@@ -782,15 +790,15 @@ struct zero_division_error final : std::domain_error {
  *                      // the result in r1.
  *    r2 = pow_ui(n,2); // Binary pow_ui(): returns n**2, which is then
  *                      // assigned to r2.
- * \endverbatim
  *
  * In case of unary functions, there are often three overloads available:
- * - a binary overload taking as first parameter a reference to the return value (GMP style),
- * - a unary overload returning the result of the operation,
- * - a nullary member function that modifies the calling object in-place.
+ *
+ * * a binary overload taking as first parameter a reference to the return value (GMP style),
+ * * a unary overload returning the result of the operation,
+ * * a nullary member function that modifies the calling object in-place.
  *
  * For instance, here are three possible ways of computing the absolute value:
- * \verbatim embed:rst:leading-asterisk
+ *
  * .. code-block:: c++
  *
  *    mp_integer<1> r1, r2, n{-5};
@@ -800,22 +808,19 @@ struct zero_division_error final : std::domain_error {
  *                 // then assigned to r2.
  *    n.abs();     // Member function abs(): replaces the value of n with its
  *                 // absolute value.
- * \endverbatim
- * Note that at this time only a small subset of the GMP API has been wrapped by mp_integer.
  *
- * # Overloaded operators #
+ * Note that at this time only a small subset of the GMP API has been wrapped by :cpp:class:`~mppp::mp_integer`.
  *
  * This class provides overloaded operators for the basic arithmetic operations, including bit shifting.
- * The binary operators are implemented as inline friend functions, the in-place operators are implemented as
- * member functions. The overloaded operators are resolved via argument-dependent lookup whenever at least
- * one argument is of type mp_integer, and the other argument is either another mp_integer or an instance
- * of an interoperable type.
+ * The overloaded operators are resolved via argument-dependent lookup whenever at least
+ * one argument is of type :cpp:class:`~mppp::mp_integer`, and the other argument is either another
+ * :cpp:class:`~mppp::mp_integer` or an instance of :cpp:concept:`~mppp::CppInteroperable`.
  *
- * For the common arithmetic operations (\p +, \p -, \p * and \p /), the type promotion
+ * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
  * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
- * is a C++ integral, the result will be of type mp_integer, if the other argument is a C++ floating-point the result
- * will be of the same floating-point type. For example:
- * \verbatim embed:rst:leading-asterisk
+ * is a C++ integral, the result will be of type :cpp:class:`~mppp::mp_integer`, if the other argument is a C++
+ * floating-point the result will be of the same floating-point type. For example:
+ *
  * .. code-block:: c++
  *
  *    mp_integer<1> n1{1}, n2{2};
@@ -824,31 +829,30 @@ struct zero_division_error final : std::domain_error {
  *    auto res3 = 2 - n2; // res3 is an mp_integer
  *    auto res4 = n1 / 2.f; // res4 is a float
  *    auto res5 = 12. / n1; // res5 is a double
- * \endverbatim
  *
- * The modulo operator \p % accepts only mp_integer and interoperable integral types as arguments, and it always returns
- * mp_integer as result. The bit shifting operators \p << and \p >> accept only interoperable integral types as
- * shift arguments, and they always return mp_integer as result.
+ * The modulo operator ``%`` accepts only :cpp:class:`~mppp::mp_integer` and interoperable integral types as arguments,
+ * and it always returns :cpp:class:`~mppp::mp_integer` as result. The bit shifting operators ``<<`` and ``>>`` accept
+ * only interoperable integral types as shift arguments, and they always return :cpp:class:`~mppp::mp_integer` as
+ * result.
  *
- * The relational operators, \p ==, \p !=, \p <, \p >, \p <= and \p >= will promote the arguments to a common type
- * before
- * comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
- * promoted to mp_integer if they are both integral types, otherwise they are promoted to the type of the floating-point
- * argument).
+ * The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote the arguments to a common type
+ * before comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
+ * promoted to :cpp:class:`~mppp::mp_integer` if they are both integral types, otherwise they are promoted to the type
+ * of the floating-point argument).
  *
- * # Interfacing with GMP #
+ * This class provides facilities to interface with the GMP library. Specifically, :cpp:class:`~mppp::mp_integer`
+ * features:
  *
- * This class provides facilities to interface with the GMP library. Specifically, mp_integer features:
- * - a constructor from the GMP integer type \p mpz_t,
- * - an mp_integer::get_mpz_t() method that promotes \p this to dynamic storage and returns a pointer to the internal
- *   \p mpz_t instance,
- * - an \p mpz_view class, an instance of which can be requested via the mp_integer::get_mpz_view() method,
- *   which allows to use mp_integer in the GMP API as a drop-in replacement for <tt>const mpz_t</tt> function
- *   arguments.
+ * * a constructor from the GMP integer type ``mpz_t``,
+ * * an :cpp:func:`~mppp::mp_integer::get_mpz_t()` method that promotes ``this`` to dynamic
+ *   storage and returns a pointer to the internal ``mpz_t`` instance,
+ * * an ``mpz_view`` class, an instance of which can be requested via the :cpp:func:`~mppp::mp_integer::get_mpz_view()`
+ *   method, which allows to use :cpp:class:`~mppp::mp_integer` in the GMP API as a drop-in replacement for
+ *   ``const mpz_t`` function arguments.
  *
- * The \p mpz_view class represent a read-only view of an mp_integer object which is implicitly convertible to the type
- * <tt>const mpz_t</tt> and which is thus usable as an argument to GMP functions. For example:
- * \verbatim embed:rst:leading-asterisk
+ * The ``mpz_view`` class represent a read-only view of an mp_integer object which is implicitly convertible to the type
+ * ``const mpz_t`` and which is thus usable as an argument to GMP functions. For example:
+ *
  * .. code-block:: c++
  *
  *    mpz_t m;
@@ -856,14 +860,13 @@ struct zero_division_error final : std::domain_error {
  *    mp_integer<1> n{1}; // Initialize an mp_integer with the value 1.
  *    mpz_add(m,m,n.get_mpz_view()); // Compute the result of n + m and store
  *                                   // it in m using the GMP API.
- * \endverbatim
- * See the documentation of mp_integer::get_mpz_view() for more details about the \p mpz_view class.
  *
- * # Hashing #
+ * See the documentation of :cpp:func:`~mppp::mp_integer::get_mpz_view()` for more details about the ``mpz_view`` class.
  *
- * This class provides a hash() function to compute a hash value for an integer. A specialisation
- * of the standard \p std::hash functor is also provided, so that it is possible to use mp_integer in standard
- * unordered associative containers out of the box.
+ * This class provides a :cpp:func:`~mppp::hash()` function to compute a hash value for an integer. A specialisation
+ * of the standard ``std::hash`` functor is also provided, so that it is possible to use :cpp:class:`~mppp::mp_integer`
+ * in standard unordered associative containers out of the box.
+ * \endrststar
  */
 template <std::size_t SSize>
 class mp_integer
@@ -1017,12 +1020,14 @@ public:
     mp_integer(mp_integer &&other) = default;
 
 private:
+#if !defined(MPPP_HAVE_CONCEPTS)
     // Enabler for generic ctor.
     template <typename T>
     using generic_ctor_enabler = enable_if_t<is_supported_interop<T>::value, int>;
     // Enabler for generic assignment.
     template <typename T>
     using generic_assignment_enabler = generic_ctor_enabler<T>;
+#endif
     // Add a limb at the top of the integer (that is, the new limb will be the new most
     // significant limb). Requires a non-negative integer. This is used only during generic construction,
     // do **NOT** use it anywhere else.
@@ -1169,25 +1174,24 @@ private:
     }
 
 public:
-    /// Generic constructor.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This constructor is enabled only if ``T`` is one of the interoperable types.
-     * \endverbatim
-     *
-     * This constructor will initialize an integer with the value of \p x. The initialization is always
-     * successful if \p T is an integral type (construction from \p bool yields 1 for \p true, 0 for \p false).
-     * If \p T is a floating-point type, the construction will fail if \p x is not finite. Construction from a
-     * floating-point type yields the truncated counterpart of the input value.
-     *
-     * @param x value that will be used to initialize \p this.
-     *
-     * @throws std::domain_error if \p x is a non-finite floating-point value.
-     */
+/// Generic constructor.
+/**
+ * This constructor will initialize an integer with the value of \p x. The initialization is always
+ * successful if \p x is an integral value (construction from \p bool yields 1 for \p true, 0 for \p false).
+ * If \p x is a floating-point value, the construction will fail if \p x is not finite. Construction from a
+ * floating-point type yields the truncated counterpart of the input value.
+ *
+ * @param x value that will be used to initialize \p this.
+ *
+ * @throws std::domain_error if \p x is a non-finite floating-point value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit mp_integer(CppInteroperable x)
+#else
     template <typename T, generic_ctor_enabler<T> = 0>
-    explicit mp_integer(T x) : m_int()
+    explicit mp_integer(T x)
+#endif
+        : m_int()
     {
         dispatch_generic_ctor(x);
     }
@@ -1204,11 +1208,11 @@ public:
      * @throws std::invalid_argument if the \p base parameter is invalid or if \p s is not a valid string representation
      * of an integer in the specified base.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. seealso::
      *
      *    https://gmplib.org/manual/Assigning-Integers.html
-     * \endverbatim
+     * \endrststar
      */
     explicit mp_integer(const char *s, int base = 10) : m_int()
     {
@@ -1244,12 +1248,12 @@ public:
      * This constructor will initialize \p this with the value of the GMP integer \p n. The storage type of \p this
      * will be static if \p n fits in the static storage, otherwise it will be dynamic.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. warning::
      *
      *    It is up to the user to ensure that ``n`` has been correctly initialized. Calling this constructor
      *    with an uninitialized ``n`` is undefined behaviour.
-     * \endverbatim
+     * \endrststar
      *
      * @param n the input GMP integer.
      */
@@ -1276,30 +1280,30 @@ public:
      * @return a reference to \p this.
      */
     mp_integer &operator=(mp_integer &&other) = default;
-    /// Generic assignment operator.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This assignment operator is enabled only if ``T`` is an interoperable type.
-     * \endverbatim
-     *
-     * The body of this operator is equivalent to:
-     * \verbatim embed:rst:leading-asterisk
-     * .. code-block:: c++
-     *
-     *    return *this = mp_integer{x};
-     * \endverbatim
-     * That is, a temporary integer is constructed from \p x and it is then move-assigned to \p this.
-     *
-     * @param x the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the generic constructor.
-     */
+/// Generic assignment operator.
+/**
+ * \rststar
+ * The body of this operator is equivalent to:
+ *
+ * .. code-block:: c++
+ *
+ *    return *this = mp_integer{x};
+ *
+ * That is, a temporary integer is constructed from ``x`` and it is then move-assigned to ``this``.
+ * \endrststar
+ *
+ * @param x the assignment argument.
+ *
+ * @return a reference to \p this.
+ *
+ * @throws unspecified any exception thrown by the generic constructor.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    mp_integer &operator=(const CppInteroperable &x)
+#else
     template <typename T, generic_assignment_enabler<T> = 0>
     mp_integer &operator=(const T &x)
+#endif
     {
         return *this = mp_integer{x};
     }
@@ -1364,11 +1368,11 @@ public:
      *
      * @throws std::invalid_argument if \p base is smaller than 2 or greater than 62.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. seealso::
      *
      *    https://gmplib.org/manual/Converting-Integers.html
-     * \endverbatim
+     * \endrststar
      */
     std::string to_string(int base = 10) const
     {
@@ -1383,9 +1387,11 @@ public:
     // std::vector<char>?
 
 private:
+#if !defined(MPPP_HAVE_CONCEPTS)
     // Implementation of the conversion operator.
     template <typename T>
     using generic_conversion_enabler = generic_ctor_enabler<T>;
+#endif
     // Conversion to bool.
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
@@ -1557,24 +1563,27 @@ private:
     }
 
 public:
-    /// Generic conversion operator.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This operator is enabled only if ``T`` is an interoperable type.
-     * \endverbatim
-     *
-     * This operator will convert \p this to the type \p T. Conversion to \p bool yields \p false if \p this is zero,
-     * \p true otherwise. Conversion to other integral types yields the exact result, if representable by the target
-     * type \p T. Conversion to floating-point types might yield inexact values and infinities.
-     *
-     * @return \p this converted to \p T.
-     *
-     * @throws std::overflow_error if \p T is an integral type and the value of \p this cannot be represented by \p T.
-     */
+/// Generic conversion operator.
+/**
+ * \rststar
+ * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppInteroperable` type.
+ * Conversion to ``bool`` yields ``false`` if ``this`` is zero,
+ * ``true`` otherwise. Conversion to other integral types yields the exact result, if representable by the target
+ * :cpp:concept:`~mppp::CppInteroperable` type. Conversion to floating-point types might yield inexact values and
+ * infinities.
+ * \endrststar
+ *
+ * @return \p this converted to the target type.
+ *
+ * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be represented by
+ * it.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit operator CppInteroperable() const
+#else
     template <typename T, generic_conversion_enabler<T> = 0>
     explicit operator T() const
+#endif
     {
         const auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
@@ -1662,7 +1671,7 @@ public:
      * object can also be retrieved via the <tt>get()</tt> method of the \p mpz_view class.
      * The view provides a read-only GMP-compatible representation of the integer stored in \p this.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. note::
      *
      *   It is important to keep in mind the following facts about the returned ``mpz_view`` object:
@@ -1677,7 +1686,7 @@ public:
      *     object (that is, if the ``mpz_view`` object is destroyed, any pointer previously returned by ``get()``
      *     becomes invalid);
      *   * any modification to ``this`` will also invalidate the view and the pointer.
-     * \endverbatim
+     * \endrststar
      *
      * @return an \p mpz view of \p this.
      */
@@ -1732,9 +1741,9 @@ private:
     // - 1: selected when there are no nail bits and the static size is 1,
     // - 2: selected when there are no nail bits and the static size is 2.
     template <typename SInt>
-    using static_add_algo = std::integral_constant<int, (!GMP_NAIL_BITS && SInt::s_size == 1)
-                                                            ? 1
-                                                            : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
+    using static_add_algo = std::
+        integral_constant<int,
+                          (!GMP_NAIL_BITS && SInt::s_size == 1) ? 1 : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
     // General implementation via mpn.
     // Small helper to compute the size after subtraction via mpn. s is a strictly positive size.
     static mpz_size_t sub_compute_size(const ::mp_limb_t *rdata, mpz_size_t s)
@@ -2186,32 +2195,32 @@ public:
     template <typename T>
     friend in_place_lenabler<T> operator+=(T &x, const mp_integer &n)
 #else
-    /// In-place addition for interoperable types.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
-     *
-     * The body of this operator is equivalent to:
-     * \verbatim embed:rst:leading-asterisk
-     * .. code-block:: c++
-     *
-     *    return x = static_cast<T>(x + n);
-     * \endverbatim
-     *
-     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
-     *
-     * @param x the first argument.
-     * @param n the second argument.
-     *
-     * @return a reference to \p x.
-     *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
-     */
+/// In-place addition for interoperable types.
+/**
+ * \rststar
+ * The body of this operator is equivalent to:
+ *
+ * .. code-block:: c++
+ *
+ *    return x = static_cast<CppInteroperable>(x + n);
+ *
+ * That is, the result of the corresponding binary operation is cast back to
+ * :cpp:concept:`~mppp::CppInteroperable` and assigned to ``x``.
+ * \endrststar
+ *
+ * @param x the first argument.
+ * @param n the second argument.
+ *
+ * @return a reference to \p x.
+ *
+ * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    friend CppInteroperable &operator+=(CppInteroperable &x, const mp_integer &n)
+#else
     template <typename T, in_place_lenabler<T> = 0>
     friend T &operator+=(T &x, const mp_integer &n)
+#endif
 #endif
     {
         // NOTE: if x is an integral, then the static cast is a generic conversion from
@@ -2307,18 +2316,18 @@ public:
 #else
     /// In-place subtraction for interoperable types.
     /**
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. note::
      *
      *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
+     * \endrststar
      *
      * The body of this operator is equivalent to:
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. code-block:: c++
      *
      *    return x = static_cast<T>(x - n);
-     * \endverbatim
+     * \endrststar
      *
      * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
      *
@@ -2369,9 +2378,9 @@ private:
     // - 1: selected when there are no nail bits and the static size is 1,
     // - 2: selected when there are no nail bits and the static size is 2.
     template <typename SInt>
-    using static_add_ui_algo = std::integral_constant<int, (!GMP_NAIL_BITS && SInt::s_size == 1)
-                                                               ? 1
-                                                               : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
+    using static_add_ui_algo = std::
+        integral_constant<int,
+                          (!GMP_NAIL_BITS && SInt::s_size == 1) ? 1 : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
     // mpn implementation.
     static bool static_add_ui_impl(s_int &rop, const s_int &op1, mpz_size_t asize1, int sign1, unsigned long op2,
                                    const std::integral_constant<int, 0> &)
@@ -2576,9 +2585,10 @@ private:
 #endif
                                                   >;
     template <typename SInt>
-    using static_mul_algo = std::integral_constant<int, (SInt::s_size == 1 && have_dlimb_mul::value)
-                                                            ? 1
-                                                            : ((SInt::s_size == 2 && have_dlimb_mul::value) ? 2 : 0)>;
+    using static_mul_algo = std::integral_constant<int,
+                                                   (SInt::s_size == 1 && have_dlimb_mul::value)
+                                                       ? 1
+                                                       : ((SInt::s_size == 2 && have_dlimb_mul::value) ? 2 : 0)>;
     // mpn implementation.
     // NOTE: this function (and the other overloads) returns 0 in case of success, otherwise it returns a hint
     // about the size in limbs of the result.
@@ -2866,18 +2876,18 @@ public:
 #else
     /// In-place multiplication for interoperable types.
     /**
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. note::
      *
      *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
+     * \endrststar
      *
      * The body of this operator is equivalent to:
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. code-block:: c++
      *
      *    return x = static_cast<T>(x * n);
-     * \endverbatim
+     * \endrststar
      *
      * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
      *
@@ -3511,18 +3521,18 @@ public:
 #else
     /// In-place division for interoperable types.
     /**
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. note::
      *
      *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
+     * \endrststar
      *
      * The body of this operator is equivalent to:
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. code-block:: c++
      *
      *    return x = static_cast<T>(x / n);
-     * \endverbatim
+     * \endrststar
      *
      * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
      *
@@ -4303,37 +4313,6 @@ public:
     {
         return !(op1 > op2);
     }
-    /// Ternary exponentiation.
-    /**
-     * This function will set \p rop to <tt>base**exp</tt>.
-     *
-     * @param rop the return value.
-     * @param base the base.
-     * @param exp the exponent.
-     */
-    friend void pow_ui(mp_integer &rop, const mp_integer &base, unsigned long exp)
-    {
-        if (rop.is_static()) {
-            MPPP_MAYBE_TLS mpz_raii tmp;
-            ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
-            rop = mp_integer(&tmp.m_mpz);
-        } else {
-            ::mpz_pow_ui(&rop.m_int.g_dy(), base.get_mpz_view(), exp);
-        }
-    }
-    /// Binary exponentiation.
-    /**
-     * @param base the base.
-     * @param exp the exponent.
-     *
-     * @return <tt>base**exp</tt>.
-     */
-    friend mp_integer pow_ui(const mp_integer &base, unsigned long exp)
-    {
-        mp_integer retval;
-        pow_ui(retval, base, exp);
-        return retval;
-    }
 
 private:
     template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
@@ -4444,13 +4423,13 @@ private:
 public:
     /// Generic binary exponentiation.
     /**
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. note::
      *
      *    This function is enabled only if at least one argument is an :cpp:class:`mppp::mp_integer`
      *    and the other argument is either an :cpp:class:`mppp::mp_integer` or an interoperable type for
      *    :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
+     * \endrststar
      *
      * This function will raise \p base to the power \p exp, and return the result. If one of the arguments
      * is a floating-point value, then the result will be computed via <tt>std::pow()</tt> and it will also be a
@@ -4512,37 +4491,6 @@ public:
         mp_integer ret(n);
         ret.abs();
         return ret;
-    }
-    /// Hash value.
-    /**
-     * This function will return a hash value for \p n. The hash value depends only on the value of \p n.
-     *
-     * @param n mp_integer whose hash value will be computed.
-     *
-     * @return a hash value for \p n.
-     */
-    friend std::size_t hash(const mp_integer &n)
-    {
-        std::size_t asize;
-        // NOTE: size is part of the common initial sequence.
-        const mpz_size_t size = n.m_int.m_st._mp_size;
-        const ::mp_limb_t *ptr;
-        if (n.m_int.is_static()) {
-            asize = static_cast<std::size_t>((size >= 0) ? size : -size);
-            ptr = n.m_int.g_st().m_limbs.data();
-        } else {
-            asize = ::mpz_size(&n.m_int.g_dy());
-            ptr = n.m_int.g_dy()._mp_d;
-        }
-        // Init the retval as the signed size.
-        auto retval = static_cast<std::size_t>(size);
-        // Combine the limbs.
-        for (std::size_t i = 0; i < asize; ++i) {
-            // The hash combiner. This is lifted directly from Boost. See also:
-            // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
-            retval ^= (ptr[i] & GMP_NUMB_MASK) + std::size_t(0x9e3779b9) + (retval << 6) + (retval >> 2);
-        }
-        return retval;
     }
 
 private:
@@ -4872,7 +4820,7 @@ public:
 #else
     /// Generic binomial coefficient.
     /**
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. note::
      *
      *    This function is enabled only in the following cases:
@@ -4882,17 +4830,17 @@ public:
      *      :cpp:class:`mppp::mp_integer`,
      *    * ``U`` is an :cpp:class:`mppp::mp_integer` and ``T`` is an integral interoperable type for
      *      :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
+     * \endrststar
      *
      * This function will compute the binomial coefficient \f$ {{n}\choose{k}} \f$, supporting integral input values.
      * The implementation can handle positive and negative values for both the top and the bottom argument. Internally,
      * the mp_integer::bin_ui() function will be employed.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. seealso::
      *
      *    http://arxiv.org/abs/1105.3689/
-     * \endverbatim
+     * \endrststar
      *
      * @param n the top argument.
      * @param k the bottom argument.
@@ -5012,11 +4960,11 @@ public:
     /**
      * This function will set \p rop to the quotient of \p n and \p d.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. warning::
      *
      *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
-     * \endverbatim
+     * \endrststar
      *
      * @param rop the return value.
      * @param n the dividend.
@@ -5037,11 +4985,11 @@ public:
     }
     /// Exact division (binary version).
     /**
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. warning::
      *
      *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
-     * \endverbatim
+     * \endrststar
      *
      * @param n the dividend.
      * @param d the divisor.
@@ -5167,13 +5115,13 @@ public:
      * and it will then return a pointer to the internal \p mpz_t structure. The returned pointer can be used as an
      * argument for the functions of the GMP API.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. note::
      *
-     *    The returned pointer is tied to the lifetime of ``this``. Calling :cpp:func:`mppp::mp_integer::demote()` or
-     *    assigning an :cpp:class:`mppp::mp_integer` with static storage to ``this`` will invalidate the returned
+     *    The returned pointer is tied to the lifetime of ``this``. Calling :cpp:func:`~mppp::mp_integer::demote()` or
+     *    assigning an :cpp:class:`~mppp::mp_integer` with static storage to ``this`` will invalidate the returned
      *    pointer.
-     * \endverbatim
+     * \endrststar
      *
      * @return a pointer to the internal \p mpz_t structure.
      */
@@ -5258,6 +5206,87 @@ private:
 
 template <std::size_t SSize>
 constexpr std::size_t mp_integer<SSize>::ssize;
+
+/** @defgroup mp_integer_exponentiation mp_integer_exponentiation
+ *  @{
+ */
+
+/// Ternary exponentiation.
+/**
+ * This function will set \p rop to <tt>base**exp</tt>.
+ *
+ * @param rop the return value.
+ * @param base the base.
+ * @param exp the exponent.
+ */
+template <std::size_t SSize>
+inline void pow_ui(mp_integer<SSize> &rop, const mp_integer<SSize> &base, unsigned long exp)
+{
+    if (rop.is_static()) {
+        MPPP_MAYBE_TLS mppp_impl::mpz_raii tmp;
+        ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
+        rop = mp_integer<SSize>(&tmp.m_mpz);
+    } else {
+        ::mpz_pow_ui(&rop._get_union().g_dy(), base.get_mpz_view(), exp);
+    }
+}
+
+/// Binary exponentiation.
+/**
+ * @param base the base.
+ * @param exp the exponent.
+ *
+ * @return <tt>base**exp</tt>.
+ */
+template <std::size_t SSize>
+inline mp_integer<SSize> pow_ui(const mp_integer<SSize> &base, unsigned long exp)
+{
+    mp_integer<SSize> retval;
+    pow_ui(retval, base, exp);
+    return retval;
+}
+
+/** @} */
+
+/** @defgroup mp_integer_other mp_integer_other
+ *  @{
+ */
+
+/// Hash value.
+/**
+ * This function will return a hash value for \p n. The hash value depends only on the value of \p n
+ * (and *not* on its storage type).
+ *
+ * @param n the integer whose hash value will be computed.
+ *
+ * @return a hash value for \p n.
+ */
+template <std::size_t SSize>
+inline std::size_t hash(const mp_integer<SSize> &n)
+{
+    std::size_t asize;
+    // NOTE: size is part of the common initial sequence.
+    const mppp_impl::mpz_size_t size = n._get_union().m_st._mp_size;
+    const ::mp_limb_t *ptr;
+    if (n._get_union().is_static()) {
+        asize = static_cast<std::size_t>((size >= 0) ? size : -size);
+        ptr = n._get_union().g_st().m_limbs.data();
+    } else {
+        asize = ::mpz_size(&n._get_union().g_dy());
+        ptr = n._get_union().g_dy()._mp_d;
+    }
+    // Init the retval as the signed size.
+    auto retval = static_cast<std::size_t>(size);
+    // Combine the limbs.
+    for (std::size_t i = 0; i < asize; ++i) {
+        // The hash combiner. This is lifted directly from Boost. See also:
+        // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
+        retval ^= (ptr[i] & GMP_NUMB_MASK) + std::size_t(0x9e3779b9) + (retval << 6) + (retval >> 2);
+    }
+    return retval;
+}
+
+/** @} */
 
 namespace mppp_impl
 {
