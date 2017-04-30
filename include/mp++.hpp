@@ -114,7 +114,7 @@
 #endif
 
 // Concepts setup.
-#if __cpp_concepts >= 201507
+#if defined(__cpp_concepts)
 
 #define MPPP_HAVE_CONCEPTS
 
@@ -1579,7 +1579,8 @@ public:
  * it.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    explicit operator CppInteroperable() const
+    template <CppInteroperable T>
+    explicit operator T() const
 #else
     template <typename T, generic_conversion_enabler<T> = 0>
     explicit operator T() const
