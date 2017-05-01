@@ -42,7 +42,6 @@ see https://www.gnu.org/licenses/. */
 static int ntries = 1000;
 
 using namespace mppp;
-using namespace mppp::mppp_impl;
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,

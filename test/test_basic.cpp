@@ -50,7 +50,6 @@ see https://www.gnu.org/licenses/. */
 static int ntries = 1000;
 
 using namespace mppp;
-using namespace mppp::mppp_impl;
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
@@ -71,19 +70,21 @@ struct no_const {
 // NOTE: char types are not supported in uniform_int_distribution by the standard.
 // Use a small wrapper to get an int distribution instead, with the min max limits
 // from the char type. We will be casting back when using the distribution.
-template <typename T, typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                || std::is_same<unsigned char, T>::value),
-                                              int>::type
-                      = 0>
+template <typename T,
+          typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                    || std::is_same<unsigned char, T>::value),
+                                  int>::type
+          = 0>
 static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
 {
     return std::uniform_int_distribution<T>(min, max);
 }
 
-template <typename T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                  || std::is_same<unsigned char, T>::value,
-                                              int>::type
-                      = 0>
+template <typename T,
+          typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                      || std::is_same<unsigned char, T>::value,
+                                  int>::type
+          = 0>
 static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
 get_int_dist(T min, T max)
 {

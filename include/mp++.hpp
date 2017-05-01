@@ -124,7 +124,7 @@
 namespace mppp
 {
 
-namespace mppp_impl
+inline namespace detail
 {
 
 // A bunch of useful utilities from C++14/C++17.
@@ -691,7 +691,7 @@ public:
 #if defined(MPPP_HAVE_CONCEPTS) && !defined(MPPP_DOXYGEN_INVOKED)
 
 template <typename T>
-concept bool CppInteroperable = mppp_impl::is_supported_interop<T>::value;
+concept bool CppInteroperable = is_supported_interop<T>::value;
 
 #endif
 
@@ -876,31 +876,9 @@ struct zero_division_error final : std::domain_error {
 template <std::size_t SSize>
 class mp_integer
 {
-    // Import these typedefs for ease of use.
-    template <bool B, typename T = void>
-    using enable_if_t = mppp_impl::enable_if_t<B, T>;
-    using s_storage = mppp_impl::static_int<SSize>;
-    using d_storage = mppp_impl::mpz_struct_t;
-    using mpz_size_t = mppp_impl::mpz_size_t;
-    using mpz_raii = mppp_impl::mpz_raii;
-    using mpz_struct_t = mppp_impl::mpz_struct_t;
-#if defined(MPPP_WITH_LONG_DOUBLE)
-    using mpfr_raii = mppp_impl::mpfr_raii;
-#endif
-    template <typename T>
-    using is_supported_integral = mppp_impl::is_supported_integral<T>;
-    template <typename T>
-    using is_supported_float = mppp_impl::is_supported_float<T>;
-    template <typename T>
-    using is_supported_interop = mppp_impl::is_supported_interop<T>;
-    template <template <class...> class Op, class... Args>
-    using is_detected = mppp_impl::is_detected<Op, Args...>;
-    template <typename... Args>
-    using conjunction = mppp_impl::conjunction<Args...>;
-    template <typename... Args>
-    using disjunction = mppp_impl::disjunction<Args...>;
-    template <typename T>
-    using negation = mppp_impl::negation<T>;
+    // Typedefs for ease of use.
+    using s_storage = static_int<SSize>;
+    using d_storage = mpz_struct_t;
     // The underlying static int.
     using s_int = s_storage;
     // mpz view class.
@@ -1167,13 +1145,13 @@ private:
             m_int.g_st().~s_storage();
             // Init dynamic.
             ::new (static_cast<void *>(&m_int.m_dy)) d_storage;
-            mppp_impl::mpz_init_set_nlimbs(m_int.m_dy, *n);
+            mpz_init_set_nlimbs(m_int.m_dy, *n);
         } else {
             // All this is noexcept.
             // NOTE: m_st() inits to zero the whole array of static limbs, and we copy
             // in only the used limbs.
             m_int.g_st()._mp_size = n->_mp_size;
-            mppp_impl::copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
         }
     }
 
@@ -1385,7 +1363,7 @@ public:
                                         "2 and 62, but a value of "
                                         + std::to_string(base) + " was provided instead");
         }
-        return mppp_impl::mpz_to_str(get_mpz_view(), base);
+        return mpz_to_str(get_mpz_view(), base);
     }
     // NOTE: maybe provide a method to access the lower-level str conversion that writes to
     // std::vector<char>?
@@ -1767,7 +1745,6 @@ private:
     static bool static_add_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
                                 int sign1, int sign2, const std::integral_constant<int, 0> &)
     {
-        using mppp_impl::copy_limbs;
         auto rdata = &rop.m_limbs[0];
         auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
         const auto size1 = op1._mp_size;
@@ -1883,7 +1860,6 @@ private:
     static bool static_add_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
                                 int sign1, int sign2, const std::integral_constant<int, 1> &)
     {
-        using mppp_impl::limb_add_overflow;
         auto rdata = &rop.m_limbs[0];
         auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
         // NOTE: both asizes have to be 0 or 1 here.
@@ -1944,7 +1920,6 @@ private:
     static bool static_add_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
                                 int sign1, int sign2, const std::integral_constant<int, 2> &)
     {
-        using mppp_impl::limb_add_overflow;
         auto rdata = &rop.m_limbs[0];
         auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
         if (sign1 == sign2) {
@@ -2322,7 +2297,6 @@ private:
     static bool static_add_ui_impl(s_int &rop, const s_int &op1, mpz_size_t asize1, int sign1, unsigned long op2,
                                    const std::integral_constant<int, 0> &)
     {
-        using mppp_impl::copy_limbs;
         auto rdata = &rop.m_limbs[0];
         auto data1 = &op1.m_limbs[0];
         const auto size1 = op1._mp_size;
@@ -2381,7 +2355,6 @@ private:
     static bool static_add_ui_impl(s_int &rop, const s_int &op1, mpz_size_t, int sign1, unsigned long op2,
                                    const std::integral_constant<int, 1> &)
     {
-        using mppp_impl::limb_add_overflow;
         const auto l1 = op1.m_limbs[0];
         const auto l2 = static_cast<::mp_limb_t>(op2);
         ::mp_limb_t tmp;
@@ -2412,7 +2385,6 @@ private:
     static bool static_add_ui_impl(s_int &rop, const s_int &op1, mpz_size_t asize1, int sign1, unsigned long op2,
                                    const std::integral_constant<int, 2> &)
     {
-        using mppp_impl::limb_add_overflow;
         auto rdata = &rop.m_limbs[0];
         auto data1 = &op1.m_limbs[0];
         const auto l2 = static_cast<::mp_limb_t>(op2);
@@ -2532,7 +2504,6 @@ private:
     static std::size_t static_mul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1,
                                        mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 0> &)
     {
-        using mppp_impl::copy_limbs_no;
         // Handle zeroes.
         if (mppp_unlikely(!sign1 || !sign2)) {
             rop._mp_size = 0;
@@ -2631,7 +2602,6 @@ private:
     static std::size_t static_mul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1,
                                        mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 2> &)
     {
-        using mppp_impl::limb_add_overflow;
         if (mppp_unlikely(!asize1 || !asize2)) {
             // Handle zeroes.
             rop._mp_size = 0;
@@ -2882,7 +2852,6 @@ private:
                                           mpz_size_t, int signr, int sign1, int sign2,
                                           const std::integral_constant<int, 1> &)
     {
-        using mppp_impl::limb_add_overflow;
         // First we do op1 * op2.
         ::mp_limb_t tmp;
         const ::mp_limb_t prod = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &tmp);
@@ -2926,7 +2895,6 @@ private:
                                           mpz_size_t asize1, mpz_size_t asize2, int signr, int sign1, int sign2,
                                           const std::integral_constant<int, 2> &)
     {
-        using mppp_impl::limb_add_overflow;
         if (mppp_unlikely(!asize1 || !asize2)) {
             // If op1 or op2 are zero, rop will be unchanged.
             return 0u;
@@ -3103,7 +3071,6 @@ private:
     static void static_div_impl(s_int &q, s_int &r, const s_int &op1, const s_int &op2, mpz_size_t asize1,
                                 mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 0> &)
     {
-        using mppp_impl::copy_limbs_no;
         // First we check if the divisor is larger than the dividend (in abs limb size), as the mpn function
         // requires asize1 >= asize2.
         if (asize2 > asize1) {
@@ -3524,7 +3491,6 @@ private:
     static std::size_t static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
                                             const std::integral_constant<int, 0> &)
     {
-        using mppp_impl::copy_limbs_no;
         mpz_size_t asize = n._mp_size;
         if (s == 0u || asize == 0) {
             // If shift is zero, or the operand is zero, write n into rop and return success.
@@ -4521,7 +4487,6 @@ public:
 private:
     static void sqrt_impl(mp_integer &rop, const mp_integer &n)
     {
-        using mppp_impl::copy_limbs_no;
         if (mppp_unlikely(n.m_int.m_st._mp_size < 0)) {
             throw std::domain_error("Cannot compute the square root of the negative number " + n.to_string());
         }
@@ -4799,7 +4764,6 @@ private:
     static void static_divexact_impl(s_int &q, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
                                      int sign1, int sign2, const std::integral_constant<int, 0> &)
     {
-        using mppp_impl::copy_limbs_no;
         if (asize1 == 0) {
             // Special casing if the numerator is zero (the mpn functions do not work with zero operands).
             q._mp_size = 0;
@@ -4943,7 +4907,6 @@ public:
 private:
     static void static_gcd(s_int &rop, const s_int &op1, const s_int &op2)
     {
-        using mppp_impl::copy_limbs_no;
         mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
         if (asize1 < 0) {
             asize1 = -asize1;
@@ -5032,7 +4995,7 @@ public:
      *
      * @return a reference to the internal union member.
      */
-    mppp_impl::integer_union<SSize> &_get_union()
+    integer_union<SSize> &_get_union()
     {
         return m_int;
     }
@@ -5042,7 +5005,7 @@ public:
      *
      * @return a const reference to the internal union member.
      */
-    const mppp_impl::integer_union<SSize> &_get_union() const
+    const integer_union<SSize> &_get_union() const
     {
         return m_int;
     }
@@ -5138,7 +5101,7 @@ public:
     }
 
 private:
-    mppp_impl::integer_union<SSize> m_int;
+    integer_union<SSize> m_int;
 };
 
 template <std::size_t SSize>
@@ -5211,12 +5174,11 @@ concept bool MpIntegerArithInteroperable = CppInteroperable<T> || std::is_same<m
 
 // Enabler for in-place arithmetic ops.
 template <typename T, std::size_t SSize>
-using in_place_enabler = mppp_impl::enable_if_t<mppp_impl::disjunction<mppp_impl::is_supported_interop<T>,
-                                                                       std::is_same<T, mp_integer<SSize>>>::value,
-                                                int>;
+using in_place_enabler
+    = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, mp_integer<SSize>>>::value, int>;
 
 template <typename T>
-using in_place_lenabler = mppp_impl::enable_if_t<mppp_impl::is_supported_interop<T>::value, int>;
+using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
 
 #endif
 
@@ -5227,12 +5189,12 @@ inline void dispatch_in_place_add(mp_integer<SSize> &retval, const mp_integer<SS
     add(retval, retval, n);
 }
 
-template <std::size_t SSize, typename T, mppp_impl::enable_if_t<mppp_impl::is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
 inline void dispatch_in_place_add(mp_integer<SSize> &retval, const T &n)
 {
     add(retval, retval, mp_integer<SSize>{n});
 }
-template <std::size_t SSize, typename T, mppp_impl::enable_if_t<mppp_impl::is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
 inline void dispatch_in_place_add(mp_integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
@@ -5269,7 +5231,7 @@ template <typename T, std::size_t SSize, in_place_lenabler<T> = 0>
 inline T &operator+=(T &x, const mp_integer<SSize> &n)
 #endif
 {
-    return x = static_cast<mppp_impl::uncvref_t<decltype(x)>>(x + n);
+    return x = static_cast<uncvref_t<decltype(x)>>(x + n);
 }
 
 /** @} */
@@ -5290,7 +5252,7 @@ template <std::size_t SSize>
 inline void pow_ui(mp_integer<SSize> &rop, const mp_integer<SSize> &base, unsigned long exp)
 {
     if (rop.is_static()) {
-        MPPP_MAYBE_TLS mppp_impl::mpz_raii tmp;
+        MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
         rop = mp_integer<SSize>(&tmp.m_mpz);
     } else {
@@ -5333,7 +5295,7 @@ inline std::size_t hash(const mp_integer<SSize> &n)
 {
     std::size_t asize;
     // NOTE: size is part of the common initial sequence.
-    const mppp_impl::mpz_size_t size = n._get_union().m_st._mp_size;
+    const mpz_size_t size = n._get_union().m_st._mp_size;
     const ::mp_limb_t *ptr;
     if (n._get_union().is_static()) {
         asize = static_cast<std::size_t>((size >= 0) ? size : -size);
@@ -5354,17 +5316,6 @@ inline std::size_t hash(const mp_integer<SSize> &n)
 }
 
 /** @} */
-
-namespace mppp_impl
-{
-
-// A small wrapper to avoid name clashing below, in the specialisation of std::hash.
-template <size_t SSize>
-inline std::size_t hash_wrapper(const mp_integer<SSize> &n)
-{
-    return hash(n);
-}
-}
 }
 
 namespace std
@@ -5385,7 +5336,7 @@ struct hash<mppp::mp_integer<SSize>> {
      */
     result_type operator()(const argument_type &n) const
     {
-        return mppp::mppp_impl::hash_wrapper(n);
+        return mppp::hash(n);
     }
 };
 }
