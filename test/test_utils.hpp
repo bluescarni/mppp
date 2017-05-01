@@ -38,7 +38,6 @@ see https://www.gnu.org/licenses/. */
 #include <initializer_list>
 #include <limits>
 #include <locale>
-#include <mp++.hpp>
 #include <random>
 #include <sstream>
 #include <string>
