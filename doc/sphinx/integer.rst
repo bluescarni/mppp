@@ -1,11 +1,6 @@
 Arbitrary-precision integers
 ============================
 
-Concepts
---------
-
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerArithInteroperable
-
 
 The ``integer`` class
 ------------------------
@@ -13,13 +8,28 @@ The ``integer`` class
 .. doxygenclass:: mppp::integer
    :members:
 
-.. _integer_functions:
+.. _integer_operators:
+
+Concepts
+--------
+
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerOpInteroperable
+
+   This concept is satisfied by all types with which an :cpp:class:`~mppp::integer` with static size ``SSize``
+   can interoperate via its :ref:`overloaded operators <integer_operators>`. Specifically, this concept is satisfied by:
+
+   * all :cpp:concept:`~mppp::CppInteroperable` types,
+   * :cpp:class:`~mppp::integer` with static size ``SSize``.
+
+   Note that the modulo and bit-shifting operators have additional restrictions.
 
 Operators
 ---------
 
 .. doxygengroup:: integer_operators
    :content-only:
+
+.. _integer_functions:
 
 Functions
 ---------

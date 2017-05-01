@@ -686,14 +686,14 @@ public:
     s_storage m_st;
     d_storage m_dy;
 };
-}
-
-#if defined(MPPP_HAVE_CONCEPTS) && !defined(MPPP_DOXYGEN_INVOKED)
 
 template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
 concept bool CppInteroperable = is_supported_interop<T>::value;
-
+#else
+using cpp_interoperable_enabler = enable_if_t<is_supported_interop<T>::value, int>;
 #endif
+}
 
 /// Exception to signal division by zero.
 /**
@@ -733,7 +733,7 @@ struct zero_division_error final : std::domain_error {
  *
  * When the value of an :cpp:class:`~mppp::integer` is stored directly within the object, the *storage type* of the
  * integer is said to be *static*. When the limb size of the integer exceeds the maximum value ``SSize``, the storage
- * types becomes *dynamic*. The transition from static to dynamic storage happens transparently whenever the integer
+ * type becomes *dynamic*. The transition from static to dynamic storage happens transparently whenever the integer
  * value becomes large enough. The demotion from dynamic to static storage usually needs to be requested explicitly.
  * For values of ``SSize`` of 1 and 2, optimised implementations of basic arithmetic operations are employed,
  * if supported by the target architecture and if the storage type is static. For larger values of ``SSize``,
@@ -742,7 +742,7 @@ struct zero_division_error final : std::domain_error {
  *
  * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
  * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list),
- * and it provides overloaded arithmetic operators. Differently from the builtin types,
+ * and it provides overloaded :ref:`operators <integer_operators>`. Differently from the builtin types,
  * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
  * from and  conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
  *
@@ -758,7 +758,7 @@ struct zero_division_error final : std::domain_error {
  *    integer<1> n{5};
  *    int m = static_cast<int>(n);
  *
- * Most of the functionality of this class is exposed via plain :ref:`functions <integer_functions>`, with the
+ * Most of the functionality is exposed via plain :ref:`functions <integer_functions>`, with the
  * general convention that the functions are named after the corresponding GMP functions minus the leading ``mpz_``
  * prefix. For instance, the GMP call
  *
@@ -816,11 +816,8 @@ struct zero_division_error final : std::domain_error {
  *
  * Note that at this time only a small subset of the GMP API has been wrapped by :cpp:class:`~mppp::integer`.
  *
- * This class provides overloaded operators for the basic arithmetic operations, including bit shifting.
- * The overloaded operators are resolved via argument-dependent lookup whenever at least
- * one argument is of type :cpp:class:`~mppp::integer`, and the other argument is either another
- * :cpp:class:`~mppp::integer` or an instance of :cpp:concept:`~mppp::CppInteroperable`.
- *
+ * Various :ref:`overloaded operators <integer_operators>` are provided. The operators are resolved via
+ * argument-dependent lookup whenever at least one argument is of type :cpp:class:`~mppp::integer`.
  * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
  * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
  * is a C++ integral, the result will be of type :cpp:class:`~mppp::integer`, if the other argument is a C++
@@ -845,7 +842,7 @@ struct zero_division_error final : std::domain_error {
  * promoted to :cpp:class:`~mppp::integer` if they are both integral types, otherwise they are promoted to the type
  * of the floating-point argument).
  *
- * This class provides facilities to interface with the GMP library. Specifically, :cpp:class:`~mppp::integer`
+ * Several facilities for interfacing with the GMP library are provided. Specifically, :cpp:class:`~mppp::integer`
  * features:
  *
  * * a constructor from the GMP integer type ``mpz_t``,
@@ -867,10 +864,6 @@ struct zero_division_error final : std::domain_error {
  *                                   // it in m using the GMP API.
  *
  * See the documentation of :cpp:func:`~mppp::integer::get_mpz_view()` for more details about the ``mpz_view`` class.
- *
- * This class provides a :cpp:func:`~mppp::hash()` function to compute a hash value for an integer. A specialisation
- * of the standard ``std::hash`` functor is also provided, so that it is possible to use :cpp:class:`~mppp::integer`
- * in standard unordered associative containers out of the box.
  * \endrststar
  */
 template <std::size_t SSize>
@@ -1002,14 +995,6 @@ public:
     integer(integer &&other) = default;
 
 private:
-#if !defined(MPPP_HAVE_CONCEPTS)
-    // Enabler for generic ctor.
-    template <typename T>
-    using generic_ctor_enabler = enable_if_t<is_supported_interop<T>::value, int>;
-    // Enabler for generic assignment.
-    template <typename T>
-    using generic_assignment_enabler = generic_ctor_enabler<T>;
-#endif
     // Add a limb at the top of the integer (that is, the new limb will be the new most
     // significant limb). Requires a non-negative integer. This is used only during generic construction,
     // do **NOT** use it anywhere else.
@@ -1107,7 +1092,7 @@ private:
         }
     }
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
-    void dispatch_generic_ctor(T x)
+    void dispatch_generic_ctor(const T &x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot init integer from the non-finite floating-point value "
@@ -1119,7 +1104,7 @@ private:
     }
 #if defined(MPPP_WITH_LONG_DOUBLE)
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
-    void dispatch_generic_ctor(T x)
+    void dispatch_generic_ctor(const T &x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot init integer from the non-finite floating-point value "
@@ -1168,10 +1153,10 @@ public:
  * @throws std::domain_error if \p x is a non-finite floating-point value.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    explicit integer(CppInteroperable x)
+    explicit integer(const CppInteroperable &x)
 #else
-    template <typename T, generic_ctor_enabler<T> = 0>
-    explicit integer(T x)
+    template <typename T, cpp_interoperable_enabler<T> = 0>
+    explicit integer(const T &x)
 #endif
         : m_int()
     {
@@ -1283,7 +1268,7 @@ public:
 #if defined(MPPP_HAVE_CONCEPTS)
     integer &operator=(const CppInteroperable &x)
 #else
-    template <typename T, generic_assignment_enabler<T> = 0>
+    template <typename T, cpp_interoperable_enabler<T> = 0>
     integer &operator=(const T &x)
 #endif
     {
@@ -1369,11 +1354,6 @@ public:
     // std::vector<char>?
 
 private:
-#if !defined(MPPP_HAVE_CONCEPTS)
-    // Implementation of the conversion operator.
-    template <typename T>
-    using generic_conversion_enabler = generic_ctor_enabler<T>;
-#endif
     // Conversion to bool.
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
@@ -1564,7 +1544,7 @@ public:
     template <CppInteroperable T>
     explicit operator T() const
 #else
-    template <typename T, generic_conversion_enabler<T> = 0>
+    template <typename T, cpp_interoperable_enabler<T> = 0>
     explicit operator T() const
 #endif
     {
@@ -5108,81 +5088,22 @@ private:
 template <std::size_t SSize>
 constexpr std::size_t integer<SSize>::ssize;
 
-#if 0
-
-
-private:
-#if defined(_MSC_VER)
-    template <typename T>
-    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, T &>;
-#else
-    template <typename T>
-    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
-#endif
-
-public:
-#if defined(_MSC_VER)
-    template <typename T>
-    friend in_place_lenabler<T> operator+=(T &x, const integer &n)
-#else
-/// In-place addition for interoperable types.
-/**
- * \rststar
- * The body of this operator is equivalent to:
- *
- * .. code-block:: c++
- *
- *    return x = static_cast<CppInteroperable>(x + n);
- *
- * That is, the result of the corresponding binary operation is cast back to
- * :cpp:concept:`~mppp::CppInteroperable` and assigned to ``x``.
- * \endrststar
- *
- * @param x the first argument.
- * @param n the second argument.
- *
- * @return a reference to \p x.
- *
- * @throws unspecified any exception thrown by the conversion operator of mppp::integer.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-    friend CppInteroperable &operator+=(CppInteroperable &x, const integer &n)
-#else
-    template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator+=(T &x, const integer &n)
-#endif
-#endif
-    {
-        // NOTE: if x is an integral, then the static cast is a generic conversion from
-        // integer to the integral, which can fail because of overflow. Otherwise, the
-        // static cast is a redundant cast to float of x + n, which is already a float.
-        return x = static_cast<mppp_impl::uncvref_t<decltype(x)>>(x + n);
-    }
-#endif
-
 /** @defgroup integer_operators integer_operators
  *  @{
  */
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
+inline namespace detail
+{
 
+template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
-
-template <typename T, std::size_t SSize>
-concept bool IntegerArithInteroperable = CppInteroperable<T> || std::is_same<integer<SSize>, T>::value;
-
+concept bool IntegerOpInteroperable = CppInteroperable<T> || std::is_same<integer<SSize>, T>::value;
 #else
-
-// Enabler for in-place arithmetic ops.
-template <typename T, std::size_t SSize>
-using in_place_enabler = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, integer<SSize>>>::value, int>;
-
-template <typename T>
-using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
-
+using integer_op_interoperable_enabler
+    = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, integer<SSize>>>::value, int>;
 #endif
 
-// Dispatching for in-place add.
+// Dispatching for in-place add, integer on the left.
 template <std::size_t SSize>
 inline void dispatch_in_place_add(integer<SSize> &retval, const integer<SSize> &n)
 {
@@ -5194,28 +5115,28 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const T &n)
 {
     add(retval, retval, integer<SSize>{n});
 }
+
 template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
 inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
 }
+}
 
-#endif
-
-/// In-place addition operator.
+/// In-place addition.
 /**
+ * @param rop the augend.
  * @param op the addend.
  *
- * @return a reference to \p this.
+ * @return a reference to \p rop.
  *
- * @throws unspecified any exception thrown by the assignment of a floating-point value to integer, iff \p T
- * is a floating-point type.
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline integer<SSize> &operator+=(integer<SSize> &rop, const IntegerArithInteroperable<SSize> &op)
+inline integer<SSize> &operator+=(integer<SSize> &rop, const IntegerOpInteroperable<SSize> &op)
 #else
-template <typename T, std::size_t SSize, in_place_enabler<T, SSize> = 0>
+template <typename T, std::size_t SSize, integer_op_interoperable_enabler<T, SSize> = 0>
 inline integer<SSize> &operator+=(integer<SSize> &rop, const T &op)
 #endif
 {
@@ -5223,15 +5144,27 @@ inline integer<SSize> &operator+=(integer<SSize> &rop, const T &op)
     return rop;
 }
 
+/// In-place addition.
+/**
+ * @param rop the augend.
+ * @param op the addend.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline CppInteroperable &operator+=(CppInteroperable &x, const integer<SSize> &n)
+inline CppInteroperable &operator+=(CppInteroperable &rop, const integer<SSize> &op)
 #else
-template <typename T, std::size_t SSize, in_place_lenabler<T> = 0>
-inline T &operator+=(T &x, const integer<SSize> &n)
+template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
+inline T &operator+=(T &rop, const integer<SSize> &op)
 #endif
 {
-    return x = static_cast<uncvref_t<decltype(x)>>(x + n);
+    // NOTE: if rop is an integral, then the static cast is a generic conversion from
+    // integer to the integral, which can fail because of overflow. Otherwise, the
+    // static cast is a redundant cast to float of rop + op, which is already a float.
+    return rop = static_cast<uncvref_t<decltype(rop)>>(rop + op);
 }
 
 /** @} */
@@ -5240,7 +5173,7 @@ inline T &operator+=(T &x, const integer<SSize> &n)
  *  @{
  */
 
-/// Ternary exponentiation.
+/// Ternary integer exponentiation.
 /**
  * This function will set \p rop to <tt>base**exp</tt>.
  *
@@ -5260,7 +5193,7 @@ inline void pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned lon
     }
 }
 
-/// Binary exponentiation.
+/// Binary integer exponentiation.
 /**
  * @param base the base.
  * @param exp the exponent.
@@ -5283,8 +5216,13 @@ inline integer<SSize> pow_ui(const integer<SSize> &base, unsigned long exp)
 
 /// Hash value.
 /**
- * This function will return a hash value for \p n. The hash value depends only on the value of \p n
+ * \rststar
+ * This function will return a hash value for ``n``. The hash value depends only on the value of ``n``
  * (and *not* on its storage type).
+ *
+ * A specialisation of the standard ``std::hash`` functor is also provided, so that it is possible to use
+ * :cpp:class:`~mppp::integer` in standard unordered associative containers out of the box.
+ * \endrststar
  *
  * @param n the integer whose hash value will be computed.
  *

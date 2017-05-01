@@ -33,6 +33,7 @@ see https://www.gnu.org/licenses/. */
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 
 #include <mp++.hpp>
 
@@ -47,6 +48,19 @@ using namespace mppp_test;
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
                          std::integral_constant<std::size_t, 10>>;
+
+// Type traits to detect the availability of operators.
+template <typename T, typename U>
+using add_t = decltype(std::declval<const T &>() + std::declval<const U &>());
+
+template <typename T, typename U>
+using inplace_add_t = decltype(std::declval<T &>() += std::declval<const U &>());
+
+template <typename T, typename U>
+using is_addable = is_detected<add_t, T, U>;
+
+template <typename T, typename U>
+using is_addable_inplace = is_detected<inplace_add_t, T, U>;
 
 struct add_tester {
     template <typename S>
@@ -117,6 +131,13 @@ struct add_tester {
                                                        + std::to_string(std::numeric_limits<double>::infinity());
                                      });
         }
+        // Type traits.
+        REQUIRE((!is_addable<integer, std::string>::value));
+        REQUIRE((!is_addable<std::string, integer>::value));
+        REQUIRE((!is_addable_inplace<integer, std::string>::value));
+        REQUIRE((!is_addable_inplace<const integer, int>::value));
+        REQUIRE((!is_addable_inplace<std::string, integer>::value));
+        REQUIRE((!is_addable_inplace<const int, integer>::value));
         // In-place with interop on the lhs.
         short nl = 1;
         nl += integer{1};
