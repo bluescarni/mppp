@@ -43,9 +43,11 @@ if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_STATIC_RUNTIME "Use the MSVC static runtime instead of the shared runtime." OFF)
 endif()
 
-# This is just a hackish way of detecting concepts, need to revisit once
-# more compilers support them.
-check_cxx_compiler_flag("-fconcepts" MPPP_HAVE_CONCEPTS)
+if(YACMA_COMPILER_IS_GNUCXX)
+    # This is just a hackish way of detecting concepts, need to revisit once
+    # more compilers support them.
+    check_cxx_compiler_flag("-fconcepts" MPPP_COMPILER_SUPPORTS_CONCEPTS)
+endif()
 
 find_package(GMP REQUIRED)
 

@@ -15,7 +15,9 @@ function(ADD_MPPP_TESTCASE arg1)
     # NOTE: for clang-cl, cmake tries to set -std=c++11 here, which makes
     # it error out. Disable it as MSVC 2015 is implicitly C++14 anyway.
     if(NOT (YACMA_COMPILER_IS_MSVC AND YACMA_COMPILER_IS_CLANGXX))
-      if(MPPP_HAVE_CONCEPTS)
+      if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
+        # NOTE: the idea here is that we want to use C++14 if the compilers supports
+        # concepts (as variable concepts are essentially template variables).
         set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 14)
       else()
         set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 11)
