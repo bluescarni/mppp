@@ -4215,7 +4215,9 @@ private:
     template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
     static unsigned long exp_to_ulong(const T &exp)
     {
+#if !defined(__INTEL_COMPILER)
         assert(exp >= T(0));
+#endif
         // NOTE: make_unsigned<T>::type is T if T is already unsigned.
         if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(exp)
                           > std::numeric_limits<unsigned long>::max())) {
