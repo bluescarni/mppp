@@ -54,7 +54,7 @@ struct gcd_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // Start with zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;

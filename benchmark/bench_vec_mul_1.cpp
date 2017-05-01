@@ -59,7 +59,7 @@ using mpz_int = boost::multiprecision::mpz_int;
 using fmpzxx = flint::fmpzxx;
 #endif
 
-using integer = mp_integer<1>;
+using integer = integer<1>;
 static const std::string name = "bench_vec_mul_1";
 
 constexpr auto size = 30000000ul;

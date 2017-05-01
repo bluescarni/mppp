@@ -52,7 +52,7 @@ struct add_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // Binary add.
         integer n1{1}, n2{-2};
         REQUIRE((lex_cast(+n2) == "-2"));
@@ -188,7 +188,7 @@ struct sub_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n1{1}, n2{-2};
         REQUIRE((lex_cast(-n2) == "2"));
         REQUIRE((lex_cast(n1 - n2) == "3"));
@@ -325,7 +325,7 @@ struct mul_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n1{1}, n2{-2};
         REQUIRE((lex_cast(n1 * n2) == "-2"));
         REQUIRE((std::is_same<decltype(n1 * n2), integer>::value));
@@ -420,7 +420,7 @@ struct div_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n1{4}, n2{-2};
         REQUIRE((lex_cast(n1 / n2) == "-2"));
         REQUIRE((std::is_same<decltype(n1 / n2), integer>::value));
@@ -536,7 +536,7 @@ struct shift_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer ret;
         REQUIRE((lex_cast(ret << 0) == "0"));
         REQUIRE((lex_cast(ret << 1u) == "0"));
@@ -635,7 +635,7 @@ struct mod_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n1{4}, n2{-2};
         REQUIRE((lex_cast(n1 % n2) == "0"));
         REQUIRE((std::is_same<decltype(n1 % n2), integer>::value));
@@ -700,7 +700,7 @@ struct rel_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n1{4}, n2{-2};
 
         REQUIRE(n1 != n2);

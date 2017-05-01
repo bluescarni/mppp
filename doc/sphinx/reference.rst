@@ -8,5 +8,5 @@ Here follows the complete C++ reference of the mp++ library.
 
    namespaces.rst
    concepts.rst
-   mp_integer.rst
+   integer.rst
    exceptions.rst

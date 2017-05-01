@@ -55,7 +55,7 @@ struct hash_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         const std::hash<integer> hasher{};
         integer n1, n2;
         REQUIRE((hash(n1) == 0u));

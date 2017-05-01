@@ -112,12 +112,12 @@ inline namespace impl
 {
 
 template <typename T>
-struct is_mp_integer {
+struct is_integer {
     static const bool value = false;
 };
 
 template <std::size_t SSize>
-struct is_mp_integer<mppp::mp_integer<SSize>> {
+struct is_integer<mppp::integer<SSize>> {
     static const bool value = true;
 };
 
@@ -133,7 +133,7 @@ inline unsigned long long lex_cast_tr(T n)
     return static_cast<unsigned long long>(n);
 }
 
-template <typename T, typename std::enable_if<is_mp_integer<T>::value, int>::type = 0>
+template <typename T, typename std::enable_if<is_integer<T>::value, int>::type = 0>
 inline std::string lex_cast_tr(const T &x)
 {
     return x.to_string();

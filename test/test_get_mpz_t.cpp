@@ -51,7 +51,7 @@ struct get_mpz_t_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n;
         auto ptr = n.get_mpz_t();
         REQUIRE(n.is_dynamic());

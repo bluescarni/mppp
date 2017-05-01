@@ -55,7 +55,7 @@ struct add_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // Start with all zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;
@@ -316,7 +316,7 @@ struct sub_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // Start with all zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;
@@ -550,7 +550,7 @@ struct mul_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // Start with zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;
@@ -757,7 +757,7 @@ struct addmul_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // Start with zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;
@@ -1041,7 +1041,7 @@ struct div_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         mpz_raii m1, m2, m3, m4;
         integer n1, n2, n3, n4;
         // A few simple tests to start.
@@ -1194,7 +1194,7 @@ struct lshift_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // A few zero tests to start.
         mpz_raii m1, m2;
         integer n1, n2;
@@ -1489,7 +1489,7 @@ struct rshift_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // A few zero tests to start.
         mpz_raii m1, m2;
         integer n1, n2;

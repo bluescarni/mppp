@@ -48,7 +48,7 @@ struct is_zero_one_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n;
         REQUIRE(n.is_zero());
         REQUIRE(is_zero(n));

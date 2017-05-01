@@ -3,7 +3,7 @@ Concepts
 
 .. cpp:concept:: template <typename T> mppp::CppInteroperable
 
-   Any C++ fundamental type with which the multiprecision classes (such as :cpp:class:`~mppp::mp_integer`)
+   Any C++ fundamental type with which the multiprecision classes (such as :cpp:class:`~mppp::integer`)
    can interoperate. The full list is:
 
    * ``bool``,

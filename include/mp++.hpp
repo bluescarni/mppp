@@ -728,10 +728,10 @@ struct zero_division_error final : std::domain_error {
  * \rststar
  * This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
  * a small value optimisation: integers whose size is up to ``SSize`` limbs are stored directly in the storage
- * occupied by the :cpp:class:`~mppp::mp_integer` object, without resorting to dynamic memory allocation. The value of
+ * occupied by the :cpp:class:`~mppp::integer` object, without resorting to dynamic memory allocation. The value of
  * ``SSize`` must be at least 1 and less than an implementation-defined upper limit.
  *
- * When the value of an :cpp:class:`~mppp::mp_integer` is stored directly within the object, the *storage type* of the
+ * When the value of an :cpp:class:`~mppp::integer` is stored directly within the object, the *storage type* of the
  * integer is said to be *static*. When the limb size of the integer exceeds the maximum value ``SSize``, the storage
  * types becomes *dynamic*. The transition from static to dynamic storage happens transparently whenever the integer
  * value becomes large enough. The demotion from dynamic to static storage usually needs to be requested explicitly.
@@ -748,17 +748,17 @@ struct zero_division_error final : std::domain_error {
  *
  * .. code-block:: c++
  *
- *    mp_integer<1> n = 5;
+ *    integer<1> n = 5;
  *    int m = n;
  *
  * will not work, and direct initialization and explicit casting should be used instead:
  *
  * .. code-block:: c++
  *
- *    mp_integer<1> n{5};
+ *    integer<1> n{5};
  *    int m = static_cast<int>(n);
  *
- * Most of the functionality of this class is exposed via plain :ref:`functions <mp_integer_functions>`, with the
+ * Most of the functionality of this class is exposed via plain :ref:`functions <integer_functions>`, with the
  * general convention that the functions are named after the corresponding GMP functions minus the leading ``mpz_``
  * prefix. For instance, the GMP call
  *
@@ -779,7 +779,7 @@ struct zero_division_error final : std::domain_error {
  * Binary functions in GMP are usually implemented via three-arguments functions, in which the first
  * argument is a reference to the return value. The exponentiation function ``mpz_pow_ui()``, for instance,
  * takes three arguments: the return value, the base and the exponent. There are two overloads of the corresponding
- * :ref:`exponentiation <mp_integer_exponentiation>` function:
+ * :ref:`exponentiation <integer_exponentiation>` function:
  *
  * * a ternary overload semantically equivalent to ``mpz_pow_ui()``,
  * * a binary overload taking as inputs the base and the exponent, and returning the result
@@ -790,7 +790,7 @@ struct zero_division_error final : std::domain_error {
  *
  * .. code-block:: c++
  *
- *    mp_integer<1> r1, r2, n{3};
+ *    integer<1> r1, r2, n{3};
  *    pow_ui(r1,n,2);   // Ternary pow_ui(): computes n**2 and stores
  *                      // the result in r1.
  *    r2 = pow_ui(n,2); // Binary pow_ui(): returns n**2, which is then
@@ -806,7 +806,7 @@ struct zero_division_error final : std::domain_error {
  *
  * .. code-block:: c++
  *
- *    mp_integer<1> r1, r2, n{-5};
+ *    integer<1> r1, r2, n{-5};
  *    abs(r1,n);   // Binary abs(): computes and stores the absolute value
  *                 // of n into r1.
  *    r2 = abs(n); // Unary abs(): returns the absolute value of n, which is
@@ -814,67 +814,67 @@ struct zero_division_error final : std::domain_error {
  *    n.abs();     // Member function abs(): replaces the value of n with its
  *                 // absolute value.
  *
- * Note that at this time only a small subset of the GMP API has been wrapped by :cpp:class:`~mppp::mp_integer`.
+ * Note that at this time only a small subset of the GMP API has been wrapped by :cpp:class:`~mppp::integer`.
  *
  * This class provides overloaded operators for the basic arithmetic operations, including bit shifting.
  * The overloaded operators are resolved via argument-dependent lookup whenever at least
- * one argument is of type :cpp:class:`~mppp::mp_integer`, and the other argument is either another
- * :cpp:class:`~mppp::mp_integer` or an instance of :cpp:concept:`~mppp::CppInteroperable`.
+ * one argument is of type :cpp:class:`~mppp::integer`, and the other argument is either another
+ * :cpp:class:`~mppp::integer` or an instance of :cpp:concept:`~mppp::CppInteroperable`.
  *
  * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
  * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
- * is a C++ integral, the result will be of type :cpp:class:`~mppp::mp_integer`, if the other argument is a C++
+ * is a C++ integral, the result will be of type :cpp:class:`~mppp::integer`, if the other argument is a C++
  * floating-point the result will be of the same floating-point type. For example:
  *
  * .. code-block:: c++
  *
- *    mp_integer<1> n1{1}, n2{2};
- *    auto res1 = n1 + n2; // res1 is an mp_integer
- *    auto res2 = n1 * 2; // res2 is an mp_integer
- *    auto res3 = 2 - n2; // res3 is an mp_integer
+ *    integer<1> n1{1}, n2{2};
+ *    auto res1 = n1 + n2; // res1 is an integer
+ *    auto res2 = n1 * 2; // res2 is an integer
+ *    auto res3 = 2 - n2; // res3 is an integer
  *    auto res4 = n1 / 2.f; // res4 is a float
  *    auto res5 = 12. / n1; // res5 is a double
  *
- * The modulo operator ``%`` accepts only :cpp:class:`~mppp::mp_integer` and interoperable integral types as arguments,
- * and it always returns :cpp:class:`~mppp::mp_integer` as result. The bit shifting operators ``<<`` and ``>>`` accept
- * only interoperable integral types as shift arguments, and they always return :cpp:class:`~mppp::mp_integer` as
+ * The modulo operator ``%`` accepts only :cpp:class:`~mppp::integer` and interoperable integral types as arguments,
+ * and it always returns :cpp:class:`~mppp::integer` as result. The bit shifting operators ``<<`` and ``>>`` accept
+ * only interoperable integral types as shift arguments, and they always return :cpp:class:`~mppp::integer` as
  * result.
  *
  * The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote the arguments to a common type
  * before comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
- * promoted to :cpp:class:`~mppp::mp_integer` if they are both integral types, otherwise they are promoted to the type
+ * promoted to :cpp:class:`~mppp::integer` if they are both integral types, otherwise they are promoted to the type
  * of the floating-point argument).
  *
- * This class provides facilities to interface with the GMP library. Specifically, :cpp:class:`~mppp::mp_integer`
+ * This class provides facilities to interface with the GMP library. Specifically, :cpp:class:`~mppp::integer`
  * features:
  *
  * * a constructor from the GMP integer type ``mpz_t``,
- * * an :cpp:func:`~mppp::mp_integer::get_mpz_t()` method that promotes ``this`` to dynamic
+ * * an :cpp:func:`~mppp::integer::get_mpz_t()` method that promotes ``this`` to dynamic
  *   storage and returns a pointer to the internal ``mpz_t`` instance,
- * * an ``mpz_view`` class, an instance of which can be requested via the :cpp:func:`~mppp::mp_integer::get_mpz_view()`
- *   method, which allows to use :cpp:class:`~mppp::mp_integer` in the GMP API as a drop-in replacement for
+ * * an ``mpz_view`` class, an instance of which can be requested via the :cpp:func:`~mppp::integer::get_mpz_view()`
+ *   method, which allows to use :cpp:class:`~mppp::integer` in the GMP API as a drop-in replacement for
  *   ``const mpz_t`` function arguments.
  *
- * The ``mpz_view`` class represent a read-only view of an mp_integer object which is implicitly convertible to the type
+ * The ``mpz_view`` class represent a read-only view of an integer object which is implicitly convertible to the type
  * ``const mpz_t`` and which is thus usable as an argument to GMP functions. For example:
  *
  * .. code-block:: c++
  *
  *    mpz_t m;
  *    mpz_init_set_si(m,1); // Create an mpz_t with the value 1.
- *    mp_integer<1> n{1}; // Initialize an mp_integer with the value 1.
+ *    integer<1> n{1}; // Initialize an integer with the value 1.
  *    mpz_add(m,m,n.get_mpz_view()); // Compute the result of n + m and store
  *                                   // it in m using the GMP API.
  *
- * See the documentation of :cpp:func:`~mppp::mp_integer::get_mpz_view()` for more details about the ``mpz_view`` class.
+ * See the documentation of :cpp:func:`~mppp::integer::get_mpz_view()` for more details about the ``mpz_view`` class.
  *
  * This class provides a :cpp:func:`~mppp::hash()` function to compute a hash value for an integer. A specialisation
- * of the standard ``std::hash`` functor is also provided, so that it is possible to use :cpp:class:`~mppp::mp_integer`
+ * of the standard ``std::hash`` functor is also provided, so that it is possible to use :cpp:class:`~mppp::integer`
  * in standard unordered associative containers out of the box.
  * \endrststar
  */
 template <std::size_t SSize>
-class mp_integer
+class integer
 {
     // Typedefs for ease of use.
     using s_storage = static_int<SSize>;
@@ -884,7 +884,7 @@ class mp_integer
     // mpz view class.
     struct mpz_view {
         using static_mpz_view = typename s_int::static_mpz_view;
-        explicit mpz_view(const mp_integer &n)
+        explicit mpz_view(const integer &n)
             : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : static_mpz_view{}),
               m_ptr(n.is_static() ? m_static_view : &(n.m_int.g_dy()))
         {
@@ -921,37 +921,37 @@ class mp_integer
     struct common_type {
     };
     template <typename Enable>
-    struct common_type<mp_integer, mp_integer, Enable> {
-        using type = mp_integer;
+    struct common_type<integer, integer, Enable> {
+        using type = integer;
     };
     template <typename U>
-    struct common_type<mp_integer, U, enable_if_t<is_supported_integral<U>::value>> {
-        using type = mp_integer;
+    struct common_type<integer, U, enable_if_t<is_supported_integral<U>::value>> {
+        using type = integer;
     };
     template <typename T>
-    struct common_type<T, mp_integer, enable_if_t<is_supported_integral<T>::value>> {
-        using type = mp_integer;
+    struct common_type<T, integer, enable_if_t<is_supported_integral<T>::value>> {
+        using type = integer;
     };
     template <typename U>
-    struct common_type<mp_integer, U, enable_if_t<is_supported_float<U>::value>> {
+    struct common_type<integer, U, enable_if_t<is_supported_float<U>::value>> {
         using type = U;
     };
     template <typename T>
-    struct common_type<T, mp_integer, enable_if_t<is_supported_float<T>::value>> {
+    struct common_type<T, integer, enable_if_t<is_supported_float<T>::value>> {
         using type = T;
     };
     template <typename T, typename U>
     using common_t = typename common_type<T, U>::type;
     // Enabler for in-place arithmetic ops.
     template <typename T>
-    using in_place_enabler = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, mp_integer>>::value, int>;
+    using in_place_enabler = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, integer>>::value, int>;
 #if defined(_MSC_VER)
     // Common metaprogramming for bit shifting operators.
     // NOTE: here and elsewhere we special case MSVC because we need to alter the SFINAE style, as the usual
     // approach (i.e., default template int argument) results in ICEs in MSVC. Instead, on MSCV we use SFINAE
     // on the return type.
     template <typename T>
-    using shift_op_enabler = enable_if_t<is_supported_integral<T>::value, mp_integer>;
+    using shift_op_enabler = enable_if_t<is_supported_integral<T>::value, integer>;
 #else
     template <typename T>
     using shift_op_enabler = enable_if_t<is_supported_integral<T>::value, int>;
@@ -984,14 +984,14 @@ public:
     /**
      * The default constructor initialises an integer with static storage type and value 0.
      */
-    mp_integer() = default;
+    integer() = default;
     /// Copy constructor.
     /**
      * The copy constructor deep-copies \p other into \p this, preserving the original storage type.
      *
      * @param other the object that will be copied into \p this.
      */
-    mp_integer(const mp_integer &other) = default;
+    integer(const integer &other) = default;
     /// Move constructor.
     /**
      * The move constructor will leave \p other in an unspecified but valid state. The storage type
@@ -999,7 +999,7 @@ public:
      *
      * @param other the object that will be moved into \p this.
      */
-    mp_integer(mp_integer &&other) = default;
+    integer(integer &&other) = default;
 
 private:
 #if !defined(MPPP_HAVE_CONCEPTS)
@@ -1168,10 +1168,10 @@ public:
  * @throws std::domain_error if \p x is a non-finite floating-point value.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    explicit mp_integer(CppInteroperable x)
+    explicit integer(CppInteroperable x)
 #else
     template <typename T, generic_ctor_enabler<T> = 0>
-    explicit mp_integer(T x)
+    explicit integer(T x)
 #endif
         : m_int()
     {
@@ -1196,7 +1196,7 @@ public:
      *    https://gmplib.org/manual/Assigning-Integers.html
      * \endrststar
      */
-    explicit mp_integer(const char *s, int base = 10) : m_int()
+    explicit integer(const char *s, int base = 10) : m_int()
     {
         if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
             throw std::invalid_argument(
@@ -1222,7 +1222,7 @@ public:
      *
      * @throws unspecified any exception thrown by the constructor from C string.
      */
-    explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
+    explicit integer(const std::string &s, int base = 10) : integer(s.c_str(), base)
     {
     }
     /// Constructor from \p mpz_t.
@@ -1239,7 +1239,7 @@ public:
      *
      * @param n the input GMP integer.
      */
-    explicit mp_integer(const ::mpz_t n) : m_int()
+    explicit integer(const ::mpz_t n) : m_int()
     {
         dispatch_mpz_ctor(n);
     }
@@ -1251,7 +1251,7 @@ public:
      *
      * @return a reference to \p this.
      */
-    mp_integer &operator=(const mp_integer &other) = default;
+    integer &operator=(const integer &other) = default;
     /// Move assignment operator.
     /**
      * After the move, \p other will be in an unspecified but valid state, and the storage type of \p this will be
@@ -1261,7 +1261,7 @@ public:
      *
      * @return a reference to \p this.
      */
-    mp_integer &operator=(mp_integer &&other) = default;
+    integer &operator=(integer &&other) = default;
 /// Generic assignment operator.
 /**
  * \rststar
@@ -1269,7 +1269,7 @@ public:
  *
  * .. code-block:: c++
  *
- *    return *this = mp_integer{x};
+ *    return *this = integer{x};
  *
  * That is, a temporary integer is constructed from ``x`` and it is then move-assigned to ``this``.
  * \endrststar
@@ -1281,13 +1281,13 @@ public:
  * @throws unspecified any exception thrown by the generic constructor.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    mp_integer &operator=(const CppInteroperable &x)
+    integer &operator=(const CppInteroperable &x)
 #else
     template <typename T, generic_assignment_enabler<T> = 0>
-    mp_integer &operator=(const T &x)
+    integer &operator=(const T &x)
 #endif
     {
-        return *this = mp_integer{x};
+        return *this = integer{x};
     }
     /// Test for static storage.
     /**
@@ -1305,39 +1305,39 @@ public:
     {
         return m_int.is_dynamic();
     }
-    /// Output stream operator for mp_integer.
+    /// Output stream operator for integer.
     /**
-     * This operator will print to the stream \p os the mp_integer \p n in base 10. Internally it uses the
-     * mp_integer::to_string() method.
+     * This operator will print to the stream \p os the integer \p n in base 10. Internally it uses the
+     * integer::to_string() method.
      *
      * @param os the target stream.
      * @param n the input integer.
      *
      * @return a reference to \p os.
      *
-     * @throws unspecified any exception thrown by mp_integer::to_string().
+     * @throws unspecified any exception thrown by integer::to_string().
      */
-    friend std::ostream &operator<<(std::ostream &os, const mp_integer &n)
+    friend std::ostream &operator<<(std::ostream &os, const integer &n)
     {
         return os << n.to_string();
     }
-    /// Input stream operator for mp_integer.
+    /// Input stream operator for integer.
     /**
      * Equivalent to extracting a line from the stream, using it to construct a temporary
-     * mp_integer and then assigning the temporary to \p n.
+     * integer and then assigning the temporary to \p n.
      *
      * @param is input stream.
      * @param n integer to which the contents of the stream will be assigned.
      *
      * @return reference to \p is.
      *
-     * @throws unspecified any exception thrown by the constructor from string of mp_integer.
+     * @throws unspecified any exception thrown by the constructor from string of integer.
      */
-    friend std::istream &operator>>(std::istream &is, mp_integer &n)
+    friend std::istream &operator>>(std::istream &is, integer &n)
     {
         MPPP_MAYBE_TLS std::string tmp_str;
         std::getline(is, tmp_str);
-        n = mp_integer{tmp_str};
+        n = integer{tmp_str};
         return is;
     }
     /// Conversion to string.
@@ -1638,11 +1638,11 @@ public:
     }
     /// Sign function.
     /**
-     * @param n the mp_integer whose sign will be computed.
+     * @param n the integer whose sign will be computed.
      *
      * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
      */
-    friend int sgn(const mp_integer &n)
+    friend int sgn(const integer &n)
     {
         return n.sgn();
     }
@@ -1683,7 +1683,7 @@ public:
      *
      * @return a reference to \p this.
      */
-    mp_integer &neg()
+    integer &neg()
     {
         if (is_static()) {
             m_int.g_st()._mp_size = -m_int.g_st()._mp_size;
@@ -1699,7 +1699,7 @@ public:
      * @param rop the return value.
      * @param n the integer that will be negated.
      */
-    friend void neg(mp_integer &rop, const mp_integer &n)
+    friend void neg(integer &rop, const integer &n)
     {
         rop = n;
         rop.neg();
@@ -1710,9 +1710,9 @@ public:
      *
      * @return <tt>-n</tt>.
      */
-    friend mp_integer neg(const mp_integer &n)
+    friend integer neg(const integer &n)
     {
-        mp_integer ret(n);
+        integer ret(n);
         ret.neg();
         return ret;
     }
@@ -2011,78 +2011,78 @@ private:
         return retval;
     }
     // Dispatching for the binary addition operator.
-    static mp_integer dispatch_binary_add(const mp_integer &op1, const mp_integer &op2)
+    static integer dispatch_binary_add(const integer &op1, const integer &op2)
     {
-        mp_integer retval;
+        integer retval;
         add(retval, op1, op2);
         return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_add(const mp_integer &op1, T n)
+    static integer dispatch_binary_add(const integer &op1, T n)
     {
-        mp_integer retval{n};
+        integer retval{n};
         add(retval, retval, op1);
         return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_add(T n, const mp_integer &op2)
+    static integer dispatch_binary_add(T n, const integer &op2)
     {
         return dispatch_binary_add(op2, n);
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_add(const mp_integer &op1, T x)
+    static T dispatch_binary_add(const integer &op1, T x)
     {
         return static_cast<T>(op1) + x;
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_add(T x, const mp_integer &op2)
+    static T dispatch_binary_add(T x, const integer &op2)
     {
         return dispatch_binary_add(op2, x);
     }
     // Dispatching for the binary subtraction operator.
-    static mp_integer dispatch_binary_sub(const mp_integer &op1, const mp_integer &op2)
+    static integer dispatch_binary_sub(const integer &op1, const integer &op2)
     {
-        mp_integer retval;
+        integer retval;
         sub(retval, op1, op2);
         return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_sub(const mp_integer &op1, T n)
+    static integer dispatch_binary_sub(const integer &op1, T n)
     {
-        mp_integer retval{n};
+        integer retval{n};
         sub(retval, retval, op1);
         retval.neg();
         return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_sub(T n, const mp_integer &op2)
+    static integer dispatch_binary_sub(T n, const integer &op2)
     {
         auto retval = dispatch_binary_sub(op2, n);
         retval.neg();
         return retval;
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_sub(const mp_integer &op1, T x)
+    static T dispatch_binary_sub(const integer &op1, T x)
     {
         return static_cast<T>(op1) - x;
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_sub(T x, const mp_integer &op2)
+    static T dispatch_binary_sub(T x, const integer &op2)
     {
         return -dispatch_binary_sub(op2, x);
     }
     // Dispatching for in-place sub.
-    static void dispatch_in_place_sub(mp_integer &retval, const mp_integer &n)
+    static void dispatch_in_place_sub(integer &retval, const integer &n)
     {
         sub(retval, retval, n);
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_sub(mp_integer &retval, const T &n)
+    static void dispatch_in_place_sub(integer &retval, const T &n)
     {
-        sub(retval, retval, mp_integer{n});
+        sub(retval, retval, integer{n});
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_sub(mp_integer &retval, const T &x)
+    static void dispatch_in_place_sub(integer &retval, const T &x)
     {
         retval = static_cast<T>(retval) - x;
     }
@@ -2096,7 +2096,7 @@ public:
      * @param op1 the first argument.
      * @param op2 the second argument.
      */
-    friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
+    friend void add(integer &rop, const integer &op1, const integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
         if (mppp_likely(sr && s1 && s2)) {
@@ -2114,7 +2114,7 @@ public:
     /**
      * @return a copy of \p this.
      */
-    mp_integer operator+() const
+    integer operator+() const
     {
         return *this;
     }
@@ -2146,7 +2146,7 @@ public:
      *
      * @return reference to \p this after the increment.
      */
-    mp_integer &operator++()
+    integer &operator++()
     {
         add_ui(*this, *this, 1u);
         return *this;
@@ -2157,9 +2157,9 @@ public:
      *
      * @return a copy of \p this before the increment.
      */
-    mp_integer operator++(int)
+    integer operator++(int)
     {
-        mp_integer retval(*this);
+        integer retval(*this);
         ++(*this);
         return retval;
     }
@@ -2171,7 +2171,7 @@ public:
      * @param op1 the first argument.
      * @param op2 the second argument.
      */
-    friend void sub(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
+    friend void sub(integer &rop, const integer &op1, const integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
         if (mppp_likely(sr && s1 && s2)) {
@@ -2189,9 +2189,9 @@ public:
     /**
      * @return a negated copy of \p this.
      */
-    mp_integer operator-() const
+    integer operator-() const
     {
-        mp_integer retval{*this};
+        integer retval{*this};
         retval.neg();
         return retval;
     }
@@ -2213,25 +2213,25 @@ public:
      *
      * @return a reference to \p this.
      *
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
+     * @throws unspecified any exception thrown by the assignment of a floating-point value to integer, iff \p T
      * is a floating-point type.
      */
     template <typename T, in_place_enabler<T> = 0>
-    mp_integer &operator-=(const T &op)
+    integer &operator-=(const T &op)
     {
         dispatch_in_place_sub(*this, op);
         return *this;
     }
 #if defined(_MSC_VER)
     template <typename T>
-    friend in_place_lenabler<T> operator-=(T &x, const mp_integer &n)
+    friend in_place_lenabler<T> operator-=(T &x, const integer &n)
 #else
     /// In-place subtraction for interoperable types.
     /**
      * \rststar
      * .. note::
      *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
+     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::integer`.
      * \endrststar
      *
      * The body of this operator is equivalent to:
@@ -2248,10 +2248,10 @@ public:
      *
      * @return a reference to \p x.
      *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+     * @throws unspecified any exception thrown by the conversion operator of mppp::integer.
      */
     template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator-=(T &x, const mp_integer &n)
+    friend T &operator-=(T &x, const integer &n)
 #endif
     {
         return x = static_cast<T>(x - n);
@@ -2262,7 +2262,7 @@ public:
      *
      * @return reference to \p this after the decrement.
      */
-    mp_integer &operator--()
+    integer &operator--()
     {
         // NOTE: this should be written in terms of sub_ui(), once implemented.
         neg();
@@ -2276,9 +2276,9 @@ public:
      *
      * @return a copy of \p this before the decrement.
      */
-    mp_integer operator--(int)
+    integer operator--(int)
     {
-        mp_integer retval(*this);
+        integer retval(*this);
         --(*this);
         return retval;
     }
@@ -2451,14 +2451,14 @@ public:
      * @param op1 the first argument.
      * @param op2 the second argument.
      */
-    friend void add_ui(mp_integer &rop, const mp_integer &op1, unsigned long op2)
+    friend void add_ui(integer &rop, const integer &op1, unsigned long op2)
     {
         if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
             // For the optimised version below to kick in we need to be sure we can safely convert
             // unsigned long to an ::mp_limb_t, modulo nail bits. This because in the optimised version
             // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an
-            // mp_integer.
-            add(rop, op1, mp_integer{op2});
+            // integer.
+            add(rop, op1, integer{op2});
             return;
         }
         const bool sr = rop.is_static(), s1 = op1.is_static();
@@ -2674,49 +2674,49 @@ private:
         return retval;
     }
     // Dispatching for the binary multiplication operator.
-    static mp_integer dispatch_binary_mul(const mp_integer &op1, const mp_integer &op2)
+    static integer dispatch_binary_mul(const integer &op1, const integer &op2)
     {
-        mp_integer retval;
+        integer retval;
         mul(retval, op1, op2);
         return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_mul(const mp_integer &op1, T n)
+    static integer dispatch_binary_mul(const integer &op1, T n)
     {
         // NOTE: with respect to addition, here we separate the retval
         // from the operands. Having a separate destination is generally better
         // for multiplication.
-        mp_integer retval;
-        mul(retval, op1, mp_integer{n});
+        integer retval;
+        mul(retval, op1, integer{n});
         return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_mul(T n, const mp_integer &op2)
+    static integer dispatch_binary_mul(T n, const integer &op2)
     {
         return dispatch_binary_mul(op2, n);
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_mul(const mp_integer &op1, T x)
+    static T dispatch_binary_mul(const integer &op1, T x)
     {
         return static_cast<T>(op1) * x;
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_mul(T x, const mp_integer &op2)
+    static T dispatch_binary_mul(T x, const integer &op2)
     {
         return dispatch_binary_mul(op2, x);
     }
     // Dispatching for in-place multiplication.
-    static void dispatch_in_place_mul(mp_integer &retval, const mp_integer &n)
+    static void dispatch_in_place_mul(integer &retval, const integer &n)
     {
         mul(retval, retval, n);
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_mul(mp_integer &retval, const T &n)
+    static void dispatch_in_place_mul(integer &retval, const T &n)
     {
-        mul(retval, retval, mp_integer{n});
+        mul(retval, retval, integer{n});
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_mul(mp_integer &retval, const T &x)
+    static void dispatch_in_place_mul(integer &retval, const T &x)
     {
         retval = static_cast<T>(retval) * x;
     }
@@ -2730,7 +2730,7 @@ public:
      * @param op1 the first argument.
      * @param op2 the second argument.
      */
-    friend void mul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
+    friend void mul(integer &rop, const integer &op1, const integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
         std::size_t size_hint = 0u;
@@ -2768,25 +2768,25 @@ public:
      *
      * @return a reference to \p this.
      *
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
+     * @throws unspecified any exception thrown by the assignment of a floating-point value to integer, iff \p T
      * is a floating-point type.
      */
     template <typename T, in_place_enabler<T> = 0>
-    mp_integer &operator*=(const T &op)
+    integer &operator*=(const T &op)
     {
         dispatch_in_place_mul(*this, op);
         return *this;
     }
 #if defined(_MSC_VER)
     template <typename T>
-    friend in_place_lenabler<T> operator*=(T &x, const mp_integer &n)
+    friend in_place_lenabler<T> operator*=(T &x, const integer &n)
 #else
     /// In-place multiplication for interoperable types.
     /**
      * \rststar
      * .. note::
      *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
+     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::integer`.
      * \endrststar
      *
      * The body of this operator is equivalent to:
@@ -2803,10 +2803,10 @@ public:
      *
      * @return a reference to \p x.
      *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+     * @throws unspecified any exception thrown by the conversion operator of mppp::integer.
      */
     template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator*=(T &x, const mp_integer &n)
+    friend T &operator*=(T &x, const integer &n)
 #endif
     {
         return x = static_cast<T>(x * n);
@@ -3028,7 +3028,7 @@ public:
      * @param op1 the first argument.
      * @param op2 the second argument.
      */
-    friend void addmul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
+    friend void addmul(integer &rop, const integer &op1, const integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
         std::size_t size_hint = 0u;
@@ -3263,50 +3263,50 @@ private:
         }
     }
     // Dispatching for the binary division operator.
-    static mp_integer dispatch_binary_div(const mp_integer &op1, const mp_integer &op2)
+    static integer dispatch_binary_div(const integer &op1, const integer &op2)
     {
-        mp_integer retval, r;
+        integer retval, r;
         tdiv_qr(retval, r, op1, op2);
         return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_div(const mp_integer &op1, T n)
+    static integer dispatch_binary_div(const integer &op1, T n)
     {
-        mp_integer retval, r;
-        tdiv_qr(retval, r, op1, mp_integer{n});
+        integer retval, r;
+        tdiv_qr(retval, r, op1, integer{n});
         return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_div(T n, const mp_integer &op2)
+    static integer dispatch_binary_div(T n, const integer &op2)
     {
-        mp_integer retval, r;
-        tdiv_qr(retval, r, mp_integer{n}, op2);
+        integer retval, r;
+        tdiv_qr(retval, r, integer{n}, op2);
         return retval;
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_div(const mp_integer &op1, T x)
+    static T dispatch_binary_div(const integer &op1, T x)
     {
         return static_cast<T>(op1) / x;
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_div(T x, const mp_integer &op2)
+    static T dispatch_binary_div(T x, const integer &op2)
     {
         return x / static_cast<T>(op2);
     }
     // Dispatching for in-place div.
-    static void dispatch_in_place_div(mp_integer &retval, const mp_integer &n)
+    static void dispatch_in_place_div(integer &retval, const integer &n)
     {
-        mp_integer r;
+        integer r;
         tdiv_qr(retval, r, retval, n);
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_div(mp_integer &retval, const T &n)
+    static void dispatch_in_place_div(integer &retval, const T &n)
     {
-        mp_integer r;
-        tdiv_qr(retval, r, retval, mp_integer{n});
+        integer r;
+        tdiv_qr(retval, r, retval, integer{n});
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_div(mp_integer &retval, const T &x)
+    static void dispatch_in_place_div(integer &retval, const T &x)
     {
         retval = static_cast<T>(retval) / x;
     }
@@ -3317,39 +3317,39 @@ private:
                       common_t<T, U>>;
     template <typename T>
     using in_place_mod_enabler
-        = enable_if_t<disjunction<is_supported_integral<T>, std::is_same<T, mp_integer>>::value, int>;
+        = enable_if_t<disjunction<is_supported_integral<T>, std::is_same<T, integer>>::value, int>;
     // Dispatching for the binary modulo operator.
-    static mp_integer dispatch_binary_mod(const mp_integer &op1, const mp_integer &op2)
+    static integer dispatch_binary_mod(const integer &op1, const integer &op2)
     {
-        mp_integer q, retval;
+        integer q, retval;
         tdiv_qr(q, retval, op1, op2);
         return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_mod(const mp_integer &op1, T n)
+    static integer dispatch_binary_mod(const integer &op1, T n)
     {
-        mp_integer q, retval;
-        tdiv_qr(q, retval, op1, mp_integer{n});
+        integer q, retval;
+        tdiv_qr(q, retval, op1, integer{n});
         return retval;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_mod(T n, const mp_integer &op2)
+    static integer dispatch_binary_mod(T n, const integer &op2)
     {
-        mp_integer q, retval;
-        tdiv_qr(q, retval, mp_integer{n}, op2);
+        integer q, retval;
+        tdiv_qr(q, retval, integer{n}, op2);
         return retval;
     }
     // Dispatching for in-place mod.
-    static void dispatch_in_place_mod(mp_integer &retval, const mp_integer &n)
+    static void dispatch_in_place_mod(integer &retval, const integer &n)
     {
-        mp_integer q;
+        integer q;
         tdiv_qr(q, retval, retval, n);
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_mod(mp_integer &retval, const T &n)
+    static void dispatch_in_place_mod(integer &retval, const T &n)
     {
-        mp_integer q;
-        tdiv_qr(q, retval, retval, mp_integer{n});
+        integer q;
+        tdiv_qr(q, retval, retval, integer{n});
     }
 
 public:
@@ -3366,7 +3366,7 @@ public:
      * @throws std::invalid_argument if \p q and \p r are the same object.
      * @throws zero_division_error if \p d is zero.
      */
-    friend void tdiv_qr(mp_integer &q, mp_integer &r, const mp_integer &n, const mp_integer &d)
+    friend void tdiv_qr(integer &q, integer &r, const integer &n, const integer &d)
     {
         if (mppp_unlikely(&q == &r)) {
             throw std::invalid_argument("When performing a division with remainder, the quotient 'q' and the "
@@ -3410,25 +3410,25 @@ public:
      * @return a reference to \p this. The result is truncated.
      *
      * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
+     * @throws unspecified any exception thrown by the assignment of a floating-point value to integer, iff \p T
      * is a floating-point type.
      */
     template <typename T, in_place_enabler<T> = 0>
-    mp_integer &operator/=(const T &d)
+    integer &operator/=(const T &d)
     {
         dispatch_in_place_div(*this, d);
         return *this;
     }
 #if defined(_MSC_VER)
     template <typename T>
-    friend in_place_lenabler<T> operator/=(T &x, const mp_integer &n)
+    friend in_place_lenabler<T> operator/=(T &x, const integer &n)
 #else
     /// In-place division for interoperable types.
     /**
      * \rststar
      * .. note::
      *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
+     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::integer`.
      * \endrststar
      *
      * The body of this operator is equivalent to:
@@ -3445,11 +3445,11 @@ public:
      *
      * @return a reference to \p x.
      *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer or by
-     * mppp::mp_integer::operator/().
+     * @throws unspecified any exception thrown by the conversion operator of mppp::integer or by
+     * mppp::integer::operator/().
      */
     template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator/=(T &x, const mp_integer &n)
+    friend T &operator/=(T &x, const integer &n)
 #endif
     {
         return x = static_cast<T>(x / n);
@@ -3477,7 +3477,7 @@ public:
      * @throws zero_division_error if \p d is zero.
      */
     template <typename T, in_place_mod_enabler<T> = 0>
-    mp_integer &operator%=(const T &d)
+    integer &operator%=(const T &d)
     {
         dispatch_in_place_mod(*this, d);
         return *this;
@@ -3678,7 +3678,7 @@ public:
      * @param n the multiplicand.
      * @param s the bit shift value.
      */
-    friend void mul_2exp(mp_integer &rop, const mp_integer &n, ::mp_bitcnt_t s)
+    friend void mul_2exp(integer &rop, const integer &n, ::mp_bitcnt_t s)
     {
         const bool sr = rop.is_static(), sn = n.is_static();
         std::size_t size_hint = 0u;
@@ -3695,7 +3695,7 @@ public:
     }
 #if defined(_MSC_VER)
     template <typename T>
-    friend shift_op_enabler<T> operator<<(const mp_integer &n, T s)
+    friend shift_op_enabler<T> operator<<(const integer &n, T s)
 #else
     /// Left shift operator.
     /**
@@ -3707,10 +3707,10 @@ public:
      * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
      */
     template <typename T, shift_op_enabler<T> = 0>
-    friend mp_integer operator<<(const mp_integer &n, T s)
+    friend integer operator<<(const integer &n, T s)
 #endif
     {
-        mp_integer retval;
+        integer retval;
         mul_2exp(retval, n, cast_to_bitcnt(s));
         return retval;
     }
@@ -3727,7 +3727,7 @@ public:
      * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
      */
     template <typename T, shift_op_enabler<T> = 0>
-    mp_integer &operator<<=(T s)
+    integer &operator<<=(T s)
 #endif
     {
         mul_2exp(*this, *this, cast_to_bitcnt(s));
@@ -3872,7 +3872,7 @@ public:
      * @param n the dividend.
      * @param s the bit shift value.
      */
-    friend void tdiv_q_2exp(mp_integer &rop, const mp_integer &n, ::mp_bitcnt_t s)
+    friend void tdiv_q_2exp(integer &rop, const integer &n, ::mp_bitcnt_t s)
     {
         const bool sr = rop.is_static(), sn = n.is_static();
         if (mppp_likely(sr && sn)) {
@@ -3886,7 +3886,7 @@ public:
     }
 #if defined(_MSC_VER)
     template <typename T>
-    friend shift_op_enabler<T> operator>>(const mp_integer &n, T s)
+    friend shift_op_enabler<T> operator>>(const integer &n, T s)
 #else
     /// Right shift operator.
     /**
@@ -3898,10 +3898,10 @@ public:
      * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
      */
     template <typename T, shift_op_enabler<T> = 0>
-    friend mp_integer operator>>(const mp_integer &n, T s)
+    friend integer operator>>(const integer &n, T s)
 #endif
     {
-        mp_integer retval;
+        integer retval;
         tdiv_q_2exp(retval, n, cast_to_bitcnt(s));
         return retval;
     }
@@ -3918,7 +3918,7 @@ public:
      * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
      */
     template <typename T, shift_op_enabler<T> = 0>
-    mp_integer &operator>>=(T s)
+    integer &operator>>=(T s)
 #endif
     {
         tdiv_q_2exp(*this, *this, cast_to_bitcnt(s));
@@ -3988,7 +3988,7 @@ private:
     }
     // Equality operator.
     // NOTE: special implementation instead of using cmp, this should be faster.
-    static bool dispatch_equality(const mp_integer &a, const mp_integer &b)
+    static bool dispatch_equality(const integer &a, const integer &b)
     {
         const mp_size_t size_a = a.m_int.m_st._mp_size, size_b = b.m_int.m_st._mp_size;
         if (size_a != size_b) {
@@ -4019,72 +4019,72 @@ private:
 #endif
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_equality(const mp_integer &a, T n)
+    static bool dispatch_equality(const integer &a, T n)
     {
-        return dispatch_equality(a, mp_integer{n});
+        return dispatch_equality(a, integer{n});
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_equality(T n, const mp_integer &a)
+    static bool dispatch_equality(T n, const integer &a)
     {
         return dispatch_equality(a, n);
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_equality(const mp_integer &a, T x)
+    static bool dispatch_equality(const integer &a, T x)
     {
         return static_cast<T>(a) == x;
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_equality(T x, const mp_integer &a)
+    static bool dispatch_equality(T x, const integer &a)
     {
         return dispatch_equality(a, x);
     }
     // Less-than operator.
-    static bool dispatch_less_than(const mp_integer &a, const mp_integer &b)
+    static bool dispatch_less_than(const integer &a, const integer &b)
     {
         return cmp(a, b) < 0;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_less_than(const mp_integer &a, T n)
+    static bool dispatch_less_than(const integer &a, T n)
     {
-        return dispatch_less_than(a, mp_integer{n});
+        return dispatch_less_than(a, integer{n});
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_less_than(T n, const mp_integer &a)
+    static bool dispatch_less_than(T n, const integer &a)
     {
-        return dispatch_greater_than(a, mp_integer{n});
+        return dispatch_greater_than(a, integer{n});
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_less_than(const mp_integer &a, T x)
+    static bool dispatch_less_than(const integer &a, T x)
     {
         return static_cast<T>(a) < x;
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_less_than(T x, const mp_integer &a)
+    static bool dispatch_less_than(T x, const integer &a)
     {
         return dispatch_greater_than(a, x);
     }
     // Greater-than operator.
-    static bool dispatch_greater_than(const mp_integer &a, const mp_integer &b)
+    static bool dispatch_greater_than(const integer &a, const integer &b)
     {
         return cmp(a, b) > 0;
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_greater_than(const mp_integer &a, T n)
+    static bool dispatch_greater_than(const integer &a, T n)
     {
-        return dispatch_greater_than(a, mp_integer{n});
+        return dispatch_greater_than(a, integer{n});
     }
     template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_greater_than(T n, const mp_integer &a)
+    static bool dispatch_greater_than(T n, const integer &a)
     {
-        return dispatch_less_than(a, mp_integer{n});
+        return dispatch_less_than(a, integer{n});
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_greater_than(const mp_integer &a, T x)
+    static bool dispatch_greater_than(const integer &a, T x)
     {
         return static_cast<T>(a) > x;
     }
     template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_greater_than(T x, const mp_integer &a)
+    static bool dispatch_greater_than(T x, const integer &a)
     {
         return dispatch_less_than(a, x);
     }
@@ -4098,7 +4098,7 @@ private:
 #endif
 
 public:
-    /// Comparison function for mp_integer.
+    /// Comparison function for integer.
     /**
      * @param op1 first argument.
      * @param op2 second argument.
@@ -4106,7 +4106,7 @@ public:
      * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
      * <tt>op1 > op2</tt>.
      */
-    friend int cmp(const mp_integer &op1, const mp_integer &op2)
+    friend int cmp(const integer &op1, const integer &op2)
     {
         const bool s1 = op1.is_static(), s2 = op2.is_static();
         if (mppp_likely(s1 && s2)) {
@@ -4223,7 +4223,7 @@ private:
     {
         return exp >= T(0);
     }
-    static bool exp_nonnegative(const mp_integer &exp)
+    static bool exp_nonnegative(const integer &exp)
     {
         return exp.sgn() >= 0;
     }
@@ -4239,7 +4239,7 @@ private:
         }
         return static_cast<unsigned long>(exp);
     }
-    static unsigned long exp_to_ulong(const mp_integer &exp)
+    static unsigned long exp_to_ulong(const integer &exp)
     {
         try {
             return static_cast<unsigned long>(exp);
@@ -4254,7 +4254,7 @@ private:
     {
         return base == T(0);
     }
-    static bool base_is_zero(const mp_integer &base)
+    static bool base_is_zero(const integer &base)
     {
         return base.is_zero();
     }
@@ -4263,7 +4263,7 @@ private:
     {
         return (exp % T(2)) != T(0);
     }
-    static bool exp_is_odd(const mp_integer &exp)
+    static bool exp_is_odd(const integer &exp)
     {
         return exp.odd_p();
     }
@@ -4272,16 +4272,16 @@ private:
     {
         return std::to_string(exp);
     }
-    static std::string exp_to_string(const mp_integer &exp)
+    static std::string exp_to_string(const integer &exp)
     {
         return exp.to_string();
     }
     // Implementation of pow().
-    // mp_integer -- integral overload.
-    template <typename T, enable_if_t<disjunction<std::is_same<T, mp_integer>, std::is_integral<T>>::value, int> = 0>
-    static mp_integer pow_impl(const mp_integer &base, const T &exp)
+    // integer -- integral overload.
+    template <typename T, enable_if_t<disjunction<std::is_same<T, integer>, std::is_integral<T>>::value, int> = 0>
+    static integer pow_impl(const integer &base, const T &exp)
     {
-        mp_integer rop;
+        integer rop;
         if (exp_nonnegative(exp)) {
             pow_ui(rop, base, exp_to_ulong(exp));
         } else if (mppp_unlikely(base_is_zero(base))) {
@@ -4304,21 +4304,21 @@ private:
         }
         return rop;
     }
-    // C++ integral -- mp_integer overload.
+    // C++ integral -- integer overload.
     template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static mp_integer pow_impl(const T &base, const mp_integer &exp)
+    static integer pow_impl(const T &base, const integer &exp)
     {
-        return pow_impl(mp_integer{base}, exp);
+        return pow_impl(integer{base}, exp);
     }
-    // mp_integer -- FP overload.
+    // integer -- FP overload.
     template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    static T pow_impl(const mp_integer &base, const T &exp)
+    static T pow_impl(const integer &base, const T &exp)
     {
         return std::pow(static_cast<T>(base), exp);
     }
-    // FP -- mp_integer overload.
+    // FP -- integer overload.
     template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    static T pow_impl(const T &base, const mp_integer &exp)
+    static T pow_impl(const T &base, const integer &exp)
     {
         return std::pow(base, static_cast<T>(exp));
     }
@@ -4329,15 +4329,15 @@ public:
      * \rststar
      * .. note::
      *
-     *    This function is enabled only if at least one argument is an :cpp:class:`mppp::mp_integer`
-     *    and the other argument is either an :cpp:class:`mppp::mp_integer` or an interoperable type for
-     *    :cpp:class:`mppp::mp_integer`.
+     *    This function is enabled only if at least one argument is an :cpp:class:`mppp::integer`
+     *    and the other argument is either an :cpp:class:`mppp::integer` or an interoperable type for
+     *    :cpp:class:`mppp::integer`.
      * \endrststar
      *
      * This function will raise \p base to the power \p exp, and return the result. If one of the arguments
      * is a floating-point value, then the result will be computed via <tt>std::pow()</tt> and it will also be a
-     * floating-point value. Otherwise, the result is computed via mppp::mp_integer::pow_ui() and its type is
-     * mppp::mp_integer. In case of a negative integral exponent and integral base, the result will be zero unless
+     * floating-point value. Otherwise, the result is computed via mppp::integer::pow_ui() and its type is
+     * mppp::integer. In case of a negative integral exponent and integral base, the result will be zero unless
      * the absolute value of \p base is 1.
      *
      * @param base the base.
@@ -4360,7 +4360,7 @@ public:
      *
      * @return reference to \p this.
      */
-    mp_integer &abs()
+    integer &abs()
     {
         if (is_static()) {
             if (m_int.g_st()._mp_size < 0) {
@@ -4378,7 +4378,7 @@ public:
      * @param rop the return value.
      * @param n the argument.
      */
-    friend void abs(mp_integer &rop, const mp_integer &n)
+    friend void abs(integer &rop, const integer &n)
     {
         rop = n;
         rop.abs();
@@ -4389,20 +4389,20 @@ public:
      *
      * @return the absolute value of \p n.
      */
-    friend mp_integer abs(const mp_integer &n)
+    friend integer abs(const integer &n)
     {
-        mp_integer ret(n);
+        integer ret(n);
         ret.abs();
         return ret;
     }
 
 private:
-    static void nextprime_impl(mp_integer &rop, const mp_integer &n)
+    static void nextprime_impl(integer &rop, const integer &n)
     {
         if (rop.is_static()) {
             MPPP_MAYBE_TLS mpz_raii tmp;
             ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
-            rop = mp_integer(&tmp.m_mpz);
+            rop = integer(&tmp.m_mpz);
         } else {
             ::mpz_nextprime(&rop.m_int.g_dy(), n.get_mpz_view());
         }
@@ -4415,22 +4415,22 @@ public:
      * Note that for negative values of \p n this function always returns 2.
      *
      * @param rop the return value.
-     * @param n the mp_integer argument.
+     * @param n the integer argument.
      */
-    friend void nextprime(mp_integer &rop, const mp_integer &n)
+    friend void nextprime(integer &rop, const integer &n)
     {
         // NOTE: nextprime on negative numbers always returns 2.
         nextprime_impl(rop, n);
     }
     /// Compute next prime number (unary version).
     /**
-     * @param n the mp_integer argument.
+     * @param n the integer argument.
      *
      * @return the first prime number greater than \p n.
      */
-    friend mp_integer nextprime(const mp_integer &n)
+    friend integer nextprime(const integer &n)
     {
-        mp_integer retval;
+        integer retval;
         nextprime_impl(retval, n);
         return retval;
     }
@@ -4440,7 +4440,7 @@ public:
      *
      * @return a reference to \p this.
      */
-    mp_integer &nextprime()
+    integer &nextprime()
     {
         nextprime_impl(*this, *this);
         return *this;
@@ -4470,22 +4470,22 @@ public:
     }
     /// Test primality.
     /**
-     * This is the free-function version of mp_integer::probab_prime_p().
+     * This is the free-function version of integer::probab_prime_p().
      *
-     * @param n the mp_integer whose primality will be tested.
+     * @param n the integer whose primality will be tested.
      * @param reps the number of tests to run.
      *
      * @return an integer indicating if \p this is a prime.
      *
-     * @throws unspecified any exception thrown by mp_integer::probab_prime_p().
+     * @throws unspecified any exception thrown by integer::probab_prime_p().
      */
-    friend int probab_prime_p(const mp_integer &n, int reps = 25)
+    friend int probab_prime_p(const integer &n, int reps = 25)
     {
         return n.probab_prime_p(reps);
     }
 
 private:
-    static void sqrt_impl(mp_integer &rop, const mp_integer &n)
+    static void sqrt_impl(integer &rop, const integer &n)
     {
         if (mppp_unlikely(n.m_int.m_st._mp_size < 0)) {
             throw std::domain_error("Cannot compute the square root of the negative number " + n.to_string());
@@ -4534,7 +4534,7 @@ public:
      *
      * @throws std::domain_error if \p this is negative.
      */
-    mp_integer &sqrt()
+    integer &sqrt()
     {
         sqrt_impl(*this, *this);
         return *this;
@@ -4544,25 +4544,25 @@ public:
      * This method will set \p rop to the integer square root of \p n.
      *
      * @param rop the return value.
-     * @param n the mp_integer whose integer square root will be computed.
+     * @param n the integer whose integer square root will be computed.
      *
      * @throws std::domain_error if \p n is negative.
      */
-    friend void sqrt(mp_integer &rop, const mp_integer &n)
+    friend void sqrt(integer &rop, const integer &n)
     {
         sqrt_impl(rop, n);
     }
     /// Integer square root (unary version).
     /**
-     * @param n the mp_integer whose integer square root will be computed.
+     * @param n the integer whose integer square root will be computed.
      *
      * @return the integer square root of \p n.
      *
      * @throws std::domain_error if \p n is negative.
      */
-    friend mp_integer sqrt(const mp_integer &n)
+    friend integer sqrt(const integer &n)
     {
-        mp_integer retval;
+        integer retval;
         sqrt_impl(retval, n);
         return retval;
     }
@@ -4584,7 +4584,7 @@ public:
      *
      * @return \p true if \p n is odd, \p false otherwise.
      */
-    friend bool odd_p(const mp_integer &n)
+    friend bool odd_p(const integer &n)
     {
         return n.odd_p();
     }
@@ -4602,7 +4602,7 @@ public:
      *
      * @return \p true if \p n is even, \p false otherwise.
      */
-    friend bool even_p(const mp_integer &n)
+    friend bool even_p(const integer &n)
     {
         return n.even_p();
     }
@@ -4615,7 +4615,7 @@ public:
      *
      * @throws std::invalid_argument if \p n is larger than an implementation-defined limit.
      */
-    friend void fac_ui(mp_integer &rop, unsigned long n)
+    friend void fac_ui(integer &rop, unsigned long n)
     {
         // NOTE: we put a limit here because the GMP function just crashes and burns
         // if n is too large, and n does not even need to be that large.
@@ -4629,7 +4629,7 @@ public:
         if (rop.is_static()) {
             MPPP_MAYBE_TLS mpz_raii tmp;
             ::mpz_fac_ui(&tmp.m_mpz, n);
-            rop = mp_integer(&tmp.m_mpz);
+            rop = integer(&tmp.m_mpz);
         } else {
             ::mpz_fac_ui(&rop.m_int.g_dy(), n);
         }
@@ -4643,12 +4643,12 @@ public:
      * @param n the top argument.
      * @param k the bottom argument.
      */
-    friend void bin_ui(mp_integer &rop, const mp_integer &n, unsigned long k)
+    friend void bin_ui(integer &rop, const integer &n, unsigned long k)
     {
         if (rop.is_static()) {
             MPPP_MAYBE_TLS mpz_raii tmp;
             ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
-            rop = mp_integer(&tmp.m_mpz);
+            rop = integer(&tmp.m_mpz);
         } else {
             ::mpz_bin_ui(&rop.m_int.g_dy(), n.get_mpz_view(), k);
         }
@@ -4660,28 +4660,29 @@ public:
      *
      * @return the binomial coefficient of \p n and \p k.
      */
-    friend mp_integer bin_ui(const mp_integer &n, unsigned long k)
+    friend integer bin_ui(const integer &n, unsigned long k)
     {
-        mp_integer retval;
+        integer retval;
         bin_ui(retval, n, k);
         return retval;
     }
 
 private:
     template <typename T, typename U>
-    using binomial_enabler_impl = std::
-        integral_constant<bool, disjunction<conjunction<std::is_same<mp_integer, T>, std::is_same<mp_integer, U>>,
-                                            conjunction<std::is_same<mp_integer, T>, is_supported_integral<U>>,
-                                            conjunction<std::is_same<mp_integer, U>, is_supported_integral<T>>>::value>;
+    using binomial_enabler_impl
+        = std::integral_constant<bool,
+                                 disjunction<conjunction<std::is_same<integer, T>, std::is_same<integer, U>>,
+                                             conjunction<std::is_same<integer, T>, is_supported_integral<U>>,
+                                             conjunction<std::is_same<integer, U>, is_supported_integral<T>>>::value>;
 #if defined(_MSC_VER)
     template <typename T, typename U>
-    using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, mp_integer>;
+    using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, integer>;
 #else
     template <typename T, typename U>
     using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, int>;
 #endif
     template <typename T>
-    static mp_integer binomial_impl(const mp_integer &n, const T &k)
+    static integer binomial_impl(const integer &n, const T &k)
     {
         // NOTE: here we re-use some helper methods used in the implementation of pow().
         if (exp_nonnegative(k)) {
@@ -4691,14 +4692,14 @@ private:
         // http://arxiv.org/abs/1105.3689/
         if (n.sgn() >= 0) {
             // n >= 0, k < 0.
-            return mp_integer{};
+            return integer{};
         }
         // n < 0, k < 0.
         if (k <= n) {
             // The formula is: (-1)**(n-k) * binomial(-k-1,n-k).
             // Cache n-k.
-            const mp_integer nmk{n - k};
-            mp_integer tmp{k};
+            const integer nmk{n - k};
+            integer tmp{k};
             ++tmp;
             tmp.neg();
             auto retval = bin_ui(tmp, exp_to_ulong(nmk));
@@ -4707,12 +4708,12 @@ private:
             }
             return retval;
         }
-        return mp_integer{};
+        return integer{};
     }
     template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static mp_integer binomial_impl(const T &n, const mp_integer &k)
+    static integer binomial_impl(const T &n, const integer &k)
     {
-        return binomial_impl(mp_integer{n}, k);
+        return binomial_impl(integer{n}, k);
     }
 
 public:
@@ -4727,16 +4728,16 @@ public:
      *
      *    This function is enabled only in the following cases:
      *
-     *    * ``T`` and ``U`` are both :cpp:class:`mppp::mp_integer`,
-     *    * ``T`` is an :cpp:class:`mppp::mp_integer` and ``U`` is an integral interoperable type for
-     *      :cpp:class:`mppp::mp_integer`,
-     *    * ``U`` is an :cpp:class:`mppp::mp_integer` and ``T`` is an integral interoperable type for
-     *      :cpp:class:`mppp::mp_integer`.
+     *    * ``T`` and ``U`` are both :cpp:class:`mppp::integer`,
+     *    * ``T`` is an :cpp:class:`mppp::integer` and ``U`` is an integral interoperable type for
+     *      :cpp:class:`mppp::integer`,
+     *    * ``U`` is an :cpp:class:`mppp::integer` and ``T`` is an integral interoperable type for
+     *      :cpp:class:`mppp::integer`.
      * \endrststar
      *
      * This function will compute the binomial coefficient \f$ {{n}\choose{k}} \f$, supporting integral input values.
      * The implementation can handle positive and negative values for both the top and the bottom argument. Internally,
-     * the mp_integer::bin_ui() function will be employed.
+     * the integer::bin_ui() function will be employed.
      *
      * \rststar
      * .. seealso::
@@ -4752,7 +4753,7 @@ public:
      * @throws std::overflow_error if \p k is greater than an implementation-defined value.
      */
     template <typename T, typename U, binomial_enabler<T, U> = 0>
-    friend mp_integer binomial(const T &n, const U &k)
+    friend integer binomial(const T &n, const U &k)
 #endif
     {
         return binomial_impl(n, k);
@@ -4871,7 +4872,7 @@ public:
      * @param n the dividend.
      * @param d the divisor.
      */
-    friend void divexact(mp_integer &rop, const mp_integer &n, const mp_integer &d)
+    friend void divexact(integer &rop, const integer &n, const integer &d)
     {
         const bool sr = rop.is_static(), s1 = n.is_static(), s2 = d.is_static();
         if (mppp_likely(sr && s1 && s2)) {
@@ -4897,9 +4898,9 @@ public:
      *
      * @return the quotient of \p n and \p d.
      */
-    friend mp_integer divexact(const mp_integer &n, const mp_integer &d)
+    friend integer divexact(const integer &n, const integer &d)
     {
-        mp_integer retval;
+        integer retval;
         divexact(retval, n, d);
         return retval;
     }
@@ -4963,7 +4964,7 @@ public:
      * @param op1 the first operand.
      * @param op2 the second operand.
      */
-    friend void gcd(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
+    friend void gcd(integer &rop, const integer &op1, const integer &op2)
     {
         const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
         if (mppp_likely(sr && s1 && s2)) {
@@ -4983,15 +4984,15 @@ public:
      *
      * @return the GCD of \p op1 and \p op2.
      */
-    friend mp_integer gcd(const mp_integer &op1, const mp_integer &op2)
+    friend integer gcd(const integer &op1, const integer &op2)
     {
-        mp_integer retval;
+        integer retval;
         gcd(retval, op1, op2);
         return retval;
     }
     /// Return a reference to the internal union.
     /**
-     * This method returns a reference to the union used internally to implement the mp_integer class.
+     * This method returns a reference to the union used internally to implement the integer class.
      *
      * @return a reference to the internal union member.
      */
@@ -5001,7 +5002,7 @@ public:
     }
     /// Return a const reference to the internal union.
     /**
-     * This method returns a const reference to the union used internally to implement the mp_integer class.
+     * This method returns a const reference to the union used internally to implement the integer class.
      *
      * @return a const reference to the internal union member.
      */
@@ -5018,8 +5019,8 @@ public:
      * \rststar
      * .. note::
      *
-     *    The returned pointer is tied to the lifetime of ``this``. Calling :cpp:func:`~mppp::mp_integer::demote()` or
-     *    assigning an :cpp:class:`~mppp::mp_integer` with static storage to ``this`` will invalidate the returned
+     *    The returned pointer is tied to the lifetime of ``this``. Calling :cpp:func:`~mppp::integer::demote()` or
+     *    assigning an :cpp:class:`~mppp::integer` with static storage to ``this`` will invalidate the returned
      *    pointer.
      * \endrststar
      *
@@ -5038,13 +5039,13 @@ public:
     {
         return m_int.m_st._mp_size == 0;
     }
-    /// Test if an mppp::mp_integer is zero.
+    /// Test if an mppp::integer is zero.
     /**
-     * @param n the mppp::mp_integer to be tested.
+     * @param n the mppp::integer to be tested.
      *
      * @return \p true if \p n is zero, \p false otherwise.
      */
-    friend bool is_zero(const mp_integer &n)
+    friend bool is_zero(const integer &n)
     {
         return n.is_zero();
     }
@@ -5071,13 +5072,13 @@ public:
     {
         return is_one_impl<1>();
     }
-    /// Test if an mppp::mp_integer is equal to one.
+    /// Test if an mppp::integer is equal to one.
     /**
-     * @param n the mppp::mp_integer to be tested.
+     * @param n the mppp::integer to be tested.
      *
      * @return \p true if \p n is equal to 1, \p false otherwise.
      */
-    friend bool is_one(const mp_integer &n)
+    friend bool is_one(const integer &n)
     {
         return n.is_one();
     }
@@ -5089,13 +5090,13 @@ public:
     {
         return is_one_impl<-1>();
     }
-    /// Test if an mppp::mp_integer is equal to minus one.
+    /// Test if an mppp::integer is equal to minus one.
     /**
-     * @param n the mppp::mp_integer to be tested.
+     * @param n the mppp::integer to be tested.
      *
      * @return \p true if \p n is equal to -1, \p false otherwise.
      */
-    friend bool is_negative_one(const mp_integer &n)
+    friend bool is_negative_one(const integer &n)
     {
         return n.is_negative_one();
     }
@@ -5105,7 +5106,7 @@ private:
 };
 
 template <std::size_t SSize>
-constexpr std::size_t mp_integer<SSize>::ssize;
+constexpr std::size_t integer<SSize>::ssize;
 
 #if 0
 
@@ -5122,7 +5123,7 @@ private:
 public:
 #if defined(_MSC_VER)
     template <typename T>
-    friend in_place_lenabler<T> operator+=(T &x, const mp_integer &n)
+    friend in_place_lenabler<T> operator+=(T &x, const integer &n)
 #else
 /// In-place addition for interoperable types.
 /**
@@ -5142,24 +5143,24 @@ public:
  *
  * @return a reference to \p x.
  *
- * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+ * @throws unspecified any exception thrown by the conversion operator of mppp::integer.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    friend CppInteroperable &operator+=(CppInteroperable &x, const mp_integer &n)
+    friend CppInteroperable &operator+=(CppInteroperable &x, const integer &n)
 #else
     template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator+=(T &x, const mp_integer &n)
+    friend T &operator+=(T &x, const integer &n)
 #endif
 #endif
     {
         // NOTE: if x is an integral, then the static cast is a generic conversion from
-        // mp_integer to the integral, which can fail because of overflow. Otherwise, the
+        // integer to the integral, which can fail because of overflow. Otherwise, the
         // static cast is a redundant cast to float of x + n, which is already a float.
         return x = static_cast<mppp_impl::uncvref_t<decltype(x)>>(x + n);
     }
 #endif
 
-/** @defgroup mp_integer_operators mp_integer_operators
+/** @defgroup integer_operators integer_operators
  *  @{
  */
 
@@ -5168,14 +5169,13 @@ public:
 #if defined(MPPP_HAVE_CONCEPTS)
 
 template <typename T, std::size_t SSize>
-concept bool MpIntegerArithInteroperable = CppInteroperable<T> || std::is_same<mp_integer<SSize>, T>::value;
+concept bool IntegerArithInteroperable = CppInteroperable<T> || std::is_same<integer<SSize>, T>::value;
 
 #else
 
 // Enabler for in-place arithmetic ops.
 template <typename T, std::size_t SSize>
-using in_place_enabler
-    = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, mp_integer<SSize>>>::value, int>;
+using in_place_enabler = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, integer<SSize>>>::value, int>;
 
 template <typename T>
 using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
@@ -5184,18 +5184,18 @@ using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
 
 // Dispatching for in-place add.
 template <std::size_t SSize>
-inline void dispatch_in_place_add(mp_integer<SSize> &retval, const mp_integer<SSize> &n)
+inline void dispatch_in_place_add(integer<SSize> &retval, const integer<SSize> &n)
 {
     add(retval, retval, n);
 }
 
 template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-inline void dispatch_in_place_add(mp_integer<SSize> &retval, const T &n)
+inline void dispatch_in_place_add(integer<SSize> &retval, const T &n)
 {
-    add(retval, retval, mp_integer<SSize>{n});
+    add(retval, retval, integer<SSize>{n});
 }
 template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-inline void dispatch_in_place_add(mp_integer<SSize> &retval, const T &x)
+inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
 }
@@ -5208,15 +5208,15 @@ inline void dispatch_in_place_add(mp_integer<SSize> &retval, const T &x)
  *
  * @return a reference to \p this.
  *
- * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to integer, iff \p T
  * is a floating-point type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline mp_integer<SSize> &operator+=(mp_integer<SSize> &rop, const MpIntegerArithInteroperable<SSize> &op)
+inline integer<SSize> &operator+=(integer<SSize> &rop, const IntegerArithInteroperable<SSize> &op)
 #else
 template <typename T, std::size_t SSize, in_place_enabler<T, SSize> = 0>
-inline mp_integer<SSize> &operator+=(mp_integer<SSize> &rop, const T &op)
+inline integer<SSize> &operator+=(integer<SSize> &rop, const T &op)
 #endif
 {
     dispatch_in_place_add(rop, op);
@@ -5225,10 +5225,10 @@ inline mp_integer<SSize> &operator+=(mp_integer<SSize> &rop, const T &op)
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline CppInteroperable &operator+=(CppInteroperable &x, const mp_integer<SSize> &n)
+inline CppInteroperable &operator+=(CppInteroperable &x, const integer<SSize> &n)
 #else
 template <typename T, std::size_t SSize, in_place_lenabler<T> = 0>
-inline T &operator+=(T &x, const mp_integer<SSize> &n)
+inline T &operator+=(T &x, const integer<SSize> &n)
 #endif
 {
     return x = static_cast<uncvref_t<decltype(x)>>(x + n);
@@ -5236,7 +5236,7 @@ inline T &operator+=(T &x, const mp_integer<SSize> &n)
 
 /** @} */
 
-/** @defgroup mp_integer_exponentiation mp_integer_exponentiation
+/** @defgroup integer_exponentiation integer_exponentiation
  *  @{
  */
 
@@ -5249,12 +5249,12 @@ inline T &operator+=(T &x, const mp_integer<SSize> &n)
  * @param exp the exponent.
  */
 template <std::size_t SSize>
-inline void pow_ui(mp_integer<SSize> &rop, const mp_integer<SSize> &base, unsigned long exp)
+inline void pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned long exp)
 {
     if (rop.is_static()) {
         MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
-        rop = mp_integer<SSize>(&tmp.m_mpz);
+        rop = integer<SSize>(&tmp.m_mpz);
     } else {
         ::mpz_pow_ui(&rop._get_union().g_dy(), base.get_mpz_view(), exp);
     }
@@ -5268,16 +5268,16 @@ inline void pow_ui(mp_integer<SSize> &rop, const mp_integer<SSize> &base, unsign
  * @return <tt>base**exp</tt>.
  */
 template <std::size_t SSize>
-inline mp_integer<SSize> pow_ui(const mp_integer<SSize> &base, unsigned long exp)
+inline integer<SSize> pow_ui(const integer<SSize> &base, unsigned long exp)
 {
-    mp_integer<SSize> retval;
+    integer<SSize> retval;
     pow_ui(retval, base, exp);
     return retval;
 }
 
 /** @} */
 
-/** @defgroup mp_integer_other mp_integer_other
+/** @defgroup integer_other integer_other
  *  @{
  */
 
@@ -5291,7 +5291,7 @@ inline mp_integer<SSize> pow_ui(const mp_integer<SSize> &base, unsigned long exp
  * @return a hash value for \p n.
  */
 template <std::size_t SSize>
-inline std::size_t hash(const mp_integer<SSize> &n)
+inline std::size_t hash(const integer<SSize> &n)
 {
     std::size_t asize;
     // NOTE: size is part of the common initial sequence.
@@ -5321,18 +5321,18 @@ inline std::size_t hash(const mp_integer<SSize> &n)
 namespace std
 {
 
-/// Specialisation of \p std::hash for mppp::mp_integer.
+/// Specialisation of \p std::hash for mppp::integer.
 template <size_t SSize>
-struct hash<mppp::mp_integer<SSize>> {
+struct hash<mppp::integer<SSize>> {
     /// The argument type.
-    typedef mppp::mp_integer<SSize> argument_type;
+    typedef mppp::integer<SSize> argument_type;
     /// The result type.
     typedef size_t result_type;
     /// Call operator.
     /**
-     * @param n the mppp::mp_integer whose hash will be returned.
+     * @param n the mppp::integer whose hash will be returned.
      *
-     * @return the hash value of \p n, as calculated by mppp::mp_integer::hash().
+     * @return the hash value of \p n, as calculated by mppp::integer::hash().
      */
     result_type operator()(const argument_type &n) const
     {

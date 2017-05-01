@@ -52,7 +52,7 @@ struct view_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n;
         const integer &nc = static_cast<const integer &>(n);
         REQUIRE((mpz_sgn(n.get_mpz_view().get()) == 0));

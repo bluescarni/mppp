@@ -65,7 +65,7 @@ struct cmp_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // Start with all zeroes.
         mpz_raii m1, m2;
         integer n1, n2;
