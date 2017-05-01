@@ -196,6 +196,14 @@ template <class B>
 struct negation : std::integral_constant<bool, !B::value> {
 };
 
+// Some handy aliases.
+template <typename T>
+using uncvref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+
+// Just a small helper, like C++14.
+template <bool B, typename T = void>
+using enable_if_t = typename std::enable_if<B, T>::type;
+
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
 // Integral types used for allocation size and number of limbs.
@@ -377,9 +385,6 @@ inline ::mp_limb_t limb_add_overflow(::mp_limb_t a, ::mp_limb_t b, ::mp_limb_t *
 // The static integer class.
 template <std::size_t SSize>
 struct static_int {
-    // Just a small helper, like C++14.
-    template <bool B, typename T = void>
-    using enable_if_t = typename std::enable_if<B, T>::type;
     // Let's put a hard cap and sanity check on the static size.
     static_assert(SSize > 0u && SSize <= 64u, "Invalid static size.");
     using limbs_type = std::array<::mp_limb_t, SSize>;
@@ -871,10 +876,9 @@ struct zero_division_error final : std::domain_error {
 template <std::size_t SSize>
 class mp_integer
 {
-    // Just a small helper, like C++14.
-    template <bool B, typename T = void>
-    using enable_if_t = typename std::enable_if<B, T>::type;
     // Import these typedefs for ease of use.
+    template <bool B, typename T = void>
+    using enable_if_t = mppp_impl::enable_if_t<B, T>;
     using s_storage = mppp_impl::static_int<SSize>;
     using d_storage = mppp_impl::mpz_struct_t;
     using mpz_size_t = mppp_impl::mpz_size_t;
@@ -2060,21 +2064,6 @@ private:
     {
         return dispatch_binary_add(op2, x);
     }
-    // Dispatching for in-place add.
-    static void dispatch_in_place_add(mp_integer &retval, const mp_integer &n)
-    {
-        add(retval, retval, n);
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_add(mp_integer &retval, const T &n)
-    {
-        add(retval, retval, mp_integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_add(mp_integer &retval, const T &x)
-    {
-        retval = static_cast<T>(retval) + x;
-    }
     // Dispatching for the binary subtraction operator.
     static mp_integer dispatch_binary_sub(const mp_integer &op1, const mp_integer &op2)
     {
@@ -2166,21 +2155,6 @@ public:
     {
         return dispatch_binary_add(op1, op2);
     }
-    /// In-place addition operator.
-    /**
-     * @param op the addend.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
-     * is a floating-point type.
-     */
-    template <typename T, in_place_enabler<T> = 0>
-    mp_integer &operator+=(const T &op)
-    {
-        dispatch_in_place_add(*this, op);
-        return *this;
-    }
 
 private:
 #if defined(_MSC_VER)
@@ -2190,45 +2164,7 @@ private:
     template <typename T>
     using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
 #endif
-
 public:
-#if defined(_MSC_VER)
-    template <typename T>
-    friend in_place_lenabler<T> operator+=(T &x, const mp_integer &n)
-#else
-/// In-place addition for interoperable types.
-/**
- * \rststar
- * The body of this operator is equivalent to:
- *
- * .. code-block:: c++
- *
- *    return x = static_cast<CppInteroperable>(x + n);
- *
- * That is, the result of the corresponding binary operation is cast back to
- * :cpp:concept:`~mppp::CppInteroperable` and assigned to ``x``.
- * \endrststar
- *
- * @param x the first argument.
- * @param n the second argument.
- *
- * @return a reference to \p x.
- *
- * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-    friend CppInteroperable &operator+=(CppInteroperable &x, const mp_integer &n)
-#else
-    template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator+=(T &x, const mp_integer &n)
-#endif
-#endif
-    {
-        // NOTE: if x is an integral, then the static cast is a generic conversion from
-        // mp_integer to the integral, which can fail because of overflow. Otherwise, the
-        // static cast is a redundant cast to float of x + n, which is already a float.
-        return x = static_cast<T>(x + n);
-    }
     /// Prefix increment.
     /**
      * Increment \p this by one.
@@ -5207,6 +5143,136 @@ private:
 
 template <std::size_t SSize>
 constexpr std::size_t mp_integer<SSize>::ssize;
+
+#if 0
+
+
+private:
+#if defined(_MSC_VER)
+    template <typename T>
+    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, T &>;
+#else
+    template <typename T>
+    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
+#endif
+
+public:
+#if defined(_MSC_VER)
+    template <typename T>
+    friend in_place_lenabler<T> operator+=(T &x, const mp_integer &n)
+#else
+/// In-place addition for interoperable types.
+/**
+ * \rststar
+ * The body of this operator is equivalent to:
+ *
+ * .. code-block:: c++
+ *
+ *    return x = static_cast<CppInteroperable>(x + n);
+ *
+ * That is, the result of the corresponding binary operation is cast back to
+ * :cpp:concept:`~mppp::CppInteroperable` and assigned to ``x``.
+ * \endrststar
+ *
+ * @param x the first argument.
+ * @param n the second argument.
+ *
+ * @return a reference to \p x.
+ *
+ * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    friend CppInteroperable &operator+=(CppInteroperable &x, const mp_integer &n)
+#else
+    template <typename T, in_place_lenabler<T> = 0>
+    friend T &operator+=(T &x, const mp_integer &n)
+#endif
+#endif
+    {
+        // NOTE: if x is an integral, then the static cast is a generic conversion from
+        // mp_integer to the integral, which can fail because of overflow. Otherwise, the
+        // static cast is a redundant cast to float of x + n, which is already a float.
+        return x = static_cast<mppp_impl::uncvref_t<decltype(x)>>(x + n);
+    }
+#endif
+
+/** @defgroup mp_integer_operators mp_integer_operators
+ *  @{
+ */
+
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T, std::size_t SSize>
+concept bool MpIntegerArithInteroperable = CppInteroperable<T> || std::is_same<mp_integer<SSize>, T>::value;
+
+#else
+
+// Enabler for in-place arithmetic ops.
+template <typename T, std::size_t SSize>
+using in_place_enabler = mppp_impl::enable_if_t<mppp_impl::disjunction<mppp_impl::is_supported_interop<T>,
+                                                                       std::is_same<T, mp_integer<SSize>>>::value,
+                                                int>;
+
+template <typename T>
+using in_place_lenabler = mppp_impl::enable_if_t<mppp_impl::is_supported_interop<T>::value, int>;
+
+#endif
+
+// Dispatching for in-place add.
+template <std::size_t SSize>
+inline void dispatch_in_place_add(mp_integer<SSize> &retval, const mp_integer<SSize> &n)
+{
+    add(retval, retval, n);
+}
+
+template <std::size_t SSize, typename T, mppp_impl::enable_if_t<mppp_impl::is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_add(mp_integer<SSize> &retval, const T &n)
+{
+    add(retval, retval, mp_integer<SSize>{n});
+}
+template <std::size_t SSize, typename T, mppp_impl::enable_if_t<mppp_impl::is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_add(mp_integer<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) + x;
+}
+
+#endif
+
+/// In-place addition operator.
+/**
+ * @param op the addend.
+ *
+ * @return a reference to \p this.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
+ * is a floating-point type.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline mp_integer<SSize> &operator+=(mp_integer<SSize> &rop, const MpIntegerArithInteroperable<SSize> &op)
+#else
+template <typename T, std::size_t SSize, in_place_enabler<T, SSize> = 0>
+inline mp_integer<SSize> &operator+=(mp_integer<SSize> &rop, const T &op)
+#endif
+{
+    dispatch_in_place_add(rop, op);
+    return rop;
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline CppInteroperable &operator+=(CppInteroperable &x, const mp_integer<SSize> &n)
+#else
+template <typename T, std::size_t SSize, in_place_lenabler<T> = 0>
+inline T &operator+=(T &x, const mp_integer<SSize> &n)
+#endif
+{
+    return x = static_cast<mppp_impl::uncvref_t<decltype(x)>>(x + n);
+}
+
+/** @} */
 
 /** @defgroup mp_integer_exponentiation mp_integer_exponentiation
  *  @{
