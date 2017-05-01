@@ -4198,10 +4198,15 @@ public:
     }
 
 private:
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     static bool exp_nonnegative(const T &exp)
     {
         return exp >= T(0);
+    }
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    static bool exp_nonnegative(const T &)
+    {
+        return true;
     }
     static bool exp_nonnegative(const integer &exp)
     {
