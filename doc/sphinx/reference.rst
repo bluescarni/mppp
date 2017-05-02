@@ -7,6 +7,6 @@ Here follows the complete C++ reference of the mp++ library.
    :maxdepth: 2
 
    namespaces.rst
+   exceptions.rst
    concepts.rst
    integer.rst
-   exceptions.rst

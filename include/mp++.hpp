@@ -5172,8 +5172,8 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
  *
  * \endrststar
  *
- * @param op1 the first argument.
- * @param op2 the second argument.
+ * @param op1 the first summand.
+ * @param op2 the second summand.
  *
  * @return <tt>op1 + op2</tt>.
  */
