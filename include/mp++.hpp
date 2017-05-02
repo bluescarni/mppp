@@ -1990,35 +1990,6 @@ private:
         }
         return retval;
     }
-    // Dispatching for the binary addition operator.
-    static integer dispatch_binary_add(const integer &op1, const integer &op2)
-    {
-        integer retval;
-        add(retval, op1, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static integer dispatch_binary_add(const integer &op1, T n)
-    {
-        integer retval{n};
-        add(retval, retval, op1);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static integer dispatch_binary_add(T n, const integer &op2)
-    {
-        return dispatch_binary_add(op2, n);
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_add(const integer &op1, T x)
-    {
-        return static_cast<T>(op1) + x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_add(T x, const integer &op2)
-    {
-        return dispatch_binary_add(op2, x);
-    }
     // Dispatching for the binary subtraction operator.
     static integer dispatch_binary_sub(const integer &op1, const integer &op2)
     {
@@ -2097,18 +2068,6 @@ public:
     integer operator+() const
     {
         return *this;
-    }
-    /// Binary addition operator.
-    /**
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     *
-     * @return <tt>op1 + op2</tt>.
-     */
-    template <typename T, typename U>
-    friend common_t<T, U> operator+(const T &op1, const U &op2)
-    {
-        return dispatch_binary_add(op1, op2);
     }
 
 private:
@@ -5110,6 +5069,75 @@ using integer_op_interoperable_enabler
     = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, integer<SSize>>>::value, int>;
 #endif
 
+// Machinery for the determination of the result of a binary operation involving integer.
+// Default is empty for SFINAE.
+template <typename, typename, typename = void>
+struct integer_common_type {
+};
+
+template <std::size_t SSize>
+struct integer_common_type<integer<SSize>, integer<SSize>> {
+    using type = integer<SSize>;
+};
+
+template <std::size_t SSize, typename U>
+struct integer_common_type<integer<SSize>, U, enable_if_t<is_supported_integral<U>::value>> {
+    using type = integer<SSize>;
+};
+
+template <std::size_t SSize, typename T>
+struct integer_common_type<T, integer<SSize>, enable_if_t<is_supported_integral<T>::value>> {
+    using type = integer<SSize>;
+};
+
+template <std::size_t SSize, typename U>
+struct integer_common_type<integer<SSize>, U, enable_if_t<is_supported_float<U>::value>> {
+    using type = U;
+};
+
+template <std::size_t SSize, typename T>
+struct integer_common_type<T, integer<SSize>, enable_if_t<is_supported_float<T>::value>> {
+    using type = T;
+};
+
+template <typename T, typename U>
+using integer_common_t = typename integer_common_type<T, U>::type;
+
+// Dispatching for the binary addition operator.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval;
+    add(retval, op1, op2);
+    return retval;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, T n)
+{
+    integer<SSize> retval{n};
+    add(retval, retval, op1);
+    return retval;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_add(T n, const integer<SSize> &op2)
+{
+    return dispatch_binary_add(op2, n);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_add(const integer<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) + x;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_add(T x, const integer<SSize> &op2)
+{
+    return dispatch_binary_add(op2, x);
+}
+
 // Dispatching for in-place add, integer on the left.
 template <std::size_t SSize>
 inline void dispatch_in_place_add(integer<SSize> &retval, const integer<SSize> &n)
@@ -5128,6 +5156,31 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
 }
+}
+
+/// Binary addition operator.
+/**
+ * \rststar
+ * This operator is enabled only if at least one argument is an :cpp:class:`~mppp::integer`
+ * and the type of the other argument satisfies :cpp:concept:`~mppp::IntegerOpType`. If both arguments are
+ * of type :cpp:class:`~mppp::integer`, they must have the same static size. The return type
+ * is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::integer`.
+ *
+ * \endrststar
+ *
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ *
+ * @return <tt>op1 + op2</tt>.
+ */
+template <typename T, typename U>
+inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
+{
+    return dispatch_binary_add(op1, op2);
 }
 
 /// In-place addition.
