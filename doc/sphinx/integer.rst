@@ -8,8 +8,6 @@ The ``integer`` class
 .. doxygenclass:: mppp::integer
    :members:
 
-.. _integer_operators:
-
 Concepts
 --------
 
@@ -22,6 +20,8 @@ Concepts
    * :cpp:class:`~mppp::integer` with static size ``SSize``.
 
    Note that the modulo and bit-shifting operators have additional restrictions.
+
+.. _integer_operators:
 
 Operators
 ---------

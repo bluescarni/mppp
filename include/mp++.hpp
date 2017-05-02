@@ -1057,7 +1057,7 @@ private:
     }
     // Dispatch for generic constructor.
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
-    void dispatch_generic_ctor(T n)
+    void dispatch_generic_ctor(const T &n)
     {
         auto nu = static_cast<unsigned long long>(n);
         while (nu) {
@@ -1069,7 +1069,7 @@ private:
         }
     }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
-    void dispatch_generic_ctor(T n)
+    void dispatch_generic_ctor(const T &n)
     {
         // NOTE: here we are using cast + unary minus to extract the abs value of n as an unsigned long long. See:
         // http://stackoverflow.com/questions/4536095/unary-minus-and-signed-to-unsigned-conversion
@@ -1542,11 +1542,10 @@ public:
  */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
-    explicit operator T() const
 #else
     template <typename T, cpp_interoperable_enabler<T> = 0>
-    explicit operator T() const
 #endif
+    explicit operator T() const
     {
         const auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
