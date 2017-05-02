@@ -5104,7 +5104,7 @@ inline namespace detail
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool IntegerOpInteroperable = CppInteroperable<T> || std::is_same<integer<SSize>, T>::value;
+concept bool IntegerOpType = CppInteroperable<T> || std::is_same<integer<SSize>, T>::value;
 #else
 using integer_op_interoperable_enabler
     = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, integer<SSize>>>::value, int>;
@@ -5141,7 +5141,7 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline integer<SSize> &operator+=(integer<SSize> &rop, const IntegerOpInteroperable<SSize> &op)
+inline integer<SSize> &operator+=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
 #else
 template <typename T, std::size_t SSize, integer_op_interoperable_enabler<T, SSize> = 0>
 inline integer<SSize> &operator+=(integer<SSize> &rop, const T &op)

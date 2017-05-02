@@ -13,10 +13,10 @@ The ``integer`` class
 Concepts
 --------
 
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerOpInteroperable
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerOpType
 
    This concept is satisfied by all types with which an :cpp:class:`~mppp::integer` with static size ``SSize``
-   can interoperate via its :ref:`overloaded operators <integer_operators>`. Specifically, this concept is satisfied by:
+   can interact via its :ref:`overloaded operators <integer_operators>`. Specifically, this concept is satisfied by:
 
    * all :cpp:concept:`~mppp::CppInteroperable` types,
    * :cpp:class:`~mppp::integer` with static size ``SSize``.
