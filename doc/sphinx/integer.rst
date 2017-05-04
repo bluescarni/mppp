@@ -26,6 +26,14 @@ Concepts
 Functions
 ---------
 
+.. _integer_arithmetic:
+
+Arithmetic
+~~~~~~~~~~
+
+.. doxygengroup:: integer_arithmetic
+   :content-only:
+
 .. _integer_exponentiation:
 
 Exponentiation
