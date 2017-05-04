@@ -832,10 +832,11 @@ struct zero_division_error final : std::domain_error {
  *    auto res4 = n1 / 2.f; // res4 is a float
  *    auto res5 = 12. / n1; // res5 is a double
  *
- * The modulo operator ``%`` accepts only :cpp:class:`~mppp::integer` and interoperable integral types as arguments,
+ * The modulo operator ``%`` accepts only :cpp:class:`~mppp::integer` and :cpp:concept:`~mppp::CppInteroperable`
+ * integral types as arguments,
  * and it always returns :cpp:class:`~mppp::integer` as result. The bit shifting operators ``<<`` and ``>>`` accept
- * only interoperable integral types as shift arguments, and they always return :cpp:class:`~mppp::integer` as
- * result.
+ * only :cpp:concept:`~mppp::CppInteroperable` integral types as shift arguments, and they always return
+ * :cpp:class:`~mppp::integer` as result.
  *
  * The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote the arguments to a common type
  * before comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
@@ -846,7 +847,7 @@ struct zero_division_error final : std::domain_error {
  * features:
  *
  * * a constructor from the GMP integer type ``mpz_t``,
- * * an :cpp:func:`~mppp::integer::get_mpz_t()` method that promotes ``this`` to dynamic
+ * * a :cpp:func:`~mppp::integer::get_mpz_t()` method that promotes ``this`` to dynamic
  *   storage and returns a pointer to the internal ``mpz_t`` instance,
  * * an ``mpz_view`` class, an instance of which can be requested via the :cpp:func:`~mppp::integer::get_mpz_view()`
  *   method, which allows to use :cpp:class:`~mppp::integer` in the GMP API as a drop-in replacement for
@@ -4964,7 +4965,8 @@ public:
      * \rststar
      * .. note::
      *
-     *    The returned pointer is tied to the lifetime of ``this``. Calling :cpp:func:`~mppp::integer::demote()` or
+     *    The returned pointer is a raw, non-owning pointer tied to the lifetime of ``this``. Calling
+     *    :cpp:func:`~mppp::integer::demote()` or
      *    assigning an :cpp:class:`~mppp::integer` with static storage to ``this`` will invalidate the returned
      *    pointer.
      * \endrststar
