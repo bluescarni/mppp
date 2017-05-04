@@ -21,14 +21,6 @@ Concepts
 
    Note that the modulo and bit-shifting operators have additional restrictions.
 
-.. _integer_operators:
-
-Operators
----------
-
-.. doxygengroup:: integer_operators
-   :content-only:
-
 .. _integer_functions:
 
 Functions
@@ -46,4 +38,12 @@ Other
 ~~~~~
 
 .. doxygengroup:: integer_other
+   :content-only:
+
+.. _integer_operators:
+
+Operators
+---------
+
+.. doxygengroup:: integer_operators
    :content-only:
