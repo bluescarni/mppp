@@ -48,7 +48,7 @@
 #endif
 
 // Compiler configuration.
-// NOTE: check for MSVC first, as clang-cl does defined both __clang__ and _MSC_VER,
+// NOTE: check for MSVC first, as clang-cl does define both __clang__ and _MSC_VER,
 // and we want to configure it as MSVC.
 #if defined(_MSC_VER)
 
