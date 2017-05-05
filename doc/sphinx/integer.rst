@@ -13,7 +13,7 @@ Concepts
 
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerOpType
 
-   This concept is satisfied by all types with which an :cpp:class:`~mppp::integer` with static size ``SSize``
+   This concept is satisfied if ``T`` is a type with which an :cpp:class:`~mppp::integer` with static size ``SSize``
    can interact via its :ref:`overloaded operators <integer_operators>`. Specifically, this concept is satisfied by:
 
    * all :cpp:concept:`~mppp::CppInteroperable` types,

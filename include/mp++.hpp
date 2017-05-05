@@ -1219,7 +1219,7 @@ public:
      * \rststar
      * .. warning::
      *
-     *    It is up to the user to ensure that ``n`` has been correctly initialized. Calling this constructor
+     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
      *    with an uninitialized ``n`` is undefined behaviour.
      * \endrststar
      *
