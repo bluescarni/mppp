@@ -1,5 +1,5 @@
-General-purpose concepts
-========================
+Common concepts
+===============
 
 .. cpp:concept:: template <typename T> mppp::CppInteroperable
 
