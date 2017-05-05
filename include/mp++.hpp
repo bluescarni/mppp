@@ -1706,118 +1706,6 @@ public:
     }
 
 private:
-    // Dispatching for the binary multiplication operator.
-    static integer dispatch_binary_mul(const integer &op1, const integer &op2)
-    {
-        integer retval;
-        mul(retval, op1, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static integer dispatch_binary_mul(const integer &op1, T n)
-    {
-        // NOTE: with respect to addition, here we separate the retval
-        // from the operands. Having a separate destination is generally better
-        // for multiplication.
-        integer retval;
-        mul(retval, op1, integer{n});
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static integer dispatch_binary_mul(T n, const integer &op2)
-    {
-        return dispatch_binary_mul(op2, n);
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_mul(const integer &op1, T x)
-    {
-        return static_cast<T>(op1) * x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_mul(T x, const integer &op2)
-    {
-        return dispatch_binary_mul(op2, x);
-    }
-    // Dispatching for in-place multiplication.
-    static void dispatch_in_place_mul(integer &retval, const integer &n)
-    {
-        mul(retval, retval, n);
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_mul(integer &retval, const T &n)
-    {
-        mul(retval, retval, integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_mul(integer &retval, const T &x)
-    {
-        retval = static_cast<T>(retval) * x;
-    }
-
-public:
-    /// Binary multiplication operator.
-    /**
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     *
-     * @return <tt>op1 * op2</tt>.
-     */
-    template <typename T, typename U>
-    friend common_t<T, U> operator*(const T &op1, const U &op2)
-    {
-        return dispatch_binary_mul(op1, op2);
-    }
-    /// In-place multiplication operator.
-    /**
-     * @param op the multiplicand.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to integer, iff \p T
-     * is a floating-point type.
-     */
-    template <typename T, in_place_enabler<T> = 0>
-    integer &operator*=(const T &op)
-    {
-        dispatch_in_place_mul(*this, op);
-        return *this;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend in_place_lenabler<T> operator*=(T &x, const integer &n)
-#else
-    /// In-place multiplication for interoperable types.
-    /**
-     * \rststar
-     * .. note::
-     *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::integer`.
-     * \endrststar
-     *
-     * The body of this operator is equivalent to:
-     * \rststar
-     * .. code-block:: c++
-     *
-     *    return x = static_cast<T>(x * n);
-     * \endrststar
-     *
-     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
-     *
-     * @param x the first argument.
-     * @param n the second argument.
-     *
-     * @return a reference to \p x.
-     *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::integer.
-     */
-    template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator*=(T &x, const integer &n)
-#endif
-    {
-        return x = static_cast<T>(x * n);
-    }
-
-private:
     // Dispatching for the binary division operator.
     static integer dispatch_binary_div(const integer &op1, const integer &op2)
     {
@@ -5435,8 +5323,8 @@ inline void dispatch_in_place_sub(integer<SSize> &retval, const T &x)
  *
  * \endrststar
  *
- * @param op1 the first summand.
- * @param op2 the second summand.
+ * @param op1 the first operand.
+ * @param op2 the second operand.
  *
  * @return <tt>op1 - op2</tt>.
  */
@@ -5449,7 +5337,7 @@ inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
 /// In-place subtraction.
 /**
  * @param rop the minuend.
- * @param op the subtrahend
+ * @param op the subtrahend.
  *
  * @return a reference to \p rop.
  *
@@ -5485,6 +5373,133 @@ inline T &operator-=(T &rop, const integer<SSize> &op)
 #endif
 {
     return rop = static_cast<uncvref_t<decltype(rop)>>(rop - op);
+}
+
+inline namespace detail
+{
+
+// Dispatching for the binary multiplication operator.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_binary_mul(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval;
+    mul(retval, op1, op2);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_mul(const integer<SSize> &op1, T n)
+{
+    // NOTE: with respect to addition, here we separate the retval
+    // from the operands. Having a separate destination is generally better
+    // for multiplication.
+    integer<SSize> retval;
+    mul(retval, op1, integer<SSize>{n});
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_mul(T n, const integer<SSize> &op2)
+{
+    return dispatch_binary_mul(op2, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_mul(const integer<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) * x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_mul(T x, const integer<SSize> &op2)
+{
+    return dispatch_binary_mul(op2, x);
+}
+
+// Dispatching for in-place multiplication.
+template <std::size_t SSize>
+inline void dispatch_in_place_mul(integer<SSize> &retval, const integer<SSize> &n)
+{
+    mul(retval, retval, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_mul(integer<SSize> &retval, const T &n)
+{
+    mul(retval, retval, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_mul(integer<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) * x;
+}
+}
+
+/// Binary multiplication operator.
+/**
+ * \rststar
+ * This operator is enabled only if at least one argument is an :cpp:class:`~mppp::integer`
+ * and the type of the other argument satisfies :cpp:concept:`~mppp::IntegerOpType`. If both arguments are
+ * of type :cpp:class:`~mppp::integer`, they must have the same static size. The return type
+ * is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::integer`.
+ *
+ * \endrststar
+ *
+ * @param op1 the first factor.
+ * @param op2 the second factor.
+ *
+ * @return <tt>op1 * op2</tt>.
+ */
+template <typename T, typename U>
+inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
+{
+    return dispatch_binary_mul(op1, op2);
+}
+
+/// In-place multiplication.
+/**
+ * @param rop the multiplicator.
+ * @param op the multiplicand.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &operator*=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
+#else
+template <typename T, std::size_t SSize, integer_op_interoperable_enabler<T, SSize> = 0>
+inline integer<SSize> &operator*=(integer<SSize> &rop, const T &op)
+#endif
+{
+    dispatch_in_place_mul(rop, op);
+    return rop;
+}
+
+/// In-place multiplication.
+/**
+ * @param rop the multiplicator.
+ * @param op the multiplicand.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline CppInteroperable &operator*=(CppInteroperable &rop, const integer<SSize> &op)
+#else
+template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
+inline T &operator*=(T &rop, const integer<SSize> &op)
+#endif
+{
+    return rop = static_cast<uncvref_t<decltype(rop)>>(rop * op);
 }
 
 /** @} */
