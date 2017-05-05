@@ -936,9 +936,6 @@ class integer
     };
     template <typename T, typename U>
     using common_t = typename common_type<T, U>::type;
-    // Enabler for in-place arithmetic ops.
-    template <typename T>
-    using in_place_enabler = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, integer>>::value, int>;
 #if defined(_MSC_VER)
     // Common metaprogramming for bit shifting operators.
     // NOTE: here and elsewhere we special case MSVC because we need to alter the SFINAE style, as the usual
@@ -1635,16 +1632,6 @@ public:
     {
         return *this;
     }
-
-private:
-#if defined(_MSC_VER)
-    template <typename T>
-    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, T &>;
-#else
-    template <typename T>
-    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
-#endif
-public:
     /// Prefix increment.
     /**
      * Increment \p this by one.
