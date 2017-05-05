@@ -1627,57 +1627,6 @@ public:
         }
         return *this;
     }
-
-private:
-    // Dispatching for the binary subtraction operator.
-    static integer dispatch_binary_sub(const integer &op1, const integer &op2)
-    {
-        integer retval;
-        sub(retval, op1, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static integer dispatch_binary_sub(const integer &op1, T n)
-    {
-        integer retval{n};
-        sub(retval, retval, op1);
-        retval.neg();
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static integer dispatch_binary_sub(T n, const integer &op2)
-    {
-        auto retval = dispatch_binary_sub(op2, n);
-        retval.neg();
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_sub(const integer &op1, T x)
-    {
-        return static_cast<T>(op1) - x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_sub(T x, const integer &op2)
-    {
-        return -dispatch_binary_sub(op2, x);
-    }
-    // Dispatching for in-place sub.
-    static void dispatch_in_place_sub(integer &retval, const integer &n)
-    {
-        sub(retval, retval, n);
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_sub(integer &retval, const T &n)
-    {
-        sub(retval, retval, integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_sub(integer &retval, const T &x)
-    {
-        retval = static_cast<T>(retval) - x;
-    }
-
-public:
     /// Identity operator.
     /**
      * @return a copy of \p this.
@@ -1728,67 +1677,6 @@ public:
         integer retval{*this};
         retval.neg();
         return retval;
-    }
-    /// Binary subtraction operator.
-    /**
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     *
-     * @return <tt>op1 - op2</tt>.
-     */
-    template <typename T, typename U>
-    friend common_t<T, U> operator-(const T &op1, const U &op2)
-    {
-        return dispatch_binary_sub(op1, op2);
-    }
-    /// In-place subtraction operator.
-    /**
-     * @param op the subtrahend.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to integer, iff \p T
-     * is a floating-point type.
-     */
-    template <typename T, in_place_enabler<T> = 0>
-    integer &operator-=(const T &op)
-    {
-        dispatch_in_place_sub(*this, op);
-        return *this;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend in_place_lenabler<T> operator-=(T &x, const integer &n)
-#else
-    /// In-place subtraction for interoperable types.
-    /**
-     * \rststar
-     * .. note::
-     *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::integer`.
-     * \endrststar
-     *
-     * The body of this operator is equivalent to:
-     * \rststar
-     * .. code-block:: c++
-     *
-     *    return x = static_cast<T>(x - n);
-     * \endrststar
-     *
-     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
-     *
-     * @param x the first argument.
-     * @param n the second argument.
-     *
-     * @return a reference to \p x.
-     *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::integer.
-     */
-    template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator-=(T &x, const integer &n)
-#endif
-    {
-        return x = static_cast<T>(x - n);
     }
     /// Prefix decrement.
     /**
@@ -5470,6 +5358,133 @@ inline T &operator+=(T &rop, const integer<SSize> &op)
     // integer to the integral, which can fail because of overflow. Otherwise, the
     // static cast is a redundant cast to float of rop + op, which is already a float.
     return rop = static_cast<uncvref_t<decltype(rop)>>(rop + op);
+}
+
+inline namespace detail
+{
+
+// Dispatching for the binary subtraction operator.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval;
+    sub(retval, op1, op2);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, T n)
+{
+    integer<SSize> retval{n};
+    sub(retval, retval, op1);
+    retval.neg();
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_sub(T n, const integer<SSize> &op2)
+{
+    auto retval = dispatch_binary_sub(op2, n);
+    retval.neg();
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_sub(const integer<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) - x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_sub(T x, const integer<SSize> &op2)
+{
+    return -dispatch_binary_sub(op2, x);
+}
+
+// Dispatching for in-place sub.
+template <std::size_t SSize>
+inline void dispatch_in_place_sub(integer<SSize> &retval, const integer<SSize> &n)
+{
+    sub(retval, retval, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_sub(integer<SSize> &retval, const T &n)
+{
+    sub(retval, retval, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_sub(integer<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) - x;
+}
+}
+
+/// Binary subtraction operator.
+/**
+ * \rststar
+ * This operator is enabled only if at least one argument is an :cpp:class:`~mppp::integer`
+ * and the type of the other argument satisfies :cpp:concept:`~mppp::IntegerOpType`. If both arguments are
+ * of type :cpp:class:`~mppp::integer`, they must have the same static size. The return type
+ * is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::integer`.
+ *
+ * \endrststar
+ *
+ * @param op1 the first summand.
+ * @param op2 the second summand.
+ *
+ * @return <tt>op1 - op2</tt>.
+ */
+template <typename T, typename U>
+inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
+{
+    return dispatch_binary_sub(op1, op2);
+}
+
+/// In-place subtraction.
+/**
+ * @param rop the minuend.
+ * @param op the subtrahend
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &operator-=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
+#else
+template <typename T, std::size_t SSize, integer_op_interoperable_enabler<T, SSize> = 0>
+inline integer<SSize> &operator-=(integer<SSize> &rop, const T &op)
+#endif
+{
+    dispatch_in_place_sub(rop, op);
+    return rop;
+}
+
+/// In-place subtraction.
+/**
+ * @param rop the minuend.
+ * @param op the subtrahend.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline CppInteroperable &operator-=(CppInteroperable &rop, const integer<SSize> &op)
+#else
+template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
+inline T &operator-=(T &rop, const integer<SSize> &op)
+#endif
+{
+    return rop = static_cast<uncvref_t<decltype(rop)>>(rop - op);
 }
 
 /** @} */
