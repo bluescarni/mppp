@@ -1291,41 +1291,6 @@ public:
     {
         return m_int.is_dynamic();
     }
-    /// Output stream operator for integer.
-    /**
-     * This operator will print to the stream \p os the integer \p n in base 10. Internally it uses the
-     * integer::to_string() method.
-     *
-     * @param os the target stream.
-     * @param n the input integer.
-     *
-     * @return a reference to \p os.
-     *
-     * @throws unspecified any exception thrown by integer::to_string().
-     */
-    friend std::ostream &operator<<(std::ostream &os, const integer &n)
-    {
-        return os << n.to_string();
-    }
-    /// Input stream operator for integer.
-    /**
-     * Equivalent to extracting a line from the stream, using it to construct a temporary
-     * integer and then assigning the temporary to \p n.
-     *
-     * @param is input stream.
-     * @param n integer to which the contents of the stream will be assigned.
-     *
-     * @return reference to \p is.
-     *
-     * @throws unspecified any exception thrown by the constructor from string of integer.
-     */
-    friend std::istream &operator>>(std::istream &is, integer &n)
-    {
-        MPPP_MAYBE_TLS std::string tmp_str;
-        std::getline(is, tmp_str);
-        n = integer{tmp_str};
-        return is;
-    }
     /// Conversion to string.
     /**
      * This method will convert \p this into a string in base \p base using the GMP function \p mpz_get_str().
@@ -5192,6 +5157,55 @@ inline integer<SSize> pow_ui(const integer<SSize> &base, unsigned long exp)
     integer<SSize> retval;
     pow_ui(retval, base, exp);
     return retval;
+}
+
+/** @} */
+
+/** @defgroup integer_io integer_io
+ *  @{
+ */
+
+/// Output stream operator.
+/**
+ * \rststar
+ * This operator will print to the stream ``os`` the :cpp:class:`~mppp::integer` ``n`` in base 10. Internally it uses
+ * the :cpp:func:`mppp::integer::to_string()` method.
+ * \endrststar
+ *
+ * @param os the target stream.
+ * @param n the input integer.
+ *
+ * @return a reference to \p os.
+ *
+ * @throws unspecified any exception thrown by integer::to_string().
+ */
+template <std::size_t SSize>
+inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
+{
+    return os << n.to_string();
+}
+
+/// Input stream operator.
+/**
+ * \rststar
+ * This operator is equivalent to extracting a line from the stream, using it to construct a temporary
+ * :cpp:class:`~mppp::integer` and then assigning the temporary to ``n``.
+ * \endrststar
+ *
+ * @param is input stream.
+ * @param n integer to which the contents of the stream will be assigned.
+ *
+ * @return reference to \p is.
+ *
+ * @throws unspecified any exception thrown by the constructor from string of integer.
+ */
+template <std::size_t SSize>
+inline std::istream &operator>>(std::istream &is, integer<SSize> &n)
+{
+    MPPP_MAYBE_TLS std::string tmp_str;
+    std::getline(is, tmp_str);
+    n = integer<SSize>{tmp_str};
+    return is;
 }
 
 /** @} */

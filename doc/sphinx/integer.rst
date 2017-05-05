@@ -50,6 +50,14 @@ Exponentiation
 .. doxygengroup:: integer_exponentiation
    :content-only:
 
+.. _integer_io:
+
+Input/Output
+~~~~~~~~~~~~
+
+.. doxygengroup:: integer_io
+   :content-only:
+
 Other
 ~~~~~
 
