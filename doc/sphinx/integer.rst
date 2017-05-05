@@ -42,6 +42,14 @@ Division
 .. doxygengroup:: integer_division
    :content-only:
 
+.. _integer_comparison:
+
+Comparison
+~~~~~~~~~~
+
+.. doxygengroup:: integer_comparison
+   :content-only:
+
 .. _integer_exponentiation:
 
 Exponentiation
