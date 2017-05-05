@@ -19,7 +19,8 @@ Concepts
    * all :cpp:concept:`~mppp::CppInteroperable` types,
    * :cpp:class:`~mppp::integer` with static size ``SSize``.
 
-   Note that the :cpp:concept:`modulo <mppp::IntegerModType>` and bit-shifting operators have additional restrictions.
+   Note that the :cpp:concept:`modulo <mppp::IntegerModType>` and :cpp:concept:`bit-shifting <mppp::IntegerShiftType>`
+   operators have additional restrictions.
 
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerModType
 
@@ -28,6 +29,11 @@ Concepts
 
    * all :cpp:concept:`~mppp::CppInteroperable` integral types,
    * :cpp:class:`~mppp::integer` with static size ``SSize``.
+
+.. cpp:concept:: template <typename T> mppp::IntegerShiftType
+
+   This concept is satisfied if ``T`` is a type that can be used as shift argument in the bit shifting operators for
+   :cpp:class:`~mppp::integer`. Specifically, this concept is satisfied by all :cpp:concept:`~mppp::CppInteroperable` integral types.
 
 .. _integer_functions:
 

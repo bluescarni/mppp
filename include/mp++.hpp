@@ -936,37 +936,6 @@ class integer
     };
     template <typename T, typename U>
     using common_t = typename common_type<T, U>::type;
-#if defined(_MSC_VER)
-    // Common metaprogramming for bit shifting operators.
-    // NOTE: here and elsewhere we special case MSVC because we need to alter the SFINAE style, as the usual
-    // approach (i.e., default template int argument) results in ICEs in MSVC. Instead, on MSCV we use SFINAE
-    // on the return type.
-    template <typename T>
-    using shift_op_enabler = enable_if_t<is_supported_integral<T>::value, integer>;
-#else
-    template <typename T>
-    using shift_op_enabler = enable_if_t<is_supported_integral<T>::value, int>;
-#endif
-    template <typename T, enable_if_t<std::is_unsigned<T>::value, int> = 0>
-    static ::mp_bitcnt_t cast_to_bitcnt(T n)
-    {
-        if (mppp_unlikely(n > std::numeric_limits<::mp_bitcnt_t>::max())) {
-            throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
-        }
-        return static_cast<::mp_bitcnt_t>(n);
-    }
-    template <typename T, enable_if_t<std::is_signed<T>::value, int> = 0>
-    static ::mp_bitcnt_t cast_to_bitcnt(T n)
-    {
-        if (mppp_unlikely(n < T(0))) {
-            throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": negative values are not supported");
-        }
-        if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(n)
-                          > std::numeric_limits<::mp_bitcnt_t>::max())) {
-            throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
-        }
-        return static_cast<::mp_bitcnt_t>(n);
-    }
 
 public:
     /// Alias for the template parameter \p SSize.
@@ -1690,86 +1659,6 @@ public:
         integer retval(*this);
         --(*this);
         return retval;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend shift_op_enabler<T> operator<<(const integer &n, T s)
-#else
-    /// Left shift operator.
-    /**
-     * @param n the multiplicand.
-     * @param s the bit shift value.
-     *
-     * @return \p n times <tt>2**s</tt>.
-     *
-     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
-     */
-    template <typename T, shift_op_enabler<T> = 0>
-    friend integer operator<<(const integer &n, T s)
-#endif
-    {
-        integer retval;
-        mul_2exp(retval, n, cast_to_bitcnt(s));
-        return retval;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    shift_op_enabler<T> &operator<<=(T s)
-#else
-    /// In-place left shift operator.
-    /**
-     * @param s the bit shift value.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
-     */
-    template <typename T, shift_op_enabler<T> = 0>
-    integer &operator<<=(T s)
-#endif
-    {
-        mul_2exp(*this, *this, cast_to_bitcnt(s));
-        return *this;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend shift_op_enabler<T> operator>>(const integer &n, T s)
-#else
-    /// Right shift operator.
-    /**
-     * @param n the dividend.
-     * @param s the bit shift value.
-     *
-     * @return \p n divided by <tt>2**s</tt>. The result will be truncated.
-     *
-     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
-     */
-    template <typename T, shift_op_enabler<T> = 0>
-    friend integer operator>>(const integer &n, T s)
-#endif
-    {
-        integer retval;
-        tdiv_q_2exp(retval, n, cast_to_bitcnt(s));
-        return retval;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    shift_op_enabler<T> &operator>>=(T s)
-#else
-    /// In-place right shift operator.
-    /**
-     * @param s the bit shift value.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
-     */
-    template <typename T, shift_op_enabler<T> = 0>
-    integer &operator>>=(T s)
-#endif
-    {
-        tdiv_q_2exp(*this, *this, cast_to_bitcnt(s));
-        return *this;
     }
 
 private:
@@ -4891,16 +4780,6 @@ using integer_op_type_enabler
     = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, integer<SSize>>>::value, int>;
 #endif
 
-template <typename T, std::size_t SSize>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool IntegerModType
-    = (CppInteroperable<T> && std::is_integral<T>::value) || std::is_same<integer<SSize>, T>::value;
-#else
-using integer_mod_type_enabler = enable_if_t<disjunction<conjunction<is_supported_interop<T>, std::is_integral<T>>,
-                                                         std::is_same<T, integer<SSize>>>::value,
-                                             int>;
-#endif
-
 // Machinery for the determination of the result of a binary operation involving integer.
 // Default is empty for SFINAE.
 template <typename, typename, typename = void>
@@ -5380,6 +5259,16 @@ using integer_common_mod_t
     = enable_if_t<conjunction<negation<std::is_floating_point<T>>, negation<std::is_floating_point<U>>>::value,
                   integer_common_t<T, U>>;
 
+template <typename T, std::size_t SSize>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerModType
+    = (CppInteroperable<T> && std::is_integral<T>::value) || std::is_same<integer<SSize>, T>::value;
+#else
+using integer_mod_type_enabler = enable_if_t<disjunction<conjunction<is_supported_interop<T>, std::is_integral<T>>,
+                                                         std::is_same<T, integer<SSize>>>::value,
+                                             int>;
+#endif
+
 // Dispatching for the binary modulo operator.
 template <std::size_t SSize>
 inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, const integer<SSize> &op2)
@@ -5531,6 +5420,129 @@ inline integer<SSize> &operator%=(integer<SSize> &rop, const T &op)
 #endif
 {
     dispatch_in_place_mod(rop, op);
+    return rop;
+}
+
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
+inline namespace detail
+{
+
+template <typename T, enable_if_t<std::is_unsigned<T>::value, int> = 0>
+inline ::mp_bitcnt_t integer_cast_to_bitcnt(T n)
+{
+    if (mppp_unlikely(n > std::numeric_limits<::mp_bitcnt_t>::max())) {
+        throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
+    }
+    return static_cast<::mp_bitcnt_t>(n);
+}
+
+template <typename T, enable_if_t<std::is_signed<T>::value, int> = 0>
+inline ::mp_bitcnt_t integer_cast_to_bitcnt(T n)
+{
+    if (mppp_unlikely(n < T(0))) {
+        throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": negative values are not supported");
+    }
+    if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(n)
+                      > std::numeric_limits<::mp_bitcnt_t>::max())) {
+        throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
+    }
+    return static_cast<::mp_bitcnt_t>(n);
+}
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerShiftType = CppInteroperable<T> &&std::is_integral<T>::value;
+#else
+using integer_shift_type_enabler = enable_if_t<is_supported_integral<T>::value, int>;
+#endif
+}
+
+#endif
+
+/// Binary left shift.
+/**
+ * @param n the multiplicand.
+ * @param s the bit shift value.
+ *
+ * @return \p n times <tt>2**s</tt>.
+ *
+ * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> operator<<(const integer<SSize> &n, IntegerShiftType s)
+#else
+template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+inline integer<SSize> operator<<(const integer<SSize> &n, T s)
+#endif
+{
+    integer<SSize> retval;
+    mul_2exp(retval, n, integer_cast_to_bitcnt(s));
+    return retval;
+}
+
+/// In-place left shift.
+/**
+ * @param rop the multiplicand.
+ * @param s the bit shift value.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &operator<<=(integer<SSize> &rop, IntegerShiftType s)
+#else
+template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
+#endif
+{
+    mul_2exp(rop, rop, integer_cast_to_bitcnt(s));
+    return rop;
+}
+
+/// Binary right shift.
+/**
+ * @param n the dividend.
+ * @param s the bit shift value.
+ *
+ * @return \p n divided <tt>2**s</tt>.
+ *
+ * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> operator>>(const integer<SSize> &n, IntegerShiftType s)
+#else
+template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+inline integer<SSize> operator>>(const integer<SSize> &n, T s)
+#endif
+{
+    integer<SSize> retval;
+    tdiv_q_2exp(retval, n, integer_cast_to_bitcnt(s));
+    return retval;
+}
+
+/// In-place right shift.
+/**
+ * @param rop the dividend.
+ * @param s the bit shift value.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &operator>>=(integer<SSize> &rop, IntegerShiftType s)
+#else
+template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
+#endif
+{
+    tdiv_q_2exp(rop, rop, integer_cast_to_bitcnt(s));
     return rop;
 }
 
