@@ -1852,197 +1852,6 @@ public:
     }
 
 private:
-    // Metaprogramming for selecting the algorithm for static addition with ui. The selection happens via
-    // an std::integral_constant with 3 possible values:
-    // - 0 (default case): use the GMP mpn functions,
-    // - 1: selected when there are no nail bits and the static size is 1,
-    // - 2: selected when there are no nail bits and the static size is 2.
-    template <typename SInt>
-    using static_add_ui_algo = std::
-        integral_constant<int,
-                          (!GMP_NAIL_BITS && SInt::s_size == 1) ? 1 : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
-    // mpn implementation.
-    static bool static_add_ui_impl(s_int &rop, const s_int &op1, mpz_size_t asize1, int sign1, unsigned long op2,
-                                   const std::integral_constant<int, 0> &)
-    {
-        auto rdata = &rop.m_limbs[0];
-        auto data1 = &op1.m_limbs[0];
-        const auto size1 = op1._mp_size;
-        const auto l2 = static_cast<::mp_limb_t>(op2);
-        // mpn functions require nonzero arguments.
-        if (mppp_unlikely(!l2)) {
-            rop._mp_size = size1;
-            copy_limbs(data1, data1 + asize1, rdata);
-            return true;
-        }
-        if (mppp_unlikely(!sign1)) {
-            // NOTE: this has to be 1 because l2 == 0 is handled above.
-            rop._mp_size = 1;
-            rdata[0] = l2;
-            return true;
-        }
-        // This is the same overflow check as in static_add().
-        const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
-        const bool c2 = SSize == 1u && (l2 >> (GMP_NUMB_BITS - 1));
-        if (mppp_unlikely(c1 || c2)) {
-            return false;
-        }
-        if (sign1 == 1) {
-            // op1 and op2 are both strictly positive.
-            if (::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2)) {
-                assert(asize1 < s_int::s_size);
-                rop._mp_size = size1 + 1;
-                // NOTE: there should be no need to use GMP_NUMB_MASK here.
-                rdata[asize1] = 1u;
-            } else {
-                // Without carry, the size is unchanged.
-                rop._mp_size = size1;
-            }
-        } else {
-            // op1 is strictly negative, op2 is strictly positive.
-            if (asize1 > 1 || (asize1 == 1 && (data1[0] & GMP_NUMB_MASK) >= l2)) {
-                // abs(op1) >= abs(op2).
-                const auto br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2);
-                (void)br;
-                assert(!br);
-                // The asize can be the original one or original - 1 (we subtracted a limb).
-                rop._mp_size = size1 + static_cast<mpz_size_t>(!(rdata[asize1 - 1] & GMP_NUMB_MASK));
-            } else {
-                // abs(op2) > abs(op1).
-                const auto br = ::mpn_sub_1(rdata, &l2, 1, data1[0]);
-                (void)br;
-                assert(!br);
-                // The size must be 1, as abs(op2) == abs(op1) is handled above.
-                assert((rdata[0] & GMP_NUMB_MASK));
-                rop._mp_size = 1;
-            }
-        }
-        return true;
-    }
-    // 1-limb optimisation (no nails).
-    static bool static_add_ui_impl(s_int &rop, const s_int &op1, mpz_size_t, int sign1, unsigned long op2,
-                                   const std::integral_constant<int, 1> &)
-    {
-        const auto l1 = op1.m_limbs[0];
-        const auto l2 = static_cast<::mp_limb_t>(op2);
-        ::mp_limb_t tmp;
-        if (sign1 >= 0) {
-            // True unsigned addition.
-            if (mppp_unlikely(limb_add_overflow(l1, l2, &tmp))) {
-                return false;
-            }
-            rop._mp_size = (tmp != 0u);
-            rop.m_limbs[0] = tmp;
-        } else {
-            // op1 is negative, op2 is non-negative. Implement as a sub.
-            if (l1 >= l2) {
-                // op1 has larger or equal abs. The result will be non-positive.
-                tmp = l1 - l2;
-                // size is -1 or 0, 0 iff l1 == l2.
-                rop._mp_size = -static_cast<mpz_size_t>(tmp != 0u);
-                rop.m_limbs[0] = tmp;
-            } else {
-                // op1 has smaller abs. The result will be positive.
-                rop._mp_size = 1;
-                rop.m_limbs[0] = l2 - l1;
-            }
-        }
-        return true;
-    }
-    // 2-limb optimisation (no nails).
-    static bool static_add_ui_impl(s_int &rop, const s_int &op1, mpz_size_t asize1, int sign1, unsigned long op2,
-                                   const std::integral_constant<int, 2> &)
-    {
-        auto rdata = &rop.m_limbs[0];
-        auto data1 = &op1.m_limbs[0];
-        const auto l2 = static_cast<::mp_limb_t>(op2);
-        if (sign1 >= 0) {
-            // True unsigned addition.
-            // These two limbs will contain the result.
-            ::mp_limb_t lo, hi;
-            // Add l2 to the low limb, placing the result in lo.
-            const ::mp_limb_t cy_lo = limb_add_overflow(data1[0], l2, &lo);
-            // Add the carry from the low addition to the high limb, placing the result in hi.
-            const ::mp_limb_t cy_hi = limb_add_overflow(data1[1], cy_lo, &hi);
-            if (mppp_unlikely(cy_hi)) {
-                return false;
-            }
-            // Compute the new size. It can be 0, 1 or 2.
-            rop._mp_size = hi ? 2 : (lo ? 1 : 0);
-            // Write out.
-            rdata[0] = lo;
-            rdata[1] = hi;
-        } else {
-            // op1 is negative, l2 is non-negative. Compare their absolute values.
-            if (asize1 == 2 || data1[0] >= l2) {
-                // op1 is >= op2 in absolute value.
-                const auto lo = data1[0] - l2;
-                // Sub from hi the borrow.
-                const auto hi = data1[1] - static_cast<::mp_limb_t>(data1[0] < l2);
-                // The final size can be -2, -1 or 0.
-                rop._mp_size = hi ? -2 : (lo ? -1 : 0);
-                rdata[0] = lo;
-                rdata[1] = hi;
-            } else {
-                // op2 > op1 in absolute value.
-                // Size has to be 1.
-                rop._mp_size = 1;
-                rdata[0] = l2 - data1[0];
-                rdata[1] = 0u;
-            }
-        }
-        return true;
-    }
-    static bool static_add_ui(s_int &rop, const s_int &op1, unsigned long op2)
-    {
-        mpz_size_t asize1 = op1._mp_size;
-        int sign1 = asize1 != 0;
-        if (asize1 < 0) {
-            asize1 = -asize1;
-            sign1 = -1;
-        }
-        const bool retval = static_add_ui_impl(rop, op1, asize1, sign1, op2, static_add_ui_algo<s_int>{});
-        if (static_add_ui_algo<s_int>::value == 0 && retval) {
-            // If we used the mpn functions and we actually wrote into rop, then
-            // make sure we zero out the unused limbs.
-            rop.zero_unused_limbs();
-        }
-        return retval;
-    }
-
-public:
-    /// Ternary add with <tt>unsigned long</tt>.
-    /**
-     * This function will set \p rop to <tt>op1 + op2</tt>.
-     *
-     * @param rop the return value.
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     */
-    friend void add_ui(integer &rop, const integer &op1, unsigned long op2)
-    {
-        if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
-            // For the optimised version below to kick in we need to be sure we can safely convert
-            // unsigned long to an ::mp_limb_t, modulo nail bits. This because in the optimised version
-            // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an
-            // integer.
-            add(rop, op1, integer{op2});
-            return;
-        }
-        const bool sr = rop.is_static(), s1 = op1.is_static();
-        if (mppp_likely(sr && s1)) {
-            // Optimise the case of all statics.
-            if (mppp_likely(static_add_ui(rop.m_int.g_st(), op1.m_int.g_st(), op2))) {
-                return;
-            }
-        }
-        if (sr) {
-            rop.m_int.promote(SSize + 1u);
-        }
-        ::mpz_add_ui(&rop.m_int.g_dy(), op1.get_mpz_view(), op2);
-    }
-
-private:
     // Dispatching for the binary multiplication operator.
     static integer dispatch_binary_mul(const integer &op1, const integer &op2)
     {
@@ -4158,6 +3967,208 @@ inline void add(integer<SSize> &rop, const integer<SSize> &op1, const integer<SS
         rop._get_union().promote(SSize + 1u);
     }
     ::mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+}
+
+inline namespace detail
+{
+
+// Metaprogramming for selecting the algorithm for static addition with ui. The selection happens via
+// an std::integral_constant with 3 possible values:
+// - 0 (default case): use the GMP mpn functions,
+// - 1: selected when there are no nail bits and the static size is 1,
+// - 2: selected when there are no nail bits and the static size is 2.
+template <typename SInt>
+using integer_static_add_ui_algo = std::
+    integral_constant<int, (!GMP_NAIL_BITS && SInt::s_size == 1) ? 1 : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
+
+// mpn implementation.
+template <std::size_t SSize>
+inline bool static_add_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
+                               unsigned long op2, const std::integral_constant<int, 0> &)
+{
+    auto rdata = &rop.m_limbs[0];
+    auto data1 = &op1.m_limbs[0];
+    const auto size1 = op1._mp_size;
+    const auto l2 = static_cast<::mp_limb_t>(op2);
+    // mpn functions require nonzero arguments.
+    if (mppp_unlikely(!l2)) {
+        rop._mp_size = size1;
+        copy_limbs(data1, data1 + asize1, rdata);
+        return true;
+    }
+    if (mppp_unlikely(!sign1)) {
+        // NOTE: this has to be 1 because l2 == 0 is handled above.
+        rop._mp_size = 1;
+        rdata[0] = l2;
+        return true;
+    }
+    // This is the same overflow check as in static_add().
+    const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
+    const bool c2 = SSize == 1u && (l2 >> (GMP_NUMB_BITS - 1));
+    if (mppp_unlikely(c1 || c2)) {
+        return false;
+    }
+    if (sign1 == 1) {
+        // op1 and op2 are both strictly positive.
+        if (::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2)) {
+            assert(asize1 < static_int<SSize>::s_size);
+            rop._mp_size = size1 + 1;
+            // NOTE: there should be no need to use GMP_NUMB_MASK here.
+            rdata[asize1] = 1u;
+        } else {
+            // Without carry, the size is unchanged.
+            rop._mp_size = size1;
+        }
+    } else {
+        // op1 is strictly negative, op2 is strictly positive.
+        if (asize1 > 1 || (asize1 == 1 && (data1[0] & GMP_NUMB_MASK) >= l2)) {
+            // abs(op1) >= abs(op2).
+            const auto br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2);
+            (void)br;
+            assert(!br);
+            // The asize can be the original one or original - 1 (we subtracted a limb).
+            rop._mp_size = size1 + static_cast<mpz_size_t>(!(rdata[asize1 - 1] & GMP_NUMB_MASK));
+        } else {
+            // abs(op2) > abs(op1).
+            const auto br = ::mpn_sub_1(rdata, &l2, 1, data1[0]);
+            (void)br;
+            assert(!br);
+            // The size must be 1, as abs(op2) == abs(op1) is handled above.
+            assert((rdata[0] & GMP_NUMB_MASK));
+            rop._mp_size = 1;
+        }
+    }
+    return true;
+}
+
+// 1-limb optimisation (no nails).
+template <std::size_t SSize>
+inline bool static_add_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t, int sign1,
+                               unsigned long op2, const std::integral_constant<int, 1> &)
+{
+    const auto l1 = op1.m_limbs[0];
+    const auto l2 = static_cast<::mp_limb_t>(op2);
+    ::mp_limb_t tmp;
+    if (sign1 >= 0) {
+        // True unsigned addition.
+        if (mppp_unlikely(limb_add_overflow(l1, l2, &tmp))) {
+            return false;
+        }
+        rop._mp_size = (tmp != 0u);
+        rop.m_limbs[0] = tmp;
+    } else {
+        // op1 is negative, op2 is non-negative. Implement as a sub.
+        if (l1 >= l2) {
+            // op1 has larger or equal abs. The result will be non-positive.
+            tmp = l1 - l2;
+            // size is -1 or 0, 0 iff l1 == l2.
+            rop._mp_size = -static_cast<mpz_size_t>(tmp != 0u);
+            rop.m_limbs[0] = tmp;
+        } else {
+            // op1 has smaller abs. The result will be positive.
+            rop._mp_size = 1;
+            rop.m_limbs[0] = l2 - l1;
+        }
+    }
+    return true;
+}
+
+// 2-limb optimisation (no nails).
+template <std::size_t SSize>
+inline bool static_add_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
+                               unsigned long op2, const std::integral_constant<int, 2> &)
+{
+    auto rdata = &rop.m_limbs[0];
+    auto data1 = &op1.m_limbs[0];
+    const auto l2 = static_cast<::mp_limb_t>(op2);
+    if (sign1 >= 0) {
+        // True unsigned addition.
+        // These two limbs will contain the result.
+        ::mp_limb_t lo, hi;
+        // Add l2 to the low limb, placing the result in lo.
+        const ::mp_limb_t cy_lo = limb_add_overflow(data1[0], l2, &lo);
+        // Add the carry from the low addition to the high limb, placing the result in hi.
+        const ::mp_limb_t cy_hi = limb_add_overflow(data1[1], cy_lo, &hi);
+        if (mppp_unlikely(cy_hi)) {
+            return false;
+        }
+        // Compute the new size. It can be 0, 1 or 2.
+        rop._mp_size = hi ? 2 : (lo ? 1 : 0);
+        // Write out.
+        rdata[0] = lo;
+        rdata[1] = hi;
+    } else {
+        // op1 is negative, l2 is non-negative. Compare their absolute values.
+        if (asize1 == 2 || data1[0] >= l2) {
+            // op1 is >= op2 in absolute value.
+            const auto lo = data1[0] - l2;
+            // Sub from hi the borrow.
+            const auto hi = data1[1] - static_cast<::mp_limb_t>(data1[0] < l2);
+            // The final size can be -2, -1 or 0.
+            rop._mp_size = hi ? -2 : (lo ? -1 : 0);
+            rdata[0] = lo;
+            rdata[1] = hi;
+        } else {
+            // op2 > op1 in absolute value.
+            // Size has to be 1.
+            rop._mp_size = 1;
+            rdata[0] = l2 - data1[0];
+            rdata[1] = 0u;
+        }
+    }
+    return true;
+}
+
+template <std::size_t SSize>
+inline bool static_add_ui(static_int<SSize> &rop, const static_int<SSize> &op1, unsigned long op2)
+{
+    mpz_size_t asize1 = op1._mp_size;
+    int sign1 = asize1 != 0;
+    if (asize1 < 0) {
+        asize1 = -asize1;
+        sign1 = -1;
+    }
+    const bool retval
+        = static_add_ui_impl(rop, op1, asize1, sign1, op2, integer_static_add_ui_algo<static_int<SSize>>{});
+    if (integer_static_add_ui_algo<static_int<SSize>>::value == 0 && retval) {
+        // If we used the mpn functions and we actually wrote into rop, then
+        // make sure we zero out the unused limbs.
+        rop.zero_unused_limbs();
+    }
+    return retval;
+}
+}
+
+/// Ternary addition with <tt>unsigned long</tt>.
+/**
+ * This function will set \p rop to <tt>op1 + op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ */
+template <std::size_t SSize>
+inline void add_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
+{
+    if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
+        // For the optimised version below to kick in we need to be sure we can safely convert
+        // unsigned long to an ::mp_limb_t, modulo nail bits. This because in the optimised version
+        // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an
+        // integer.
+        add(rop, op1, integer<SSize>{op2});
+        return;
+    }
+    const bool sr = rop.is_static(), s1 = op1.is_static();
+    if (mppp_likely(sr && s1)) {
+        // Optimise the case of all statics.
+        if (mppp_likely(static_add_ui(rop._get_union().g_st(), op1._get_union().g_st(), op2))) {
+            return;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(SSize + 1u);
+    }
+    ::mpz_add_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), op2);
 }
 
 /// Ternary subtraction.
