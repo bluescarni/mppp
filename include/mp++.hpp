@@ -4443,34 +4443,6 @@ inline void addmul(integer<SSize> &rop, const integer<SSize> &op1, const integer
     ::mpz_addmul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
 }
 
-/// Binary negation.
-/**
- * This method will set \p rop to <tt>-n</tt>.
- *
- * @param rop the return value.
- * @param n the integer that will be negated.
- */
-template <std::size_t SSize>
-inline void neg(integer<SSize> &rop, const integer<SSize> &n)
-{
-    rop = n;
-    rop.neg();
-}
-
-/// Unary negation.
-/**
- * @param n the integer that will be negated.
- *
- * @return <tt>-n</tt>.
- */
-template <std::size_t SSize>
-inline integer<SSize> neg(const integer<SSize> &n)
-{
-    integer<SSize> ret(n);
-    ret.neg();
-    return ret;
-}
-
 inline namespace detail
 {
 
@@ -4690,6 +4662,34 @@ inline void mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t
         rop._get_union().promote(size_hint);
     }
     ::mpz_mul_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
+}
+
+/// Binary negation.
+/**
+ * This method will set \p rop to <tt>-n</tt>.
+ *
+ * @param rop the return value.
+ * @param n the integer that will be negated.
+ */
+template <std::size_t SSize>
+inline void neg(integer<SSize> &rop, const integer<SSize> &n)
+{
+    rop = n;
+    rop.neg();
+}
+
+/// Unary negation.
+/**
+ * @param n the integer that will be negated.
+ *
+ * @return <tt>-n</tt>.
+ */
+template <std::size_t SSize>
+inline integer<SSize> neg(const integer<SSize> &n)
+{
+    integer<SSize> ret(n);
+    ret.neg();
+    return ret;
 }
 
 /** @} */
