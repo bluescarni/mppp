@@ -1704,192 +1704,6 @@ public:
         --(*this);
         return retval;
     }
-
-private:
-    // Dispatching for the binary division operator.
-    static integer dispatch_binary_div(const integer &op1, const integer &op2)
-    {
-        integer retval, r;
-        tdiv_qr(retval, r, op1, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static integer dispatch_binary_div(const integer &op1, T n)
-    {
-        integer retval, r;
-        tdiv_qr(retval, r, op1, integer{n});
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static integer dispatch_binary_div(T n, const integer &op2)
-    {
-        integer retval, r;
-        tdiv_qr(retval, r, integer{n}, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_div(const integer &op1, T x)
-    {
-        return static_cast<T>(op1) / x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_div(T x, const integer &op2)
-    {
-        return x / static_cast<T>(op2);
-    }
-    // Dispatching for in-place div.
-    static void dispatch_in_place_div(integer &retval, const integer &n)
-    {
-        integer r;
-        tdiv_qr(retval, r, retval, n);
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_div(integer &retval, const T &n)
-    {
-        integer r;
-        tdiv_qr(retval, r, retval, integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_div(integer &retval, const T &x)
-    {
-        retval = static_cast<T>(retval) / x;
-    }
-    // Enablers for modulo operators. They are special because they don't accept floating-point.
-    template <typename T, typename U>
-    using common_mod_t
-        = enable_if_t<conjunction<negation<std::is_floating_point<T>>, negation<std::is_floating_point<U>>>::value,
-                      common_t<T, U>>;
-    template <typename T>
-    using in_place_mod_enabler
-        = enable_if_t<disjunction<is_supported_integral<T>, std::is_same<T, integer>>::value, int>;
-    // Dispatching for the binary modulo operator.
-    static integer dispatch_binary_mod(const integer &op1, const integer &op2)
-    {
-        integer q, retval;
-        tdiv_qr(q, retval, op1, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static integer dispatch_binary_mod(const integer &op1, T n)
-    {
-        integer q, retval;
-        tdiv_qr(q, retval, op1, integer{n});
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static integer dispatch_binary_mod(T n, const integer &op2)
-    {
-        integer q, retval;
-        tdiv_qr(q, retval, integer{n}, op2);
-        return retval;
-    }
-    // Dispatching for in-place mod.
-    static void dispatch_in_place_mod(integer &retval, const integer &n)
-    {
-        integer q;
-        tdiv_qr(q, retval, retval, n);
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_mod(integer &retval, const T &n)
-    {
-        integer q;
-        tdiv_qr(q, retval, retval, integer{n});
-    }
-
-public:
-    /// Binary division operator.
-    /**
-     * @param n the dividend.
-     * @param d the divisor.
-     *
-     * @return <tt>n / d</tt>. The result is truncated if only integral types are involved in the division.
-     *
-     * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
-     */
-    template <typename T, typename U>
-    friend common_t<T, U> operator/(const T &n, const U &d)
-    {
-        return dispatch_binary_div(n, d);
-    }
-    /// In-place division operator.
-    /**
-     * @param d the divisor.
-     *
-     * @return a reference to \p this. The result is truncated.
-     *
-     * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to integer, iff \p T
-     * is a floating-point type.
-     */
-    template <typename T, in_place_enabler<T> = 0>
-    integer &operator/=(const T &d)
-    {
-        dispatch_in_place_div(*this, d);
-        return *this;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend in_place_lenabler<T> operator/=(T &x, const integer &n)
-#else
-    /// In-place division for interoperable types.
-    /**
-     * \rststar
-     * .. note::
-     *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::integer`.
-     * \endrststar
-     *
-     * The body of this operator is equivalent to:
-     * \rststar
-     * .. code-block:: c++
-     *
-     *    return x = static_cast<T>(x / n);
-     * \endrststar
-     *
-     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
-     *
-     * @param x the first argument.
-     * @param n the second argument.
-     *
-     * @return a reference to \p x.
-     *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::integer or by
-     * mppp::integer::operator/().
-     */
-    template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator/=(T &x, const integer &n)
-#endif
-    {
-        return x = static_cast<T>(x / n);
-    }
-    /// Binary modulo operator.
-    /**
-     * @param n the dividend.
-     * @param d the divisor.
-     *
-     * @return <tt>n % d</tt>.
-     *
-     * @throws zero_division_error if \p d is zero.
-     */
-    template <typename T, typename U>
-    friend common_mod_t<T, U> operator%(const T &n, const U &d)
-    {
-        return dispatch_binary_mod(n, d);
-    }
-    /// In-place modulo operator.
-    /**
-     * @param d the divisor.
-     *
-     * @return a reference to \p this..
-     *
-     * @throws zero_division_error if \p d is zero.
-     */
-    template <typename T, in_place_mod_enabler<T> = 0>
-    integer &operator%=(const T &d)
-    {
-        dispatch_in_place_mod(*this, d);
-        return *this;
-    }
 #if defined(_MSC_VER)
     template <typename T>
     friend shift_op_enabler<T> operator<<(const integer &n, T s)
@@ -5086,8 +4900,18 @@ template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
 concept bool IntegerOpType = CppInteroperable<T> || std::is_same<integer<SSize>, T>::value;
 #else
-using integer_op_interoperable_enabler
+using integer_op_type_enabler
     = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, integer<SSize>>>::value, int>;
+#endif
+
+template <typename T, std::size_t SSize>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerModType
+    = (CppInteroperable<T> && std::is_integral<T>::value) || std::is_same<integer<SSize>, T>::value;
+#else
+using integer_mod_type_enabler = enable_if_t<disjunction<conjunction<is_supported_interop<T>, std::is_integral<T>>,
+                                                         std::is_same<T, integer<SSize>>>::value,
+                                             int>;
 #endif
 
 // Machinery for the determination of the result of a binary operation involving integer.
@@ -5217,7 +5041,7 @@ inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
 template <std::size_t SSize>
 inline integer<SSize> &operator+=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
 #else
-template <typename T, std::size_t SSize, integer_op_interoperable_enabler<T, SSize> = 0>
+template <typename T, std::size_t SSize, integer_op_type_enabler<T, SSize> = 0>
 inline integer<SSize> &operator+=(integer<SSize> &rop, const T &op)
 #endif
 {
@@ -5347,7 +5171,7 @@ inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
 template <std::size_t SSize>
 inline integer<SSize> &operator-=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
 #else
-template <typename T, std::size_t SSize, integer_op_interoperable_enabler<T, SSize> = 0>
+template <typename T, std::size_t SSize, integer_op_type_enabler<T, SSize> = 0>
 inline integer<SSize> &operator-=(integer<SSize> &rop, const T &op)
 #endif
 {
@@ -5474,7 +5298,7 @@ inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
 template <std::size_t SSize>
 inline integer<SSize> &operator*=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
 #else
-template <typename T, std::size_t SSize, integer_op_interoperable_enabler<T, SSize> = 0>
+template <typename T, std::size_t SSize, integer_op_type_enabler<T, SSize> = 0>
 inline integer<SSize> &operator*=(integer<SSize> &rop, const T &op)
 #endif
 {
@@ -5500,6 +5324,227 @@ inline T &operator*=(T &rop, const integer<SSize> &op)
 #endif
 {
     return rop = static_cast<uncvref_t<decltype(rop)>>(rop * op);
+}
+
+inline namespace detail
+{
+
+// Dispatching for the binary division operator.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval, r;
+    tdiv_qr(retval, r, op1, op2);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, T n)
+{
+    integer<SSize> retval, r;
+    tdiv_qr(retval, r, op1, integer<SSize>{n});
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_div(T n, const integer<SSize> &op2)
+{
+    integer<SSize> retval, r;
+    tdiv_qr(retval, r, integer<SSize>{n}, op2);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_div(const integer<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) / x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_div(T x, const integer<SSize> &op2)
+{
+    return x / static_cast<T>(op2);
+}
+
+// Dispatching for in-place div.
+template <std::size_t SSize>
+inline void dispatch_in_place_div(integer<SSize> &retval, const integer<SSize> &n)
+{
+    integer<SSize> r;
+    tdiv_qr(retval, r, retval, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_div(integer<SSize> &retval, const T &n)
+{
+    integer<SSize> r;
+    tdiv_qr(retval, r, retval, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_div(integer<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) / x;
+}
+
+// Enablers for modulo operators. They are special because they don't accept floating-point.
+template <typename T, typename U>
+using integer_common_mod_t
+    = enable_if_t<conjunction<negation<std::is_floating_point<T>>, negation<std::is_floating_point<U>>>::value,
+                  integer_common_t<T, U>>;
+
+// Dispatching for the binary modulo operator.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> q, retval;
+    tdiv_qr(q, retval, op1, op2);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, T n)
+{
+    integer<SSize> q, retval;
+    tdiv_qr(q, retval, op1, integer<SSize>{n});
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_mod(T n, const integer<SSize> &op2)
+{
+    integer<SSize> q, retval;
+    tdiv_qr(q, retval, integer<SSize>{n}, op2);
+    return retval;
+}
+
+// Dispatching for in-place mod.
+template <std::size_t SSize>
+inline void dispatch_in_place_mod(integer<SSize> &retval, const integer<SSize> &n)
+{
+    integer<SSize> q;
+    tdiv_qr(q, retval, retval, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_mod(integer<SSize> &retval, const T &n)
+{
+    integer<SSize> q;
+    tdiv_qr(q, retval, retval, integer<SSize>{n});
+}
+}
+
+/// Binary division operator.
+/**
+ * \rststar
+ * This operator is enabled only if at least one argument is an :cpp:class:`~mppp::integer`
+ * and the type of the other argument satisfies :cpp:concept:`~mppp::IntegerOpType`. If both arguments are
+ * of type :cpp:class:`~mppp::integer`, they must have the same static size. The return type
+ * is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::integer`.
+ *
+ * \endrststar
+ *
+ * @param n the dividend.
+ * @param d the divisor.
+ *
+ * @return <tt>n / d</tt>.
+ *
+ * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
+ */
+template <typename T, typename U>
+inline integer_common_t<T, U> operator/(const T &n, const U &d)
+{
+    return dispatch_binary_div(n, d);
+}
+
+/// In-place division.
+/**
+ * @param rop the dividend.
+ * @param op the divisor.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws zero_division_error if \p op is zero and only integral types are involved in the division.
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &operator/=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
+#else
+template <typename T, std::size_t SSize, integer_op_type_enabler<T, SSize> = 0>
+inline integer<SSize> &operator/=(integer<SSize> &rop, const T &op)
+#endif
+{
+    dispatch_in_place_div(rop, op);
+    return rop;
+}
+
+/// In-place division.
+/**
+ * @param rop the dividend.
+ * @param op the divisor.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop,
+ * or by the binary division operator.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline CppInteroperable &operator/=(CppInteroperable &rop, const integer<SSize> &op)
+#else
+template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
+inline T &operator/=(T &rop, const integer<SSize> &op)
+#endif
+{
+    return rop = static_cast<uncvref_t<decltype(rop)>>(rop / op);
+}
+
+/// Binary modulo operator.
+/**
+ * \rststar
+ * This operator is enabled only if at least one argument is an :cpp:class:`~mppp::integer`
+ * and the type of the other argument satisfies :cpp:concept:`~mppp::IntegerModType`. If both arguments are
+ * of type :cpp:class:`~mppp::integer`, they must have the same static size. The return type
+ * is :cpp:class:`~mppp::integer`.
+ * \endrststar
+ *
+ * @param n the dividend.
+ * @param d the divisor.
+ *
+ * @return <tt>n % d</tt>.
+ *
+ * @throws zero_division_error if \p d is zero.
+ */
+template <typename T, typename U>
+inline integer_common_mod_t<T, U> operator%(const T &n, const U &d)
+{
+    return dispatch_binary_mod(n, d);
+}
+
+/// In-place modulo.
+/**
+ * @param rop the dividend.
+ * @param op the divisor.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws zero_division_error if \p op is zero.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &operator%=(integer<SSize> &rop, const IntegerModType<SSize> &op)
+#else
+template <typename T, std::size_t SSize, integer_mod_type_enabler<T, SSize> = 0>
+inline integer<SSize> &operator%=(integer<SSize> &rop, const T &op)
+#endif
+{
+    dispatch_in_place_mod(rop, op);
+    return rop;
 }
 
 /** @} */
