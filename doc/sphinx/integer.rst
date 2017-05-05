@@ -34,6 +34,14 @@ Arithmetic
 .. doxygengroup:: integer_arithmetic
    :content-only:
 
+.. _integer_division:
+
+Division
+~~~~~~~~
+
+.. doxygengroup:: integer_division
+   :content-only:
+
 .. _integer_exponentiation:
 
 Exponentiation
