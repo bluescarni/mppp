@@ -5098,14 +5098,14 @@ inline void divexact(integer<SSize> &rop, const integer<SSize> &n, const integer
 {
     const bool sr = rop.is_static(), s1 = n.is_static(), s2 = d.is_static();
     if (mppp_likely(sr && s1 && s2)) {
-        static_divexact(rop.m_int.g_st(), n.m_int.g_st(), d.m_int.g_st());
+        static_divexact(rop._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
         // Division can never fail.
         return;
     }
     if (sr) {
-        rop.m_int.promote();
+        rop._get_union().promote();
     }
-    ::mpz_divexact(&rop.m_int.g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    ::mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
 }
 
 /// Exact division (binary version).
