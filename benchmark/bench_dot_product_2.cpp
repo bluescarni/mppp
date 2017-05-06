@@ -59,7 +59,7 @@ using mpz_int = boost::multiprecision::mpz_int;
 using fmpzxx = flint::fmpzxx;
 #endif
 
-using integer = integer<2>;
+using integer_t = integer<2>;
 static const std::string name = "bench_dot_product_2";
 
 constexpr auto size = 30000000ul;
@@ -94,7 +94,7 @@ int main()
         s += "['mp++','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            integer ret(0);
+            integer_t ret(0);
             for (auto i = 0ul; i < size; ++i) {
                 addmul(ret, p.first[i], p.second[i]);
             }
