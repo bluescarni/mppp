@@ -353,7 +353,7 @@ using is_supported_float = std::integral_constant<bool, disjunction<std::is_same
                                                                     >::value>;
 
 template <typename T>
-using is_supported_interop
+using is_cpp_interoperable
     = std::integral_constant<bool, disjunction<is_supported_integral<T>, is_supported_float<T>>::value>;
 
 // Small wrapper to copy limbs.
@@ -689,9 +689,9 @@ public:
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool CppInteroperable = is_supported_interop<T>::value;
+concept bool CppInteroperable = is_cpp_interoperable<T>::value;
 #else
-using cpp_interoperable_enabler = enable_if_t<is_supported_interop<T>::value, int>;
+using cpp_interoperable_enabler = enable_if_t<is_cpp_interoperable<T>::value, int>;
 #endif
 }
 
@@ -1659,298 +1659,6 @@ public:
         integer retval(*this);
         --(*this);
         return retval;
-    }
-
-private:
-    // Selection of the algorithm for static cmp.
-    template <typename SInt>
-    using static_cmp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
-    // mpn implementation.
-    static int static_cmp(const s_int &n1, const s_int &n2, const std::integral_constant<int, 0> &)
-    {
-        if (n1._mp_size < n2._mp_size) {
-            return -1;
-        }
-        if (n2._mp_size < n1._mp_size) {
-            return 1;
-        }
-        // The two sizes are equal, compare the absolute values.
-        const auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
-        if (asize == 0) {
-            // Both operands are zero.
-            // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
-            // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
-            return 0;
-        }
-        const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize));
-        // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
-        return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
-    }
-    // 1-limb optimisation.
-    static int static_cmp(const s_int &n1, const s_int &n2, const std::integral_constant<int, 1> &)
-    {
-        if (n1._mp_size < n2._mp_size) {
-            return -1;
-        }
-        if (n2._mp_size < n1._mp_size) {
-            return 1;
-        }
-        int cmp_abs = (n1.m_limbs[0u] & GMP_NUMB_MASK) > (n2.m_limbs[0u] & GMP_NUMB_MASK);
-        if (!cmp_abs) {
-            cmp_abs = -static_cast<int>((n1.m_limbs[0u] & GMP_NUMB_MASK) < (n2.m_limbs[0u] & GMP_NUMB_MASK));
-        }
-        return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
-    }
-    // 2-limb optimisation.
-    static int static_cmp(const s_int &n1, const s_int &n2, const std::integral_constant<int, 2> &)
-    {
-        if (n1._mp_size < n2._mp_size) {
-            return -1;
-        }
-        if (n2._mp_size < n1._mp_size) {
-            return 1;
-        }
-        auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
-        while (asize != 0) {
-            --asize;
-            if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) > (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
-                return (n1._mp_size >= 0) ? 1 : -1;
-            }
-            if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) < (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
-                return (n1._mp_size >= 0) ? -1 : 1;
-            }
-        }
-        return 0;
-    }
-    // Equality operator.
-    // NOTE: special implementation instead of using cmp, this should be faster.
-    static bool dispatch_equality(const integer &a, const integer &b)
-    {
-        const mp_size_t size_a = a.m_int.m_st._mp_size, size_b = b.m_int.m_st._mp_size;
-        if (size_a != size_b) {
-            return false;
-        }
-        const ::mp_limb_t *ptr_a, *ptr_b;
-        std::size_t asize;
-        if (a.is_static()) {
-            ptr_a = a.m_int.g_st().m_limbs.data();
-            asize = static_cast<std::size_t>((size_a >= 0) ? size_a : -size_a);
-        } else {
-            ptr_a = a.m_int.g_dy()._mp_d;
-            asize = ::mpz_size(&a.m_int.g_dy());
-        }
-        if (b.is_static()) {
-            ptr_b = b.m_int.g_st().m_limbs.data();
-        } else {
-            ptr_b = b.m_int.g_dy()._mp_d;
-        }
-        auto limb_cmp
-            = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
-#if defined(_MSC_VER)
-        return std::equal(stdext::make_checked_array_iterator(ptr_a, asize),
-                          stdext::make_checked_array_iterator(ptr_a, asize, asize),
-                          stdext::make_checked_array_iterator(ptr_b, asize), limb_cmp);
-#else
-        return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
-#endif
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_equality(const integer &a, T n)
-    {
-        return dispatch_equality(a, integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_equality(T n, const integer &a)
-    {
-        return dispatch_equality(a, n);
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_equality(const integer &a, T x)
-    {
-        return static_cast<T>(a) == x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_equality(T x, const integer &a)
-    {
-        return dispatch_equality(a, x);
-    }
-    // Less-than operator.
-    static bool dispatch_less_than(const integer &a, const integer &b)
-    {
-        return cmp(a, b) < 0;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_less_than(const integer &a, T n)
-    {
-        return dispatch_less_than(a, integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_less_than(T n, const integer &a)
-    {
-        return dispatch_greater_than(a, integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_less_than(const integer &a, T x)
-    {
-        return static_cast<T>(a) < x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_less_than(T x, const integer &a)
-    {
-        return dispatch_greater_than(a, x);
-    }
-    // Greater-than operator.
-    static bool dispatch_greater_than(const integer &a, const integer &b)
-    {
-        return cmp(a, b) > 0;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_greater_than(const integer &a, T n)
-    {
-        return dispatch_greater_than(a, integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_greater_than(T n, const integer &a)
-    {
-        return dispatch_less_than(a, integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_greater_than(const integer &a, T x)
-    {
-        return static_cast<T>(a) > x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_greater_than(T x, const integer &a)
-    {
-        return dispatch_less_than(a, x);
-    }
-// The enabler for relational operators.
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    using rel_enabler = enable_if_t<!std::is_same<void, common_t<T, U>>::value, bool>;
-#else
-    template <typename T, typename U>
-    using rel_enabler = enable_if_t<!std::is_same<void, common_t<T, U>>::value, int>;
-#endif
-
-public:
-    /// Comparison function for integer.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
-     * <tt>op1 > op2</tt>.
-     */
-    friend int cmp(const integer &op1, const integer &op2)
-    {
-        const bool s1 = op1.is_static(), s2 = op2.is_static();
-        if (mppp_likely(s1 && s2)) {
-            return static_cmp(op1.m_int.g_st(), op2.m_int.g_st(), static_cmp_algo<s_int>{});
-        }
-        return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator==(const T &op1, const U &op2)
-#else
-    /// Equality operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator==(const T &op1, const U &op2)
-#endif
-    {
-        return dispatch_equality(op1, op2);
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator!=(const T &op1, const U &op2)
-#else
-    /// Inequality operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator!=(const T &op1, const U &op2)
-#endif
-    {
-        return !(op1 == op2);
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator<(const T &op1, const U &op2)
-#else
-    /// Less-than operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator<(const T &op1, const U &op2)
-#endif
-    {
-        return dispatch_less_than(op1, op2);
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator>=(const T &op1, const U &op2)
-#else
-    /// Greater-than or equal operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator>=(const T &op1, const U &op2)
-#endif
-    {
-        return !(op1 < op2);
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator>(const T &op1, const U &op2)
-#else
-    /// Greater-than operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator>(const T &op1, const U &op2)
-#endif
-    {
-        return dispatch_greater_than(op1, op2);
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator<=(const T &op1, const U &op2)
-#else
-    /// Less-than or equal operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator<=(const T &op1, const U &op2)
-#endif
-    {
-        return !(op1 > op2);
     }
 
 private:
@@ -4616,6 +4324,96 @@ inline void tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcn
  *  @{
  */
 
+inline namespace detail
+{
+
+// Selection of the algorithm for static cmp.
+template <typename SInt>
+using integer_static_cmp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
+
+// mpn implementation.
+template <std::size_t SSize>
+inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 0> &)
+{
+    if (n1._mp_size < n2._mp_size) {
+        return -1;
+    }
+    if (n2._mp_size < n1._mp_size) {
+        return 1;
+    }
+    // The two sizes are equal, compare the absolute values.
+    const auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
+    if (asize == 0) {
+        // Both operands are zero.
+        // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
+        // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
+        return 0;
+    }
+    const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize));
+    // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
+    return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
+}
+
+// 1-limb optimisation.
+template <std::size_t SSize>
+inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 1> &)
+{
+    if (n1._mp_size < n2._mp_size) {
+        return -1;
+    }
+    if (n2._mp_size < n1._mp_size) {
+        return 1;
+    }
+    int cmp_abs = (n1.m_limbs[0u] & GMP_NUMB_MASK) > (n2.m_limbs[0u] & GMP_NUMB_MASK);
+    if (!cmp_abs) {
+        cmp_abs = -static_cast<int>((n1.m_limbs[0u] & GMP_NUMB_MASK) < (n2.m_limbs[0u] & GMP_NUMB_MASK));
+    }
+    return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
+}
+
+// 2-limb optimisation.
+template <std::size_t SSize>
+inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 2> &)
+{
+    if (n1._mp_size < n2._mp_size) {
+        return -1;
+    }
+    if (n2._mp_size < n1._mp_size) {
+        return 1;
+    }
+    auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
+    while (asize != 0) {
+        --asize;
+        if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) > (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
+            return (n1._mp_size >= 0) ? 1 : -1;
+        }
+        if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) < (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
+            return (n1._mp_size >= 0) ? -1 : 1;
+        }
+    }
+    return 0;
+}
+}
+
+/// Comparison function for integer.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
+ * <tt>op1 > op2</tt>.
+ */
+template <std::size_t SSize>
+inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool s1 = op1.is_static(), s2 = op2.is_static();
+    if (mppp_likely(s1 && s2)) {
+        return static_cmp(op1._get_union().g_st(), op2._get_union().g_st(),
+                          integer_static_cmp_algo<static_int<SSize>>{});
+    }
+    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
+}
+
 /// Sign function.
 /**
  * @param n the integer whose sign will be computed.
@@ -4777,7 +4575,35 @@ template <typename T, std::size_t SSize>
 concept bool IntegerOpType = CppInteroperable<T> || std::is_same<integer<SSize>, T>::value;
 #else
 using integer_op_type_enabler
-    = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, integer<SSize>>>::value, int>;
+    = enable_if_t<disjunction<is_cpp_interoperable<T>, std::is_same<T, integer<SSize>>>::value, int>;
+#endif
+
+template <typename T, typename U>
+struct is_same_ssize_integer : std::false_type {
+};
+
+template <std::size_t SSize>
+struct is_same_ssize_integer<integer<SSize>, integer<SSize>> : std::true_type {
+};
+
+template <typename T>
+struct is_integer : std::false_type {
+};
+
+template <std::size_t SSize>
+struct is_integer<integer<SSize>> : std::true_type {
+};
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerBinaryOpTypes
+    = is_same_ssize_integer<T, U>::value
+      || (is_integer<T>::value && CppInteroperable<U>) || (is_integer<U>::value && CppInteroperable<T>);
+#else
+using integer_binary_op_types_enabler
+    = enable_if_t<disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_cpp_interoperable<U>>,
+                              conjunction<is_integer<U>, is_cpp_interoperable<T>>>::value,
+                  int>;
 #endif
 
 // Machinery for the determination of the result of a binary operation involving integer.
@@ -4872,10 +4698,8 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
 /// Binary addition operator.
 /**
  * \rststar
- * This operator is enabled only if at least one argument is an :cpp:class:`~mppp::integer`
- * and the type of the other argument satisfies :cpp:concept:`~mppp::IntegerOpType`. If both arguments are
- * of type :cpp:class:`~mppp::integer`, they must have the same static size. The return type
- * is determined as follows:
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
  *   type of the result is ``F``; otherwise,
@@ -5002,10 +4826,8 @@ inline void dispatch_in_place_sub(integer<SSize> &retval, const T &x)
 /// Binary subtraction operator.
 /**
  * \rststar
- * This operator is enabled only if at least one argument is an :cpp:class:`~mppp::integer`
- * and the type of the other argument satisfies :cpp:concept:`~mppp::IntegerOpType`. If both arguments are
- * of type :cpp:class:`~mppp::integer`, they must have the same static size. The return type
- * is determined as follows:
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
  *   type of the result is ``F``; otherwise,
@@ -5129,10 +4951,8 @@ inline void dispatch_in_place_mul(integer<SSize> &retval, const T &x)
 /// Binary multiplication operator.
 /**
  * \rststar
- * This operator is enabled only if at least one argument is an :cpp:class:`~mppp::integer`
- * and the type of the other argument satisfies :cpp:concept:`~mppp::IntegerOpType`. If both arguments are
- * of type :cpp:class:`~mppp::integer`, they must have the same static size. The return type
- * is determined as follows:
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
  *   type of the result is ``F``; otherwise,
@@ -5264,7 +5084,7 @@ template <typename T, std::size_t SSize>
 concept bool IntegerModType
     = (CppInteroperable<T> && std::is_integral<T>::value) || std::is_same<integer<SSize>, T>::value;
 #else
-using integer_mod_type_enabler = enable_if_t<disjunction<conjunction<is_supported_interop<T>, std::is_integral<T>>,
+using integer_mod_type_enabler = enable_if_t<disjunction<conjunction<is_cpp_interoperable<T>, std::is_integral<T>>,
                                                          std::is_same<T, integer<SSize>>>::value,
                                              int>;
 #endif
@@ -5313,10 +5133,8 @@ inline void dispatch_in_place_mod(integer<SSize> &retval, const T &n)
 /// Binary division operator.
 /**
  * \rststar
- * This operator is enabled only if at least one argument is an :cpp:class:`~mppp::integer`
- * and the type of the other argument satisfies :cpp:concept:`~mppp::IntegerOpType`. If both arguments are
- * of type :cpp:class:`~mppp::integer`, they must have the same static size. The return type
- * is determined as follows:
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
  *   type of the result is ``F``; otherwise,
@@ -5454,7 +5272,7 @@ template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
 concept bool IntegerShiftType = CppInteroperable<T> &&std::is_integral<T>::value;
 #else
-using integer_shift_type_enabler = enable_if_t<is_supported_integral<T>::value, int>;
+using integer_shift_type_enabler = enable_if_t<conjunction<is_cpp_interoperable<T>, std::is_integral<T>>::value, int>;
 #endif
 }
 
@@ -5544,6 +5362,274 @@ inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
 {
     tdiv_q_2exp(rop, rop, integer_cast_to_bitcnt(s));
     return rop;
+}
+
+inline namespace detail
+{
+
+// Equality operator.
+// NOTE: special implementation instead of using cmp, this should be faster.
+template <std::size_t SSize>
+inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
+{
+    const mp_size_t size_a = a._get_union().m_st._mp_size, size_b = b._get_union().m_st._mp_size;
+    if (size_a != size_b) {
+        return false;
+    }
+    const ::mp_limb_t *ptr_a, *ptr_b;
+    std::size_t asize;
+    if (a.is_static()) {
+        ptr_a = a._get_union().g_st().m_limbs.data();
+        asize = static_cast<std::size_t>((size_a >= 0) ? size_a : -size_a);
+    } else {
+        ptr_a = a._get_union().g_dy()._mp_d;
+        asize = ::mpz_size(&a._get_union().g_dy());
+    }
+    if (b.is_static()) {
+        ptr_b = b._get_union().g_st().m_limbs.data();
+    } else {
+        ptr_b = b._get_union().g_dy()._mp_d;
+    }
+    auto limb_cmp
+        = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
+#if defined(_MSC_VER)
+    return std::equal(stdext::make_checked_array_iterator(ptr_a, asize),
+                      stdext::make_checked_array_iterator(ptr_a, asize, asize),
+                      stdext::make_checked_array_iterator(ptr_b, asize), limb_cmp);
+#else
+    return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
+#endif
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_equality(const integer<SSize> &a, T n)
+{
+    return dispatch_equality(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_equality(T n, const integer<SSize> &a)
+{
+    return dispatch_equality(a, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_equality(const integer<SSize> &a, T x)
+{
+    return static_cast<T>(a) == x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_equality(T x, const integer<SSize> &a)
+{
+    return dispatch_equality(a, x);
+}
+
+// Less-than operator.
+template <std::size_t SSize>
+inline bool dispatch_less_than(const integer<SSize> &a, const integer<SSize> &b)
+{
+    return cmp(a, b) < 0;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_less_than(const integer<SSize> &a, T n)
+{
+    return dispatch_less_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_less_than(T n, const integer<SSize> &a)
+{
+    return dispatch_greater_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_less_than(const integer<SSize> &a, T x)
+{
+    return static_cast<T>(a) < x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_less_than(T x, const integer<SSize> &a)
+{
+    return dispatch_greater_than(a, x);
+}
+
+// Greater-than operator.
+template <std::size_t SSize>
+inline bool dispatch_greater_than(const integer<SSize> &a, const integer<SSize> &b)
+{
+    return cmp(a, b) > 0;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_greater_than(const integer<SSize> &a, T n)
+{
+    return dispatch_greater_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_greater_than(T n, const integer<SSize> &a)
+{
+    return dispatch_less_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_greater_than(const integer<SSize> &a, T x)
+{
+    return static_cast<T>(a) > x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_greater_than(T x, const integer<SSize> &a)
+{
+    return dispatch_less_than(a, x);
+}
+}
+
+/// Equality operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerBinaryOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator==(const T &op1, const U &op2)
+{
+    return dispatch_equality(op1, op2);
+}
+
+/// Inequality operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerBinaryOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator!=(const T &op1, const U &op2)
+{
+    return !(op1 == op2);
+}
+
+/// Less-than operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerBinaryOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator<(const T &op1, const U &op2)
+{
+    return dispatch_less_than(op1, op2);
+}
+
+/// Greater-than or equal operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerBinaryOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator>=(const T &op1, const U &op2)
+{
+    return !(op1 < op2);
+}
+
+/// Greater-than operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerBinaryOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator>(const T &op1, const U &op2)
+{
+    return dispatch_greater_than(op1, op2);
+}
+
+/// Less-than or equal operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerBinaryOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator<=(const T &op1, const U &op2)
+{
+    return !(op1 > op2);
 }
 
 /** @} */
