@@ -695,6 +695,13 @@ using cpp_interoperable_enabler = enable_if_t<is_cpp_interoperable<T>::value, in
 #endif
 }
 
+// Useful fwd declarations.
+template <std::size_t>
+class integer;
+
+template <std::size_t SSize>
+void sqrt(integer<SSize> &, const integer<SSize> &);
+
 /// Exception to signal division by zero.
 /**
  * \rststar
@@ -1680,49 +1687,6 @@ public:
         }
         return ::mpz_probab_prime_p(get_mpz_view(), reps);
     }
-
-private:
-    static void sqrt_impl(integer &rop, const integer &n)
-    {
-        if (mppp_unlikely(n.m_int.m_st._mp_size < 0)) {
-            throw std::domain_error("Cannot compute the square root of the negative number " + n.to_string());
-        }
-        const bool sr = rop.is_static(), sn = n.is_static();
-        if (mppp_likely(sr && sn)) {
-            s_int &rs = rop.m_int.g_st();
-            const s_int &ns = n.m_int.g_st();
-            // NOTE: we know this is not negative, from the check above.
-            const mpz_size_t size = ns._mp_size;
-            if (!size) {
-                // Special casing for zero.
-                rs._mp_size = 0;
-                rs.zero_unused_limbs();
-                return;
-            }
-            // In case of overlap we need to go through a tmp variable.
-            std::array<::mp_limb_t, SSize> tmp;
-            const bool overlap = (&rs == &ns);
-            auto out_ptr = overlap ? tmp.data() : rs.m_limbs.data();
-            ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
-            // Compute the size of the output (which is ceil(size / 2)).
-            const mpz_size_t new_size = size / 2 + size % 2;
-            assert(!new_size || (out_ptr[new_size - 1] & GMP_NUMB_MASK));
-            // Write out the result.
-            rs._mp_size = new_size;
-            if (overlap) {
-                copy_limbs_no(out_ptr, out_ptr + new_size, rs.m_limbs.data());
-            }
-            // Clear out unused limbs.
-            rs.zero_unused_limbs();
-            return;
-        }
-        if (sr) {
-            rop.promote();
-        }
-        ::mpz_sqrt(&rop.m_int.g_dy(), n.get_mpz_view());
-    }
-
-public:
     /// Integer square root (in-place version).
     /**
      * This method will set \p this to its integer square root.
@@ -1733,35 +1697,8 @@ public:
      */
     integer &sqrt()
     {
-        sqrt_impl(*this, *this);
+        mppp::sqrt(*this, *this);
         return *this;
-    }
-    /// Integer square root (binary version).
-    /**
-     * This method will set \p rop to the integer square root of \p n.
-     *
-     * @param rop the return value.
-     * @param n the integer whose integer square root will be computed.
-     *
-     * @throws std::domain_error if \p n is negative.
-     */
-    friend void sqrt(integer &rop, const integer &n)
-    {
-        sqrt_impl(rop, n);
-    }
-    /// Integer square root (unary version).
-    /**
-     * @param n the integer whose integer square root will be computed.
-     *
-     * @return the integer square root of \p n.
-     *
-     * @throws std::domain_error if \p n is negative.
-     */
-    friend integer sqrt(const integer &n)
-    {
-        integer retval;
-        sqrt_impl(retval, n);
-        return retval;
     }
     /// Test if value is odd.
     /**
@@ -4548,6 +4485,88 @@ template <typename T, typename U>
 inline integer_common_t<T, U> pow(const T &base, const U &exp)
 {
     return pow_impl(base, exp);
+}
+
+/** @} */
+
+/** @defgroup integer_roots integer_roots
+ *  @{
+ */
+
+inline namespace detail
+{
+
+template <std::size_t SSize>
+inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
+{
+    if (mppp_unlikely(n._get_union().m_st._mp_size < 0)) {
+        throw std::domain_error("Cannot compute the square root of the negative number " + n.to_string());
+    }
+    const bool sr = rop.is_static(), sn = n.is_static();
+    if (mppp_likely(sr && sn)) {
+        static_int<SSize> &rs = rop._get_union().g_st();
+        const static_int<SSize> &ns = n._get_union().g_st();
+        // NOTE: we know this is not negative, from the check above.
+        const mpz_size_t size = ns._mp_size;
+        if (!size) {
+            // Special casing for zero.
+            rs._mp_size = 0;
+            rs.zero_unused_limbs();
+            return;
+        }
+        // In case of overlap we need to go through a tmp variable.
+        std::array<::mp_limb_t, SSize> tmp;
+        const bool overlap = (&rs == &ns);
+        auto out_ptr = overlap ? tmp.data() : rs.m_limbs.data();
+        ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
+        // Compute the size of the output (which is ceil(size / 2)).
+        const mpz_size_t new_size = size / 2 + size % 2;
+        assert(!new_size || (out_ptr[new_size - 1] & GMP_NUMB_MASK));
+        // Write out the result.
+        rs._mp_size = new_size;
+        if (overlap) {
+            copy_limbs_no(out_ptr, out_ptr + new_size, rs.m_limbs.data());
+        }
+        // Clear out unused limbs.
+        rs.zero_unused_limbs();
+        return;
+    }
+    if (sr) {
+        rop.promote();
+    }
+    ::mpz_sqrt(&rop._get_union().g_dy(), n.get_mpz_view());
+}
+}
+
+/// Integer square root (binary version).
+/**
+ * This method will set \p rop to the integer square root of \p n.
+ *
+ * @param rop the return value.
+ * @param n the integer whose integer square root will be computed.
+ *
+ * @throws std::domain_error if \p n is negative.
+ */
+template <std::size_t SSize>
+inline void sqrt(integer<SSize> &rop, const integer<SSize> &n)
+{
+    sqrt_impl(rop, n);
+}
+
+/// Integer square root (unary version).
+/**
+ * @param n the integer whose integer square root will be computed.
+ *
+ * @return the integer square root of \p n.
+ *
+ * @throws std::domain_error if \p n is negative.
+ */
+template <std::size_t SSize>
+inline integer<SSize> sqrt(const integer<SSize> &n)
+{
+    integer<SSize> retval;
+    sqrt_impl(retval, n);
+    return retval;
 }
 
 /** @} */

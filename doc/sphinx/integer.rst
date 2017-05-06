@@ -82,6 +82,14 @@ Exponentiation
 .. doxygengroup:: integer_exponentiation
    :content-only:
 
+.. _integer_roots:
+
+Roots
+~~~~~
+
+.. doxygengroup:: integer_roots
+   :content-only:
+
 .. _integer_io:
 
 Input/Output
