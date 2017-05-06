@@ -905,37 +905,6 @@ class integer
         static_mpz_view m_static_view;
         const mpz_struct_t *m_ptr;
     };
-    // Machinery for the determination of the result of a binary operation.
-    // NOTE: this metaprogramming could be done more cleanly using expr. SFINAE
-    // on the internal dispatching functions, but this generates an error in MSVC about
-    // the operator being defined twice. My impression is that this is an MSVC problem at the
-    // intersection between SFINAE and friend function templates (GCC and clang work fine).
-    // We adopt this construction as a workaround.
-    template <typename, typename, typename = void>
-    struct common_type {
-    };
-    template <typename Enable>
-    struct common_type<integer, integer, Enable> {
-        using type = integer;
-    };
-    template <typename U>
-    struct common_type<integer, U, enable_if_t<is_supported_integral<U>::value>> {
-        using type = integer;
-    };
-    template <typename T>
-    struct common_type<T, integer, enable_if_t<is_supported_integral<T>::value>> {
-        using type = integer;
-    };
-    template <typename U>
-    struct common_type<integer, U, enable_if_t<is_supported_float<U>::value>> {
-        using type = U;
-    };
-    template <typename T>
-    struct common_type<T, integer, enable_if_t<is_supported_float<T>::value>> {
-        using type = T;
-    };
-    template <typename T, typename U>
-    using common_t = typename common_type<T, U>::type;
 
 public:
     /// Alias for the template parameter \p SSize.
@@ -1660,151 +1629,6 @@ public:
         --(*this);
         return retval;
     }
-
-private:
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
-    static bool exp_nonnegative(const T &exp)
-    {
-        return exp >= T(0);
-    }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
-    static bool exp_nonnegative(const T &)
-    {
-        return true;
-    }
-    static bool exp_nonnegative(const integer &exp)
-    {
-        return exp.sgn() >= 0;
-    }
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static unsigned long exp_to_ulong(const T &exp)
-    {
-#if !defined(__INTEL_COMPILER)
-        assert(exp >= T(0));
-#endif
-        // NOTE: make_unsigned<T>::type is T if T is already unsigned.
-        if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(exp)
-                          > std::numeric_limits<unsigned long>::max())) {
-            throw std::overflow_error("Cannot convert the integral value " + std::to_string(exp)
-                                      + " to unsigned long: the value is too large.");
-        }
-        return static_cast<unsigned long>(exp);
-    }
-    static unsigned long exp_to_ulong(const integer &exp)
-    {
-        try {
-            return static_cast<unsigned long>(exp);
-        } catch (const std::overflow_error &) {
-            // Rewrite the error message.
-            throw std::overflow_error("Cannot convert the integral value " + exp.to_string()
-                                      + " to unsigned long: the value is too large.");
-        }
-    }
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static bool base_is_zero(const T &base)
-    {
-        return base == T(0);
-    }
-    static bool base_is_zero(const integer &base)
-    {
-        return base.is_zero();
-    }
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static bool exp_is_odd(const T &exp)
-    {
-        return (exp % T(2)) != T(0);
-    }
-    static bool exp_is_odd(const integer &exp)
-    {
-        return exp.odd_p();
-    }
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static std::string exp_to_string(const T &exp)
-    {
-        return std::to_string(exp);
-    }
-    static std::string exp_to_string(const integer &exp)
-    {
-        return exp.to_string();
-    }
-    // Implementation of pow().
-    // integer -- integral overload.
-    template <typename T, enable_if_t<disjunction<std::is_same<T, integer>, std::is_integral<T>>::value, int> = 0>
-    static integer pow_impl(const integer &base, const T &exp)
-    {
-        integer rop;
-        if (exp_nonnegative(exp)) {
-            pow_ui(rop, base, exp_to_ulong(exp));
-        } else if (mppp_unlikely(base_is_zero(base))) {
-            // 0**-n is a division by zero.
-            throw zero_division_error("cannot raise zero to the negative power " + exp_to_string(exp));
-        } else if (base.is_one()) {
-            // 1**n == 1.
-            rop = 1;
-        } else if (base.is_negative_one()) {
-            if (exp_is_odd(exp)) {
-                // 1**(-2n-1) == -1.
-                rop = -1;
-            } else {
-                // 1**(-2n) == 1.
-                rop = 1;
-            }
-        } else {
-            // m**-n == 1 / m**n == 0.
-            rop = 0;
-        }
-        return rop;
-    }
-    // C++ integral -- integer overload.
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static integer pow_impl(const T &base, const integer &exp)
-    {
-        return pow_impl(integer{base}, exp);
-    }
-    // integer -- FP overload.
-    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    static T pow_impl(const integer &base, const T &exp)
-    {
-        return std::pow(static_cast<T>(base), exp);
-    }
-    // FP -- integer overload.
-    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    static T pow_impl(const T &base, const integer &exp)
-    {
-        return std::pow(base, static_cast<T>(exp));
-    }
-
-public:
-    /// Generic binary exponentiation.
-    /**
-     * \rststar
-     * .. note::
-     *
-     *    This function is enabled only if at least one argument is an :cpp:class:`mppp::integer`
-     *    and the other argument is either an :cpp:class:`mppp::integer` or an interoperable type for
-     *    :cpp:class:`mppp::integer`.
-     * \endrststar
-     *
-     * This function will raise \p base to the power \p exp, and return the result. If one of the arguments
-     * is a floating-point value, then the result will be computed via <tt>std::pow()</tt> and it will also be a
-     * floating-point value. Otherwise, the result is computed via mppp::integer::pow_ui() and its type is
-     * mppp::integer. In case of a negative integral exponent and integral base, the result will be zero unless
-     * the absolute value of \p base is 1.
-     *
-     * @param base the base.
-     * @param exp the exponent.
-     *
-     * @return <tt>base**exp</tt>.
-     *
-     * @throws std::overflow_error if \p base and \p exp are integrals and \p exp is non-negative and outside the range
-     * of <tt>unsigned long</tt>.
-     * @throws zero_division_error if \p base and \p exp are integrals and \p base is zero and \p exp is negative.
-     */
-    template <typename T, typename U>
-    friend common_t<T, U> pow(const T &base, const U &exp)
-    {
-        return pow_impl(base, exp);
-    }
     /// In-place absolute value.
     /**
      * This method will set \p this to its absolute value.
@@ -2057,158 +1881,6 @@ public:
     {
         return n.even_p();
     }
-    /// Factorial.
-    /**
-     * This function will set \p rop to the factorial of \p n.
-     *
-     * @param rop the return value.
-     * @param n the argument for the factorial.
-     *
-     * @throws std::invalid_argument if \p n is larger than an implementation-defined limit.
-     */
-    friend void fac_ui(integer &rop, unsigned long n)
-    {
-        // NOTE: we put a limit here because the GMP function just crashes and burns
-        // if n is too large, and n does not even need to be that large.
-        constexpr auto max_fac = 1000000ull;
-        if (mppp_unlikely(n > max_fac)) {
-            throw std::invalid_argument(
-                "The value " + std::to_string(n)
-                + " is too large to be used as input for the factorial function (the maximum allowed value is "
-                + std::to_string(max_fac) + ")");
-        }
-        if (rop.is_static()) {
-            MPPP_MAYBE_TLS mpz_raii tmp;
-            ::mpz_fac_ui(&tmp.m_mpz, n);
-            rop = integer(&tmp.m_mpz);
-        } else {
-            ::mpz_fac_ui(&rop.m_int.g_dy(), n);
-        }
-    }
-    /// Binomial coefficient (ternary version).
-    /**
-     * This function will set \p rop to the binomial coefficient of \p n and \p k. Negative values of \p n are
-     * supported.
-     *
-     * @param rop the return value.
-     * @param n the top argument.
-     * @param k the bottom argument.
-     */
-    friend void bin_ui(integer &rop, const integer &n, unsigned long k)
-    {
-        if (rop.is_static()) {
-            MPPP_MAYBE_TLS mpz_raii tmp;
-            ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
-            rop = integer(&tmp.m_mpz);
-        } else {
-            ::mpz_bin_ui(&rop.m_int.g_dy(), n.get_mpz_view(), k);
-        }
-    }
-    /// Binomial coefficient (binary version).
-    /**
-     * @param n the top argument.
-     * @param k the bottom argument.
-     *
-     * @return the binomial coefficient of \p n and \p k.
-     */
-    friend integer bin_ui(const integer &n, unsigned long k)
-    {
-        integer retval;
-        bin_ui(retval, n, k);
-        return retval;
-    }
-
-private:
-    template <typename T, typename U>
-    using binomial_enabler_impl
-        = std::integral_constant<bool,
-                                 disjunction<conjunction<std::is_same<integer, T>, std::is_same<integer, U>>,
-                                             conjunction<std::is_same<integer, T>, is_supported_integral<U>>,
-                                             conjunction<std::is_same<integer, U>, is_supported_integral<T>>>::value>;
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, integer>;
-#else
-    template <typename T, typename U>
-    using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, int>;
-#endif
-    template <typename T>
-    static integer binomial_impl(const integer &n, const T &k)
-    {
-        // NOTE: here we re-use some helper methods used in the implementation of pow().
-        if (exp_nonnegative(k)) {
-            return bin_ui(n, exp_to_ulong(k));
-        }
-        // This is the case k < 0, handled according to:
-        // http://arxiv.org/abs/1105.3689/
-        if (n.sgn() >= 0) {
-            // n >= 0, k < 0.
-            return integer{};
-        }
-        // n < 0, k < 0.
-        if (k <= n) {
-            // The formula is: (-1)**(n-k) * binomial(-k-1,n-k).
-            // Cache n-k.
-            const integer nmk{n - k};
-            integer tmp{k};
-            ++tmp;
-            tmp.neg();
-            auto retval = bin_ui(tmp, exp_to_ulong(nmk));
-            if (nmk.odd_p()) {
-                retval.neg();
-            }
-            return retval;
-        }
-        return integer{};
-    }
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static integer binomial_impl(const T &n, const integer &k)
-    {
-        return binomial_impl(integer{n}, k);
-    }
-
-public:
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend binomial_enabler<T, U> binomial(const T &n, const U &k)
-#else
-    /// Generic binomial coefficient.
-    /**
-     * \rststar
-     * .. note::
-     *
-     *    This function is enabled only in the following cases:
-     *
-     *    * ``T`` and ``U`` are both :cpp:class:`mppp::integer`,
-     *    * ``T`` is an :cpp:class:`mppp::integer` and ``U`` is an integral interoperable type for
-     *      :cpp:class:`mppp::integer`,
-     *    * ``U`` is an :cpp:class:`mppp::integer` and ``T`` is an integral interoperable type for
-     *      :cpp:class:`mppp::integer`.
-     * \endrststar
-     *
-     * This function will compute the binomial coefficient \f$ {{n}\choose{k}} \f$, supporting integral input values.
-     * The implementation can handle positive and negative values for both the top and the bottom argument. Internally,
-     * the integer::bin_ui() function will be employed.
-     *
-     * \rststar
-     * .. seealso::
-     *
-     *    http://arxiv.org/abs/1105.3689/
-     * \endrststar
-     *
-     * @param n the top argument.
-     * @param k the bottom argument.
-     *
-     * @return \f$ {{n}\choose{k}} \f$.
-     *
-     * @throws std::overflow_error if \p k is greater than an implementation-defined value.
-     */
-    template <typename T, typename U, binomial_enabler<T, U> = 0>
-    friend integer binomial(const T &n, const U &k)
-#endif
-    {
-        return binomial_impl(n, k);
-    }
 
 private:
     static void static_gcd(s_int &rop, const s_int &op1, const s_int &op2)
@@ -2413,6 +2085,86 @@ private:
 
 template <std::size_t SSize>
 constexpr std::size_t integer<SSize>::ssize;
+
+inline namespace detail
+{
+
+// Machinery for the determination of the result of a binary operation involving integer.
+// Default is empty for SFINAE.
+template <typename, typename, typename = void>
+struct integer_common_type {
+};
+
+template <std::size_t SSize>
+struct integer_common_type<integer<SSize>, integer<SSize>> {
+    using type = integer<SSize>;
+};
+
+template <std::size_t SSize, typename U>
+struct integer_common_type<integer<SSize>, U, enable_if_t<is_supported_integral<U>::value>> {
+    using type = integer<SSize>;
+};
+
+template <std::size_t SSize, typename T>
+struct integer_common_type<T, integer<SSize>, enable_if_t<is_supported_integral<T>::value>> {
+    using type = integer<SSize>;
+};
+
+template <std::size_t SSize, typename U>
+struct integer_common_type<integer<SSize>, U, enable_if_t<is_supported_float<U>::value>> {
+    using type = U;
+};
+
+template <std::size_t SSize, typename T>
+struct integer_common_type<T, integer<SSize>, enable_if_t<is_supported_float<T>::value>> {
+    using type = T;
+};
+
+template <typename T, typename U>
+using integer_common_t = typename integer_common_type<T, U>::type;
+
+// Various utilities, concepts, enablers used in both the operators and the functions.
+template <typename T, typename U>
+struct is_same_ssize_integer : std::false_type {
+};
+
+template <std::size_t SSize>
+struct is_same_ssize_integer<integer<SSize>, integer<SSize>> : std::true_type {
+};
+
+template <typename T>
+struct is_integer : std::false_type {
+};
+
+template <std::size_t SSize>
+struct is_integer<integer<SSize>> : std::true_type {
+};
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerOpTypes
+    = is_same_ssize_integer<T, U>::value
+      || (is_integer<T>::value && CppInteroperable<U>) || (is_integer<U>::value && CppInteroperable<T>);
+#else
+using integer_op_types_enabler
+    = enable_if_t<disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_cpp_interoperable<U>>,
+                              conjunction<is_integer<U>, is_cpp_interoperable<T>>>::value,
+                  int>;
+#endif
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerIntegralOpTypes
+    = is_same_ssize_integer<T, U>::value || (is_integer<T>::value && CppInteroperable<U> && std::is_integral<U>::value)
+      || (is_integer<U>::value && CppInteroperable<T> && std::is_integral<T>::value);
+#else
+using integer_integral_op_types_enabler
+    = enable_if_t<disjunction<is_same_ssize_integer<T, U>,
+                              conjunction<is_integer<T>, is_cpp_interoperable<U>, std::is_integral<U>>,
+                              conjunction<is_integer<U>, is_cpp_interoperable<T>, std::is_integral<T>>>::value,
+                  int>;
+#endif
+}
 
 /** @defgroup integer_arithmetic integer_arithmetic
  *  @{
@@ -4428,6 +4180,199 @@ inline int sgn(const integer<SSize> &n)
 
 /** @} */
 
+/** @defgroup integer_ntheory integer_ntheory
+ *  @{
+ */
+
+/// Factorial.
+/**
+ * This function will set \p rop to the factorial of \p n.
+ *
+ * @param rop the return value.
+ * @param n the argument for the factorial.
+ *
+ * @throws std::invalid_argument if \p n is larger than an implementation-defined limit.
+ */
+template <std::size_t SSize>
+inline void fac_ui(integer<SSize> &rop, unsigned long n)
+{
+    // NOTE: we put a limit here because the GMP function just crashes and burns
+    // if n is too large, and n does not even need to be that large.
+    constexpr auto max_fac = 1000000ull;
+    if (mppp_unlikely(n > max_fac)) {
+        throw std::invalid_argument(
+            "The value " + std::to_string(n)
+            + " is too large to be used as input for the factorial function (the maximum allowed value is "
+            + std::to_string(max_fac) + ")");
+    }
+    if (rop.is_static()) {
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_fac_ui(&tmp.m_mpz, n);
+        rop = integer<SSize>(&tmp.m_mpz);
+    } else {
+        ::mpz_fac_ui(&rop._get_union().g_dy(), n);
+    }
+}
+
+/// Binomial coefficient (ternary version).
+/**
+ * This function will set \p rop to the binomial coefficient of \p n and \p k. Negative values of \p n are
+ * supported.
+ *
+ * @param rop the return value.
+ * @param n the top argument.
+ * @param k the bottom argument.
+ */
+template <std::size_t SSize>
+inline void bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k)
+{
+    if (rop.is_static()) {
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
+        rop = integer<SSize>(&tmp.m_mpz);
+    } else {
+        ::mpz_bin_ui(&rop._get_union().g_dy(), n.get_mpz_view(), k);
+    }
+}
+
+/// Binomial coefficient (binary version).
+/**
+ * @param n the top argument.
+ * @param k the bottom argument.
+ *
+ * @return the binomial coefficient of \p n and \p k.
+ */
+template <std::size_t SSize>
+inline integer<SSize> bin_ui(const integer<SSize> &n, unsigned long k)
+{
+    integer<SSize> retval;
+    bin_ui(retval, n, k);
+    return retval;
+}
+
+inline namespace detail
+{
+
+// These helpers are used here and in pow() as well.
+template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+inline bool integer_exp_nonnegative(const T &exp)
+{
+    return exp >= T(0);
+}
+
+template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+inline bool integer_exp_nonnegative(const T &)
+{
+    return true;
+}
+
+template <std::size_t SSize>
+inline bool integer_exp_nonnegative(const integer<SSize> &exp)
+{
+    return exp.sgn() >= 0;
+}
+
+template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline unsigned long integer_exp_to_ulong(const T &exp)
+{
+#if !defined(__INTEL_COMPILER)
+    assert(exp >= T(0));
+#endif
+    // NOTE: make_unsigned<T>::type is T if T is already unsigned.
+    if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(exp)
+                      > std::numeric_limits<unsigned long>::max())) {
+        throw std::overflow_error("Cannot convert the integral value " + std::to_string(exp)
+                                  + " to unsigned long: the value is too large.");
+    }
+    return static_cast<unsigned long>(exp);
+}
+
+template <std::size_t SSize>
+inline unsigned long integer_exp_to_ulong(const integer<SSize> &exp)
+{
+    try {
+        return static_cast<unsigned long>(exp);
+    } catch (const std::overflow_error &) {
+        // Rewrite the error message.
+        throw std::overflow_error("Cannot convert the integral value " + exp.to_string()
+                                  + " to unsigned long: the value is too large.");
+    }
+}
+
+template <typename T, std::size_t SSize>
+inline integer<SSize> binomial_impl(const integer<SSize> &n, const T &k)
+{
+    // NOTE: here we re-use some helper methods used in the implementation of pow().
+    if (integer_exp_nonnegative(k)) {
+        return bin_ui(n, integer_exp_to_ulong(k));
+    }
+    // This is the case k < 0, handled according to:
+    // http://arxiv.org/abs/1105.3689/
+    if (n.sgn() >= 0) {
+        // n >= 0, k < 0.
+        return integer<SSize>{};
+    }
+    // n < 0, k < 0.
+    if (k <= n) {
+        // The formula is: (-1)**(n-k) * binomial(-k-1,n-k).
+        // Cache n-k.
+        const integer<SSize> nmk{n - k};
+        integer<SSize> tmp{k};
+        ++tmp;
+        tmp.neg();
+        auto retval = bin_ui(tmp, integer_exp_to_ulong(nmk));
+        if (nmk.odd_p()) {
+            retval.neg();
+        }
+        return retval;
+    }
+    return integer<SSize>{};
+}
+
+template <typename T, std::size_t SSize, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
+{
+    return binomial_impl(integer<SSize>{n}, k);
+}
+}
+
+/// Generic binomial coefficient.
+/**
+ * \rststar
+ * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
+ * The return type is :cpp:class:`~mppp::integer`.
+ *
+ * This function will compute the binomial coefficient :math:`{{n}\choose{k}}`, supporting integral input values.
+ * The implementation can handle positive and negative values for both the top and the bottom argument.
+ *
+ * .. seealso::
+ *
+ *    http://arxiv.org/abs/1105.3689/
+ *
+ * \endrststar
+ *
+ * @param n the top argument.
+ * @param k the bottom argument.
+ *
+ * @return \f$ {{n}\choose{k}} \f$.
+ *
+ * @throws std::overflow_error if \p k is greater than an implementation-defined value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerIntegralOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+#endif
+    inline integer_common_t<T, U> binomial(const T &n, const U &k)
+{
+    return binomial_impl(n, k);
+}
+
+/** @} */
+
 /** @defgroup integer_exponentiation integer_exponentiation
  *  @{
  */
@@ -4465,6 +4410,130 @@ inline integer<SSize> pow_ui(const integer<SSize> &base, unsigned long exp)
     integer<SSize> retval;
     pow_ui(retval, base, exp);
     return retval;
+}
+
+inline namespace detail
+{
+
+// Various helpers for the implementation of pow().
+template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline bool integer_base_is_zero(const T &base)
+{
+    return base == T(0);
+}
+
+template <std::size_t SSize>
+inline bool integer_base_is_zero(const integer<SSize> &base)
+{
+    return base.is_zero();
+}
+
+template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline bool integer_exp_is_odd(const T &exp)
+{
+    return (exp % T(2)) != T(0);
+}
+
+template <std::size_t SSize>
+inline bool integer_exp_is_odd(const integer<SSize> &exp)
+{
+    return exp.odd_p();
+}
+
+template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline std::string integer_exp_to_string(const T &exp)
+{
+    return std::to_string(exp);
+}
+
+template <std::size_t SSize>
+inline std::string integer_exp_to_string(const integer<SSize> &exp)
+{
+    return exp.to_string();
+}
+
+// Implementation of pow().
+// integer -- integral overload.
+template <typename T, std::size_t SSize,
+          enable_if_t<disjunction<std::is_same<T, integer<SSize>>, std::is_integral<T>>::value, int> = 0>
+inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
+{
+    integer<SSize> rop;
+    if (integer_exp_nonnegative(exp)) {
+        pow_ui(rop, base, integer_exp_to_ulong(exp));
+    } else if (mppp_unlikely(integer_base_is_zero(base))) {
+        // 0**-n is a division by zero.
+        throw zero_division_error("cannot raise zero to the negative power " + integer_exp_to_string(exp));
+    } else if (base.is_one()) {
+        // 1**n == 1.
+        rop = 1;
+    } else if (base.is_negative_one()) {
+        if (integer_exp_is_odd(exp)) {
+            // 1**(-2n-1) == -1.
+            rop = -1;
+        } else {
+            // 1**(-2n) == 1.
+            rop = 1;
+        }
+    } else {
+        // m**-n == 1 / m**n == 0.
+        rop = 0;
+    }
+    return rop;
+}
+
+// C++ integral -- integer overload.
+template <typename T, std::size_t SSize, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline integer<SSize> pow_impl(const T &base, const integer<SSize> &exp)
+{
+    return pow_impl(integer<SSize>{base}, exp);
+}
+
+// integer -- FP overload.
+template <typename T, std::size_t SSize, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline T pow_impl(const integer<SSize> &base, const T &exp)
+{
+    return std::pow(static_cast<T>(base), exp);
+}
+
+// FP -- integer overload.
+template <typename T, std::size_t SSize, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline T pow_impl(const T &base, const integer<SSize> &exp)
+{
+    return std::pow(base, static_cast<T>(exp));
+}
+}
+
+/// Binary exponentiation.
+/**
+ * \rststar
+ * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::integer`.
+ *
+ * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
+ * is a floating-point value, then the result will be computed via ``std::pow()`` and it will also be a
+ * floating-point value. Otherwise, the result will be an :cpp:class:`~mppp::integer`.
+ * In case of a negative integral exponent and integral base, the result will be zero unless
+ * the absolute value of ``base`` is 1.
+ * \endrststar
+ *
+ * @param base the base.
+ * @param exp the exponent.
+ *
+ * @return <tt>base**exp</tt>.
+ *
+ * @throws std::overflow_error if \p base and \p exp are integrals and \p exp is non-negative and outside the range
+ * of <tt>unsigned long</tt>.
+ * @throws zero_division_error if \p base and \p exp are integrals and \p base is zero and \p exp is negative.
+ */
+template <typename T, typename U>
+inline integer_common_t<T, U> pow(const T &base, const U &exp)
+{
+    return pow_impl(base, exp);
 }
 
 /** @} */
@@ -4570,76 +4639,6 @@ inline std::size_t hash(const integer<SSize> &n)
 inline namespace detail
 {
 
-template <typename T, std::size_t SSize>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool IntegerOpType = CppInteroperable<T> || std::is_same<integer<SSize>, T>::value;
-#else
-using integer_op_type_enabler
-    = enable_if_t<disjunction<is_cpp_interoperable<T>, std::is_same<T, integer<SSize>>>::value, int>;
-#endif
-
-template <typename T, typename U>
-struct is_same_ssize_integer : std::false_type {
-};
-
-template <std::size_t SSize>
-struct is_same_ssize_integer<integer<SSize>, integer<SSize>> : std::true_type {
-};
-
-template <typename T>
-struct is_integer : std::false_type {
-};
-
-template <std::size_t SSize>
-struct is_integer<integer<SSize>> : std::true_type {
-};
-
-template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool IntegerBinaryOpTypes
-    = is_same_ssize_integer<T, U>::value
-      || (is_integer<T>::value && CppInteroperable<U>) || (is_integer<U>::value && CppInteroperable<T>);
-#else
-using integer_binary_op_types_enabler
-    = enable_if_t<disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_cpp_interoperable<U>>,
-                              conjunction<is_integer<U>, is_cpp_interoperable<T>>>::value,
-                  int>;
-#endif
-
-// Machinery for the determination of the result of a binary operation involving integer.
-// Default is empty for SFINAE.
-template <typename, typename, typename = void>
-struct integer_common_type {
-};
-
-template <std::size_t SSize>
-struct integer_common_type<integer<SSize>, integer<SSize>> {
-    using type = integer<SSize>;
-};
-
-template <std::size_t SSize, typename U>
-struct integer_common_type<integer<SSize>, U, enable_if_t<is_supported_integral<U>::value>> {
-    using type = integer<SSize>;
-};
-
-template <std::size_t SSize, typename T>
-struct integer_common_type<T, integer<SSize>, enable_if_t<is_supported_integral<T>::value>> {
-    using type = integer<SSize>;
-};
-
-template <std::size_t SSize, typename U>
-struct integer_common_type<integer<SSize>, U, enable_if_t<is_supported_float<U>::value>> {
-    using type = U;
-};
-
-template <std::size_t SSize, typename T>
-struct integer_common_type<T, integer<SSize>, enable_if_t<is_supported_float<T>::value>> {
-    using type = T;
-};
-
-template <typename T, typename U>
-using integer_common_t = typename integer_common_type<T, U>::type;
-
 // Dispatching for the binary addition operator.
 template <std::size_t SSize>
 inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, const integer<SSize> &op2)
@@ -4675,7 +4674,7 @@ inline T dispatch_binary_add(T x, const integer<SSize> &op2)
     return dispatch_binary_add(op2, x);
 }
 
-// Dispatching for in-place add, integer on the left.
+// Dispatching for in-place add.
 template <std::size_t SSize>
 inline void dispatch_in_place_add(integer<SSize> &retval, const integer<SSize> &n)
 {
@@ -4693,12 +4692,18 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
 }
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop + op);
+}
 }
 
 /// Binary addition operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -4718,48 +4723,32 @@ inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
     return dispatch_binary_add(op1, op2);
 }
 
-/// In-place addition.
+/// In-place addition operator.
 /**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
  * @param rop the augend.
  * @param op the addend.
  *
  * @return a reference to \p rop.
  *
- * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop.
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline integer<SSize> &operator+=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
-#else
-template <typename T, std::size_t SSize, integer_op_type_enabler<T, SSize> = 0>
-inline integer<SSize> &operator+=(integer<SSize> &rop, const T &op)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
 #endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline T &operator+=(T &rop, const U &op)
 {
     dispatch_in_place_add(rop, op);
     return rop;
-}
-
-/// In-place addition.
-/**
- * @param rop the augend.
- * @param op the addend.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline CppInteroperable &operator+=(CppInteroperable &rop, const integer<SSize> &op)
-#else
-template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
-inline T &operator+=(T &rop, const integer<SSize> &op)
-#endif
-{
-    // NOTE: if rop is an integral, then the static cast is a generic conversion from
-    // integer to the integral, which can fail because of overflow. Otherwise, the
-    // static cast is a redundant cast to float of rop + op, which is already a float.
-    return rop = static_cast<uncvref_t<decltype(rop)>>(rop + op);
 }
 
 inline namespace detail
@@ -4821,12 +4810,18 @@ inline void dispatch_in_place_sub(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) - x;
 }
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_sub(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop - op);
+}
 }
 
 /// Binary subtraction operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -4846,45 +4841,32 @@ inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
     return dispatch_binary_sub(op1, op2);
 }
 
-/// In-place subtraction.
+/// In-place subtraction operator.
 /**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
  * @param rop the minuend.
  * @param op the subtrahend.
  *
  * @return a reference to \p rop.
  *
- * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop.
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline integer<SSize> &operator-=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
-#else
-template <typename T, std::size_t SSize, integer_op_type_enabler<T, SSize> = 0>
-inline integer<SSize> &operator-=(integer<SSize> &rop, const T &op)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
 #endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline T &operator-=(T &rop, const U &op)
 {
     dispatch_in_place_sub(rop, op);
     return rop;
-}
-
-/// In-place subtraction.
-/**
- * @param rop the minuend.
- * @param op the subtrahend.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline CppInteroperable &operator-=(CppInteroperable &rop, const integer<SSize> &op)
-#else
-template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
-inline T &operator-=(T &rop, const integer<SSize> &op)
-#endif
-{
-    return rop = static_cast<uncvref_t<decltype(rop)>>(rop - op);
 }
 
 inline namespace detail
@@ -4946,12 +4928,18 @@ inline void dispatch_in_place_mul(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) * x;
 }
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop * op);
+}
 }
 
 /// Binary multiplication operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -4971,45 +4959,32 @@ inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
     return dispatch_binary_mul(op1, op2);
 }
 
-/// In-place multiplication.
+/// In-place multiplication operator.
 /**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
  * @param rop the multiplicator.
  * @param op the multiplicand.
  *
  * @return a reference to \p rop.
  *
- * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop.
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline integer<SSize> &operator*=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
-#else
-template <typename T, std::size_t SSize, integer_op_type_enabler<T, SSize> = 0>
-inline integer<SSize> &operator*=(integer<SSize> &rop, const T &op)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
 #endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline T &operator*=(T &rop, const U &op)
 {
     dispatch_in_place_mul(rop, op);
     return rop;
-}
-
-/// In-place multiplication.
-/**
- * @param rop the multiplicator.
- * @param op the multiplicand.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline CppInteroperable &operator*=(CppInteroperable &rop, const integer<SSize> &op)
-#else
-template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
-inline T &operator*=(T &rop, const integer<SSize> &op)
-#endif
-{
-    return rop = static_cast<uncvref_t<decltype(rop)>>(rop * op);
 }
 
 inline namespace detail
@@ -5073,21 +5048,11 @@ inline void dispatch_in_place_div(integer<SSize> &retval, const T &x)
     retval = static_cast<T>(retval) / x;
 }
 
-// Enablers for modulo operators. They are special because they don't accept floating-point.
-template <typename T, typename U>
-using integer_common_mod_t
-    = enable_if_t<conjunction<negation<std::is_floating_point<T>>, negation<std::is_floating_point<U>>>::value,
-                  integer_common_t<T, U>>;
-
 template <typename T, std::size_t SSize>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool IntegerModType
-    = (CppInteroperable<T> && std::is_integral<T>::value) || std::is_same<integer<SSize>, T>::value;
-#else
-using integer_mod_type_enabler = enable_if_t<disjunction<conjunction<is_cpp_interoperable<T>, std::is_integral<T>>,
-                                                         std::is_same<T, integer<SSize>>>::value,
-                                             int>;
-#endif
+inline void dispatch_in_place_div(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop / op);
+}
 
 // Dispatching for the binary modulo operator.
 template <std::size_t SSize>
@@ -5128,12 +5093,18 @@ inline void dispatch_in_place_mod(integer<SSize> &retval, const T &n)
     integer<SSize> q;
     tdiv_qr(q, retval, retval, integer<SSize>{n});
 }
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop % op);
+}
 }
 
 /// Binary division operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -5155,56 +5126,40 @@ inline integer_common_t<T, U> operator/(const T &n, const U &d)
     return dispatch_binary_div(n, d);
 }
 
-/// In-place division.
+/// In-place division operator.
 /**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
  * @param rop the dividend.
  * @param op the divisor.
  *
  * @return a reference to \p rop.
  *
  * @throws zero_division_error if \p op is zero and only integral types are involved in the division.
- * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop.
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline integer<SSize> &operator/=(integer<SSize> &rop, const IntegerOpType<SSize> &op)
-#else
-template <typename T, std::size_t SSize, integer_op_type_enabler<T, SSize> = 0>
-inline integer<SSize> &operator/=(integer<SSize> &rop, const T &op)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
 #endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline T &operator/=(T &rop, const U &op)
 {
     dispatch_in_place_div(rop, op);
     return rop;
 }
 
-/// In-place division.
-/**
- * @param rop the dividend.
- * @param op the divisor.
- *
- * @return a reference to \p rop.
- *
- * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop,
- * or by the binary division operator.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline CppInteroperable &operator/=(CppInteroperable &rop, const integer<SSize> &op)
-#else
-template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
-inline T &operator/=(T &rop, const integer<SSize> &op)
-#endif
-{
-    return rop = static_cast<uncvref_t<decltype(rop)>>(rop / op);
-}
-
 /// Binary modulo operator.
 /**
  * \rststar
- * This operator is enabled only if at least one argument is an :cpp:class:`~mppp::integer`
- * and the type of the other argument satisfies :cpp:concept:`~mppp::IntegerModType`. If both arguments are
- * of type :cpp:class:`~mppp::integer`, they must have the same static size. The return type
- * is :cpp:class:`~mppp::integer`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
+ * The return type is :cpp:class:`~mppp::integer`.
  * \endrststar
  *
  * @param n the dividend.
@@ -5214,28 +5169,42 @@ inline T &operator/=(T &rop, const integer<SSize> &op)
  *
  * @throws zero_division_error if \p d is zero.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-inline integer_common_mod_t<T, U> operator%(const T &n, const U &d)
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerIntegralOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+#endif
+    inline integer_common_t<T, U> operator%(const T &n, const U &d)
 {
     return dispatch_binary_mod(n, d);
 }
 
-/// In-place modulo.
+/// In-place modulo operator.
 /**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
+ * \endrststar
+ *
  * @param rop the dividend.
  * @param op the divisor.
  *
  * @return a reference to \p rop.
  *
  * @throws zero_division_error if \p op is zero.
+ * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline integer<SSize> &operator%=(integer<SSize> &rop, const IntegerModType<SSize> &op)
-#else
-template <typename T, std::size_t SSize, integer_mod_type_enabler<T, SSize> = 0>
-inline integer<SSize> &operator%=(integer<SSize> &rop, const T &op)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerIntegralOpTypes<T, U>
 #endif
+#else
+template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+#endif
+    inline T &operator%=(T &rop, const U &op)
 {
     dispatch_in_place_mod(rop, op);
     return rop;
@@ -5278,7 +5247,7 @@ using integer_shift_type_enabler = enable_if_t<conjunction<is_cpp_interoperable<
 
 #endif
 
-/// Binary left shift.
+/// Binary left shift operator.
 /**
  * @param n the multiplicand.
  * @param s the bit shift value.
@@ -5300,7 +5269,7 @@ inline integer<SSize> operator<<(const integer<SSize> &n, T s)
     return retval;
 }
 
-/// In-place left shift.
+/// In-place left shift operator.
 /**
  * @param rop the multiplicand.
  * @param s the bit shift value.
@@ -5321,7 +5290,7 @@ inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
     return rop;
 }
 
-/// Binary right shift.
+/// Binary right shift operator.
 /**
  * @param n the dividend.
  * @param s the bit shift value.
@@ -5343,7 +5312,7 @@ inline integer<SSize> operator>>(const integer<SSize> &n, T s)
     return retval;
 }
 
-/// In-place right shift.
+/// In-place right shift operator.
 /**
  * @param rop the dividend.
  * @param s the bit shift value.
@@ -5491,7 +5460,7 @@ inline bool dispatch_greater_than(T x, const integer<SSize> &a)
 /// Equality operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * \endrststar
  *
  * @param op1 first argument.
@@ -5502,10 +5471,10 @@ inline bool dispatch_greater_than(T x, const integer<SSize> &a)
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 #if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerBinaryOpTypes<T, U>
+requires IntegerOpTypes<T, U>
 #endif
 #else
-template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator==(const T &op1, const U &op2)
 {
@@ -5515,7 +5484,7 @@ template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
 /// Inequality operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * \endrststar
  *
  * @param op1 first argument.
@@ -5526,10 +5495,10 @@ template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 #if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerBinaryOpTypes<T, U>
+requires IntegerOpTypes<T, U>
 #endif
 #else
-template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator!=(const T &op1, const U &op2)
 {
@@ -5539,7 +5508,7 @@ template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
 /// Less-than operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * \endrststar
  *
  * @param op1 first argument.
@@ -5550,10 +5519,10 @@ template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 #if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerBinaryOpTypes<T, U>
+requires IntegerOpTypes<T, U>
 #endif
 #else
-template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator<(const T &op1, const U &op2)
 {
@@ -5563,7 +5532,7 @@ template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
 /// Greater-than or equal operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * \endrststar
  *
  * @param op1 first argument.
@@ -5574,10 +5543,10 @@ template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 #if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerBinaryOpTypes<T, U>
+requires IntegerOpTypes<T, U>
 #endif
 #else
-template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator>=(const T &op1, const U &op2)
 {
@@ -5587,7 +5556,7 @@ template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
 /// Greater-than operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * \endrststar
  *
  * @param op1 first argument.
@@ -5598,10 +5567,10 @@ template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 #if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerBinaryOpTypes<T, U>
+requires IntegerOpTypes<T, U>
 #endif
 #else
-template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator>(const T &op1, const U &op2)
 {
@@ -5611,7 +5580,7 @@ template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
 /// Less-than or equal operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerBinaryOpTypes`.
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * \endrststar
  *
  * @param op1 first argument.
@@ -5622,10 +5591,10 @@ template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 #if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerBinaryOpTypes<T, U>
+requires IntegerOpTypes<T, U>
 #endif
 #else
-template <typename T, typename U, integer_binary_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator<=(const T &op1, const U &op2)
 {

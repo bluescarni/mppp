@@ -11,36 +11,26 @@ The ``integer`` class
 Concepts
 --------
 
-.. cpp:concept:: template <typename T, typename U> mppp::IntegerBinaryOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::IntegerOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
-   :ref:`overloaded binary operators <integer_operators>` for :cpp:class:`~mppp::integer`. Specifically,
-   the concept will be ``true`` if either:
+   :ref:`operators <integer_operators>` and mathematical :ref:`functions <integer_functions>`
+   involving :cpp:class:`~mppp::integer`. Specifically, the concept will be ``true`` if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size ``SSize``, or
    * one type is :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::CppInteroperable` type.
 
-   Note that the :cpp:concept:`modulo <mppp::IntegerModType>` and :cpp:concept:`bit-shifting <mppp::IntegerShiftType>`
-   operators have additional restrictions.
+   Note that the modulo and bit-shifting operators have additional restrictions.
 
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerOpType
+.. cpp:concept:: template <typename T, typename U> mppp::IntegerIntegralOpTypes
 
-   This concept is satisfied if ``T`` is a type with which an :cpp:class:`~mppp::integer` with static size ``SSize``
-   can interact via its :ref:`overloaded operators <integer_operators>`. Specifically, this concept is satisfied by:
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   :ref:`operators <integer_operators>` and mathematical :ref:`functions <integer_functions>`
+   involving :cpp:class:`~mppp::integer` and C++ integral types. Specifically, the concept will be ``true``
+   if either:
 
-   * all :cpp:concept:`~mppp::CppInteroperable` types,
-   * :cpp:class:`~mppp::integer` with static size ``SSize``.
-
-   Note that the :cpp:concept:`modulo <mppp::IntegerModType>` and :cpp:concept:`bit-shifting <mppp::IntegerShiftType>`
-   operators have additional restrictions.
-
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerModType
-
-   This concept is satisfied if ``T`` is a type with which an :cpp:class:`~mppp::integer` with static size ``SSize``
-   can interact via its modulo operators. Specifically, this concept is satisfied by:
-
-   * all :cpp:concept:`~mppp::CppInteroperable` integral types,
-   * :cpp:class:`~mppp::integer` with static size ``SSize``.
+   * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size ``SSize``, or
+   * one type is :cpp:class:`~mppp::integer` and the other is an integral :cpp:concept:`~mppp::CppInteroperable` type.
 
 .. cpp:concept:: template <typename T> mppp::IntegerShiftType
 
@@ -74,6 +64,14 @@ Comparison
 ~~~~~~~~~~
 
 .. doxygengroup:: integer_comparison
+   :content-only:
+
+.. _integer_ntheory:
+
+Number theoretic functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. doxygengroup:: integer_ntheory
    :content-only:
 
 .. _integer_exponentiation:
