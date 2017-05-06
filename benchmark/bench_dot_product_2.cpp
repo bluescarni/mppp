@@ -90,7 +90,7 @@ int main()
         std::cout << "\n\nBenchmarking mp++.";
         simple_timer st1;
         double init_time;
-        auto p = get_init_vectors<integer>(init_time);
+        auto p = get_init_vectors<integer_t>(init_time);
         s += "['mp++','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
