@@ -1712,16 +1712,6 @@ public:
         }
         return mpz_odd_p(&m_int.g_dy());
     }
-    /// Test if integer is odd.
-    /**
-     * @param n the argument.
-     *
-     * @return \p true if \p n is odd, \p false otherwise.
-     */
-    friend bool odd_p(const integer &n)
-    {
-        return n.odd_p();
-    }
     /// Test if value is even.
     /**
      * @return \p true if \p this is even, \p false otherwise.
@@ -1729,102 +1719,6 @@ public:
     bool even_p() const
     {
         return !odd_p();
-    }
-    /// Test if integer is even.
-    /**
-     * @param n the argument.
-     *
-     * @return \p true if \p n is even, \p false otherwise.
-     */
-    friend bool even_p(const integer &n)
-    {
-        return n.even_p();
-    }
-
-private:
-    static void static_gcd(s_int &rop, const s_int &op1, const s_int &op2)
-    {
-        mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
-        if (asize1 < 0) {
-            asize1 = -asize1;
-        }
-        if (asize2 < 0) {
-            asize2 = -asize2;
-        }
-        // Handle zeroes.
-        if (!asize1) {
-            rop._mp_size = asize2;
-            rop.m_limbs = op2.m_limbs;
-            return;
-        }
-        if (!asize2) {
-            rop._mp_size = asize1;
-            rop.m_limbs = op1.m_limbs;
-            return;
-        }
-        // Special casing if an operand has asize 1.
-        if (asize1 == 1) {
-            rop._mp_size = 1;
-            rop.m_limbs[0] = ::mpn_gcd_1(op2.m_limbs.data(), static_cast<::mp_size_t>(asize2), op1.m_limbs[0]);
-            return;
-        }
-        if (asize2 == 1) {
-            rop._mp_size = 1;
-            rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
-            return;
-        }
-        // General case, via mpz.
-        // NOTE: there is an mpn_gcd() function, but it seems difficult to use. Apparently, and contrary to
-        // what stated in the latest documentation, the mpn function requires odd operands and bit size
-        // (not only limb size!) of the second operand not greater than the first. See for instance the old
-        // documentation:
-        // ftp://ftp.gnu.org/old-gnu/Manuals/gmp-3.1.1/html_chapter/gmp_9.html
-        // Indeed, compiling GMP in debug mode and then trying to use the mpn function without respecting the above
-        // results in assertion failures. For now let's keep it like this, the small operand cases are handled above
-        // (partially) via mpn_gcd_1(), and in the future we can also think about binary GCD for 1/2 limbs optimisation.
-        MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpz_gcd(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
-        // Copy over.
-        rop._mp_size = tmp.m_mpz._mp_size;
-        assert(rop._mp_size > 0);
-        copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + rop._mp_size, rop.m_limbs.data());
-    }
-
-public:
-    /// GCD (ternary version).
-    /**
-     * This function will set \p rop to the GCD of \p op1 and \p op2. The result is always positive.
-     * If both operands are zero, zero is returned.
-     *
-     * @param rop the return value.
-     * @param op1 the first operand.
-     * @param op2 the second operand.
-     */
-    friend void gcd(integer &rop, const integer &op1, const integer &op2)
-    {
-        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
-        if (mppp_likely(sr && s1 && s2)) {
-            static_gcd(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
-            rop.m_int.g_st().zero_unused_limbs();
-            return;
-        }
-        if (sr) {
-            rop.m_int.promote();
-        }
-        ::mpz_gcd(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
-    }
-    /// GCD (binary version).
-    /**
-     * @param op1 the first operand.
-     * @param op2 the second operand.
-     *
-     * @return the GCD of \p op1 and \p op2.
-     */
-    friend integer gcd(const integer &op1, const integer &op2)
-    {
-        integer retval;
-        gcd(retval, op1, op2);
-        return retval;
     }
     /// Return a reference to the internal union.
     /**
@@ -4065,11 +3959,127 @@ inline int sgn(const integer<SSize> &n)
     return n.sgn();
 }
 
+/// Test if integer is odd.
+/**
+ * @param n the argument.
+ *
+ * @return \p true if \p n is odd, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool odd_p(const integer<SSize> &n)
+{
+    return n.odd_p();
+}
+
+/// Test if integer is even.
+/**
+ * @param n the argument.
+ *
+ * @return \p true if \p n is even, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool even_p(const integer<SSize> &n)
+{
+    return n.even_p();
+}
+
 /** @} */
 
 /** @defgroup integer_ntheory integer_ntheory
  *  @{
  */
+
+inline namespace detail
+{
+
+template <std::size_t SSize>
+inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
+    if (asize1 < 0) {
+        asize1 = -asize1;
+    }
+    if (asize2 < 0) {
+        asize2 = -asize2;
+    }
+    // Handle zeroes.
+    if (!asize1) {
+        rop._mp_size = asize2;
+        rop.m_limbs = op2.m_limbs;
+        return;
+    }
+    if (!asize2) {
+        rop._mp_size = asize1;
+        rop.m_limbs = op1.m_limbs;
+        return;
+    }
+    // Special casing if an operand has asize 1.
+    if (asize1 == 1) {
+        rop._mp_size = 1;
+        rop.m_limbs[0] = ::mpn_gcd_1(op2.m_limbs.data(), static_cast<::mp_size_t>(asize2), op1.m_limbs[0]);
+        return;
+    }
+    if (asize2 == 1) {
+        rop._mp_size = 1;
+        rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
+        return;
+    }
+    // General case, via mpz.
+    // NOTE: there is an mpn_gcd() function, but it seems difficult to use. Apparently, and contrary to
+    // what stated in the latest documentation, the mpn function requires odd operands and bit size
+    // (not only limb size!) of the second operand not greater than the first. See for instance the old
+    // documentation:
+    // ftp://ftp.gnu.org/old-gnu/Manuals/gmp-3.1.1/html_chapter/gmp_9.html
+    // Indeed, compiling GMP in debug mode and then trying to use the mpn function without respecting the above
+    // results in assertion failures. For now let's keep it like this, the small operand cases are handled above
+    // (partially) via mpn_gcd_1(), and in the future we can also think about binary GCD for 1/2 limbs optimisation.
+    MPPP_MAYBE_TLS mpz_raii tmp;
+    ::mpz_gcd(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
+    // Copy over.
+    rop._mp_size = tmp.m_mpz._mp_size;
+    assert(rop._mp_size > 0);
+    copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + rop._mp_size, rop.m_limbs.data());
+}
+}
+
+/// GCD (ternary version).
+/**
+ * This function will set \p rop to the GCD of \p op1 and \p op2. The result is always positive.
+ * If both operands are zero, zero is returned.
+ *
+ * @param rop the return value.
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ */
+template <std::size_t SSize>
+inline void gcd(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+    if (mppp_likely(sr && s1 && s2)) {
+        static_gcd(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
+        rop._get_union().g_st().zero_unused_limbs();
+        return;
+    }
+    if (sr) {
+        rop._get_union().promote();
+    }
+    ::mpz_gcd(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+}
+
+/// GCD (binary version).
+/**
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ *
+ * @return the GCD of \p op1 and \p op2.
+ */
+template <std::size_t SSize>
+inline integer<SSize> gcd(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval;
+    gcd(retval, op1, op2);
+    return retval;
+}
 
 /// Factorial.
 /**
