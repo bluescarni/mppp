@@ -1770,16 +1770,6 @@ public:
     {
         return m_int.m_st._mp_size == 0;
     }
-    /// Test if an mppp::integer is zero.
-    /**
-     * @param n the mppp::integer to be tested.
-     *
-     * @return \p true if \p n is zero, \p false otherwise.
-     */
-    friend bool is_zero(const integer &n)
-    {
-        return n.is_zero();
-    }
 
 private:
     // Implementation of is_one()/is_negative_one().
@@ -1803,16 +1793,6 @@ public:
     {
         return is_one_impl<1>();
     }
-    /// Test if an mppp::integer is equal to one.
-    /**
-     * @param n the mppp::integer to be tested.
-     *
-     * @return \p true if \p n is equal to 1, \p false otherwise.
-     */
-    friend bool is_one(const integer &n)
-    {
-        return n.is_one();
-    }
     /// Test if the value is equal to minus one.
     /**
      * @return \p true if the value represented by \p this is -1, \p false otherwise.
@@ -1820,16 +1800,6 @@ public:
     bool is_negative_one() const
     {
         return is_one_impl<-1>();
-    }
-    /// Test if an mppp::integer is equal to minus one.
-    /**
-     * @param n the mppp::integer to be tested.
-     *
-     * @return \p true if \p n is equal to -1, \p false otherwise.
-     */
-    friend bool is_negative_one(const integer &n)
-    {
-        return n.is_negative_one();
     }
 
 private:
@@ -3983,6 +3953,42 @@ inline bool even_p(const integer<SSize> &n)
     return n.even_p();
 }
 
+/// Test if integer is zero.
+/**
+ * @param n the integer to be tested.
+ *
+ * @return \p true if \p n is zero, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool is_zero(const integer<SSize> &n)
+{
+    return n.is_zero();
+}
+
+/// Test if an integer is equal to one.
+/**
+ * @param n the integer to be tested.
+ *
+ * @return \p true if \p n is equal to 1, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool is_one(const integer<SSize> &n)
+{
+    return n.is_one();
+}
+
+/// Test if an integer is equal to minus one.
+/**
+ * @param n the integer to be tested.
+ *
+ * @return \p true if \p n is equal to -1, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool is_negative_one(const integer<SSize> &n)
+{
+    return n.is_negative_one();
+}
+
 /** @} */
 
 /** @defgroup integer_ntheory integer_ntheory
@@ -4253,7 +4259,7 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
  *
  * @return \f$ {{n}\choose{k}} \f$.
  *
- * @throws std::overflow_error if \p k is greater than an implementation-defined value.
+ * @throws std::overflow_error if \p k is outside an implementation-defined range.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
