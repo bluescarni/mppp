@@ -14,7 +14,7 @@ Concepts
 .. cpp:concept:: template <typename T, typename U> mppp::IntegerOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
-   :ref:`operators <integer_operators>` and mathematical :ref:`functions <integer_functions>`
+   generic :ref:`operators <integer_operators>` and :ref:`functions <integer_functions>`
    involving :cpp:class:`~mppp::integer`. Specifically, the concept will be ``true`` if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size ``SSize``, or
@@ -25,7 +25,7 @@ Concepts
 .. cpp:concept:: template <typename T, typename U> mppp::IntegerIntegralOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
-   :ref:`operators <integer_operators>` and mathematical :ref:`functions <integer_functions>`
+   generic :ref:`operators <integer_operators>` and :ref:`functions <integer_functions>`
    involving :cpp:class:`~mppp::integer` and C++ integral types. Specifically, the concept will be ``true``
    if either:
 
@@ -41,6 +41,9 @@ Concepts
 
 Functions
 ---------
+
+Much of the functionality of the :cpp:class:`~mppp::integer` class is exposed via plain functions. These functions
+mimic the GMP API where appropriate, but a variety of convenience/generic overloads is provided as well.
 
 .. _integer_arithmetic:
 
@@ -108,6 +111,9 @@ Other
 
 Operators
 ---------
+
+Overloaded operators are provided for convenience. Their interface is generic, and their implementation
+is typically built on top of basic :ref:`functions <integer_functions>`.
 
 .. doxygengroup:: integer_operators
    :content-only:

@@ -5578,7 +5578,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return dispatch_less_than(op1, op2);
 }
 
-/// Greater-than or equal operator.
+/// Less-than or equal operator.
 /**
  * \rststar
  * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
@@ -5587,7 +5587,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
  * @param op1 first argument.
  * @param op2 second argument.
  *
- * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
+ * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
@@ -5597,9 +5597,9 @@ requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 #endif
-    inline bool operator>=(const T &op1, const U &op2)
+    inline bool operator<=(const T &op1, const U &op2)
 {
-    return !(op1 < op2);
+    return !(op1 > op2);
 }
 
 /// Greater-than operator.
@@ -5626,7 +5626,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
     return dispatch_greater_than(op1, op2);
 }
 
-/// Less-than or equal operator.
+/// Greater-than or equal operator.
 /**
  * \rststar
  * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
@@ -5635,7 +5635,7 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
  * @param op1 first argument.
  * @param op2 second argument.
  *
- * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
+ * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
@@ -5645,9 +5645,9 @@ requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 #endif
-    inline bool operator<=(const T &op1, const U &op2)
+    inline bool operator>=(const T &op1, const U &op2)
 {
-    return !(op1 > op2);
+    return !(op1 < op2);
 }
 
 /** @} */
