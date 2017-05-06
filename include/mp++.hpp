@@ -1646,69 +1646,6 @@ public:
         }
         return *this;
     }
-    /// Binary absolute value.
-    /**
-     * This function will set \p rop to the absolute value of \p n.
-     *
-     * @param rop the return value.
-     * @param n the argument.
-     */
-    friend void abs(integer &rop, const integer &n)
-    {
-        rop = n;
-        rop.abs();
-    }
-    /// Unary absolute value.
-    /**
-     * @param n the argument.
-     *
-     * @return the absolute value of \p n.
-     */
-    friend integer abs(const integer &n)
-    {
-        integer ret(n);
-        ret.abs();
-        return ret;
-    }
-
-private:
-    static void nextprime_impl(integer &rop, const integer &n)
-    {
-        if (rop.is_static()) {
-            MPPP_MAYBE_TLS mpz_raii tmp;
-            ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
-            rop = integer(&tmp.m_mpz);
-        } else {
-            ::mpz_nextprime(&rop.m_int.g_dy(), n.get_mpz_view());
-        }
-    }
-
-public:
-    /// Compute next prime number (binary version).
-    /**
-     * This function will set \p rop to the first prime number greater than \p n.
-     * Note that for negative values of \p n this function always returns 2.
-     *
-     * @param rop the return value.
-     * @param n the integer argument.
-     */
-    friend void nextprime(integer &rop, const integer &n)
-    {
-        // NOTE: nextprime on negative numbers always returns 2.
-        nextprime_impl(rop, n);
-    }
-    /// Compute next prime number (unary version).
-    /**
-     * @param n the integer argument.
-     *
-     * @return the first prime number greater than \p n.
-     */
-    friend integer nextprime(const integer &n)
-    {
-        integer retval;
-        nextprime_impl(retval, n);
-        return retval;
-    }
     /// Compute next prime number (in-place version).
     /**
      * This method will set \p this to the first prime number greater than the current value.
@@ -1742,21 +1679,6 @@ public:
             throw std::invalid_argument("Cannot run primality tests on the negative number " + to_string());
         }
         return ::mpz_probab_prime_p(get_mpz_view(), reps);
-    }
-    /// Test primality.
-    /**
-     * This is the free-function version of integer::probab_prime_p().
-     *
-     * @param n the integer whose primality will be tested.
-     * @param reps the number of tests to run.
-     *
-     * @return an integer indicating if \p this is a prime.
-     *
-     * @throws unspecified any exception thrown by integer::probab_prime_p().
-     */
-    friend int probab_prime_p(const integer &n, int reps = 25)
-    {
-        return n.probab_prime_p(reps);
     }
 
 private:
@@ -3467,6 +3389,34 @@ inline integer<SSize> neg(const integer<SSize> &n)
     return ret;
 }
 
+/// Binary absolute value.
+/**
+ * This function will set \p rop to the absolute value of \p n.
+ *
+ * @param rop the return value.
+ * @param n the argument.
+ */
+template <std::size_t SSize>
+inline void abs(integer<SSize> &rop, const integer<SSize> &n)
+{
+    rop = n;
+    rop.abs();
+}
+
+/// Unary absolute value.
+/**
+ * @param n the argument.
+ *
+ * @return the absolute value of \p n.
+ */
+template <std::size_t SSize>
+inline integer<SSize> abs(const integer<SSize> &n)
+{
+    integer<SSize> ret(n);
+    ret.abs();
+    return ret;
+}
+
 /** @} */
 
 /** @defgroup integer_division integer_division
@@ -4369,6 +4319,70 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
     inline integer_common_t<T, U> binomial(const T &n, const U &k)
 {
     return binomial_impl(n, k);
+}
+
+inline namespace detail
+{
+
+template <std::size_t SSize>
+inline void nextprime_impl(integer<SSize> &rop, const integer<SSize> &n)
+{
+    if (rop.is_static()) {
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
+        rop = integer<SSize>(&tmp.m_mpz);
+    } else {
+        ::mpz_nextprime(&rop._get_union().g_dy(), n.get_mpz_view());
+    }
+}
+}
+
+/// Compute next prime number (binary version).
+/**
+ * This function will set \p rop to the first prime number greater than \p n.
+ * Note that for negative values of \p n this function always returns 2.
+ *
+ * @param rop the return value.
+ * @param n the integer argument.
+ */
+template <std::size_t SSize>
+inline void nextprime(integer<SSize> &rop, const integer<SSize> &n)
+{
+    // NOTE: nextprime on negative numbers always returns 2.
+    nextprime_impl(rop, n);
+}
+
+/// Compute next prime number (unary version).
+/**
+ * @param n the integer argument.
+ *
+ * @return the first prime number greater than \p n.
+ */
+template <std::size_t SSize>
+inline integer<SSize> nextprime(const integer<SSize> &n)
+{
+    integer<SSize> retval;
+    nextprime_impl(retval, n);
+    return retval;
+}
+
+/// Test primality.
+/**
+ * \rststar
+ * This is the free-function version of :cpp:func:`mppp::integer::probab_prime_p()`.
+ * \endrststar
+ *
+ * @param n the integer whose primality will be tested.
+ * @param reps the number of tests to run.
+ *
+ * @return an integer indicating if \p this is a prime.
+ *
+ * @throws unspecified any exception thrown by integer::probab_prime_p().
+ */
+template <std::size_t SSize>
+inline int probab_prime_p(const integer<SSize> &n, int reps = 25)
+{
+    return n.probab_prime_p(reps);
 }
 
 /** @} */
