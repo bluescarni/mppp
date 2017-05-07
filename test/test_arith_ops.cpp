@@ -131,13 +131,6 @@ struct add_tester {
                                                        + std::to_string(std::numeric_limits<double>::infinity());
                                      });
         }
-        // Type traits.
-        REQUIRE((!is_addable<integer, std::string>::value));
-        REQUIRE((!is_addable<std::string, integer>::value));
-        REQUIRE((!is_addable_inplace<integer, std::string>::value));
-        REQUIRE((!is_addable_inplace<const integer, int>::value));
-        REQUIRE((!is_addable_inplace<std::string, integer>::value));
-        REQUIRE((!is_addable_inplace<const int, integer>::value));
         // In-place with interop on the lhs.
         short nl = 1;
         nl += integer{1};
@@ -197,6 +190,13 @@ struct add_tester {
         retval++;
         ::mpz_add_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
         REQUIRE((lex_cast(retval) == lex_cast(tmp)));
+        // Type traits.
+        REQUIRE((!is_addable<integer, std::string>::value));
+        REQUIRE((!is_addable<std::string, integer>::value));
+        REQUIRE((!is_addable_inplace<integer, std::string>::value));
+        REQUIRE((!is_addable_inplace<const integer, int>::value));
+        REQUIRE((!is_addable_inplace<std::string, integer>::value));
+        REQUIRE((!is_addable_inplace<const int, integer>::value));
     }
 };
 
@@ -204,6 +204,18 @@ TEST_CASE("add")
 {
     tuple_for_each(sizes{}, add_tester{});
 }
+
+template <typename T, typename U>
+using sub_t = decltype(std::declval<const T &>() - std::declval<const U &>());
+
+template <typename T, typename U>
+using inplace_sub_t = decltype(std::declval<T &>() -= std::declval<const U &>());
+
+template <typename T, typename U>
+using is_subtractable = is_detected<sub_t, T, U>;
+
+template <typename T, typename U>
+using is_subtractable_inplace = is_detected<inplace_sub_t, T, U>;
 
 struct sub_tester {
     template <typename S>
@@ -334,6 +346,13 @@ struct sub_tester {
         retval--;
         ::mpz_sub_ui(&tmp.m_mpz, &tmp.m_mpz, 1);
         REQUIRE((lex_cast(retval) == lex_cast(tmp)));
+        // Type traits.
+        REQUIRE((!is_subtractable<integer, std::string>::value));
+        REQUIRE((!is_subtractable<std::string, integer>::value));
+        REQUIRE((!is_subtractable_inplace<integer, std::string>::value));
+        REQUIRE((!is_subtractable_inplace<const integer, int>::value));
+        REQUIRE((!is_subtractable_inplace<std::string, integer>::value));
+        REQUIRE((!is_subtractable_inplace<const int, integer>::value));
     }
 };
 
@@ -341,6 +360,18 @@ TEST_CASE("sub")
 {
     tuple_for_each(sizes{}, sub_tester{});
 }
+
+template <typename T, typename U>
+using mul_t = decltype(std::declval<const T &>() * std::declval<const U &>());
+
+template <typename T, typename U>
+using inplace_mul_t = decltype(std::declval<T &>() *= std::declval<const U &>());
+
+template <typename T, typename U>
+using is_multipliable = is_detected<mul_t, T, U>;
+
+template <typename T, typename U>
+using is_multipliable_inplace = is_detected<inplace_mul_t, T, U>;
 
 struct mul_tester {
     template <typename S>
@@ -429,6 +460,13 @@ struct mul_tester {
             dl *= integer{2};
             REQUIRE(dl == std::numeric_limits<double>::infinity());
         }
+        // Type traits.
+        REQUIRE((!is_multipliable<integer, std::string>::value));
+        REQUIRE((!is_multipliable<std::string, integer>::value));
+        REQUIRE((!is_multipliable_inplace<integer, std::string>::value));
+        REQUIRE((!is_multipliable_inplace<const integer, int>::value));
+        REQUIRE((!is_multipliable_inplace<std::string, integer>::value));
+        REQUIRE((!is_multipliable_inplace<const int, integer>::value));
     }
 };
 
@@ -436,6 +474,18 @@ TEST_CASE("mul")
 {
     tuple_for_each(sizes{}, mul_tester{});
 }
+
+template <typename T, typename U>
+using divvv_t = decltype(std::declval<const T &>() / std::declval<const U &>());
+
+template <typename T, typename U>
+using inplace_divvv_t = decltype(std::declval<T &>() /= std::declval<const U &>());
+
+template <typename T, typename U>
+using is_divisible = is_detected<divvv_t, T, U>;
+
+template <typename T, typename U>
+using is_divisible_inplace = is_detected<inplace_divvv_t, T, U>;
 
 struct div_tester {
     template <typename S>
@@ -545,6 +595,13 @@ struct div_tester {
                                                   : std::to_string(-std::numeric_limits<double>::infinity()));
             });
         }
+        // Type traits.
+        REQUIRE((!is_divisible<integer, std::string>::value));
+        REQUIRE((!is_divisible<std::string, integer>::value));
+        REQUIRE((!is_divisible_inplace<integer, std::string>::value));
+        REQUIRE((!is_divisible_inplace<const integer, int>::value));
+        REQUIRE((!is_divisible_inplace<std::string, integer>::value));
+        REQUIRE((!is_divisible_inplace<const int, integer>::value));
     }
 };
 
@@ -552,6 +609,30 @@ TEST_CASE("div")
 {
     tuple_for_each(sizes{}, div_tester{});
 }
+
+template <typename T, typename U>
+using lshift_t = decltype(std::declval<const T &>() << std::declval<const U &>());
+
+template <typename T, typename U>
+using inplace_lshift_t = decltype(std::declval<T &>() <<= std::declval<const U &>());
+
+template <typename T, typename U>
+using is_lshiftable = is_detected<lshift_t, T, U>;
+
+template <typename T, typename U>
+using is_lshiftable_inplace = is_detected<inplace_lshift_t, T, U>;
+
+template <typename T, typename U>
+using rshift_t = decltype(std::declval<const T &>() >> std::declval<const U &>());
+
+template <typename T, typename U>
+using inplace_rshift_t = decltype(std::declval<T &>() >>= std::declval<const U &>());
+
+template <typename T, typename U>
+using is_rshiftable = is_detected<rshift_t, T, U>;
+
+template <typename T, typename U>
+using is_rshiftable_inplace = is_detected<inplace_rshift_t, T, U>;
 
 struct shift_tester {
     template <typename S>
@@ -644,6 +725,31 @@ struct shift_tester {
                                   + ": the value is too large";
                 });
         }
+        // Type traits.
+        REQUIRE((!is_lshiftable<integer, double>::value));
+        REQUIRE((!is_lshiftable<integer, integer>::value));
+        REQUIRE((!is_lshiftable<integer, std::string>::value));
+        REQUIRE((!is_lshiftable<std::string, integer>::value));
+        REQUIRE((!is_lshiftable_inplace<integer, std::string>::value));
+        REQUIRE((!is_lshiftable_inplace<const integer, int>::value));
+        REQUIRE((!is_lshiftable_inplace<std::string, integer>::value));
+        REQUIRE((!is_lshiftable_inplace<const int, integer>::value));
+        REQUIRE((!is_lshiftable<int, integer>::value));
+        REQUIRE((!is_lshiftable_inplace<int, integer>::value));
+        REQUIRE((!is_lshiftable_inplace<integer, double>::value));
+        REQUIRE((!is_lshiftable_inplace<integer, integer>::value));
+        REQUIRE((!is_rshiftable<integer, double>::value));
+        REQUIRE((!is_rshiftable<integer, integer>::value));
+        REQUIRE((!is_rshiftable<integer, std::string>::value));
+        REQUIRE((!is_rshiftable<std::string, integer>::value));
+        REQUIRE((!is_rshiftable_inplace<integer, std::string>::value));
+        REQUIRE((!is_rshiftable_inplace<const integer, int>::value));
+        REQUIRE((!is_rshiftable_inplace<std::string, integer>::value));
+        REQUIRE((!is_rshiftable_inplace<const int, integer>::value));
+        REQUIRE((!is_rshiftable<int, integer>::value));
+        REQUIRE((!is_rshiftable_inplace<int, integer>::value));
+        REQUIRE((!is_rshiftable_inplace<integer, double>::value));
+        REQUIRE((!is_rshiftable_inplace<integer, integer>::value));
     }
 };
 
@@ -651,6 +757,18 @@ TEST_CASE("shift")
 {
     tuple_for_each(sizes{}, shift_tester{});
 }
+
+template <typename T, typename U>
+using mod_t = decltype(std::declval<const T &>() << std::declval<const U &>());
+
+template <typename T, typename U>
+using inplace_mod_t = decltype(std::declval<T &>() <<= std::declval<const U &>());
+
+template <typename T, typename U>
+using is_modable = is_detected<mod_t, T, U>;
+
+template <typename T, typename U>
+using is_modable_inplace = is_detected<inplace_mod_t, T, U>;
 
 struct mod_tester {
     template <typename S>
@@ -693,6 +811,13 @@ struct mod_tester {
         retval = -19;
         retval %= (unsigned long long)(7);
         REQUIRE((lex_cast(retval) == "-5"));
+        // CppInteroperable on the left.
+        int n = 3;
+        n %= integer{2};
+        REQUIRE(n == 1);
+        n = -3;
+        n %= integer{2};
+        REQUIRE(n == -1);
         // Error checking.
         REQUIRE_THROWS_PREDICATE(integer{1} % integer{0}, zero_division_error, [](const zero_division_error &ex) {
             return std::string(ex.what()) == "Integer division by zero";
@@ -709,6 +834,15 @@ struct mod_tester {
         REQUIRE_THROWS_PREDICATE(retval %= 0, zero_division_error, [](const zero_division_error &ex) {
             return std::string(ex.what()) == "Integer division by zero";
         });
+        REQUIRE((!is_modable<integer, std::string>::value));
+        REQUIRE((!is_modable<integer, double>::value));
+        REQUIRE((!is_modable<std::string, integer>::value));
+        REQUIRE((!is_modable_inplace<integer, std::string>::value));
+        REQUIRE((!is_modable_inplace<const integer, int>::value));
+        REQUIRE((!is_modable_inplace<std::string, integer>::value));
+        REQUIRE((!is_modable_inplace<const int, integer>::value));
+        REQUIRE((!is_modable<int, integer>::value));
+        REQUIRE((!is_modable_inplace<int, integer>::value));
     }
 };
 
