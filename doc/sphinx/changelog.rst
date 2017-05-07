@@ -7,6 +7,11 @@ Changelog
 New
 ~~~
 
+- Implement the missing in-place modulo operator with C++ integrals
+  on the left. [Francesco Biscani]
+
+- Experimental support for C++ concepts. [Francesco Biscani]
+
 - Support the ``clang-cl`` compiler on Windows. [Francesco Biscani]
 
 - Add input stream operator. [Francesco Biscani]
@@ -22,11 +27,18 @@ New
 - Add functions to test if an integer is equal to -1. [Francesco
   Biscani]
 
-- Add a static member to ``mp_integer`` storing the static size. [Francesco
+- Add a static member to ``integer`` storing the static size. [Francesco
   Biscani]
 
 Changes
 ~~~~~~~
+
+- Rename the ``mp_integer`` class to ``integer``. [Francesco Biscani]
+
+- Various improvements to the documentation. [Francesco Biscani]
+
+- Rework the library interface to use regular functions rather than
+  ``inline friend`` functions. [Francesco Biscani]
 
 - Change the license to MPL2. [Francesco Biscani]
 

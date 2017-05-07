@@ -59,7 +59,7 @@ using mpz_int = boost::multiprecision::mpz_int;
 using fmpzxx = flint::fmpzxx;
 #endif
 
-using integer = mp_integer<3>;
+using integer_t = integer<3>;
 static const std::string name = "bench_vec_mul_3";
 
 constexpr auto size = 30000000ul;
@@ -90,11 +90,11 @@ int main()
         std::cout << "\n\nBenchmarking mp++.";
         simple_timer st1;
         double init_time;
-        auto p = get_init_vectors<integer>(init_time);
+        auto p = get_init_vectors<integer_t>(init_time);
         s += "['mp++','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            integer ret(0);
+            integer_t ret(0);
             for (auto i = 0ul; i < size; ++i) {
                 mul(std::get<2>(p)[i], std::get<0>(p)[i], std::get<1>(p)[i]);
             }

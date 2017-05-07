@@ -44,7 +44,6 @@ see https://www.gnu.org/licenses/. */
 static int ntries = 1000;
 
 using namespace mppp;
-using namespace mppp::mppp_impl;
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -57,7 +56,7 @@ struct bin_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // Start with all zeroes.
         mpz_raii m1, m2;
         integer n1, n2;
@@ -103,7 +102,7 @@ struct binomial_tester {
     template <typename T>
     void operator()(const T &) const
     {
-        using int_type = mp_integer<T::value>;
+        using int_type = integer<T::value>;
         int_type n;
         REQUIRE(binomial(n, 0) == 1);
         REQUIRE(binomial(n, 1) == 0);

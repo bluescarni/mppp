@@ -43,7 +43,6 @@ see https://www.gnu.org/licenses/. */
 static int ntries = 1000;
 
 using namespace mppp;
-using namespace mppp::mppp_impl;
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -54,7 +53,7 @@ struct probab_prime_p_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         mpz_raii m1;
         integer n1;
         REQUIRE((probab_prime_p(n1) == ::mpz_probab_prime_p(&m1.m_mpz, 25)));

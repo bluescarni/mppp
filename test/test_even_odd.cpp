@@ -42,7 +42,6 @@ see https://www.gnu.org/licenses/. */
 static int ntries = 1000;
 
 using namespace mppp;
-using namespace mppp::mppp_impl;
 using namespace mppp_test;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
@@ -55,7 +54,7 @@ struct even_odd_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         // Start with all zeroes.
         mpz_raii m1;
         integer n1;

@@ -48,7 +48,7 @@
 #endif
 
 // Compiler configuration.
-// NOTE: check for MSVC first, as clang-cl does defined both __clang__ and _MSC_VER,
+// NOTE: check for MSVC first, as clang-cl does define both __clang__ and _MSC_VER,
 // and we want to configure it as MSVC.
 #if defined(_MSC_VER)
 
@@ -113,11 +113,18 @@
 
 #endif
 
+// Concepts setup.
+#if defined(__cpp_concepts)
+
+#define MPPP_HAVE_CONCEPTS
+
+#endif
+
 /// The root mp++ namespace.
 namespace mppp
 {
 
-namespace mppp_impl
+inline namespace detail
 {
 
 // A bunch of useful utilities from C++14/C++17.
@@ -188,6 +195,14 @@ struct disjunction<B1, Bn...> : std::conditional<B1::value != false, B1, disjunc
 template <class B>
 struct negation : std::integral_constant<bool, !B::value> {
 };
+
+// Some handy aliases.
+template <typename T>
+using uncvref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+
+// Just a small helper, like C++14.
+template <bool B, typename T = void>
+using enable_if_t = typename std::enable_if<B, T>::type;
 
 // mpz_t is an array of some struct.
 using mpz_struct_t = std::remove_extent<::mpz_t>::type;
@@ -338,7 +353,7 @@ using is_supported_float = std::integral_constant<bool, disjunction<std::is_same
                                                                     >::value>;
 
 template <typename T>
-using is_supported_interop
+using is_cpp_interoperable
     = std::integral_constant<bool, disjunction<is_supported_integral<T>, is_supported_float<T>>::value>;
 
 // Small wrapper to copy limbs.
@@ -370,9 +385,6 @@ inline ::mp_limb_t limb_add_overflow(::mp_limb_t a, ::mp_limb_t b, ::mp_limb_t *
 // The static integer class.
 template <std::size_t SSize>
 struct static_int {
-    // Just a small helper, like C++14.
-    template <bool B, typename T = void>
-    using enable_if_t = typename std::enable_if<B, T>::type;
     // Let's put a hard cap and sanity check on the static size.
     static_assert(SSize > 0u && SSize <= 64u, "Invalid static size.");
     using limbs_type = std::array<::mp_limb_t, SSize>;
@@ -674,12 +686,30 @@ public:
     s_storage m_st;
     d_storage m_dy;
 };
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool CppInteroperable = is_cpp_interoperable<T>::value;
+#else
+using cpp_interoperable_enabler = enable_if_t<is_cpp_interoperable<T>::value, int>;
+#endif
 }
+
+// Useful fwd declarations.
+template <std::size_t>
+class integer;
+
+template <std::size_t SSize>
+void sqrt(integer<SSize> &, const integer<SSize> &);
 
 /// Exception to signal division by zero.
 /**
- * This exception inherits all members (including constructors) from \p std::domain_error. It will be thrown
- * when a division by zero involving an mp_integer is attempted.
+ * \rststar
+ * This exception inherits all members (including constructors) from
+ * `std::domain_error <http://en.cppreference.com/w/cpp/error/domain_error>`_. It will be thrown
+ * when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
+ * represent infinities.
+ * \endrststar
  */
 struct zero_division_error final : std::domain_error {
     using std::domain_error::domain_error;
@@ -703,203 +733,160 @@ struct zero_division_error final : std::domain_error {
 //   is what we are doing now).
 /// Multiprecision integer class.
 /**
- * This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP \p mpz_t type, with
- * a small value optimisation: integers whose size is up to \p SSize limbs are stored directly in the storage
- * occupied by the mp_integer object, without resorting to dynamic memory allocation. The value of \p SSize
- * must be at least 1 and less than an implementation-defined upper limit.
+ * \rststar
+ * This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
+ * a small value optimisation: integers whose size is up to ``SSize`` limbs are stored directly in the storage
+ * occupied by the :cpp:class:`~mppp::integer` object, without resorting to dynamic memory allocation. The value of
+ * ``SSize`` must be at least 1 and less than an implementation-defined upper limit.
  *
- * When the value of an mp_integer is stored directly within the object, the <em>storage type</em> of the integer is
- * said to be <em>static</em>. When the limb size of the integer exceeds the maximum value \p SSize, the storage types
- * becomes <em>dynamic</em>. The transition from static to dynamic storage happens transparently whenever the integer
+ * When the value of an :cpp:class:`~mppp::integer` is stored directly within the object, the *storage type* of the
+ * integer is said to be *static*. When the limb size of the integer exceeds the maximum value ``SSize``, the storage
+ * type becomes *dynamic*. The transition from static to dynamic storage happens transparently whenever the integer
  * value becomes large enough. The demotion from dynamic to static storage usually needs to be requested explicitly.
- * For values of \p SSize of 1 and 2, optimised implementations of basic arithmetic operations are employed,
- * if supported by the target architecture and if the storage type is static. For larger values of \p SSize,
- * the \p mpn_ low-level functions of the GMP API are used if the storage type is static. If the storage type is
- * dynamic, the usual \p mpz_ functions from the GMP API are used.
+ * For values of ``SSize`` of 1 and 2, optimised implementations of basic arithmetic operations are employed,
+ * if supported by the target architecture and if the storage type is static. For larger values of ``SSize``,
+ * the ``mpn_`` low-level functions of the GMP API are used if the storage type is static. If the storage type is
+ * dynamic, the usual ``mpz_`` functions from the GMP API are used.
  *
- * # Interoperable types #
  * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
- * floating-point
- * primitive types, and it provides overloaded arithmetic operators. Differently from the builtin types, however, this
- * class does not allow any implicit conversion to/from other types (apart from \p bool): construction from and
- * conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
- * \verbatim embed:rst:leading-asterisk
+ * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list),
+ * and it provides overloaded :ref:`operators <integer_operators>`. Differently from the builtin types,
+ * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
+ * from and  conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
+ *
  * .. code-block:: c++
  *
- *    mp_integer<1> n = 5;
+ *    integer<1> n = 5;
  *    int m = n;
- * \endverbatim
+ *
  * will not work, and direct initialization and explicit casting should be used instead:
- * \verbatim embed:rst:leading-asterisk
+ *
  * .. code-block:: c++
  *
- *    mp_integer<1> n{5};
+ *    integer<1> n{5};
  *    int m = static_cast<int>(n);
- * \endverbatim
- * The full list of interoperable builtin types is:
- * - \p bool,
- * - \p char, <tt>signed char</tt> and <tt>unsigned char</tt>,
- * - \p short and <tt>unsigned short</tt>,
- * - \p int and \p unsigned,
- * - \p long and <tt>unsigned long</tt>,
- * - <tt>long long</tt> and <tt>unsigned long long</tt>,
- * - \p float, \p double and <tt>long double</tt> (<tt>long double</tt> requires the MPFR library).
  *
- * # API #
- * Most of the functionality of this class is exposed via inline friend functions, with the general convention
- * that the functions are named after the corresponding GMP functions minus the leading \p mpz_ prefix. For instance,
- * the GMP call
- * \verbatim embed:rst:leading-asterisk
+ * Most of the functionality is exposed via plain :ref:`functions <integer_functions>`, with the
+ * general convention that the functions are named after the corresponding GMP functions minus the leading ``mpz_``
+ * prefix. For instance, the GMP call
+ *
  * .. code-block:: c++
  *
  *    mpz_add(rop,a,b);
- * \endverbatim
- * that writes the result of <tt>a + b</tt> into \p rop becomes simply
- * \verbatim embed:rst:leading-asterisk
+ *
+ * that writes the result of ``a + b`` into ``rop`` becomes simply
+ *
  * .. code-block:: c++
  *
  *    add(rop,a,b);
- * \endverbatim
- * where the add() function is resolved via argument-dependent lookup. Function calls with overlapping arguments
+ *
+ * where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
  * are allowed, unless noted otherwise.
  *
  * Multiple overloads of the same functionality are often available.
  * Binary functions in GMP are usually implemented via three-arguments functions, in which the first
- * argument is a reference to the return value. The exponentiation function \p mpz_pow_ui(), for instance,
+ * argument is a reference to the return value. The exponentiation function ``mpz_pow_ui()``, for instance,
  * takes three arguments: the return value, the base and the exponent. There are two overloads of the corresponding
- * pow_ui() function:
- * - a ternary overload semantically equivalent to \p mpz_pow_ui(),
- * - a binary overload taking as inputs the base and the exponent, and returning the result
+ * :ref:`exponentiation <integer_exponentiation>` function:
+ *
+ * * a ternary overload semantically equivalent to ``mpz_pow_ui()``,
+ * * a binary overload taking as inputs the base and the exponent, and returning the result
  *   of the exponentiation.
  *
- * This allows to avoid having to set up a return value for one-off invocations of pow_ui() (the binary overload will
- * do it for you). For example:
- * \verbatim embed:rst:leading-asterisk
+ * This allows to avoid having to set up a return value for one-off invocations of ``pow_ui()`` (the binary overload
+ * will do it for you). For example:
+ *
  * .. code-block:: c++
  *
- *    mp_integer<1> r1, r2, n{3};
+ *    integer<1> r1, r2, n{3};
  *    pow_ui(r1,n,2);   // Ternary pow_ui(): computes n**2 and stores
  *                      // the result in r1.
  *    r2 = pow_ui(n,2); // Binary pow_ui(): returns n**2, which is then
  *                      // assigned to r2.
- * \endverbatim
  *
  * In case of unary functions, there are often three overloads available:
- * - a binary overload taking as first parameter a reference to the return value (GMP style),
- * - a unary overload returning the result of the operation,
- * - a nullary member function that modifies the calling object in-place.
+ *
+ * * a binary overload taking as first parameter a reference to the return value (GMP style),
+ * * a unary overload returning the result of the operation,
+ * * a nullary member function that modifies the calling object in-place.
  *
  * For instance, here are three possible ways of computing the absolute value:
- * \verbatim embed:rst:leading-asterisk
+ *
  * .. code-block:: c++
  *
- *    mp_integer<1> r1, r2, n{-5};
+ *    integer<1> r1, r2, n{-5};
  *    abs(r1,n);   // Binary abs(): computes and stores the absolute value
  *                 // of n into r1.
  *    r2 = abs(n); // Unary abs(): returns the absolute value of n, which is
  *                 // then assigned to r2.
  *    n.abs();     // Member function abs(): replaces the value of n with its
  *                 // absolute value.
- * \endverbatim
- * Note that at this time only a small subset of the GMP API has been wrapped by mp_integer.
  *
- * # Overloaded operators #
+ * Note that at this time only a small subset of the GMP API has been wrapped by :cpp:class:`~mppp::integer`.
  *
- * This class provides overloaded operators for the basic arithmetic operations, including bit shifting.
- * The binary operators are implemented as inline friend functions, the in-place operators are implemented as
- * member functions. The overloaded operators are resolved via argument-dependent lookup whenever at least
- * one argument is of type mp_integer, and the other argument is either another mp_integer or an instance
- * of an interoperable type.
- *
- * For the common arithmetic operations (\p +, \p -, \p * and \p /), the type promotion
+ * Various :ref:`overloaded operators <integer_operators>` are provided. The operators are resolved via
+ * argument-dependent lookup whenever at least one argument is of type :cpp:class:`~mppp::integer`.
+ * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
  * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
- * is a C++ integral, the result will be of type mp_integer, if the other argument is a C++ floating-point the result
- * will be of the same floating-point type. For example:
- * \verbatim embed:rst:leading-asterisk
+ * is a C++ integral, the result will be of type :cpp:class:`~mppp::integer`, if the other argument is a C++
+ * floating-point the result will be of the same floating-point type. For example:
+ *
  * .. code-block:: c++
  *
- *    mp_integer<1> n1{1}, n2{2};
- *    auto res1 = n1 + n2; // res1 is an mp_integer
- *    auto res2 = n1 * 2; // res2 is an mp_integer
- *    auto res3 = 2 - n2; // res3 is an mp_integer
+ *    integer<1> n1{1}, n2{2};
+ *    auto res1 = n1 + n2; // res1 is an integer
+ *    auto res2 = n1 * 2; // res2 is an integer
+ *    auto res3 = 2 - n2; // res3 is an integer
  *    auto res4 = n1 / 2.f; // res4 is a float
  *    auto res5 = 12. / n1; // res5 is a double
- * \endverbatim
  *
- * The modulo operator \p % accepts only mp_integer and interoperable integral types as arguments, and it always returns
- * mp_integer as result. The bit shifting operators \p << and \p >> accept only interoperable integral types as
- * shift arguments, and they always return mp_integer as result.
+ * The modulo operator ``%`` accepts only :cpp:class:`~mppp::integer` and :cpp:concept:`~mppp::CppInteroperable`
+ * integral types as arguments,
+ * and it always returns :cpp:class:`~mppp::integer` as result. The bit shifting operators ``<<`` and ``>>`` accept
+ * only :cpp:concept:`~mppp::CppInteroperable` integral types as shift arguments, and they always return
+ * :cpp:class:`~mppp::integer` as result.
  *
- * The relational operators, \p ==, \p !=, \p <, \p >, \p <= and \p >= will promote the arguments to a common type
- * before
- * comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
- * promoted to mp_integer if they are both integral types, otherwise they are promoted to the type of the floating-point
- * argument).
+ * The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote the arguments to a common type
+ * before comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
+ * promoted to :cpp:class:`~mppp::integer` if they are both integral types, otherwise they are promoted to the type
+ * of the floating-point argument).
  *
- * # Interfacing with GMP #
+ * Several facilities for interfacing with the GMP library are provided. Specifically, :cpp:class:`~mppp::integer`
+ * features:
  *
- * This class provides facilities to interface with the GMP library. Specifically, mp_integer features:
- * - a constructor from the GMP integer type \p mpz_t,
- * - an mp_integer::get_mpz_t() method that promotes \p this to dynamic storage and returns a pointer to the internal
- *   \p mpz_t instance,
- * - an \p mpz_view class, an instance of which can be requested via the mp_integer::get_mpz_view() method,
- *   which allows to use mp_integer in the GMP API as a drop-in replacement for <tt>const mpz_t</tt> function
- *   arguments.
+ * * a constructor from the GMP integer type ``mpz_t``,
+ * * a :cpp:func:`~mppp::integer::get_mpz_t()` method that promotes ``this`` to dynamic
+ *   storage and returns a pointer to the internal ``mpz_t`` instance,
+ * * an ``mpz_view`` class, an instance of which can be requested via the :cpp:func:`~mppp::integer::get_mpz_view()`
+ *   method, which allows to use :cpp:class:`~mppp::integer` in the GMP API as a drop-in replacement for
+ *   ``const mpz_t`` function arguments.
  *
- * The \p mpz_view class represent a read-only view of an mp_integer object which is implicitly convertible to the type
- * <tt>const mpz_t</tt> and which is thus usable as an argument to GMP functions. For example:
- * \verbatim embed:rst:leading-asterisk
+ * The ``mpz_view`` class represent a read-only view of an integer object which is implicitly convertible to the type
+ * ``const mpz_t`` and which is thus usable as an argument to GMP functions. For example:
+ *
  * .. code-block:: c++
  *
  *    mpz_t m;
  *    mpz_init_set_si(m,1); // Create an mpz_t with the value 1.
- *    mp_integer<1> n{1}; // Initialize an mp_integer with the value 1.
+ *    integer<1> n{1}; // Initialize an integer with the value 1.
  *    mpz_add(m,m,n.get_mpz_view()); // Compute the result of n + m and store
  *                                   // it in m using the GMP API.
- * \endverbatim
- * See the documentation of mp_integer::get_mpz_view() for more details about the \p mpz_view class.
  *
- * # Hashing #
- *
- * This class provides a hash() function to compute a hash value for an integer. A specialisation
- * of the standard \p std::hash functor is also provided, so that it is possible to use mp_integer in standard
- * unordered associative containers out of the box.
+ * See the documentation of :cpp:func:`~mppp::integer::get_mpz_view()` for more details about the ``mpz_view`` class.
+ * \endrststar
  */
 template <std::size_t SSize>
-class mp_integer
+class integer
 {
-    // Just a small helper, like C++14.
-    template <bool B, typename T = void>
-    using enable_if_t = typename std::enable_if<B, T>::type;
-    // Import these typedefs for ease of use.
-    using s_storage = mppp_impl::static_int<SSize>;
-    using d_storage = mppp_impl::mpz_struct_t;
-    using mpz_size_t = mppp_impl::mpz_size_t;
-    using mpz_raii = mppp_impl::mpz_raii;
-    using mpz_struct_t = mppp_impl::mpz_struct_t;
-#if defined(MPPP_WITH_LONG_DOUBLE)
-    using mpfr_raii = mppp_impl::mpfr_raii;
-#endif
-    template <typename T>
-    using is_supported_integral = mppp_impl::is_supported_integral<T>;
-    template <typename T>
-    using is_supported_float = mppp_impl::is_supported_float<T>;
-    template <typename T>
-    using is_supported_interop = mppp_impl::is_supported_interop<T>;
-    template <template <class...> class Op, class... Args>
-    using is_detected = mppp_impl::is_detected<Op, Args...>;
-    template <typename... Args>
-    using conjunction = mppp_impl::conjunction<Args...>;
-    template <typename... Args>
-    using disjunction = mppp_impl::disjunction<Args...>;
-    template <typename T>
-    using negation = mppp_impl::negation<T>;
+    // Typedefs for ease of use.
+    using s_storage = static_int<SSize>;
+    using d_storage = mpz_struct_t;
     // The underlying static int.
     using s_int = s_storage;
     // mpz view class.
     struct mpz_view {
         using static_mpz_view = typename s_int::static_mpz_view;
-        explicit mpz_view(const mp_integer &n)
+        explicit mpz_view(const integer &n)
             : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : static_mpz_view{}),
               m_ptr(n.is_static() ? m_static_view : &(n.m_int.g_dy()))
         {
@@ -926,71 +913,6 @@ class mp_integer
         static_mpz_view m_static_view;
         const mpz_struct_t *m_ptr;
     };
-    // Machinery for the determination of the result of a binary operation.
-    // NOTE: this metaprogramming could be done more cleanly using expr. SFINAE
-    // on the internal dispatching functions, but this generates an error in MSVC about
-    // the operator being defined twice. My impression is that this is an MSVC problem at the
-    // intersection between SFINAE and friend function templates (GCC and clang work fine).
-    // We adopt this construction as a workaround.
-    template <typename, typename, typename = void>
-    struct common_type {
-    };
-    template <typename T>
-    struct common_type<T, T, enable_if_t<std::is_same<T, mp_integer>::value>> {
-        using type = mp_integer;
-    };
-    template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<conjunction<std::is_same<T, mp_integer>, is_supported_integral<U>>::value>> {
-        using type = mp_integer;
-    };
-    template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<conjunction<std::is_same<U, mp_integer>, is_supported_integral<T>>::value>> {
-        using type = mp_integer;
-    };
-    template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<conjunction<std::is_same<T, mp_integer>, is_supported_float<U>>::value>> {
-        using type = U;
-    };
-    template <typename T, typename U>
-    struct common_type<T, U, enable_if_t<conjunction<std::is_same<U, mp_integer>, is_supported_float<T>>::value>> {
-        using type = T;
-    };
-    template <typename T, typename U>
-    using common_t = typename common_type<T, U>::type;
-    // Enabler for in-place arithmetic ops.
-    template <typename T>
-    using in_place_enabler = enable_if_t<disjunction<is_supported_interop<T>, std::is_same<T, mp_integer>>::value, int>;
-#if defined(_MSC_VER)
-    // Common metaprogramming for bit shifting operators.
-    // NOTE: here and elsewhere we special case MSVC because we need to alter the SFINAE style, as the usual
-    // approach (i.e., default template int argument) results in ICEs in MSVC. Instead, on MSCV we use SFINAE
-    // on the return type.
-    template <typename T>
-    using shift_op_enabler = enable_if_t<is_supported_integral<T>::value, mp_integer>;
-#else
-    template <typename T>
-    using shift_op_enabler = enable_if_t<is_supported_integral<T>::value, int>;
-#endif
-    template <typename T, enable_if_t<std::is_unsigned<T>::value, int> = 0>
-    static ::mp_bitcnt_t cast_to_bitcnt(T n)
-    {
-        if (mppp_unlikely(n > std::numeric_limits<::mp_bitcnt_t>::max())) {
-            throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
-        }
-        return static_cast<::mp_bitcnt_t>(n);
-    }
-    template <typename T, enable_if_t<std::is_signed<T>::value, int> = 0>
-    static ::mp_bitcnt_t cast_to_bitcnt(T n)
-    {
-        if (mppp_unlikely(n < T(0))) {
-            throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": negative values are not supported");
-        }
-        if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(n)
-                          > std::numeric_limits<::mp_bitcnt_t>::max())) {
-            throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
-        }
-        return static_cast<::mp_bitcnt_t>(n);
-    }
 
 public:
     /// Alias for the template parameter \p SSize.
@@ -999,14 +921,14 @@ public:
     /**
      * The default constructor initialises an integer with static storage type and value 0.
      */
-    mp_integer() = default;
+    integer() = default;
     /// Copy constructor.
     /**
      * The copy constructor deep-copies \p other into \p this, preserving the original storage type.
      *
      * @param other the object that will be copied into \p this.
      */
-    mp_integer(const mp_integer &other) = default;
+    integer(const integer &other) = default;
     /// Move constructor.
     /**
      * The move constructor will leave \p other in an unspecified but valid state. The storage type
@@ -1014,15 +936,9 @@ public:
      *
      * @param other the object that will be moved into \p this.
      */
-    mp_integer(mp_integer &&other) = default;
+    integer(integer &&other) = default;
 
 private:
-    // Enabler for generic ctor.
-    template <typename T>
-    using generic_ctor_enabler = enable_if_t<is_supported_interop<T>::value, int>;
-    // Enabler for generic assignment.
-    template <typename T>
-    using generic_assignment_enabler = generic_ctor_enabler<T>;
     // Add a limb at the top of the integer (that is, the new limb will be the new most
     // significant limb). Requires a non-negative integer. This is used only during generic construction,
     // do **NOT** use it anywhere else.
@@ -1085,7 +1001,7 @@ private:
     }
     // Dispatch for generic constructor.
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
-    void dispatch_generic_ctor(T n)
+    void dispatch_generic_ctor(const T &n)
     {
         auto nu = static_cast<unsigned long long>(n);
         while (nu) {
@@ -1097,7 +1013,7 @@ private:
         }
     }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
-    void dispatch_generic_ctor(T n)
+    void dispatch_generic_ctor(const T &n)
     {
         // NOTE: here we are using cast + unary minus to extract the abs value of n as an unsigned long long. See:
         // http://stackoverflow.com/questions/4536095/unary-minus-and-signed-to-unsigned-conversion
@@ -1120,7 +1036,7 @@ private:
         }
     }
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
-    void dispatch_generic_ctor(T x)
+    void dispatch_generic_ctor(const T &x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot init integer from the non-finite floating-point value "
@@ -1132,7 +1048,7 @@ private:
     }
 #if defined(MPPP_WITH_LONG_DOUBLE)
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
-    void dispatch_generic_ctor(T x)
+    void dispatch_generic_ctor(const T &x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot init integer from the non-finite floating-point value "
@@ -1158,36 +1074,35 @@ private:
             m_int.g_st().~s_storage();
             // Init dynamic.
             ::new (static_cast<void *>(&m_int.m_dy)) d_storage;
-            mppp_impl::mpz_init_set_nlimbs(m_int.m_dy, *n);
+            mpz_init_set_nlimbs(m_int.m_dy, *n);
         } else {
             // All this is noexcept.
             // NOTE: m_st() inits to zero the whole array of static limbs, and we copy
             // in only the used limbs.
             m_int.g_st()._mp_size = n->_mp_size;
-            mppp_impl::copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
         }
     }
 
 public:
-    /// Generic constructor.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This constructor is enabled only if ``T`` is one of the interoperable types.
-     * \endverbatim
-     *
-     * This constructor will initialize an integer with the value of \p x. The initialization is always
-     * successful if \p T is an integral type (construction from \p bool yields 1 for \p true, 0 for \p false).
-     * If \p T is a floating-point type, the construction will fail if \p x is not finite. Construction from a
-     * floating-point type yields the truncated counterpart of the input value.
-     *
-     * @param x value that will be used to initialize \p this.
-     *
-     * @throws std::domain_error if \p x is a non-finite floating-point value.
-     */
-    template <typename T, generic_ctor_enabler<T> = 0>
-    explicit mp_integer(T x) : m_int()
+/// Generic constructor.
+/**
+ * This constructor will initialize an integer with the value of \p x. The initialization is always
+ * successful if \p x is an integral value (construction from \p bool yields 1 for \p true, 0 for \p false).
+ * If \p x is a floating-point value, the construction will fail if \p x is not finite. Construction from a
+ * floating-point type yields the truncated counterpart of the input value.
+ *
+ * @param x value that will be used to initialize \p this.
+ *
+ * @throws std::domain_error if \p x is a non-finite floating-point value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit integer(const CppInteroperable &x)
+#else
+    template <typename T, cpp_interoperable_enabler<T> = 0>
+    explicit integer(const T &x)
+#endif
+        : m_int()
     {
         dispatch_generic_ctor(x);
     }
@@ -1204,13 +1119,13 @@ public:
      * @throws std::invalid_argument if the \p base parameter is invalid or if \p s is not a valid string representation
      * of an integer in the specified base.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. seealso::
      *
      *    https://gmplib.org/manual/Assigning-Integers.html
-     * \endverbatim
+     * \endrststar
      */
-    explicit mp_integer(const char *s, int base = 10) : m_int()
+    explicit integer(const char *s, int base = 10) : m_int()
     {
         if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
             throw std::invalid_argument(
@@ -1236,7 +1151,7 @@ public:
      *
      * @throws unspecified any exception thrown by the constructor from C string.
      */
-    explicit mp_integer(const std::string &s, int base = 10) : mp_integer(s.c_str(), base)
+    explicit integer(const std::string &s, int base = 10) : integer(s.c_str(), base)
     {
     }
     /// Constructor from \p mpz_t.
@@ -1244,16 +1159,16 @@ public:
      * This constructor will initialize \p this with the value of the GMP integer \p n. The storage type of \p this
      * will be static if \p n fits in the static storage, otherwise it will be dynamic.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. warning::
      *
-     *    It is up to the user to ensure that ``n`` has been correctly initialized. Calling this constructor
+     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
      *    with an uninitialized ``n`` is undefined behaviour.
-     * \endverbatim
+     * \endrststar
      *
      * @param n the input GMP integer.
      */
-    explicit mp_integer(const ::mpz_t n) : m_int()
+    explicit integer(const ::mpz_t n) : m_int()
     {
         dispatch_mpz_ctor(n);
     }
@@ -1265,7 +1180,7 @@ public:
      *
      * @return a reference to \p this.
      */
-    mp_integer &operator=(const mp_integer &other) = default;
+    integer &operator=(const integer &other) = default;
     /// Move assignment operator.
     /**
      * After the move, \p other will be in an unspecified but valid state, and the storage type of \p this will be
@@ -1275,33 +1190,33 @@ public:
      *
      * @return a reference to \p this.
      */
-    mp_integer &operator=(mp_integer &&other) = default;
-    /// Generic assignment operator.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This assignment operator is enabled only if ``T`` is an interoperable type.
-     * \endverbatim
-     *
-     * The body of this operator is equivalent to:
-     * \verbatim embed:rst:leading-asterisk
-     * .. code-block:: c++
-     *
-     *    return *this = mp_integer{x};
-     * \endverbatim
-     * That is, a temporary integer is constructed from \p x and it is then move-assigned to \p this.
-     *
-     * @param x the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the generic constructor.
-     */
-    template <typename T, generic_assignment_enabler<T> = 0>
-    mp_integer &operator=(const T &x)
+    integer &operator=(integer &&other) = default;
+/// Generic assignment operator.
+/**
+ * \rststar
+ * The body of this operator is equivalent to:
+ *
+ * .. code-block:: c++
+ *
+ *    return *this = integer{x};
+ *
+ * That is, a temporary integer is constructed from ``x`` and it is then move-assigned to ``this``.
+ * \endrststar
+ *
+ * @param x the assignment argument.
+ *
+ * @return a reference to \p this.
+ *
+ * @throws unspecified any exception thrown by the generic constructor.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    integer &operator=(const CppInteroperable &x)
+#else
+    template <typename T, cpp_interoperable_enabler<T> = 0>
+    integer &operator=(const T &x)
+#endif
     {
-        return *this = mp_integer{x};
+        return *this = integer{x};
     }
     /// Test for static storage.
     /**
@@ -1319,41 +1234,6 @@ public:
     {
         return m_int.is_dynamic();
     }
-    /// Output stream operator for mp_integer.
-    /**
-     * This operator will print to the stream \p os the mp_integer \p n in base 10. Internally it uses the
-     * mp_integer::to_string() method.
-     *
-     * @param os the target stream.
-     * @param n the input integer.
-     *
-     * @return a reference to \p os.
-     *
-     * @throws unspecified any exception thrown by mp_integer::to_string().
-     */
-    friend std::ostream &operator<<(std::ostream &os, const mp_integer &n)
-    {
-        return os << n.to_string();
-    }
-    /// Input stream operator for mp_integer.
-    /**
-     * Equivalent to extracting a line from the stream, using it to construct a temporary
-     * mp_integer and then assigning the temporary to \p n.
-     *
-     * @param is input stream.
-     * @param n integer to which the contents of the stream will be assigned.
-     *
-     * @return reference to \p is.
-     *
-     * @throws unspecified any exception thrown by the constructor from string of mp_integer.
-     */
-    friend std::istream &operator>>(std::istream &is, mp_integer &n)
-    {
-        MPPP_MAYBE_TLS std::string tmp_str;
-        std::getline(is, tmp_str);
-        n = mp_integer{tmp_str};
-        return is;
-    }
     /// Conversion to string.
     /**
      * This method will convert \p this into a string in base \p base using the GMP function \p mpz_get_str().
@@ -1364,11 +1244,11 @@ public:
      *
      * @throws std::invalid_argument if \p base is smaller than 2 or greater than 62.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. seealso::
      *
      *    https://gmplib.org/manual/Converting-Integers.html
-     * \endverbatim
+     * \endrststar
      */
     std::string to_string(int base = 10) const
     {
@@ -1377,15 +1257,12 @@ public:
                                         "2 and 62, but a value of "
                                         + std::to_string(base) + " was provided instead");
         }
-        return mppp_impl::mpz_to_str(get_mpz_view(), base);
+        return mpz_to_str(get_mpz_view(), base);
     }
     // NOTE: maybe provide a method to access the lower-level str conversion that writes to
     // std::vector<char>?
 
 private:
-    // Implementation of the conversion operator.
-    template <typename T>
-    using generic_conversion_enabler = generic_ctor_enabler<T>;
     // Conversion to bool.
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
@@ -1557,23 +1434,26 @@ private:
     }
 
 public:
-    /// Generic conversion operator.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This operator is enabled only if ``T`` is an interoperable type.
-     * \endverbatim
-     *
-     * This operator will convert \p this to the type \p T. Conversion to \p bool yields \p false if \p this is zero,
-     * \p true otherwise. Conversion to other integral types yields the exact result, if representable by the target
-     * type \p T. Conversion to floating-point types might yield inexact values and infinities.
-     *
-     * @return \p this converted to \p T.
-     *
-     * @throws std::overflow_error if \p T is an integral type and the value of \p this cannot be represented by \p T.
-     */
-    template <typename T, generic_conversion_enabler<T> = 0>
+/// Generic conversion operator.
+/**
+ * \rststar
+ * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppInteroperable` type.
+ * Conversion to ``bool`` yields ``false`` if ``this`` is zero,
+ * ``true`` otherwise. Conversion to other integral types yields the exact result, if representable by the target
+ * :cpp:concept:`~mppp::CppInteroperable` type. Conversion to floating-point types might yield inexact values and
+ * infinities.
+ * \endrststar
+ *
+ * @return \p this converted to the target type.
+ *
+ * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be represented by
+ * it.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <CppInteroperable T>
+#else
+    template <typename T, cpp_interoperable_enabler<T> = 0>
+#endif
     explicit operator T() const
     {
         const auto retval = dispatch_conversion<T>();
@@ -1644,16 +1524,6 @@ public:
             return 0;
         }
     }
-    /// Sign function.
-    /**
-     * @param n the mp_integer whose sign will be computed.
-     *
-     * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
-     */
-    friend int sgn(const mp_integer &n)
-    {
-        return n.sgn();
-    }
     /// Get an \p mpz_t view.
     /**
      * This method will return an object of an unspecified type \p mpz_view which is implicitly convertible
@@ -1662,7 +1532,7 @@ public:
      * object can also be retrieved via the <tt>get()</tt> method of the \p mpz_view class.
      * The view provides a read-only GMP-compatible representation of the integer stored in \p this.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. note::
      *
      *   It is important to keep in mind the following facts about the returned ``mpz_view`` object:
@@ -1677,7 +1547,7 @@ public:
      *     object (that is, if the ``mpz_view`` object is destroyed, any pointer previously returned by ``get()``
      *     becomes invalid);
      *   * any modification to ``this`` will also invalidate the view and the pointer.
-     * \endverbatim
+     * \endrststar
      *
      * @return an \p mpz view of \p this.
      */
@@ -1691,7 +1561,7 @@ public:
      *
      * @return a reference to \p this.
      */
-    mp_integer &neg()
+    integer &neg()
     {
         if (is_static()) {
             m_int.g_st()._mp_size = -m_int.g_st()._mp_size;
@@ -1700,524 +1570,13 @@ public:
         }
         return *this;
     }
-    /// Binary negation.
-    /**
-     * This method will set \p rop to <tt>-n</tt>.
-     *
-     * @param rop the return value.
-     * @param n the integer that will be negated.
-     */
-    friend void neg(mp_integer &rop, const mp_integer &n)
-    {
-        rop = n;
-        rop.neg();
-    }
-    /// Unary negation.
-    /**
-     * @param n the integer that will be negated.
-     *
-     * @return <tt>-n</tt>.
-     */
-    friend mp_integer neg(const mp_integer &n)
-    {
-        mp_integer ret(n);
-        ret.neg();
-        return ret;
-    }
-
-private:
-    // Metaprogramming for selecting the algorithm for static addition. The selection happens via
-    // an std::integral_constant with 3 possible values:
-    // - 0 (default case): use the GMP mpn functions,
-    // - 1: selected when there are no nail bits and the static size is 1,
-    // - 2: selected when there are no nail bits and the static size is 2.
-    template <typename SInt>
-    using static_add_algo = std::integral_constant<int, (!GMP_NAIL_BITS && SInt::s_size == 1)
-                                                            ? 1
-                                                            : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
-    // General implementation via mpn.
-    // Small helper to compute the size after subtraction via mpn. s is a strictly positive size.
-    static mpz_size_t sub_compute_size(const ::mp_limb_t *rdata, mpz_size_t s)
-    {
-        assert(s > 0);
-        mpz_size_t cur_idx = s - 1;
-        for (; cur_idx >= 0; --cur_idx) {
-            if (rdata[cur_idx] & GMP_NUMB_MASK) {
-                break;
-            }
-        }
-        return cur_idx + 1;
-    }
-    // NOTE: this function (and its other overloads) will return true in case of success, false in case of failure
-    // (i.e., the addition overflows and the static size is not enough).
-    static bool static_add_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
-                                int sign1, int sign2, const std::integral_constant<int, 0> &)
-    {
-        using mppp_impl::copy_limbs;
-        auto rdata = &rop.m_limbs[0];
-        auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
-        const auto size1 = op1._mp_size;
-        // NOTE: cannot trust the size member from op2, as op2 could've been negated if
-        // we are actually subtracting.
-        const auto size2 = (sign2 >= 0) ? asize2 : -asize2;
-        // mpn functions require nonzero arguments.
-        if (mppp_unlikely(!sign2)) {
-            rop._mp_size = size1;
-            copy_limbs(data1, data1 + asize1, rdata);
-            return true;
-        }
-        if (mppp_unlikely(!sign1)) {
-            rop._mp_size = size2;
-            copy_limbs(data2, data2 + asize2, rdata);
-            return true;
-        }
-        // Check, for op1 and op2, whether:
-        // - the asize is the max static size, and, if yes,
-        // - the highest bit in the highest limb is set.
-        // If this condition holds for op1 and op2, we return failure, as the computation might require
-        // an extra limb.
-        // NOTE: the reason we check this is that we do not want to run into the situation in which we have written
-        // something into rop (via the mpn functions below), only to realize later that the computation overflows.
-        // This would be bad because, in case of overlapping arguments, it would destroy one or two operands without
-        // possibility of recovering. The alternative would be to do the computation in some local buffer and then
-        // copy
-        // it out, but that is rather costly. Note that this means that in principle a computation that could fit in
-        // static storage ends up triggering a promotion.
-        const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
-        const bool c2 = std::size_t(asize2) == SSize && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
-        if (mppp_unlikely(c1 || c2)) {
-            return false;
-        }
-        if (sign1 == sign2) {
-            // Same sign.
-            if (asize1 >= asize2) {
-                // The number of limbs of op1 >= op2.
-                ::mp_limb_t cy;
-                if (asize2 == 1) {
-                    // NOTE: we are not masking data2[0] with GMP_NUMB_MASK, I am assuming the mpn function
-                    // is able to deal with a limb with a nail.
-                    cy = ::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
-                } else if (asize1 == asize2) {
-                    cy = ::mpn_add_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
-                } else {
-                    cy = ::mpn_add(rdata, data1, static_cast<::mp_size_t>(asize1), data2,
-                                   static_cast<::mp_size_t>(asize2));
-                }
-                if (cy) {
-                    assert(asize1 < s_int::s_size);
-                    rop._mp_size = size1 + sign1;
-                    // NOTE: there should be no need to use GMP_NUMB_MASK here.
-                    rdata[asize1] = 1u;
-                } else {
-                    // Without carry, the size is unchanged.
-                    rop._mp_size = size1;
-                }
-            } else {
-                // The number of limbs of op2 > op1.
-                ::mp_limb_t cy;
-                if (asize1 == 1) {
-                    cy = ::mpn_add_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
-                } else {
-                    cy = ::mpn_add(rdata, data2, static_cast<::mp_size_t>(asize2), data1,
-                                   static_cast<::mp_size_t>(asize1));
-                }
-                if (cy) {
-                    assert(asize2 < s_int::s_size);
-                    rop._mp_size = size2 + sign2;
-                    rdata[asize2] = 1u;
-                } else {
-                    rop._mp_size = size2;
-                }
-            }
-        } else {
-            if (asize1 > asize2
-                || (asize1 == asize2 && ::mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
-                // abs(op1) >= abs(op2).
-                ::mp_limb_t br;
-                if (asize2 == 1) {
-                    br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
-                } else if (asize1 == asize2) {
-                    br = ::mpn_sub_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
-                } else {
-                    br = ::mpn_sub(rdata, data1, static_cast<::mp_size_t>(asize1), data2,
-                                   static_cast<::mp_size_t>(asize2));
-                }
-                assert(!br);
-                rop._mp_size = sub_compute_size(rdata, asize1);
-                if (sign1 != 1) {
-                    rop._mp_size = -rop._mp_size;
-                }
-            } else {
-                // abs(op2) > abs(op1).
-                ::mp_limb_t br;
-                if (asize1 == 1) {
-                    br = ::mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
-                } else {
-                    br = ::mpn_sub(rdata, data2, static_cast<::mp_size_t>(asize2), data1,
-                                   static_cast<::mp_size_t>(asize1));
-                }
-                assert(!br);
-                rop._mp_size = sub_compute_size(rdata, asize2);
-                if (sign2 != 1) {
-                    rop._mp_size = -rop._mp_size;
-                }
-            }
-        }
-        return true;
-    }
-    // Optimization for single-limb statics with no nails.
-    static bool static_add_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
-                                int sign1, int sign2, const std::integral_constant<int, 1> &)
-    {
-        using mppp_impl::limb_add_overflow;
-        auto rdata = &rop.m_limbs[0];
-        auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
-        // NOTE: both asizes have to be 0 or 1 here.
-        assert((asize1 == 1 && data1[0] != 0u) || (asize1 == 0 && data1[0] == 0u));
-        assert((asize2 == 1 && data2[0] != 0u) || (asize2 == 0 && data2[0] == 0u));
-        ::mp_limb_t tmp;
-        if (sign1 == sign2) {
-            // When the signs are identical, we can implement addition as a true addition.
-            if (mppp_unlikely(limb_add_overflow(data1[0], data2[0], &tmp))) {
-                return false;
-            }
-            // Assign the output. asize can be zero (sign1 == sign2 == 0) or 1.
-            rop._mp_size = sign1;
-            rdata[0] = tmp;
-        } else {
-            // When the signs differ, we need to implement addition as a subtraction.
-            // NOTE: this also includes the case in which only one of the operands is zero.
-            if (data1[0] >= data2[0]) {
-                // op1 is not smaller than op2.
-                tmp = data1[0] - data2[0];
-                // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
-                rop._mp_size = sign1;
-                if (mppp_unlikely(!tmp)) {
-                    rop._mp_size = 0;
-                }
-                rdata[0] = tmp;
-            } else {
-                // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
-                rop._mp_size = sign2;
-                rdata[0] = data2[0] - data1[0];
-            }
-        }
-        return true;
-    }
-    // Optimization for two-limbs statics with no nails.
-    // Small helper to compare two statics of equal asize 1 or 2.
-    static int compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *data2, mpz_size_t asize)
-    {
-        // NOTE: this requires no nail bits.
-        assert(!GMP_NAIL_BITS);
-        assert(asize == 1 || asize == 2);
-        // Start comparing from the top.
-        auto cmp_idx = asize - 1;
-        if (data1[cmp_idx] != data2[cmp_idx]) {
-            return data1[cmp_idx] > data2[cmp_idx] ? 1 : -1;
-        }
-        // The top limbs are equal, move down one limb.
-        // If we are already at the bottom limb, it means the two numbers are equal.
-        if (!cmp_idx) {
-            return 0;
-        }
-        --cmp_idx;
-        if (data1[cmp_idx] != data2[cmp_idx]) {
-            return data1[cmp_idx] > data2[cmp_idx] ? 1 : -1;
-        }
-        return 0;
-    }
-    static bool static_add_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
-                                int sign1, int sign2, const std::integral_constant<int, 2> &)
-    {
-        using mppp_impl::limb_add_overflow;
-        auto rdata = &rop.m_limbs[0];
-        auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
-        if (sign1 == sign2) {
-            // NOTE: this handles the case in which the numbers have the same sign, including 0 + 0.
-            //
-            // NOTE: this is the implementation for 2 limbs, even if potentially the operands have 1 limb.
-            // The idea here is that it's better to do a few computations more rather than paying the branching
-            // cost. 1-limb operands will have the upper limb set to zero from the zero-initialization of
-            // the limbs of static ints.
-            //
-            // NOTE: the rop hi limb might spill over either from the addition of the hi limbs
-            // of op1 and op2, or by the addition of carry coming over from the addition of
-            // the lo limbs of op1 and op2.
-            //
-            // Add the hi and lo limbs.
-            const auto a = data1[0], b = data2[0], c = data1[1], d = data2[1];
-            ::mp_limb_t lo, hi1, hi2;
-            const ::mp_limb_t cy_lo = limb_add_overflow(a, b, &lo), cy_hi1 = limb_add_overflow(c, d, &hi1),
-                              cy_hi2 = limb_add_overflow(hi1, cy_lo, &hi2);
-            // The result will overflow if we have any carry relating to the high limb.
-            if (mppp_unlikely(cy_hi1 || cy_hi2)) {
-                return false;
-            }
-            // For the size compuation:
-            // - if sign1 == 0, size is zero,
-            // - if sign1 == +-1, then the size is either +-1 or +-2: asize is 2 if the result
-            //   has a nonzero 2nd limb, otherwise asize is 1.
-            rop._mp_size = sign1;
-            if (hi2) {
-                rop._mp_size = sign1 + sign1;
-            }
-            rdata[0] = lo;
-            rdata[1] = hi2;
-        } else {
-            // When the signs differ, we need to implement addition as a subtraction.
-            // NOTE: this also includes the case in which only one of the operands is zero.
-            if (asize1 > asize2 || (asize1 == asize2 && compare_limbs_2(data1, data2, asize1) >= 0)) {
-                // op1 is >= op2 in absolute value.
-                const auto lo = data1[0] - data2[0];
-                // If there's a borrow, then hi1 > hi2, otherwise we would have a negative result.
-                assert(data1[0] >= data2[0] || data1[1] > data2[1]);
-                // This can never wrap around, at most it goes to zero.
-                const auto hi = data1[1] - data2[1] - static_cast<::mp_limb_t>(data1[0] < data2[0]);
-                // asize can be 0, 1 or 2.
-                rop._mp_size = 0;
-                if (hi) {
-                    rop._mp_size = sign1 + sign1;
-                } else if (lo) {
-                    rop._mp_size = sign1;
-                }
-                rdata[0] = lo;
-                rdata[1] = hi;
-            } else {
-                // op2 is > op1 in absolute value.
-                const auto lo = data2[0] - data1[0];
-                assert(data2[0] >= data1[0] || data2[1] > data1[1]);
-                const auto hi = data2[1] - data1[1] - static_cast<::mp_limb_t>(data2[0] < data1[0]);
-                // asize can be 1 or 2, but not zero as we know abs(op1) != abs(op2).
-                rop._mp_size = sign2;
-                if (hi) {
-                    rop._mp_size = sign2 + sign2;
-                }
-                rdata[0] = lo;
-                rdata[1] = hi;
-            }
-        }
-        return true;
-    }
-    template <bool AddOrSub>
-    static bool static_addsub(s_int &rop, const s_int &op1, const s_int &op2)
-    {
-        // NOTE: effectively negate op2 if we are subtracting.
-        mpz_size_t asize1 = op1._mp_size, asize2 = AddOrSub ? op2._mp_size : -op2._mp_size;
-        int sign1 = asize1 != 0, sign2 = asize2 != 0;
-        if (asize1 < 0) {
-            asize1 = -asize1;
-            sign1 = -1;
-        }
-        if (asize2 < 0) {
-            asize2 = -asize2;
-            sign2 = -1;
-        }
-        const bool retval = static_add_impl(rop, op1, op2, asize1, asize2, sign1, sign2, static_add_algo<s_int>{});
-        if (static_add_algo<s_int>::value == 0 && retval) {
-            // If we used the mpn functions and we actually wrote into rop, then
-            // make sure we zero out the unused limbs.
-            rop.zero_unused_limbs();
-        }
-        return retval;
-    }
-    // Dispatching for the binary addition operator.
-    static mp_integer dispatch_binary_add(const mp_integer &op1, const mp_integer &op2)
-    {
-        mp_integer retval;
-        add(retval, op1, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_add(const mp_integer &op1, T n)
-    {
-        mp_integer retval{n};
-        add(retval, retval, op1);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_add(T n, const mp_integer &op2)
-    {
-        return dispatch_binary_add(op2, n);
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_add(const mp_integer &op1, T x)
-    {
-        return static_cast<T>(op1) + x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_add(T x, const mp_integer &op2)
-    {
-        return dispatch_binary_add(op2, x);
-    }
-    // Dispatching for in-place add.
-    static void dispatch_in_place_add(mp_integer &retval, const mp_integer &n)
-    {
-        add(retval, retval, n);
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_add(mp_integer &retval, const T &n)
-    {
-        add(retval, retval, mp_integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_add(mp_integer &retval, const T &x)
-    {
-        retval = static_cast<T>(retval) + x;
-    }
-    // Dispatching for the binary subtraction operator.
-    static mp_integer dispatch_binary_sub(const mp_integer &op1, const mp_integer &op2)
-    {
-        mp_integer retval;
-        sub(retval, op1, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_sub(const mp_integer &op1, T n)
-    {
-        mp_integer retval{n};
-        sub(retval, retval, op1);
-        retval.neg();
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_sub(T n, const mp_integer &op2)
-    {
-        auto retval = dispatch_binary_sub(op2, n);
-        retval.neg();
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_sub(const mp_integer &op1, T x)
-    {
-        return static_cast<T>(op1) - x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_sub(T x, const mp_integer &op2)
-    {
-        return -dispatch_binary_sub(op2, x);
-    }
-    // Dispatching for in-place sub.
-    static void dispatch_in_place_sub(mp_integer &retval, const mp_integer &n)
-    {
-        sub(retval, retval, n);
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_sub(mp_integer &retval, const T &n)
-    {
-        sub(retval, retval, mp_integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_sub(mp_integer &retval, const T &x)
-    {
-        retval = static_cast<T>(retval) - x;
-    }
-
-public:
-    /// Ternary add.
-    /**
-     * This function will set \p rop to <tt>op1 + op2</tt>.
-     *
-     * @param rop the return value.
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     */
-    friend void add(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
-    {
-        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
-        if (mppp_likely(sr && s1 && s2)) {
-            // Optimise the case of all statics.
-            if (mppp_likely(static_addsub<true>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st()))) {
-                return;
-            }
-        }
-        if (sr) {
-            rop.m_int.promote(SSize + 1u);
-        }
-        ::mpz_add(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
-    }
     /// Identity operator.
     /**
      * @return a copy of \p this.
      */
-    mp_integer operator+() const
+    integer operator+() const
     {
         return *this;
-    }
-    /// Binary addition operator.
-    /**
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     *
-     * @return <tt>op1 + op2</tt>.
-     */
-    template <typename T, typename U>
-    friend common_t<T, U> operator+(const T &op1, const U &op2)
-    {
-        return dispatch_binary_add(op1, op2);
-    }
-    /// In-place addition operator.
-    /**
-     * @param op the addend.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
-     * is a floating-point type.
-     */
-    template <typename T, in_place_enabler<T> = 0>
-    mp_integer &operator+=(const T &op)
-    {
-        dispatch_in_place_add(*this, op);
-        return *this;
-    }
-
-private:
-#if defined(_MSC_VER)
-    template <typename T>
-    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, T &>;
-#else
-    template <typename T>
-    using in_place_lenabler = enable_if_t<is_supported_interop<T>::value, int>;
-#endif
-
-public:
-#if defined(_MSC_VER)
-    template <typename T>
-    friend in_place_lenabler<T> operator+=(T &x, const mp_integer &n)
-#else
-    /// In-place addition for interoperable types.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
-     *
-     * The body of this operator is equivalent to:
-     * \verbatim embed:rst:leading-asterisk
-     * .. code-block:: c++
-     *
-     *    return x = static_cast<T>(x + n);
-     * \endverbatim
-     *
-     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
-     *
-     * @param x the first argument.
-     * @param n the second argument.
-     *
-     * @return a reference to \p x.
-     *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
-     */
-    template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator+=(T &x, const mp_integer &n)
-#endif
-    {
-        // NOTE: if x is an integral, then the static cast is a generic conversion from
-        // mp_integer to the integral, which can fail because of overflow. Otherwise, the
-        // static cast is a redundant cast to float of x + n, which is already a float.
-        return x = static_cast<T>(x + n);
     }
     /// Prefix increment.
     /**
@@ -2225,7 +1584,7 @@ public:
      *
      * @return reference to \p this after the increment.
      */
-    mp_integer &operator++()
+    integer &operator++()
     {
         add_ui(*this, *this, 1u);
         return *this;
@@ -2236,104 +1595,21 @@ public:
      *
      * @return a copy of \p this before the increment.
      */
-    mp_integer operator++(int)
+    integer operator++(int)
     {
-        mp_integer retval(*this);
+        integer retval(*this);
         ++(*this);
         return retval;
-    }
-    /// Ternary subtraction.
-    /**
-     * This function will set \p rop to <tt>op1 - op2</tt>.
-     *
-     * @param rop the return value.
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     */
-    friend void sub(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
-    {
-        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
-        if (mppp_likely(sr && s1 && s2)) {
-            // Optimise the case of all statics.
-            if (mppp_likely(static_addsub<false>(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st()))) {
-                return;
-            }
-        }
-        if (sr) {
-            rop.m_int.promote(SSize + 1u);
-        }
-        ::mpz_sub(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     }
     /// Negated copy.
     /**
      * @return a negated copy of \p this.
      */
-    mp_integer operator-() const
+    integer operator-() const
     {
-        mp_integer retval{*this};
+        integer retval{*this};
         retval.neg();
         return retval;
-    }
-    /// Binary subtraction operator.
-    /**
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     *
-     * @return <tt>op1 - op2</tt>.
-     */
-    template <typename T, typename U>
-    friend common_t<T, U> operator-(const T &op1, const U &op2)
-    {
-        return dispatch_binary_sub(op1, op2);
-    }
-    /// In-place subtraction operator.
-    /**
-     * @param op the subtrahend.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
-     * is a floating-point type.
-     */
-    template <typename T, in_place_enabler<T> = 0>
-    mp_integer &operator-=(const T &op)
-    {
-        dispatch_in_place_sub(*this, op);
-        return *this;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend in_place_lenabler<T> operator-=(T &x, const mp_integer &n)
-#else
-    /// In-place subtraction for interoperable types.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
-     *
-     * The body of this operator is equivalent to:
-     * \verbatim embed:rst:leading-asterisk
-     * .. code-block:: c++
-     *
-     *    return x = static_cast<T>(x - n);
-     * \endverbatim
-     *
-     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
-     *
-     * @param x the first argument.
-     * @param n the second argument.
-     *
-     * @return a reference to \p x.
-     *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
-     */
-    template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator-=(T &x, const mp_integer &n)
-#endif
-    {
-        return x = static_cast<T>(x - n);
     }
     /// Prefix decrement.
     /**
@@ -2341,7 +1617,7 @@ public:
      *
      * @return reference to \p this after the decrement.
      */
-    mp_integer &operator--()
+    integer &operator--()
     {
         // NOTE: this should be written in terms of sub_ui(), once implemented.
         neg();
@@ -2355,2122 +1631,11 @@ public:
      *
      * @return a copy of \p this before the decrement.
      */
-    mp_integer operator--(int)
+    integer operator--(int)
     {
-        mp_integer retval(*this);
+        integer retval(*this);
         --(*this);
         return retval;
-    }
-
-private:
-    // Metaprogramming for selecting the algorithm for static addition with ui. The selection happens via
-    // an std::integral_constant with 3 possible values:
-    // - 0 (default case): use the GMP mpn functions,
-    // - 1: selected when there are no nail bits and the static size is 1,
-    // - 2: selected when there are no nail bits and the static size is 2.
-    template <typename SInt>
-    using static_add_ui_algo = std::integral_constant<int, (!GMP_NAIL_BITS && SInt::s_size == 1)
-                                                               ? 1
-                                                               : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
-    // mpn implementation.
-    static bool static_add_ui_impl(s_int &rop, const s_int &op1, mpz_size_t asize1, int sign1, unsigned long op2,
-                                   const std::integral_constant<int, 0> &)
-    {
-        using mppp_impl::copy_limbs;
-        auto rdata = &rop.m_limbs[0];
-        auto data1 = &op1.m_limbs[0];
-        const auto size1 = op1._mp_size;
-        const auto l2 = static_cast<::mp_limb_t>(op2);
-        // mpn functions require nonzero arguments.
-        if (mppp_unlikely(!l2)) {
-            rop._mp_size = size1;
-            copy_limbs(data1, data1 + asize1, rdata);
-            return true;
-        }
-        if (mppp_unlikely(!sign1)) {
-            // NOTE: this has to be 1 because l2 == 0 is handled above.
-            rop._mp_size = 1;
-            rdata[0] = l2;
-            return true;
-        }
-        // This is the same overflow check as in static_add().
-        const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
-        const bool c2 = SSize == 1u && (l2 >> (GMP_NUMB_BITS - 1));
-        if (mppp_unlikely(c1 || c2)) {
-            return false;
-        }
-        if (sign1 == 1) {
-            // op1 and op2 are both strictly positive.
-            if (::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2)) {
-                assert(asize1 < s_int::s_size);
-                rop._mp_size = size1 + 1;
-                // NOTE: there should be no need to use GMP_NUMB_MASK here.
-                rdata[asize1] = 1u;
-            } else {
-                // Without carry, the size is unchanged.
-                rop._mp_size = size1;
-            }
-        } else {
-            // op1 is strictly negative, op2 is strictly positive.
-            if (asize1 > 1 || (asize1 == 1 && (data1[0] & GMP_NUMB_MASK) >= l2)) {
-                // abs(op1) >= abs(op2).
-                const auto br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2);
-                (void)br;
-                assert(!br);
-                // The asize can be the original one or original - 1 (we subtracted a limb).
-                rop._mp_size = size1 + static_cast<mpz_size_t>(!(rdata[asize1 - 1] & GMP_NUMB_MASK));
-            } else {
-                // abs(op2) > abs(op1).
-                const auto br = ::mpn_sub_1(rdata, &l2, 1, data1[0]);
-                (void)br;
-                assert(!br);
-                // The size must be 1, as abs(op2) == abs(op1) is handled above.
-                assert((rdata[0] & GMP_NUMB_MASK));
-                rop._mp_size = 1;
-            }
-        }
-        return true;
-    }
-    // 1-limb optimisation (no nails).
-    static bool static_add_ui_impl(s_int &rop, const s_int &op1, mpz_size_t, int sign1, unsigned long op2,
-                                   const std::integral_constant<int, 1> &)
-    {
-        using mppp_impl::limb_add_overflow;
-        const auto l1 = op1.m_limbs[0];
-        const auto l2 = static_cast<::mp_limb_t>(op2);
-        ::mp_limb_t tmp;
-        if (sign1 >= 0) {
-            // True unsigned addition.
-            if (mppp_unlikely(limb_add_overflow(l1, l2, &tmp))) {
-                return false;
-            }
-            rop._mp_size = (tmp != 0u);
-            rop.m_limbs[0] = tmp;
-        } else {
-            // op1 is negative, op2 is non-negative. Implement as a sub.
-            if (l1 >= l2) {
-                // op1 has larger or equal abs. The result will be non-positive.
-                tmp = l1 - l2;
-                // size is -1 or 0, 0 iff l1 == l2.
-                rop._mp_size = -static_cast<mpz_size_t>(tmp != 0u);
-                rop.m_limbs[0] = tmp;
-            } else {
-                // op1 has smaller abs. The result will be positive.
-                rop._mp_size = 1;
-                rop.m_limbs[0] = l2 - l1;
-            }
-        }
-        return true;
-    }
-    // 2-limb optimisation (no nails).
-    static bool static_add_ui_impl(s_int &rop, const s_int &op1, mpz_size_t asize1, int sign1, unsigned long op2,
-                                   const std::integral_constant<int, 2> &)
-    {
-        using mppp_impl::limb_add_overflow;
-        auto rdata = &rop.m_limbs[0];
-        auto data1 = &op1.m_limbs[0];
-        const auto l2 = static_cast<::mp_limb_t>(op2);
-        if (sign1 >= 0) {
-            // True unsigned addition.
-            // These two limbs will contain the result.
-            ::mp_limb_t lo, hi;
-            // Add l2 to the low limb, placing the result in lo.
-            const ::mp_limb_t cy_lo = limb_add_overflow(data1[0], l2, &lo);
-            // Add the carry from the low addition to the high limb, placing the result in hi.
-            const ::mp_limb_t cy_hi = limb_add_overflow(data1[1], cy_lo, &hi);
-            if (mppp_unlikely(cy_hi)) {
-                return false;
-            }
-            // Compute the new size. It can be 0, 1 or 2.
-            rop._mp_size = hi ? 2 : (lo ? 1 : 0);
-            // Write out.
-            rdata[0] = lo;
-            rdata[1] = hi;
-        } else {
-            // op1 is negative, l2 is non-negative. Compare their absolute values.
-            if (asize1 == 2 || data1[0] >= l2) {
-                // op1 is >= op2 in absolute value.
-                const auto lo = data1[0] - l2;
-                // Sub from hi the borrow.
-                const auto hi = data1[1] - static_cast<::mp_limb_t>(data1[0] < l2);
-                // The final size can be -2, -1 or 0.
-                rop._mp_size = hi ? -2 : (lo ? -1 : 0);
-                rdata[0] = lo;
-                rdata[1] = hi;
-            } else {
-                // op2 > op1 in absolute value.
-                // Size has to be 1.
-                rop._mp_size = 1;
-                rdata[0] = l2 - data1[0];
-                rdata[1] = 0u;
-            }
-        }
-        return true;
-    }
-    static bool static_add_ui(s_int &rop, const s_int &op1, unsigned long op2)
-    {
-        mpz_size_t asize1 = op1._mp_size;
-        int sign1 = asize1 != 0;
-        if (asize1 < 0) {
-            asize1 = -asize1;
-            sign1 = -1;
-        }
-        const bool retval = static_add_ui_impl(rop, op1, asize1, sign1, op2, static_add_ui_algo<s_int>{});
-        if (static_add_ui_algo<s_int>::value == 0 && retval) {
-            // If we used the mpn functions and we actually wrote into rop, then
-            // make sure we zero out the unused limbs.
-            rop.zero_unused_limbs();
-        }
-        return retval;
-    }
-
-public:
-    /// Ternary add with <tt>unsigned long</tt>.
-    /**
-     * This function will set \p rop to <tt>op1 + op2</tt>.
-     *
-     * @param rop the return value.
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     */
-    friend void add_ui(mp_integer &rop, const mp_integer &op1, unsigned long op2)
-    {
-        if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
-            // For the optimised version below to kick in we need to be sure we can safely convert
-            // unsigned long to an ::mp_limb_t, modulo nail bits. This because in the optimised version
-            // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an
-            // mp_integer.
-            add(rop, op1, mp_integer{op2});
-            return;
-        }
-        const bool sr = rop.is_static(), s1 = op1.is_static();
-        if (mppp_likely(sr && s1)) {
-            // Optimise the case of all statics.
-            if (mppp_likely(static_add_ui(rop.m_int.g_st(), op1.m_int.g_st(), op2))) {
-                return;
-            }
-        }
-        if (sr) {
-            rop.m_int.promote(SSize + 1u);
-        }
-        ::mpz_add_ui(&rop.m_int.g_dy(), op1.get_mpz_view(), op2);
-    }
-
-private:
-    // The double limb multiplication optimization is available in the following cases:
-    // - no nails, we are on a 64bit MSVC build, the limb type has exactly 64 bits and GMP_NUMB_BITS is 64,
-    // - no nails, we have a 128bit unsigned available, the limb type has exactly 64 bits and GMP_NUMB_BITS is 64,
-    // - no nails, the smallest 64 bit unsigned type has exactly 64 bits, the limb type has exactly 32 bits and
-    //   GMP_NUMB_BITS is 32.
-    // NOTE: here we are checking that GMP_NUMB_BITS is the same as the limits ::digits property, which is probably
-    // rather redundant on any conceivable architecture.
-    using have_dlimb_mul = std::integral_constant<bool,
-#if (defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64)) || (defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64))
-                                                  !GMP_NAIL_BITS && std::numeric_limits<::mp_limb_t>::digits == 64
-#elif GMP_NUMB_BITS == 32
-                                                  !GMP_NAIL_BITS
-                                                      && std::numeric_limits<std::uint_least64_t>::digits == 64
-                                                      && std::numeric_limits<::mp_limb_t>::digits == 32
-#else
-                                                  false
-#endif
-                                                  >;
-    template <typename SInt>
-    using static_mul_algo = std::integral_constant<int, (SInt::s_size == 1 && have_dlimb_mul::value)
-                                                            ? 1
-                                                            : ((SInt::s_size == 2 && have_dlimb_mul::value) ? 2 : 0)>;
-    // mpn implementation.
-    // NOTE: this function (and the other overloads) returns 0 in case of success, otherwise it returns a hint
-    // about the size in limbs of the result.
-    static std::size_t static_mul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1,
-                                       mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 0> &)
-    {
-        using mppp_impl::copy_limbs_no;
-        // Handle zeroes.
-        if (mppp_unlikely(!sign1 || !sign2)) {
-            rop._mp_size = 0;
-            return 0u;
-        }
-        auto rdata = &rop.m_limbs[0];
-        auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
-        const auto max_asize = std::size_t(asize1 + asize2);
-        // Temporary storage, to be used if we cannot write into rop.
-        std::array<::mp_limb_t, SSize * 2u> res;
-        // We can write directly into rop if these conditions hold:
-        // - rop does not overlap with op1 and op2,
-        // - SSize is large enough to hold the max size of the result.
-        ::mp_limb_t *MPPP_RESTRICT res_data
-            = (rdata != data1 && rdata != data2 && max_asize <= SSize) ? rdata : res.data();
-        // Proceed to the multiplication.
-        ::mp_limb_t hi;
-        if (asize2 == 1) {
-            // NOTE: the 1-limb versions do not write the hi limb, we have to write it ourselves.
-            hi = ::mpn_mul_1(res_data, data1, static_cast<::mp_size_t>(asize1), data2[0]);
-            res_data[asize1] = hi;
-        } else if (asize1 == 1) {
-            hi = ::mpn_mul_1(res_data, data2, static_cast<::mp_size_t>(asize2), data1[0]);
-            res_data[asize2] = hi;
-        } else if (asize1 == asize2) {
-            ::mpn_mul_n(res_data, data1, data2, static_cast<::mp_size_t>(asize1));
-            hi = res_data[2 * asize1 - 1];
-        } else if (asize1 >= asize2) {
-            hi = ::mpn_mul(res_data, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
-        } else {
-            hi = ::mpn_mul(res_data, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
-        }
-        // The actual size.
-        const std::size_t asize = max_asize - unsigned(hi == 0u);
-        if (res_data == rdata) {
-            // If we wrote directly into rop, it means that we had enough storage in it to begin with.
-            rop._mp_size = mpz_size_t(asize);
-            if (sign1 != sign2) {
-                rop._mp_size = -rop._mp_size;
-            }
-            return 0u;
-        }
-        // If we used the temporary storage, we need to check if we can write into rop.
-        if (asize > SSize) {
-            // Not enough space, return the size.
-            return asize;
-        }
-        // Enough space, set size and copy limbs.
-        rop._mp_size = mpz_size_t(asize);
-        if (sign1 != sign2) {
-            rop._mp_size = -rop._mp_size;
-        }
-        copy_limbs_no(res_data, res_data + asize, rdata);
-        return 0u;
-    }
-#if defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
-    static ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
-    {
-        return ::UnsignedMultiply128(op1, op2, hi);
-    }
-#elif defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
-    static ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
-    {
-        using dlimb_t = MPPP_UINT128;
-        const dlimb_t res = dlimb_t(op1) * op2;
-        *hi = static_cast<::mp_limb_t>(res >> 64);
-        return static_cast<::mp_limb_t>(res);
-    }
-#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
-    static ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
-    {
-        using dlimb_t = std::uint_least64_t;
-        const dlimb_t res = dlimb_t(op1) * op2;
-        *hi = static_cast<::mp_limb_t>(res >> 32);
-        return static_cast<::mp_limb_t>(res);
-    }
-#endif
-    // 1-limb optimization via dlimb.
-    static std::size_t static_mul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t, mpz_size_t,
-                                       int sign1, int sign2, const std::integral_constant<int, 1> &)
-    {
-        ::mp_limb_t hi;
-        const ::mp_limb_t lo = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &hi);
-        if (mppp_unlikely(hi)) {
-            return 2u;
-        }
-        const mpz_size_t asize = (lo != 0u);
-        rop._mp_size = asize;
-        if (sign1 != sign2) {
-            rop._mp_size = -rop._mp_size;
-        }
-        rop.m_limbs[0] = lo;
-        return 0u;
-    }
-    // 2-limb optimization via dlimb.
-    static std::size_t static_mul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asize1,
-                                       mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 2> &)
-    {
-        using mppp_impl::limb_add_overflow;
-        if (mppp_unlikely(!asize1 || !asize2)) {
-            // Handle zeroes.
-            rop._mp_size = 0;
-            rop.m_limbs[0] = 0u;
-            rop.m_limbs[1] = 0u;
-            return 0u;
-        }
-        if (asize1 == 1 && asize2 == 1) {
-            rop.m_limbs[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &rop.m_limbs[1]);
-            rop._mp_size = static_cast<mpz_size_t>((asize1 + asize2) - mpz_size_t(rop.m_limbs[1] == 0u));
-            if (sign1 != sign2) {
-                rop._mp_size = -rop._mp_size;
-            }
-            return 0u;
-        }
-        if (asize1 != asize2) {
-            // The only possibility of success is 2limbs x 1limb.
-            //
-            //             b      a X
-            //                    c
-            // --------------------
-            // tmp[2] tmp[1] tmp[0]
-            //
-            ::mp_limb_t a = op1.m_limbs[0], b = op1.m_limbs[1], c = op2.m_limbs[0];
-            if (asize1 < asize2) {
-                // Switch them around if needed.
-                a = op2.m_limbs[0], b = op2.m_limbs[1], c = op1.m_limbs[0];
-            }
-            ::mp_limb_t ca_lo, ca_hi, cb_lo, cb_hi, tmp0, tmp1, tmp2;
-            ca_lo = dlimb_mul(c, a, &ca_hi);
-            cb_lo = dlimb_mul(c, b, &cb_hi);
-            tmp0 = ca_lo;
-            const auto cy = limb_add_overflow(cb_lo, ca_hi, &tmp1);
-            tmp2 = cb_hi + cy;
-            // Now determine the size. asize must be at least 2.
-            const mpz_size_t asize = 2 + mpz_size_t(tmp2 != 0u);
-            if (asize == 2) {
-                // Size is good, write out the result.
-                rop._mp_size = asize;
-                if (sign1 != sign2) {
-                    rop._mp_size = -rop._mp_size;
-                }
-                rop.m_limbs[0] = tmp0;
-                rop.m_limbs[1] = tmp1;
-                return 0u;
-            }
-        }
-        // Return 4 as a size hint. Real size could be 3, but GMP will require 4 limbs
-        // of storage to perform the operation anyway.
-        return 4u;
-    }
-    static std::size_t static_mul(s_int &rop, const s_int &op1, const s_int &op2)
-    {
-        // Cache a few quantities, detect signs.
-        mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
-        int sign1 = asize1 != 0, sign2 = asize2 != 0;
-        if (asize1 < 0) {
-            asize1 = -asize1;
-            sign1 = -1;
-        }
-        if (asize2 < 0) {
-            asize2 = -asize2;
-            sign2 = -1;
-        }
-        const std::size_t retval
-            = static_mul_impl(rop, op1, op2, asize1, asize2, sign1, sign2, static_mul_algo<s_int>{});
-        if (static_mul_algo<s_int>::value == 0 && retval == 0u) {
-            rop.zero_unused_limbs();
-        }
-        return retval;
-    }
-    // Dispatching for the binary multiplication operator.
-    static mp_integer dispatch_binary_mul(const mp_integer &op1, const mp_integer &op2)
-    {
-        mp_integer retval;
-        mul(retval, op1, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_mul(const mp_integer &op1, T n)
-    {
-        // NOTE: with respect to addition, here we separate the retval
-        // from the operands. Having a separate destination is generally better
-        // for multiplication.
-        mp_integer retval;
-        mul(retval, op1, mp_integer{n});
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_mul(T n, const mp_integer &op2)
-    {
-        return dispatch_binary_mul(op2, n);
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_mul(const mp_integer &op1, T x)
-    {
-        return static_cast<T>(op1) * x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_mul(T x, const mp_integer &op2)
-    {
-        return dispatch_binary_mul(op2, x);
-    }
-    // Dispatching for in-place multiplication.
-    static void dispatch_in_place_mul(mp_integer &retval, const mp_integer &n)
-    {
-        mul(retval, retval, n);
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_mul(mp_integer &retval, const T &n)
-    {
-        mul(retval, retval, mp_integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_mul(mp_integer &retval, const T &x)
-    {
-        retval = static_cast<T>(retval) * x;
-    }
-
-public:
-    /// Ternary multiplication.
-    /**
-     * This function will set \p rop to <tt>op1 * op2</tt>.
-     *
-     * @param rop the return value.
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     */
-    friend void mul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
-    {
-        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
-        std::size_t size_hint = 0u;
-        if (mppp_likely(sr && s1 && s2)) {
-            size_hint = static_mul(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
-            if (mppp_likely(size_hint == 0u)) {
-                return;
-            }
-        }
-        if (sr) {
-            // We use the size hint from the static_mul if available, otherwise a normal promotion will take place.
-            // NOTE: here the best way of proceeding would be to calculate the max size of the result based on
-            // the op1/op2 sizes, but for whatever reason this computation has disastrous performance consequences
-            // on micro-benchmarks. We need to understand if that's the case in real-world scenarios as well, and
-            // revisit this.
-            rop.m_int.promote(size_hint);
-        }
-        ::mpz_mul(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
-    }
-    /// Binary multiplication operator.
-    /**
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     *
-     * @return <tt>op1 * op2</tt>.
-     */
-    template <typename T, typename U>
-    friend common_t<T, U> operator*(const T &op1, const U &op2)
-    {
-        return dispatch_binary_mul(op1, op2);
-    }
-    /// In-place multiplication operator.
-    /**
-     * @param op the multiplicand.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
-     * is a floating-point type.
-     */
-    template <typename T, in_place_enabler<T> = 0>
-    mp_integer &operator*=(const T &op)
-    {
-        dispatch_in_place_mul(*this, op);
-        return *this;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend in_place_lenabler<T> operator*=(T &x, const mp_integer &n)
-#else
-    /// In-place multiplication for interoperable types.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
-     *
-     * The body of this operator is equivalent to:
-     * \verbatim embed:rst:leading-asterisk
-     * .. code-block:: c++
-     *
-     *    return x = static_cast<T>(x * n);
-     * \endverbatim
-     *
-     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
-     *
-     * @param x the first argument.
-     * @param n the second argument.
-     *
-     * @return a reference to \p x.
-     *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer.
-     */
-    template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator*=(T &x, const mp_integer &n)
-#endif
-    {
-        return x = static_cast<T>(x * n);
-    }
-
-private:
-    // Selection of the algorithm for addmul: if optimised algorithms exist for both add and mul, then use the
-    // optimised addmul algos. Otherwise, use the mpn one.
-    template <typename SInt>
-    using static_addmul_algo
-        = std::integral_constant<int,
-                                 (static_add_algo<SInt>::value == 2 && static_mul_algo<SInt>::value == 2)
-                                     ? 2
-                                     : ((static_add_algo<SInt>::value == 1 && static_mul_algo<SInt>::value == 1) ? 1
-                                                                                                                 : 0)>;
-    // NOTE: same return value as mul: 0 for success, otherwise a hint for the size of the result.
-    static std::size_t static_addmul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asizer,
-                                          mpz_size_t asize1, mpz_size_t asize2, int signr, int sign1, int sign2,
-                                          const std::integral_constant<int, 0> &)
-    {
-        // First try to do the static prod, if it does not work it's a failure.
-        s_int prod;
-        if (mppp_unlikely(
-                static_mul_impl(prod, op1, op2, asize1, asize2, sign1, sign2, std::integral_constant<int, 0>{}))) {
-            // This is the maximum size a static addmul can have.
-            return SSize * 2u + 1u;
-        }
-        // Determine sign and asize of the product.
-        mpz_size_t asize_prod = prod._mp_size;
-        int sign_prod = (asize_prod != 0);
-        if (asize_prod < 0) {
-            asize_prod = -asize_prod;
-            sign_prod = -1;
-        }
-        // Try to do the add.
-        if (mppp_unlikely(!static_add_impl(rop, rop, prod, asizer, asize_prod, signr, sign_prod,
-                                           std::integral_constant<int, 0>{}))) {
-            return SSize + 1u;
-        }
-        return 0u;
-    }
-    static std::size_t static_addmul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t, mpz_size_t,
-                                          mpz_size_t, int signr, int sign1, int sign2,
-                                          const std::integral_constant<int, 1> &)
-    {
-        using mppp_impl::limb_add_overflow;
-        // First we do op1 * op2.
-        ::mp_limb_t tmp;
-        const ::mp_limb_t prod = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &tmp);
-        if (mppp_unlikely(tmp)) {
-            return 3u;
-        }
-        // Determine the sign of the product: 0, 1 or -1.
-        int sign_prod = prod != 0u;
-        if (sign1 != sign2) {
-            sign_prod = -sign_prod;
-        }
-        // Now add/sub.
-        if (signr == sign_prod) {
-            // Same sign, do addition with overflow check.
-            if (mppp_unlikely(limb_add_overflow(rop.m_limbs[0], prod, &tmp))) {
-                return 2u;
-            }
-            // Assign the output.
-            rop._mp_size = signr;
-            rop.m_limbs[0] = tmp;
-        } else {
-            // When the signs differ, we need to implement addition as a subtraction.
-            if (rop.m_limbs[0] >= prod) {
-                // abs(rop) >= abs(prod).
-                tmp = rop.m_limbs[0] - prod;
-                // asize is either 1 or 0 (0 iff rop == prod).
-                rop._mp_size = signr;
-                if (mppp_unlikely(!tmp)) {
-                    rop._mp_size = 0;
-                }
-                rop.m_limbs[0] = tmp;
-            } else {
-                // NOTE: this cannot be zero, as rop and prod cannot be equal.
-                rop._mp_size = sign_prod;
-                rop.m_limbs[0] = prod - rop.m_limbs[0];
-            }
-        }
-        return 0u;
-    }
-    static std::size_t static_addmul_impl(s_int &rop, const s_int &op1, const s_int &op2, mpz_size_t asizer,
-                                          mpz_size_t asize1, mpz_size_t asize2, int signr, int sign1, int sign2,
-                                          const std::integral_constant<int, 2> &)
-    {
-        using mppp_impl::limb_add_overflow;
-        if (mppp_unlikely(!asize1 || !asize2)) {
-            // If op1 or op2 are zero, rop will be unchanged.
-            return 0u;
-        }
-        // Handle op1 * op2.
-        std::array<::mp_limb_t, 2> prod;
-        int sign_prod = 1;
-        if (sign1 != sign2) {
-            sign_prod = -1;
-        }
-        mpz_size_t asize_prod;
-        if (asize1 == 1 && asize2 == 1) {
-            prod[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &prod[1]);
-            asize_prod = (asize1 + asize2) - mpz_size_t(prod[1] == 0u);
-        } else {
-            // The only possibility of success is 2limbs x 1limb.
-            //
-            //       b       a X
-            //               c
-            // ---------------
-            // prod[1] prod[0]
-            //
-            if (mppp_unlikely(asize1 == asize2)) {
-                // This means that both sizes are 2.
-                return 5u;
-            }
-            ::mp_limb_t a = op1.m_limbs[0], b = op1.m_limbs[1], c = op2.m_limbs[0];
-            if (asize1 < asize2) {
-                // Switch them around if needed.
-                a = op2.m_limbs[0], b = op2.m_limbs[1], c = op1.m_limbs[0];
-            }
-            ::mp_limb_t ca_hi, cb_hi;
-            // These are the three operations that build the result, two mults, one add.
-            prod[0] = dlimb_mul(c, a, &ca_hi);
-            prod[1] = dlimb_mul(c, b, &cb_hi);
-            // NOTE: we can use this with overlapping arguments because the first two
-            // are passed as copies.
-            const auto cy = limb_add_overflow(prod[1], ca_hi, &prod[1]);
-            // Check if the third limb exists, if so we return failure.
-            if (mppp_unlikely(cb_hi || cy)) {
-                return 4u;
-            }
-            asize_prod = 2;
-        }
-        // Proceed to the addition.
-        if (signr == sign_prod) {
-            // Add the hi and lo limbs.
-            ::mp_limb_t lo, hi1, hi2;
-            const ::mp_limb_t cy_lo = limb_add_overflow(rop.m_limbs[0], prod[0], &lo),
-                              cy_hi1 = limb_add_overflow(rop.m_limbs[1], prod[1], &hi1),
-                              cy_hi2 = limb_add_overflow(hi1, cy_lo, &hi2);
-            // The result will overflow if we have any carry relating to the high limb.
-            if (mppp_unlikely(cy_hi1 || cy_hi2)) {
-                return 3u;
-            }
-            // For the size compuation:
-            // - cannot be zero, as prod is not zero,
-            // - if signr == +-1, then the size is either +-1 or +-2: asize is 2 if the result
-            //   has a nonzero 2nd limb, otherwise asize is 1.
-            rop._mp_size = signr;
-            if (hi2) {
-                rop._mp_size = signr + signr;
-            }
-            rop.m_limbs[0] = lo;
-            rop.m_limbs[1] = hi2;
-        } else {
-            // When the signs differ, we need to implement addition as a subtraction.
-            if (asizer > asize_prod
-                || (asizer == asize_prod && compare_limbs_2(&rop.m_limbs[0], &prod[0], asizer) >= 0)) {
-                // rop >= prod in absolute value.
-                const auto lo = rop.m_limbs[0] - prod[0];
-                // If there's a borrow, then hi1 > hi2, otherwise we would have a negative result.
-                assert(rop.m_limbs[0] >= prod[0] || rop.m_limbs[1] > prod[1]);
-                // This can never wrap around, at most it goes to zero.
-                const auto hi = rop.m_limbs[1] - prod[1] - static_cast<::mp_limb_t>(rop.m_limbs[0] < prod[0]);
-                // asize can be 0, 1 or 2.
-                rop._mp_size = 0;
-                if (hi) {
-                    rop._mp_size = signr + signr;
-                } else if (lo) {
-                    rop._mp_size = signr;
-                }
-                rop.m_limbs[0] = lo;
-                rop.m_limbs[1] = hi;
-            } else {
-                // prod > rop in absolute value.
-                const auto lo = prod[0] - rop.m_limbs[0];
-                assert(prod[0] >= rop.m_limbs[0] || prod[1] > rop.m_limbs[1]);
-                const auto hi = prod[1] - rop.m_limbs[1] - static_cast<::mp_limb_t>(prod[0] < rop.m_limbs[0]);
-                // asize can be 1 or 2, but not zero as we know abs(prod) != abs(rop).
-                rop._mp_size = sign_prod;
-                if (hi) {
-                    rop._mp_size = sign_prod + sign_prod;
-                }
-                rop.m_limbs[0] = lo;
-                rop.m_limbs[1] = hi;
-            }
-        }
-        return 0u;
-    }
-    static std::size_t static_addmul(s_int &rop, const s_int &op1, const s_int &op2)
-    {
-        mpz_size_t asizer = rop._mp_size, asize1 = op1._mp_size, asize2 = op2._mp_size;
-        int signr = asizer != 0, sign1 = asize1 != 0, sign2 = asize2 != 0;
-        if (asizer < 0) {
-            asizer = -asizer;
-            signr = -1;
-        }
-        if (asize1 < 0) {
-            asize1 = -asize1;
-            sign1 = -1;
-        }
-        if (asize2 < 0) {
-            asize2 = -asize2;
-            sign2 = -1;
-        }
-        const std::size_t retval = static_addmul_impl(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
-                                                      static_addmul_algo<s_int>{});
-        if (static_addmul_algo<s_int>::value == 0 && retval == 0u) {
-            rop.zero_unused_limbs();
-        }
-        return retval;
-    }
-
-public:
-    /// Ternary multiply–accumulate.
-    /**
-     * This function will set \p rop to <tt>rop + op1 * op2</tt>.
-     *
-     * @param rop the return value.
-     * @param op1 the first argument.
-     * @param op2 the second argument.
-     */
-    friend void addmul(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
-    {
-        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
-        std::size_t size_hint = 0u;
-        if (mppp_likely(sr && s1 && s2)) {
-            size_hint = static_addmul(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
-            if (mppp_likely(size_hint == 0u)) {
-                return;
-            }
-        }
-        if (sr) {
-            rop.m_int.promote(size_hint);
-        }
-        ::mpz_addmul(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
-    }
-
-private:
-    // Detect the presence of dual-limb division. This is currently possible only if:
-    // - we are on a 32bit build (with the usual constraints that the types have exactly 32/64 bits and no nails),
-    // - we are on a 64bit build and we have the 128bit int type available (plus usual constraints).
-    // MSVC currently does not provide any primitive for 128bit division.
-    using have_dlimb_div = std::integral_constant<bool,
-#if defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64)
-                                                  !GMP_NAIL_BITS && std::numeric_limits<::mp_limb_t>::digits == 64
-#elif GMP_NUMB_BITS == 32
-                                                  !GMP_NAIL_BITS
-                                                      && std::numeric_limits<std::uint_least64_t>::digits == 64
-                                                      && std::numeric_limits<::mp_limb_t>::digits == 32
-#else
-                                                  false
-#endif
-                                                  >;
-    // Selection of algorithm for static division:
-    // - for 1 limb, we can always do static division,
-    // - for 2 limbs, we need the dual limb division if avaiable,
-    // - otherwise we just use the mpn functions.
-    template <typename SInt>
-    using static_div_algo
-        = std::integral_constant<int, SInt::s_size == 1 ? 1 : ((SInt::s_size == 2 && have_dlimb_div::value) ? 2 : 0)>;
-    // mpn implementation.
-    static void static_div_impl(s_int &q, s_int &r, const s_int &op1, const s_int &op2, mpz_size_t asize1,
-                                mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 0> &)
-    {
-        using mppp_impl::copy_limbs_no;
-        // First we check if the divisor is larger than the dividend (in abs limb size), as the mpn function
-        // requires asize1 >= asize2.
-        if (asize2 > asize1) {
-            // Copy op1 into the remainder.
-            r = op1;
-            // Zero out q.
-            q._mp_size = 0;
-            return;
-        }
-        // We need to take care of potentially overlapping arguments. We know that q and r are distinct, but op1
-        // could overlap with q or r, and op2 could overlap with op1, q or r.
-        std::array<::mp_limb_t, SSize> op1_alt, op2_alt;
-        const ::mp_limb_t *data1 = op1.m_limbs.data();
-        const ::mp_limb_t *data2 = op2.m_limbs.data();
-        if (&op1 == &q || &op1 == &r) {
-            copy_limbs_no(data1, data1 + asize1, op1_alt.data());
-            data1 = op1_alt.data();
-        }
-        if (&op2 == &q || &op2 == &r || &op1 == &op2) {
-            copy_limbs_no(data2, data2 + asize2, op2_alt.data());
-            data2 = op2_alt.data();
-        }
-        // Small helper function to verify that all pointers are distinct. Used exclusively for debugging purposes.
-        auto distinct_op = [&q, &r, data1, data2]() -> bool {
-            const ::mp_limb_t *ptrs[] = {q.m_limbs.data(), r.m_limbs.data(), data1, data2};
-            std::sort(ptrs, ptrs + 4, std::less<const ::mp_limb_t *>());
-            return std::unique(ptrs, ptrs + 4) == (ptrs + 4);
-        };
-        (void)distinct_op;
-        assert(distinct_op());
-        // Proceed to the division.
-        if (asize2 == 1) {
-            // Optimization when the divisor has 1 limb.
-            r.m_limbs[0]
-                = ::mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
-        } else {
-            // General implementation.
-            ::mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1),
-                          data2, static_cast<::mp_size_t>(asize2));
-        }
-        // Complete the quotient: compute size and sign.
-        q._mp_size = asize1 - asize2 + 1;
-        while (q._mp_size && !(q.m_limbs[static_cast<std::size_t>(q._mp_size - 1)] & GMP_NUMB_MASK)) {
-            --q._mp_size;
-        }
-        if (sign1 != sign2) {
-            q._mp_size = -q._mp_size;
-        }
-        // Complete the remainder.
-        r._mp_size = asize2;
-        while (r._mp_size && !(r.m_limbs[static_cast<std::size_t>(r._mp_size - 1)] & GMP_NUMB_MASK)) {
-            --r._mp_size;
-        }
-        if (sign1 == -1) {
-            r._mp_size = -r._mp_size;
-        }
-    }
-    // 1-limb optimisation.
-    static void static_div_impl(s_int &q, s_int &r, const s_int &op1, const s_int &op2, mpz_size_t, mpz_size_t,
-                                int sign1, int sign2, const std::integral_constant<int, 1> &)
-    {
-        // NOTE: here we have to use GMP_NUMB_MASK because if s_size is 1 this implementation is *always*
-        // called, even if we have nail bits (whereas the optimisation for other operations currently kicks in
-        // only without nail bits). Thus, we need to discard from m_limbs[0] the nail bits before doing the
-        // division.
-        const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK),
-                          r_ = (op1.m_limbs[0] & GMP_NUMB_MASK) % (op2.m_limbs[0] & GMP_NUMB_MASK);
-        // Write q.
-        q._mp_size = (q_ != 0u);
-        if (sign1 != sign2) {
-            q._mp_size = -q._mp_size;
-        }
-        // NOTE: there should be no need here to mask.
-        q.m_limbs[0] = q_;
-        // Write r.
-        r._mp_size = (r_ != 0u);
-        // Following C++11, the sign of r is the sign of op1:
-        // http://stackoverflow.com/questions/13100711/operator-modulo-change-in-c-11
-        if (sign1 == -1) {
-            r._mp_size = -r._mp_size;
-        }
-        r.m_limbs[0] = r_;
-    }
-#if defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
-    static void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
-                          ::mp_limb_t *MPPP_RESTRICT r2)
-    {
-        using dlimb_t = MPPP_UINT128;
-        const auto op1 = op11 + (dlimb_t(op12) << 64);
-        const auto op2 = op21 + (dlimb_t(op22) << 64);
-        const auto q = op1 / op2, r = op1 % op2;
-        *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-        *q2 = static_cast<::mp_limb_t>(q >> 64);
-        *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
-        *r2 = static_cast<::mp_limb_t>(r >> 64);
-    }
-    // Without remainder.
-    static void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
-    {
-        using dlimb_t = MPPP_UINT128;
-        const auto op1 = op11 + (dlimb_t(op12) << 64);
-        const auto op2 = op21 + (dlimb_t(op22) << 64);
-        const auto q = op1 / op2;
-        *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-        *q2 = static_cast<::mp_limb_t>(q >> 64);
-    }
-#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
-    static void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
-                          ::mp_limb_t *MPPP_RESTRICT r2)
-    {
-        using dlimb_t = std::uint_least64_t;
-        const auto op1 = op11 + (dlimb_t(op12) << 32);
-        const auto op2 = op21 + (dlimb_t(op22) << 32);
-        const auto q = op1 / op2, r = op1 % op2;
-        *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-        *q2 = static_cast<::mp_limb_t>(q >> 32);
-        *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
-        *r2 = static_cast<::mp_limb_t>(r >> 32);
-    }
-    static void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
-    {
-        using dlimb_t = std::uint_least64_t;
-        const auto op1 = op11 + (dlimb_t(op12) << 32);
-        const auto op2 = op21 + (dlimb_t(op22) << 32);
-        const auto q = op1 / op2;
-        *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-        *q2 = static_cast<::mp_limb_t>(q >> 32);
-    }
-#endif
-    // 2-limbs optimisation.
-    static void static_div_impl(s_int &q, s_int &r, const s_int &op1, const s_int &op2, mpz_size_t asize1,
-                                mpz_size_t asize2, int sign1, int sign2, const std::integral_constant<int, 2> &)
-    {
-        if (asize1 < 2 && asize2 < 2) {
-            // NOTE: testing indicates that it pays off to optimize the case in which the operands have
-            // fewer than 2 limbs. This a slightly modified version of the 1-limb division from above,
-            // without the need to mask as this function is called only if there are no nail bits.
-            const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0], r_ = op1.m_limbs[0] % op2.m_limbs[0];
-            q._mp_size = (q_ != 0u);
-            if (sign1 != sign2) {
-                q._mp_size = -q._mp_size;
-            }
-            q.m_limbs[0] = q_;
-            q.m_limbs[1] = 0u;
-            r._mp_size = (r_ != 0u);
-            if (sign1 == -1) {
-                r._mp_size = -r._mp_size;
-            }
-            r.m_limbs[0] = r_;
-            r.m_limbs[1] = 0u;
-            return;
-        }
-        // Perform the division.
-        ::mp_limb_t q1, q2, r1, r2;
-        dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2, &r1, &r2);
-        // Write out.
-        q._mp_size = q2 ? 2 : (q1 ? 1 : 0);
-        if (sign1 != sign2) {
-            q._mp_size = -q._mp_size;
-        }
-        q.m_limbs[0] = q1;
-        q.m_limbs[1] = q2;
-        r._mp_size = r2 ? 2 : (r1 ? 1 : 0);
-        if (sign1 == -1) {
-            r._mp_size = -r._mp_size;
-        }
-        r.m_limbs[0] = r1;
-        r.m_limbs[1] = r2;
-    }
-    static void static_div(s_int &q, s_int &r, const s_int &op1, const s_int &op2)
-    {
-        mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
-        int sign1 = asize1 != 0, sign2 = asize2 != 0;
-        if (asize1 < 0) {
-            asize1 = -asize1;
-            sign1 = -1;
-        }
-        if (asize2 < 0) {
-            asize2 = -asize2;
-            sign2 = -1;
-        }
-        static_div_impl(q, r, op1, op2, asize1, asize2, sign1, sign2, static_div_algo<s_int>{});
-        if (static_div_algo<s_int>::value == 0) {
-            q.zero_unused_limbs();
-            r.zero_unused_limbs();
-        }
-    }
-    // Dispatching for the binary division operator.
-    static mp_integer dispatch_binary_div(const mp_integer &op1, const mp_integer &op2)
-    {
-        mp_integer retval, r;
-        tdiv_qr(retval, r, op1, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_div(const mp_integer &op1, T n)
-    {
-        mp_integer retval, r;
-        tdiv_qr(retval, r, op1, mp_integer{n});
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_div(T n, const mp_integer &op2)
-    {
-        mp_integer retval, r;
-        tdiv_qr(retval, r, mp_integer{n}, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_div(const mp_integer &op1, T x)
-    {
-        return static_cast<T>(op1) / x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static T dispatch_binary_div(T x, const mp_integer &op2)
-    {
-        return x / static_cast<T>(op2);
-    }
-    // Dispatching for in-place div.
-    static void dispatch_in_place_div(mp_integer &retval, const mp_integer &n)
-    {
-        mp_integer r;
-        tdiv_qr(retval, r, retval, n);
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_div(mp_integer &retval, const T &n)
-    {
-        mp_integer r;
-        tdiv_qr(retval, r, retval, mp_integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static void dispatch_in_place_div(mp_integer &retval, const T &x)
-    {
-        retval = static_cast<T>(retval) / x;
-    }
-    // Enablers for modulo operators. They are special because they don't accept floating-point.
-    template <typename T, typename U>
-    using common_mod_t
-        = enable_if_t<conjunction<negation<std::is_floating_point<T>>, negation<std::is_floating_point<U>>>::value,
-                      common_t<T, U>>;
-    template <typename T>
-    using in_place_mod_enabler
-        = enable_if_t<disjunction<is_supported_integral<T>, std::is_same<T, mp_integer>>::value, int>;
-    // Dispatching for the binary modulo operator.
-    static mp_integer dispatch_binary_mod(const mp_integer &op1, const mp_integer &op2)
-    {
-        mp_integer q, retval;
-        tdiv_qr(q, retval, op1, op2);
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_mod(const mp_integer &op1, T n)
-    {
-        mp_integer q, retval;
-        tdiv_qr(q, retval, op1, mp_integer{n});
-        return retval;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static mp_integer dispatch_binary_mod(T n, const mp_integer &op2)
-    {
-        mp_integer q, retval;
-        tdiv_qr(q, retval, mp_integer{n}, op2);
-        return retval;
-    }
-    // Dispatching for in-place mod.
-    static void dispatch_in_place_mod(mp_integer &retval, const mp_integer &n)
-    {
-        mp_integer q;
-        tdiv_qr(q, retval, retval, n);
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static void dispatch_in_place_mod(mp_integer &retval, const T &n)
-    {
-        mp_integer q;
-        tdiv_qr(q, retval, retval, mp_integer{n});
-    }
-
-public:
-    /// Ternary truncated division.
-    /**
-     * This function will set \p q to the truncated quotient <tt>n / d</tt> and \p r to
-     * <tt>n % d</tt>. The remainder \p r has the same sign as \p n. \p q and \p r must be two distinct objects.
-     *
-     * @param q the quotient.
-     * @param r the remainder.
-     * @param n the dividend.
-     * @param d the divisor.
-     *
-     * @throws std::invalid_argument if \p q and \p r are the same object.
-     * @throws zero_division_error if \p d is zero.
-     */
-    friend void tdiv_qr(mp_integer &q, mp_integer &r, const mp_integer &n, const mp_integer &d)
-    {
-        if (mppp_unlikely(&q == &r)) {
-            throw std::invalid_argument("When performing a division with remainder, the quotient 'q' and the "
-                                        "remainder 'r' must be distinct objects");
-        }
-        if (mppp_unlikely(d.sgn() == 0)) {
-            throw zero_division_error("Integer division by zero");
-        }
-        const bool sq = q.is_static(), sr = r.is_static(), s1 = n.is_static(), s2 = d.is_static();
-        if (mppp_likely(sq && sr && s1 && s2)) {
-            static_div(q.m_int.g_st(), r.m_int.g_st(), n.m_int.g_st(), d.m_int.g_st());
-            // Division can never fail.
-            return;
-        }
-        if (sq) {
-            q.m_int.promote();
-        }
-        if (sr) {
-            r.m_int.promote();
-        }
-        ::mpz_tdiv_qr(&q.m_int.g_dy(), &r.m_int.g_dy(), n.get_mpz_view(), d.get_mpz_view());
-    }
-    /// Binary division operator.
-    /**
-     * @param n the dividend.
-     * @param d the divisor.
-     *
-     * @return <tt>n / d</tt>. The result is truncated if only integral types are involved in the division.
-     *
-     * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
-     */
-    template <typename T, typename U>
-    friend common_t<T, U> operator/(const T &n, const U &d)
-    {
-        return dispatch_binary_div(n, d);
-    }
-    /// In-place division operator.
-    /**
-     * @param d the divisor.
-     *
-     * @return a reference to \p this. The result is truncated.
-     *
-     * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
-     * @throws unspecified any exception thrown by the assignment of a floating-point value to mp_integer, iff \p T
-     * is a floating-point type.
-     */
-    template <typename T, in_place_enabler<T> = 0>
-    mp_integer &operator/=(const T &d)
-    {
-        dispatch_in_place_div(*this, d);
-        return *this;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend in_place_lenabler<T> operator/=(T &x, const mp_integer &n)
-#else
-    /// In-place division for interoperable types.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This operator is enabled only if ``T`` is an interoperable type for :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
-     *
-     * The body of this operator is equivalent to:
-     * \verbatim embed:rst:leading-asterisk
-     * .. code-block:: c++
-     *
-     *    return x = static_cast<T>(x / n);
-     * \endverbatim
-     *
-     * That is, the result of the corresponding binary operation is cast back to \p T and assigned to \p x.
-     *
-     * @param x the first argument.
-     * @param n the second argument.
-     *
-     * @return a reference to \p x.
-     *
-     * @throws unspecified any exception thrown by the conversion operator of mppp::mp_integer or by
-     * mppp::mp_integer::operator/().
-     */
-    template <typename T, in_place_lenabler<T> = 0>
-    friend T &operator/=(T &x, const mp_integer &n)
-#endif
-    {
-        return x = static_cast<T>(x / n);
-    }
-    /// Binary modulo operator.
-    /**
-     * @param n the dividend.
-     * @param d the divisor.
-     *
-     * @return <tt>n % d</tt>.
-     *
-     * @throws zero_division_error if \p d is zero.
-     */
-    template <typename T, typename U>
-    friend common_mod_t<T, U> operator%(const T &n, const U &d)
-    {
-        return dispatch_binary_mod(n, d);
-    }
-    /// In-place modulo operator.
-    /**
-     * @param d the divisor.
-     *
-     * @return a reference to \p this..
-     *
-     * @throws zero_division_error if \p d is zero.
-     */
-    template <typename T, in_place_mod_enabler<T> = 0>
-    mp_integer &operator%=(const T &d)
-    {
-        dispatch_in_place_mod(*this, d);
-        return *this;
-    }
-
-private:
-    // Selection of the algorithm for static mul_2exp.
-    template <typename SInt>
-    using static_mul_2exp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
-    // mpn implementation.
-    static std::size_t static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
-                                            const std::integral_constant<int, 0> &)
-    {
-        using mppp_impl::copy_limbs_no;
-        mpz_size_t asize = n._mp_size;
-        if (s == 0u || asize == 0) {
-            // If shift is zero, or the operand is zero, write n into rop and return success.
-            rop = n;
-            return 0u;
-        }
-        // Finish setting up asize and sign.
-        int sign = asize != 0;
-        if (asize < 0) {
-            asize = -asize;
-            sign = -1;
-        }
-        // ls: number of entire limbs shifted.
-        // rs: effective shift that will be passed to the mpn function.
-        const auto ls = s / GMP_NUMB_BITS, rs = s % GMP_NUMB_BITS;
-        // At the very minimum, the new asize will be the old asize
-        // plus ls.
-        const mpz_size_t new_asize = asize + static_cast<mpz_size_t>(ls);
-        if (std::size_t(new_asize) < SSize) {
-            // In this case the operation will always succeed, and we can write directly into rop.
-            ::mp_limb_t ret = 0u;
-            if (rs) {
-                // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
-                // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() + ls >= n.m_limbs.data().
-                ret = ::mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize),
-                                   unsigned(rs));
-                // Write bits spilling out.
-                rop.m_limbs[std::size_t(new_asize)] = ret;
-            } else {
-                // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
-                // NOTE: we have to use move_backward here because the ranges are overlapping and they do not
-                // start at the same pointer (in which case we could've used copy_limbs()). Here we know ls is not
-                // zero: we don't have a remainder, and s == 0 was already handled above. Hence, new_asize > asize.
-                assert(new_asize > asize);
-                std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
-            }
-            // Zero the lower limbs vacated by the shift.
-            std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
-            // Set the size.
-            rop._mp_size = new_asize + (ret != 0u);
-            if (sign == -1) {
-                rop._mp_size = -rop._mp_size;
-            }
-            return 0u;
-        }
-        if (std::size_t(new_asize) == SSize) {
-            if (rs) {
-                // In this case the operation may fail, so we need to write to temporary storage.
-                std::array<::mp_limb_t, SSize> tmp;
-                if (::mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
-                    return SSize + 1u;
-                }
-                // The shift was successful without spill over, copy the content from the tmp
-                // storage into rop.
-                copy_limbs_no(tmp.data(), tmp.data() + asize, rop.m_limbs.data() + ls);
-            } else {
-                // If we shifted by a multiple of the limb size, then we can write directly to rop.
-                assert(new_asize > asize);
-                std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
-            }
-            // Zero the lower limbs vacated by the shift.
-            std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
-            // Set the size.
-            rop._mp_size = new_asize;
-            if (sign == -1) {
-                rop._mp_size = -rop._mp_size;
-            }
-            return 0u;
-        }
-        // Shift is too much, the size will overflow the static limit.
-        // Return a hint for the size of the result.
-        return std::size_t(new_asize) + 1u;
-    }
-    // 1-limb optimisation.
-    static std::size_t static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
-                                            const std::integral_constant<int, 1> &)
-    {
-        const ::mp_limb_t l = n.m_limbs[0] & GMP_NUMB_MASK;
-        if (s == 0u || l == 0u) {
-            // If shift is zero, or the operand is zero, write n into rop and return success.
-            rop = n;
-            return 0u;
-        }
-        if (mppp_unlikely(s >= GMP_NUMB_BITS || (l >> (GMP_NUMB_BITS - s)))) {
-            // The two conditions:
-            // - if the shift is >= number of data bits, the operation will certainly
-            //   fail (as the operand is nonzero);
-            // - shifting by s would overflow  the single limb.
-            // NOTE: s is at least 1, so in the right shift above we never risk UB due to too much shift.
-            // NOTE: for the size hint: s / nbits is the number of entire limbs shifted, +1 because the shifted
-            // limbs add to the current size (1), +1 because another limb might be needed.
-            return std::size_t(s) / GMP_NUMB_BITS + 2u;
-        }
-        // Write out.
-        rop.m_limbs[0] = l << s;
-        // Size is the same as the input value.
-        rop._mp_size = n._mp_size;
-        return 0u;
-    }
-    // 2-limb optimisation.
-    static std::size_t static_mul_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
-                                            const std::integral_constant<int, 2> &)
-    {
-        mpz_size_t asize = n._mp_size;
-        if (s == 0u || asize == 0) {
-            rop = n;
-            return 0u;
-        }
-        int sign = asize != 0;
-        if (asize < 0) {
-            asize = -asize;
-            sign = -1;
-        }
-        // Too much shift, this can never work on a nonzero value.
-        static_assert(GMP_NUMB_BITS
-                          < std::numeric_limits<typename std::decay<decltype(GMP_NUMB_BITS)>::type>::max() / 2u,
-                      "Overflow error.");
-        if (mppp_unlikely(s >= 2u * GMP_NUMB_BITS)) {
-            // NOTE: this is the generic formula to estimate the final size.
-            return std::size_t(s) / GMP_NUMB_BITS + 1u + std::size_t(asize);
-        }
-        if (s == GMP_NUMB_BITS) {
-            // This case can be dealt with moving lo into hi, but only if asize is 1.
-            if (mppp_unlikely(asize == 2)) {
-                // asize is 2, shift is too much.
-                return 3u;
-            }
-            rop.m_limbs[1u] = n.m_limbs[0u];
-            rop.m_limbs[0u] = 0u;
-            // The size has to be 2.
-            rop._mp_size = 2;
-            if (sign == -1) {
-                rop._mp_size = -2;
-            }
-            return 0u;
-        }
-        // Temp hi lo limbs to store the result that will eventually go into rop.
-        ::mp_limb_t lo = n.m_limbs[0u], hi = n.m_limbs[1u];
-        if (s > GMP_NUMB_BITS) {
-            if (mppp_unlikely(asize == 2)) {
-                return std::size_t(s) / GMP_NUMB_BITS + 1u + std::size_t(asize);
-            }
-            // Move lo to hi and set lo to zero.
-            hi = n.m_limbs[0u];
-            lo = 0u;
-            // Update the shift.
-            s = static_cast<::mp_bitcnt_t>(s - GMP_NUMB_BITS);
-        }
-        // Check that hi will not be shifted too much. Note that
-        // here and below s can never be zero, so we never shift too much.
-        assert(s > 0u && s < GMP_NUMB_BITS);
-        if (mppp_unlikely((hi & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - s))) {
-            return 3u;
-        }
-        // Shift hi and lo. hi gets the carry over from lo.
-        hi = ((hi & GMP_NUMB_MASK) << s) + ((lo & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - s));
-        // NOTE: here the result needs to be masked as well as the shift could
-        // end up writing in nail bits.
-        lo = ((lo & GMP_NUMB_MASK) << s) & GMP_NUMB_MASK;
-        // Write rop.
-        rop.m_limbs[0u] = lo;
-        rop.m_limbs[1u] = hi;
-        // asize is at least 1.
-        rop._mp_size = 1 + (hi != 0u);
-        if (sign == -1) {
-            rop._mp_size = -rop._mp_size;
-        }
-        return 0u;
-    }
-    static std::size_t static_mul_2exp(s_int &rop, const s_int &n, ::mp_bitcnt_t s)
-    {
-        const std::size_t retval = static_mul_2exp_impl(rop, n, s, static_mul_2exp_algo<s_int>{});
-        if (static_mul_2exp_algo<s_int>::value == 0 && retval == 0u) {
-            rop.zero_unused_limbs();
-        }
-        return retval;
-    }
-
-public:
-    /// Ternary left shift.
-    /**
-     * This function will set \p rop to \p n multiplied by <tt>2**s</tt>.
-     *
-     * @param rop the return value.
-     * @param n the multiplicand.
-     * @param s the bit shift value.
-     */
-    friend void mul_2exp(mp_integer &rop, const mp_integer &n, ::mp_bitcnt_t s)
-    {
-        const bool sr = rop.is_static(), sn = n.is_static();
-        std::size_t size_hint = 0u;
-        if (mppp_likely(sr && sn)) {
-            size_hint = static_mul_2exp(rop.m_int.g_st(), n.m_int.g_st(), s);
-            if (mppp_likely(size_hint == 0u)) {
-                return;
-            }
-        }
-        if (sr) {
-            rop.m_int.promote(size_hint);
-        }
-        ::mpz_mul_2exp(&rop.m_int.g_dy(), n.get_mpz_view(), s);
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend shift_op_enabler<T> operator<<(const mp_integer &n, T s)
-#else
-    /// Left shift operator.
-    /**
-     * @param n the multiplicand.
-     * @param s the bit shift value.
-     *
-     * @return \p n times <tt>2**s</tt>.
-     *
-     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
-     */
-    template <typename T, shift_op_enabler<T> = 0>
-    friend mp_integer operator<<(const mp_integer &n, T s)
-#endif
-    {
-        mp_integer retval;
-        mul_2exp(retval, n, cast_to_bitcnt(s));
-        return retval;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    shift_op_enabler<T> &operator<<=(T s)
-#else
-    /// In-place left shift operator.
-    /**
-     * @param s the bit shift value.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
-     */
-    template <typename T, shift_op_enabler<T> = 0>
-    mp_integer &operator<<=(T s)
-#endif
-    {
-        mul_2exp(*this, *this, cast_to_bitcnt(s));
-        return *this;
-    }
-
-private:
-    // Selection of the algorithm for static tdiv_q_2exp.
-    template <typename SInt>
-    using static_tdiv_q_2exp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
-    // mpn implementation.
-    static void static_tdiv_q_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
-                                        const std::integral_constant<int, 0> &)
-    {
-        mpz_size_t asize = n._mp_size;
-        if (s == 0u || asize == 0) {
-            // If shift is zero, or the operand is zero, write n into rop and return.
-            rop = n;
-            return;
-        }
-        // Finish setting up asize and sign.
-        int sign = asize != 0;
-        if (asize < 0) {
-            asize = -asize;
-            sign = -1;
-        }
-        // ls: number of entire limbs shifted.
-        // rs: effective shift that will be passed to the mpn function.
-        const auto ls = s / GMP_NUMB_BITS, rs = s % GMP_NUMB_BITS;
-        if (ls >= std::size_t(asize)) {
-            // If we shift by a number of entire limbs equal to or larger than the asize,
-            // the result will be zero.
-            rop._mp_size = 0;
-            return;
-        }
-        // The maximum new asize will be the old asize minus ls.
-        const mpz_size_t new_asize = asize - static_cast<mpz_size_t>(ls);
-        if (rs) {
-            // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
-            // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() <= n.m_limbs.data() + ls.
-            ::mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize), unsigned(rs));
-        } else {
-            // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
-            // NOTE: std::move requires that the destination iterator is not within the input range.
-            // Here we are sure that ls > 0 because we don't have a remainder, and the zero shift case
-            // was already handled above.
-            assert(ls);
-            std::move(n.m_limbs.begin() + ls, n.m_limbs.begin() + asize, rop.m_limbs.begin());
-        }
-        // Set the size. We need to check if the top limb is zero.
-        rop._mp_size = new_asize - ((rop.m_limbs[std::size_t(new_asize - 1)] & GMP_NUMB_MASK) == 0u);
-        if (sign == -1) {
-            rop._mp_size = -rop._mp_size;
-        }
-    }
-    // 1-limb optimisation.
-    static void static_tdiv_q_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
-                                        const std::integral_constant<int, 1> &)
-    {
-        const ::mp_limb_t l = n.m_limbs[0] & GMP_NUMB_MASK;
-        if (s == 0u || l == 0u) {
-            rop = n;
-            return;
-        }
-        if (s >= GMP_NUMB_BITS) {
-            // We are shifting by the limb's bit size or greater, the result will be zero.
-            rop._mp_size = 0;
-            rop.m_limbs[0] = 0u;
-            return;
-        }
-        // Compute the result.
-        const auto res = l >> s;
-        // Size is the original one or zero.
-        rop._mp_size = res ? n._mp_size : 0;
-        rop.m_limbs[0] = res;
-    }
-    // 2-limb optimisation.
-    static void static_tdiv_q_2exp_impl(s_int &rop, const s_int &n, ::mp_bitcnt_t s,
-                                        const std::integral_constant<int, 2> &)
-    {
-        mpz_size_t asize = n._mp_size;
-        if (s == 0u || asize == 0) {
-            rop = n;
-            return;
-        }
-        int sign = asize != 0;
-        if (asize < 0) {
-            asize = -asize;
-            sign = -1;
-        }
-        // If shift is too large, zero the result and return.
-        static_assert(GMP_NUMB_BITS
-                          < std::numeric_limits<typename std::decay<decltype(GMP_NUMB_BITS)>::type>::max() / 2u,
-                      "Overflow error.");
-        if (s >= 2u * GMP_NUMB_BITS) {
-            rop._mp_size = 0;
-            rop.m_limbs[0u] = 0u;
-            rop.m_limbs[1u] = 0u;
-            return;
-        }
-        if (s >= GMP_NUMB_BITS) {
-            // NOTE: here the effective shift < GMP_NUMB_BITS, otherwise it would have been caught
-            // in the check above.
-            const auto lo = (n.m_limbs[1u] & GMP_NUMB_MASK) >> (s - GMP_NUMB_BITS);
-            // The size could be zero or +-1, depending
-            // on the new content of m_limbs[0] and the previous
-            // sign of _mp_size.
-            rop._mp_size = lo ? sign : 0;
-            rop.m_limbs[0u] = lo;
-            rop.m_limbs[1u] = 0u;
-            return;
-        }
-        assert(s > 0u && s < GMP_NUMB_BITS);
-        // This represents the bits in hi that will be shifted down into lo.
-        // We move them up so we can add tmp to the new lo to account for them.
-        // NOTE: mask the final result to avoid spillover into potential nail bits.
-        const auto tmp = ((n.m_limbs[1u] & GMP_NUMB_MASK) << (GMP_NUMB_BITS - s)) & GMP_NUMB_MASK;
-        rop.m_limbs[0u] = ((n.m_limbs[0u] & GMP_NUMB_MASK) >> s) + tmp;
-        rop.m_limbs[1u] = (n.m_limbs[1u] & GMP_NUMB_MASK) >> s;
-        // The effective shift was less than 1 entire limb. The new asize must be the old one,
-        // or one less than that.
-        rop._mp_size = asize - ((rop.m_limbs[std::size_t(asize - 1)] & GMP_NUMB_MASK) == 0u);
-        if (sign == -1) {
-            rop._mp_size = -rop._mp_size;
-        }
-    }
-    static void static_tdiv_q_2exp(s_int &rop, const s_int &n, ::mp_bitcnt_t s)
-    {
-        static_tdiv_q_2exp_impl(rop, n, s, static_tdiv_q_2exp_algo<s_int>{});
-        if (static_tdiv_q_2exp_algo<s_int>::value == 0) {
-            rop.zero_unused_limbs();
-        }
-    }
-
-public:
-    /// Ternary right shift.
-    /**
-     * This function will set \p rop to \p n divided by <tt>2**s</tt>. \p rop will be the truncated result of the
-     * division.
-     *
-     * @param rop the return value.
-     * @param n the dividend.
-     * @param s the bit shift value.
-     */
-    friend void tdiv_q_2exp(mp_integer &rop, const mp_integer &n, ::mp_bitcnt_t s)
-    {
-        const bool sr = rop.is_static(), sn = n.is_static();
-        if (mppp_likely(sr && sn)) {
-            static_tdiv_q_2exp(rop.m_int.g_st(), n.m_int.g_st(), s);
-            return;
-        }
-        if (sr) {
-            rop.m_int.promote();
-        }
-        ::mpz_tdiv_q_2exp(&rop.m_int.g_dy(), n.get_mpz_view(), s);
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    friend shift_op_enabler<T> operator>>(const mp_integer &n, T s)
-#else
-    /// Right shift operator.
-    /**
-     * @param n the dividend.
-     * @param s the bit shift value.
-     *
-     * @return \p n divided by <tt>2**s</tt>. The result will be truncated.
-     *
-     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
-     */
-    template <typename T, shift_op_enabler<T> = 0>
-    friend mp_integer operator>>(const mp_integer &n, T s)
-#endif
-    {
-        mp_integer retval;
-        tdiv_q_2exp(retval, n, cast_to_bitcnt(s));
-        return retval;
-    }
-#if defined(_MSC_VER)
-    template <typename T>
-    shift_op_enabler<T> &operator>>=(T s)
-#else
-    /// In-place right shift operator.
-    /**
-     * @param s the bit shift value.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
-     */
-    template <typename T, shift_op_enabler<T> = 0>
-    mp_integer &operator>>=(T s)
-#endif
-    {
-        tdiv_q_2exp(*this, *this, cast_to_bitcnt(s));
-        return *this;
-    }
-
-private:
-    // Selection of the algorithm for static cmp.
-    template <typename SInt>
-    using static_cmp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
-    // mpn implementation.
-    static int static_cmp(const s_int &n1, const s_int &n2, const std::integral_constant<int, 0> &)
-    {
-        if (n1._mp_size < n2._mp_size) {
-            return -1;
-        }
-        if (n2._mp_size < n1._mp_size) {
-            return 1;
-        }
-        // The two sizes are equal, compare the absolute values.
-        const auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
-        if (asize == 0) {
-            // Both operands are zero.
-            // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
-            // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
-            return 0;
-        }
-        const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize));
-        // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
-        return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
-    }
-    // 1-limb optimisation.
-    static int static_cmp(const s_int &n1, const s_int &n2, const std::integral_constant<int, 1> &)
-    {
-        if (n1._mp_size < n2._mp_size) {
-            return -1;
-        }
-        if (n2._mp_size < n1._mp_size) {
-            return 1;
-        }
-        int cmp_abs = (n1.m_limbs[0u] & GMP_NUMB_MASK) > (n2.m_limbs[0u] & GMP_NUMB_MASK);
-        if (!cmp_abs) {
-            cmp_abs = -static_cast<int>((n1.m_limbs[0u] & GMP_NUMB_MASK) < (n2.m_limbs[0u] & GMP_NUMB_MASK));
-        }
-        return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
-    }
-    // 2-limb optimisation.
-    static int static_cmp(const s_int &n1, const s_int &n2, const std::integral_constant<int, 2> &)
-    {
-        if (n1._mp_size < n2._mp_size) {
-            return -1;
-        }
-        if (n2._mp_size < n1._mp_size) {
-            return 1;
-        }
-        auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
-        while (asize != 0) {
-            --asize;
-            if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) > (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
-                return (n1._mp_size >= 0) ? 1 : -1;
-            }
-            if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) < (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
-                return (n1._mp_size >= 0) ? -1 : 1;
-            }
-        }
-        return 0;
-    }
-    // Equality operator.
-    // NOTE: special implementation instead of using cmp, this should be faster.
-    static bool dispatch_equality(const mp_integer &a, const mp_integer &b)
-    {
-        const mp_size_t size_a = a.m_int.m_st._mp_size, size_b = b.m_int.m_st._mp_size;
-        if (size_a != size_b) {
-            return false;
-        }
-        const ::mp_limb_t *ptr_a, *ptr_b;
-        std::size_t asize;
-        if (a.is_static()) {
-            ptr_a = a.m_int.g_st().m_limbs.data();
-            asize = static_cast<std::size_t>((size_a >= 0) ? size_a : -size_a);
-        } else {
-            ptr_a = a.m_int.g_dy()._mp_d;
-            asize = ::mpz_size(&a.m_int.g_dy());
-        }
-        if (b.is_static()) {
-            ptr_b = b.m_int.g_st().m_limbs.data();
-        } else {
-            ptr_b = b.m_int.g_dy()._mp_d;
-        }
-        auto limb_cmp
-            = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
-#if defined(_MSC_VER)
-        return std::equal(stdext::make_checked_array_iterator(ptr_a, asize),
-                          stdext::make_checked_array_iterator(ptr_a, asize, asize),
-                          stdext::make_checked_array_iterator(ptr_b, asize), limb_cmp);
-#else
-        return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
-#endif
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_equality(const mp_integer &a, T n)
-    {
-        return dispatch_equality(a, mp_integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_equality(T n, const mp_integer &a)
-    {
-        return dispatch_equality(a, n);
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_equality(const mp_integer &a, T x)
-    {
-        return static_cast<T>(a) == x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_equality(T x, const mp_integer &a)
-    {
-        return dispatch_equality(a, x);
-    }
-    // Less-than operator.
-    static bool dispatch_less_than(const mp_integer &a, const mp_integer &b)
-    {
-        return cmp(a, b) < 0;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_less_than(const mp_integer &a, T n)
-    {
-        return dispatch_less_than(a, mp_integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_less_than(T n, const mp_integer &a)
-    {
-        return dispatch_greater_than(a, mp_integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_less_than(const mp_integer &a, T x)
-    {
-        return static_cast<T>(a) < x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_less_than(T x, const mp_integer &a)
-    {
-        return dispatch_greater_than(a, x);
-    }
-    // Greater-than operator.
-    static bool dispatch_greater_than(const mp_integer &a, const mp_integer &b)
-    {
-        return cmp(a, b) > 0;
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_greater_than(const mp_integer &a, T n)
-    {
-        return dispatch_greater_than(a, mp_integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
-    static bool dispatch_greater_than(T n, const mp_integer &a)
-    {
-        return dispatch_less_than(a, mp_integer{n});
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_greater_than(const mp_integer &a, T x)
-    {
-        return static_cast<T>(a) > x;
-    }
-    template <typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
-    static bool dispatch_greater_than(T x, const mp_integer &a)
-    {
-        return dispatch_less_than(a, x);
-    }
-// The enabler for relational operators.
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    using rel_enabler = enable_if_t<!std::is_same<void, common_t<T, U>>::value, bool>;
-#else
-    template <typename T, typename U>
-    using rel_enabler = enable_if_t<!std::is_same<void, common_t<T, U>>::value, int>;
-#endif
-
-public:
-    /// Comparison function for mp_integer.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
-     * <tt>op1 > op2</tt>.
-     */
-    friend int cmp(const mp_integer &op1, const mp_integer &op2)
-    {
-        const bool s1 = op1.is_static(), s2 = op2.is_static();
-        if (mppp_likely(s1 && s2)) {
-            return static_cmp(op1.m_int.g_st(), op2.m_int.g_st(), static_cmp_algo<s_int>{});
-        }
-        return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator==(const T &op1, const U &op2)
-#else
-    /// Equality operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator==(const T &op1, const U &op2)
-#endif
-    {
-        return dispatch_equality(op1, op2);
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator!=(const T &op1, const U &op2)
-#else
-    /// Inequality operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator!=(const T &op1, const U &op2)
-#endif
-    {
-        return !(op1 == op2);
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator<(const T &op1, const U &op2)
-#else
-    /// Less-than operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator<(const T &op1, const U &op2)
-#endif
-    {
-        return dispatch_less_than(op1, op2);
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator>=(const T &op1, const U &op2)
-#else
-    /// Greater-than or equal operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator>=(const T &op1, const U &op2)
-#endif
-    {
-        return !(op1 < op2);
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator>(const T &op1, const U &op2)
-#else
-    /// Greater-than operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator>(const T &op1, const U &op2)
-#endif
-    {
-        return dispatch_greater_than(op1, op2);
-    }
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend rel_enabler<T, U> operator<=(const T &op1, const U &op2)
-#else
-    /// Less-than or equal operator.
-    /**
-     * @param op1 first argument.
-     * @param op2 second argument.
-     *
-     * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
-     */
-    template <typename T, typename U, rel_enabler<T, U> = 0>
-    friend bool operator<=(const T &op1, const U &op2)
-#endif
-    {
-        return !(op1 > op2);
-    }
-    /// Ternary exponentiation.
-    /**
-     * This function will set \p rop to <tt>base**exp</tt>.
-     *
-     * @param rop the return value.
-     * @param base the base.
-     * @param exp the exponent.
-     */
-    friend void pow_ui(mp_integer &rop, const mp_integer &base, unsigned long exp)
-    {
-        if (rop.is_static()) {
-            MPPP_MAYBE_TLS mpz_raii tmp;
-            ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
-            rop = mp_integer(&tmp.m_mpz);
-        } else {
-            ::mpz_pow_ui(&rop.m_int.g_dy(), base.get_mpz_view(), exp);
-        }
-    }
-    /// Binary exponentiation.
-    /**
-     * @param base the base.
-     * @param exp the exponent.
-     *
-     * @return <tt>base**exp</tt>.
-     */
-    friend mp_integer pow_ui(const mp_integer &base, unsigned long exp)
-    {
-        mp_integer retval;
-        pow_ui(retval, base, exp);
-        return retval;
-    }
-
-private:
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static bool exp_nonnegative(const T &exp)
-    {
-        return exp >= T(0);
-    }
-    static bool exp_nonnegative(const mp_integer &exp)
-    {
-        return exp.sgn() >= 0;
-    }
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static unsigned long exp_to_ulong(const T &exp)
-    {
-        assert(exp >= T(0));
-        // NOTE: make_unsigned<T>::type is T if T is already unsigned.
-        if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(exp)
-                          > std::numeric_limits<unsigned long>::max())) {
-            throw std::overflow_error("Cannot convert the integral value " + std::to_string(exp)
-                                      + " to unsigned long: the value is too large.");
-        }
-        return static_cast<unsigned long>(exp);
-    }
-    static unsigned long exp_to_ulong(const mp_integer &exp)
-    {
-        try {
-            return static_cast<unsigned long>(exp);
-        } catch (const std::overflow_error &) {
-            // Rewrite the error message.
-            throw std::overflow_error("Cannot convert the integral value " + exp.to_string()
-                                      + " to unsigned long: the value is too large.");
-        }
-    }
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static bool base_is_zero(const T &base)
-    {
-        return base == T(0);
-    }
-    static bool base_is_zero(const mp_integer &base)
-    {
-        return base.is_zero();
-    }
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static bool exp_is_odd(const T &exp)
-    {
-        return (exp % T(2)) != T(0);
-    }
-    static bool exp_is_odd(const mp_integer &exp)
-    {
-        return exp.odd_p();
-    }
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static std::string exp_to_string(const T &exp)
-    {
-        return std::to_string(exp);
-    }
-    static std::string exp_to_string(const mp_integer &exp)
-    {
-        return exp.to_string();
-    }
-    // Implementation of pow().
-    // mp_integer -- integral overload.
-    template <typename T, enable_if_t<disjunction<std::is_same<T, mp_integer>, std::is_integral<T>>::value, int> = 0>
-    static mp_integer pow_impl(const mp_integer &base, const T &exp)
-    {
-        mp_integer rop;
-        if (exp_nonnegative(exp)) {
-            pow_ui(rop, base, exp_to_ulong(exp));
-        } else if (mppp_unlikely(base_is_zero(base))) {
-            // 0**-n is a division by zero.
-            throw zero_division_error("cannot raise zero to the negative power " + exp_to_string(exp));
-        } else if (base.is_one()) {
-            // 1**n == 1.
-            rop = 1;
-        } else if (base.is_negative_one()) {
-            if (exp_is_odd(exp)) {
-                // 1**(-2n-1) == -1.
-                rop = -1;
-            } else {
-                // 1**(-2n) == 1.
-                rop = 1;
-            }
-        } else {
-            // m**-n == 1 / m**n == 0.
-            rop = 0;
-        }
-        return rop;
-    }
-    // C++ integral -- mp_integer overload.
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static mp_integer pow_impl(const T &base, const mp_integer &exp)
-    {
-        return pow_impl(mp_integer{base}, exp);
-    }
-    // mp_integer -- FP overload.
-    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    static T pow_impl(const mp_integer &base, const T &exp)
-    {
-        return std::pow(static_cast<T>(base), exp);
-    }
-    // FP -- mp_integer overload.
-    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    static T pow_impl(const T &base, const mp_integer &exp)
-    {
-        return std::pow(base, static_cast<T>(exp));
-    }
-
-public:
-    /// Generic binary exponentiation.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This function is enabled only if at least one argument is an :cpp:class:`mppp::mp_integer`
-     *    and the other argument is either an :cpp:class:`mppp::mp_integer` or an interoperable type for
-     *    :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
-     *
-     * This function will raise \p base to the power \p exp, and return the result. If one of the arguments
-     * is a floating-point value, then the result will be computed via <tt>std::pow()</tt> and it will also be a
-     * floating-point value. Otherwise, the result is computed via mppp::mp_integer::pow_ui() and its type is
-     * mppp::mp_integer. In case of a negative integral exponent and integral base, the result will be zero unless
-     * the absolute value of \p base is 1.
-     *
-     * @param base the base.
-     * @param exp the exponent.
-     *
-     * @return <tt>base**exp</tt>.
-     *
-     * @throws std::overflow_error if \p base and \p exp are integrals and \p exp is non-negative and outside the range
-     * of <tt>unsigned long</tt>.
-     * @throws zero_division_error if \p base and \p exp are integrals and \p base is zero and \p exp is negative.
-     */
-    template <typename T, typename U>
-    friend common_t<T, U> pow(const T &base, const U &exp)
-    {
-        return pow_impl(base, exp);
     }
     /// In-place absolute value.
     /**
@@ -4478,7 +1643,7 @@ public:
      *
      * @return reference to \p this.
      */
-    mp_integer &abs()
+    integer &abs()
     {
         if (is_static()) {
             if (m_int.g_st()._mp_size < 0) {
@@ -4489,107 +1654,13 @@ public:
         }
         return *this;
     }
-    /// Binary absolute value.
-    /**
-     * This function will set \p rop to the absolute value of \p n.
-     *
-     * @param rop the return value.
-     * @param n the argument.
-     */
-    friend void abs(mp_integer &rop, const mp_integer &n)
-    {
-        rop = n;
-        rop.abs();
-    }
-    /// Unary absolute value.
-    /**
-     * @param n the argument.
-     *
-     * @return the absolute value of \p n.
-     */
-    friend mp_integer abs(const mp_integer &n)
-    {
-        mp_integer ret(n);
-        ret.abs();
-        return ret;
-    }
-    /// Hash value.
-    /**
-     * This function will return a hash value for \p n. The hash value depends only on the value of \p n.
-     *
-     * @param n mp_integer whose hash value will be computed.
-     *
-     * @return a hash value for \p n.
-     */
-    friend std::size_t hash(const mp_integer &n)
-    {
-        std::size_t asize;
-        // NOTE: size is part of the common initial sequence.
-        const mpz_size_t size = n.m_int.m_st._mp_size;
-        const ::mp_limb_t *ptr;
-        if (n.m_int.is_static()) {
-            asize = static_cast<std::size_t>((size >= 0) ? size : -size);
-            ptr = n.m_int.g_st().m_limbs.data();
-        } else {
-            asize = ::mpz_size(&n.m_int.g_dy());
-            ptr = n.m_int.g_dy()._mp_d;
-        }
-        // Init the retval as the signed size.
-        auto retval = static_cast<std::size_t>(size);
-        // Combine the limbs.
-        for (std::size_t i = 0; i < asize; ++i) {
-            // The hash combiner. This is lifted directly from Boost. See also:
-            // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
-            retval ^= (ptr[i] & GMP_NUMB_MASK) + std::size_t(0x9e3779b9) + (retval << 6) + (retval >> 2);
-        }
-        return retval;
-    }
-
-private:
-    static void nextprime_impl(mp_integer &rop, const mp_integer &n)
-    {
-        if (rop.is_static()) {
-            MPPP_MAYBE_TLS mpz_raii tmp;
-            ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
-            rop = mp_integer(&tmp.m_mpz);
-        } else {
-            ::mpz_nextprime(&rop.m_int.g_dy(), n.get_mpz_view());
-        }
-    }
-
-public:
-    /// Compute next prime number (binary version).
-    /**
-     * This function will set \p rop to the first prime number greater than \p n.
-     * Note that for negative values of \p n this function always returns 2.
-     *
-     * @param rop the return value.
-     * @param n the mp_integer argument.
-     */
-    friend void nextprime(mp_integer &rop, const mp_integer &n)
-    {
-        // NOTE: nextprime on negative numbers always returns 2.
-        nextprime_impl(rop, n);
-    }
-    /// Compute next prime number (unary version).
-    /**
-     * @param n the mp_integer argument.
-     *
-     * @return the first prime number greater than \p n.
-     */
-    friend mp_integer nextprime(const mp_integer &n)
-    {
-        mp_integer retval;
-        nextprime_impl(retval, n);
-        return retval;
-    }
     /// Compute next prime number (in-place version).
     /**
      * This method will set \p this to the first prime number greater than the current value.
      *
      * @return a reference to \p this.
      */
-    mp_integer &nextprime()
+    integer &nextprime()
     {
         nextprime_impl(*this, *this);
         return *this;
@@ -4617,65 +1688,6 @@ public:
         }
         return ::mpz_probab_prime_p(get_mpz_view(), reps);
     }
-    /// Test primality.
-    /**
-     * This is the free-function version of mp_integer::probab_prime_p().
-     *
-     * @param n the mp_integer whose primality will be tested.
-     * @param reps the number of tests to run.
-     *
-     * @return an integer indicating if \p this is a prime.
-     *
-     * @throws unspecified any exception thrown by mp_integer::probab_prime_p().
-     */
-    friend int probab_prime_p(const mp_integer &n, int reps = 25)
-    {
-        return n.probab_prime_p(reps);
-    }
-
-private:
-    static void sqrt_impl(mp_integer &rop, const mp_integer &n)
-    {
-        using mppp_impl::copy_limbs_no;
-        if (mppp_unlikely(n.m_int.m_st._mp_size < 0)) {
-            throw std::domain_error("Cannot compute the square root of the negative number " + n.to_string());
-        }
-        const bool sr = rop.is_static(), sn = n.is_static();
-        if (mppp_likely(sr && sn)) {
-            s_int &rs = rop.m_int.g_st();
-            const s_int &ns = n.m_int.g_st();
-            // NOTE: we know this is not negative, from the check above.
-            const mpz_size_t size = ns._mp_size;
-            if (!size) {
-                // Special casing for zero.
-                rs._mp_size = 0;
-                rs.zero_unused_limbs();
-                return;
-            }
-            // In case of overlap we need to go through a tmp variable.
-            std::array<::mp_limb_t, SSize> tmp;
-            const bool overlap = (&rs == &ns);
-            auto out_ptr = overlap ? tmp.data() : rs.m_limbs.data();
-            ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
-            // Compute the size of the output (which is ceil(size / 2)).
-            const mpz_size_t new_size = size / 2 + size % 2;
-            assert(!new_size || (out_ptr[new_size - 1] & GMP_NUMB_MASK));
-            // Write out the result.
-            rs._mp_size = new_size;
-            if (overlap) {
-                copy_limbs_no(out_ptr, out_ptr + new_size, rs.m_limbs.data());
-            }
-            // Clear out unused limbs.
-            rs.zero_unused_limbs();
-            return;
-        }
-        if (sr) {
-            rop.promote();
-        }
-        ::mpz_sqrt(&rop.m_int.g_dy(), n.get_mpz_view());
-    }
-
-public:
     /// Integer square root (in-place version).
     /**
      * This method will set \p this to its integer square root.
@@ -4684,37 +1696,10 @@ public:
      *
      * @throws std::domain_error if \p this is negative.
      */
-    mp_integer &sqrt()
+    integer &sqrt()
     {
-        sqrt_impl(*this, *this);
+        mppp::sqrt(*this, *this);
         return *this;
-    }
-    /// Integer square root (binary version).
-    /**
-     * This method will set \p rop to the integer square root of \p n.
-     *
-     * @param rop the return value.
-     * @param n the mp_integer whose integer square root will be computed.
-     *
-     * @throws std::domain_error if \p n is negative.
-     */
-    friend void sqrt(mp_integer &rop, const mp_integer &n)
-    {
-        sqrt_impl(rop, n);
-    }
-    /// Integer square root (unary version).
-    /**
-     * @param n the mp_integer whose integer square root will be computed.
-     *
-     * @return the integer square root of \p n.
-     *
-     * @throws std::domain_error if \p n is negative.
-     */
-    friend mp_integer sqrt(const mp_integer &n)
-    {
-        mp_integer retval;
-        sqrt_impl(retval, n);
-        return retval;
     }
     /// Test if value is odd.
     /**
@@ -4728,16 +1713,6 @@ public:
         }
         return mpz_odd_p(&m_int.g_dy());
     }
-    /// Test if integer is odd.
-    /**
-     * @param n the argument.
-     *
-     * @return \p true if \p n is odd, \p false otherwise.
-     */
-    friend bool odd_p(const mp_integer &n)
-    {
-        return n.odd_p();
-    }
     /// Test if value is even.
     /**
      * @return \p true if \p this is even, \p false otherwise.
@@ -4746,418 +1721,23 @@ public:
     {
         return !odd_p();
     }
-    /// Test if integer is even.
-    /**
-     * @param n the argument.
-     *
-     * @return \p true if \p n is even, \p false otherwise.
-     */
-    friend bool even_p(const mp_integer &n)
-    {
-        return n.even_p();
-    }
-    /// Factorial.
-    /**
-     * This function will set \p rop to the factorial of \p n.
-     *
-     * @param rop the return value.
-     * @param n the argument for the factorial.
-     *
-     * @throws std::invalid_argument if \p n is larger than an implementation-defined limit.
-     */
-    friend void fac_ui(mp_integer &rop, unsigned long n)
-    {
-        // NOTE: we put a limit here because the GMP function just crashes and burns
-        // if n is too large, and n does not even need to be that large.
-        constexpr auto max_fac = 1000000ull;
-        if (mppp_unlikely(n > max_fac)) {
-            throw std::invalid_argument(
-                "The value " + std::to_string(n)
-                + " is too large to be used as input for the factorial function (the maximum allowed value is "
-                + std::to_string(max_fac) + ")");
-        }
-        if (rop.is_static()) {
-            MPPP_MAYBE_TLS mpz_raii tmp;
-            ::mpz_fac_ui(&tmp.m_mpz, n);
-            rop = mp_integer(&tmp.m_mpz);
-        } else {
-            ::mpz_fac_ui(&rop.m_int.g_dy(), n);
-        }
-    }
-    /// Binomial coefficient (ternary version).
-    /**
-     * This function will set \p rop to the binomial coefficient of \p n and \p k. Negative values of \p n are
-     * supported.
-     *
-     * @param rop the return value.
-     * @param n the top argument.
-     * @param k the bottom argument.
-     */
-    friend void bin_ui(mp_integer &rop, const mp_integer &n, unsigned long k)
-    {
-        if (rop.is_static()) {
-            MPPP_MAYBE_TLS mpz_raii tmp;
-            ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
-            rop = mp_integer(&tmp.m_mpz);
-        } else {
-            ::mpz_bin_ui(&rop.m_int.g_dy(), n.get_mpz_view(), k);
-        }
-    }
-    /// Binomial coefficient (binary version).
-    /**
-     * @param n the top argument.
-     * @param k the bottom argument.
-     *
-     * @return the binomial coefficient of \p n and \p k.
-     */
-    friend mp_integer bin_ui(const mp_integer &n, unsigned long k)
-    {
-        mp_integer retval;
-        bin_ui(retval, n, k);
-        return retval;
-    }
-
-private:
-    template <typename T, typename U>
-    using binomial_enabler_impl = std::
-        integral_constant<bool, disjunction<conjunction<std::is_same<mp_integer, T>, std::is_same<mp_integer, U>>,
-                                            conjunction<std::is_same<mp_integer, T>, is_supported_integral<U>>,
-                                            conjunction<std::is_same<mp_integer, U>, is_supported_integral<T>>>::value>;
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, mp_integer>;
-#else
-    template <typename T, typename U>
-    using binomial_enabler = enable_if_t<binomial_enabler_impl<T, U>::value, int>;
-#endif
-    template <typename T>
-    static mp_integer binomial_impl(const mp_integer &n, const T &k)
-    {
-        // NOTE: here we re-use some helper methods used in the implementation of pow().
-        if (exp_nonnegative(k)) {
-            return bin_ui(n, exp_to_ulong(k));
-        }
-        // This is the case k < 0, handled according to:
-        // http://arxiv.org/abs/1105.3689/
-        if (n.sgn() >= 0) {
-            // n >= 0, k < 0.
-            return mp_integer{};
-        }
-        // n < 0, k < 0.
-        if (k <= n) {
-            // The formula is: (-1)**(n-k) * binomial(-k-1,n-k).
-            // Cache n-k.
-            const mp_integer nmk{n - k};
-            mp_integer tmp{k};
-            ++tmp;
-            tmp.neg();
-            auto retval = bin_ui(tmp, exp_to_ulong(nmk));
-            if (nmk.odd_p()) {
-                retval.neg();
-            }
-            return retval;
-        }
-        return mp_integer{};
-    }
-    template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-    static mp_integer binomial_impl(const T &n, const mp_integer &k)
-    {
-        return binomial_impl(mp_integer{n}, k);
-    }
-
-public:
-#if defined(_MSC_VER)
-    template <typename T, typename U>
-    friend binomial_enabler<T, U> binomial(const T &n, const U &k)
-#else
-    /// Generic binomial coefficient.
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. note::
-     *
-     *    This function is enabled only in the following cases:
-     *
-     *    * ``T`` and ``U`` are both :cpp:class:`mppp::mp_integer`,
-     *    * ``T`` is an :cpp:class:`mppp::mp_integer` and ``U`` is an integral interoperable type for
-     *      :cpp:class:`mppp::mp_integer`,
-     *    * ``U`` is an :cpp:class:`mppp::mp_integer` and ``T`` is an integral interoperable type for
-     *      :cpp:class:`mppp::mp_integer`.
-     * \endverbatim
-     *
-     * This function will compute the binomial coefficient \f$ {{n}\choose{k}} \f$, supporting integral input values.
-     * The implementation can handle positive and negative values for both the top and the bottom argument. Internally,
-     * the mp_integer::bin_ui() function will be employed.
-     *
-     * \verbatim embed:rst:leading-asterisk
-     * .. seealso::
-     *
-     *    http://arxiv.org/abs/1105.3689/
-     * \endverbatim
-     *
-     * @param n the top argument.
-     * @param k the bottom argument.
-     *
-     * @return \f$ {{n}\choose{k}} \f$.
-     *
-     * @throws std::overflow_error if \p k is greater than an implementation-defined value.
-     */
-    template <typename T, typename U, binomial_enabler<T, U> = 0>
-    friend mp_integer binomial(const T &n, const U &k)
-#endif
-    {
-        return binomial_impl(n, k);
-    }
-
-private:
-    // Exact division.
-    // mpn implementation.
-    static void static_divexact_impl(s_int &q, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
-                                     int sign1, int sign2, const std::integral_constant<int, 0> &)
-    {
-        using mppp_impl::copy_limbs_no;
-        if (asize1 == 0) {
-            // Special casing if the numerator is zero (the mpn functions do not work with zero operands).
-            q._mp_size = 0;
-            return;
-        }
-#if __GNU_MP_VERSION > 6 || (__GNU_MP_VERSION == 6 && __GNU_MP_VERSION_MINOR >= 1)
-        // NOTE: mpn_divexact_1() is available since GMP 6.1.0.
-        if (asize2 == 1) {
-            // Optimisation in case the dividend has only 1 limb.
-            // NOTE: overlapping arguments are fine here.
-            ::mpn_divexact_1(q.m_limbs.data(), op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
-            // Complete the quotient: compute size and sign.
-            q._mp_size = asize1 - asize2 + 1;
-            while (q._mp_size && !(q.m_limbs[static_cast<std::size_t>(q._mp_size - 1)] & GMP_NUMB_MASK)) {
-                --q._mp_size;
-            }
-            if (sign1 != sign2) {
-                q._mp_size = -q._mp_size;
-            }
-            return;
-        }
-#else
-        // Avoid compiler warnings for unused parameters.
-        (void)sign1;
-        (void)sign2;
-        (void)asize2;
-#endif
-        // General implementation (via the mpz function).
-        MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpz_divexact(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
-        // Copy over from the tmp struct into q.
-        q._mp_size = tmp.m_mpz._mp_size;
-        copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + (q._mp_size >= 0 ? q._mp_size : -q._mp_size),
-                      q.m_limbs.data());
-    }
-    // 1-limb optimisation.
-    static void static_divexact_impl(s_int &q, const s_int &op1, const s_int &op2, mpz_size_t, mpz_size_t, int sign1,
-                                     int sign2, const std::integral_constant<int, 1> &)
-    {
-        const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK);
-        // Write q.
-        q._mp_size = (q_ != 0u);
-        if (sign1 != sign2) {
-            q._mp_size = -q._mp_size;
-        }
-        q.m_limbs[0] = q_;
-    }
-    // 2-limbs optimisation.
-    static void static_divexact_impl(s_int &q, const s_int &op1, const s_int &op2, mpz_size_t asize1, mpz_size_t asize2,
-                                     int sign1, int sign2, const std::integral_constant<int, 2> &)
-    {
-        if (asize1 < 2 && asize2 < 2) {
-            // 1-limb optimisation.
-            const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0];
-            q._mp_size = (q_ != 0u);
-            if (sign1 != sign2) {
-                q._mp_size = -q._mp_size;
-            }
-            q.m_limbs[0] = q_;
-            q.m_limbs[1] = 0u;
-            return;
-        }
-        // General case.
-        ::mp_limb_t q1, q2;
-        dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
-        q._mp_size = q2 ? 2 : (q1 ? 1 : 0);
-        if (sign1 != sign2) {
-            q._mp_size = -q._mp_size;
-        }
-        q.m_limbs[0] = q1;
-        q.m_limbs[1] = q2;
-    }
-    static void static_divexact(s_int &q, const s_int &op1, const s_int &op2)
-    {
-        mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
-        int sign1 = asize1 != 0, sign2 = asize2 != 0;
-        if (asize1 < 0) {
-            asize1 = -asize1;
-            sign1 = -1;
-        }
-        if (asize2 < 0) {
-            asize2 = -asize2;
-            sign2 = -1;
-        }
-        assert(asize1 == 0 || asize2 <= asize1);
-        // NOTE: use static_div_algo for the algorithm selection.
-        static_divexact_impl(q, op1, op2, asize1, asize2, sign1, sign2, static_div_algo<s_int>{});
-        if (static_div_algo<s_int>::value == 0) {
-            q.zero_unused_limbs();
-        }
-    }
-
-public:
-    /// Exact division (ternary version).
-    /**
-     * This function will set \p rop to the quotient of \p n and \p d.
-     *
-     * \verbatim embed:rst:leading-asterisk
-     * .. warning::
-     *
-     *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
-     * \endverbatim
-     *
-     * @param rop the return value.
-     * @param n the dividend.
-     * @param d the divisor.
-     */
-    friend void divexact(mp_integer &rop, const mp_integer &n, const mp_integer &d)
-    {
-        const bool sr = rop.is_static(), s1 = n.is_static(), s2 = d.is_static();
-        if (mppp_likely(sr && s1 && s2)) {
-            static_divexact(rop.m_int.g_st(), n.m_int.g_st(), d.m_int.g_st());
-            // Division can never fail.
-            return;
-        }
-        if (sr) {
-            rop.m_int.promote();
-        }
-        ::mpz_divexact(&rop.m_int.g_dy(), n.get_mpz_view(), d.get_mpz_view());
-    }
-    /// Exact division (binary version).
-    /**
-     * \verbatim embed:rst:leading-asterisk
-     * .. warning::
-     *
-     *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
-     * \endverbatim
-     *
-     * @param n the dividend.
-     * @param d the divisor.
-     *
-     * @return the quotient of \p n and \p d.
-     */
-    friend mp_integer divexact(const mp_integer &n, const mp_integer &d)
-    {
-        mp_integer retval;
-        divexact(retval, n, d);
-        return retval;
-    }
-
-private:
-    static void static_gcd(s_int &rop, const s_int &op1, const s_int &op2)
-    {
-        using mppp_impl::copy_limbs_no;
-        mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
-        if (asize1 < 0) {
-            asize1 = -asize1;
-        }
-        if (asize2 < 0) {
-            asize2 = -asize2;
-        }
-        // Handle zeroes.
-        if (!asize1) {
-            rop._mp_size = asize2;
-            rop.m_limbs = op2.m_limbs;
-            return;
-        }
-        if (!asize2) {
-            rop._mp_size = asize1;
-            rop.m_limbs = op1.m_limbs;
-            return;
-        }
-        // Special casing if an operand has asize 1.
-        if (asize1 == 1) {
-            rop._mp_size = 1;
-            rop.m_limbs[0] = ::mpn_gcd_1(op2.m_limbs.data(), static_cast<::mp_size_t>(asize2), op1.m_limbs[0]);
-            return;
-        }
-        if (asize2 == 1) {
-            rop._mp_size = 1;
-            rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
-            return;
-        }
-        // General case, via mpz.
-        // NOTE: there is an mpn_gcd() function, but it seems difficult to use. Apparently, and contrary to
-        // what stated in the latest documentation, the mpn function requires odd operands and bit size
-        // (not only limb size!) of the second operand not greater than the first. See for instance the old
-        // documentation:
-        // ftp://ftp.gnu.org/old-gnu/Manuals/gmp-3.1.1/html_chapter/gmp_9.html
-        // Indeed, compiling GMP in debug mode and then trying to use the mpn function without respecting the above
-        // results in assertion failures. For now let's keep it like this, the small operand cases are handled above
-        // (partially) via mpn_gcd_1(), and in the future we can also think about binary GCD for 1/2 limbs optimisation.
-        MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpz_gcd(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
-        // Copy over.
-        rop._mp_size = tmp.m_mpz._mp_size;
-        assert(rop._mp_size > 0);
-        copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + rop._mp_size, rop.m_limbs.data());
-    }
-
-public:
-    /// GCD (ternary version).
-    /**
-     * This function will set \p rop to the GCD of \p op1 and \p op2. The result is always positive.
-     * If both operands are zero, zero is returned.
-     *
-     * @param rop the return value.
-     * @param op1 the first operand.
-     * @param op2 the second operand.
-     */
-    friend void gcd(mp_integer &rop, const mp_integer &op1, const mp_integer &op2)
-    {
-        const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
-        if (mppp_likely(sr && s1 && s2)) {
-            static_gcd(rop.m_int.g_st(), op1.m_int.g_st(), op2.m_int.g_st());
-            rop.m_int.g_st().zero_unused_limbs();
-            return;
-        }
-        if (sr) {
-            rop.m_int.promote();
-        }
-        ::mpz_gcd(&rop.m_int.g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
-    }
-    /// GCD (binary version).
-    /**
-     * @param op1 the first operand.
-     * @param op2 the second operand.
-     *
-     * @return the GCD of \p op1 and \p op2.
-     */
-    friend mp_integer gcd(const mp_integer &op1, const mp_integer &op2)
-    {
-        mp_integer retval;
-        gcd(retval, op1, op2);
-        return retval;
-    }
     /// Return a reference to the internal union.
     /**
-     * This method returns a reference to the union used internally to implement the mp_integer class.
+     * This method returns a reference to the union used internally to implement the integer class.
      *
      * @return a reference to the internal union member.
      */
-    mppp_impl::integer_union<SSize> &_get_union()
+    integer_union<SSize> &_get_union()
     {
         return m_int;
     }
     /// Return a const reference to the internal union.
     /**
-     * This method returns a const reference to the union used internally to implement the mp_integer class.
+     * This method returns a const reference to the union used internally to implement the integer class.
      *
      * @return a const reference to the internal union member.
      */
-    const mppp_impl::integer_union<SSize> &_get_union() const
+    const integer_union<SSize> &_get_union() const
     {
         return m_int;
     }
@@ -5167,13 +1747,14 @@ public:
      * and it will then return a pointer to the internal \p mpz_t structure. The returned pointer can be used as an
      * argument for the functions of the GMP API.
      *
-     * \verbatim embed:rst:leading-asterisk
+     * \rststar
      * .. note::
      *
-     *    The returned pointer is tied to the lifetime of ``this``. Calling :cpp:func:`mppp::mp_integer::demote()` or
-     *    assigning an :cpp:class:`mppp::mp_integer` with static storage to ``this`` will invalidate the returned
+     *    The returned pointer is a raw, non-owning pointer tied to the lifetime of ``this``. Calling
+     *    :cpp:func:`~mppp::integer::demote()` or
+     *    assigning an :cpp:class:`~mppp::integer` with static storage to ``this`` will invalidate the returned
      *    pointer.
-     * \endverbatim
+     * \endrststar
      *
      * @return a pointer to the internal \p mpz_t structure.
      */
@@ -5189,16 +1770,6 @@ public:
     bool is_zero() const
     {
         return m_int.m_st._mp_size == 0;
-    }
-    /// Test if an mppp::mp_integer is zero.
-    /**
-     * @param n the mppp::mp_integer to be tested.
-     *
-     * @return \p true if \p n is zero, \p false otherwise.
-     */
-    friend bool is_zero(const mp_integer &n)
-    {
-        return n.is_zero();
     }
 
 private:
@@ -5223,16 +1794,6 @@ public:
     {
         return is_one_impl<1>();
     }
-    /// Test if an mppp::mp_integer is equal to one.
-    /**
-     * @param n the mppp::mp_integer to be tested.
-     *
-     * @return \p true if \p n is equal to 1, \p false otherwise.
-     */
-    friend bool is_one(const mp_integer &n)
-    {
-        return n.is_one();
-    }
     /// Test if the value is equal to minus one.
     /**
      * @return \p true if the value represented by \p this is -1, \p false otherwise.
@@ -5241,55 +1802,3877 @@ public:
     {
         return is_one_impl<-1>();
     }
-    /// Test if an mppp::mp_integer is equal to minus one.
-    /**
-     * @param n the mppp::mp_integer to be tested.
-     *
-     * @return \p true if \p n is equal to -1, \p false otherwise.
-     */
-    friend bool is_negative_one(const mp_integer &n)
-    {
-        return n.is_negative_one();
-    }
 
 private:
-    mppp_impl::integer_union<SSize> m_int;
+    integer_union<SSize> m_int;
 };
 
 template <std::size_t SSize>
-constexpr std::size_t mp_integer<SSize>::ssize;
+constexpr std::size_t integer<SSize>::ssize;
 
-namespace mppp_impl
+inline namespace detail
 {
 
-// A small wrapper to avoid name clashing below, in the specialisation of std::hash.
-template <size_t SSize>
-inline std::size_t hash_wrapper(const mp_integer<SSize> &n)
+// Machinery for the determination of the result of a binary operation involving integer.
+// Default is empty for SFINAE.
+template <typename, typename, typename = void>
+struct integer_common_type {
+};
+
+template <std::size_t SSize>
+struct integer_common_type<integer<SSize>, integer<SSize>> {
+    using type = integer<SSize>;
+};
+
+template <std::size_t SSize, typename U>
+struct integer_common_type<integer<SSize>, U, enable_if_t<is_supported_integral<U>::value>> {
+    using type = integer<SSize>;
+};
+
+template <std::size_t SSize, typename T>
+struct integer_common_type<T, integer<SSize>, enable_if_t<is_supported_integral<T>::value>> {
+    using type = integer<SSize>;
+};
+
+template <std::size_t SSize, typename U>
+struct integer_common_type<integer<SSize>, U, enable_if_t<is_supported_float<U>::value>> {
+    using type = U;
+};
+
+template <std::size_t SSize, typename T>
+struct integer_common_type<T, integer<SSize>, enable_if_t<is_supported_float<T>::value>> {
+    using type = T;
+};
+
+template <typename T, typename U>
+using integer_common_t = typename integer_common_type<T, U>::type;
+
+// Various utilities, concepts, enablers used in both the operators and the functions.
+template <typename T, typename U>
+struct is_same_ssize_integer : std::false_type {
+};
+
+template <std::size_t SSize>
+struct is_same_ssize_integer<integer<SSize>, integer<SSize>> : std::true_type {
+};
+
+template <typename T>
+struct is_integer : std::false_type {
+};
+
+template <std::size_t SSize>
+struct is_integer<integer<SSize>> : std::true_type {
+};
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerOpTypes
+    = is_same_ssize_integer<T, U>::value
+      || (is_integer<T>::value && CppInteroperable<U>) || (is_integer<U>::value && CppInteroperable<T>);
+#else
+using integer_op_types_enabler
+    = enable_if_t<disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_cpp_interoperable<U>>,
+                              conjunction<is_integer<U>, is_cpp_interoperable<T>>>::value,
+                  int>;
+#endif
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerIntegralOpTypes
+    = is_same_ssize_integer<T, U>::value || (is_integer<T>::value && CppInteroperable<U> && std::is_integral<U>::value)
+      || (is_integer<U>::value && CppInteroperable<T> && std::is_integral<T>::value);
+#else
+using integer_integral_op_types_enabler
+    = enable_if_t<disjunction<is_same_ssize_integer<T, U>,
+                              conjunction<is_integer<T>, is_cpp_interoperable<U>, std::is_integral<U>>,
+                              conjunction<is_integer<U>, is_cpp_interoperable<T>, std::is_integral<T>>>::value,
+                  int>;
+#endif
+}
+
+/** @defgroup integer_arithmetic integer_arithmetic
+ *  @{
+ */
+
+inline namespace detail
 {
-    return hash(n);
+
+// Metaprogramming for selecting the algorithm for static addition. The selection happens via
+// an std::integral_constant with 3 possible values:
+// - 0 (default case): use the GMP mpn functions,
+// - 1: selected when there are no nail bits and the static size is 1,
+// - 2: selected when there are no nail bits and the static size is 2.
+template <typename SInt>
+using integer_static_add_algo = std::
+    integral_constant<int, (!GMP_NAIL_BITS && SInt::s_size == 1) ? 1 : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
+
+// General implementation via mpn.
+// Small helper to compute the size after subtraction via mpn. s is a strictly positive size.
+inline mpz_size_t integer_sub_compute_size(const ::mp_limb_t *rdata, mpz_size_t s)
+{
+    assert(s > 0);
+    mpz_size_t cur_idx = s - 1;
+    for (; cur_idx >= 0; --cur_idx) {
+        if (rdata[cur_idx] & GMP_NUMB_MASK) {
+            break;
+        }
+    }
+    return cur_idx + 1;
+}
+
+// NOTE: this function (and its other overloads) will return true in case of success, false in case of failure
+// (i.e., the addition overflows and the static size is not enough).
+template <std::size_t SSize>
+inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                            const std::integral_constant<int, 0> &)
+{
+    auto rdata = &rop.m_limbs[0];
+    auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
+    const auto size1 = op1._mp_size;
+    // NOTE: cannot trust the size member from op2, as op2 could've been negated if
+    // we are actually subtracting.
+    const auto size2 = (sign2 >= 0) ? asize2 : -asize2;
+    // mpn functions require nonzero arguments.
+    if (mppp_unlikely(!sign2)) {
+        rop._mp_size = size1;
+        copy_limbs(data1, data1 + asize1, rdata);
+        return true;
+    }
+    if (mppp_unlikely(!sign1)) {
+        rop._mp_size = size2;
+        copy_limbs(data2, data2 + asize2, rdata);
+        return true;
+    }
+    // Check, for op1 and op2, whether:
+    // - the asize is the max static size, and, if yes,
+    // - the highest bit in the highest limb is set.
+    // If this condition holds for op1 and op2, we return failure, as the computation might require
+    // an extra limb.
+    // NOTE: the reason we check this is that we do not want to run into the situation in which we have written
+    // something into rop (via the mpn functions below), only to realize later that the computation overflows.
+    // This would be bad because, in case of overlapping arguments, it would destroy one or two operands without
+    // possibility of recovering. The alternative would be to do the computation in some local buffer and then
+    // copy
+    // it out, but that is rather costly. Note that this means that in principle a computation that could fit in
+    // static storage ends up triggering a promotion.
+    const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
+    const bool c2 = std::size_t(asize2) == SSize && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
+    if (mppp_unlikely(c1 || c2)) {
+        return false;
+    }
+    if (sign1 == sign2) {
+        // Same sign.
+        if (asize1 >= asize2) {
+            // The number of limbs of op1 >= op2.
+            ::mp_limb_t cy;
+            if (asize2 == 1) {
+                // NOTE: we are not masking data2[0] with GMP_NUMB_MASK, I am assuming the mpn function
+                // is able to deal with a limb with a nail.
+                cy = ::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+            } else if (asize1 == asize2) {
+                cy = ::mpn_add_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
+            } else {
+                cy = ::mpn_add(rdata, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
+            }
+            if (cy) {
+                assert(asize1 < static_int<SSize>::s_size);
+                rop._mp_size = size1 + sign1;
+                // NOTE: there should be no need to use GMP_NUMB_MASK here.
+                rdata[asize1] = 1u;
+            } else {
+                // Without carry, the size is unchanged.
+                rop._mp_size = size1;
+            }
+        } else {
+            // The number of limbs of op2 > op1.
+            ::mp_limb_t cy;
+            if (asize1 == 1) {
+                cy = ::mpn_add_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+            } else {
+                cy = ::mpn_add(rdata, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
+            }
+            if (cy) {
+                assert(asize2 < static_int<SSize>::s_size);
+                rop._mp_size = size2 + sign2;
+                rdata[asize2] = 1u;
+            } else {
+                rop._mp_size = size2;
+            }
+        }
+    } else {
+        if (asize1 > asize2 || (asize1 == asize2 && ::mpn_cmp(data1, data2, static_cast<::mp_size_t>(asize1)) >= 0)) {
+            // abs(op1) >= abs(op2).
+            ::mp_limb_t br;
+            if (asize2 == 1) {
+                br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+            } else if (asize1 == asize2) {
+                br = ::mpn_sub_n(rdata, data1, data2, static_cast<::mp_size_t>(asize1));
+            } else {
+                br = ::mpn_sub(rdata, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
+            }
+            assert(!br);
+            rop._mp_size = integer_sub_compute_size(rdata, asize1);
+            if (sign1 != 1) {
+                rop._mp_size = -rop._mp_size;
+            }
+        } else {
+            // abs(op2) > abs(op1).
+            ::mp_limb_t br;
+            if (asize1 == 1) {
+                br = ::mpn_sub_1(rdata, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+            } else {
+                br = ::mpn_sub(rdata, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
+            }
+            assert(!br);
+            rop._mp_size = integer_sub_compute_size(rdata, asize2);
+            if (sign2 != 1) {
+                rop._mp_size = -rop._mp_size;
+            }
+        }
+    }
+    return true;
+}
+
+// Optimization for single-limb statics with no nails.
+template <std::size_t SSize>
+inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                            const std::integral_constant<int, 1> &)
+{
+    auto rdata = &rop.m_limbs[0];
+    auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
+    // NOTE: both asizes have to be 0 or 1 here.
+    assert((asize1 == 1 && data1[0] != 0u) || (asize1 == 0 && data1[0] == 0u));
+    assert((asize2 == 1 && data2[0] != 0u) || (asize2 == 0 && data2[0] == 0u));
+    ::mp_limb_t tmp;
+    if (sign1 == sign2) {
+        // When the signs are identical, we can implement addition as a true addition.
+        if (mppp_unlikely(limb_add_overflow(data1[0], data2[0], &tmp))) {
+            return false;
+        }
+        // Assign the output. asize can be zero (sign1 == sign2 == 0) or 1.
+        rop._mp_size = sign1;
+        rdata[0] = tmp;
+    } else {
+        // When the signs differ, we need to implement addition as a subtraction.
+        // NOTE: this also includes the case in which only one of the operands is zero.
+        if (data1[0] >= data2[0]) {
+            // op1 is not smaller than op2.
+            tmp = data1[0] - data2[0];
+            // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
+            rop._mp_size = sign1;
+            if (mppp_unlikely(!tmp)) {
+                rop._mp_size = 0;
+            }
+            rdata[0] = tmp;
+        } else {
+            // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
+            rop._mp_size = sign2;
+            rdata[0] = data2[0] - data1[0];
+        }
+    }
+    return true;
+}
+
+// Optimization for two-limbs statics with no nails.
+// Small helper to compare two statics of equal asize 1 or 2.
+inline int integer_compare_limbs_2(const ::mp_limb_t *data1, const ::mp_limb_t *data2, mpz_size_t asize)
+{
+    // NOTE: this requires no nail bits.
+    assert(!GMP_NAIL_BITS);
+    assert(asize == 1 || asize == 2);
+    // Start comparing from the top.
+    auto cmp_idx = asize - 1;
+    if (data1[cmp_idx] != data2[cmp_idx]) {
+        return data1[cmp_idx] > data2[cmp_idx] ? 1 : -1;
+    }
+    // The top limbs are equal, move down one limb.
+    // If we are already at the bottom limb, it means the two numbers are equal.
+    if (!cmp_idx) {
+        return 0;
+    }
+    --cmp_idx;
+    if (data1[cmp_idx] != data2[cmp_idx]) {
+        return data1[cmp_idx] > data2[cmp_idx] ? 1 : -1;
+    }
+    return 0;
+}
+
+template <std::size_t SSize>
+inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                            const std::integral_constant<int, 2> &)
+{
+    auto rdata = &rop.m_limbs[0];
+    auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
+    if (sign1 == sign2) {
+        // NOTE: this handles the case in which the numbers have the same sign, including 0 + 0.
+        //
+        // NOTE: this is the implementation for 2 limbs, even if potentially the operands have 1 limb.
+        // The idea here is that it's better to do a few computations more rather than paying the branching
+        // cost. 1-limb operands will have the upper limb set to zero from the zero-initialization of
+        // the limbs of static ints.
+        //
+        // NOTE: the rop hi limb might spill over either from the addition of the hi limbs
+        // of op1 and op2, or by the addition of carry coming over from the addition of
+        // the lo limbs of op1 and op2.
+        //
+        // Add the hi and lo limbs.
+        const auto a = data1[0], b = data2[0], c = data1[1], d = data2[1];
+        ::mp_limb_t lo, hi1, hi2;
+        const ::mp_limb_t cy_lo = limb_add_overflow(a, b, &lo), cy_hi1 = limb_add_overflow(c, d, &hi1),
+                          cy_hi2 = limb_add_overflow(hi1, cy_lo, &hi2);
+        // The result will overflow if we have any carry relating to the high limb.
+        if (mppp_unlikely(cy_hi1 || cy_hi2)) {
+            return false;
+        }
+        // For the size compuation:
+        // - if sign1 == 0, size is zero,
+        // - if sign1 == +-1, then the size is either +-1 or +-2: asize is 2 if the result
+        //   has a nonzero 2nd limb, otherwise asize is 1.
+        rop._mp_size = sign1;
+        if (hi2) {
+            rop._mp_size = sign1 + sign1;
+        }
+        rdata[0] = lo;
+        rdata[1] = hi2;
+    } else {
+        // When the signs differ, we need to implement addition as a subtraction.
+        // NOTE: this also includes the case in which only one of the operands is zero.
+        if (asize1 > asize2 || (asize1 == asize2 && integer_compare_limbs_2(data1, data2, asize1) >= 0)) {
+            // op1 is >= op2 in absolute value.
+            const auto lo = data1[0] - data2[0];
+            // If there's a borrow, then hi1 > hi2, otherwise we would have a negative result.
+            assert(data1[0] >= data2[0] || data1[1] > data2[1]);
+            // This can never wrap around, at most it goes to zero.
+            const auto hi = data1[1] - data2[1] - static_cast<::mp_limb_t>(data1[0] < data2[0]);
+            // asize can be 0, 1 or 2.
+            rop._mp_size = 0;
+            if (hi) {
+                rop._mp_size = sign1 + sign1;
+            } else if (lo) {
+                rop._mp_size = sign1;
+            }
+            rdata[0] = lo;
+            rdata[1] = hi;
+        } else {
+            // op2 is > op1 in absolute value.
+            const auto lo = data2[0] - data1[0];
+            assert(data2[0] >= data1[0] || data2[1] > data1[1]);
+            const auto hi = data2[1] - data1[1] - static_cast<::mp_limb_t>(data2[0] < data1[0]);
+            // asize can be 1 or 2, but not zero as we know abs(op1) != abs(op2).
+            rop._mp_size = sign2;
+            if (hi) {
+                rop._mp_size = sign2 + sign2;
+            }
+            rdata[0] = lo;
+            rdata[1] = hi;
+        }
+    }
+    return true;
+}
+
+template <bool AddOrSub, std::size_t SSize>
+inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    // NOTE: effectively negate op2 if we are subtracting.
+    mpz_size_t asize1 = op1._mp_size, asize2 = AddOrSub ? op2._mp_size : -op2._mp_size;
+    int sign1 = asize1 != 0, sign2 = asize2 != 0;
+    if (asize1 < 0) {
+        asize1 = -asize1;
+        sign1 = -1;
+    }
+    if (asize2 < 0) {
+        asize2 = -asize2;
+        sign2 = -1;
+    }
+    const bool retval
+        = static_add_impl(rop, op1, op2, asize1, asize2, sign1, sign2, integer_static_add_algo<static_int<SSize>>{});
+    if (integer_static_add_algo<static_int<SSize>>::value == 0 && retval) {
+        // If we used the mpn functions and we actually wrote into rop, then
+        // make sure we zero out the unused limbs.
+        rop.zero_unused_limbs();
+    }
+    return retval;
 }
 }
+
+/// Ternary addition.
+/**
+ * This function will set \p rop to <tt>op1 + op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ */
+template <std::size_t SSize>
+inline void add(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+    if (mppp_likely(sr && s1 && s2)) {
+        // Optimise the case of all statics.
+        if (mppp_likely(
+                static_addsub<true>(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st()))) {
+            return;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(SSize + 1u);
+    }
+    ::mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+}
+
+inline namespace detail
+{
+
+// Metaprogramming for selecting the algorithm for static addition with ui. The selection happens via
+// an std::integral_constant with 3 possible values:
+// - 0 (default case): use the GMP mpn functions,
+// - 1: selected when there are no nail bits and the static size is 1,
+// - 2: selected when there are no nail bits and the static size is 2.
+template <typename SInt>
+using integer_static_add_ui_algo = std::
+    integral_constant<int, (!GMP_NAIL_BITS && SInt::s_size == 1) ? 1 : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
+
+// mpn implementation.
+template <std::size_t SSize>
+inline bool static_add_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
+                               unsigned long op2, const std::integral_constant<int, 0> &)
+{
+    auto rdata = &rop.m_limbs[0];
+    auto data1 = &op1.m_limbs[0];
+    const auto size1 = op1._mp_size;
+    const auto l2 = static_cast<::mp_limb_t>(op2);
+    // mpn functions require nonzero arguments.
+    if (mppp_unlikely(!l2)) {
+        rop._mp_size = size1;
+        copy_limbs(data1, data1 + asize1, rdata);
+        return true;
+    }
+    if (mppp_unlikely(!sign1)) {
+        // NOTE: this has to be 1 because l2 == 0 is handled above.
+        rop._mp_size = 1;
+        rdata[0] = l2;
+        return true;
+    }
+    // This is the same overflow check as in static_add().
+    const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
+    const bool c2 = SSize == 1u && (l2 >> (GMP_NUMB_BITS - 1));
+    if (mppp_unlikely(c1 || c2)) {
+        return false;
+    }
+    if (sign1 == 1) {
+        // op1 and op2 are both strictly positive.
+        if (::mpn_add_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2)) {
+            assert(asize1 < static_int<SSize>::s_size);
+            rop._mp_size = size1 + 1;
+            // NOTE: there should be no need to use GMP_NUMB_MASK here.
+            rdata[asize1] = 1u;
+        } else {
+            // Without carry, the size is unchanged.
+            rop._mp_size = size1;
+        }
+    } else {
+        // op1 is strictly negative, op2 is strictly positive.
+        if (asize1 > 1 || (asize1 == 1 && (data1[0] & GMP_NUMB_MASK) >= l2)) {
+            // abs(op1) >= abs(op2).
+            const auto br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2);
+            (void)br;
+            assert(!br);
+            // The asize can be the original one or original - 1 (we subtracted a limb).
+            rop._mp_size = size1 + static_cast<mpz_size_t>(!(rdata[asize1 - 1] & GMP_NUMB_MASK));
+        } else {
+            // abs(op2) > abs(op1).
+            const auto br = ::mpn_sub_1(rdata, &l2, 1, data1[0]);
+            (void)br;
+            assert(!br);
+            // The size must be 1, as abs(op2) == abs(op1) is handled above.
+            assert((rdata[0] & GMP_NUMB_MASK));
+            rop._mp_size = 1;
+        }
+    }
+    return true;
+}
+
+// 1-limb optimisation (no nails).
+template <std::size_t SSize>
+inline bool static_add_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t, int sign1,
+                               unsigned long op2, const std::integral_constant<int, 1> &)
+{
+    const auto l1 = op1.m_limbs[0];
+    const auto l2 = static_cast<::mp_limb_t>(op2);
+    ::mp_limb_t tmp;
+    if (sign1 >= 0) {
+        // True unsigned addition.
+        if (mppp_unlikely(limb_add_overflow(l1, l2, &tmp))) {
+            return false;
+        }
+        rop._mp_size = (tmp != 0u);
+        rop.m_limbs[0] = tmp;
+    } else {
+        // op1 is negative, op2 is non-negative. Implement as a sub.
+        if (l1 >= l2) {
+            // op1 has larger or equal abs. The result will be non-positive.
+            tmp = l1 - l2;
+            // size is -1 or 0, 0 iff l1 == l2.
+            rop._mp_size = -static_cast<mpz_size_t>(tmp != 0u);
+            rop.m_limbs[0] = tmp;
+        } else {
+            // op1 has smaller abs. The result will be positive.
+            rop._mp_size = 1;
+            rop.m_limbs[0] = l2 - l1;
+        }
+    }
+    return true;
+}
+
+// 2-limb optimisation (no nails).
+template <std::size_t SSize>
+inline bool static_add_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
+                               unsigned long op2, const std::integral_constant<int, 2> &)
+{
+    auto rdata = &rop.m_limbs[0];
+    auto data1 = &op1.m_limbs[0];
+    const auto l2 = static_cast<::mp_limb_t>(op2);
+    if (sign1 >= 0) {
+        // True unsigned addition.
+        // These two limbs will contain the result.
+        ::mp_limb_t lo, hi;
+        // Add l2 to the low limb, placing the result in lo.
+        const ::mp_limb_t cy_lo = limb_add_overflow(data1[0], l2, &lo);
+        // Add the carry from the low addition to the high limb, placing the result in hi.
+        const ::mp_limb_t cy_hi = limb_add_overflow(data1[1], cy_lo, &hi);
+        if (mppp_unlikely(cy_hi)) {
+            return false;
+        }
+        // Compute the new size. It can be 0, 1 or 2.
+        rop._mp_size = hi ? 2 : (lo ? 1 : 0);
+        // Write out.
+        rdata[0] = lo;
+        rdata[1] = hi;
+    } else {
+        // op1 is negative, l2 is non-negative. Compare their absolute values.
+        if (asize1 == 2 || data1[0] >= l2) {
+            // op1 is >= op2 in absolute value.
+            const auto lo = data1[0] - l2;
+            // Sub from hi the borrow.
+            const auto hi = data1[1] - static_cast<::mp_limb_t>(data1[0] < l2);
+            // The final size can be -2, -1 or 0.
+            rop._mp_size = hi ? -2 : (lo ? -1 : 0);
+            rdata[0] = lo;
+            rdata[1] = hi;
+        } else {
+            // op2 > op1 in absolute value.
+            // Size has to be 1.
+            rop._mp_size = 1;
+            rdata[0] = l2 - data1[0];
+            rdata[1] = 0u;
+        }
+    }
+    return true;
+}
+
+template <std::size_t SSize>
+inline bool static_add_ui(static_int<SSize> &rop, const static_int<SSize> &op1, unsigned long op2)
+{
+    mpz_size_t asize1 = op1._mp_size;
+    int sign1 = asize1 != 0;
+    if (asize1 < 0) {
+        asize1 = -asize1;
+        sign1 = -1;
+    }
+    const bool retval
+        = static_add_ui_impl(rop, op1, asize1, sign1, op2, integer_static_add_ui_algo<static_int<SSize>>{});
+    if (integer_static_add_ui_algo<static_int<SSize>>::value == 0 && retval) {
+        // If we used the mpn functions and we actually wrote into rop, then
+        // make sure we zero out the unused limbs.
+        rop.zero_unused_limbs();
+    }
+    return retval;
+}
+}
+
+/// Ternary addition with <tt>unsigned long</tt>.
+/**
+ * This function will set \p rop to <tt>op1 + op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ */
+template <std::size_t SSize>
+inline void add_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
+{
+    if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
+        // For the optimised version below to kick in we need to be sure we can safely convert
+        // unsigned long to an ::mp_limb_t, modulo nail bits. This because in the optimised version
+        // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an
+        // integer.
+        add(rop, op1, integer<SSize>{op2});
+        return;
+    }
+    const bool sr = rop.is_static(), s1 = op1.is_static();
+    if (mppp_likely(sr && s1)) {
+        // Optimise the case of all statics.
+        if (mppp_likely(static_add_ui(rop._get_union().g_st(), op1._get_union().g_st(), op2))) {
+            return;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(SSize + 1u);
+    }
+    ::mpz_add_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), op2);
+}
+
+/// Ternary subtraction.
+/**
+ * This function will set \p rop to <tt>op1 - op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ */
+template <std::size_t SSize>
+inline void sub(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+    if (mppp_likely(sr && s1 && s2)) {
+        // Optimise the case of all statics.
+        if (mppp_likely(
+                static_addsub<false>(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st()))) {
+            return;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(SSize + 1u);
+    }
+    ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+}
+
+inline namespace detail
+{
+
+// The double limb multiplication optimization is available in the following cases:
+// - no nails, we are on a 64bit MSVC build, the limb type has exactly 64 bits and GMP_NUMB_BITS is 64,
+// - no nails, we have a 128bit unsigned available, the limb type has exactly 64 bits and GMP_NUMB_BITS is 64,
+// - no nails, the smallest 64 bit unsigned type has exactly 64 bits, the limb type has exactly 32 bits and
+//   GMP_NUMB_BITS is 32.
+// NOTE: here we are checking that GMP_NUMB_BITS is the same as the limits ::digits property, which is probably
+// rather redundant on any conceivable architecture.
+using integer_have_dlimb_mul = std::integral_constant<bool,
+#if (defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64)) || (defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64))
+                                                      !GMP_NAIL_BITS && std::numeric_limits<::mp_limb_t>::digits == 64
+#elif GMP_NUMB_BITS == 32
+                                                      !GMP_NAIL_BITS
+                                                          && std::numeric_limits<std::uint_least64_t>::digits == 64
+                                                          && std::numeric_limits<::mp_limb_t>::digits == 32
+#else
+                                                      false
+#endif
+                                                      >;
+
+template <typename SInt>
+using integer_static_mul_algo
+    = std::integral_constant<int,
+                             (SInt::s_size == 1 && integer_have_dlimb_mul::value)
+                                 ? 1
+                                 : ((SInt::s_size == 2 && integer_have_dlimb_mul::value) ? 2 : 0)>;
+
+// mpn implementation.
+// NOTE: this function (and the other overloads) returns 0 in case of success, otherwise it returns a hint
+// about the size in limbs of the result.
+template <std::size_t SSize>
+inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                   mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                                   const std::integral_constant<int, 0> &)
+{
+    // Handle zeroes.
+    if (mppp_unlikely(!sign1 || !sign2)) {
+        rop._mp_size = 0;
+        return 0u;
+    }
+    auto rdata = &rop.m_limbs[0];
+    auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
+    const auto max_asize = std::size_t(asize1 + asize2);
+    // Temporary storage, to be used if we cannot write into rop.
+    std::array<::mp_limb_t, SSize * 2u> res;
+    // We can write directly into rop if these conditions hold:
+    // - rop does not overlap with op1 and op2,
+    // - SSize is large enough to hold the max size of the result.
+    ::mp_limb_t *MPPP_RESTRICT res_data = (rdata != data1 && rdata != data2 && max_asize <= SSize) ? rdata : res.data();
+    // Proceed to the multiplication.
+    ::mp_limb_t hi;
+    if (asize2 == 1) {
+        // NOTE: the 1-limb versions do not write the hi limb, we have to write it ourselves.
+        hi = ::mpn_mul_1(res_data, data1, static_cast<::mp_size_t>(asize1), data2[0]);
+        res_data[asize1] = hi;
+    } else if (asize1 == 1) {
+        hi = ::mpn_mul_1(res_data, data2, static_cast<::mp_size_t>(asize2), data1[0]);
+        res_data[asize2] = hi;
+    } else if (asize1 == asize2) {
+        ::mpn_mul_n(res_data, data1, data2, static_cast<::mp_size_t>(asize1));
+        hi = res_data[2 * asize1 - 1];
+    } else if (asize1 >= asize2) {
+        hi = ::mpn_mul(res_data, data1, static_cast<::mp_size_t>(asize1), data2, static_cast<::mp_size_t>(asize2));
+    } else {
+        hi = ::mpn_mul(res_data, data2, static_cast<::mp_size_t>(asize2), data1, static_cast<::mp_size_t>(asize1));
+    }
+    // The actual size.
+    const std::size_t asize = max_asize - unsigned(hi == 0u);
+    if (res_data == rdata) {
+        // If we wrote directly into rop, it means that we had enough storage in it to begin with.
+        rop._mp_size = mpz_size_t(asize);
+        if (sign1 != sign2) {
+            rop._mp_size = -rop._mp_size;
+        }
+        return 0u;
+    }
+    // If we used the temporary storage, we need to check if we can write into rop.
+    if (asize > SSize) {
+        // Not enough space, return the size.
+        return asize;
+    }
+    // Enough space, set size and copy limbs.
+    rop._mp_size = mpz_size_t(asize);
+    if (sign1 != sign2) {
+        rop._mp_size = -rop._mp_size;
+    }
+    copy_limbs_no(res_data, res_data + asize, rdata);
+    return 0u;
+}
+
+#if defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
+{
+    return ::UnsignedMultiply128(op1, op2, hi);
+}
+#elif defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
+{
+    using dlimb_t = MPPP_UINT128;
+    const dlimb_t res = dlimb_t(op1) * op2;
+    *hi = static_cast<::mp_limb_t>(res >> 64);
+    return static_cast<::mp_limb_t>(res);
+}
+#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
+inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
+{
+    using dlimb_t = std::uint_least64_t;
+    const dlimb_t res = dlimb_t(op1) * op2;
+    *hi = static_cast<::mp_limb_t>(res >> 32);
+    return static_cast<::mp_limb_t>(res);
+}
+#endif
+
+// 1-limb optimization via dlimb.
+template <std::size_t SSize>
+inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                   mpz_size_t, mpz_size_t, int sign1, int sign2, const std::integral_constant<int, 1> &)
+{
+    ::mp_limb_t hi;
+    const ::mp_limb_t lo = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &hi);
+    if (mppp_unlikely(hi)) {
+        return 2u;
+    }
+    const mpz_size_t asize = (lo != 0u);
+    rop._mp_size = asize;
+    if (sign1 != sign2) {
+        rop._mp_size = -rop._mp_size;
+    }
+    rop.m_limbs[0] = lo;
+    return 0u;
+}
+
+// 2-limb optimization via dlimb.
+template <std::size_t SSize>
+inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                   mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                                   const std::integral_constant<int, 2> &)
+{
+    if (mppp_unlikely(!asize1 || !asize2)) {
+        // Handle zeroes.
+        rop._mp_size = 0;
+        rop.m_limbs[0] = 0u;
+        rop.m_limbs[1] = 0u;
+        return 0u;
+    }
+    if (asize1 == 1 && asize2 == 1) {
+        rop.m_limbs[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &rop.m_limbs[1]);
+        rop._mp_size = static_cast<mpz_size_t>((asize1 + asize2) - mpz_size_t(rop.m_limbs[1] == 0u));
+        if (sign1 != sign2) {
+            rop._mp_size = -rop._mp_size;
+        }
+        return 0u;
+    }
+    if (asize1 != asize2) {
+        // The only possibility of success is 2limbs x 1limb.
+        //
+        //             b      a X
+        //                    c
+        // --------------------
+        // tmp[2] tmp[1] tmp[0]
+        //
+        ::mp_limb_t a = op1.m_limbs[0], b = op1.m_limbs[1], c = op2.m_limbs[0];
+        if (asize1 < asize2) {
+            // Switch them around if needed.
+            a = op2.m_limbs[0], b = op2.m_limbs[1], c = op1.m_limbs[0];
+        }
+        ::mp_limb_t ca_lo, ca_hi, cb_lo, cb_hi, tmp0, tmp1, tmp2;
+        ca_lo = dlimb_mul(c, a, &ca_hi);
+        cb_lo = dlimb_mul(c, b, &cb_hi);
+        tmp0 = ca_lo;
+        const auto cy = limb_add_overflow(cb_lo, ca_hi, &tmp1);
+        tmp2 = cb_hi + cy;
+        // Now determine the size. asize must be at least 2.
+        const mpz_size_t asize = 2 + mpz_size_t(tmp2 != 0u);
+        if (asize == 2) {
+            // Size is good, write out the result.
+            rop._mp_size = asize;
+            if (sign1 != sign2) {
+                rop._mp_size = -rop._mp_size;
+            }
+            rop.m_limbs[0] = tmp0;
+            rop.m_limbs[1] = tmp1;
+            return 0u;
+        }
+    }
+    // Return 4 as a size hint. Real size could be 3, but GMP will require 4 limbs
+    // of storage to perform the operation anyway.
+    return 4u;
+}
+
+template <std::size_t SSize>
+inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    // Cache a few quantities, detect signs.
+    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
+    int sign1 = asize1 != 0, sign2 = asize2 != 0;
+    if (asize1 < 0) {
+        asize1 = -asize1;
+        sign1 = -1;
+    }
+    if (asize2 < 0) {
+        asize2 = -asize2;
+        sign2 = -1;
+    }
+    const std::size_t retval
+        = static_mul_impl(rop, op1, op2, asize1, asize2, sign1, sign2, integer_static_mul_algo<static_int<SSize>>{});
+    if (integer_static_mul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
+        rop.zero_unused_limbs();
+    }
+    return retval;
+}
+}
+
+/// Ternary multiplication.
+/**
+ * This function will set \p rop to <tt>op1 * op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ */
+template <std::size_t SSize>
+inline void mul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+    std::size_t size_hint = 0u;
+    if (mppp_likely(sr && s1 && s2)) {
+        size_hint = static_mul(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
+        if (mppp_likely(size_hint == 0u)) {
+            return;
+        }
+    }
+    if (sr) {
+        // We use the size hint from the static_mul if available, otherwise a normal promotion will take place.
+        // NOTE: here the best way of proceeding would be to calculate the max size of the result based on
+        // the op1/op2 sizes, but for whatever reason this computation has disastrous performance consequences
+        // on micro-benchmarks. We need to understand if that's the case in real-world scenarios as well, and
+        // revisit this.
+        rop._get_union().promote(size_hint);
+    }
+    ::mpz_mul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+}
+
+inline namespace detail
+{
+
+// Selection of the algorithm for addmul: if optimised algorithms exist for both add and mul, then use the
+// optimised addmul algos. Otherwise, use the mpn one.
+template <typename SInt>
+using integer_static_addmul_algo
+    = std::integral_constant<int,
+                             (integer_static_add_algo<SInt>::value == 2 && integer_static_mul_algo<SInt>::value == 2)
+                                 ? 2
+                                 : ((integer_static_add_algo<SInt>::value == 1
+                                     && integer_static_mul_algo<SInt>::value == 1)
+                                        ? 1
+                                        : 0)>;
+
+// NOTE: same return value as mul: 0 for success, otherwise a hint for the size of the result.
+template <std::size_t SSize>
+inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
+                                      const static_int<SSize> &op2, mpz_size_t asizer, mpz_size_t asize1,
+                                      mpz_size_t asize2, int signr, int sign1, int sign2,
+                                      const std::integral_constant<int, 0> &)
+{
+    // First try to do the static prod, if it does not work it's a failure.
+    static_int<SSize> prod;
+    if (mppp_unlikely(
+            static_mul_impl(prod, op1, op2, asize1, asize2, sign1, sign2, std::integral_constant<int, 0>{}))) {
+        // This is the maximum size a static addmul can have.
+        return SSize * 2u + 1u;
+    }
+    // Determine sign and asize of the product.
+    mpz_size_t asize_prod = prod._mp_size;
+    int sign_prod = (asize_prod != 0);
+    if (asize_prod < 0) {
+        asize_prod = -asize_prod;
+        sign_prod = -1;
+    }
+    // Try to do the add.
+    if (mppp_unlikely(
+            !static_add_impl(rop, rop, prod, asizer, asize_prod, signr, sign_prod, std::integral_constant<int, 0>{}))) {
+        return SSize + 1u;
+    }
+    return 0u;
+}
+
+template <std::size_t SSize>
+inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
+                                      const static_int<SSize> &op2, mpz_size_t, mpz_size_t, mpz_size_t, int signr,
+                                      int sign1, int sign2, const std::integral_constant<int, 1> &)
+{
+    // First we do op1 * op2.
+    ::mp_limb_t tmp;
+    const ::mp_limb_t prod = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &tmp);
+    if (mppp_unlikely(tmp)) {
+        return 3u;
+    }
+    // Determine the sign of the product: 0, 1 or -1.
+    int sign_prod = prod != 0u;
+    if (sign1 != sign2) {
+        sign_prod = -sign_prod;
+    }
+    // Now add/sub.
+    if (signr == sign_prod) {
+        // Same sign, do addition with overflow check.
+        if (mppp_unlikely(limb_add_overflow(rop.m_limbs[0], prod, &tmp))) {
+            return 2u;
+        }
+        // Assign the output.
+        rop._mp_size = signr;
+        rop.m_limbs[0] = tmp;
+    } else {
+        // When the signs differ, we need to implement addition as a subtraction.
+        if (rop.m_limbs[0] >= prod) {
+            // abs(rop) >= abs(prod).
+            tmp = rop.m_limbs[0] - prod;
+            // asize is either 1 or 0 (0 iff rop == prod).
+            rop._mp_size = signr;
+            if (mppp_unlikely(!tmp)) {
+                rop._mp_size = 0;
+            }
+            rop.m_limbs[0] = tmp;
+        } else {
+            // NOTE: this cannot be zero, as rop and prod cannot be equal.
+            rop._mp_size = sign_prod;
+            rop.m_limbs[0] = prod - rop.m_limbs[0];
+        }
+    }
+    return 0u;
+}
+
+template <std::size_t SSize>
+inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
+                                      const static_int<SSize> &op2, mpz_size_t asizer, mpz_size_t asize1,
+                                      mpz_size_t asize2, int signr, int sign1, int sign2,
+                                      const std::integral_constant<int, 2> &)
+{
+    if (mppp_unlikely(!asize1 || !asize2)) {
+        // If op1 or op2 are zero, rop will be unchanged.
+        return 0u;
+    }
+    // Handle op1 * op2.
+    std::array<::mp_limb_t, 2> prod;
+    int sign_prod = 1;
+    if (sign1 != sign2) {
+        sign_prod = -1;
+    }
+    mpz_size_t asize_prod;
+    if (asize1 == 1 && asize2 == 1) {
+        prod[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &prod[1]);
+        asize_prod = (asize1 + asize2) - mpz_size_t(prod[1] == 0u);
+    } else {
+        // The only possibility of success is 2limbs x 1limb.
+        //
+        //       b       a X
+        //               c
+        // ---------------
+        // prod[1] prod[0]
+        //
+        if (mppp_unlikely(asize1 == asize2)) {
+            // This means that both sizes are 2.
+            return 5u;
+        }
+        ::mp_limb_t a = op1.m_limbs[0], b = op1.m_limbs[1], c = op2.m_limbs[0];
+        if (asize1 < asize2) {
+            // Switch them around if needed.
+            a = op2.m_limbs[0], b = op2.m_limbs[1], c = op1.m_limbs[0];
+        }
+        ::mp_limb_t ca_hi, cb_hi;
+        // These are the three operations that build the result, two mults, one add.
+        prod[0] = dlimb_mul(c, a, &ca_hi);
+        prod[1] = dlimb_mul(c, b, &cb_hi);
+        // NOTE: we can use this with overlapping arguments because the first two
+        // are passed as copies.
+        const auto cy = limb_add_overflow(prod[1], ca_hi, &prod[1]);
+        // Check if the third limb exists, if so we return failure.
+        if (mppp_unlikely(cb_hi || cy)) {
+            return 4u;
+        }
+        asize_prod = 2;
+    }
+    // Proceed to the addition.
+    if (signr == sign_prod) {
+        // Add the hi and lo limbs.
+        ::mp_limb_t lo, hi1, hi2;
+        const ::mp_limb_t cy_lo = limb_add_overflow(rop.m_limbs[0], prod[0], &lo),
+                          cy_hi1 = limb_add_overflow(rop.m_limbs[1], prod[1], &hi1),
+                          cy_hi2 = limb_add_overflow(hi1, cy_lo, &hi2);
+        // The result will overflow if we have any carry relating to the high limb.
+        if (mppp_unlikely(cy_hi1 || cy_hi2)) {
+            return 3u;
+        }
+        // For the size compuation:
+        // - cannot be zero, as prod is not zero,
+        // - if signr == +-1, then the size is either +-1 or +-2: asize is 2 if the result
+        //   has a nonzero 2nd limb, otherwise asize is 1.
+        rop._mp_size = signr;
+        if (hi2) {
+            rop._mp_size = signr + signr;
+        }
+        rop.m_limbs[0] = lo;
+        rop.m_limbs[1] = hi2;
+    } else {
+        // When the signs differ, we need to implement addition as a subtraction.
+        if (asizer > asize_prod
+            || (asizer == asize_prod && integer_compare_limbs_2(&rop.m_limbs[0], &prod[0], asizer) >= 0)) {
+            // rop >= prod in absolute value.
+            const auto lo = rop.m_limbs[0] - prod[0];
+            // If there's a borrow, then hi1 > hi2, otherwise we would have a negative result.
+            assert(rop.m_limbs[0] >= prod[0] || rop.m_limbs[1] > prod[1]);
+            // This can never wrap around, at most it goes to zero.
+            const auto hi = rop.m_limbs[1] - prod[1] - static_cast<::mp_limb_t>(rop.m_limbs[0] < prod[0]);
+            // asize can be 0, 1 or 2.
+            rop._mp_size = 0;
+            if (hi) {
+                rop._mp_size = signr + signr;
+            } else if (lo) {
+                rop._mp_size = signr;
+            }
+            rop.m_limbs[0] = lo;
+            rop.m_limbs[1] = hi;
+        } else {
+            // prod > rop in absolute value.
+            const auto lo = prod[0] - rop.m_limbs[0];
+            assert(prod[0] >= rop.m_limbs[0] || prod[1] > rop.m_limbs[1]);
+            const auto hi = prod[1] - rop.m_limbs[1] - static_cast<::mp_limb_t>(prod[0] < rop.m_limbs[0]);
+            // asize can be 1 or 2, but not zero as we know abs(prod) != abs(rop).
+            rop._mp_size = sign_prod;
+            if (hi) {
+                rop._mp_size = sign_prod + sign_prod;
+            }
+            rop.m_limbs[0] = lo;
+            rop.m_limbs[1] = hi;
+        }
+    }
+    return 0u;
+}
+
+template <std::size_t SSize>
+inline std::size_t static_addmul(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    mpz_size_t asizer = rop._mp_size, asize1 = op1._mp_size, asize2 = op2._mp_size;
+    int signr = asizer != 0, sign1 = asize1 != 0, sign2 = asize2 != 0;
+    if (asizer < 0) {
+        asizer = -asizer;
+        signr = -1;
+    }
+    if (asize1 < 0) {
+        asize1 = -asize1;
+        sign1 = -1;
+    }
+    if (asize2 < 0) {
+        asize2 = -asize2;
+        sign2 = -1;
+    }
+    const std::size_t retval = static_addmul_impl(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
+                                                  integer_static_addmul_algo<static_int<SSize>>{});
+    if (integer_static_addmul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
+        rop.zero_unused_limbs();
+    }
+    return retval;
+}
+}
+
+/// Ternary multiply–accumulate.
+/**
+ * This function will set \p rop to <tt>rop + op1 * op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ */
+template <std::size_t SSize>
+inline void addmul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+    std::size_t size_hint = 0u;
+    if (mppp_likely(sr && s1 && s2)) {
+        size_hint = static_addmul(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
+        if (mppp_likely(size_hint == 0u)) {
+            return;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(size_hint);
+    }
+    ::mpz_addmul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+}
+
+inline namespace detail
+{
+
+// Selection of the algorithm for static mul_2exp.
+template <typename SInt>
+using integer_static_mul_2exp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
+
+// mpn implementation.
+template <std::size_t SSize>
+inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s,
+                                        const std::integral_constant<int, 0> &)
+{
+    mpz_size_t asize = n._mp_size;
+    if (s == 0u || asize == 0) {
+        // If shift is zero, or the operand is zero, write n into rop and return success.
+        rop = n;
+        return 0u;
+    }
+    // Finish setting up asize and sign.
+    int sign = asize != 0;
+    if (asize < 0) {
+        asize = -asize;
+        sign = -1;
+    }
+    // ls: number of entire limbs shifted.
+    // rs: effective shift that will be passed to the mpn function.
+    const auto ls = s / GMP_NUMB_BITS, rs = s % GMP_NUMB_BITS;
+    // At the very minimum, the new asize will be the old asize
+    // plus ls.
+    const mpz_size_t new_asize = asize + static_cast<mpz_size_t>(ls);
+    if (std::size_t(new_asize) < SSize) {
+        // In this case the operation will always succeed, and we can write directly into rop.
+        ::mp_limb_t ret = 0u;
+        if (rs) {
+            // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
+            // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() + ls >= n.m_limbs.data().
+            ret = ::mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize),
+                               unsigned(rs));
+            // Write bits spilling out.
+            rop.m_limbs[std::size_t(new_asize)] = ret;
+        } else {
+            // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
+            // NOTE: we have to use move_backward here because the ranges are overlapping and they do not
+            // start at the same pointer (in which case we could've used copy_limbs()). Here we know ls is not
+            // zero: we don't have a remainder, and s == 0 was already handled above. Hence, new_asize > asize.
+            assert(new_asize > asize);
+            std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
+        }
+        // Zero the lower limbs vacated by the shift.
+        std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
+        // Set the size.
+        rop._mp_size = new_asize + (ret != 0u);
+        if (sign == -1) {
+            rop._mp_size = -rop._mp_size;
+        }
+        return 0u;
+    }
+    if (std::size_t(new_asize) == SSize) {
+        if (rs) {
+            // In this case the operation may fail, so we need to write to temporary storage.
+            std::array<::mp_limb_t, SSize> tmp;
+            if (::mpn_lshift(tmp.data(), n.m_limbs.data(), static_cast<::mp_size_t>(asize), unsigned(rs))) {
+                return SSize + 1u;
+            }
+            // The shift was successful without spill over, copy the content from the tmp
+            // storage into rop.
+            copy_limbs_no(tmp.data(), tmp.data() + asize, rop.m_limbs.data() + ls);
+        } else {
+            // If we shifted by a multiple of the limb size, then we can write directly to rop.
+            assert(new_asize > asize);
+            std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
+        }
+        // Zero the lower limbs vacated by the shift.
+        std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
+        // Set the size.
+        rop._mp_size = new_asize;
+        if (sign == -1) {
+            rop._mp_size = -rop._mp_size;
+        }
+        return 0u;
+    }
+    // Shift is too much, the size will overflow the static limit.
+    // Return a hint for the size of the result.
+    return std::size_t(new_asize) + 1u;
+}
+
+// 1-limb optimisation.
+template <std::size_t SSize>
+inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s,
+                                        const std::integral_constant<int, 1> &)
+{
+    const ::mp_limb_t l = n.m_limbs[0] & GMP_NUMB_MASK;
+    if (s == 0u || l == 0u) {
+        // If shift is zero, or the operand is zero, write n into rop and return success.
+        rop = n;
+        return 0u;
+    }
+    if (mppp_unlikely(s >= GMP_NUMB_BITS || (l >> (GMP_NUMB_BITS - s)))) {
+        // The two conditions:
+        // - if the shift is >= number of data bits, the operation will certainly
+        //   fail (as the operand is nonzero);
+        // - shifting by s would overflow  the single limb.
+        // NOTE: s is at least 1, so in the right shift above we never risk UB due to too much shift.
+        // NOTE: for the size hint: s / nbits is the number of entire limbs shifted, +1 because the shifted
+        // limbs add to the current size (1), +1 because another limb might be needed.
+        return std::size_t(s) / GMP_NUMB_BITS + 2u;
+    }
+    // Write out.
+    rop.m_limbs[0] = l << s;
+    // Size is the same as the input value.
+    rop._mp_size = n._mp_size;
+    return 0u;
+}
+
+// 2-limb optimisation.
+template <std::size_t SSize>
+inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s,
+                                        const std::integral_constant<int, 2> &)
+{
+    mpz_size_t asize = n._mp_size;
+    if (s == 0u || asize == 0) {
+        rop = n;
+        return 0u;
+    }
+    int sign = asize != 0;
+    if (asize < 0) {
+        asize = -asize;
+        sign = -1;
+    }
+    // Too much shift, this can never work on a nonzero value.
+    static_assert(GMP_NUMB_BITS < std::numeric_limits<typename std::decay<decltype(GMP_NUMB_BITS)>::type>::max() / 2u,
+                  "Overflow error.");
+    if (mppp_unlikely(s >= 2u * GMP_NUMB_BITS)) {
+        // NOTE: this is the generic formula to estimate the final size.
+        return std::size_t(s) / GMP_NUMB_BITS + 1u + std::size_t(asize);
+    }
+    if (s == GMP_NUMB_BITS) {
+        // This case can be dealt with moving lo into hi, but only if asize is 1.
+        if (mppp_unlikely(asize == 2)) {
+            // asize is 2, shift is too much.
+            return 3u;
+        }
+        rop.m_limbs[1u] = n.m_limbs[0u];
+        rop.m_limbs[0u] = 0u;
+        // The size has to be 2.
+        rop._mp_size = 2;
+        if (sign == -1) {
+            rop._mp_size = -2;
+        }
+        return 0u;
+    }
+    // Temp hi lo limbs to store the result that will eventually go into rop.
+    ::mp_limb_t lo = n.m_limbs[0u], hi = n.m_limbs[1u];
+    if (s > GMP_NUMB_BITS) {
+        if (mppp_unlikely(asize == 2)) {
+            return std::size_t(s) / GMP_NUMB_BITS + 1u + std::size_t(asize);
+        }
+        // Move lo to hi and set lo to zero.
+        hi = n.m_limbs[0u];
+        lo = 0u;
+        // Update the shift.
+        s = static_cast<::mp_bitcnt_t>(s - GMP_NUMB_BITS);
+    }
+    // Check that hi will not be shifted too much. Note that
+    // here and below s can never be zero, so we never shift too much.
+    assert(s > 0u && s < GMP_NUMB_BITS);
+    if (mppp_unlikely((hi & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - s))) {
+        return 3u;
+    }
+    // Shift hi and lo. hi gets the carry over from lo.
+    hi = ((hi & GMP_NUMB_MASK) << s) + ((lo & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - s));
+    // NOTE: here the result needs to be masked as well as the shift could
+    // end up writing in nail bits.
+    lo = ((lo & GMP_NUMB_MASK) << s) & GMP_NUMB_MASK;
+    // Write rop.
+    rop.m_limbs[0u] = lo;
+    rop.m_limbs[1u] = hi;
+    // asize is at least 1.
+    rop._mp_size = 1 + (hi != 0u);
+    if (sign == -1) {
+        rop._mp_size = -rop._mp_size;
+    }
+    return 0u;
+}
+
+template <std::size_t SSize>
+inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s)
+{
+    const std::size_t retval = static_mul_2exp_impl(rop, n, s, integer_static_mul_2exp_algo<static_int<SSize>>{});
+    if (integer_static_mul_2exp_algo<static_int<SSize>>::value == 0 && retval == 0u) {
+        rop.zero_unused_limbs();
+    }
+    return retval;
+}
+}
+
+/// Ternary left shift.
+/**
+ * This function will set \p rop to \p n multiplied by <tt>2**s</tt>.
+ *
+ * @param rop the return value.
+ * @param n the multiplicand.
+ * @param s the bit shift value.
+ */
+template <std::size_t SSize>
+inline void mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
+{
+    const bool sr = rop.is_static(), sn = n.is_static();
+    std::size_t size_hint = 0u;
+    if (mppp_likely(sr && sn)) {
+        size_hint = static_mul_2exp(rop._get_union().g_st(), n._get_union().g_st(), s);
+        if (mppp_likely(size_hint == 0u)) {
+            return;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(size_hint);
+    }
+    ::mpz_mul_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
+}
+
+/// Binary negation.
+/**
+ * This method will set \p rop to <tt>-n</tt>.
+ *
+ * @param rop the return value.
+ * @param n the integer that will be negated.
+ */
+template <std::size_t SSize>
+inline void neg(integer<SSize> &rop, const integer<SSize> &n)
+{
+    rop = n;
+    rop.neg();
+}
+
+/// Unary negation.
+/**
+ * @param n the integer that will be negated.
+ *
+ * @return <tt>-n</tt>.
+ */
+template <std::size_t SSize>
+inline integer<SSize> neg(const integer<SSize> &n)
+{
+    integer<SSize> ret(n);
+    ret.neg();
+    return ret;
+}
+
+/// Binary absolute value.
+/**
+ * This function will set \p rop to the absolute value of \p n.
+ *
+ * @param rop the return value.
+ * @param n the argument.
+ */
+template <std::size_t SSize>
+inline void abs(integer<SSize> &rop, const integer<SSize> &n)
+{
+    rop = n;
+    rop.abs();
+}
+
+/// Unary absolute value.
+/**
+ * @param n the argument.
+ *
+ * @return the absolute value of \p n.
+ */
+template <std::size_t SSize>
+inline integer<SSize> abs(const integer<SSize> &n)
+{
+    integer<SSize> ret(n);
+    ret.abs();
+    return ret;
+}
+
+/** @} */
+
+/** @defgroup integer_division integer_division
+ *  @{
+ */
+
+inline namespace detail
+{
+
+// Detect the presence of dual-limb division. This is currently possible only if:
+// - we are on a 32bit build (with the usual constraints that the types have exactly 32/64 bits and no nails),
+// - we are on a 64bit build and we have the 128bit int type available (plus usual constraints).
+// MSVC currently does not provide any primitive for 128bit division.
+using integer_have_dlimb_div = std::integral_constant<bool,
+#if defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64)
+                                                      !GMP_NAIL_BITS && std::numeric_limits<::mp_limb_t>::digits == 64
+#elif GMP_NUMB_BITS == 32
+                                                      !GMP_NAIL_BITS
+                                                          && std::numeric_limits<std::uint_least64_t>::digits == 64
+                                                          && std::numeric_limits<::mp_limb_t>::digits == 32
+#else
+                                                      false
+#endif
+                                                      >;
+
+// Selection of algorithm for static division:
+// - for 1 limb, we can always do static division,
+// - for 2 limbs, we need the dual limb division if avaiable,
+// - otherwise we just use the mpn functions.
+template <typename SInt>
+using integer_static_div_algo
+    = std::integral_constant<int,
+                             SInt::s_size == 1 ? 1 : ((SInt::s_size == 2 && integer_have_dlimb_div::value) ? 2 : 0)>;
+
+// mpn implementation.
+template <std::size_t SSize>
+inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                            const static_int<SSize> &op2, mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                            const std::integral_constant<int, 0> &)
+{
+    // First we check if the divisor is larger than the dividend (in abs limb size), as the mpn function
+    // requires asize1 >= asize2.
+    if (asize2 > asize1) {
+        // Copy op1 into the remainder.
+        r = op1;
+        // Zero out q.
+        q._mp_size = 0;
+        return;
+    }
+    // We need to take care of potentially overlapping arguments. We know that q and r are distinct, but op1
+    // could overlap with q or r, and op2 could overlap with op1, q or r.
+    std::array<::mp_limb_t, SSize> op1_alt, op2_alt;
+    const ::mp_limb_t *data1 = op1.m_limbs.data();
+    const ::mp_limb_t *data2 = op2.m_limbs.data();
+    if (&op1 == &q || &op1 == &r) {
+        copy_limbs_no(data1, data1 + asize1, op1_alt.data());
+        data1 = op1_alt.data();
+    }
+    if (&op2 == &q || &op2 == &r || &op1 == &op2) {
+        copy_limbs_no(data2, data2 + asize2, op2_alt.data());
+        data2 = op2_alt.data();
+    }
+    // Small helper function to verify that all pointers are distinct. Used exclusively for debugging purposes.
+    auto distinct_op = [&q, &r, data1, data2]() -> bool {
+        const ::mp_limb_t *ptrs[] = {q.m_limbs.data(), r.m_limbs.data(), data1, data2};
+        std::sort(ptrs, ptrs + 4, std::less<const ::mp_limb_t *>());
+        return std::unique(ptrs, ptrs + 4) == (ptrs + 4);
+    };
+    (void)distinct_op;
+    assert(distinct_op());
+    // Proceed to the division.
+    if (asize2 == 1) {
+        // Optimization when the divisor has 1 limb.
+        r.m_limbs[0]
+            = ::mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
+    } else {
+        // General implementation.
+        ::mpn_tdiv_qr(q.m_limbs.data(), r.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1),
+                      data2, static_cast<::mp_size_t>(asize2));
+    }
+    // Complete the quotient: compute size and sign.
+    q._mp_size = asize1 - asize2 + 1;
+    while (q._mp_size && !(q.m_limbs[static_cast<std::size_t>(q._mp_size - 1)] & GMP_NUMB_MASK)) {
+        --q._mp_size;
+    }
+    if (sign1 != sign2) {
+        q._mp_size = -q._mp_size;
+    }
+    // Complete the remainder.
+    r._mp_size = asize2;
+    while (r._mp_size && !(r.m_limbs[static_cast<std::size_t>(r._mp_size - 1)] & GMP_NUMB_MASK)) {
+        --r._mp_size;
+    }
+    if (sign1 == -1) {
+        r._mp_size = -r._mp_size;
+    }
+}
+
+// 1-limb optimisation.
+template <std::size_t SSize>
+inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                            const static_int<SSize> &op2, mpz_size_t, mpz_size_t, int sign1, int sign2,
+                            const std::integral_constant<int, 1> &)
+{
+    // NOTE: here we have to use GMP_NUMB_MASK because if s_size is 1 this implementation is *always*
+    // called, even if we have nail bits (whereas the optimisation for other operations currently kicks in
+    // only without nail bits). Thus, we need to discard from m_limbs[0] the nail bits before doing the
+    // division.
+    const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK),
+                      r_ = (op1.m_limbs[0] & GMP_NUMB_MASK) % (op2.m_limbs[0] & GMP_NUMB_MASK);
+    // Write q.
+    q._mp_size = (q_ != 0u);
+    if (sign1 != sign2) {
+        q._mp_size = -q._mp_size;
+    }
+    // NOTE: there should be no need here to mask.
+    q.m_limbs[0] = q_;
+    // Write r.
+    r._mp_size = (r_ != 0u);
+    // Following C++11, the sign of r is the sign of op1:
+    // http://stackoverflow.com/questions/13100711/operator-modulo-change-in-c-11
+    if (sign1 == -1) {
+        r._mp_size = -r._mp_size;
+    }
+    r.m_limbs[0] = r_;
+}
+
+#if defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                      ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
+                      ::mp_limb_t *MPPP_RESTRICT r2)
+{
+    using dlimb_t = MPPP_UINT128;
+    const auto op1 = op11 + (dlimb_t(op12) << 64);
+    const auto op2 = op21 + (dlimb_t(op22) << 64);
+    const auto q = op1 / op2, r = op1 % op2;
+    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q2 = static_cast<::mp_limb_t>(q >> 64);
+    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
+    *r2 = static_cast<::mp_limb_t>(r >> 64);
+}
+
+// Without remainder.
+inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                      ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
+{
+    using dlimb_t = MPPP_UINT128;
+    const auto op1 = op11 + (dlimb_t(op12) << 64);
+    const auto op2 = op21 + (dlimb_t(op22) << 64);
+    const auto q = op1 / op2;
+    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q2 = static_cast<::mp_limb_t>(q >> 64);
+}
+
+#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
+
+inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                      ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
+                      ::mp_limb_t *MPPP_RESTRICT r2)
+{
+    using dlimb_t = std::uint_least64_t;
+    const auto op1 = op11 + (dlimb_t(op12) << 32);
+    const auto op2 = op21 + (dlimb_t(op22) << 32);
+    const auto q = op1 / op2, r = op1 % op2;
+    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q2 = static_cast<::mp_limb_t>(q >> 32);
+    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
+    *r2 = static_cast<::mp_limb_t>(r >> 32);
+}
+
+inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                      ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
+{
+    using dlimb_t = std::uint_least64_t;
+    const auto op1 = op11 + (dlimb_t(op12) << 32);
+    const auto op2 = op21 + (dlimb_t(op22) << 32);
+    const auto q = op1 / op2;
+    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q2 = static_cast<::mp_limb_t>(q >> 32);
+}
+
+#endif
+
+// 2-limbs optimisation.
+template <std::size_t SSize>
+inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                            const static_int<SSize> &op2, mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                            const std::integral_constant<int, 2> &)
+{
+    if (asize1 < 2 && asize2 < 2) {
+        // NOTE: testing indicates that it pays off to optimize the case in which the operands have
+        // fewer than 2 limbs. This a slightly modified version of the 1-limb division from above,
+        // without the need to mask as this function is called only if there are no nail bits.
+        const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0], r_ = op1.m_limbs[0] % op2.m_limbs[0];
+        q._mp_size = (q_ != 0u);
+        if (sign1 != sign2) {
+            q._mp_size = -q._mp_size;
+        }
+        q.m_limbs[0] = q_;
+        q.m_limbs[1] = 0u;
+        r._mp_size = (r_ != 0u);
+        if (sign1 == -1) {
+            r._mp_size = -r._mp_size;
+        }
+        r.m_limbs[0] = r_;
+        r.m_limbs[1] = 0u;
+        return;
+    }
+    // Perform the division.
+    ::mp_limb_t q1, q2, r1, r2;
+    dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2, &r1, &r2);
+    // Write out.
+    q._mp_size = q2 ? 2 : (q1 ? 1 : 0);
+    if (sign1 != sign2) {
+        q._mp_size = -q._mp_size;
+    }
+    q.m_limbs[0] = q1;
+    q.m_limbs[1] = q2;
+    r._mp_size = r2 ? 2 : (r1 ? 1 : 0);
+    if (sign1 == -1) {
+        r._mp_size = -r._mp_size;
+    }
+    r.m_limbs[0] = r1;
+    r.m_limbs[1] = r2;
+}
+
+template <std::size_t SSize>
+inline void static_div(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                       const static_int<SSize> &op2)
+{
+    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
+    int sign1 = asize1 != 0, sign2 = asize2 != 0;
+    if (asize1 < 0) {
+        asize1 = -asize1;
+        sign1 = -1;
+    }
+    if (asize2 < 0) {
+        asize2 = -asize2;
+        sign2 = -1;
+    }
+    static_div_impl(q, r, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
+    if (integer_static_div_algo<static_int<SSize>>::value == 0) {
+        q.zero_unused_limbs();
+        r.zero_unused_limbs();
+    }
+}
+
+// Exact division.
+// mpn implementation.
+template <std::size_t SSize>
+inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                 mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                                 const std::integral_constant<int, 0> &)
+{
+    if (asize1 == 0) {
+        // Special casing if the numerator is zero (the mpn functions do not work with zero operands).
+        q._mp_size = 0;
+        return;
+    }
+#if __GNU_MP_VERSION > 6 || (__GNU_MP_VERSION == 6 && __GNU_MP_VERSION_MINOR >= 1)
+    // NOTE: mpn_divexact_1() is available since GMP 6.1.0.
+    if (asize2 == 1) {
+        // Optimisation in case the dividend has only 1 limb.
+        // NOTE: overlapping arguments are fine here.
+        ::mpn_divexact_1(q.m_limbs.data(), op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
+        // Complete the quotient: compute size and sign.
+        q._mp_size = asize1 - asize2 + 1;
+        while (q._mp_size && !(q.m_limbs[static_cast<std::size_t>(q._mp_size - 1)] & GMP_NUMB_MASK)) {
+            --q._mp_size;
+        }
+        if (sign1 != sign2) {
+            q._mp_size = -q._mp_size;
+        }
+        return;
+    }
+#else
+    // Avoid compiler warnings for unused parameters.
+    (void)sign1;
+    (void)sign2;
+    (void)asize2;
+#endif
+    // General implementation (via the mpz function).
+    MPPP_MAYBE_TLS mpz_raii tmp;
+    ::mpz_divexact(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
+    // Copy over from the tmp struct into q.
+    q._mp_size = tmp.m_mpz._mp_size;
+    copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + (q._mp_size >= 0 ? q._mp_size : -q._mp_size), q.m_limbs.data());
+}
+
+// 1-limb optimisation.
+template <std::size_t SSize>
+inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                 mpz_size_t, mpz_size_t, int sign1, int sign2, const std::integral_constant<int, 1> &)
+{
+    const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK);
+    // Write q.
+    q._mp_size = (q_ != 0u);
+    if (sign1 != sign2) {
+        q._mp_size = -q._mp_size;
+    }
+    q.m_limbs[0] = q_;
+}
+
+// 2-limbs optimisation.
+template <std::size_t SSize>
+inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                                 mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                                 const std::integral_constant<int, 2> &)
+{
+    if (asize1 < 2 && asize2 < 2) {
+        // 1-limb optimisation.
+        const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0];
+        q._mp_size = (q_ != 0u);
+        if (sign1 != sign2) {
+            q._mp_size = -q._mp_size;
+        }
+        q.m_limbs[0] = q_;
+        q.m_limbs[1] = 0u;
+        return;
+    }
+    // General case.
+    ::mp_limb_t q1, q2;
+    dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
+    q._mp_size = q2 ? 2 : (q1 ? 1 : 0);
+    if (sign1 != sign2) {
+        q._mp_size = -q._mp_size;
+    }
+    q.m_limbs[0] = q1;
+    q.m_limbs[1] = q2;
+}
+
+template <std::size_t SSize>
+inline void static_divexact(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
+    int sign1 = asize1 != 0, sign2 = asize2 != 0;
+    if (asize1 < 0) {
+        asize1 = -asize1;
+        sign1 = -1;
+    }
+    if (asize2 < 0) {
+        asize2 = -asize2;
+        sign2 = -1;
+    }
+    assert(asize1 == 0 || asize2 <= asize1);
+    // NOTE: use integer_static_div_algo for the algorithm selection.
+    static_divexact_impl(q, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
+    if (integer_static_div_algo<static_int<SSize>>::value == 0) {
+        q.zero_unused_limbs();
+    }
+}
+}
+
+/// Ternary truncated division.
+/**
+ * This function will set \p q to the truncated quotient <tt>n / d</tt> and \p r to
+ * <tt>n % d</tt>. The remainder \p r has the same sign as \p n. \p q and \p r must be two distinct objects.
+ *
+ * @param q the quotient.
+ * @param r the remainder.
+ * @param n the dividend.
+ * @param d the divisor.
+ *
+ * @throws std::invalid_argument if \p q and \p r are the same object.
+ * @throws zero_division_error if \p d is zero.
+ */
+template <std::size_t SSize>
+inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &n, const integer<SSize> &d)
+{
+    if (mppp_unlikely(&q == &r)) {
+        throw std::invalid_argument("When performing a division with remainder, the quotient 'q' and the "
+                                    "remainder 'r' must be distinct objects");
+    }
+    if (mppp_unlikely(d.sgn() == 0)) {
+        throw zero_division_error("Integer division by zero");
+    }
+    const bool sq = q.is_static(), sr = r.is_static(), s1 = n.is_static(), s2 = d.is_static();
+    if (mppp_likely(sq && sr && s1 && s2)) {
+        static_div(q._get_union().g_st(), r._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
+        // Division can never fail.
+        return;
+    }
+    if (sq) {
+        q._get_union().promote();
+    }
+    if (sr) {
+        r._get_union().promote();
+    }
+    ::mpz_tdiv_qr(&q._get_union().g_dy(), &r._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+}
+
+/// Exact division (ternary version).
+/**
+ * This function will set \p rop to the quotient of \p n and \p d.
+ *
+ * \rststar
+ * .. warning::
+ *
+ *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
+ * \endrststar
+ *
+ * @param rop the return value.
+ * @param n the dividend.
+ * @param d the divisor.
+ */
+template <std::size_t SSize>
+inline void divexact(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
+{
+    const bool sr = rop.is_static(), s1 = n.is_static(), s2 = d.is_static();
+    if (mppp_likely(sr && s1 && s2)) {
+        static_divexact(rop._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
+        // Division can never fail.
+        return;
+    }
+    if (sr) {
+        rop._get_union().promote();
+    }
+    ::mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+}
+
+/// Exact division (binary version).
+/**
+ * \rststar
+ * .. warning::
+ *
+ *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
+ * \endrststar
+ *
+ * @param n the dividend.
+ * @param d the divisor.
+ *
+ * @return the quotient of \p n and \p d.
+ */
+template <std::size_t SSize>
+inline integer<SSize> divexact(const integer<SSize> &n, const integer<SSize> &d)
+{
+    integer<SSize> retval;
+    divexact(retval, n, d);
+    return retval;
+}
+
+inline namespace detail
+{
+
+// Selection of the algorithm for static tdiv_q_2exp.
+template <typename SInt>
+using integer_static_tdiv_q_2exp_algo
+    = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
+
+// mpn implementation.
+template <std::size_t SSize>
+inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s,
+                                    const std::integral_constant<int, 0> &)
+{
+    mpz_size_t asize = n._mp_size;
+    if (s == 0u || asize == 0) {
+        // If shift is zero, or the operand is zero, write n into rop and return.
+        rop = n;
+        return;
+    }
+    // Finish setting up asize and sign.
+    int sign = asize != 0;
+    if (asize < 0) {
+        asize = -asize;
+        sign = -1;
+    }
+    // ls: number of entire limbs shifted.
+    // rs: effective shift that will be passed to the mpn function.
+    const auto ls = s / GMP_NUMB_BITS, rs = s % GMP_NUMB_BITS;
+    if (ls >= std::size_t(asize)) {
+        // If we shift by a number of entire limbs equal to or larger than the asize,
+        // the result will be zero.
+        rop._mp_size = 0;
+        return;
+    }
+    // The maximum new asize will be the old asize minus ls.
+    const mpz_size_t new_asize = asize - static_cast<mpz_size_t>(ls);
+    if (rs) {
+        // Perform the shift via the mpn function, if we are effectively shifting at least 1 bit.
+        // Overlapping is fine, as it is guaranteed that rop.m_limbs.data() <= n.m_limbs.data() + ls.
+        ::mpn_rshift(rop.m_limbs.data(), n.m_limbs.data() + ls, static_cast<::mp_size_t>(new_asize), unsigned(rs));
+    } else {
+        // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
+        // NOTE: std::move requires that the destination iterator is not within the input range.
+        // Here we are sure that ls > 0 because we don't have a remainder, and the zero shift case
+        // was already handled above.
+        assert(ls);
+        std::move(n.m_limbs.begin() + ls, n.m_limbs.begin() + asize, rop.m_limbs.begin());
+    }
+    // Set the size. We need to check if the top limb is zero.
+    rop._mp_size = new_asize - ((rop.m_limbs[std::size_t(new_asize - 1)] & GMP_NUMB_MASK) == 0u);
+    if (sign == -1) {
+        rop._mp_size = -rop._mp_size;
+    }
+}
+
+// 1-limb optimisation.
+template <std::size_t SSize>
+inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s,
+                                    const std::integral_constant<int, 1> &)
+{
+    const ::mp_limb_t l = n.m_limbs[0] & GMP_NUMB_MASK;
+    if (s == 0u || l == 0u) {
+        rop = n;
+        return;
+    }
+    if (s >= GMP_NUMB_BITS) {
+        // We are shifting by the limb's bit size or greater, the result will be zero.
+        rop._mp_size = 0;
+        rop.m_limbs[0] = 0u;
+        return;
+    }
+    // Compute the result.
+    const auto res = l >> s;
+    // Size is the original one or zero.
+    rop._mp_size = res ? n._mp_size : 0;
+    rop.m_limbs[0] = res;
+}
+
+// 2-limb optimisation.
+template <std::size_t SSize>
+inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s,
+                                    const std::integral_constant<int, 2> &)
+{
+    mpz_size_t asize = n._mp_size;
+    if (s == 0u || asize == 0) {
+        rop = n;
+        return;
+    }
+    int sign = asize != 0;
+    if (asize < 0) {
+        asize = -asize;
+        sign = -1;
+    }
+    // If shift is too large, zero the result and return.
+    static_assert(GMP_NUMB_BITS < std::numeric_limits<typename std::decay<decltype(GMP_NUMB_BITS)>::type>::max() / 2u,
+                  "Overflow error.");
+    if (s >= 2u * GMP_NUMB_BITS) {
+        rop._mp_size = 0;
+        rop.m_limbs[0u] = 0u;
+        rop.m_limbs[1u] = 0u;
+        return;
+    }
+    if (s >= GMP_NUMB_BITS) {
+        // NOTE: here the effective shift < GMP_NUMB_BITS, otherwise it would have been caught
+        // in the check above.
+        const auto lo = (n.m_limbs[1u] & GMP_NUMB_MASK) >> (s - GMP_NUMB_BITS);
+        // The size could be zero or +-1, depending
+        // on the new content of m_limbs[0] and the previous
+        // sign of _mp_size.
+        rop._mp_size = lo ? sign : 0;
+        rop.m_limbs[0u] = lo;
+        rop.m_limbs[1u] = 0u;
+        return;
+    }
+    assert(s > 0u && s < GMP_NUMB_BITS);
+    // This represents the bits in hi that will be shifted down into lo.
+    // We move them up so we can add tmp to the new lo to account for them.
+    // NOTE: mask the final result to avoid spillover into potential nail bits.
+    const auto tmp = ((n.m_limbs[1u] & GMP_NUMB_MASK) << (GMP_NUMB_BITS - s)) & GMP_NUMB_MASK;
+    rop.m_limbs[0u] = ((n.m_limbs[0u] & GMP_NUMB_MASK) >> s) + tmp;
+    rop.m_limbs[1u] = (n.m_limbs[1u] & GMP_NUMB_MASK) >> s;
+    // The effective shift was less than 1 entire limb. The new asize must be the old one,
+    // or one less than that.
+    rop._mp_size = asize - ((rop.m_limbs[std::size_t(asize - 1)] & GMP_NUMB_MASK) == 0u);
+    if (sign == -1) {
+        rop._mp_size = -rop._mp_size;
+    }
+}
+
+template <std::size_t SSize>
+inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s)
+{
+    static_tdiv_q_2exp_impl(rop, n, s, integer_static_tdiv_q_2exp_algo<static_int<SSize>>{});
+    if (integer_static_tdiv_q_2exp_algo<static_int<SSize>>::value == 0) {
+        rop.zero_unused_limbs();
+    }
+}
+}
+
+/// Ternary right shift.
+/**
+ * This function will set \p rop to \p n divided by <tt>2**s</tt>. \p rop will be the truncated result of the
+ * division.
+ *
+ * @param rop the return value.
+ * @param n the dividend.
+ * @param s the bit shift value.
+ */
+template <std::size_t SSize>
+inline void tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
+{
+    const bool sr = rop.is_static(), sn = n.is_static();
+    if (mppp_likely(sr && sn)) {
+        static_tdiv_q_2exp(rop._get_union().g_st(), n._get_union().g_st(), s);
+        return;
+    }
+    if (sr) {
+        rop._get_union().promote();
+    }
+    ::mpz_tdiv_q_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
+}
+
+/** @} */
+
+/** @defgroup integer_comparison integer_comparison
+ *  @{
+ */
+
+inline namespace detail
+{
+
+// Selection of the algorithm for static cmp.
+template <typename SInt>
+using integer_static_cmp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
+
+// mpn implementation.
+template <std::size_t SSize>
+inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 0> &)
+{
+    if (n1._mp_size < n2._mp_size) {
+        return -1;
+    }
+    if (n2._mp_size < n1._mp_size) {
+        return 1;
+    }
+    // The two sizes are equal, compare the absolute values.
+    const auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
+    if (asize == 0) {
+        // Both operands are zero.
+        // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
+        // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
+        return 0;
+    }
+    const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize));
+    // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
+    return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
+}
+
+// 1-limb optimisation.
+template <std::size_t SSize>
+inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 1> &)
+{
+    if (n1._mp_size < n2._mp_size) {
+        return -1;
+    }
+    if (n2._mp_size < n1._mp_size) {
+        return 1;
+    }
+    int cmp_abs = (n1.m_limbs[0u] & GMP_NUMB_MASK) > (n2.m_limbs[0u] & GMP_NUMB_MASK);
+    if (!cmp_abs) {
+        cmp_abs = -static_cast<int>((n1.m_limbs[0u] & GMP_NUMB_MASK) < (n2.m_limbs[0u] & GMP_NUMB_MASK));
+    }
+    return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
+}
+
+// 2-limb optimisation.
+template <std::size_t SSize>
+inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 2> &)
+{
+    if (n1._mp_size < n2._mp_size) {
+        return -1;
+    }
+    if (n2._mp_size < n1._mp_size) {
+        return 1;
+    }
+    auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
+    while (asize != 0) {
+        --asize;
+        if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) > (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
+            return (n1._mp_size >= 0) ? 1 : -1;
+        }
+        if ((n1.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK) < (n2.m_limbs[std::size_t(asize)] & GMP_NUMB_MASK)) {
+            return (n1._mp_size >= 0) ? -1 : 1;
+        }
+    }
+    return 0;
+}
+}
+
+/// Comparison function for integer.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
+ * <tt>op1 > op2</tt>.
+ */
+template <std::size_t SSize>
+inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool s1 = op1.is_static(), s2 = op2.is_static();
+    if (mppp_likely(s1 && s2)) {
+        return static_cmp(op1._get_union().g_st(), op2._get_union().g_st(),
+                          integer_static_cmp_algo<static_int<SSize>>{});
+    }
+    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
+}
+
+/// Sign function.
+/**
+ * @param n the integer whose sign will be computed.
+ *
+ * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
+ */
+template <std::size_t SSize>
+inline int sgn(const integer<SSize> &n)
+{
+    return n.sgn();
+}
+
+/// Test if integer is odd.
+/**
+ * @param n the argument.
+ *
+ * @return \p true if \p n is odd, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool odd_p(const integer<SSize> &n)
+{
+    return n.odd_p();
+}
+
+/// Test if integer is even.
+/**
+ * @param n the argument.
+ *
+ * @return \p true if \p n is even, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool even_p(const integer<SSize> &n)
+{
+    return n.even_p();
+}
+
+/// Test if integer is zero.
+/**
+ * @param n the integer to be tested.
+ *
+ * @return \p true if \p n is zero, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool is_zero(const integer<SSize> &n)
+{
+    return n.is_zero();
+}
+
+/// Test if an integer is equal to one.
+/**
+ * @param n the integer to be tested.
+ *
+ * @return \p true if \p n is equal to 1, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool is_one(const integer<SSize> &n)
+{
+    return n.is_one();
+}
+
+/// Test if an integer is equal to minus one.
+/**
+ * @param n the integer to be tested.
+ *
+ * @return \p true if \p n is equal to -1, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool is_negative_one(const integer<SSize> &n)
+{
+    return n.is_negative_one();
+}
+
+/** @} */
+
+/** @defgroup integer_ntheory integer_ntheory
+ *  @{
+ */
+
+inline namespace detail
+{
+
+template <std::size_t SSize>
+inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
+    if (asize1 < 0) {
+        asize1 = -asize1;
+    }
+    if (asize2 < 0) {
+        asize2 = -asize2;
+    }
+    // Handle zeroes.
+    if (!asize1) {
+        rop._mp_size = asize2;
+        rop.m_limbs = op2.m_limbs;
+        return;
+    }
+    if (!asize2) {
+        rop._mp_size = asize1;
+        rop.m_limbs = op1.m_limbs;
+        return;
+    }
+    // Special casing if an operand has asize 1.
+    if (asize1 == 1) {
+        rop._mp_size = 1;
+        rop.m_limbs[0] = ::mpn_gcd_1(op2.m_limbs.data(), static_cast<::mp_size_t>(asize2), op1.m_limbs[0]);
+        return;
+    }
+    if (asize2 == 1) {
+        rop._mp_size = 1;
+        rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(asize1), op2.m_limbs[0]);
+        return;
+    }
+    // General case, via mpz.
+    // NOTE: there is an mpn_gcd() function, but it seems difficult to use. Apparently, and contrary to
+    // what stated in the latest documentation, the mpn function requires odd operands and bit size
+    // (not only limb size!) of the second operand not greater than the first. See for instance the old
+    // documentation:
+    // ftp://ftp.gnu.org/old-gnu/Manuals/gmp-3.1.1/html_chapter/gmp_9.html
+    // Indeed, compiling GMP in debug mode and then trying to use the mpn function without respecting the above
+    // results in assertion failures. For now let's keep it like this, the small operand cases are handled above
+    // (partially) via mpn_gcd_1(), and in the future we can also think about binary GCD for 1/2 limbs optimisation.
+    MPPP_MAYBE_TLS mpz_raii tmp;
+    ::mpz_gcd(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
+    // Copy over.
+    rop._mp_size = tmp.m_mpz._mp_size;
+    assert(rop._mp_size > 0);
+    copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + rop._mp_size, rop.m_limbs.data());
+}
+}
+
+/// GCD (ternary version).
+/**
+ * This function will set \p rop to the GCD of \p op1 and \p op2. The result is always positive.
+ * If both operands are zero, zero is returned.
+ *
+ * @param rop the return value.
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ */
+template <std::size_t SSize>
+inline void gcd(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+    if (mppp_likely(sr && s1 && s2)) {
+        static_gcd(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
+        rop._get_union().g_st().zero_unused_limbs();
+        return;
+    }
+    if (sr) {
+        rop._get_union().promote();
+    }
+    ::mpz_gcd(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+}
+
+/// GCD (binary version).
+/**
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ *
+ * @return the GCD of \p op1 and \p op2.
+ */
+template <std::size_t SSize>
+inline integer<SSize> gcd(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval;
+    gcd(retval, op1, op2);
+    return retval;
+}
+
+/// Factorial.
+/**
+ * This function will set \p rop to the factorial of \p n.
+ *
+ * @param rop the return value.
+ * @param n the argument for the factorial.
+ *
+ * @throws std::invalid_argument if \p n is larger than an implementation-defined limit.
+ */
+template <std::size_t SSize>
+inline void fac_ui(integer<SSize> &rop, unsigned long n)
+{
+    // NOTE: we put a limit here because the GMP function just crashes and burns
+    // if n is too large, and n does not even need to be that large.
+    constexpr auto max_fac = 1000000ull;
+    if (mppp_unlikely(n > max_fac)) {
+        throw std::invalid_argument(
+            "The value " + std::to_string(n)
+            + " is too large to be used as input for the factorial function (the maximum allowed value is "
+            + std::to_string(max_fac) + ")");
+    }
+    if (rop.is_static()) {
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_fac_ui(&tmp.m_mpz, n);
+        rop = integer<SSize>(&tmp.m_mpz);
+    } else {
+        ::mpz_fac_ui(&rop._get_union().g_dy(), n);
+    }
+}
+
+/// Binomial coefficient (ternary version).
+/**
+ * This function will set \p rop to the binomial coefficient of \p n and \p k. Negative values of \p n are
+ * supported.
+ *
+ * @param rop the return value.
+ * @param n the top argument.
+ * @param k the bottom argument.
+ */
+template <std::size_t SSize>
+inline void bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k)
+{
+    if (rop.is_static()) {
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
+        rop = integer<SSize>(&tmp.m_mpz);
+    } else {
+        ::mpz_bin_ui(&rop._get_union().g_dy(), n.get_mpz_view(), k);
+    }
+}
+
+/// Binomial coefficient (binary version).
+/**
+ * @param n the top argument.
+ * @param k the bottom argument.
+ *
+ * @return the binomial coefficient of \p n and \p k.
+ */
+template <std::size_t SSize>
+inline integer<SSize> bin_ui(const integer<SSize> &n, unsigned long k)
+{
+    integer<SSize> retval;
+    bin_ui(retval, n, k);
+    return retval;
+}
+
+inline namespace detail
+{
+
+// These helpers are used here and in pow() as well.
+template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+inline bool integer_exp_nonnegative(const T &exp)
+{
+    return exp >= T(0);
+}
+
+template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+inline bool integer_exp_nonnegative(const T &)
+{
+    return true;
+}
+
+template <std::size_t SSize>
+inline bool integer_exp_nonnegative(const integer<SSize> &exp)
+{
+    return exp.sgn() >= 0;
+}
+
+template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline unsigned long integer_exp_to_ulong(const T &exp)
+{
+#if !defined(__INTEL_COMPILER)
+    assert(exp >= T(0));
+#endif
+    // NOTE: make_unsigned<T>::type is T if T is already unsigned.
+    if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(exp)
+                      > std::numeric_limits<unsigned long>::max())) {
+        throw std::overflow_error("Cannot convert the integral value " + std::to_string(exp)
+                                  + " to unsigned long: the value is too large.");
+    }
+    return static_cast<unsigned long>(exp);
+}
+
+template <std::size_t SSize>
+inline unsigned long integer_exp_to_ulong(const integer<SSize> &exp)
+{
+    try {
+        return static_cast<unsigned long>(exp);
+    } catch (const std::overflow_error &) {
+        // Rewrite the error message.
+        throw std::overflow_error("Cannot convert the integral value " + exp.to_string()
+                                  + " to unsigned long: the value is too large.");
+    }
+}
+
+template <typename T, std::size_t SSize>
+inline integer<SSize> binomial_impl(const integer<SSize> &n, const T &k)
+{
+    // NOTE: here we re-use some helper methods used in the implementation of pow().
+    if (integer_exp_nonnegative(k)) {
+        return bin_ui(n, integer_exp_to_ulong(k));
+    }
+    // This is the case k < 0, handled according to:
+    // http://arxiv.org/abs/1105.3689/
+    if (n.sgn() >= 0) {
+        // n >= 0, k < 0.
+        return integer<SSize>{};
+    }
+    // n < 0, k < 0.
+    if (k <= n) {
+        // The formula is: (-1)**(n-k) * binomial(-k-1,n-k).
+        // Cache n-k.
+        const integer<SSize> nmk{n - k};
+        integer<SSize> tmp{k};
+        ++tmp;
+        tmp.neg();
+        auto retval = bin_ui(tmp, integer_exp_to_ulong(nmk));
+        if (nmk.odd_p()) {
+            retval.neg();
+        }
+        return retval;
+    }
+    return integer<SSize>{};
+}
+
+template <typename T, std::size_t SSize, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
+{
+    return binomial_impl(integer<SSize>{n}, k);
+}
+}
+
+/// Generic binomial coefficient.
+/**
+ * \rststar
+ * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
+ * The return type is :cpp:class:`~mppp::integer`.
+ *
+ * This function will compute the binomial coefficient :math:`{{n}\choose{k}}`, supporting integral input values.
+ * The implementation can handle positive and negative values for both the top and the bottom argument.
+ *
+ * .. seealso::
+ *
+ *    http://arxiv.org/abs/1105.3689/
+ *
+ * \endrststar
+ *
+ * @param n the top argument.
+ * @param k the bottom argument.
+ *
+ * @return \f$ {{n}\choose{k}} \f$.
+ *
+ * @throws std::overflow_error if \p k is outside an implementation-defined range.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerIntegralOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+#endif
+    inline integer_common_t<T, U> binomial(const T &n, const U &k)
+{
+    return binomial_impl(n, k);
+}
+
+inline namespace detail
+{
+
+template <std::size_t SSize>
+inline void nextprime_impl(integer<SSize> &rop, const integer<SSize> &n)
+{
+    if (rop.is_static()) {
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
+        rop = integer<SSize>(&tmp.m_mpz);
+    } else {
+        ::mpz_nextprime(&rop._get_union().g_dy(), n.get_mpz_view());
+    }
+}
+}
+
+/// Compute next prime number (binary version).
+/**
+ * This function will set \p rop to the first prime number greater than \p n.
+ * Note that for negative values of \p n this function always returns 2.
+ *
+ * @param rop the return value.
+ * @param n the integer argument.
+ */
+template <std::size_t SSize>
+inline void nextprime(integer<SSize> &rop, const integer<SSize> &n)
+{
+    // NOTE: nextprime on negative numbers always returns 2.
+    nextprime_impl(rop, n);
+}
+
+/// Compute next prime number (unary version).
+/**
+ * @param n the integer argument.
+ *
+ * @return the first prime number greater than \p n.
+ */
+template <std::size_t SSize>
+inline integer<SSize> nextprime(const integer<SSize> &n)
+{
+    integer<SSize> retval;
+    nextprime_impl(retval, n);
+    return retval;
+}
+
+/// Test primality.
+/**
+ * \rststar
+ * This is the free-function version of :cpp:func:`mppp::integer::probab_prime_p()`.
+ * \endrststar
+ *
+ * @param n the integer whose primality will be tested.
+ * @param reps the number of tests to run.
+ *
+ * @return an integer indicating if \p this is a prime.
+ *
+ * @throws unspecified any exception thrown by integer::probab_prime_p().
+ */
+template <std::size_t SSize>
+inline int probab_prime_p(const integer<SSize> &n, int reps = 25)
+{
+    return n.probab_prime_p(reps);
+}
+
+/** @} */
+
+/** @defgroup integer_exponentiation integer_exponentiation
+ *  @{
+ */
+
+/// Ternary integer exponentiation.
+/**
+ * This function will set \p rop to <tt>base**exp</tt>.
+ *
+ * @param rop the return value.
+ * @param base the base.
+ * @param exp the exponent.
+ */
+template <std::size_t SSize>
+inline void pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned long exp)
+{
+    if (rop.is_static()) {
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
+        rop = integer<SSize>(&tmp.m_mpz);
+    } else {
+        ::mpz_pow_ui(&rop._get_union().g_dy(), base.get_mpz_view(), exp);
+    }
+}
+
+/// Binary integer exponentiation.
+/**
+ * @param base the base.
+ * @param exp the exponent.
+ *
+ * @return <tt>base**exp</tt>.
+ */
+template <std::size_t SSize>
+inline integer<SSize> pow_ui(const integer<SSize> &base, unsigned long exp)
+{
+    integer<SSize> retval;
+    pow_ui(retval, base, exp);
+    return retval;
+}
+
+inline namespace detail
+{
+
+// Various helpers for the implementation of pow().
+template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline bool integer_base_is_zero(const T &base)
+{
+    return base == T(0);
+}
+
+template <std::size_t SSize>
+inline bool integer_base_is_zero(const integer<SSize> &base)
+{
+    return base.is_zero();
+}
+
+template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline bool integer_exp_is_odd(const T &exp)
+{
+    return (exp % T(2)) != T(0);
+}
+
+template <std::size_t SSize>
+inline bool integer_exp_is_odd(const integer<SSize> &exp)
+{
+    return exp.odd_p();
+}
+
+template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline std::string integer_exp_to_string(const T &exp)
+{
+    return std::to_string(exp);
+}
+
+template <std::size_t SSize>
+inline std::string integer_exp_to_string(const integer<SSize> &exp)
+{
+    return exp.to_string();
+}
+
+// Implementation of pow().
+// integer -- integral overload.
+template <typename T, std::size_t SSize,
+          enable_if_t<disjunction<std::is_same<T, integer<SSize>>, std::is_integral<T>>::value, int> = 0>
+inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
+{
+    integer<SSize> rop;
+    if (integer_exp_nonnegative(exp)) {
+        pow_ui(rop, base, integer_exp_to_ulong(exp));
+    } else if (mppp_unlikely(integer_base_is_zero(base))) {
+        // 0**-n is a division by zero.
+        throw zero_division_error("cannot raise zero to the negative power " + integer_exp_to_string(exp));
+    } else if (base.is_one()) {
+        // 1**n == 1.
+        rop = 1;
+    } else if (base.is_negative_one()) {
+        if (integer_exp_is_odd(exp)) {
+            // 1**(-2n-1) == -1.
+            rop = -1;
+        } else {
+            // 1**(-2n) == 1.
+            rop = 1;
+        }
+    } else {
+        // m**-n == 1 / m**n == 0.
+        rop = 0;
+    }
+    return rop;
+}
+
+// C++ integral -- integer overload.
+template <typename T, std::size_t SSize, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline integer<SSize> pow_impl(const T &base, const integer<SSize> &exp)
+{
+    return pow_impl(integer<SSize>{base}, exp);
+}
+
+// integer -- FP overload.
+template <typename T, std::size_t SSize, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline T pow_impl(const integer<SSize> &base, const T &exp)
+{
+    return std::pow(static_cast<T>(base), exp);
+}
+
+// FP -- integer overload.
+template <typename T, std::size_t SSize, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline T pow_impl(const T &base, const integer<SSize> &exp)
+{
+    return std::pow(base, static_cast<T>(exp));
+}
+}
+
+/// Binary exponentiation.
+/**
+ * \rststar
+ * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::integer`.
+ *
+ * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
+ * is a floating-point value, then the result will be computed via ``std::pow()`` and it will also be a
+ * floating-point value. Otherwise, the result will be an :cpp:class:`~mppp::integer`.
+ * In case of a negative integral exponent and integral base, the result will be zero unless
+ * the absolute value of ``base`` is 1.
+ * \endrststar
+ *
+ * @param base the base.
+ * @param exp the exponent.
+ *
+ * @return <tt>base**exp</tt>.
+ *
+ * @throws std::overflow_error if \p base and \p exp are integrals and \p exp is non-negative and outside the range
+ * of <tt>unsigned long</tt>.
+ * @throws zero_division_error if \p base and \p exp are integrals and \p base is zero and \p exp is negative.
+ */
+template <typename T, typename U>
+inline integer_common_t<T, U> pow(const T &base, const U &exp)
+{
+    return pow_impl(base, exp);
+}
+
+/** @} */
+
+/** @defgroup integer_roots integer_roots
+ *  @{
+ */
+
+inline namespace detail
+{
+
+template <std::size_t SSize>
+inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
+{
+    if (mppp_unlikely(n._get_union().m_st._mp_size < 0)) {
+        throw std::domain_error("Cannot compute the square root of the negative number " + n.to_string());
+    }
+    const bool sr = rop.is_static(), sn = n.is_static();
+    if (mppp_likely(sr && sn)) {
+        static_int<SSize> &rs = rop._get_union().g_st();
+        const static_int<SSize> &ns = n._get_union().g_st();
+        // NOTE: we know this is not negative, from the check above.
+        const mpz_size_t size = ns._mp_size;
+        if (!size) {
+            // Special casing for zero.
+            rs._mp_size = 0;
+            rs.zero_unused_limbs();
+            return;
+        }
+        // In case of overlap we need to go through a tmp variable.
+        std::array<::mp_limb_t, SSize> tmp;
+        const bool overlap = (&rs == &ns);
+        auto out_ptr = overlap ? tmp.data() : rs.m_limbs.data();
+        ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
+        // Compute the size of the output (which is ceil(size / 2)).
+        const mpz_size_t new_size = size / 2 + size % 2;
+        assert(!new_size || (out_ptr[new_size - 1] & GMP_NUMB_MASK));
+        // Write out the result.
+        rs._mp_size = new_size;
+        if (overlap) {
+            copy_limbs_no(out_ptr, out_ptr + new_size, rs.m_limbs.data());
+        }
+        // Clear out unused limbs.
+        rs.zero_unused_limbs();
+        return;
+    }
+    if (sr) {
+        rop.promote();
+    }
+    ::mpz_sqrt(&rop._get_union().g_dy(), n.get_mpz_view());
+}
+}
+
+/// Integer square root (binary version).
+/**
+ * This method will set \p rop to the integer square root of \p n.
+ *
+ * @param rop the return value.
+ * @param n the integer whose integer square root will be computed.
+ *
+ * @throws std::domain_error if \p n is negative.
+ */
+template <std::size_t SSize>
+inline void sqrt(integer<SSize> &rop, const integer<SSize> &n)
+{
+    sqrt_impl(rop, n);
+}
+
+/// Integer square root (unary version).
+/**
+ * @param n the integer whose integer square root will be computed.
+ *
+ * @return the integer square root of \p n.
+ *
+ * @throws std::domain_error if \p n is negative.
+ */
+template <std::size_t SSize>
+inline integer<SSize> sqrt(const integer<SSize> &n)
+{
+    integer<SSize> retval;
+    sqrt_impl(retval, n);
+    return retval;
+}
+
+/** @} */
+
+/** @defgroup integer_io integer_io
+ *  @{
+ */
+
+/// Output stream operator.
+/**
+ * \rststar
+ * This operator will print to the stream ``os`` the :cpp:class:`~mppp::integer` ``n`` in base 10. Internally it uses
+ * the :cpp:func:`mppp::integer::to_string()` method.
+ * \endrststar
+ *
+ * @param os the target stream.
+ * @param n the input integer.
+ *
+ * @return a reference to \p os.
+ *
+ * @throws unspecified any exception thrown by integer::to_string().
+ */
+template <std::size_t SSize>
+inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
+{
+    return os << n.to_string();
+}
+
+/// Input stream operator.
+/**
+ * \rststar
+ * This operator is equivalent to extracting a line from the stream, using it to construct a temporary
+ * :cpp:class:`~mppp::integer` and then assigning the temporary to ``n``.
+ * \endrststar
+ *
+ * @param is input stream.
+ * @param n integer to which the contents of the stream will be assigned.
+ *
+ * @return reference to \p is.
+ *
+ * @throws unspecified any exception thrown by the constructor from string of integer.
+ */
+template <std::size_t SSize>
+inline std::istream &operator>>(std::istream &is, integer<SSize> &n)
+{
+    MPPP_MAYBE_TLS std::string tmp_str;
+    std::getline(is, tmp_str);
+    n = integer<SSize>{tmp_str};
+    return is;
+}
+
+/** @} */
+
+/** @defgroup integer_other integer_other
+ *  @{
+ */
+
+/// Hash value.
+/**
+ * \rststar
+ * This function will return a hash value for ``n``. The hash value depends only on the value of ``n``
+ * (and *not* on its storage type).
+ *
+ * A specialisation of the standard ``std::hash`` functor is also provided, so that it is possible to use
+ * :cpp:class:`~mppp::integer` in standard unordered associative containers out of the box.
+ * \endrststar
+ *
+ * @param n the integer whose hash value will be computed.
+ *
+ * @return a hash value for \p n.
+ */
+template <std::size_t SSize>
+inline std::size_t hash(const integer<SSize> &n)
+{
+    std::size_t asize;
+    // NOTE: size is part of the common initial sequence.
+    const mpz_size_t size = n._get_union().m_st._mp_size;
+    const ::mp_limb_t *ptr;
+    if (n._get_union().is_static()) {
+        asize = static_cast<std::size_t>((size >= 0) ? size : -size);
+        ptr = n._get_union().g_st().m_limbs.data();
+    } else {
+        asize = ::mpz_size(&n._get_union().g_dy());
+        ptr = n._get_union().g_dy()._mp_d;
+    }
+    // Init the retval as the signed size.
+    auto retval = static_cast<std::size_t>(size);
+    // Combine the limbs.
+    for (std::size_t i = 0; i < asize; ++i) {
+        // The hash combiner. This is lifted directly from Boost. See also:
+        // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
+        retval ^= (ptr[i] & GMP_NUMB_MASK) + std::size_t(0x9e3779b9) + (retval << 6) + (retval >> 2);
+    }
+    return retval;
+}
+
+/** @} */
+
+/** @defgroup integer_operators integer_operators
+ *  @{
+ */
+
+inline namespace detail
+{
+
+// Dispatching for the binary addition operator.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval;
+    add(retval, op1, op2);
+    return retval;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, T n)
+{
+    integer<SSize> retval{n};
+    add(retval, retval, op1);
+    return retval;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_add(T n, const integer<SSize> &op2)
+{
+    return dispatch_binary_add(op2, n);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_add(const integer<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) + x;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_add(T x, const integer<SSize> &op2)
+{
+    return dispatch_binary_add(op2, x);
+}
+
+// Dispatching for in-place add.
+template <std::size_t SSize>
+inline void dispatch_in_place_add(integer<SSize> &retval, const integer<SSize> &n)
+{
+    add(retval, retval, n);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_add(integer<SSize> &retval, const T &n)
+{
+    add(retval, retval, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) + x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop + op);
+}
+}
+
+/// Binary addition operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::integer`.
+ *
+ * \endrststar
+ *
+ * @param op1 the first summand.
+ * @param op2 the second summand.
+ *
+ * @return <tt>op1 + op2</tt>.
+ */
+template <typename T, typename U>
+inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
+{
+    return dispatch_binary_add(op1, op2);
+}
+
+/// In-place addition operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
+ * @param rop the augend.
+ * @param op the addend.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::integer integer\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline T &operator+=(T &rop, const U &op)
+{
+    dispatch_in_place_add(rop, op);
+    return rop;
+}
+
+inline namespace detail
+{
+
+// Dispatching for the binary subtraction operator.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval;
+    sub(retval, op1, op2);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, T n)
+{
+    integer<SSize> retval{n};
+    sub(retval, retval, op1);
+    retval.neg();
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_sub(T n, const integer<SSize> &op2)
+{
+    auto retval = dispatch_binary_sub(op2, n);
+    retval.neg();
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_sub(const integer<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) - x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_sub(T x, const integer<SSize> &op2)
+{
+    return -dispatch_binary_sub(op2, x);
+}
+
+// Dispatching for in-place sub.
+template <std::size_t SSize>
+inline void dispatch_in_place_sub(integer<SSize> &retval, const integer<SSize> &n)
+{
+    sub(retval, retval, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_sub(integer<SSize> &retval, const T &n)
+{
+    sub(retval, retval, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_sub(integer<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) - x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_sub(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop - op);
+}
+}
+
+/// Binary subtraction operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::integer`.
+ *
+ * \endrststar
+ *
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ *
+ * @return <tt>op1 - op2</tt>.
+ */
+template <typename T, typename U>
+inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
+{
+    return dispatch_binary_sub(op1, op2);
+}
+
+/// In-place subtraction operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
+ * @param rop the minuend.
+ * @param op the subtrahend.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::integer integer\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline T &operator-=(T &rop, const U &op)
+{
+    dispatch_in_place_sub(rop, op);
+    return rop;
+}
+
+inline namespace detail
+{
+
+// Dispatching for the binary multiplication operator.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_binary_mul(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval;
+    mul(retval, op1, op2);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_mul(const integer<SSize> &op1, T n)
+{
+    // NOTE: with respect to addition, here we separate the retval
+    // from the operands. Having a separate destination is generally better
+    // for multiplication.
+    integer<SSize> retval;
+    mul(retval, op1, integer<SSize>{n});
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_mul(T n, const integer<SSize> &op2)
+{
+    return dispatch_binary_mul(op2, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_mul(const integer<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) * x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_mul(T x, const integer<SSize> &op2)
+{
+    return dispatch_binary_mul(op2, x);
+}
+
+// Dispatching for in-place multiplication.
+template <std::size_t SSize>
+inline void dispatch_in_place_mul(integer<SSize> &retval, const integer<SSize> &n)
+{
+    mul(retval, retval, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_mul(integer<SSize> &retval, const T &n)
+{
+    mul(retval, retval, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_mul(integer<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) * x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop * op);
+}
+}
+
+/// Binary multiplication operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::integer`.
+ *
+ * \endrststar
+ *
+ * @param op1 the first factor.
+ * @param op2 the second factor.
+ *
+ * @return <tt>op1 * op2</tt>.
+ */
+template <typename T, typename U>
+inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
+{
+    return dispatch_binary_mul(op1, op2);
+}
+
+/// In-place multiplication operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
+ * @param rop the multiplicator.
+ * @param op the multiplicand.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::integer integer\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline T &operator*=(T &rop, const U &op)
+{
+    dispatch_in_place_mul(rop, op);
+    return rop;
+}
+
+inline namespace detail
+{
+
+// Dispatching for the binary division operator.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval, r;
+    tdiv_qr(retval, r, op1, op2);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, T n)
+{
+    integer<SSize> retval, r;
+    tdiv_qr(retval, r, op1, integer<SSize>{n});
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_div(T n, const integer<SSize> &op2)
+{
+    integer<SSize> retval, r;
+    tdiv_qr(retval, r, integer<SSize>{n}, op2);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_div(const integer<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) / x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_div(T x, const integer<SSize> &op2)
+{
+    return x / static_cast<T>(op2);
+}
+
+// Dispatching for in-place div.
+template <std::size_t SSize>
+inline void dispatch_in_place_div(integer<SSize> &retval, const integer<SSize> &n)
+{
+    integer<SSize> r;
+    tdiv_qr(retval, r, retval, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_div(integer<SSize> &retval, const T &n)
+{
+    integer<SSize> r;
+    tdiv_qr(retval, r, retval, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_div(integer<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) / x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_div(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop / op);
+}
+
+// Dispatching for the binary modulo operator.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> q, retval;
+    tdiv_qr(q, retval, op1, op2);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, T n)
+{
+    integer<SSize> q, retval;
+    tdiv_qr(q, retval, op1, integer<SSize>{n});
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_mod(T n, const integer<SSize> &op2)
+{
+    integer<SSize> q, retval;
+    tdiv_qr(q, retval, integer<SSize>{n}, op2);
+    return retval;
+}
+
+// Dispatching for in-place mod.
+template <std::size_t SSize>
+inline void dispatch_in_place_mod(integer<SSize> &retval, const integer<SSize> &n)
+{
+    integer<SSize> q;
+    tdiv_qr(q, retval, retval, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_mod(integer<SSize> &retval, const T &n)
+{
+    integer<SSize> q;
+    tdiv_qr(q, retval, retval, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop % op);
+}
+}
+
+/// Binary division operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::integer`.
+ *
+ * \endrststar
+ *
+ * @param n the dividend.
+ * @param d the divisor.
+ *
+ * @return <tt>n / d</tt>.
+ *
+ * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
+ */
+template <typename T, typename U>
+inline integer_common_t<T, U> operator/(const T &n, const U &d)
+{
+    return dispatch_binary_div(n, d);
+}
+
+/// In-place division operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
+ * @param rop the dividend.
+ * @param op the divisor.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws zero_division_error if \p op is zero and only integral types are involved in the division.
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::integer integer\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline T &operator/=(T &rop, const U &op)
+{
+    dispatch_in_place_div(rop, op);
+    return rop;
+}
+
+/// Binary modulo operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
+ * The return type is :cpp:class:`~mppp::integer`.
+ * \endrststar
+ *
+ * @param n the dividend.
+ * @param d the divisor.
+ *
+ * @return <tt>n % d</tt>.
+ *
+ * @throws zero_division_error if \p d is zero.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerIntegralOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+#endif
+    inline integer_common_t<T, U> operator%(const T &n, const U &d)
+{
+    return dispatch_binary_mod(n, d);
+}
+
+/// In-place modulo operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
+ * \endrststar
+ *
+ * @param rop the dividend.
+ * @param op the divisor.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws zero_division_error if \p op is zero.
+ * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerIntegralOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+#endif
+    inline T &operator%=(T &rop, const U &op)
+{
+    dispatch_in_place_mod(rop, op);
+    return rop;
+}
+
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
+inline namespace detail
+{
+
+template <typename T, enable_if_t<std::is_unsigned<T>::value, int> = 0>
+inline ::mp_bitcnt_t integer_cast_to_bitcnt(T n)
+{
+    if (mppp_unlikely(n > std::numeric_limits<::mp_bitcnt_t>::max())) {
+        throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
+    }
+    return static_cast<::mp_bitcnt_t>(n);
+}
+
+template <typename T, enable_if_t<std::is_signed<T>::value, int> = 0>
+inline ::mp_bitcnt_t integer_cast_to_bitcnt(T n)
+{
+    if (mppp_unlikely(n < T(0))) {
+        throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": negative values are not supported");
+    }
+    if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(n)
+                      > std::numeric_limits<::mp_bitcnt_t>::max())) {
+        throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
+    }
+    return static_cast<::mp_bitcnt_t>(n);
+}
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerShiftType = CppInteroperable<T> &&std::is_integral<T>::value;
+#else
+using integer_shift_type_enabler = enable_if_t<conjunction<is_cpp_interoperable<T>, std::is_integral<T>>::value, int>;
+#endif
+}
+
+#endif
+
+/// Binary left shift operator.
+/**
+ * @param n the multiplicand.
+ * @param s the bit shift value.
+ *
+ * @return \p n times <tt>2**s</tt>.
+ *
+ * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> operator<<(const integer<SSize> &n, IntegerShiftType s)
+#else
+template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+inline integer<SSize> operator<<(const integer<SSize> &n, T s)
+#endif
+{
+    integer<SSize> retval;
+    mul_2exp(retval, n, integer_cast_to_bitcnt(s));
+    return retval;
+}
+
+/// In-place left shift operator.
+/**
+ * @param rop the multiplicand.
+ * @param s the bit shift value.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &operator<<=(integer<SSize> &rop, IntegerShiftType s)
+#else
+template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
+#endif
+{
+    mul_2exp(rop, rop, integer_cast_to_bitcnt(s));
+    return rop;
+}
+
+/// Binary right shift operator.
+/**
+ * @param n the dividend.
+ * @param s the bit shift value.
+ *
+ * @return \p n divided <tt>2**s</tt>.
+ *
+ * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> operator>>(const integer<SSize> &n, IntegerShiftType s)
+#else
+template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+inline integer<SSize> operator>>(const integer<SSize> &n, T s)
+#endif
+{
+    integer<SSize> retval;
+    tdiv_q_2exp(retval, n, integer_cast_to_bitcnt(s));
+    return retval;
+}
+
+/// In-place right shift operator.
+/**
+ * @param rop the dividend.
+ * @param s the bit shift value.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &operator>>=(integer<SSize> &rop, IntegerShiftType s)
+#else
+template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
+#endif
+{
+    tdiv_q_2exp(rop, rop, integer_cast_to_bitcnt(s));
+    return rop;
+}
+
+inline namespace detail
+{
+
+// Equality operator.
+// NOTE: special implementation instead of using cmp, this should be faster.
+template <std::size_t SSize>
+inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
+{
+    const mp_size_t size_a = a._get_union().m_st._mp_size, size_b = b._get_union().m_st._mp_size;
+    if (size_a != size_b) {
+        return false;
+    }
+    const ::mp_limb_t *ptr_a, *ptr_b;
+    std::size_t asize;
+    if (a.is_static()) {
+        ptr_a = a._get_union().g_st().m_limbs.data();
+        asize = static_cast<std::size_t>((size_a >= 0) ? size_a : -size_a);
+    } else {
+        ptr_a = a._get_union().g_dy()._mp_d;
+        asize = ::mpz_size(&a._get_union().g_dy());
+    }
+    if (b.is_static()) {
+        ptr_b = b._get_union().g_st().m_limbs.data();
+    } else {
+        ptr_b = b._get_union().g_dy()._mp_d;
+    }
+    auto limb_cmp
+        = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
+#if defined(_MSC_VER)
+    return std::equal(stdext::make_checked_array_iterator(ptr_a, asize),
+                      stdext::make_checked_array_iterator(ptr_a, asize, asize),
+                      stdext::make_checked_array_iterator(ptr_b, asize), limb_cmp);
+#else
+    return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
+#endif
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_equality(const integer<SSize> &a, T n)
+{
+    return dispatch_equality(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_equality(T n, const integer<SSize> &a)
+{
+    return dispatch_equality(a, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_equality(const integer<SSize> &a, T x)
+{
+    return static_cast<T>(a) == x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_equality(T x, const integer<SSize> &a)
+{
+    return dispatch_equality(a, x);
+}
+
+// Less-than operator.
+template <std::size_t SSize>
+inline bool dispatch_less_than(const integer<SSize> &a, const integer<SSize> &b)
+{
+    return cmp(a, b) < 0;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_less_than(const integer<SSize> &a, T n)
+{
+    return dispatch_less_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_less_than(T n, const integer<SSize> &a)
+{
+    return dispatch_greater_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_less_than(const integer<SSize> &a, T x)
+{
+    return static_cast<T>(a) < x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_less_than(T x, const integer<SSize> &a)
+{
+    return dispatch_greater_than(a, x);
+}
+
+// Greater-than operator.
+template <std::size_t SSize>
+inline bool dispatch_greater_than(const integer<SSize> &a, const integer<SSize> &b)
+{
+    return cmp(a, b) > 0;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_greater_than(const integer<SSize> &a, T n)
+{
+    return dispatch_greater_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_greater_than(T n, const integer<SSize> &a)
+{
+    return dispatch_less_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_greater_than(const integer<SSize> &a, T x)
+{
+    return static_cast<T>(a) > x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_greater_than(T x, const integer<SSize> &a)
+{
+    return dispatch_less_than(a, x);
+}
+}
+
+/// Equality operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator==(const T &op1, const U &op2)
+{
+    return dispatch_equality(op1, op2);
+}
+
+/// Inequality operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator!=(const T &op1, const U &op2)
+{
+    return !(op1 == op2);
+}
+
+/// Less-than operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator<(const T &op1, const U &op2)
+{
+    return dispatch_less_than(op1, op2);
+}
+
+/// Less-than or equal operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator<=(const T &op1, const U &op2)
+{
+    return !(op1 > op2);
+}
+
+/// Greater-than operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator>(const T &op1, const U &op2)
+{
+    return dispatch_greater_than(op1, op2);
+}
+
+/// Greater-than or equal operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator>=(const T &op1, const U &op2)
+{
+    return !(op1 < op2);
+}
+
+/** @} */
 }
 
 namespace std
 {
 
-/// Specialisation of \p std::hash for mppp::mp_integer.
+/// Specialisation of \p std::hash for mppp::integer.
 template <size_t SSize>
-struct hash<mppp::mp_integer<SSize>> {
+struct hash<mppp::integer<SSize>> {
     /// The argument type.
-    typedef mppp::mp_integer<SSize> argument_type;
+    typedef mppp::integer<SSize> argument_type;
     /// The result type.
     typedef size_t result_type;
     /// Call operator.
     /**
-     * @param n the mppp::mp_integer whose hash will be returned.
+     * @param n the mppp::integer whose hash will be returned.
      *
-     * @return the hash value of \p n, as calculated by mppp::mp_integer::hash().
+     * @return the hash value of \p n, as calculated by mppp::integer::hash().
      */
     result_type operator()(const argument_type &n) const
     {
-        return mppp::mppp_impl::hash_wrapper(n);
+        return mppp::hash(n);
     }
 };
 }

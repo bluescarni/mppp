@@ -15,7 +15,7 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
     # Download and compile locally GMP in debug mode.
-    wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2;
+    wget ftp://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.bz2;
     tar xjvf gmp-6.1.2.tar.bz2;
     cd gmp-6.1.2;
     CXX=g++-4.8 CC=gcc-4.8 ./configure --disable-shared --enable-assert --enable-alloca=debug --disable-assembly CFLAGS=-g;
@@ -30,13 +30,13 @@ elif [[ "${MPPP_BUILD}" == "CoverageGCC5" ]]; then
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-5;
 elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
-    wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2;
+    wget ftp://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.bz2;
     tar xjvf gmp-6.1.2.tar.bz2;
     cd gmp-6.1.2;
     CXX=g++-6 CC=gcc-6 ABI=32 ./configure --disable-shared;
     make -j2;
     cd ..;
-    CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -D_GLIBCXX_CONCEPT_CHECKS" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a ../;
+    CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -D_GLIBCXX_CONCEPT_CHECKS -fconcepts" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-6;

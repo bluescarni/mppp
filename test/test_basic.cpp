@@ -50,7 +50,6 @@ see https://www.gnu.org/licenses/. */
 static int ntries = 1000;
 
 using namespace mppp;
-using namespace mppp::mppp_impl;
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
@@ -71,19 +70,21 @@ struct no_const {
 // NOTE: char types are not supported in uniform_int_distribution by the standard.
 // Use a small wrapper to get an int distribution instead, with the min max limits
 // from the char type. We will be casting back when using the distribution.
-template <typename T, typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                || std::is_same<unsigned char, T>::value),
-                                              int>::type
-                      = 0>
+template <typename T,
+          typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                    || std::is_same<unsigned char, T>::value),
+                                  int>::type
+          = 0>
 static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
 {
     return std::uniform_int_distribution<T>(min, max);
 }
 
-template <typename T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                  || std::is_same<unsigned char, T>::value,
-                                              int>::type
-                      = 0>
+template <typename T,
+          typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                      || std::is_same<unsigned char, T>::value,
+                                  int>::type
+          = 0>
 static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
 get_int_dist(T min, T max)
 {
@@ -97,7 +98,7 @@ struct int_ctor_tester {
         template <typename Int>
         void operator()(const Int &) const
         {
-            using integer = mp_integer<S::value>;
+            using integer = integer<S::value>;
             REQUIRE((std::is_constructible<integer, Int>::value));
             REQUIRE(lex_cast(Int(0)) == lex_cast(integer{Int(0)}));
             auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
@@ -130,7 +131,7 @@ struct int_ctor_tester {
     {
         tuple_for_each(int_types{}, runner<S>{});
         // Some testing for bool.
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         REQUIRE((std::is_constructible<integer, bool>::value));
         REQUIRE((lex_cast(integer{false}) == "0"));
         REQUIRE((lex_cast(integer{true}) == "1"));
@@ -158,7 +159,7 @@ struct fp_ctor_tester {
         template <typename Float>
         void operator()(const Float &) const
         {
-            using integer = mp_integer<S::value>;
+            using integer = integer<S::value>;
             REQUIRE((std::is_constructible<integer, Float>::value));
             if (std::numeric_limits<Float>::is_iec559) {
                 REQUIRE_THROWS_PREDICATE(integer{std::numeric_limits<Float>::infinity()}, std::domain_error,
@@ -222,7 +223,7 @@ struct string_ctor_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         REQUIRE_THROWS_PREDICATE((integer{"", 1}), std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what())
                    == "In the constructor from string, a base of 1"
@@ -290,7 +291,7 @@ struct mpz_ctor_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         mpz_raii m;
         REQUIRE(lex_cast(integer{&m.m_mpz}) == "0");
         ::mpz_set_si(&m.m_mpz, 1234);
@@ -337,7 +338,7 @@ struct copy_move_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n;
         REQUIRE(n.is_static());
         n = 123;
@@ -414,7 +415,7 @@ struct promdem_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n;
         REQUIRE(n.promote());
         REQUIRE(n.sgn() == 0);
@@ -451,7 +452,7 @@ struct sign_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n;
         REQUIRE(n.sgn() == 0);
         REQUIRE(sgn(n) == 0);
@@ -482,7 +483,7 @@ struct to_string_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         REQUIRE(integer{}.to_string() == "0");
         REQUIRE(integer{1}.to_string() == "1");
         REQUIRE(integer{-1}.to_string() == "-1");
@@ -515,7 +516,7 @@ struct stream_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         {
             std::ostringstream oss;
             oss << integer{};
@@ -591,7 +592,7 @@ struct int_convert_tester {
         template <typename Int>
         void operator()(const Int &) const
         {
-            using integer = mp_integer<S::value>;
+            using integer = integer<S::value>;
             REQUIRE((is_convertible<integer, Int>::value));
             REQUIRE(roundtrip_conversion<integer>(0));
             auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
@@ -652,7 +653,7 @@ struct int_convert_tester {
     {
         tuple_for_each(int_types{}, runner<S>{});
         // Some testing for bool.
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         REQUIRE((is_convertible<integer, bool>::value));
         REQUIRE(roundtrip_conversion<integer>(true));
         REQUIRE(roundtrip_conversion<integer>(false));
@@ -673,7 +674,7 @@ struct fp_convert_tester {
         template <typename Float>
         void operator()(const Float &) const
         {
-            using integer = mp_integer<S::value>;
+            using integer = integer<S::value>;
             REQUIRE((is_convertible<integer, Float>::value));
             REQUIRE(static_cast<Float>(integer{0}) == Float(0));
             REQUIRE(static_cast<Float>(integer{1}) == Float(1));
@@ -730,7 +731,7 @@ struct sizes_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = mp_integer<S::value>;
+        using integer = integer<S::value>;
         integer n;
         REQUIRE(n.nbits() == 0u);
         REQUIRE(n.size() == 0u);
