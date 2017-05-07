@@ -705,7 +705,8 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
 /// Exception to signal division by zero.
 /**
  * \rststar
- * This exception inherits all members (including constructors) from ``std::domain_error``. It will be thrown
+ * This exception inherits all members (including constructors) from
+ * `std::domain_error <http://en.cppreference.com/w/cpp/error/domain_error>`_. It will be thrown
  * when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
  * represent infinities.
  * \endrststar

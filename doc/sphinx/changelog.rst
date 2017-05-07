@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Experimental support for C++ concepts. [Francesco Biscani]
+
 - Support the ``clang-cl`` compiler on Windows. [Francesco Biscani]
 
 - Add input stream operator. [Francesco Biscani]
@@ -27,6 +29,11 @@ New
 
 Changes
 ~~~~~~~
+
+- Various improvements to the documentation. [Francesco Biscani]
+
+- Rework the library interface to use regular functions rather than
+  ``inline friend`` functions. [Francesco Biscani]
 
 - Change the license to MPL2. [Francesco Biscani]
 
