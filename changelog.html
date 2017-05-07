@@ -106,6 +106,9 @@
 <div class="section" id="new">
 <h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Implement the missing in-place modulo operator with C++ integrals
+on the left. [Francesco Biscani]</li>
+<li>Experimental support for C++ concepts. [Francesco Biscani]</li>
 <li>Support the <code class="docutils literal"><span class="pre">clang-cl</span></code> compiler on Windows. [Francesco Biscani]</li>
 <li>Add input stream operator. [Francesco Biscani]</li>
 <li>Add in-place arithmetic operators with interoperable types on the
@@ -115,13 +118,17 @@ coefficient. [Francesco Biscani]</li>
 <li>Add convenience overloads for <code class="docutils literal"><span class="pre">pow()</span></code>. [Francesco Biscani]</li>
 <li>Add functions to test if an integer is equal to -1. [Francesco
 Biscani]</li>
-<li>Add a static member to <code class="docutils literal"><span class="pre">mp_integer</span></code> storing the static size. [Francesco
+<li>Add a static member to <code class="docutils literal"><span class="pre">integer</span></code> storing the static size. [Francesco
 Biscani]</li>
 </ul>
 </div>
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Rename the <code class="docutils literal"><span class="pre">mp_integer</span></code> class to <code class="docutils literal"><span class="pre">integer</span></code>. [Francesco Biscani]</li>
+<li>Various improvements to the documentation. [Francesco Biscani]</li>
+<li>Rework the library interface to use regular functions rather than
+<code class="docutils literal"><span class="pre">inline</span> <span class="pre">friend</span></code> functions. [Francesco Biscani]</li>
 <li>Change the license to MPL2. [Francesco Biscani]</li>
 <li>Remove the allocation cache. [Francesco Biscani]</li>
 <li>Remove the custom namespace option. [Francesco Biscani]</li>

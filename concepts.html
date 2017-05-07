@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Exceptions &#8212; mp++ 0.1 documentation</title>
+    <title>Common concepts &#8212; mp++ 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -27,8 +27,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Common concepts" href="concepts.html" />
-    <link rel="prev" title="Namespaces" href="namespaces.html" />
+    <link rel="next" title="Arbitrary-precision integers" href="integer.html" />
+    <link rel="prev" title="Exceptions" href="exceptions.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -65,8 +65,8 @@
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Exceptions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Common concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integer.html">Arbitrary-precision integers</a></li>
 </ul>
 </li>
@@ -79,8 +79,8 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="reference.html">Reference</a><ul>
-      <li>Previous: <a href="namespaces.html" title="previous chapter">Namespaces</a></li>
-      <li>Next: <a href="concepts.html" title="next chapter">Common concepts</a></li>
+      <li>Previous: <a href="exceptions.html" title="previous chapter">Exceptions</a></li>
+      <li>Next: <a href="integer.html" title="next chapter">Arbitrary-precision integers</a></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -101,18 +101,34 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="exceptions">
-<h1>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="_CPPv2N4mppp19zero_division_errorE">
-<span id="mppp::zero_division_error"></span><span class="target" id="mp++structmppp_1_1zero__division__error"></span><em class="property">struct </em><code class="descclassname">mppp::</code><code class="descname">zero_division_error</code><a class="headerlink" href="#_CPPv2N4mppp19zero_division_errorE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Exception to signal division by zero. </p>
-<p><p>This exception inherits all members (including constructors) from
-<a class="reference external" href="http://en.cppreference.com/w/cpp/error/domain_error">std::domain_error</a>. It will be thrown
-when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
-represent infinities.</p>
- </p>
-<p>Inherits from std::domain_error</p>
+  <div class="section" id="common-concepts">
+<h1>Common concepts<a class="headerlink" href="#common-concepts" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Generic functions and classes in mp++ support a mechanism called <a class="reference external" href="https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)">concepts</a>
+to constrain the types with which they can be used. C++ concepts are not (yet) part of the standard, and they are
+currently available only in GCC 6 and later (with the <code class="docutils literal"><span class="pre">-fconcepts</span></code> compilation flag). When used with compilers which do not
+support concepts natively, mp++ will employ a concept emulation layer in order to provide the same functionality as native
+C++ concepts.</p>
+<p class="last">Since the syntax of true C++ concepts is clearer than that of the concept emulation layer, the mp++ documentation describes
+and refers to concepts in their native C++ form.</p>
+</div>
+<dl class="concept">
+<dt id="_CPPv2I0EN4mppp16CppInteroperableE">
+template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">CppInteroperable</code><a class="headerlink" href="#_CPPv2I0EN4mppp16CppInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied by any C++ fundamental type with which the multiprecision classes (such as <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>)
+can interoperate. The full list of types satisfying this concept is:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">bool</span></code>,</li>
+<li><code class="docutils literal"><span class="pre">char</span></code>, <code class="docutils literal"><span class="pre">signed</span> <span class="pre">char</span></code> and <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">char</span></code>,</li>
+<li><code class="docutils literal"><span class="pre">short</span></code> and <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">short</span></code>,</li>
+<li><code class="docutils literal"><span class="pre">int</span></code> and <code class="docutils literal"><span class="pre">unsigned</span></code>,</li>
+<li><code class="docutils literal"><span class="pre">long</span></code> and <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span></code>,</li>
+<li><code class="docutils literal"><span class="pre">long</span> <span class="pre">long</span></code> and <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">long</span></code>,</li>
+<li><code class="docutils literal"><span class="pre">float</span></code> and <code class="docutils literal"><span class="pre">double</span></code>.</li>
+</ul>
+<p><code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> is also supported, but only if the <code class="docutils literal"><span class="pre">MPPP_WITH_LONG_DOUBLE</span></code> definition is activated
+(see the <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">configuration instructions</span></a>).</p>
 </dd></dl>
 
 </div>
@@ -131,7 +147,7 @@ represent infinities.</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/exceptions.rst.txt"
+      <a href="_sources/concepts.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
