@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Implement the missing in-place modulo operator with C++ integrals
+  on the left. [Francesco Biscani]
+
 - Experimental support for C++ concepts. [Francesco Biscani]
 
 - Support the ``clang-cl`` compiler on Windows. [Francesco Biscani]
@@ -29,6 +32,8 @@ New
 
 Changes
 ~~~~~~~
+
+- Rename the ``mp_integer`` class to ``integer``. [Francesco Biscani]
 
 - Various improvements to the documentation. [Francesco Biscani]
 
