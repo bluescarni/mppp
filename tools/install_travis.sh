@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
 
-# Exit on error
-set -e
 # Echo each command
 set -x
 
 if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
-    make -j2 VERBOSE=1;
+    make -j2 VERBOSE=1 install;
     ctest -V;
+
+    # Test the CMake export installation.
+    cd ../tools/sample_project;
+    mkdir build;
+    cd build;
+    cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir;
+    make;
+    ./main;
+
 elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
     make -j2 VERBOSE=1;
