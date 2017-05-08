@@ -20,14 +20,22 @@ or `intrinsics <https://msdn.microsoft.com/en-us/library/windows/desktop/hh80293
 architectures) for the implementation of fast basic arithmetics. If such functionality is not available, mp++
 will fall back to GMP's ``mpn_`` functions.
 
-The only mandatory dependency is the `GMP <http://www.gmplib.org>`__ library (GMP 5 and later versions are supported).
-The `MPIR <http://mpir.org/>`__ fork of GMP can also be used as a drop-in replacement for GMP.
-In order to interoperate with the ``long double`` C++ type, mp++ optionally depends
-on the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library (see the
-:ref:`configuration <configuration>` section - MPFR 3 or a later version is required).
-The benchmark suite depends optionally on `Boost <http://www.boost.org/>`__ and `FLINT <http://flintlib.org/>`__.
+mp++ has the following dependencies:
 
-Releases of mp++ can be downloaded from `github <https://github.com/bluescarni/mppp/releases>`__.
+* the `GMP <http://www.gmplib.org>`__ library, **mandatory** (GMP 5 and later versions are supported,
+  the `MPIR <http://mpir.org/>`__ fork of GMP can also be used);
+* the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library, *optional*, currently used only for
+  supporting the ``long double`` type (MPFR 3 or a later version is required);
+* the `Boost <http://www.boost.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*, currently used
+  only in the benchmarking suite.
+
+Additionally, `CMake <http://www.cmake.org/>`__ is the build system used by mp++ and it must also be installed when
+installing from source (the minimum required version is 3.2).
+
+Installation from source
+------------------------
+
+Source releases of mp++ can be downloaded from `github <https://github.com/bluescarni/mppp/releases>`__.
 In order to use mp++, you only have to include the ``include/mp++.hpp`` header in your project and link to the GMP
 (or MPIR) library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:
 
