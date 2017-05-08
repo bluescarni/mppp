@@ -58,7 +58,7 @@ add_library(mp++ INTERFACE)
 if(MPPP_WITH_MPFR)
     find_package(MPFR REQUIRED)
     target_link_libraries(mp++ INTERFACE MPFR::MPFR)
-    set(MPPP_ENABLE_MPFR "#define MPPP_ENABLE_MPFR")
+    set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
 
 # mp++ depends on GMP.
@@ -69,10 +69,36 @@ target_include_directories(mp++ INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>)
-install(DIRECTORY include/ DESTINATION include)
 
 # Configure config.hpp.
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in" "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" @ONLY)
+
+# Configure the doc files.
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/Doxyfile.in" "${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/Doxyfile" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/sphinx/conf.py.in" "${CMAKE_CURRENT_SOURCE_DIR}/doc/sphinx/conf.py" @ONLY)
+
+# Installation.
+# Setup of the export.
+install(TARGETS mp++ EXPORT mp++_export)
+# Setup of the optional deps.
+set(_MPPP_CONFIG_OPTIONAL_DEPS)
+if(MPPP_WITH_MPFR)
+    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(MPFR REQUIRED)\n")
+endif()
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" DESTINATION "lib/cmake/mp++")
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMPFR.cmake"
+	DESTINATION "lib/cmake/mp++")
+install(EXPORT mp++_export NAMESPACE Mp++:: DESTINATION lib/cmake/mp++)
+# Take care of versioning.
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" VERSION ${mp++_VERSION}
+	COMPATIBILITY ExactVersion)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATION "lib/cmake/mp++")
+
+# Installation of the header files.
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" DESTINATION include)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" DESTINATION include/mp++)
 
 if(MPPP_BUILD_TESTS)
     enable_testing()
