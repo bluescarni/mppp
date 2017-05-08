@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation &#8212; mp++ 0.1 documentation</title>
+    <title>Installation &#8212; mp++ 0.2 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1',
+        VERSION:     '0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Configuration" href="configuration.html" />
+    <link rel="next" title="Reference" href="reference.html" />
     <link rel="prev" title="Welcome to mp++’s documentation!" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -61,8 +61,11 @@
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation-from-source">Installation from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#including-mp-in-your-project-via-cmake">Including mp++ in your project via CMake</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -73,7 +76,7 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Welcome to mp++&#8217;s documentation!</a></li>
-      <li>Next: <a href="configuration.html" title="next chapter">Configuration</a></li>
+      <li>Next: <a href="reference.html" title="next chapter">Reference</a></li>
   </ul></li>
 </ul>
 </div>
@@ -111,22 +114,76 @@ mp++ does use compiler-specific functionality (e.g., 128-bit <a class="reference
 or <a class="reference external" href="https://msdn.microsoft.com/en-us/library/windows/desktop/hh802933(v=vs.85).aspx">intrinsics</a> on 64-bit
 architectures) for the implementation of fast basic arithmetics. If such functionality is not available, mp++
 will fall back to GMP&#8217;s <code class="docutils literal"><span class="pre">mpn_</span></code> functions.</p>
-<p>The only mandatory dependency is the <a class="reference external" href="http://www.gmplib.org">GMP</a> library (GMP 5 and later versions are supported).
-The <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP can also be used as a drop-in replacement for GMP.
-In order to interoperate with the <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> C++ type, mp++ optionally depends
-on the <a class="reference external" href="http://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library (see the
-<a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">configuration</span></a> section - MPFR 3 or a later version is required).
-The benchmark suite depends optionally on <a class="reference external" href="http://www.boost.org/">Boost</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a>.</p>
-<p>Releases of mp++ can be downloaded from <a class="reference external" href="https://github.com/bluescarni/mppp/releases">github</a>.
-In order to use mp++, you only have to include the <code class="docutils literal"><span class="pre">include/mp++.hpp</span></code> header in your project and link to the GMP
-(or MPIR) library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 my_executable.cpp -lgmp
+<p>mp++ has the following dependencies:</p>
+<ul class="simple">
+<li>the <a class="reference external" href="http://www.gmplib.org">GMP</a> library, <strong>mandatory</strong> (GMP 5 and later versions are supported,
+the <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP can also be used);</li>
+<li>the <a class="reference external" href="http://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library, <em>optional</em>, currently used only for
+supporting the <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> type (MPFR 3 or a later version is required);</li>
+<li>the <a class="reference external" href="http://www.boost.org/">Boost</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a> libraries, <em>optional</em>, currently used
+only in the benchmarking suite.</li>
+</ul>
+<p>Additionally, <a class="reference external" href="http://www.cmake.org/">CMake</a> is the build system used by mp++ and it must also be available when
+installing from source (the minimum required version is 3.2).</p>
+<div class="section" id="installation-from-source">
+<h2>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this headline">¶</a></h2>
+<p>Source releases of mp++ can be downloaded from <a class="reference external" href="https://github.com/bluescarni/mppp/releases">github</a>. Once in the source tree
+of mp++, you can use <code class="docutils literal"><span class="pre">cmake</span></code> to configure the build to your liking (e.g., enabling optional features, customizing the installation
+path, etc.). Since mp++ is a header-only library, there&#8217;s no compilation step, and the installation of mp++ via <code class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></code> or
+similar will just copy the headers to your <code class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></code>, in the <code class="docutils literal"><span class="pre">include</span></code> subdirectory.</p>
+<p>After the installation of the headers, you can test the installation with the following simple <code class="docutils literal"><span class="pre">main.cpp</span></code> program:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;mp++/mp++.hpp&gt;</span><span class="cp"></span>
+
+<span class="k">using</span> <span class="n">int_t</span> <span class="o">=</span> <span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">n</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p>If you require interoperability with <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code>, link in the MPFR library as well and activate the <code class="docutils literal"><span class="pre">MPPP_WITH_LONG_DOUBLE</span></code>
-preprocessor definition:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 -DMPPP_WITH_LONG_DOUBLE my_executable.cpp -lmpfr -lgmp
+<p>If mp++ is installed in a standard prefix, on a typical GNU/Linux system you can compile this example with the following command:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 main.cpp -lgmp
 </pre></div>
+</div>
+<p>If you installed mp++ with the optional MPFR support turned on, you will need to link in the MPFR library as well:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 main.cpp -lmpfr -lgmp
+</pre></div>
+</div>
+</div>
+<div class="section" id="including-mp-in-your-project-via-cmake">
+<h2>Including mp++ in your project via CMake<a class="headerlink" href="#including-mp-in-your-project-via-cmake" title="Permalink to this headline">¶</a></h2>
+<p>As part of the mp++ installation, a group of CMake files is installed into <code class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX/lib/cmake/mp++</span></code>.
+This bundle, which is known in the CMake lingo as a <a class="reference external" href="https://cmake.org/cmake/help/v3.2/manual/cmake-packages.7.html">config-file package</a>,
+facilitates the detection and use of mp++ from other CMake-based projects. mp++&#8217;s config-file package, once loaded, provides
+an imported target called <code class="docutils literal"><span class="pre">Mp++::mp++</span></code> which encapsulate all the information necessary to use mp++. That is, linking to
+<code class="docutils literal"><span class="pre">Mp++::mp++</span></code> ensures that mp++&#8217;s include directories are added to the include path of the compiler, and that the libraries
+on which mp++ depends (e.g., GMP) are brought into the link chain.</p>
+<p>For instance, a <code class="docutils literal"><span class="pre">CMakeLists.txt</span></code> file for the simple <code class="docutils literal"><span class="pre">main.cpp</span></code> program presented earlier may look like this:</p>
+<div class="highlight-cmake"><div class="highlight"><pre><span></span><span class="c"># mp++ needs at least CMake 3.2.</span>
+<span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.2.0</span><span class="p">)</span>
+
+<span class="c"># The name of our project.</span>
+<span class="nb">project</span><span class="p">(</span><span class="s">sample_project</span><span class="p">)</span>
+
+<span class="c"># Look for an installation of mp++ in the system.</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">Mp++</span> <span class="s">REQUIRED</span><span class="p">)</span>
+
+<span class="c"># Create an executable, and link it to the Mp++::mp++ imported target.</span>
+<span class="c"># This ensures that, in the compilation of &#39;main&#39;, mp++&#39;s include</span>
+<span class="c"># dirs are added to the include path of the compiler and that mp++&#39;s</span>
+<span class="c"># dependencies (e.g., GMP) are transitively linked to &#39;main&#39;.</span>
+<span class="nb">add_executable</span><span class="p">(</span><span class="s">main</span> <span class="s">main.cpp</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">main</span> <span class="s">Mp++::mp++</span><span class="p">)</span>
+
+<span class="c"># This line indicates to your compiler</span>
+<span class="c"># that C++11 is needed for the compilation.</span>
+<span class="c"># Not strictly necessary with a recent-enough compiler.</span>
+<span class="nb">set_property</span><span class="p">(</span><span class="s">TARGET</span> <span class="s">main</span> <span class="s">PROPERTY</span> <span class="s">CXX_STANDARD</span> <span class="s">11</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 

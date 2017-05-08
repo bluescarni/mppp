@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Changelog &#8212; mp++ 0.1 documentation</title>
+    <title>Changelog &#8212; mp++ 0.2 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1',
+        VERSION:     '0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -61,7 +61,6 @@
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
@@ -106,6 +105,8 @@
 <div class="section" id="new">
 <h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Provide a CMake config-file package as part of the install process.
+[Francesco Biscani]</li>
 <li>Implement the missing in-place modulo operator with C++ integrals
 on the left. [Francesco Biscani]</li>
 <li>Experimental support for C++ concepts. [Francesco Biscani]</li>
@@ -125,6 +126,7 @@ Biscani]</li>
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Split out the library in multiple files. [Francesco Biscani]</li>
 <li>Rename the <code class="docutils literal"><span class="pre">mp_integer</span></code> class to <code class="docutils literal"><span class="pre">integer</span></code>. [Francesco Biscani]</li>
 <li>Various improvements to the documentation. [Francesco Biscani]</li>
 <li>Rework the library interface to use regular functions rather than

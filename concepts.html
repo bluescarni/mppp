@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Common concepts &#8212; mp++ 0.1 documentation</title>
+    <title>Common concepts &#8212; mp++ 0.2 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1',
+        VERSION:     '0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -62,7 +62,6 @@
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
@@ -105,7 +104,7 @@
 <h1>Common concepts<a class="headerlink" href="#common-concepts" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p>Generic functions and classes in mp++ support a mechanism called <a class="reference external" href="https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)">concepts</a>
+<p>Generic functions and classes in mp++ support <a class="reference external" href="https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)">concepts</a>
 to constrain the types with which they can be used. C++ concepts are not (yet) part of the standard, and they are
 currently available only in GCC 6 and later (with the <code class="docutils literal"><span class="pre">-fconcepts</span></code> compilation flag). When used with compilers which do not
 support concepts natively, mp++ will employ a concept emulation layer in order to provide the same functionality as native
@@ -127,8 +126,8 @@ can interoperate. The full list of types satisfying this concept is:</p>
 <li><code class="docutils literal"><span class="pre">long</span> <span class="pre">long</span></code> and <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">long</span></code>,</li>
 <li><code class="docutils literal"><span class="pre">float</span></code> and <code class="docutils literal"><span class="pre">double</span></code>.</li>
 </ul>
-<p><code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> is also supported, but only if the <code class="docutils literal"><span class="pre">MPPP_WITH_LONG_DOUBLE</span></code> definition is activated
-(see the <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">configuration instructions</span></a>).</p>
+<p><code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> is also supported, but only if mp++ was installed with the <code class="docutils literal"><span class="pre">MPPP_WITH_MPFR</span></code> option enabled
+(see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
 </dd></dl>
 
 </div>

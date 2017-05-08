@@ -26,7 +26,6 @@ mp++ is released under the `MPL2 <https://www.mozilla.org/en-US/MPL/2.0/FAQ/>`__
 .. toctree::
 
    installation.rst
-   configuration.rst
    reference.rst
    benchmarks.rst
    changelog.rst
