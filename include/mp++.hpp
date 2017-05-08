@@ -1570,73 +1570,6 @@ public:
         }
         return *this;
     }
-    /// Identity operator.
-    /**
-     * @return a copy of \p this.
-     */
-    integer operator+() const
-    {
-        return *this;
-    }
-    /// Prefix increment.
-    /**
-     * Increment \p this by one.
-     *
-     * @return reference to \p this after the increment.
-     */
-    integer &operator++()
-    {
-        add_ui(*this, *this, 1u);
-        return *this;
-    }
-    /// Suffix increment.
-    /**
-     * Increment \p this by one and return a copy of \p this as it was before the increment.
-     *
-     * @return a copy of \p this before the increment.
-     */
-    integer operator++(int)
-    {
-        integer retval(*this);
-        ++(*this);
-        return retval;
-    }
-    /// Negated copy.
-    /**
-     * @return a negated copy of \p this.
-     */
-    integer operator-() const
-    {
-        integer retval{*this};
-        retval.neg();
-        return retval;
-    }
-    /// Prefix decrement.
-    /**
-     * Decrement \p this by one.
-     *
-     * @return reference to \p this after the decrement.
-     */
-    integer &operator--()
-    {
-        // NOTE: this should be written in terms of sub_ui(), once implemented.
-        neg();
-        add_ui(*this, *this, 1u);
-        neg();
-        return *this;
-    }
-    /// Suffix decrement.
-    /**
-     * Decrement \p this by one and return a copy of \p this as it was before the decrement.
-     *
-     * @return a copy of \p this before the decrement.
-     */
-    integer operator--(int)
-    {
-        integer retval(*this);
-        --(*this);
-        return retval;
-    }
     /// In-place absolute value.
     /**
      * This method will set \p this to its absolute value.
@@ -4750,6 +4683,18 @@ inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
 }
 }
 
+/// Identity operator.
+/**
+ * @param n the integer that will be copied.
+ *
+ * @return a copy of \p n.
+ */
+template <std::size_t SSize>
+inline integer<SSize> operator+(const integer<SSize> &n)
+{
+    return n;
+}
+
 /// Binary addition operator.
 /**
  * \rststar
@@ -4799,6 +4744,37 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 {
     dispatch_in_place_add(rop, op);
     return rop;
+}
+
+/// Prefix increment.
+/**
+ * Increment \p n by one.
+ *
+ * @param n the integer that will be increased.
+ *
+ * @return reference to \p n after the increment.
+ */
+template <std::size_t SSize>
+integer<SSize> &operator++(integer<SSize> &n)
+{
+    add_ui(n, n, 1u);
+    return n;
+}
+
+/// Suffix increment.
+/**
+ * Increment \p n by one and return a copy of \p n as it was before the increment.
+ *
+ * @param n the integer that will be increased.
+ *
+ * @return a copy of \p n before the increment.
+ */
+template <std::size_t SSize>
+integer<SSize> operator++(integer<SSize> &n, int)
+{
+    auto retval(n);
+    ++n;
+    return retval;
 }
 
 inline namespace detail
@@ -4868,6 +4844,20 @@ inline void dispatch_in_place_sub(T &rop, const integer<SSize> &op)
 }
 }
 
+/// Negated copy.
+/**
+ * @param n the integer that will be negated.
+ *
+ * @return a negated copy of \p n.
+ */
+template <std::size_t SSize>
+integer<SSize> operator-(const integer<SSize> &n)
+{
+    auto retval(n);
+    retval.neg();
+    return retval;
+}
+
 /// Binary subtraction operator.
 /**
  * \rststar
@@ -4917,6 +4907,40 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 {
     dispatch_in_place_sub(rop, op);
     return rop;
+}
+
+/// Prefix decrement.
+/**
+ * Decrement \p n by one.
+ *
+ * @param n the integer that will be decreased.
+ *
+ * @return reference to \p n after the decrement.
+ */
+template <std::size_t SSize>
+integer<SSize> &operator--(integer<SSize> &n)
+{
+    // NOTE: this should be written in terms of sub_ui(), once implemented.
+    n.neg();
+    add_ui(n, n, 1u);
+    n.neg();
+    return n;
+}
+
+/// Suffix decrement.
+/**
+ * Decrement \p n by one and return a copy of \p n as it was before the decrement.
+ *
+ * @param n the integer that will be decreased.
+ *
+ * @return a copy of \p n before the decrement.
+ */
+template <std::size_t SSize>
+integer<SSize> operator--(integer<SSize> &n, int)
+{
+    auto retval(n);
+    --n;
+    return retval;
 }
 
 inline namespace detail
