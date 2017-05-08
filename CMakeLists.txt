@@ -1,10 +1,12 @@
 cmake_policy(SET CMP0048 NEW)
 
-project(mp++ VERSION 0.1 LANGUAGES CXX C)
+project(mp++ VERSION 0.2 LANGUAGES CXX C)
 
 cmake_minimum_required(VERSION 3.2.0)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
+
+message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
 
 include(YACMACompilerLinkerSettings)
 
@@ -38,7 +40,7 @@ option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
 option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires Boost)." OFF)
 option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
-option(MPPP_WITH_LONG_DOUBLE "Enable interoperability with long double (requires MPFR)." OFF)
+option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
 if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_STATIC_RUNTIME "Use the MSVC static runtime instead of the shared runtime." OFF)
 endif()
@@ -53,19 +55,50 @@ find_package(GMP REQUIRED)
 
 # Setup of the mp++ interface library.
 add_library(mp++ INTERFACE)
-if(MPPP_WITH_LONG_DOUBLE)
+if(MPPP_WITH_MPFR)
     find_package(MPFR REQUIRED)
-    target_compile_definitions(mp++ INTERFACE MPPP_WITH_LONG_DOUBLE)
     target_link_libraries(mp++ INTERFACE MPFR::MPFR)
+    set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
+
 # mp++ depends on GMP.
 # NOTE: depend on GMP *after* optionally depending on MPFR, as the order
 # of the libraries matters on some platforms.
 target_link_libraries(mp++ INTERFACE GMP::GMP)
 target_include_directories(mp++ INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>)
-install(DIRECTORY include/ DESTINATION include)
+
+# Configure config.hpp.
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in" "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" @ONLY)
+
+# Configure the doc files.
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/Doxyfile.in" "${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen/Doxyfile" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/sphinx/conf.py.in" "${CMAKE_CURRENT_SOURCE_DIR}/doc/sphinx/conf.py" @ONLY)
+
+# Installation.
+# Setup of the export.
+install(TARGETS mp++ EXPORT mp++_export)
+# Setup of the optional deps.
+set(_MPPP_CONFIG_OPTIONAL_DEPS)
+if(MPPP_WITH_MPFR)
+    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(MPFR REQUIRED)\n")
+endif()
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" DESTINATION "lib/cmake/mp++")
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMPFR.cmake"
+	DESTINATION "lib/cmake/mp++")
+install(EXPORT mp++_export NAMESPACE Mp++:: DESTINATION lib/cmake/mp++)
+# Take care of versioning.
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" VERSION ${mp++_VERSION}
+	COMPATIBILITY ExactVersion)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATION "lib/cmake/mp++")
+
+# Installation of the header files.
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" DESTINATION include)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" DESTINATION include/mp++)
 
 if(MPPP_BUILD_TESTS)
     enable_testing()

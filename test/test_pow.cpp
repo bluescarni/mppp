@@ -35,7 +35,7 @@ see https://www.gnu.org/licenses/. */
 #include <tuple>
 #include <type_traits>
 
-#include <mp++.hpp>
+#include <mp++/mp++.hpp>
 
 #include "test_utils.hpp"
 
@@ -196,7 +196,7 @@ struct pow_tester {
         REQUIRE((std::is_same<float, decltype(pow(0.f, integer{}))>::value));
         REQUIRE((std::is_same<double, decltype(pow(integer{}, 0.))>::value));
         REQUIRE((std::is_same<double, decltype(pow(0., integer{}))>::value));
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE((std::is_same<long double, decltype(pow(integer{}, 0.l))>::value));
         REQUIRE((std::is_same<long double, decltype(pow(0.l, integer{}))>::value));
 #endif
@@ -204,7 +204,7 @@ struct pow_tester {
         REQUIRE(pow(4.5f, integer{-2}) == std::pow(4.5f, -2.f));
         REQUIRE(pow(integer{2}, 4.5) == std::pow(2., 4.5));
         REQUIRE(pow(4.5, integer{-2}) == std::pow(4.5, -2.));
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE(pow(integer{2}, 4.5l) == std::pow(2.l, 4.5l));
         REQUIRE(pow(4.5l, integer{-2}) == std::pow(4.5l, -2.l));
 #endif

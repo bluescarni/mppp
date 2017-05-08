@@ -35,7 +35,7 @@ see https://www.gnu.org/licenses/. */
 #include <type_traits>
 #include <utility>
 
-#include <mp++.hpp>
+#include <mp++/mp++.hpp>
 
 #include "test_utils.hpp"
 
@@ -94,7 +94,7 @@ struct add_tester {
         REQUIRE((4. + n2 == 2.));
         REQUIRE((std::is_same<decltype(n1 + 4.), double>::value));
         REQUIRE((std::is_same<decltype(4. + n2), double>::value));
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE((n1 + 4.l == 5.l));
         REQUIRE((4.l + n2 == 2.l));
         REQUIRE((std::is_same<decltype(n1 + 4.l), long double>::value));
@@ -118,7 +118,7 @@ struct add_tester {
         REQUIRE((lex_cast(retval) == "18"));
         retval += -3.5;
         REQUIRE((lex_cast(retval) == "14"));
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         retval += -1.5l;
         REQUIRE((lex_cast(retval) == "12"));
 #endif
@@ -248,7 +248,7 @@ struct sub_tester {
         REQUIRE((4. - n2 == 6.));
         REQUIRE((std::is_same<decltype(n1 - 4.), double>::value));
         REQUIRE((std::is_same<decltype(4. - n2), double>::value));
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE((n1 - 4.l == -3.l));
         REQUIRE((4.l - n2 == 6.l));
         REQUIRE((std::is_same<decltype(n1 - 4.l), long double>::value));
@@ -272,7 +272,7 @@ struct sub_tester {
         REQUIRE((lex_cast(retval) == "-16"));
         retval -= -3.5;
         REQUIRE((lex_cast(retval) == "-12"));
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         retval -= -1.5l;
         REQUIRE((lex_cast(retval) == "-10"));
 #endif
@@ -403,7 +403,7 @@ struct mul_tester {
         REQUIRE((4. * n2 == -8.));
         REQUIRE((std::is_same<decltype(n1 * 4.), double>::value));
         REQUIRE((std::is_same<decltype(4. * n2), double>::value));
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE((n1 * 4.l == 4.l));
         REQUIRE((4.l * n2 == -8.l));
         REQUIRE((std::is_same<decltype(n1 * 4.l), long double>::value));
@@ -427,7 +427,7 @@ struct mul_tester {
         REQUIRE((lex_cast(retval) == "-250"));
         retval *= -3.5;
         REQUIRE((lex_cast(retval) == "875"));
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         retval *= -1.5l;
         REQUIRE((lex_cast(retval) == "-1312"));
 #endif
@@ -517,7 +517,7 @@ struct div_tester {
         REQUIRE((4. / n2 == -2.));
         REQUIRE((std::is_same<decltype(n1 / 4.), double>::value));
         REQUIRE((std::is_same<decltype(4. / n2), double>::value));
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE((n1 / 4.l == 1.l));
         REQUIRE((4.l / n2 == -2.l));
         REQUIRE((std::is_same<decltype(n1 / 4.l), long double>::value));
@@ -544,7 +544,7 @@ struct div_tester {
         retval = 10;
         retval /= -3.5;
         REQUIRE((lex_cast(retval) == lex_cast(integer{10. / -3.5})));
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         retval /= -1.5l;
         REQUIRE((lex_cast(retval) == lex_cast(integer{10. / -3.5 / -1.5l})));
 #endif
@@ -878,7 +878,7 @@ struct rel_tester {
         REQUIRE(n2 == -2.);
         REQUIRE(-3. != n2);
         REQUIRE(n2 != -3.);
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE(-2.l == n2);
         REQUIRE(n2 == -2.l);
         REQUIRE(-3.l != n2);
@@ -894,7 +894,7 @@ struct rel_tester {
         REQUIRE(-3.f < n2);
         REQUIRE(n2 < 0.);
         REQUIRE(-3. < n2);
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE(n2 < 0.l);
         REQUIRE(-3.l < n2);
 #endif
@@ -908,7 +908,7 @@ struct rel_tester {
         REQUIRE(n2 > -3.f);
         REQUIRE(0. > n2);
         REQUIRE(n2 > -3.);
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE(0.l > n2);
         REQUIRE(n2 > -3.l);
 #endif
@@ -932,7 +932,7 @@ struct rel_tester {
         REQUIRE(-3. <= n2);
         REQUIRE(-2. <= n2);
         REQUIRE(n2 <= -2.);
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE(n2 <= 0.l);
         REQUIRE(-3.l <= n2);
         REQUIRE(-2.l <= n2);
@@ -958,7 +958,7 @@ struct rel_tester {
         REQUIRE(n2 >= -3.);
         REQUIRE(-2. >= n2);
         REQUIRE(n2 >= -2.);
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
         REQUIRE(0.l >= n2);
         REQUIRE(n2 >= -3.l);
         REQUIRE(-2.l >= n2);

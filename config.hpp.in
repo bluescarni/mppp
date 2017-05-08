@@ -1,0 +1,74 @@
+// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+//
+// This file is part of the mp++ library.
+//
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#ifndef MPPP_CONFIG_HPP
+#define MPPP_CONFIG_HPP
+
+// Start of defines instantiated by CMake.
+// clang-format off
+#define MPPP_VERSION @mp++_VERSION@
+#define MPPP_VERSION_MAJOR @mp++_VERSION_MAJOR@
+#define MPPP_VERSION_MINOR @mp++_VERSION_MINOR@
+@MPPP_ENABLE_MPFR@
+// clang-format on
+// End of defines instantiated by CMake.
+
+// Compiler configuration.
+
+// NOTE: check for MSVC first, as clang-cl does define both __clang__ and _MSC_VER,
+// and we want to configure it as MSVC.
+#if defined(_MSC_VER)
+
+// clang-cl supports __builtin_expect().
+#if defined(__clang__)
+#define mppp_likely(x) __builtin_expect(!!(x), 1)
+#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
+#else
+#define mppp_likely(x) (x)
+#define mppp_unlikely(x) (x)
+#endif
+#define MPPP_RESTRICT __restrict
+
+#elif defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
+
+#define mppp_likely(x) __builtin_expect(!!(x), 1)
+#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
+#define MPPP_RESTRICT __restrict
+
+#else
+
+#define mppp_likely(x) (x)
+#define mppp_unlikely(x) (x)
+#define MPPP_RESTRICT
+
+#endif
+
+// Configuration of the thread_local keyword.
+#if defined(__apple_build_version__) || defined(__MINGW32__) || defined(__INTEL_COMPILER)
+
+// - Apple clang does not support the thread_local keyword until very recent versions.
+// - Testing shows that at least some MinGW versions have buggy thread_local implementations.
+// - Also on Intel the thread_local keyword looks buggy.
+#define MPPP_MAYBE_TLS
+
+#else
+
+// For the rest, we assume thread_local is available.
+#define MPPP_HAVE_THREAD_LOCAL
+#define MPPP_MAYBE_TLS static thread_local
+
+#endif
+
+// Concepts setup.
+#if defined(__cpp_concepts)
+
+#define MPPP_HAVE_CONCEPTS
+
+#endif
+
+#endif

@@ -34,7 +34,7 @@ see https://www.gnu.org/licenses/. */
 #include <tuple>
 #include <type_traits>
 
-#include <mp++.hpp>
+#include <mp++/mp++.hpp>
 
 #include "test_utils.hpp"
 

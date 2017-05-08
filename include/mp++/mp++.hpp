@@ -17,7 +17,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <functional>
-#include <gmp.h>
 #include <initializer_list>
 #include <iostream>
 #include <limits>
@@ -29,23 +28,12 @@
 #include <utility>
 #include <vector>
 
-#if __GNU_MP_VERSION < 5
-
-#error Minimum supported GMP version is 5.
-
+#include <mp++/config.hpp>
+#include <mp++/detail/gmp.hpp>
+#if defined(MPPP_WITH_MPFR)
+#include <mp++/detail/mpfr.hpp>
 #endif
-
-#if defined(MPPP_WITH_LONG_DOUBLE)
-
-#include <mpfr.h>
-
-#if MPFR_VERSION_MAJOR < 3
-
-#error Minimum supported MPFR version is 3.
-
-#endif
-
-#endif
+#include <mp++/detail/type_traits.hpp>
 
 // Compiler configuration.
 // NOTE: check for MSVC first, as clang-cl does define both __clang__ and _MSC_VER,
@@ -58,16 +46,6 @@
 #include <Winnt.h>
 // clang-format on
 
-// clang-cl supports __builtin_expect().
-#if defined(__clang__)
-#define mppp_likely(x) __builtin_expect(!!(x), 1)
-#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
-#else
-#define mppp_likely(x) (x)
-#define mppp_unlikely(x) (x)
-#endif
-#define MPPP_RESTRICT __restrict
-
 // Disable some warnings for MSVC.
 #pragma warning(push)
 #pragma warning(disable : 4127)
@@ -79,137 +57,19 @@
 
 #elif defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
 
-#define mppp_likely(x) __builtin_expect(!!(x), 1)
-#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
-#define MPPP_RESTRICT __restrict
-
 // NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
 // http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
 #if defined(__SIZEOF_INT128__)
 #define MPPP_UINT128 __uint128_t
 #endif
 
-#else
-
-#define mppp_likely(x) (x)
-#define mppp_unlikely(x) (x)
-#define MPPP_RESTRICT
-
 #endif
 
-// Configuration of the thread_local keyword.
-#if defined(__apple_build_version__) || defined(__MINGW32__) || defined(__INTEL_COMPILER)
-
-// - Apple clang does not support the thread_local keyword until very recent versions.
-// - Testing shows that at least some MinGW versions have buggy thread_local implementations.
-// - Also on Intel the thread_local keyword looks buggy.
-#define MPPP_MAYBE_TLS
-
-#else
-
-// For the rest, we assume thread_local is available.
-#define MPPP_HAVE_THREAD_LOCAL
-#define MPPP_MAYBE_TLS static thread_local
-
-#endif
-
-// Concepts setup.
-#if defined(__cpp_concepts)
-
-#define MPPP_HAVE_CONCEPTS
-
-#endif
-
-/// The root mp++ namespace.
 namespace mppp
 {
 
 inline namespace detail
 {
-
-// A bunch of useful utilities from C++14/C++17.
-
-// http://en.cppreference.com/w/cpp/types/void_t
-template <typename... Ts>
-struct make_void {
-    typedef void type;
-};
-
-template <typename... Ts>
-using void_t = typename make_void<Ts...>::type;
-
-// http://en.cppreference.com/w/cpp/experimental/is_detected
-template <class Default, class AlwaysVoid, template <class...> class Op, class... Args>
-struct detector {
-    using value_t = std::false_type;
-    using type = Default;
-};
-
-template <class Default, template <class...> class Op, class... Args>
-struct detector<Default, void_t<Op<Args...>>, Op, Args...> {
-    using value_t = std::true_type;
-    using type = Op<Args...>;
-};
-
-// http://en.cppreference.com/w/cpp/experimental/nonesuch
-struct nonesuch {
-    nonesuch() = delete;
-    ~nonesuch() = delete;
-    nonesuch(nonesuch const &) = delete;
-    void operator=(nonesuch const &) = delete;
-};
-
-template <template <class...> class Op, class... Args>
-using is_detected = typename detector<nonesuch, void, Op, Args...>::value_t;
-
-template <template <class...> class Op, class... Args>
-using detected_t = typename detector<nonesuch, void, Op, Args...>::type;
-
-// http://en.cppreference.com/w/cpp/types/conjunction
-template <class...>
-struct conjunction : std::true_type {
-};
-
-template <class B1>
-struct conjunction<B1> : B1 {
-};
-
-template <class B1, class... Bn>
-struct conjunction<B1, Bn...> : std::conditional<B1::value != false, conjunction<Bn...>, B1>::type {
-};
-
-// http://en.cppreference.com/w/cpp/types/disjunction
-template <class...>
-struct disjunction : std::false_type {
-};
-
-template <class B1>
-struct disjunction<B1> : B1 {
-};
-
-template <class B1, class... Bn>
-struct disjunction<B1, Bn...> : std::conditional<B1::value != false, B1, disjunction<Bn...>>::type {
-};
-
-// http://en.cppreference.com/w/cpp/types/negation
-template <class B>
-struct negation : std::integral_constant<bool, !B::value> {
-};
-
-// Some handy aliases.
-template <typename T>
-using uncvref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
-
-// Just a small helper, like C++14.
-template <bool B, typename T = void>
-using enable_if_t = typename std::enable_if<B, T>::type;
-
-// mpz_t is an array of some struct.
-using mpz_struct_t = std::remove_extent<::mpz_t>::type;
-// Integral types used for allocation size and number of limbs.
-using mpz_alloc_t = decltype(std::declval<mpz_struct_t>()._mp_alloc);
-using mpz_size_t = decltype(std::declval<mpz_struct_t>()._mp_size);
-
 // Some misc tests to check that the mpz struct conforms to our expectations.
 // This is crucial for the implementation of the union integer type.
 struct expected_mpz_struct_t {
@@ -258,45 +118,7 @@ inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
     ::mpz_set(&m0, &m1);
 }
 
-// Simple RAII holder for GMP integers.
-struct mpz_raii {
-    mpz_raii()
-    {
-        ::mpz_init(&m_mpz);
-        assert(m_mpz._mp_alloc >= 0);
-    }
-    mpz_raii(const mpz_raii &) = delete;
-    mpz_raii(mpz_raii &&) = delete;
-    mpz_raii &operator=(const mpz_raii &) = delete;
-    mpz_raii &operator=(mpz_raii &&) = delete;
-    ~mpz_raii()
-    {
-        // NOTE: even in recent GMP versions, with lazy allocation,
-        // it seems like the pointer always points to something:
-        // https://gmplib.org/repo/gmp/file/835f8974ff6e/mpz/init.c
-        assert(m_mpz._mp_d != nullptr);
-        ::mpz_clear(&m_mpz);
-    }
-    mpz_struct_t m_mpz;
-};
-
-#if defined(MPPP_WITH_LONG_DOUBLE)
-
-// mpfr_t is an array of some struct.
-using mpfr_struct_t = std::remove_extent<::mpfr_t>::type;
-
-// Simple RAII holder for MPFR floats.
-struct mpfr_raii {
-    mpfr_raii()
-    {
-        ::mpfr_init2(&m_mpfr, 53);
-    }
-    ~mpfr_raii()
-    {
-        ::mpfr_clear(&m_mpfr);
-    }
-    mpfr_struct_t m_mpfr;
-};
+#if defined(MPPP_WITH_MPFR)
 
 // A couple of sanity checks when constructing temporary mpfrs from long double.
 static_assert(std::numeric_limits<long double>::digits10 < std::numeric_limits<int>::max() / 4, "Overflow error.");
@@ -346,7 +168,7 @@ using is_supported_integral
 // Type trait to check if T is a supported floating-point type.
 template <typename T>
 using is_supported_float = std::integral_constant<bool, disjunction<std::is_same<T, float>, std::is_same<T, double>
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
                                                                     ,
                                                                     std::is_same<T, long double>
 #endif
@@ -1046,7 +868,7 @@ private:
         ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
         dispatch_mpz_ctor(&tmp.m_mpz);
     }
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
     void dispatch_generic_ctor(const T &x)
     {
@@ -1384,7 +1206,7 @@ private:
     {
         return {true, static_cast<T>(::mpz_get_d(&m))};
     }
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
     static std::pair<bool, T> mpz_float_conversion(const mpz_struct_t &m)
     {
@@ -1569,73 +1391,6 @@ public:
             ::mpz_neg(&m_int.g_dy(), &m_int.g_dy());
         }
         return *this;
-    }
-    /// Identity operator.
-    /**
-     * @return a copy of \p this.
-     */
-    integer operator+() const
-    {
-        return *this;
-    }
-    /// Prefix increment.
-    /**
-     * Increment \p this by one.
-     *
-     * @return reference to \p this after the increment.
-     */
-    integer &operator++()
-    {
-        add_ui(*this, *this, 1u);
-        return *this;
-    }
-    /// Suffix increment.
-    /**
-     * Increment \p this by one and return a copy of \p this as it was before the increment.
-     *
-     * @return a copy of \p this before the increment.
-     */
-    integer operator++(int)
-    {
-        integer retval(*this);
-        ++(*this);
-        return retval;
-    }
-    /// Negated copy.
-    /**
-     * @return a negated copy of \p this.
-     */
-    integer operator-() const
-    {
-        integer retval{*this};
-        retval.neg();
-        return retval;
-    }
-    /// Prefix decrement.
-    /**
-     * Decrement \p this by one.
-     *
-     * @return reference to \p this after the decrement.
-     */
-    integer &operator--()
-    {
-        // NOTE: this should be written in terms of sub_ui(), once implemented.
-        neg();
-        add_ui(*this, *this, 1u);
-        neg();
-        return *this;
-    }
-    /// Suffix decrement.
-    /**
-     * Decrement \p this by one and return a copy of \p this as it was before the decrement.
-     *
-     * @return a copy of \p this before the decrement.
-     */
-    integer operator--(int)
-    {
-        integer retval(*this);
-        --(*this);
-        return retval;
     }
     /// In-place absolute value.
     /**
@@ -4750,6 +4505,18 @@ inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
 }
 }
 
+/// Identity operator.
+/**
+ * @param n the integer that will be copied.
+ *
+ * @return a copy of \p n.
+ */
+template <std::size_t SSize>
+inline integer<SSize> operator+(const integer<SSize> &n)
+{
+    return n;
+}
+
 /// Binary addition operator.
 /**
  * \rststar
@@ -4799,6 +4566,37 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 {
     dispatch_in_place_add(rop, op);
     return rop;
+}
+
+/// Prefix increment.
+/**
+ * Increment \p n by one.
+ *
+ * @param n the integer that will be increased.
+ *
+ * @return reference to \p n after the increment.
+ */
+template <std::size_t SSize>
+integer<SSize> &operator++(integer<SSize> &n)
+{
+    add_ui(n, n, 1u);
+    return n;
+}
+
+/// Suffix increment.
+/**
+ * Increment \p n by one and return a copy of \p n as it was before the increment.
+ *
+ * @param n the integer that will be increased.
+ *
+ * @return a copy of \p n before the increment.
+ */
+template <std::size_t SSize>
+integer<SSize> operator++(integer<SSize> &n, int)
+{
+    auto retval(n);
+    ++n;
+    return retval;
 }
 
 inline namespace detail
@@ -4868,6 +4666,20 @@ inline void dispatch_in_place_sub(T &rop, const integer<SSize> &op)
 }
 }
 
+/// Negated copy.
+/**
+ * @param n the integer that will be negated.
+ *
+ * @return a negated copy of \p n.
+ */
+template <std::size_t SSize>
+integer<SSize> operator-(const integer<SSize> &n)
+{
+    auto retval(n);
+    retval.neg();
+    return retval;
+}
+
 /// Binary subtraction operator.
 /**
  * \rststar
@@ -4917,6 +4729,40 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 {
     dispatch_in_place_sub(rop, op);
     return rop;
+}
+
+/// Prefix decrement.
+/**
+ * Decrement \p n by one.
+ *
+ * @param n the integer that will be decreased.
+ *
+ * @return reference to \p n after the decrement.
+ */
+template <std::size_t SSize>
+integer<SSize> &operator--(integer<SSize> &n)
+{
+    // NOTE: this should be written in terms of sub_ui(), once implemented.
+    n.neg();
+    add_ui(n, n, 1u);
+    n.neg();
+    return n;
+}
+
+/// Suffix decrement.
+/**
+ * Decrement \p n by one and return a copy of \p n as it was before the decrement.
+ *
+ * @param n the integer that will be decreased.
+ *
+ * @return a copy of \p n before the decrement.
+ */
+template <std::size_t SSize>
+integer<SSize> operator--(integer<SSize> &n, int)
+{
+    auto retval(n);
+    --n;
+    return retval;
 }
 
 inline namespace detail
@@ -5680,6 +5526,12 @@ struct hash<mppp::integer<SSize>> {
 #if defined(_MSC_VER)
 
 #pragma warning(pop)
+
+#endif
+
+#if defined(MPPP_UINT128)
+
+#undef MPPP_UINT128
 
 #endif
 

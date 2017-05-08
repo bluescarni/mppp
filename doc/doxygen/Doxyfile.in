@@ -38,7 +38,7 @@ PROJECT_NAME           = mp++
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 0.1
+PROJECT_NUMBER         = @mp++_VERSION@
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -2090,7 +2090,7 @@ INCLUDE_FILE_PATTERNS  =
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
 PREDEFINED             = MPPP_DOXYGEN_INVOKED \
-                         MPPP_WITH_LONG_DOUBLE \
+                         MPPP_WITH_MPFR \
                          MPPP_HAVE_THREAD_LOCAL \
                          MPPP_HAVE_CONCEPTS
 

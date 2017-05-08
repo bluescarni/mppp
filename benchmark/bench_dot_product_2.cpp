@@ -29,7 +29,7 @@ see https://www.gnu.org/licenses/. */
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <mp++.hpp>
+#include <mp++/mp++.hpp>
 #include <string>
 #include <utility>
 #include <vector>
