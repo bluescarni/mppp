@@ -61,7 +61,6 @@ If mp++ was installed in a standard prefix, on a typical GNU/Linux system you ca
 
    $ g++ -std=c++11 main.cpp -lgmp
 
-If mp++ was installed in a non-standard prefix, you will have to add it to the compiler include search path via the ``-I`` switch.
 If you installed mp++ with the optional MPFR support turned on, you will need to link in the MPFR library as well:
 
 .. code-block:: console
