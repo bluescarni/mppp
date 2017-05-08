@@ -45,7 +45,7 @@ see https://www.gnu.org/licenses/. */
 #include <type_traits>
 #include <utility>
 
-#include <mp++.hpp>
+#include <mp++/mp++.hpp>
 
 namespace mppp_test
 {

@@ -2090,7 +2090,7 @@ INCLUDE_FILE_PATTERNS  =
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
 PREDEFINED             = MPPP_DOXYGEN_INVOKED \
-                         MPPP_WITH_LONG_DOUBLE \
+                         MPPP_WITH_MPFR \
                          MPPP_HAVE_THREAD_LOCAL \
                          MPPP_HAVE_CONCEPTS
 

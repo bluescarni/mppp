@@ -40,7 +40,7 @@ see https://www.gnu.org/licenses/. */
 #include <tuple>
 #include <type_traits>
 
-#include <mp++.hpp>
+#include <mp++/mp++.hpp>
 
 #include "test_utils.hpp"
 
@@ -147,7 +147,7 @@ TEST_CASE("integral constructors")
 }
 
 using fp_types = std::tuple<float, double
-#if defined(MPPP_WITH_LONG_DOUBLE)
+#if defined(MPPP_WITH_MPFR)
                             ,
                             long double
 #endif
