@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Provide a CMake config-file package as part of the install process.
+  [Francesco Biscani]
+
 - Implement the missing in-place modulo operator with C++ integrals
   on the left. [Francesco Biscani]
 
@@ -32,6 +35,8 @@ New
 
 Changes
 ~~~~~~~
+
+- Split out the library in multiple files. [Francesco Biscani]
 
 - Rename the ``mp_integer`` class to ``integer``. [Francesco Biscani]
 
