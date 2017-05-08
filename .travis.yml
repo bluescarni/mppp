@@ -125,6 +125,8 @@ matrix:
           - ubuntu-toolchain-r-test
           - george-edison55-precise-backports
           packages:
+          - libgmp-dev
+          - libmpfr-dev
           - graphviz
           - graphviz-dev
           - texlive

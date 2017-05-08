@@ -35,17 +35,35 @@ installing from source (the minimum required version is 3.2).
 Installation from source
 ------------------------
 
-Source releases of mp++ can be downloaded from `github <https://github.com/bluescarni/mppp/releases>`__.
-In order to use mp++, you only have to include the ``include/mp++.hpp`` header in your project and link to the GMP
-(or MPIR) library when compiling. E.g., on a Unix-like operating system with GCC, you would compile your executable as:
+Source releases of mp++ can be downloaded from `github <https://github.com/bluescarni/mppp/releases>`__. Once in the source tree
+of mp++, you can use ``cmake`` to configure the build to your liking (e.g., enabling optional features, customizing the installation
+path, etc.). Since mp++ is a header-only library, there's no compilation step, and the installation of mp++ via ``make install`` or
+similar will just copy the headers to your ``INSTALL_PREFIX``, in the ``include`` subdirectory.
+
+After the installation of the headers, you can test the installation with the following simple ``main.cpp``:
+
+.. code-block:: c++
+
+   #include <iostream>
+   #include <mp++/mp++.hpp>
+
+   using int_t = mppp::integer<1>;
+
+   int main()
+   {
+       int_t n{42};
+       std::cout << n << '\n';
+   }
+
+If mp++ was installed in a standard prefix, on a typical GNU/Linux system you can compile this example with the following command:
 
 .. code-block:: console
 
-   $ g++ -std=c++11 my_executable.cpp -lgmp
+   $ g++ -std=c++11 main.cpp -lgmp
 
-If you require interoperability with ``long double``, link in the MPFR library as well and activate the ``MPPP_WITH_LONG_DOUBLE``
-preprocessor definition:
+If mp++ was installed in a non-standard prefix, you will have to add it to the compiler include search path via the ``-I`` switch.
+If you installed mp++ with the optional MPFR support turned on, you will need to link in the MPFR library as well:
 
 .. code-block:: console
 
-   $ g++ -std=c++11 -DMPPP_WITH_LONG_DOUBLE my_executable.cpp -lmpfr -lgmp
+   $ g++ -std=c++11 main.cpp -lmpfr -lgmp

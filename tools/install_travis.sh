@@ -12,7 +12,7 @@ if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
     cd ../tools/sample_project;
     mkdir build;
     cd build;
-    cmake ../ -DCMAKE_PREFIX_PATH=/home/travis/.local;
+    CXX=g++-4.8 CC=gcc-4.8 cmake ../ -DCMAKE_PREFIX_PATH=/home/travis/.local;
     make;
     ./main;
 
@@ -61,6 +61,9 @@ elif [[ "${MPPP_BUILD}" == "ReleaseClang38" ]]; then
 #     set -x;
 #     docker pull ${DOCKER_IMAGE};
 elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
+    # Run the configure step to create the doc config files.
+    CXX=g++-5 CC=gcc-5 cmake -DMPPP_WITH_MPFR=yes ../;
+
     # Install a recent version of Doxygen locally.
     wget "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.13.src.tar.gz";
     tar xzf doxygen-1.8.13.src.tar.gz;
