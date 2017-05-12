@@ -10,6 +10,7 @@
 #define MPPP_MPPP_HPP
 
 #include <mp++/config.hpp>
+#include <mp++/exceptions.hpp>
 #include <mp++/integer.hpp>
 
 #endif

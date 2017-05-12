@@ -28,12 +28,14 @@
 #include <utility>
 #include <vector>
 
+#include <mp++/concepts.hpp>
 #include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
 #if defined(MPPP_WITH_MPFR)
 #include <mp++/detail/mpfr.hpp>
 #endif
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/exceptions.hpp>
 
 // Compiler configuration.
 // NOTE: check for MSVC first, as clang-cl does define both __clang__ and _MSC_VER,
@@ -154,29 +156,6 @@ inline std::string mpz_to_str(const mpz_struct_t *mpz, int base = 10)
     mpz_to_str(tmp, mpz, base);
     return tmp.data();
 }
-
-// Type trait to check if T is a supported integral type.
-template <typename T>
-using is_supported_integral
-    = std::integral_constant<bool, disjunction<std::is_same<T, bool>, std::is_same<T, char>,
-                                               std::is_same<T, signed char>, std::is_same<T, unsigned char>,
-                                               std::is_same<T, short>, std::is_same<T, unsigned short>,
-                                               std::is_same<T, int>, std::is_same<T, unsigned>, std::is_same<T, long>,
-                                               std::is_same<T, unsigned long>, std::is_same<T, long long>,
-                                               std::is_same<T, unsigned long long>>::value>;
-
-// Type trait to check if T is a supported floating-point type.
-template <typename T>
-using is_supported_float = std::integral_constant<bool, disjunction<std::is_same<T, float>, std::is_same<T, double>
-#if defined(MPPP_WITH_MPFR)
-                                                                    ,
-                                                                    std::is_same<T, long double>
-#endif
-                                                                    >::value>;
-
-template <typename T>
-using is_cpp_interoperable
-    = std::integral_constant<bool, disjunction<is_supported_integral<T>, is_supported_float<T>>::value>;
 
 // Small wrapper to copy limbs.
 inline void copy_limbs(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp_limb_t *out)
@@ -508,13 +487,6 @@ public:
     s_storage m_st;
     d_storage m_dy;
 };
-
-template <typename T>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool CppInteroperable = is_cpp_interoperable<T>::value;
-#else
-using cpp_interoperable_enabler = enable_if_t<is_cpp_interoperable<T>::value, int>;
-#endif
 }
 
 // Useful fwd declarations.
@@ -523,19 +495,6 @@ class integer;
 
 template <std::size_t SSize>
 void sqrt(integer<SSize> &, const integer<SSize> &);
-
-/// Exception to signal division by zero.
-/**
- * \rststar
- * This exception inherits all members (including constructors) from
- * `std::domain_error <http://en.cppreference.com/w/cpp/error/domain_error>`_. It will be thrown
- * when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
- * represent infinities.
- * \endrststar
- */
-struct zero_division_error final : std::domain_error {
-    using std::domain_error::domain_error;
-};
 
 // NOTE: a few misc things:
 // - re-visit at one point the issue of the estimators when we need to promote from static to dynamic
@@ -556,6 +515,8 @@ struct zero_division_error final : std::domain_error {
 /// Multiprecision integer class.
 /**
  * \rststar
+ * *#include <mp++/integer.hpp>*
+ *
  * This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
  * a small value optimisation: integers whose size is up to ``SSize`` limbs are stored directly in the storage
  * occupied by the :cpp:class:`~mppp::integer` object, without resorting to dynamic memory allocation. The value of
@@ -5512,9 +5473,9 @@ struct hash<mppp::integer<SSize>> {
     typedef size_t result_type;
     /// Call operator.
     /**
-     * @param n the mppp::integer whose hash will be returned.
+     * @param n the integer whose hash will be returned.
      *
-     * @return the hash value of \p n, as calculated by mppp::integer::hash().
+     * @return a hash value for \p n.
      */
     result_type operator()(const argument_type &n) const
     {
