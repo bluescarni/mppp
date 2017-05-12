@@ -37,7 +37,13 @@ Installation from source
 
 Source releases of mp++ can be downloaded from `github <https://github.com/bluescarni/mppp/releases>`__. Once in the source tree
 of mp++, you can use ``cmake`` to configure the build to your liking (e.g., enabling optional features, customizing the installation
-path, etc.). Since mp++ is a header-only library, there's no compilation step, and the installation of mp++ via ``make install`` or
+path, etc.). The available configuration options are:
+
+* ``MPPP_WITH_MPFR``: enable features relying on the GNU MPFR library (off by default),
+* ``MPPP_BUILD_TESTS``: build the test suite (off by default),
+* ``MPPP_BUILD_BENCHMARKS``: build the benchmarking suite (off by default).
+
+Since mp++ is a header-only library, there's no compilation step, and the installation of mp++ via ``make install`` or
 similar will just copy the headers to your ``CMAKE_INSTALL_PREFIX``, in the ``include`` subdirectory.
 
 After the installation of the headers, you can test the installation with the following simple ``main.cpp`` program:
