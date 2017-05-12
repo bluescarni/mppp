@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Arbitrary-precision integers &#8212; mp++ 0.2 documentation</title>
+    <title>Arbitrary-precision integers &#8212; mp++ 0.3 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2',
+        VERSION:     '0.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -126,7 +126,8 @@
 <dt id="_CPPv2N4mppp7integerE">
 <span id="mppp::integer"></span><em class="property">class </em><code class="descclassname">mppp::</code><code class="descname">integer</code><a class="headerlink" href="#_CPPv2N4mppp7integerE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Multiprecision integer class. </p>
-<p><p>This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP <code class="docutils literal"><span class="pre">mpz_t</span></code> type, with
+<p><p><em>#include &lt;mp++/integer.hpp&gt;</em></p>
+<p>This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP <code class="docutils literal"><span class="pre">mpz_t</span></code> type, with
 a small value optimisation: integers whose size is up to <code class="docutils literal"><span class="pre">SSize</span></code> limbs are stored directly in the storage
 occupied by the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> object, without resorting to dynamic memory allocation. The value of
 <code class="docutils literal"><span class="pre">SSize</span></code> must be at least 1 and less than an implementation-defined upper limit.</p>

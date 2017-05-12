@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Exceptions &#8212; mp++ 0.2 documentation</title>
+    <title>Exceptions &#8212; mp++ 0.3 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2',
+        VERSION:     '0.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -106,7 +106,8 @@
 <dt id="_CPPv2N4mppp19zero_division_errorE">
 <span id="mppp::zero_division_error"></span><span class="target" id="mp++structmppp_1_1zero__division__error"></span><em class="property">struct </em><code class="descclassname">mppp::</code><code class="descname">zero_division_error</code><a class="headerlink" href="#_CPPv2N4mppp19zero_division_errorE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Exception to signal division by zero. </p>
-<p><p>This exception inherits all members (including constructors) from
+<p><p><em>#include &lt;mp++/exceptions.hpp&gt;</em></p>
+<p>This exception inherits all members (including constructors) from
 <a class="reference external" href="http://en.cppreference.com/w/cpp/error/domain_error">std::domain_error</a>. It will be thrown
 when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
 represent infinities.</p>
