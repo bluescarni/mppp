@@ -1579,6 +1579,7 @@ struct is_integer : std::false_type {
 template <std::size_t SSize>
 struct is_integer<integer<SSize>> : std::true_type {
 };
+}
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1604,7 +1605,6 @@ using integer_integral_op_types_enabler
                               conjunction<is_integer<U>, is_cpp_interoperable<T>, std::is_integral<T>>>::value,
                   int>;
 #endif
-}
 
 /** @defgroup integer_arithmetic integer_arithmetic
  *  @{
