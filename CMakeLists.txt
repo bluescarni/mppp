@@ -1,6 +1,6 @@
 cmake_policy(SET CMP0048 NEW)
 
-project(mp++ VERSION 0.2 LANGUAGES CXX C)
+project(mp++ VERSION 0.3 LANGUAGES CXX C)
 
 cmake_minimum_required(VERSION 3.2.0)
 
@@ -39,7 +39,9 @@ endif()
 option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
 option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires Boost)." OFF)
+mark_as_advanced(MPPP_BENCHMARK_BOOST)
 option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
+mark_as_advanced(MPPP_BENCHMARK_FLINT)
 option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
 if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_STATIC_RUNTIME "Use the MSVC static runtime instead of the shared runtime." OFF)
