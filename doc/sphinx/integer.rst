@@ -1,9 +1,9 @@
-Arbitrary-precision integers
-============================
+Multiprecision integers
+=======================
 
 
 The ``integer`` class
-------------------------
+---------------------
 
 .. doxygenclass:: mppp::integer
    :members:

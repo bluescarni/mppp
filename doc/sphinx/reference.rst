@@ -8,3 +8,4 @@ Reference
    exceptions.rst
    concepts.rst
    integer.rst
+   rational.rst
