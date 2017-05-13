@@ -4,6 +4,12 @@ Changelog
 0.3 (unreleased)
 ----------------
 
+New
+~~~
+
+- Implement the assignment operator from ``mpz_t``, and use it in various function
+  in order to avoid the creation of a temporary.
+
 0.2 (2017-05-09)
 ----------------
 

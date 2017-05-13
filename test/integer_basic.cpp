@@ -391,6 +391,62 @@ TEST_CASE("copy and move")
     tuple_for_each(sizes{}, copy_move_tester{});
 }
 
+struct mpz_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        integer n;
+        mpz_raii m;
+        REQUIRE(lex_cast(integer{&m.m_mpz}) == "0");
+        ::mpz_set_si(&m.m_mpz, 1234);
+        n = &m.m_mpz;
+        REQUIRE(n == 1234);
+        ::mpz_set_si(&m.m_mpz, -1234);
+        n = &m.m_mpz;
+        REQUIRE(n == -1234);
+        ::mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        n = &m.m_mpz;
+        REQUIRE(n == integer("3218372891372987328917389127389217398271983712987398127398172389712937819237"));
+        ::mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        n = &m.m_mpz;
+        REQUIRE(n == integer("-3218372891372987328917389127389217398271983712987398127398172389712937819237"));
+        // Random testing.
+        std::atomic<bool> fail(false);
+        auto f = [&fail](unsigned u) {
+            std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
+                                                     std::numeric_limits<long>::max());
+            std::uniform_int_distribution<int> sdist(0, 1);
+            std::mt19937 eng(static_cast<std::mt19937::result_type>(u + mt_rng_seed));
+            for (auto i = 0; i < ntries; ++i) {
+                mpz_raii mpz;
+                auto tmp = dist(eng);
+                ::mpz_set_si(&mpz.m_mpz, tmp);
+                integer z;
+                if (sdist(eng)) {
+                    z.promote();
+                }
+                z = &mpz.m_mpz;
+                if (z != tmp) {
+                    fail.store(false);
+                }
+            }
+        };
+        std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+        t0.join();
+        t1.join();
+        t2.join();
+        t3.join();
+        REQUIRE(!fail.load());
+        mt_rng_seed += 4u;
+    }
+};
+
+TEST_CASE("mpz_t assignment")
+{
+    tuple_for_each(sizes{}, mpz_ass_tester{});
+}
+
 struct promdem_tester {
     template <typename S>
     void operator()(const S &) const

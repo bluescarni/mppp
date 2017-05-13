@@ -212,7 +212,6 @@ struct static_int {
     static_int &operator=(static_int &&) = default;
     bool dtor_checks() const
     {
-        // LCOV_EXCL_START
         const auto asize = abs_size();
         // Check the value of the alloc member.
         if (_mp_alloc != s_alloc) {
@@ -236,7 +235,6 @@ struct static_int {
             return false;
         }
         return true;
-        // LCOV_EXCL_STOP
     }
     ~static_int()
     {
@@ -508,10 +506,6 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
 // - pow() can probably benefit for some specialised static implementation, especially in conjunction with
 //   mpn_sqr().
 // - gcd() can be improved (see notes).
-// - the pattern we follow when no mpn primitives are available is to use a static thread local instance of mpz_t
-//   to perform the computation with mpz_ functions and then assign the result to rop. We could probably benefit
-//   from a true assignment operator from mpz_t instead of cting an integer from mpz_t and assigning it (which
-//   is what we are doing now).
 /// Multiprecision integer class.
 /**
  * \rststar
@@ -637,7 +631,7 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
  * Several facilities for interfacing with the GMP library are provided. Specifically, :cpp:class:`~mppp::integer`
  * features:
  *
- * * a constructor from the GMP integer type ``mpz_t``,
+ * * a constructor and an assignment operator from the GMP integer type ``mpz_t``,
  * * a :cpp:func:`~mppp::integer::get_mpz_t()` method that promotes ``this`` to dynamic
  *   storage and returns a pointer to the internal ``mpz_t`` instance,
  * * an ``mpz_view`` class, an instance of which can be requested via the :cpp:func:`~mppp::integer::get_mpz_view()`
@@ -1000,6 +994,61 @@ public:
 #endif
     {
         return *this = integer{x};
+    }
+    /// Assignment from \p mpz_t.
+    /**
+     * This assignment operator will copy into \p this the value of the GMP integer \p n. The storage type of \p this
+     * after the assignment will be static if \p n fits in the static storage, otherwise it will be dynamic.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
+     *    with an uninitialized ``n`` is undefined behaviour.
+     * \endrststar
+     *
+     * @param n the input GMP integer.
+     *
+     * @return a reference to \p this.
+     */
+    integer &operator=(const ::mpz_t n)
+    {
+        const auto asize = ::mpz_size(n);
+        const auto s = is_static();
+        if (s && asize <= SSize) {
+            // this is static, n fits into static. Copy over.
+            m_int.g_st()._mp_size = n->_mp_size;
+            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+            if (SSize <= static_int<SSize>::opt_size) {
+                // Zero the non-copied limbs, but only if the static size is not greater than
+                // the size for which special optimisations kick in. See the documentation
+                // of zero_unused_limbs().
+                std::fill(m_int.g_st().m_limbs.begin() + asize, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+            }
+        } else if (!s && asize > SSize) {
+            // Dynamic to dynamic.
+            ::mpz_set(&m_int.m_dy, n);
+        } else if (s && asize > SSize) {
+            // this is static, n is too big. Promote and assign.
+            // Destroy static.
+            m_int.g_st().~s_storage();
+            // Init dynamic.
+            ::new (static_cast<void *>(&m_int.m_dy)) d_storage;
+            mpz_init_set_nlimbs(m_int.m_dy, *n);
+        } else {
+            // This is dynamic and n fits into static.
+            assert(!s && asize <= SSize);
+            // Destroy the dynamic storage.
+            m_int.destroy_dynamic();
+            // Init an empty static.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage();
+            // Copy over from n.
+            m_int.g_st()._mp_size = n->_mp_size;
+            // NOTE: the upper limbs are guaranteed to be zero by the def
+            // initialisation of s_storage above.
+            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+        }
+        return *this;
     }
     /// Test for static storage.
     /**
@@ -3828,7 +3877,7 @@ inline void fac_ui(integer<SSize> &rop, unsigned long n)
     if (rop.is_static()) {
         MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpz_fac_ui(&tmp.m_mpz, n);
-        rop = integer<SSize>(&tmp.m_mpz);
+        rop = &tmp.m_mpz;
     } else {
         ::mpz_fac_ui(&rop._get_union().g_dy(), n);
     }
@@ -3849,7 +3898,7 @@ inline void bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k
     if (rop.is_static()) {
         MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
-        rop = integer<SSize>(&tmp.m_mpz);
+        rop = &tmp.m_mpz;
     } else {
         ::mpz_bin_ui(&rop._get_union().g_dy(), n.get_mpz_view(), k);
     }
@@ -4000,7 +4049,7 @@ inline void nextprime_impl(integer<SSize> &rop, const integer<SSize> &n)
     if (rop.is_static()) {
         MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
-        rop = integer<SSize>(&tmp.m_mpz);
+        rop = &tmp.m_mpz;
     } else {
         ::mpz_nextprime(&rop._get_union().g_dy(), n.get_mpz_view());
     }
@@ -4075,7 +4124,7 @@ inline void pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned lon
     if (rop.is_static()) {
         MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
-        rop = integer<SSize>(&tmp.m_mpz);
+        rop = &tmp.m_mpz;
     } else {
         ::mpz_pow_ui(&rop._get_union().g_dy(), base.get_mpz_view(), exp);
     }
