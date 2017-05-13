@@ -33,6 +33,13 @@ struct rat_ctor_tester {
         std::cout << "n static limbs: " << S::value << ", size: " << sizeof(rat_t) << '\n';
         rat_t q;
         q = rat_t{1, 2};
+        std::cout << q << '\n';
+        q = rat_t{2, -4};
+        std::cout << q << '\n';
+        q = rat_t{1.3};
+        std::cout << q << '\n';
+        q = rat_t{1.3f};
+        std::cout << q << '\n';
     }
 };
 

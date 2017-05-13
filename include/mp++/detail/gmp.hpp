@@ -53,6 +53,26 @@ struct mpz_raii {
     }
     mpz_struct_t m_mpz;
 };
+
+// mpq_t is an array of some struct.
+using mpq_struct_t = std::remove_extent<::mpq_t>::type;
+
+// Simple RAII holder for GMP rationals.
+struct mpq_raii {
+    mpq_raii()
+    {
+        ::mpq_init(&m_mpq);
+    }
+    mpq_raii(const mpq_raii &) = delete;
+    mpq_raii(mpq_raii &&) = delete;
+    mpq_raii &operator=(const mpq_raii &) = delete;
+    mpq_raii &operator=(mpq_raii &&) = delete;
+    ~mpq_raii()
+    {
+        ::mpq_clear(&m_mpq);
+    }
+    mpq_struct_t m_mpq;
+};
 }
 }
 
