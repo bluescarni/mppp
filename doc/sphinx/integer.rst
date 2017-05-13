@@ -14,7 +14,7 @@ Concepts
 .. cpp:concept:: template <typename T, typename U> mppp::IntegerOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
-   generic :ref:`operators <integer_operators>` and :ref:`functions <integer_functions>`
+   generic binary :ref:`operators <integer_operators>` and :ref:`functions <integer_functions>`
    involving :cpp:class:`~mppp::integer`. Specifically, the concept will be ``true`` if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size ``SSize``, or
@@ -25,7 +25,7 @@ Concepts
 .. cpp:concept:: template <typename T, typename U> mppp::IntegerIntegralOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
-   generic :ref:`operators <integer_operators>` and :ref:`functions <integer_functions>`
+   generic binary :ref:`operators <integer_operators>` and :ref:`functions <integer_functions>`
    involving :cpp:class:`~mppp::integer` and C++ integral types. Specifically, the concept will be ``true``
    if either:
 

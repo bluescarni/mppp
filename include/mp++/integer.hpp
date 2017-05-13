@@ -517,7 +517,7 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
  * \rststar
  * *#include <mp++/integer.hpp>*
  *
- * This class represent arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
+ * This class represents arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
  * a small value optimisation: integers whose size is up to ``SSize`` limbs are stored directly in the storage
  * occupied by the :cpp:class:`~mppp::integer` object, without resorting to dynamic memory allocation. The value of
  * ``SSize`` must be at least 1 and less than an implementation-defined upper limit.

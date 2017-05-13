@@ -14,8 +14,6 @@ Common concepts
 
 .. cpp:concept:: template <typename T> mppp::CppInteroperable
 
-   Interoperable fundamental C++ types.
-
    *#include <mp++/concepts.hpp>*
 
    This concept is satisfied by any C++ fundamental type with which the multiprecision classes (such as :cpp:class:`~mppp::integer`)
