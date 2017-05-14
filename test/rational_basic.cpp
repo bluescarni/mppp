@@ -30,11 +30,13 @@ struct rat_ctor_tester {
     inline void operator()(const S &) const
     {
         using rat_t = rational<S::value>;
+        using int_t = typename rat_t::int_t;
         std::cout << "n static limbs: " << S::value << ", size: " << sizeof(rat_t) << '\n';
         rat_t q;
         q = rat_t{1, 2};
         std::cout << q << '\n';
         q = rat_t{2, -4};
+        q = rat_t{2, int_t{-4}};
         std::cout << q << '\n';
         q = rat_t{1.3};
         std::cout << q << '\n';
