@@ -13,8 +13,11 @@
 
 #if defined(MPPP_WITH_MPFR)
 
+#include <limits>
 #include <mpfr.h>
 #include <type_traits>
+
+#include <mp++/detail/gmp.hpp>
 
 #if MPFR_VERSION_MAJOR < 3
 
@@ -44,6 +47,13 @@ struct mpfr_raii {
     mpfr_struct_t m_mpfr;
 };
 }
+
+// A couple of sanity checks when constructing temporary mpfrs/mpfs from long double.
+static_assert(std::numeric_limits<long double>::digits10 < std::numeric_limits<int>::max() / 4, "Overflow error.");
+static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limits<::mpfr_prec_t>::max(),
+              "Overflow error.");
+static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limits<::mp_bitcnt_t>::max(),
+              "Overflow error.");
 }
 
 #else

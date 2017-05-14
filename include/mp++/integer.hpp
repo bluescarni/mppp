@@ -120,15 +120,6 @@ inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
     ::mpz_set(&m0, &m1);
 }
 
-#if defined(MPPP_WITH_MPFR)
-
-// A couple of sanity checks when constructing temporary mpfrs from long double.
-static_assert(std::numeric_limits<long double>::digits10 < std::numeric_limits<int>::max() / 4, "Overflow error.");
-static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limits<::mpfr_prec_t>::max(),
-              "Overflow error.");
-
-#endif
-
 // Convert an mpz to a string in a specific base, to be written into out.
 inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base = 10)
 {
@@ -833,7 +824,7 @@ private:
         }
         MPPP_MAYBE_TLS mpfr_raii mpfr;
         MPPP_MAYBE_TLS mpz_raii tmp;
-        // NOTE: static checks for overflows are done above.
+        // NOTE: static checks for overflows are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
         ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);

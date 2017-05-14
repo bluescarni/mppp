@@ -73,6 +73,26 @@ struct mpq_raii {
     }
     mpq_struct_t m_mpq;
 };
+
+// mpf_t is an array of some struct.
+using mpf_struct_t = std::remove_extent<::mpf_t>::type;
+
+// Simple RAII holder for GMP floats.
+struct mpf_raii {
+    mpf_raii()
+    {
+        ::mpf_init(&m_mpf);
+    }
+    mpf_raii(const mpf_raii &) = delete;
+    mpf_raii(mpf_raii &&) = delete;
+    mpf_raii &operator=(const mpf_raii &) = delete;
+    mpf_raii &operator=(mpf_raii &&) = delete;
+    ~mpf_raii()
+    {
+        ::mpf_clear(&m_mpf);
+    }
+    mpf_struct_t m_mpf;
+};
 }
 }
 
