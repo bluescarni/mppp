@@ -30,6 +30,7 @@
 
 #include <mp++/concepts.hpp>
 #include <mp++/config.hpp>
+#include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #if defined(MPPP_WITH_MPFR)
 #include <mp++/detail/mpfr.hpp>
@@ -478,13 +479,6 @@ public:
 };
 }
 
-// Useful fwd declarations.
-template <std::size_t>
-class integer;
-
-template <std::size_t SSize>
-void sqrt(integer<SSize> &, const integer<SSize> &);
-
 // NOTE: a few misc things:
 // - re-visit at one point the issue of the estimators when we need to promote from static to dynamic
 //   in arithmetic ops. Currently they are not 100% optimal since they rely on the information coming out
@@ -681,6 +675,9 @@ class integer
         static_mpz_view m_static_view;
         const mpz_struct_t *m_ptr;
     };
+    // Make friends with rational.
+    template <std::size_t>
+    friend class rational;
 
 public:
     /// Alias for the template parameter \p SSize.
@@ -870,7 +867,6 @@ public:
     template <typename T, cpp_interoperable_enabler<T> = 0>
     explicit integer(const T &x)
 #endif
-        : m_int()
     {
         dispatch_generic_ctor(x);
     }
@@ -893,7 +889,7 @@ public:
      *    https://gmplib.org/manual/Assigning-Integers.html
      * \endrststar
      */
-    explicit integer(const char *s, int base = 10) : m_int()
+    explicit integer(const char *s, int base = 10)
     {
         if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
             throw std::invalid_argument(
@@ -936,7 +932,7 @@ public:
      *
      * @param n the input GMP integer.
      */
-    explicit integer(const ::mpz_t n) : m_int()
+    explicit integer(const ::mpz_t n)
     {
         dispatch_mpz_ctor(n);
     }
@@ -1444,19 +1440,7 @@ public:
         }
         return ::mpz_probab_prime_p(get_mpz_view(), reps);
     }
-    /// Integer square root (in-place version).
-    /**
-     * This method will set \p this to its integer square root.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if \p this is negative.
-     */
-    integer &sqrt()
-    {
-        mppp::sqrt(*this, *this);
-        return *this;
-    }
+    integer &sqrt();
     /// Test if value is odd.
     /**
      * @return \p true if \p this is odd, \p false otherwise.
@@ -4343,6 +4327,21 @@ inline integer<SSize> sqrt(const integer<SSize> &n)
 }
 
 /** @} */
+
+/// Integer square root (in-place version).
+/**
+ * This method will set \p this to its integer square root.
+ *
+ * @return a reference to \p this.
+ *
+ * @throws std::domain_error if \p this is negative.
+ */
+template <std::size_t SSize>
+inline integer<SSize> &integer<SSize>::sqrt()
+{
+    mppp::sqrt(*this, *this);
+    return *this;
+}
 
 /** @defgroup integer_io integer_io
  *  @{
