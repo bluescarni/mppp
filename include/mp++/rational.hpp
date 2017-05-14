@@ -183,6 +183,18 @@ private:
 
 public:
 /// Generic constructor.
+/**
+ * \rststar
+ * This constructor will initialize a rational with the value of ``x``. The initialization is always
+ * successful if ``x`` is an integral value (construction from ``bool`` yields 1 for ``true``, 0 for ``false``)
+ * or an instance of :cpp:type:`~mppp::rational::int_t`.
+ * If ``x`` is a floating-point value, the construction will fail if ``x`` is not finite.
+ * \endrststar
+ *
+ * @param x value that will be used to initialize \p this.
+ *
+ * @throws std::domain_error if \p x is a non-finite floating-point value.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
     explicit rational(const RationalInteroperable<SSize> &x)
 #else
@@ -204,29 +216,92 @@ public:
      * @return a reference to ``this``.
      */
     rational &operator=(rational &&) = default;
-    const int_t &_get_num() const
-    {
-        return m_num;
-    }
+    /// Assignment from \p mpq_t.
+    /**
+     * This assignment operator will copy into \p this the value of the GMP rational \p q.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this operator
+     *    with an uninitialized ``q`` is undefined behaviour. Also, this operator will **not** canonicalise
+     *    the assigned value: numerator and denominator are assigned as-is from ``q``.
+     * \endrststar
+     *
+     * @param q the input GMP rational.
+     *
+     * @return a reference to \p this.
+     */
     rational &operator=(const ::mpq_t q)
     {
         m_num = mpq_numref(q);
         m_den = mpq_denref(q);
         return *this;
     }
-    const int_t &_get_den() const
+    /// Const numerator getter.
+    /**
+     * @return a const reference to the numerator.
+     */
+    const int_t &get_num() const
+    {
+        return m_num;
+    }
+    /// Const denominator getter.
+    /**
+     * @return a const reference to the denominator.
+     */
+    const int_t &get_den() const
     {
         return m_den;
     }
+    /// Mutable numerator getter.
+    /**
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that, after changing the numerator
+     *    via this getter, the rational is kept in canonical form.
+     * \endrststar
+     *
+     * @return a mutable reference to the numerator.
+     */
     int_t &_get_num()
     {
         return m_num;
     }
+    /// Mutable denominator getter.
+    /**
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that, after changing the denominator
+     *    via this getter, the rational is kept in canonical form.
+     * \endrststar
+     *
+     * @return a mutable reference to the denominator.
+     */
     int_t &_get_den()
     {
         return m_den;
     }
     /// Canonicalise.
+    /**
+     * \rststar
+     * This method will put ``this`` in canonical form. In particular, this method
+     * will make sure that:
+     *
+     * * if the numerator is zero, the denominator is set to 1,
+     * * the numerator and denominator are coprime (dividing them by their GCD,
+     *   if necessary),
+     * * the denominator is strictly positive.
+     *
+     * In general, it is not necessary to call explicitly this method, as the public
+     * API of :cpp:class:`~mppp::rational` ensures that rationals are kept in canonical
+     * form. This method however might be necessary if the numerator and/or denominator
+     * are modified manually, or when constructing/assigning from non-canonical ``mpq_t``
+     * values.
+     * \endrststar
+     */
     void canonicalise()
     {
         if (m_num.is_zero()) {
@@ -263,10 +338,10 @@ private:
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
 {
-    if (q._get_den().is_one()) {
-        return os << q._get_num();
+    if (q.get_den().is_one()) {
+        return os << q.get_num();
     }
-    return os << q._get_num() << "/" << q._get_den();
+    return os << q.get_num() << "/" << q.get_den();
 }
 }
 

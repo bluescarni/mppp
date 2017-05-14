@@ -42,8 +42,6 @@ struct rat_ctor_tester {
         std::cout << q << '\n';
         q = rat_t{1.3f};
         std::cout << q << '\n';
-        q = rat_t{1.3l};
-        std::cout << q << '\n';
     }
 };
 
