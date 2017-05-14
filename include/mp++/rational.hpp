@@ -21,6 +21,7 @@
 
 #include <mp++/concepts.hpp>
 #include <mp++/config.hpp>
+#include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #if defined(MPPP_WITH_MPFR)
 #include <mp++/detail/mpfr.hpp>
@@ -32,26 +33,23 @@
 namespace mppp
 {
 
-template <typename T, typename U, std::size_t SSize>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool RationalNumDenCtorTypes
-    = (std::is_same<T, integer<SSize>>::value || (CppInteroperable<T> && std::is_integral<T>::value))
-      && (std::is_same<U, integer<SSize>>::value || (CppInteroperable<U> && std::is_integral<U>::value));
-#else
-using rational_num_den_ctor_types_enabler
-    = enable_if_t<conjunction<disjunction<std::is_same<T, integer<SSize>>,
-                                          conjunction<is_cpp_interoperable<T>, std::is_integral<T>>>,
-                              disjunction<std::is_same<U, integer<SSize>>,
-                                          conjunction<is_cpp_interoperable<U>, std::is_integral<U>>>>::value,
-                  int>;
-#endif
+template <typename T, std::size_t SSize>
+using is_rational_interoperable = disjunction<is_cpp_interoperable<T>, std::is_same<T, integer<SSize>>>;
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool RationalInteroperable = CppInteroperable<T> || std::is_same<T, integer<SSize>>::value;
+concept bool RationalInteroperable = is_rational_interoperable<T, SSize>::value;
 #else
-using rational_interoperable_enabler
-    = enable_if_t<disjunction<is_cpp_interoperable<T>, std::is_same<T, integer<SSize>>>::value, int>;
+using rational_interoperable_enabler = enable_if_t<is_rational_interoperable<T, SSize>::value, int>;
+#endif
+
+template <typename T, std::size_t SSize>
+using is_rational_integral_interoperable
+    = conjunction<is_rational_interoperable<T, SSize>, negation<std::is_floating_point<T>>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, std::size_t SSize>
+concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
 #endif
 
 /// Multiprecision rational class.
@@ -110,10 +108,10 @@ public:
 /// Constructor from numerator and denominator.
 /**
  * \rststar
- * This constructor is enabled only if ``T`` and ``U`` satisfy the :cpp:concept:`~mppp::RationalNumDenCtorTypes`
- * concept. The input value ``n`` will be used to initialise the numerator, while ``d`` will be used to
- * initialise the denominator. The constructor will call :cpp:func:`~mppp::rational::canonicalise()` after
- * the construction of numerator and denominator.
+ * This constructor is enabled only if both ``T`` and ``U`` satisfy the
+ * :cpp:concept:`~mppp::RationalIntegralInteroperable` concept. The input value ``n`` will be used to initialise the
+ * numerator, while ``d`` will be used to initialise the denominator. The constructor will call
+ * :cpp:func:`~mppp::rational::canonicalise()` after the construction of numerator and denominator.
  * \endrststar
  *
  * @param n the numerator.
@@ -124,15 +122,18 @@ public:
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T, typename U>
 #if !defined(MPPP_DOXYGEN_INVOKED)
-    requires RationalNumDenCtorTypes<T, U, SSize>
+    requires RationalIntegralInteroperable<T, SSize> &&RationalIntegralInteroperable<U, SSize>
 #endif
 #else
-    template <typename T, typename U, rational_num_den_ctor_types_enabler<T, U, SSize> = 0>
+    template <typename T, typename U,
+              enable_if_t<conjunction<is_rational_integral_interoperable<T, SSize>,
+                                      is_rational_integral_interoperable<U, SSize>>::value,
+                          int> = 0>
 #endif
         explicit rational(T &&n, U &&d) : m_num(std::forward<T>(n)), m_den(std::forward<U>(d))
     {
         if (mppp_unlikely(m_den.is_zero())) {
-            throw zero_division_error("Cannot create a rational with zero as denominator");
+            throw zero_division_error("Cannot construct a rational with zero as denominator");
         }
         canonicalise();
     }
@@ -148,18 +149,19 @@ private:
     void dispatch_generic_construction(const T &x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
-            throw std::domain_error("Cannot init rational from the non-finite floating-point value "
+            throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
                                     + std::to_string(x));
         }
         MPPP_MAYBE_TLS mpq_raii q;
         ::mpq_set_d(&q.m_mpq, static_cast<double>(x));
-        *this = &q.m_mpq;
+        m_num.dispatch_mpz_ctor(mpq_numref(&q.m_mpq));
+        m_den.dispatch_mpz_ctor(mpq_denref(&q.m_mpq));
     }
 #if defined(MPPP_WITH_MPFR)
     void dispatch_generic_construction(const long double &x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
-            throw std::domain_error("Cannot init rational from the non-finite floating-point value "
+            throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
                                     + std::to_string(x));
         }
         MPPP_MAYBE_TLS mpfr_raii mpfr;
@@ -174,7 +176,8 @@ private:
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
         ::mpfr_get_f(&mpf.m_mpf, &mpfr.m_mpfr, MPFR_RNDN);
         ::mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
-        *this = &mpq.m_mpq;
+        m_num.dispatch_mpz_ctor(mpq_numref(&mpq.m_mpq));
+        m_den.dispatch_mpz_ctor(mpq_denref(&mpq.m_mpq));
     }
 #endif
 
