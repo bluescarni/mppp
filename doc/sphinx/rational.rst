@@ -21,5 +21,5 @@ Concepts
 
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalIntegralInteroperable
 
-   This concept is satisfied if ``T`` is a :cpp:concept:`~mppp::RationalInteroperable` and it is not
+   This concept is satisfied if ``T`` is a :cpp:concept:`~mppp::RationalInteroperable` type and it is not
    a floating-point type.

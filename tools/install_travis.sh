@@ -3,6 +3,9 @@
 # Echo each command
 set -x
 
+# Exit on error.
+set -e
+
 if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=/home/travis/.local -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
     make -j2 VERBOSE=1 install;
