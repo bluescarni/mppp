@@ -804,7 +804,7 @@ private:
     void dispatch_generic_ctor(const T &x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
-            throw std::domain_error("Cannot init integer from the non-finite floating-point value "
+            throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
                                     + std::to_string(x));
         }
         MPPP_MAYBE_TLS mpz_raii tmp;
@@ -816,7 +816,7 @@ private:
     void dispatch_generic_ctor(const T &x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
-            throw std::domain_error("Cannot init integer from the non-finite floating-point value "
+            throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
                                     + std::to_string(x));
         }
         MPPP_MAYBE_TLS mpfr_raii mpfr;
