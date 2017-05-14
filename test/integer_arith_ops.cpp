@@ -104,12 +104,12 @@ struct add_tester {
 #endif
         if (std::numeric_limits<double>::is_iec559) {
             retval = 1;
-            REQUIRE_THROWS_PREDICATE(retval += std::numeric_limits<double>::infinity(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot init integer from the non-finite floating-point value "
-                                                       + std::to_string(std::numeric_limits<double>::infinity());
-                                     });
+            REQUIRE_THROWS_PREDICATE(
+                retval += std::numeric_limits<double>::infinity(), std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot construct an integer from the non-finite floating-point value "
+                                  + std::to_string(std::numeric_limits<double>::infinity());
+                });
         }
         // In-place with interop on the lhs.
         short nl = 1;
@@ -258,12 +258,12 @@ struct sub_tester {
 #endif
         if (std::numeric_limits<double>::is_iec559) {
             retval = 1;
-            REQUIRE_THROWS_PREDICATE(retval -= std::numeric_limits<double>::infinity(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot init integer from the non-finite floating-point value "
-                                                       + std::to_string(-std::numeric_limits<double>::infinity());
-                                     });
+            REQUIRE_THROWS_PREDICATE(
+                retval -= std::numeric_limits<double>::infinity(), std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot construct an integer from the non-finite floating-point value "
+                                  + std::to_string(-std::numeric_limits<double>::infinity());
+                });
         }
         // In-place with interop on the lhs.
         short nl = 1;
@@ -413,12 +413,12 @@ struct mul_tester {
 #endif
         if (std::numeric_limits<double>::is_iec559) {
             retval = 1;
-            REQUIRE_THROWS_PREDICATE(retval *= std::numeric_limits<double>::infinity(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot init integer from the non-finite floating-point value "
-                                                       + std::to_string(std::numeric_limits<double>::infinity());
-                                     });
+            REQUIRE_THROWS_PREDICATE(
+                retval *= std::numeric_limits<double>::infinity(), std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot construct an integer from the non-finite floating-point value "
+                                  + std::to_string(std::numeric_limits<double>::infinity());
+                });
         }
         // In-place with interop on the lhs.
         short nl = 1;
@@ -570,7 +570,7 @@ struct div_tester {
             REQUIRE((integer{-4} / 0. == -std::numeric_limits<double>::infinity()));
             REQUIRE_THROWS_PREDICATE(retval /= 0., std::domain_error, [&retval](const std::domain_error &ex) {
                 return std::string(ex.what())
-                       == "Cannot init integer from the non-finite floating-point value "
+                       == "Cannot construct an integer from the non-finite floating-point value "
                               + (retval.sgn() > 0 ? std::to_string(std::numeric_limits<double>::infinity())
                                                   : std::to_string(-std::numeric_limits<double>::infinity()));
             });
