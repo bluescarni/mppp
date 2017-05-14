@@ -40,11 +40,17 @@ option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
 option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires Boost)." OFF)
 mark_as_advanced(MPPP_BENCHMARK_BOOST)
-option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
-mark_as_advanced(MPPP_BENCHMARK_FLINT)
+option(MPPP_WITH_FLINT "Enable features relying on FLINT (e.g., benchmarking against fmpz_t)." OFF)
+option(MPPP_WITH_ARB "Enable features relying on ARB (e.g., the 'real' type)." OFF)
 option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
-if(YACMA_COMPILER_IS_MSVC)
-    option(MPPP_MSVC_STATIC_RUNTIME "Use the MSVC static runtime instead of the shared runtime." OFF)
+
+# Check consistency of options.
+if(MPPP_WITH_ARB AND NOT MPPP_WITH_FLINT)
+    message(FATAL_ERROR "The MPPP_WITH_ARB option requires the MPPP_WITH_FLINT option.")
+endif()
+
+if(MPPP_WITH_ARB AND NOT MPPP_WITH_MPFR)
+    message(FATAL_ERROR "The MPPP_WITH_ARB option requires the MPPP_WITH_MPFR option.")
 endif()
 
 if(YACMA_COMPILER_IS_GNUCXX)
@@ -57,14 +63,27 @@ find_package(GMP REQUIRED)
 
 # Setup of the mp++ interface library.
 add_library(mp++ INTERFACE)
+
+if(MPPP_WITH_ARB)
+    find_package(ARB REQUIRED)
+    target_link_libraries(mp++ INTERFACE ARB::ARB)
+    set(MPPP_ENABLE_ARB "#define MPPP_WITH_ARB")
+endif()
+
 if(MPPP_WITH_MPFR)
     find_package(MPFR REQUIRED)
     target_link_libraries(mp++ INTERFACE MPFR::MPFR)
     set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
 
+if(MPPP_WITH_FLINT)
+    find_package(FLINT REQUIRED)
+    target_link_libraries(mp++ INTERFACE FLINT::FLINT)
+    set(MPPP_ENABLE_FLINT "#define MPPP_WITH_FLINT")
+endif()
+
 # mp++ depends on GMP.
-# NOTE: depend on GMP *after* optionally depending on MPFR, as the order
+# NOTE: depend on GMP *after* optionally depending on MPFR, etc., as the order
 # of the libraries matters on some platforms.
 target_link_libraries(mp++ INTERFACE GMP::GMP)
 target_include_directories(mp++ INTERFACE
@@ -87,10 +106,16 @@ set(_MPPP_CONFIG_OPTIONAL_DEPS)
 if(MPPP_WITH_MPFR)
     set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(MPFR REQUIRED)\n")
 endif()
+if(MPPP_WITH_FLINT)
+    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(FLINT REQUIRED)\n")
+endif()
+if(MPPP_WITH_ARB)
+    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(ARB REQUIRED)\n")
+endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" DESTINATION "lib/cmake/mp++")
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMPFR.cmake"
-	DESTINATION "lib/cmake/mp++")
+	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindFLINT.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindARB.cmake" DESTINATION "lib/cmake/mp++")
 install(EXPORT mp++_export NAMESPACE Mp++:: DESTINATION lib/cmake/mp++)
 # Take care of versioning.
 include(CMakePackageConfigHelpers)

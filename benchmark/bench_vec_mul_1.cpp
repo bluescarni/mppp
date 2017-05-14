@@ -22,7 +22,7 @@
 #include <gmp.h>
 #endif
 
-#if defined(MPPP_BENCHMARK_FLINT)
+#if defined(MPPP_WITH_FLINT)
 #include <flint/flint.h>
 #include <flint/fmpzxx.h>
 #endif
@@ -35,7 +35,7 @@ using cpp_int = boost::multiprecision::cpp_int;
 using mpz_int = boost::multiprecision::mpz_int;
 #endif
 
-#if defined(MPPP_BENCHMARK_FLINT)
+#if defined(MPPP_WITH_FLINT)
 using fmpzxx = flint::fmpzxx;
 #endif
 
@@ -135,7 +135,7 @@ int main()
         std::cout << "\nTotal runtime: ";
     }
 #endif
-#if defined(MPPP_BENCHMARK_FLINT)
+#if defined(MPPP_WITH_FLINT)
     {
         std::cout << "\n\nBenchmarking fmpzxx.";
         simple_timer st1;

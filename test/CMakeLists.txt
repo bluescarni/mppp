@@ -9,9 +9,6 @@ function(ADD_MPPP_TESTCASE arg1)
     add_executable(${arg1} ${arg1}.cpp)
     target_link_libraries(${arg1} mp++ Threads::Threads)
     target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
-    if(YACMA_COMPILER_IS_MSVC AND MPPP_MSVC_STATIC_RUNTIME)
-      target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:-MTd>" "$<$<CONFIG:RELEASE>:-MT>")
-    endif()
     # NOTE: for clang-cl, cmake tries to set -std=c++11 here, which makes
     # it error out. Disable it as MSVC 2015 is implicitly C++14 anyway.
     if(NOT (YACMA_COMPILER_IS_MSVC AND YACMA_COMPILER_IS_CLANGXX))
