@@ -10,14 +10,21 @@
 #define MPPP_RATIONAL_HPP
 
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <iostream>
+#include <limits>
+#include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <utility>
 
 #include <mp++/concepts.hpp>
 #include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
+#if defined(MPPP_WITH_MPFR)
+#include <mp++/detail/mpfr.hpp>
+#endif
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/exceptions.hpp>
 #include <mp++/integer.hpp>
@@ -138,17 +145,47 @@ private:
         fast_set_den_one();
     }
     template <typename T, enable_if_t<disjunction<std::is_same<float, T>, std::is_same<double, T>>::value, int> = 0>
-    void dispatch_generic_construction(T x)
+    void dispatch_generic_construction(const T &x)
     {
+        if (mppp_unlikely(!std::isfinite(x))) {
+            throw std::domain_error("Cannot init rational from the non-finite floating-point value "
+                                    + std::to_string(x));
+        }
         MPPP_MAYBE_TLS mpq_raii q;
         ::mpq_set_d(&q.m_mpq, static_cast<double>(x));
-        m_num = mpq_numref(&q.m_mpq);
-        m_den = mpq_denref(&q.m_mpq);
+        *this = &q.m_mpq;
     }
+#if defined(MPPP_WITH_MPFR)
+    void dispatch_generic_construction(const long double &x)
+    {
+        if (mppp_unlikely(!std::isfinite(x))) {
+            throw std::domain_error("Cannot init rational from the non-finite floating-point value "
+                                    + std::to_string(x));
+        }
+        MPPP_MAYBE_TLS mpfr_raii mpfr;
+        MPPP_MAYBE_TLS mpf_raii mpf;
+        MPPP_MAYBE_TLS mpq_raii mpq;
+        // NOTE: static checks for overflows are done in mpfr.hpp.
+        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
+        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
+        ::mpf_set_prec(&mpf.m_mpf, static_cast<::mp_bitcnt_t>(d2));
+        // NOTE: we go through an mpfr->mpf->mpq conversion chain as
+        // mpfr_get_q() does not exist.
+        ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
+        ::mpfr_get_f(&mpf.m_mpf, &mpfr.m_mpfr, MPFR_RNDN);
+        ::mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
+        *this = &mpq.m_mpq;
+    }
+#endif
 
 public:
-    /// Generic constructor.
+/// Generic constructor.
+#if defined(MPPP_HAVE_CONCEPTS)
     explicit rational(const RationalInteroperable<SSize> &x)
+#else
+    template <typename T, rational_interoperable_enabler<T, SSize> = 0>
+    explicit rational(const T &x)
+#endif
     {
         dispatch_generic_construction(x);
     }
@@ -167,6 +204,12 @@ public:
     const int_t &_get_num() const
     {
         return m_num;
+    }
+    rational &operator=(const ::mpq_t q)
+    {
+        m_num = mpq_numref(q);
+        m_den = mpq_denref(q);
+        return *this;
     }
     const int_t &_get_den() const
     {
