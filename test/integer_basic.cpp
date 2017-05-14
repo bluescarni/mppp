@@ -142,24 +142,27 @@ struct fp_ctor_tester {
             using integer = integer<S::value>;
             REQUIRE((std::is_constructible<integer, Float>::value));
             if (std::numeric_limits<Float>::is_iec559) {
-                REQUIRE_THROWS_PREDICATE(integer{std::numeric_limits<Float>::infinity()}, std::domain_error,
-                                         [](const std::domain_error &ex) {
-                                             return ex.what()
-                                                    == "Cannot init integer from the non-finite floating-point value "
-                                                           + std::to_string(std::numeric_limits<Float>::infinity());
-                                         });
-                REQUIRE_THROWS_PREDICATE(integer{-std::numeric_limits<Float>::infinity()}, std::domain_error,
-                                         [](const std::domain_error &ex) {
-                                             return ex.what()
-                                                    == "Cannot init integer from the non-finite floating-point value "
-                                                           + std::to_string(-std::numeric_limits<Float>::infinity());
-                                         });
-                REQUIRE_THROWS_PREDICATE(integer{std::numeric_limits<Float>::quiet_NaN()}, std::domain_error,
-                                         [](const std::domain_error &ex) {
-                                             return ex.what()
-                                                    == "Cannot init integer from the non-finite floating-point value "
-                                                           + std::to_string(std::numeric_limits<Float>::quiet_NaN());
-                                         });
+                REQUIRE_THROWS_PREDICATE(
+                    integer{std::numeric_limits<Float>::infinity()}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct an integer from the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<Float>::infinity());
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    integer{-std::numeric_limits<Float>::infinity()}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct an integer from the non-finite floating-point value "
+                                      + std::to_string(-std::numeric_limits<Float>::infinity());
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    integer{std::numeric_limits<Float>::quiet_NaN()}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct an integer from the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<Float>::quiet_NaN());
+                    });
             }
             REQUIRE(lex_cast(integer{Float(0)}) == "0");
             REQUIRE(lex_cast(integer{Float(1.5)}) == "1");
