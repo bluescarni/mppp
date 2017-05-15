@@ -7,7 +7,9 @@ Changelog
 New
 ~~~
 
-- Implement the assignment operator from ``mpz_t``, and use it in various function
+- Implement the ``submul()`` primitive for :cpp:class:`~mppp::integer`.
+
+- Implement the assignment operator from ``mpz_t`` in :cpp:class:`~mppp::integer`, and use it in various function
   in order to avoid the creation of a temporary.
 
 0.2 (2017-05-09)
