@@ -31,7 +31,25 @@ class real
 {
 public:
     using arb_slong = arb_slong_impl;
-    real()
+
+private:
+    // Make sure that arb_slong can represent the full precision range of MPFR.
+    static_assert(MPFR_PREC_MAX <= std::numeric_limits<arb_slong>::max(), "Overflow error.");
+    // Minimum precision: it's 2 for ARB, MPFR_PREC_MIN for MPFR. Pick the highest value.
+    static constexpr arb_slong min_prec()
+    {
+        return static_cast<arb_slong>((MPFR_PREC_MIN <= 2) ? 2 : (MPFR_PREC_MIN));
+    }
+    // Maximum precision: it's MPFR_PREC_MAX for MPFR, while for ARB we pick arbitrarily
+    // 2**20, based on the ARB documentation. Select the smallest value.
+    // http://arblib.org/issues.html#integer-overflow.
+    static constexpr arb_slong max_prec()
+    {
+        return static_cast<arb_slong>(((2l << 20) <= MPFR_PREC_MAX) ? (2l << 20) : (MPFR_PREC_MAX));
+    }
+
+public:
+    real() : m_prec(min_prec())
     {
         ::arf_init(&m_arf);
     }
@@ -53,13 +71,7 @@ public:
     }
     void set_prec(arb_slong prec)
     {
-        // See http://arblib.org/issues.html#integer-overflow.
-        // Make sure we are within MPFR's bounds as well.
-        constexpr arb_slong min_prec = (2 >= MPFR_PREC_MIN) ? 2 : static_cast<arb_slong>(MPFR_PREC_MIN);
-        // Let's put 2**20 as safe max precision.
-        constexpr arb_slong max_prec
-            = ((2l << 20) < MPFR_PREC_MAX) ? (2l << 20) : static_cast<arb_slong>(MPFR_PREC_MAX);
-        if (mppp_unlikely(prec > max_prec || prec < min_prec)) {
+        if (mppp_unlikely(prec > max_prec() || prec < min_prec())) {
             // TODO throw.
             throw std::invalid_argument("");
         }
@@ -68,7 +80,7 @@ public:
 
 private:
     ::arf_struct m_arf;
-    arb_slong m_prec = 113;
+    arb_slong m_prec;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const real &r)
