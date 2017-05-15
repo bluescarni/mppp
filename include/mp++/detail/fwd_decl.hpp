@@ -11,6 +11,8 @@
 
 #include <cstddef>
 
+#include <mp++/config.hpp>
+
 namespace mppp
 {
 
@@ -19,6 +21,10 @@ class integer;
 
 template <std::size_t>
 class rational;
+
+#if defined(MPPP_WITH_ARB)
+class real;
+#endif
 }
 
 #endif

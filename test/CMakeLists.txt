@@ -47,3 +47,5 @@ ADD_MPPP_TESTCASE(integer_sqrt)
 ADD_MPPP_TESTCASE(integer_view)
 
 ADD_MPPP_TESTCASE(rational_basic)
+
+ADD_MPPP_TESTCASE(real_basic)

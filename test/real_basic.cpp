@@ -6,15 +6,19 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#ifndef MPPP_MPPP_HPP
-#define MPPP_MPPP_HPP
+#include <mp++/mp++.hpp>
 
-#include <mp++/config.hpp>
-#include <mp++/exceptions.hpp>
-#include <mp++/integer.hpp>
-#include <mp++/rational.hpp>
-#if defined(MPPP_WITH_ARB)
-#include <mp++/real.hpp>
-#endif
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 
-#endif
+using namespace mppp;
+
+TEST_CASE("real constructors")
+{
+    real r;
+    std::cout << r << '\n';
+    ::arf_set_d(r.get_arf_t(), 1.3E-8);
+    std::cout << r << '\n';
+    ::arf_set_d(r.get_arf_t(), 1);
+    std::cout << r << '\n';
+}
