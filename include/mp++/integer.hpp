@@ -2631,10 +2631,11 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     return 0u;
 }
 
-template <std::size_t SSize>
-inline std::size_t static_addmul(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+template <bool AddOrSub, std::size_t SSize>
+inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
-    mpz_size_t asizer = rop._mp_size, asize1 = op1._mp_size, asize2 = op2._mp_size;
+    // NOTE: negate op2 in case we are doing a submul.
+    mpz_size_t asizer = rop._mp_size, asize1 = op1._mp_size, asize2 = AddOrSub ? op2._mp_size : -op2._mp_size;
     int signr = asizer != 0, sign1 = asize1 != 0, sign2 = asize2 != 0;
     if (asizer < 0) {
         asizer = -asizer;
@@ -2657,7 +2658,7 @@ inline std::size_t static_addmul(static_int<SSize> &rop, const static_int<SSize>
 }
 }
 
-/// Ternary multiply–accumulate.
+/// Ternary multiply–add.
 /**
  * This function will set \p rop to <tt>rop + op1 * op2</tt>.
  *
@@ -2671,7 +2672,7 @@ inline void addmul(integer<SSize> &rop, const integer<SSize> &op1, const integer
     const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
     std::size_t size_hint = 0u;
     if (mppp_likely(sr && s1 && s2)) {
-        size_hint = static_addmul(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
+        size_hint = static_addsubmul<true>(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
         if (mppp_likely(size_hint == 0u)) {
             return;
         }
@@ -2680,6 +2681,31 @@ inline void addmul(integer<SSize> &rop, const integer<SSize> &op1, const integer
         rop._get_union().promote(size_hint);
     }
     ::mpz_addmul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+}
+
+/// Ternary multiply–sub.
+/**
+ * This function will set \p rop to <tt>rop - op1 * op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ */
+template <std::size_t SSize>
+inline void submul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+    std::size_t size_hint = 0u;
+    if (mppp_likely(sr && s1 && s2)) {
+        size_hint = static_addsubmul<false>(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
+        if (mppp_likely(size_hint == 0u)) {
+            return;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(size_hint);
+    }
+    ::mpz_submul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
 }
 
 inline namespace detail

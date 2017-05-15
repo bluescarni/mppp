@@ -43,7 +43,8 @@ Functions
 ---------
 
 Much of the functionality of the :cpp:class:`~mppp::integer` class is exposed via plain functions. These functions
-mimic the GMP API where appropriate, but a variety of convenience/generic overloads is provided as well.
+mimic the `GMP API <https://gmplib.org/manual/Integer-Functions.html>`_ where appropriate, but a variety of
+convenience/generic overloads is provided as well.
 
 .. _integer_arithmetic:
 
