@@ -42,6 +42,9 @@ struct rat_ctor_tester {
         std::cout << q << '\n';
         q = rat_t{1.3f};
         std::cout << q << '\n';
+        rat_t q1, q2, rop;
+        add(rop, q1, q2);
+        std::cout << rop << '\n';
     }
 };
 
