@@ -45,6 +45,9 @@ struct rat_ctor_tester {
         rat_t q1, q2, rop;
         add(rop, q1, q2);
         std::cout << rop << '\n';
+        std::cout << rat_t{"123"} << '\n';
+        std::cout << rat_t{"110/110010", 2} << '\n';
+        std::cout << rat_t{" 110  / 110010  ", 2} << '\n';
     }
 };
 

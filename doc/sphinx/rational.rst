@@ -40,3 +40,11 @@ Arithmetic
 
 .. doxygengroup:: rational_arithmetic
    :content-only:
+
+.. _rational_io:
+
+Input/Output
+~~~~~~~~~~~~
+
+.. doxygengroup:: rational_io
+   :content-only:

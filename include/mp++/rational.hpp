@@ -110,8 +110,7 @@ public:
  * \rststar
  * This constructor is enabled only if both ``T`` and ``U`` satisfy the
  * :cpp:concept:`~mppp::RationalIntegralInteroperable` concept. The input value ``n`` will be used to initialise the
- * numerator, while ``d`` will be used to initialise the denominator. The constructor will call
- * :cpp:func:`~mppp::rational::canonicalise()` after the construction of numerator and denominator.
+ * numerator, while ``d`` will be used to initialise the denominator.
  * \endrststar
  *
  * @param n the numerator.
@@ -136,6 +135,26 @@ public:
             throw zero_division_error("Cannot construct a rational with zero as denominator");
         }
         canonicalise();
+    }
+    /// Constructor from \p mpq_t.
+    /**
+     * This constructor will initialise the numerator and denominator of \p this with those of the GMP rational \p q.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
+     *    with an uninitialized ``q`` is undefined behaviour. Also, this constructor will **not**
+     *    canonicalise ``this``: numerator and denominator are constructed
+     *    as-is from ``q``.
+     * \endrststar
+     *
+     * @param q the input GMP rational.
+     */
+    explicit rational(const ::mpq_t q)
+    {
+        m_num.dispatch_mpz_ctor(mpq_numref(q));
+        m_den.dispatch_mpz_ctor(mpq_denref(q));
     }
 
 private:
@@ -203,6 +222,52 @@ public:
 #endif
     {
         dispatch_generic_construction(x);
+    }
+    /// Constructor from C string.
+    /**
+     * \rststar
+     * This constructor will initialize ``this`` from the null-terminated string ``s``, which must represent
+     * a rational value in base ``base``. The expected format is either a numerator-denominator pair separated
+     * by the division operator ``/``, or just a numerator (in which case the denominator will be set to one).
+     * The format of numerator and denominator is described in the documentation of the constructor from string
+     * of :cpp:class:`~mppp::integer`.
+     * \endrststar
+     *
+     * @param s the input string.
+     * @param base the base used in the string representation.
+     *
+     * @throws mppp::zero_division_error if the denominator is zero.
+     * @throws unspecified any exception thrown by the string constructor of mppp::integer.
+     */
+    explicit rational(const char *s, int base = 10)
+    {
+        MPPP_MAYBE_TLS std::string tmp_str;
+        auto ptr = s;
+        for (; *ptr != '\0' && *ptr != '/'; ++ptr) {
+        }
+        tmp_str.assign(s, ptr);
+        m_num = int_t{tmp_str, base};
+        if (*ptr == '\0') {
+            fast_set_den_one();
+        } else {
+            tmp_str.assign(ptr + 1);
+            m_den = int_t{tmp_str, base};
+            if (mppp_unlikely(m_den.is_zero())) {
+                throw zero_division_error(
+                    "A zero denominator was detected in the constructor of a rational from string");
+            }
+            canonicalise();
+        }
+    }
+    /// Constructor from C++ string (equivalent to the constructor from C string).
+    /**
+     * @param s the input string.
+     * @param base the base used in the string representation.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
+    explicit rational(const std::string &s, int base = 10) : rational(s.c_str(), base)
+    {
     }
     /// Defaulted copy-assignment operator.
     /**
@@ -297,7 +362,7 @@ public:
      *
      * In general, it is not necessary to call explicitly this method, as the public
      * API of :cpp:class:`~mppp::rational` ensures that rationals are kept in canonical
-     * form. This method however might be necessary if the numerator and/or denominator
+     * form. Calling this method, however, might be necessary if the numerator and/or denominator
      * are modified manually, or when constructing/assigning from non-canonical ``mpq_t``
      * values.
      * \endrststar
@@ -449,6 +514,21 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
  *  @{
  */
 
+/// Output stream operator.
+/**
+ * \rststar
+ * This operator will print to the stream ``os`` the :cpp:class:`~mppp::rational` ``q`` in base 10.
+ * The printing format consists of the numerator, followed by the division operator ``/`` and the
+ * denominator, but only if the denominator is not unitary. Otherwise, only the numerator will be printed.
+ * \endrststar
+ *
+ * @param os the target stream.
+ * @param q the input rational.
+ *
+ * @return a reference to \p os.
+ *
+ * @throws unspecified any exception thrown by the stream operator of mppp::integer.
+ */
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
 {
