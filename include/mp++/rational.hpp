@@ -105,57 +105,6 @@ public:
     rational(const rational &) = default;
     /// Defaulted move constructor.
     rational(rational &&) = default;
-/// Constructor from numerator and denominator.
-/**
- * \rststar
- * This constructor is enabled only if both ``T`` and ``U`` satisfy the
- * :cpp:concept:`~mppp::RationalIntegralInteroperable` concept. The input value ``n`` will be used to initialise the
- * numerator, while ``d`` will be used to initialise the denominator.
- * \endrststar
- *
- * @param n the numerator.
- * @param d the denominator.
- *
- * @throws mppp::zero_division_error if the denominator is zero.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-    requires RationalIntegralInteroperable<T, SSize> &&RationalIntegralInteroperable<U, SSize>
-#endif
-#else
-    template <typename T, typename U,
-              enable_if_t<conjunction<is_rational_integral_interoperable<T, SSize>,
-                                      is_rational_integral_interoperable<U, SSize>>::value,
-                          int> = 0>
-#endif
-        explicit rational(T &&n, U &&d) : m_num(std::forward<T>(n)), m_den(std::forward<U>(d))
-    {
-        if (mppp_unlikely(m_den.is_zero())) {
-            throw zero_division_error("Cannot construct a rational with zero as denominator");
-        }
-        canonicalise();
-    }
-    /// Constructor from \p mpq_t.
-    /**
-     * This constructor will initialise the numerator and denominator of \p this with those of the GMP rational \p q.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``q`` is undefined behaviour. Also, this constructor will **not**
-     *    canonicalise ``this``: numerator and denominator are constructed
-     *    as-is from ``q``.
-     * \endrststar
-     *
-     * @param q the input GMP rational.
-     */
-    explicit rational(const ::mpq_t q)
-    {
-        m_num.dispatch_mpz_ctor(mpq_numref(q));
-        m_den.dispatch_mpz_ctor(mpq_denref(q));
-    }
 
 private:
     template <typename T, enable_if_t<disjunction<std::is_integral<T>, std::is_same<T, int_t>>::value, int> = 0>
@@ -223,6 +172,37 @@ public:
     {
         dispatch_generic_construction(x);
     }
+/// Constructor from numerator and denominator.
+/**
+ * \rststar
+ * This constructor is enabled only if both ``T`` and ``U`` satisfy the
+ * :cpp:concept:`~mppp::RationalIntegralInteroperable` concept. The input value ``n`` will be used to initialise the
+ * numerator, while ``d`` will be used to initialise the denominator.
+ * \endrststar
+ *
+ * @param n the numerator.
+ * @param d the denominator.
+ *
+ * @throws mppp::zero_division_error if the denominator is zero.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+    requires RationalIntegralInteroperable<T, SSize> &&RationalIntegralInteroperable<U, SSize>
+#endif
+#else
+    template <typename T, typename U,
+              enable_if_t<conjunction<is_rational_integral_interoperable<T, SSize>,
+                                      is_rational_integral_interoperable<U, SSize>>::value,
+                          int> = 0>
+#endif
+        explicit rational(T &&n, U &&d) : m_num(std::forward<T>(n)), m_den(std::forward<U>(d))
+    {
+        if (mppp_unlikely(m_den.is_zero())) {
+            throw zero_division_error("Cannot construct a rational with zero as denominator");
+        }
+        canonicalise();
+    }
     /// Constructor from C string.
     /**
      * \rststar
@@ -268,6 +248,26 @@ public:
      */
     explicit rational(const std::string &s, int base = 10) : rational(s.c_str(), base)
     {
+    }
+    /// Constructor from \p mpq_t.
+    /**
+     * This constructor will initialise the numerator and denominator of \p this with those of the GMP rational \p q.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
+     *    with an uninitialized ``q`` is undefined behaviour. Also, this constructor will **not**
+     *    canonicalise ``this``: numerator and denominator are constructed
+     *    as-is from ``q``.
+     * \endrststar
+     *
+     * @param q the input GMP rational.
+     */
+    explicit rational(const ::mpq_t q)
+    {
+        m_num.dispatch_mpz_ctor(mpq_numref(q));
+        m_den.dispatch_mpz_ctor(mpq_denref(q));
     }
     /// Defaulted copy-assignment operator.
     /**
@@ -518,8 +518,7 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
 /**
  * \rststar
  * This operator will print to the stream ``os`` the :cpp:class:`~mppp::rational` ``q`` in base 10.
- * The printing format consists of the numerator, followed by the division operator ``/`` and the
- * denominator, but only if the denominator is not unitary. Otherwise, only the numerator will be printed.
+ * The printing format is described in :cpp:func:`mppp::rational::to_string()`.
  * \endrststar
  *
  * @param os the target stream.
@@ -527,15 +526,12 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
  *
  * @return a reference to \p os.
  *
- * @throws unspecified any exception thrown by the stream operator of mppp::integer.
+ * @throws unspecified any exception thrown by mppp::rational::to_string().
  */
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
 {
-    if (q.get_den().is_one()) {
-        return os << q.get_num();
-    }
-    return os << q.get_num() << "/" << q.get_den();
+    return os << q.to_string(10);
 }
 
 /** @} */
