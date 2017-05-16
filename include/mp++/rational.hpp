@@ -303,6 +303,92 @@ public:
         m_den = mpq_denref(q);
         return *this;
     }
+/// Generic assignment operator.
+/**
+ * \rststar
+ * The body of this operator is equivalent to:
+ *
+ * .. code-block:: c++
+ *
+ *    return *this = rational{x};
+ *
+ * That is, a temporary rational is constructed from ``x`` and it is then move-assigned to ``this``.
+ * \endrststar
+ *
+ * @param x the assignment argument.
+ *
+ * @return a reference to \p this.
+ *
+ * @throws unspecified any exception thrown by the generic constructor.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    rational &operator=(const RationalInteroperable<SSize> &x)
+#else
+    template <typename T, rational_interoperable_enabler<T, SSize> = 0>
+    rational &operator=(const T &x)
+#endif
+    {
+        return *this = rational{x};
+    }
+    /// Convert to string.
+    /**
+     * \rststar
+     * This operator will return a string representation of ``this`` in base ``base``.
+     * The string format consists of the numerator, followed by the division operator ``/`` and the
+     * denominator, but only if the denominator is not unitary. Otherwise, only the numerator will be
+     * present in the returned string.
+     * \endrststar
+     *
+     * @param base the desired base for the string representation.
+     *
+     * @return a string representation for ``this``.
+     *
+     * @throws unspecified any exception thrown by mppp::integer::to_string().
+     */
+    std::string to_string(int base = 10) const
+    {
+        if (m_den.is_one()) {
+            return m_num.to_string(base);
+        }
+        return m_num.to_string(base) + "/" + m_den.to_string(base);
+    }
+
+private:
+    // Conversion to bool.
+    template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
+    {
+        return {true, m_num.m_int.m_st._mp_size != 0};
+    }
+    // Conversion to int_t.
+    template <typename T, enable_if_t<std::is_same<int_t, T>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
+    {
+        return std::make_pair(true, m_num / m_den);
+    }
+    // Conversion to integral types other than bool.
+    template <typename T,
+              enable_if_t<conjunction<std::is_integral<T>, negation<std::is_same<bool, T>>>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
+    {
+        return static_cast<int_t>(*this).dispatch_conversion<T>();
+    }
+
+public:
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <RationalInteroperable<SSize> T>
+#else
+    template <typename T, rational_interoperable_enabler<T, SSize> = 0>
+#endif
+    explicit operator T() const
+    {
+        auto retval = dispatch_conversion<T>();
+        if (mppp_unlikely(!retval.first)) {
+            throw std::overflow_error("Conversion of the rational " + to_string() + " to the type " + typeid(T).name()
+                                      + " results in overflow");
+        }
+        return std::move(retval.second);
+    }
     /// Const numerator getter.
     /**
      * @return a const reference to the numerator.
