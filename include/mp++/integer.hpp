@@ -194,7 +194,7 @@ struct static_int {
     // NOTE: init limbs to zero: in some few-limbs optimisations we operate on the whole limb
     // array regardless of the integer size, for performance reasons. If we didn't init to zero,
     // we would read from uninited storage and we would have wrong results as well.
-    static_int() : _mp_alloc(s_alloc), _mp_size(0), m_limbs()
+    static_int() : _mp_size(0), m_limbs()
     {
     }
     // The defaults here are good.
@@ -285,7 +285,7 @@ struct static_int {
     {
         return static_mpz_view{*this};
     }
-    mpz_alloc_t _mp_alloc;
+    mpz_alloc_t _mp_alloc = s_alloc;
     mpz_size_t _mp_size;
     limbs_type m_limbs;
 };
