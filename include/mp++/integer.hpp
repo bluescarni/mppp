@@ -650,9 +650,9 @@ class integer
     // static integer but actually copies it as a data member.
     struct mpz_view {
         explicit mpz_view(const integer &n)
-            // NOTE: explicitly initialize mpz_struct_t{} in order to avoid reading from
+            // NOTE: explicitly initialize mpz_struct_t() in order to avoid reading from
             // uninited memory in the move constructor, in case of a dynamic view.
-            : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : mpz_struct_t{}),
+            : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : mpz_struct_t()),
               m_ptr(n.is_static() ? &m_static_view : &(n.m_int.g_dy()))
         {
         }
