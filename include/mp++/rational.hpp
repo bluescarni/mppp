@@ -371,7 +371,7 @@ private:
               enable_if_t<conjunction<std::is_integral<T>, negation<std::is_same<bool, T>>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        return static_cast<int_t>(*this).dispatch_conversion<T>();
+        return static_cast<int_t>(*this).template dispatch_conversion<T>();
     }
 
 public:
