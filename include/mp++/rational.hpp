@@ -424,7 +424,7 @@ inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational
         add(rop._get_num(), op1.get_num(), op2.get_num());
     } else if (u1) {
         integer<SSize> tmp{op2.get_num()};
-        // ok, tmp is a separate variable, won't modify ops.
+        // Ok, tmp is a separate variable, won't modify ops.
         addmul(tmp, op1.get_num(), op2.get_den());
         // Final assignments, potential for self-assignment
         // in the second one.
@@ -477,7 +477,7 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
     } else if (u1) {
         integer<SSize> tmp{op2.get_num()};
         tmp.neg();
-        // ok, tmp is a separate variable, won't modify ops.
+        // Ok, tmp is a separate variable, won't modify ops.
         addmul(tmp, op1.get_num(), op2.get_den());
         // Final assignments, potential for self-assignment
         // in the second one.
