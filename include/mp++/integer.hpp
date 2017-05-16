@@ -251,39 +251,11 @@ struct static_int {
     {
         return _mp_size >= 0 ? _mp_size : -_mp_size;
     }
-    struct static_mpz_view {
-        // NOTE: this is needed when we have the variant view in the integer class: if the active view
-        // is the dynamic one, we need to def construct a static view that we will never use.
-        // NOTE: m_mpz needs to be zero inited because otherwise when using the move ctor we will
-        // be reading from uninited memory.
-        // NOTE: use round parentheses here in an attempt to shut a GCC warning that happens with curly
-        // braces - they should be equivalent, see:
-        // http://en.cppreference.com/w/cpp/language/value_initialization
-        static_mpz_view() : m_mpz()
-        {
-        }
-        // NOTE: we use the const_cast to cast away the constness from the pointer to the limbs
-        // in n. This is valid as we are never going to use this pointer for writing.
-        // NOTE: in recent GMP versions there are functions to accomplish this type of read-only init
-        // of an mpz:
-        // https://gmplib.org/manual/Integer-Special-Functions.html#Integer-Special-Functions
-        explicit static_mpz_view(const static_int &n)
-            : m_mpz{s_size, n._mp_size, const_cast<::mp_limb_t *>(n.m_limbs.data())}
-        {
-        }
-        static_mpz_view(static_mpz_view &&) = default;
-        static_mpz_view(const static_mpz_view &) = delete;
-        static_mpz_view &operator=(const static_mpz_view &) = delete;
-        static_mpz_view &operator=(static_mpz_view &&) = delete;
-        operator const mpz_struct_t *() const
-        {
-            return &m_mpz;
-        }
-        mpz_struct_t m_mpz;
-    };
-    static_mpz_view get_mpz_view() const
+    // NOTE: the retval here can be used only in read-only mode, otherwise
+    // we will have UB due to the const_cast use.
+    mpz_struct_t get_mpz_view() const
     {
-        return static_mpz_view{*this};
+        return {_mp_alloc, _mp_size, const_cast<::mp_limb_t *>(m_limbs.data())};
     }
     mpz_alloc_t _mp_alloc = s_alloc;
     mpz_size_t _mp_size;
@@ -433,16 +405,17 @@ public:
     {
         assert(is_static());
         mpz_struct_t tmp_mpz;
-        auto v = g_st().get_mpz_view();
+        // Get a static_view.
+        const auto v = g_st().get_mpz_view();
         if (nlimbs == 0u) {
             // If nlimbs is zero, we will allocate exactly the needed
             // number of limbs to represent this.
-            mpz_init_set_nlimbs(tmp_mpz, *v);
+            mpz_init_set_nlimbs(tmp_mpz, v);
         } else {
             // Otherwise, we preallocate nlimbs and then set tmp_mpz
             // to the value of this.
             mpz_init_nlimbs(tmp_mpz, nlimbs);
-            ::mpz_set(&tmp_mpz, v);
+            ::mpz_set(&tmp_mpz, &v);
         }
         // Destroy static.
         g_st().~s_storage();
@@ -646,20 +619,50 @@ class integer
     // The underlying static int.
     using s_int = s_storage;
     // mpz view class.
+    // NOTE: this class looks more complicated than it seemingly should be - it looks like
+    // it should be enough to shallow-copy around an mpz_struct_t with the limbs pointing
+    // either to a static integer or a dynamic one. This option, however, has a problem:
+    // in case of a dynamic integer, one can get 2 different mpz_struct_t instances, one
+    // via m_int.g_dy(), the other via the view class, which internally point to the same
+    // limbs vector. Having 2 *distinct* mpz_t point to the same limbs vector is not
+    // something which is supported by the GMP API, at least when one mpz_t is being written into.
+    // This happens for instance when using arithmetic functions
+    // in which the return object is the same as one of the operands (GMP supports aliasing
+    // if multiple mpz_t are the same object, but in this case they are distinct objects.)
+    //
+    // In the current implementation, mixing dynamic views with mpz_t objects in the GMP
+    // API is fine, as dynamic views point to unique mpz_t objects within the integers.
+    // We still however have potential for aliasing when using the static views: these
+    // do not point to "real" mpz_t objects, they are mpz_t objects internally pointing
+    // to the limbs of static integers. So, for instance, in an add() operation with
+    // rop dynamic, and op1 and op2 statics and the same object, we create two separate
+    // static views pointing to the same limbs internally, and feed them to the GMP API.
+    //
+    // This seems to work however: the data in the static views is strictly read-only and
+    // it cannot be modified by a modification to a rop, as this needs to be a real mpz_t
+    // in order to be used in the GMP API (views are convertible to const mpz_t only,
+    // not mutable mpz_t). That is, static views and rops can only point to distinct
+    // limbs vectors.
+    //
+    // The bottom line is that, in practice, the GMP API does not seem to be bothered by the fact
+    // that const arguments might overlap behind its back. If this ever becomes a problem,
+    // we can consider a "true" static view which does not simply point to an existing
+    // static integer but actually copies it as a data member.
     struct mpz_view {
-        using static_mpz_view = typename s_int::static_mpz_view;
         explicit mpz_view(const integer &n)
-            : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : static_mpz_view{}),
-              m_ptr(n.is_static() ? m_static_view : &(n.m_int.g_dy()))
+            // NOTE: explicitly initialize mpz_struct_t{} in order to avoid reading from
+            // uninited memory in the move constructor, in case of a dynamic view.
+            : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : mpz_struct_t{}),
+              m_ptr(n.is_static() ? &m_static_view : &(n.m_int.g_dy()))
         {
         }
         mpz_view(const mpz_view &) = delete;
         mpz_view(mpz_view &&other)
-            : m_static_view(std::move(other.m_static_view)),
+            : m_static_view(other.m_static_view),
               // NOTE: we need to re-init ptr here if other is a static view, because in that case
-              // other.m_ptr will be pointing to data in other and we want it to point to data
-              // in this now.
-              m_ptr((other.m_ptr == other.m_static_view) ? m_static_view : other.m_ptr)
+              // other.m_ptr will be pointing to an mpz_struct_t in other and we want it to point to
+              // the struct in this now.
+              m_ptr((other.m_ptr == &other.m_static_view) ? &m_static_view : other.m_ptr)
         {
         }
         mpz_view &operator=(const mpz_view &) = delete;
@@ -672,7 +675,7 @@ class integer
         {
             return m_ptr;
         }
-        static_mpz_view m_static_view;
+        mpz_struct_t m_static_view;
         const mpz_struct_t *m_ptr;
     };
     // Make friends with rational.
@@ -3268,7 +3271,9 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
 #endif
     // General implementation (via the mpz function).
     MPPP_MAYBE_TLS mpz_raii tmp;
-    ::mpz_divexact(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
+    const auto v1 = op1.get_mpz_view();
+    const auto v2 = op2.get_mpz_view();
+    ::mpz_divexact(&tmp.m_mpz, &v1, &v2);
     // Copy over from the tmp struct into q.
     q._mp_size = tmp.m_mpz._mp_size;
     copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + (q._mp_size >= 0 ? q._mp_size : -q._mp_size), q.m_limbs.data());
@@ -3807,7 +3812,9 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
     // results in assertion failures. For now let's keep it like this, the small operand cases are handled above
     // (partially) via mpn_gcd_1(), and in the future we can also think about binary GCD for 1/2 limbs optimisation.
     MPPP_MAYBE_TLS mpz_raii tmp;
-    ::mpz_gcd(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
+    const auto v1 = op1.get_mpz_view();
+    const auto v2 = op2.get_mpz_view();
+    ::mpz_gcd(&tmp.m_mpz, &v1, &v2);
     // Copy over.
     rop._mp_size = tmp.m_mpz._mp_size;
     assert(rop._mp_size > 0);
