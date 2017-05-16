@@ -1275,12 +1275,12 @@ public:
 #endif
     explicit operator T() const
     {
-        const auto retval = dispatch_conversion<T>();
+        auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
             throw std::overflow_error("Conversion of the integer " + to_string() + " to the type " + typeid(T).name()
                                       + " results in overflow");
         }
-        return retval.second;
+        return std::move(retval.second);
     }
     /// Promote to dynamic storage.
     /**
