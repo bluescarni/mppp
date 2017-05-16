@@ -43,7 +43,7 @@ elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     wget ftp://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.bz2;
     tar xjvf gmp-6.1.2.tar.bz2;
     cd gmp-6.1.2;
-    CXX=g++-6 CC=gcc-6 ABI=32 ./configure --disable-shared CFLAGS="-fsanitize=address";
+    CXX=g++-6 CC=gcc-6 ABI=32 ./configure --disable-shared;
     make -j2;
     cd ..;
     CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -D_GLIBCXX_CONCEPT_CHECKS -fconcepts" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a ../;
