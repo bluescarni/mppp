@@ -48,6 +48,7 @@ struct rat_ctor_tester {
         std::cout << rat_t{"123"} << '\n';
         std::cout << rat_t{"110/110010", 2} << '\n';
         std::cout << rat_t{" 110  / 110010  ", 2} << '\n';
+        std::cout << static_cast<double>(rat_t{" 110  / 110010  ", 2}) << '\n';
     }
 };
 

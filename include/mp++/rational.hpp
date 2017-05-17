@@ -354,17 +354,46 @@ public:
     }
 
 private:
+    // Let's keep the view machinery private for now, as it suffers from the potential aliasing
+    // issues described in the mpz_view documentation. In this case, we have to fill in an mpq_struct
+    // in any case, as the rational class is never backed by a regular mpq_t. We could then have aliasing
+    // between a real mpz_t and, say, the numerator extracted from a view which is internally pointing
+    // to the same mpz_t. Example:
+    //
+    // rational q;
+    // auto &n = q._get_num();
+    // n.promote();
+    // auto q_view = q.get_mpq_view();
+    // mpz_add_ui(n.get_mpz_t(), mpq_numref(q_view.get()), 1);
+    //
+    // In the last line, mpq_numref() is extracting an mpz_struct from the view which internally
+    // points to the same limbs as the mpz_t inside n. The mpz_add_ui code will try to realloc()
+    // the limb pointer inside n, thus invalidating the limb pointer in the view (this would work
+    // if the view's mpz_struct were the same object as n's mpz_t, as the GMP code would update
+    // the new pointer after the realloc for both structs).
+    struct mpq_view {
+        explicit mpq_view(const rational &q) : m_mpq{*q.m_num.get_mpz_view().get(), *q.m_den.get_mpz_view().get()}
+        {
+        }
+        operator mpq_struct_t const *() const
+        {
+            return get();
+        }
+        mpq_struct_t const *get() const
+        {
+            return &m_mpq;
+        }
+        mpq_struct_t m_mpq;
+    };
+    mpq_view get_mpq_view() const
+    {
+        return mpq_view{*this};
+    }
     // Conversion to bool.
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
         return {true, m_num.m_int.m_st._mp_size != 0};
-    }
-    // Conversion to int_t.
-    template <typename T, enable_if_t<std::is_same<int_t, T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
-    {
-        return std::make_pair(true, m_num / m_den);
     }
     // Conversion to integral types other than bool.
     template <typename T,
@@ -373,8 +402,54 @@ private:
     {
         return static_cast<int_t>(*this).template dispatch_conversion<T>();
     }
+    // Conversion to int_t.
+    template <typename T, enable_if_t<std::is_same<int_t, T>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
+    {
+        return std::make_pair(true, m_num / m_den);
+    }
+    // Conversion to float/double.
+    template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
+    {
+        auto q_view = get_mpq_view();
+        return {true, static_cast<T>(::mpq_get_d(q_view))};
+    }
+#if defined(MPPP_WITH_MPFR)
+    // Conversion to long double.
+    template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
+    {
+        auto q_view = get_mpq_view();
+        MPPP_MAYBE_TLS mpf_raii mpf;
+        MPPP_MAYBE_TLS mpfr_raii mpfr;
+        // NOTE: static checks for overflows are done in mpfr.hpp.
+        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
+        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
+        ::mpf_set_prec(&mpf.m_mpf, static_cast<::mp_bitcnt_t>(d2));
+        ::mpf_set_q(&mpf.m_mpf, q_view);
+        ::mpfr_set_f(&mpfr.m_mpfr, &mpf.m_mpf, MPFR_RNDN);
+        return {true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN)};
+    }
+#endif
 
 public:
+/// Generic conversion operator.
+/**
+ * \rststar
+ * This operator will convert ``this`` to a :cpp:concept:`~mppp::RationalInteroperable` type.
+ * Conversion to ``bool`` yields ``false`` if ``this`` is zero,
+ * ``true`` otherwise. Conversion to other integral types and to :cpp:type:`~mppp::rational::int_t`
+ * yields the result of the truncated division of the numerator by the denominator, if representable by the target
+ * :cpp:concept:`~mppp::RationalInteroperable` type. Conversion to floating-point types might yield inexact values and
+ * infinities.
+ * \endrststar
+ *
+ * @return \p this converted to the target type.
+ *
+ * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be represented by
+ * it.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RationalInteroperable<SSize> T>
 #else
