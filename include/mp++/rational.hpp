@@ -357,8 +357,8 @@ public:
 
 private:
     // Let's keep the view machinery private for now, as it suffers from the potential aliasing
-    // issues described in the mpz_view documentation. In this case, we have to fill in an mpq_struct
-    // in any case, as the rational class is never backed by a regular mpq_t. We could then have aliasing
+    // issues described in the mpz_view documentation. In this case, we have to fill in a shallow mpq_struct
+    // in any case, as the rational class is not backed by a regular mpq_t. We could then have aliasing
     // between a real mpz_t and, say, the numerator extracted from a view which is internally pointing
     // to the same mpz_t. Example:
     //
@@ -563,7 +563,7 @@ public:
      */
     int sgn() const
     {
-        return sgn(m_num);
+        return mppp::sgn(m_num);
     }
     /// Negate in-place.
     /**
