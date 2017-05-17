@@ -204,6 +204,7 @@ struct static_int {
     static_int &operator=(static_int &&) = default;
     bool dtor_checks() const
     {
+        // LCOV_EXCL_START
         const auto asize = abs_size();
         // Check the value of the alloc member.
         if (_mp_alloc != s_alloc) {
@@ -227,6 +228,7 @@ struct static_int {
             return false;
         }
         return true;
+        // LCOV_EXCL_STOP
     }
     ~static_int()
     {
