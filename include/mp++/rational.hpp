@@ -93,6 +93,8 @@ public:
 #else
     using int_t = integer<SSize>;
 #endif
+    /// Alias for the template parameter \p SSize.
+    static constexpr std::size_t ssize = SSize;
     /// Default constructor.
     /**
      * The default constructor will initialize ``this`` to 0 (represented as 0/1).
@@ -549,11 +551,49 @@ public:
             divexact(m_den, m_den, g);
         }
         // Fix mismatch in signs.
-        if (sgn(m_den) == -1) {
+        if (mppp::sgn(m_den) == -1) {
             m_num.neg();
             m_den.neg();
         }
         // NOTE: consider attempting demoting num/den. Let's KIS for now.
+    }
+    /// Sign.
+    /**
+     * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
+     */
+    int sgn() const
+    {
+        return sgn(m_num);
+    }
+    /// Negate in-place.
+    /**
+     * This method will set \p this to <tt>-this</tt>.
+     *
+     * @return a reference to \p this.
+     */
+    rational &neg()
+    {
+        mppp::neg(m_num);
+        return *this;
+    }
+    /// In-place absolute value.
+    /**
+     * This method will set \p this to its absolute value.
+     *
+     * @return reference to \p this.
+     */
+    rational &abs()
+    {
+        mppp::abs(m_num);
+        return *this;
+    }
+    /// Test if the value is zero.
+    /**
+     * @return \p true if the value represented by \p this is zero, \p false otherwise.
+     */
+    bool is_zero() const
+    {
+        return mppp::is_zero(m_num);
     }
 
 private:
