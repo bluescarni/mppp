@@ -200,8 +200,23 @@ struct static_int {
     // The defaults here are good.
     static_int(const static_int &) = default;
     static_int(static_int &&) = default;
-    static_int &operator=(const static_int &) = default;
-    static_int &operator=(static_int &&) = default;
+    // Implement specifically the assignment operators, in order to ensure
+    // it is safe to self-assign. This allows us to skip self-assignment
+    // checks in the union and in integer.
+    // NOTE: I am not 100% sure there are occasions in which we need the self
+    // assignment, we are engaging in some defensive programming.
+    static_int &operator=(const static_int &other)
+    {
+        _mp_size = other._mp_size;
+        for (std::size_t i = 0u; i < SSize; ++i) {
+            m_limbs[i] = other.m_limbs[i];
+        }
+        return *this;
+    }
+    static_int &operator=(static_int &&other) noexcept
+    {
+        return operator=(other);
+    }
     bool dtor_checks() const
     {
         // LCOV_EXCL_START
@@ -302,11 +317,9 @@ public:
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
     {
-        if (mppp_unlikely(this == &other)) {
-            return *this;
-        }
         const bool s1 = is_static(), s2 = other.is_static();
         if (s1 && s2) {
+            // Self assignment is fine, handled in the static.
             g_st() = other.g_st();
         } else if (s1 && !s2) {
             // Destroy static.
@@ -322,6 +335,7 @@ public:
             // Init-copy the static from other.
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
+            // Self assignment is fine, mpz_set() can have aliasing arguments.
             ::mpz_set(&g_dy(), &other.g_dy());
         }
         return *this;
@@ -330,12 +344,10 @@ public:
     // and other is dynamic, other is downgraded to a zero static.
     integer_union &operator=(integer_union &&other) noexcept
     {
-        if (mppp_unlikely(this == &other)) {
-            return *this;
-        }
         const bool s1 = is_static(), s2 = other.is_static();
         if (s1 && s2) {
-            g_st() = std::move(other.g_st());
+            // Self assignment is fine, handled in the static.
+            g_st() = other.g_st();
         } else if (s1 && !s2) {
             // Destroy static.
             g_st().~s_storage();
@@ -350,7 +362,8 @@ public:
             destroy_dynamic();
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
-            // Swap with other.
+            // Swap with other. Self-assignment is fine, mpz_swap() can have
+            // aliasing arguments.
             ::mpz_swap(&g_dy(), &other.g_dy());
         }
         return *this;
