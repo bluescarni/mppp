@@ -911,7 +911,7 @@ public:
     {
         if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
             throw std::invalid_argument(
-                "In the constructor from string, a base of " + std::to_string(base)
+                "In the constructor of integer from string, a base of " + std::to_string(base)
                 + " was specified, but the only valid values are 0 and any value in the [2,62] range");
         }
         MPPP_MAYBE_TLS mpz_raii mpz;
@@ -921,7 +921,7 @@ public:
                                             + std::to_string(base));
             } else {
                 throw std::invalid_argument(std::string("The string '") + s
-                                            + "' is not a valid integer any supported base");
+                                            + "' is not a valid integer in any supported base");
             }
         }
         dispatch_mpz_ctor(&mpz.m_mpz);

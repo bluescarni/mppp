@@ -124,6 +124,41 @@ struct int_ctor_tester {
         REQUIRE((lex_cast(rational{integer{-12}}) == "-12"));
         REQUIRE((lex_cast(rational{integer{123}}) == "123"));
         REQUIRE((lex_cast(rational{integer{-123}}) == "-123"));
+        // Testing for the ctor from num/den.
+        REQUIRE((std::is_constructible<rational, integer, integer>::value));
+        REQUIRE((std::is_constructible<rational, integer, int>::value));
+        REQUIRE((std::is_constructible<rational, short, integer>::value));
+        REQUIRE((!std::is_constructible<rational, short, wchar_t>::value));
+        REQUIRE((!std::is_constructible<rational, std::string, integer>::value));
+        REQUIRE((!std::is_constructible<rational, float, integer>::value));
+        REQUIRE((!std::is_constructible<rational, integer, float>::value));
+        auto q = rational{integer{0}, integer{5}};
+        REQUIRE((lex_cast(q.get_num()) == "0"));
+        REQUIRE((lex_cast(q.get_den()) == "1"));
+        q = rational{char(0), -5};
+        REQUIRE((lex_cast(q.get_num()) == "0"));
+        REQUIRE((lex_cast(q.get_den()) == "1"));
+        REQUIRE_THROWS_PREDICATE((rational{1, 0}), zero_division_error, [](const zero_division_error &ex) {
+            return ex.what() == std::string("Cannot construct a rational with zero as denominator");
+        });
+        REQUIRE_THROWS_PREDICATE((rational{0, char(0)}), zero_division_error, [](const zero_division_error &ex) {
+            return ex.what() == std::string("Cannot construct a rational with zero as denominator");
+        });
+        q = rational{-5, integer{25}};
+        REQUIRE((lex_cast(q) == "-1/5"));
+        q = rational{5ull, -25};
+        REQUIRE((lex_cast(q) == "-1/5"));
+        REQUIRE((lex_cast(q.get_num()) == "-1"));
+        REQUIRE((lex_cast(q.get_den()) == "5"));
+        // A couple of examples with GCD 1.
+        q = rational{3, -7};
+        REQUIRE((lex_cast(q) == "-3/7"));
+        REQUIRE((lex_cast(q.get_num()) == "-3"));
+        REQUIRE((lex_cast(q.get_den()) == "7"));
+        q = rational{-9, 17};
+        REQUIRE((lex_cast(q) == "-9/17"));
+        REQUIRE((lex_cast(q.get_num()) == "-9"));
+        REQUIRE((lex_cast(q.get_den()) == "17"));
     }
 };
 
@@ -206,4 +241,68 @@ struct fp_ctor_tester {
 TEST_CASE("floating-point constructors")
 {
     tuple_for_each(sizes{}, fp_ctor_tester{});
+}
+
+struct string_ctor_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        REQUIRE((std::is_constructible<rational, const char *>::value));
+        REQUIRE((std::is_constructible<rational, std::string>::value));
+        REQUIRE((std::is_constructible<rational, char *>::value));
+        auto q = rational{"0"};
+        REQUIRE((lex_cast(q) == "0"));
+        q = rational{std::string{"0"}};
+        REQUIRE((lex_cast(q) == "0"));
+        q = rational{std::string{"-123"}};
+        REQUIRE((lex_cast(q) == "-123"));
+        q = rational{std::string{"123"}, 16};
+        REQUIRE((lex_cast(q) == "291"));
+        q = rational{std::string{"-4/5"}};
+        REQUIRE((lex_cast(q) == "-4/5"));
+        q = rational{std::string{"4/-5"}};
+        REQUIRE((lex_cast(q) == "-4/5"));
+        q = rational{std::string{"4/-20"}};
+        REQUIRE((lex_cast(q) == "-1/5"));
+        q = rational{std::string{" 3 /  9 "}};
+        REQUIRE((lex_cast(q) == "1/3"));
+        // Try a different base.
+        q = rational{std::string{" 10 /  -110 "}, 2};
+        REQUIRE((lex_cast(q) == "-1/3"));
+        q = rational{std::string{" -10 /  110 "}, 2};
+        REQUIRE((lex_cast(q) == "-1/3"));
+        REQUIRE_THROWS_PREDICATE(
+            (q = rational{std::string{" -10 /  110 "}, 1}), std::invalid_argument, [](const std::invalid_argument &ia) {
+                return std::string(ia.what())
+                       == "In the constructor of integer from string, a base of 1"
+                          " was specified, but the only valid values are 0 and any value in the [2,62] range";
+            });
+        REQUIRE_THROWS_PREDICATE(
+            (q = rational{std::string{" -1 /0 "}}), zero_division_error, [](const zero_division_error &ia) {
+                return std::string(ia.what())
+                       == "A zero denominator was detected in the constructor of a rational from string";
+            });
+        REQUIRE_THROWS_PREDICATE(
+            (q = rational{std::string{" -1 / "}, 0}), std::invalid_argument, [](const std::invalid_argument &ia) {
+                return std::string(ia.what()) == "The string ' ' is not a valid integer in any supported base";
+            });
+        REQUIRE_THROWS_PREDICATE(
+            (q = rational{std::string{" -1 /"}, 0}), std::invalid_argument, [](const std::invalid_argument &ia) {
+                return std::string(ia.what()) == "The string '' is not a valid integer in any supported base";
+            });
+        REQUIRE_THROWS_PREDICATE((q = rational{std::string{" -1 /"}, 10}), std::invalid_argument,
+                                 [](const std::invalid_argument &ia) {
+                                     return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
+                                 });
+        REQUIRE_THROWS_PREDICATE((q = rational{std::string{""}}), std::invalid_argument,
+                                 [](const std::invalid_argument &ia) {
+                                     return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
+                                 });
+    }
+};
+
+TEST_CASE("string constructor")
+{
+    tuple_for_each(sizes{}, string_ctor_tester{});
 }

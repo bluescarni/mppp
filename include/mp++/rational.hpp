@@ -211,7 +211,7 @@ public:
      * This constructor will initialize ``this`` from the null-terminated string ``s``, which must represent
      * a rational value in base ``base``. The expected format is either a numerator-denominator pair separated
      * by the division operator ``/``, or just a numerator (in which case the denominator will be set to one).
-     * The format of numerator and denominator is described in the documentation of the constructor from string
+     * The format for numerator and denominator is described in the documentation of the constructor from string
      * of :cpp:class:`~mppp::integer`.
      * \endrststar
      *
@@ -391,6 +391,12 @@ private:
     {
         return mpq_view{*this};
     }
+    // Conversion to int_t.
+    template <typename T, enable_if_t<std::is_same<int_t, T>::value, int> = 0>
+    std::pair<bool, T> dispatch_conversion() const
+    {
+        return std::make_pair(true, m_num / m_den);
+    }
     // Conversion to bool.
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
@@ -403,12 +409,6 @@ private:
     std::pair<bool, T> dispatch_conversion() const
     {
         return static_cast<int_t>(*this).template dispatch_conversion<T>();
-    }
-    // Conversion to int_t.
-    template <typename T, enable_if_t<std::is_same<int_t, T>::value, int> = 0>
-    std::pair<bool, T> dispatch_conversion() const
-    {
-        return std::make_pair(true, m_num / m_den);
     }
     // Conversion to float/double.
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
