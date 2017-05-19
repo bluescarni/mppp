@@ -482,8 +482,6 @@ public:
 /// Multiprecision integer class.
 /**
  * \rststar
- * *#include <mp++/integer.hpp>*
- *
  * This class represents arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
  * a small value optimisation: integers whose size is up to ``SSize`` limbs are stored directly in the storage
  * occupied by the :cpp:class:`~mppp::integer` object, without resorting to dynamic memory allocation. The value of

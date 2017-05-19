@@ -55,10 +55,6 @@ concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<
 /// Multiprecision rational class.
 /**
  * \rststar
- * *#include <mp++/rational.hpp>*
- *
- * .. versionadded:: 0.3
- *
  * This class represents arbitrary-precision rationals. Internally, the class stores a pair of
  * :cpp:class:`integers <mppp::integer>` with static size ``SSize`` as the numerator and denonimator.
  * Rational numbers are represented in the usual canonical form:

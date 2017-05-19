@@ -1,6 +1,9 @@
 Multiprecision rationals
 ========================
 
+.. versionadded:: 0.3
+
+*#include <mp++/rational.hpp>*
 
 The ``rational`` class
 ----------------------
