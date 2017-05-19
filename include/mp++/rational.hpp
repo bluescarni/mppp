@@ -326,6 +326,40 @@ public:
     {
         return *this = rational{x};
     }
+    /// Assignment from C string.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = rational{s};
+     *
+     * That is, a temporary rational is constructed from ``s`` and it is then move-assigned to ``this``.
+     * \endrststar
+     *
+     * @param s the C string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string.
+     */
+    rational &operator=(const char *s)
+    {
+        return *this = rational{s};
+    }
+    /// Assignment from C++ string (equivalent to the assignment from C string).
+    /**
+     * @param s the C++ string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the assignment operator from C string.
+     */
+    rational &operator=(const std::string &s)
+    {
+        return operator=(s.c_str());
+    }
     /// Convert to string.
     /**
      * \rststar

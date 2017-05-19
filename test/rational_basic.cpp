@@ -347,7 +347,6 @@ struct copy_move_tester {
     {
         using rational = rational<S::value>;
         using integer = typename rational::int_t;
-        REQUIRE((!std::is_assignable<rational, const std::string &>::value));
         REQUIRE((!std::is_assignable<rational, const wchar_t &>::value));
         rational q;
         q = 123;
@@ -406,4 +405,33 @@ struct copy_move_tester {
 TEST_CASE("copy and move")
 {
     tuple_for_each(sizes{}, copy_move_tester{});
+}
+
+struct string_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        rational q;
+        q = "1";
+        REQUIRE(lex_cast(q) == "1");
+        q = "-23";
+        REQUIRE(lex_cast(q) == "-23");
+        q = std::string("-2/-4");
+        REQUIRE(lex_cast(q) == "1/2");
+        q = "3/-9";
+        REQUIRE(lex_cast(q) == "-1/3");
+        REQUIRE_THROWS_PREDICATE(q = "", std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
+        });
+        REQUIRE_THROWS_PREDICATE(q = std::string("-3/0"), zero_division_error, [](const zero_division_error &ia) {
+            return std::string(ia.what())
+                   == "A zero denominator was detected in the constructor of a rational from string";
+        });
+    }
+};
+
+TEST_CASE("string ass")
+{
+    tuple_for_each(sizes{}, string_ass_tester{});
 }
