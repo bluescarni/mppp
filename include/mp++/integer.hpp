@@ -784,6 +784,7 @@ private:
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_generic_ctor(const T &n)
     {
+        // NOTE: try special codepath if n fits directly in a single limb.
         auto nu = static_cast<unsigned long long>(n);
         while (nu) {
             push_limb(static_cast<::mp_limb_t>(nu & GMP_NUMB_MASK));
@@ -808,6 +809,11 @@ private:
         // we could init the integer with the wrong value. We should be able to test for this in the unit tests.
         // Let's keep this in mind in the remote case this ever becomes a problem. In such case, we would probably need
         // to specialise the implementation for negative values to use bit shifting and modulo operations.
+        //
+        // NOTE: there are performance gains to be made here, as shown in the sorting benchmark comparing the cpp_int
+        // init time (after switching to signed integers for the benchmark). In general, we should try have efficient
+        // codepaths for the special cases in which we can construct directly a single-limb integer. Still not clear
+        // to me how to best proceed for the signed case.
         const auto nu = static_cast<unsigned long long>(n);
         if (n >= T(0)) {
             dispatch_generic_ctor(nu);
