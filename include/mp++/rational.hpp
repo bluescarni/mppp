@@ -130,13 +130,11 @@ private:
             throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
                                     + std::to_string(x));
         }
-        MPPP_MAYBE_TLS mpfr_raii mpfr;
-        MPPP_MAYBE_TLS mpf_raii mpf;
-        MPPP_MAYBE_TLS mpq_raii mpq;
         // NOTE: static checks for overflows are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
-        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
-        ::mpf_set_prec(&mpf.m_mpf, static_cast<::mp_bitcnt_t>(d2));
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
+        MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(d2));
+        MPPP_MAYBE_TLS mpq_raii mpq;
         // NOTE: we go through an mpfr->mpf->mpq conversion chain as
         // mpfr_get_q() does not exist.
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
@@ -419,12 +417,10 @@ private:
     std::pair<bool, T> dispatch_conversion() const
     {
         auto q_view = get_mpq_view();
-        MPPP_MAYBE_TLS mpf_raii mpf;
-        MPPP_MAYBE_TLS mpfr_raii mpfr;
         // NOTE: static checks for overflows are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
-        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
-        ::mpf_set_prec(&mpf.m_mpf, static_cast<::mp_bitcnt_t>(d2));
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
+        MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(d2));
         ::mpf_set_q(&mpf.m_mpf, q_view);
         ::mpfr_set_f(&mpfr.m_mpfr, &mpf.m_mpf, MPFR_RNDN);
         return {true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN)};

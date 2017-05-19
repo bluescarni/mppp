@@ -835,11 +835,10 @@ private:
             throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
                                     + std::to_string(x));
         }
-        MPPP_MAYBE_TLS mpfr_raii mpfr;
-        MPPP_MAYBE_TLS mpz_raii tmp;
         // NOTE: static checks for overflows are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
-        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
+        MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
         ::mpfr_get_z(&tmp.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
         dispatch_mpz_ctor(&tmp.m_mpz);
@@ -1257,9 +1256,8 @@ private:
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
     static std::pair<bool, T> mpz_float_conversion(const mpz_struct_t &m)
     {
-        MPPP_MAYBE_TLS mpfr_raii mpfr;
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
-        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         ::mpfr_set_z(&mpfr.m_mpfr, &m, MPFR_RNDN);
         return {true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN)};
     }
