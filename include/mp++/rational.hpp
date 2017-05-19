@@ -697,7 +697,7 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
     } else {
         integer<SSize> tmp;
         // These two steps are ok, tmp is a separate variable.
-        // NOTE: these implement a*d+b*c. We might have a primitive operation
+        // NOTE: these implement a*d-b*c. We might have a primitive operation
         // for that down the line.
         mul(tmp, op1.get_num(), op2.get_den());
         submul(tmp, op1.get_den(), op2.get_num());
