@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Add assignment operators from string for :cpp:class:`~mppp::integer`.
+
 - Implement the ``submul()`` primitive for :cpp:class:`~mppp::integer`.
 
 - Implement the assignment operator from ``mpz_t`` in :cpp:class:`~mppp::integer`, and use it in various function

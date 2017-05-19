@@ -1053,6 +1053,40 @@ public:
         }
         return *this;
     }
+    /// Assignment from C string.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = integer{s};
+     *
+     * That is, a temporary integer is constructed from ``s`` and it is then move-assigned to ``this``.
+     * \endrststar
+     *
+     * @param s the C string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string.
+     */
+    integer &operator=(const char *s)
+    {
+        return *this = integer{s};
+    }
+    /// Assignment from C++ string (equivalent to the assignment from C string).
+    /**
+     * @param s the C++ string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the assignment operator from C string.
+     */
+    integer &operator=(const std::string &s)
+    {
+        return operator=(s.c_str());
+    }
     /// Test for static storage.
     /**
      * @return \p true if the storage type is static, \p false otherwise.

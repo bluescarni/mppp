@@ -322,7 +322,6 @@ struct copy_move_tester {
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
-        REQUIRE((!std::is_assignable<integer, const std::string &>::value));
         REQUIRE((!std::is_assignable<integer, const wchar_t &>::value));
         integer n;
         REQUIRE(n.is_static());
@@ -450,6 +449,31 @@ struct mpz_ass_tester {
 TEST_CASE("mpz_t assignment")
 {
     tuple_for_each(sizes{}, mpz_ass_tester{});
+}
+
+struct string_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        integer n;
+        n = "123";
+        REQUIRE(n == 123);
+        n = " -456 ";
+        REQUIRE(n == -456);
+        n = std::string("123");
+        REQUIRE(n == 123);
+        n = std::string(" -456 ");
+        REQUIRE(n == -456);
+        REQUIRE_THROWS_PREDICATE(n = "", std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
+        });
+    }
+};
+
+TEST_CASE("string assignment")
+{
+    tuple_for_each(sizes{}, string_ass_tester{});
 }
 
 struct promdem_tester {
