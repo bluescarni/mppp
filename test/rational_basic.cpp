@@ -11,6 +11,7 @@
 #include <atomic>
 #include <cmath>
 #include <cstddef>
+#include <gmp.h>
 #include <iostream>
 #include <limits>
 #include <random>
@@ -305,4 +306,30 @@ struct string_ctor_tester {
 TEST_CASE("string constructor")
 {
     tuple_for_each(sizes{}, string_ctor_tester{});
+}
+
+struct mpq_ctor_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        mpq_raii m;
+        REQUIRE(lex_cast(rational{&m.m_mpq}) == "0");
+        ::mpz_set_si(mpq_numref(&m.m_mpq), 1234);
+        REQUIRE(lex_cast(rational{&m.m_mpq}) == "1234");
+        ::mpz_set_si(mpq_numref(&m.m_mpq), -1234);
+        REQUIRE(lex_cast(rational{&m.m_mpq}) == "-1234");
+        ::mpz_set_si(mpq_numref(&m.m_mpq), 4);
+        ::mpz_set_si(mpq_denref(&m.m_mpq), -3);
+        REQUIRE(lex_cast(rational{&m.m_mpq}) == "4/-3");
+        ::mpz_set_str(mpq_numref(&m.m_mpq),
+                      "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        REQUIRE(lex_cast(rational{&m.m_mpq})
+                == "3218372891372987328917389127389217398271983712987398127398172389712937819237/-3");
+    }
+};
+
+TEST_CASE("mpq_t constructor")
+{
+    tuple_for_each(sizes{}, mpq_ctor_tester{});
 }
