@@ -109,8 +109,10 @@ struct int_ctor_tester {
     inline void operator()(const S &) const
     {
         tuple_for_each(int_types{}, runner<S>{});
-        // Some testing for bool.
         using rational = rational<S::value>;
+        // Def ctor.
+        REQUIRE((lex_cast(rational{}) == "0"));
+        // Some testing for bool.
         REQUIRE((std::is_constructible<rational, bool>::value));
         REQUIRE((lex_cast(rational{false}) == "0"));
         REQUIRE((lex_cast(rational{true}) == "1"));
