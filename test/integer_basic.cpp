@@ -322,6 +322,8 @@ struct copy_move_tester {
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
+        REQUIRE((!std::is_assignable<integer, const std::string &>::value));
+        REQUIRE((!std::is_assignable<integer, const wchar_t &>::value));
         integer n;
         REQUIRE(n.is_static());
         n = 123;

@@ -340,3 +340,70 @@ TEST_CASE("mpq_t constructor")
 {
     tuple_for_each(sizes{}, mpq_ctor_tester{});
 }
+
+struct copy_move_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        using integer = typename rational::int_t;
+        REQUIRE((!std::is_assignable<rational, const std::string &>::value));
+        REQUIRE((!std::is_assignable<rational, const wchar_t &>::value));
+        rational q;
+        q = 123;
+        REQUIRE(lex_cast(q) == "123");
+        q = -123ll;
+        REQUIRE(lex_cast(q) == "-123");
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        rational q2{q};
+        REQUIRE(lex_cast(q2) == "-123");
+        REQUIRE(q2.get_num().is_static());
+        REQUIRE(q2.get_den().is_static());
+        q2._get_den().promote();
+        rational q3{q2};
+        REQUIRE(lex_cast(q3) == "-123");
+        REQUIRE(q3.get_num().is_static());
+        REQUIRE(q3.get_den().is_dynamic());
+        q3 = q;
+        REQUIRE(lex_cast(q3) == "-123");
+        REQUIRE(q3.get_num().is_static());
+        REQUIRE(q3.get_den().is_static());
+        rational q4{std::move(q2)};
+        REQUIRE(lex_cast(q4) == "-123");
+        REQUIRE(q4.get_num().is_static());
+        REQUIRE(q4.get_den().is_dynamic());
+        // Revive q2.
+        q2 = q;
+        REQUIRE(lex_cast(q2) == "-123");
+        REQUIRE(q2.get_num().is_static());
+        REQUIRE(q2.get_den().is_static());
+        q2 = std::move(q4);
+        REQUIRE(lex_cast(q2) == "-123");
+        REQUIRE(q2.get_num().is_static());
+        REQUIRE(q2.get_den().is_dynamic());
+        // Self assignments.
+        q2 = q2;
+        REQUIRE(lex_cast(q2) == "-123");
+        REQUIRE(q2.get_num().is_static());
+        REQUIRE(q2.get_den().is_dynamic());
+#if !defined(__clang__)
+        q2 = std::move(q2);
+        REQUIRE(lex_cast(q2) == "-123");
+        REQUIRE(q2.get_num().is_static());
+        REQUIRE(q2.get_den().is_dynamic());
+#endif
+        q = 1.23;
+        REQUIRE(lex_cast(q.get_num()) == lex_cast(rational(1.23).get_num()));
+        REQUIRE(lex_cast(q.get_den()) == lex_cast(rational(1.23).get_den()));
+        q = integer{-12};
+        REQUIRE(lex_cast(q) == "-12");
+        q = rational{3, -12};
+        REQUIRE(lex_cast(q) == "-1/4");
+    }
+};
+
+TEST_CASE("copy and move")
+{
+    tuple_for_each(sizes{}, copy_move_tester{});
+}

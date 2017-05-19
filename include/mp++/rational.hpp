@@ -728,7 +728,7 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
 {
-    return os << q.to_string(10);
+    return os << q.to_string();
 }
 
 /** @} */
