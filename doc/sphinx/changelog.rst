@@ -12,6 +12,11 @@ New
 - Implement the assignment operator from ``mpz_t`` in :cpp:class:`~mppp::integer`, and use it in various function
   in order to avoid the creation of a temporary.
 
+Changes
+~~~~~~~
+
+- Performance improvements for the copy/move assignment operators of :cpp:class:`~mppp::integer`.
+
 0.2 (2017-05-09)
 ----------------
 
@@ -37,11 +42,9 @@ New
 
 - Add convenience overloads for ``pow()``.
 
-- Add functions to test if an integer is equal to -1. [Francesco
-  Biscani]
+- Add functions to test if an integer is equal to -1.
 
-- Add a static member to ``integer`` storing the static size. [Francesco
-  Biscani]
+- Add a static member to ``integer`` storing the static size.
 
 Changes
 ~~~~~~~
