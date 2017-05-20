@@ -475,8 +475,9 @@ public:
  *
  * @return \p this converted to the target type.
  *
- * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be represented by
- * it.
+ * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be
+ * represented by it.
+ * @throws unspecified any exception thrown by the division operator of mppp::integer.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RationalInteroperable<SSize> T>
@@ -627,6 +628,54 @@ private:
     int_t m_den;
 };
 
+inline namespace detail
+{
+
+// Machinery for the determination of the result of a binary operation involving rational.
+// Default is empty for SFINAE.
+template <typename, typename, typename = void>
+struct rational_common_type {
+};
+
+template <std::size_t SSize>
+struct rational_common_type<rational<SSize>, rational<SSize>> {
+    using type = rational<SSize>;
+};
+
+template <std::size_t SSize>
+struct rational_common_type<rational<SSize>, integer<SSize>> {
+    using type = rational<SSize>;
+};
+
+template <std::size_t SSize>
+struct rational_common_type<integer<SSize>, rational<SSize>> {
+    using type = rational<SSize>;
+};
+
+template <std::size_t SSize, typename U>
+struct rational_common_type<rational<SSize>, U, enable_if_t<is_supported_integral<U>::value>> {
+    using type = rational<SSize>;
+};
+
+template <std::size_t SSize, typename T>
+struct rational_common_type<T, rational<SSize>, enable_if_t<is_supported_integral<T>::value>> {
+    using type = rational<SSize>;
+};
+
+template <std::size_t SSize, typename U>
+struct rational_common_type<rational<SSize>, U, enable_if_t<is_supported_float<U>::value>> {
+    using type = U;
+};
+
+template <std::size_t SSize, typename T>
+struct rational_common_type<T, rational<SSize>, enable_if_t<is_supported_float<T>::value>> {
+    using type = T;
+};
+
+template <typename T, typename U>
+using rational_common_t = typename rational_common_type<T, U>::type;
+}
+
 /** @defgroup rational_arithmetic rational_arithmetic
  *  @{
  */
@@ -759,6 +808,172 @@ template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
 {
     return os << q.to_string();
+}
+
+/** @} */
+
+/** @defgroup rational_operators rational_operators
+ *  @{
+ */
+
+inline namespace detail
+{
+
+// Dispatching for the binary addition operator.
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_add(const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    rational<SSize> retval;
+    add(retval, op1, op2);
+    return retval;
+}
+
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_add(const rational<SSize> &op1, const integer<SSize> &op2)
+{
+    rational<SSize> retval{op1};
+    if (op1.get_den().is_one()) {
+        add(retval._get_num(), retval._get_num(), op2);
+    } else {
+        addmul(retval._get_num(), retval.get_den(), op2);
+    }
+    return retval;
+}
+
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_add(const integer<SSize> &op1, const rational<SSize> &op2)
+{
+    return dispatch_binary_add(op2, op1);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline rational<SSize> dispatch_binary_add(const rational<SSize> &op1, T n)
+{
+    return dispatch_binary_add(op1, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline rational<SSize> dispatch_binary_add(T n, const rational<SSize> &op2)
+{
+    return dispatch_binary_add(op2, n);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_add(const rational<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) + x;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_add(T x, const rational<SSize> &op2)
+{
+    return dispatch_binary_add(op2, x);
+}
+}
+
+/// Binary addition operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::rational`.
+ *
+ * \endrststar
+ *
+ * @param op1 the first summand.
+ * @param op2 the second summand.
+ *
+ * @return <tt>op1 + op2</tt>.
+ */
+template <typename T, typename U>
+inline rational_common_t<T, U> operator+(const T &op1, const U &op2)
+{
+    return dispatch_binary_add(op1, op2);
+}
+
+inline namespace detail
+{
+
+// Dispatching for the binary subtraction operator.
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_sub(const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    rational<SSize> retval;
+    sub(retval, op1, op2);
+    return retval;
+}
+
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_sub(const rational<SSize> &op1, const integer<SSize> &op2)
+{
+    rational<SSize> retval{op1};
+    if (op1.get_den().is_one()) {
+        sub(retval._get_num(), retval._get_num(), op2);
+    } else {
+        submul(retval._get_num(), retval.get_den(), op2);
+    }
+    return retval;
+}
+
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_sub(const integer<SSize> &op1, const rational<SSize> &op2)
+{
+    auto retval = dispatch_binary_sub(op2, op1);
+    retval.neg();
+    return retval;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline rational<SSize> dispatch_binary_sub(const rational<SSize> &op1, T n)
+{
+    return dispatch_binary_sub(op1, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline rational<SSize> dispatch_binary_sub(T n, const rational<SSize> &op2)
+{
+    auto retval = dispatch_binary_sub(op2, n);
+    retval.neg();
+    return retval;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_sub(const rational<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) - x;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
+{
+    return -dispatch_binary_sub(op2, x);
+}
+}
+
+/// Binary subtraction operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::rational`.
+ *
+ * \endrststar
+ *
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ *
+ * @return <tt>op1 - op2</tt>.
+ */
+template <typename T, typename U>
+inline rational_common_t<T, U> operator-(const T &op1, const U &op2)
+{
+    return dispatch_binary_sub(op1, op2);
 }
 
 /** @} */

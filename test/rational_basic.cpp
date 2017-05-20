@@ -20,6 +20,7 @@
 #include <thread>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 
 #include "test_utils.hpp"
 
@@ -434,4 +435,172 @@ struct string_ass_tester {
 TEST_CASE("string ass")
 {
     tuple_for_each(sizes{}, string_ass_tester{});
+}
+
+struct mpq_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        rational q;
+        mpq_raii m;
+        REQUIRE(lex_cast(rational{&m.m_mpq}) == "0");
+        ::mpq_set_si(&m.m_mpq, 1234, 1);
+        q = &m.m_mpq;
+        REQUIRE(lex_cast(q) == "1234");
+        ::mpq_set_si(&m.m_mpq, -1234, 1);
+        q = &m.m_mpq;
+        REQUIRE(lex_cast(q) == "-1234");
+        ::mpq_set_str(&m.m_mpq, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        q = &m.m_mpq;
+        REQUIRE(lex_cast(q) == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
+        ::mpq_set_str(&m.m_mpq, "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2", 10);
+        q = &m.m_mpq;
+        REQUIRE(lex_cast(q) == "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2");
+    }
+};
+
+TEST_CASE("mpq_t assignment")
+{
+    tuple_for_each(sizes{}, mpq_ass_tester{});
+}
+
+struct gen_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        using integer = typename rational::int_t;
+        rational q;
+        q = 12;
+        REQUIRE(lex_cast(q) == "12");
+        q = (signed char)-11;
+        REQUIRE(lex_cast(q) == "-11");
+        q = integer{"-2323232312312311"};
+        REQUIRE(lex_cast(q) == "-2323232312312311");
+        if (std::numeric_limits<double>::radix == 2) {
+            q = -1.5;
+            REQUIRE(lex_cast(q) == "-3/2");
+        }
+#if defined(MPPP_WITH_MPFR)
+        if (std::numeric_limits<long double>::radix == 2) {
+            q = -4.5l;
+            REQUIRE(lex_cast(q) == "-9/2");
+        }
+#endif
+    }
+};
+
+TEST_CASE("generic assignment")
+{
+    tuple_for_each(sizes{}, gen_ass_tester{});
+}
+
+struct yes {
+};
+
+struct no {
+};
+
+template <typename From, typename To>
+static inline auto test_static_cast(int) -> decltype(void(static_cast<To>(std::declval<const From &>())), yes{});
+
+template <typename From, typename To>
+static inline no test_static_cast(...);
+
+template <typename From, typename To>
+using is_convertible = std::integral_constant<bool, std::is_same<decltype(test_static_cast<From, To>(0)), yes>::value>;
+
+template <typename Integer, typename T>
+static inline bool roundtrip_conversion(const T &x)
+{
+    Integer tmp{x};
+    return (static_cast<T>(tmp) == x) && (lex_cast(x) == lex_cast(tmp));
+}
+
+struct no_conv {
+};
+
+struct int_convert_tester {
+    template <typename S>
+    struct runner {
+        template <typename Int>
+        void operator()(const Int &) const
+        {
+            using rational = rational<S::value>;
+            REQUIRE((is_convertible<rational, Int>::value));
+            REQUIRE(roundtrip_conversion<rational>(0));
+            auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
+            REQUIRE(roundtrip_conversion<rational>(min));
+            REQUIRE(roundtrip_conversion<rational>(max));
+            REQUIRE(roundtrip_conversion<rational>(min + Int(1)));
+            REQUIRE(roundtrip_conversion<rational>(max - Int(1)));
+            REQUIRE(roundtrip_conversion<rational>(min + Int(2)));
+            REQUIRE(roundtrip_conversion<rational>(max - Int(2)));
+            REQUIRE(roundtrip_conversion<rational>(min + Int(3)));
+            REQUIRE(roundtrip_conversion<rational>(max - Int(3)));
+            REQUIRE(roundtrip_conversion<rational>(min + Int(42)));
+            REQUIRE(roundtrip_conversion<rational>(max - Int(42)));
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(min) - 1), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(min) - 2), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(min) - 3), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(min) - 123), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(max) + 1), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(max) + 2), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(max) + 3), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(max) + 123), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+#if 0
+            // Try with large integers that should trigger a specific error, at least on some platforms.
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) * max * max * max * max), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
+            if (min != Int(0)) {
+                REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) * min * min * min * min), std::overflow_error,
+                                         [](const std::overflow_error &) { return true; });
+            }
+            std::atomic<bool> fail(false);
+            auto f = [&fail, min, max](unsigned n) {
+                auto dist = get_int_dist(min, max);
+                std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
+                for (auto i = 0; i < ntries; ++i) {
+                    if (!roundtrip_conversion<integer>(static_cast<Int>(dist(eng)))) {
+                        fail.store(false);
+                    }
+                }
+            };
+            std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+            t0.join();
+            t1.join();
+            t2.join();
+            t3.join();
+            REQUIRE(!fail.load());
+            mt_rng_seed += 4u;
+#endif
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(int_types{}, runner<S>{});
+        // Some testing for bool.
+        using rational = rational<S::value>;
+        REQUIRE((is_convertible<rational, bool>::value));
+        REQUIRE(roundtrip_conversion<rational>(true));
+        REQUIRE(roundtrip_conversion<rational>(false));
+        // Extra.
+        REQUIRE((!is_convertible<rational, wchar_t>::value));
+        REQUIRE((!is_convertible<rational, no_conv>::value));
+    }
+};
+
+TEST_CASE("integral conversions")
+{
+    tuple_for_each(sizes{}, int_convert_tester{});
 }
