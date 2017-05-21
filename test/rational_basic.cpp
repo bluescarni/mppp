@@ -574,16 +574,87 @@ struct int_convert_tester {
         tuple_for_each(int_types{}, runner<S>{});
         // Some testing for bool.
         using rational = rational<S::value>;
+        using integer = typename rational::int_t;
         REQUIRE((is_convertible<rational, bool>::value));
         REQUIRE(roundtrip_conversion<rational>(true));
         REQUIRE(roundtrip_conversion<rational>(false));
         // Extra.
         REQUIRE((!is_convertible<rational, wchar_t>::value));
         REQUIRE((!is_convertible<rational, no_conv>::value));
+        // Conversion to int_t.
+        REQUIRE((is_convertible<rational, integer>::value));
+        REQUIRE(roundtrip_conversion<rational>(integer{42}));
+        REQUIRE(roundtrip_conversion<rational>(integer{-42}));
+        REQUIRE(static_cast<integer>(rational{1, 2}) == 0);
+        REQUIRE(static_cast<integer>(rational{3, 2}) == 1);
+        REQUIRE(static_cast<integer>(rational{3, -2}) == -1);
     }
 };
 
 TEST_CASE("integral conversions")
 {
     tuple_for_each(sizes{}, int_convert_tester{});
+}
+
+struct fp_convert_tester {
+    template <typename S>
+    struct runner {
+        template <typename Float>
+        void operator()(const Float &) const
+        {
+            using rational = rational<S::value>;
+            REQUIRE((is_convertible<rational, Float>::value));
+            REQUIRE(static_cast<Float>(rational{0}) == Float(0));
+            REQUIRE(static_cast<Float>(rational{1}) == Float(1));
+            REQUIRE(static_cast<Float>(rational{-1}) == Float(-1));
+            REQUIRE(static_cast<Float>(rational{12}) == Float(12));
+            REQUIRE(static_cast<Float>(rational{-12}) == Float(-12));
+            if (std::numeric_limits<Float>::is_iec559) {
+                REQUIRE(static_cast<Float>(rational{1, 2}) == Float(.5));
+                REQUIRE(static_cast<Float>(rational{3, -2}) == Float(-1.5));
+                REQUIRE(static_cast<Float>(rational{7, 2}) == Float(3.5));
+            }
+            // Random testing.
+            std::atomic<bool> fail(false);
+            auto f = [&fail](unsigned n) {
+                {
+                    std::uniform_real_distribution<Float> dist(Float(-1E9), Float(1E9));
+                    std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
+                    for (auto i = 0; i < ntries; ++i) {
+                        const auto tmp = dist(eng);
+                        if (!roundtrip_conversion<rational>(tmp)) {
+                            fail.store(false);
+                        }
+                    }
+                }
+                {
+                    std::uniform_real_distribution<Float> dist(Float(-1E-9), Float(1E-9));
+                    std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
+                    for (auto i = 0; i < ntries; ++i) {
+                        const auto tmp = dist(eng);
+                        if (!roundtrip_conversion<rational>(tmp)) {
+                            fail.store(false);
+                        }
+                    }
+                }
+            };
+            std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+            t0.join();
+            t1.join();
+            t2.join();
+            t3.join();
+            REQUIRE(!fail.load());
+            mt_rng_seed += 4u;
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(fp_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("floating-point conversions")
+{
+    tuple_for_each(sizes{}, fp_convert_tester{});
 }
