@@ -139,7 +139,9 @@ struct int_ctor_tester {
         auto q = rational{integer{0}, integer{5}};
         REQUIRE((lex_cast(q.get_num()) == "0"));
         REQUIRE((lex_cast(q.get_den()) == "1"));
-        q = rational{char(0), -5};
+        char c0 = 0;
+        int m5 = -5;
+        q = rational{c0, m5};
         REQUIRE((lex_cast(q.get_num()) == "0"));
         REQUIRE((lex_cast(q.get_den()) == "1"));
         REQUIRE_THROWS_PREDICATE((rational{1, 0}), zero_division_error, [](const zero_division_error &ex) {
@@ -528,6 +530,7 @@ struct int_convert_tester {
         void operator()(const Int &) const
         {
             using rational = rational<S::value>;
+            using integer = typename rational::int_t;
             REQUIRE((is_convertible<rational, Int>::value));
             REQUIRE(roundtrip_conversion<rational>(0));
             auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
@@ -541,6 +544,12 @@ struct int_convert_tester {
             REQUIRE(roundtrip_conversion<rational>(max - Int(3)));
             REQUIRE(roundtrip_conversion<rational>(min + Int(42)));
             REQUIRE(roundtrip_conversion<rational>(max - Int(42)));
+            if (min != Int(0)) {
+                REQUIRE(static_cast<Int>(rational{integer(min) * 3, integer(min) * -2}) == Int(-1));
+            }
+            REQUIRE(static_cast<Int>(rational{integer(max) * 5, integer(max) * 2}) == Int(2));
+            REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(integer(min) * 2, 2) - 1), std::overflow_error,
+                                     [](const std::overflow_error &) { return true; });
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(min) - 1), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(min) - 2), std::overflow_error,
@@ -557,32 +566,6 @@ struct int_convert_tester {
                                      [](const std::overflow_error &) { return true; });
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(max) + 123), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
-#if 0
-            // Try with large integers that should trigger a specific error, at least on some platforms.
-            REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) * max * max * max * max), std::overflow_error,
-                                     [](const std::overflow_error &) { return true; });
-            if (min != Int(0)) {
-                REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) * min * min * min * min), std::overflow_error,
-                                         [](const std::overflow_error &) { return true; });
-            }
-            std::atomic<bool> fail(false);
-            auto f = [&fail, min, max](unsigned n) {
-                auto dist = get_int_dist(min, max);
-                std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
-                for (auto i = 0; i < ntries; ++i) {
-                    if (!roundtrip_conversion<integer>(static_cast<Int>(dist(eng)))) {
-                        fail.store(false);
-                    }
-                }
-            };
-            std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
-            t0.join();
-            t1.join();
-            t2.join();
-            t3.join();
-            REQUIRE(!fail.load());
-            mt_rng_seed += 4u;
-#endif
         }
     };
     template <typename S>

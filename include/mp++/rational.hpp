@@ -192,7 +192,7 @@ public:
                                       is_rational_integral_interoperable<U, SSize>>::value,
                           int> = 0>
 #endif
-        explicit rational(T &&n, U &&d) : m_num(std::forward<T>(n)), m_den(std::forward<U>(d))
+        explicit rational(const T &n, const U &d) : m_num(n), m_den(d)
     {
         if (mppp_unlikely(m_den.is_zero())) {
             throw zero_division_error("Cannot construct a rational with zero as denominator");
@@ -442,20 +442,18 @@ private:
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        auto q_view = get_mpq_view();
-        return {true, static_cast<T>(::mpq_get_d(q_view))};
+        return {true, static_cast<T>(::mpq_get_d(get_mpq_view()))};
     }
 #if defined(MPPP_WITH_MPFR)
     // Conversion to long double.
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        auto q_view = get_mpq_view();
         // NOTE: static checks for overflows are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(d2));
-        ::mpf_set_q(&mpf.m_mpf, q_view);
+        ::mpf_set_q(&mpf.m_mpf, get_mpq_view());
         ::mpfr_set_f(&mpfr.m_mpfr, &mpf.m_mpf, MPFR_RNDN);
         return {true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN)};
     }
@@ -477,7 +475,6 @@ public:
  *
  * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be
  * represented by it.
- * @throws unspecified any exception thrown by the division operator of mppp::integer.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RationalInteroperable<SSize> T>
