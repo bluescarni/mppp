@@ -209,21 +209,21 @@ struct string_ctor_tester {
         using integer = integer<S::value>;
         REQUIRE_THROWS_PREDICATE((integer{"", 1}), std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what())
-                   == "In the constructor from string, a base of 1"
+                   == "In the constructor of integer from string, a base of 1"
                       " was specified, but the only valid values are 0 and any value in the [2,62] range";
         });
         REQUIRE_THROWS_PREDICATE((integer{"", -10}), std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what())
-                   == "In the constructor from string, a base of -10"
+                   == "In the constructor of integer from string, a base of -10"
                       " was specified, but the only valid values are 0 and any value in the [2,62] range";
         });
         REQUIRE_THROWS_PREDICATE((integer{"", 63}), std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what())
-                   == "In the constructor from string, a base of 63"
+                   == "In the constructor of integer from string, a base of 63"
                       " was specified, but the only valid values are 0 and any value in the [2,62] range";
         });
         REQUIRE_THROWS_PREDICATE((integer{"00x00abba", 0}), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '00x00abba' is not a valid integer any supported base";
+            return std::string(ia.what()) == "The string '00x00abba' is not a valid integer in any supported base";
         });
         REQUIRE_THROWS_PREDICATE(integer{""}, std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
@@ -322,6 +322,7 @@ struct copy_move_tester {
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
+        REQUIRE((!std::is_assignable<integer, const wchar_t &>::value));
         integer n;
         REQUIRE(n.is_static());
         n = 123;
@@ -448,6 +449,31 @@ struct mpz_ass_tester {
 TEST_CASE("mpz_t assignment")
 {
     tuple_for_each(sizes{}, mpz_ass_tester{});
+}
+
+struct string_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        integer n;
+        n = "123";
+        REQUIRE(n == 123);
+        n = " -456 ";
+        REQUIRE(n == -456);
+        n = std::string("123");
+        REQUIRE(n == 123);
+        n = std::string(" -456 ");
+        REQUIRE(n == -456);
+        REQUIRE_THROWS_PREDICATE(n = "", std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
+        });
+    }
+};
+
+TEST_CASE("string assignment")
+{
+    tuple_for_each(sizes{}, string_ass_tester{});
 }
 
 struct promdem_tester {

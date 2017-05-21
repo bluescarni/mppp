@@ -119,6 +119,12 @@ inline std::string lex_cast_tr(const T &x)
     return x.to_string();
 }
 
+template <std::size_t SSize>
+inline std::string lex_cast_tr(const mppp::rational<SSize> &q)
+{
+    return q.to_string();
+}
+
 template <typename T, typename std::enable_if<std::is_floating_point<T>::value, int>::type = 0>
 inline T lex_cast_tr(const T &x)
 {

@@ -194,16 +194,32 @@ struct static_int {
     // NOTE: init limbs to zero: in some few-limbs optimisations we operate on the whole limb
     // array regardless of the integer size, for performance reasons. If we didn't init to zero,
     // we would read from uninited storage and we would have wrong results as well.
-    static_int() : _mp_alloc(s_alloc), _mp_size(0), m_limbs()
+    static_int() : _mp_size(0), m_limbs()
     {
     }
     // The defaults here are good.
     static_int(const static_int &) = default;
     static_int(static_int &&) = default;
-    static_int &operator=(const static_int &) = default;
-    static_int &operator=(static_int &&) = default;
+    // Implement specifically the assignment operators, in order to ensure
+    // it is safe to self-assign. This allows us to skip self-assignment
+    // checks in the union and in integer.
+    // NOTE: I am not 100% sure there are occasions in which we need the self
+    // assignment, we are engaging in some defensive programming.
+    static_int &operator=(const static_int &other)
+    {
+        _mp_size = other._mp_size;
+        for (std::size_t i = 0u; i < SSize; ++i) {
+            m_limbs[i] = other.m_limbs[i];
+        }
+        return *this;
+    }
+    static_int &operator=(static_int &&other) noexcept
+    {
+        return operator=(other);
+    }
     bool dtor_checks() const
     {
+        // LCOV_EXCL_START
         const auto asize = abs_size();
         // Check the value of the alloc member.
         if (_mp_alloc != s_alloc) {
@@ -227,6 +243,7 @@ struct static_int {
             return false;
         }
         return true;
+        // LCOV_EXCL_STOP
     }
     ~static_int()
     {
@@ -251,41 +268,13 @@ struct static_int {
     {
         return _mp_size >= 0 ? _mp_size : -_mp_size;
     }
-    struct static_mpz_view {
-        // NOTE: this is needed when we have the variant view in the integer class: if the active view
-        // is the dynamic one, we need to def construct a static view that we will never use.
-        // NOTE: m_mpz needs to be zero inited because otherwise when using the move ctor we will
-        // be reading from uninited memory.
-        // NOTE: use round parentheses here in an attempt to shut a GCC warning that happens with curly
-        // braces - they should be equivalent, see:
-        // http://en.cppreference.com/w/cpp/language/value_initialization
-        static_mpz_view() : m_mpz()
-        {
-        }
-        // NOTE: we use the const_cast to cast away the constness from the pointer to the limbs
-        // in n. This is valid as we are never going to use this pointer for writing.
-        // NOTE: in recent GMP versions there are functions to accomplish this type of read-only init
-        // of an mpz:
-        // https://gmplib.org/manual/Integer-Special-Functions.html#Integer-Special-Functions
-        explicit static_mpz_view(const static_int &n)
-            : m_mpz{s_size, n._mp_size, const_cast<::mp_limb_t *>(n.m_limbs.data())}
-        {
-        }
-        static_mpz_view(static_mpz_view &&) = default;
-        static_mpz_view(const static_mpz_view &) = delete;
-        static_mpz_view &operator=(const static_mpz_view &) = delete;
-        static_mpz_view &operator=(static_mpz_view &&) = delete;
-        operator const mpz_struct_t *() const
-        {
-            return &m_mpz;
-        }
-        mpz_struct_t m_mpz;
-    };
-    static_mpz_view get_mpz_view() const
+    // NOTE: the retval here can be used only in read-only mode, otherwise
+    // we will have UB due to the const_cast use.
+    mpz_struct_t get_mpz_view() const
     {
-        return static_mpz_view{*this};
+        return {_mp_alloc, _mp_size, const_cast<::mp_limb_t *>(m_limbs.data())};
     }
-    mpz_alloc_t _mp_alloc;
+    mpz_alloc_t _mp_alloc = s_alloc;
     mpz_size_t _mp_size;
     limbs_type m_limbs;
 };
@@ -328,11 +317,9 @@ public:
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
     {
-        if (mppp_unlikely(this == &other)) {
-            return *this;
-        }
         const bool s1 = is_static(), s2 = other.is_static();
         if (s1 && s2) {
+            // Self assignment is fine, handled in the static.
             g_st() = other.g_st();
         } else if (s1 && !s2) {
             // Destroy static.
@@ -348,6 +335,7 @@ public:
             // Init-copy the static from other.
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
+            // Self assignment is fine, mpz_set() can have aliasing arguments.
             ::mpz_set(&g_dy(), &other.g_dy());
         }
         return *this;
@@ -356,12 +344,10 @@ public:
     // and other is dynamic, other is downgraded to a zero static.
     integer_union &operator=(integer_union &&other) noexcept
     {
-        if (mppp_unlikely(this == &other)) {
-            return *this;
-        }
         const bool s1 = is_static(), s2 = other.is_static();
         if (s1 && s2) {
-            g_st() = std::move(other.g_st());
+            // Self assignment is fine, handled in the static.
+            g_st() = other.g_st();
         } else if (s1 && !s2) {
             // Destroy static.
             g_st().~s_storage();
@@ -376,7 +362,8 @@ public:
             destroy_dynamic();
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
-            // Swap with other.
+            // Swap with other. Self-assignment is fine, mpz_swap() can have
+            // aliasing arguments.
             ::mpz_swap(&g_dy(), &other.g_dy());
         }
         return *this;
@@ -433,16 +420,17 @@ public:
     {
         assert(is_static());
         mpz_struct_t tmp_mpz;
-        auto v = g_st().get_mpz_view();
+        // Get a static_view.
+        const auto v = g_st().get_mpz_view();
         if (nlimbs == 0u) {
             // If nlimbs is zero, we will allocate exactly the needed
             // number of limbs to represent this.
-            mpz_init_set_nlimbs(tmp_mpz, *v);
+            mpz_init_set_nlimbs(tmp_mpz, v);
         } else {
             // Otherwise, we preallocate nlimbs and then set tmp_mpz
             // to the value of this.
             mpz_init_nlimbs(tmp_mpz, nlimbs);
-            ::mpz_set(&tmp_mpz, v);
+            ::mpz_set(&tmp_mpz, &v);
         }
         // Destroy static.
         g_st().~s_storage();
@@ -494,8 +482,6 @@ public:
 /// Multiprecision integer class.
 /**
  * \rststar
- * *#include <mp++/integer.hpp>*
- *
  * This class represents arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
  * a small value optimisation: integers whose size is up to ``SSize`` limbs are stored directly in the storage
  * occupied by the :cpp:class:`~mppp::integer` object, without resorting to dynamic memory allocation. The value of
@@ -646,20 +632,50 @@ class integer
     // The underlying static int.
     using s_int = s_storage;
     // mpz view class.
+    // NOTE: this class looks more complicated than it seemingly should be - it looks like
+    // it should be enough to shallow-copy around an mpz_struct_t with the limbs pointing
+    // either to a static integer or a dynamic one. This option, however, has a problem:
+    // in case of a dynamic integer, one can get 2 different mpz_struct_t instances, one
+    // via m_int.g_dy(), the other via the view class, which internally point to the same
+    // limbs vector. Having 2 *distinct* mpz_t point to the same limbs vector is not
+    // something which is supported by the GMP API, at least when one mpz_t is being written into.
+    // This happens for instance when using arithmetic functions
+    // in which the return object is the same as one of the operands (GMP supports aliasing
+    // if multiple mpz_t are the same object, but in this case they are distinct objects.)
+    //
+    // In the current implementation, mixing dynamic views with mpz_t objects in the GMP
+    // API is fine, as dynamic views point to unique mpz_t objects within the integers.
+    // We still however have potential for aliasing when using the static views: these
+    // do not point to "real" mpz_t objects, they are mpz_t objects internally pointing
+    // to the limbs of static integers. So, for instance, in an add() operation with
+    // rop dynamic, and op1 and op2 statics and the same object, we create two separate
+    // static views pointing to the same limbs internally, and feed them to the GMP API.
+    //
+    // This seems to work however: the data in the static views is strictly read-only and
+    // it cannot be modified by a modification to a rop, as this needs to be a real mpz_t
+    // in order to be used in the GMP API (views are convertible to const mpz_t only,
+    // not mutable mpz_t). That is, static views and rops can only point to distinct
+    // limbs vectors.
+    //
+    // The bottom line is that, in practice, the GMP API does not seem to be bothered by the fact
+    // that const arguments might overlap behind its back. If this ever becomes a problem,
+    // we can consider a "true" static view which does not simply point to an existing
+    // static integer but actually copies it as a data member.
     struct mpz_view {
-        using static_mpz_view = typename s_int::static_mpz_view;
         explicit mpz_view(const integer &n)
-            : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : static_mpz_view{}),
-              m_ptr(n.is_static() ? m_static_view : &(n.m_int.g_dy()))
+            // NOTE: explicitly initialize mpz_struct_t() in order to avoid reading from
+            // uninited memory in the move constructor, in case of a dynamic view.
+            : m_static_view(n.is_static() ? n.m_int.g_st().get_mpz_view() : mpz_struct_t()),
+              m_ptr(n.is_static() ? &m_static_view : &(n.m_int.g_dy()))
         {
         }
         mpz_view(const mpz_view &) = delete;
         mpz_view(mpz_view &&other)
-            : m_static_view(std::move(other.m_static_view)),
+            : m_static_view(other.m_static_view),
               // NOTE: we need to re-init ptr here if other is a static view, because in that case
-              // other.m_ptr will be pointing to data in other and we want it to point to data
-              // in this now.
-              m_ptr((other.m_ptr == other.m_static_view) ? m_static_view : other.m_ptr)
+              // other.m_ptr will be pointing to an mpz_struct_t in other and we want it to point to
+              // the struct in this now.
+              m_ptr((other.m_ptr == &other.m_static_view) ? &m_static_view : other.m_ptr)
         {
         }
         mpz_view &operator=(const mpz_view &) = delete;
@@ -672,7 +688,7 @@ class integer
         {
             return m_ptr;
         }
-        static_mpz_view m_static_view;
+        mpz_struct_t m_static_view;
         const mpz_struct_t *m_ptr;
     };
     // Make friends with rational.
@@ -768,6 +784,7 @@ private:
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_generic_ctor(const T &n)
     {
+        // NOTE: try special codepath if n fits directly in a single limb.
         auto nu = static_cast<unsigned long long>(n);
         while (nu) {
             push_limb(static_cast<::mp_limb_t>(nu & GMP_NUMB_MASK));
@@ -792,6 +809,11 @@ private:
         // we could init the integer with the wrong value. We should be able to test for this in the unit tests.
         // Let's keep this in mind in the remote case this ever becomes a problem. In such case, we would probably need
         // to specialise the implementation for negative values to use bit shifting and modulo operations.
+        //
+        // NOTE: there are performance gains to be made here, as shown in the sorting benchmark comparing the cpp_int
+        // init time (after switching to signed integers for the benchmark). In general, we should try have efficient
+        // codepaths for the special cases in which we can construct directly a single-limb integer. Still not clear
+        // to me how to best proceed for the signed case.
         const auto nu = static_cast<unsigned long long>(n);
         if (n >= T(0)) {
             dispatch_generic_ctor(nu);
@@ -819,11 +841,10 @@ private:
             throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
                                     + std::to_string(x));
         }
-        MPPP_MAYBE_TLS mpfr_raii mpfr;
-        MPPP_MAYBE_TLS mpz_raii tmp;
         // NOTE: static checks for overflows are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
-        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
+        MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
         ::mpfr_get_z(&tmp.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
         dispatch_mpz_ctor(&tmp.m_mpz);
@@ -893,7 +914,7 @@ public:
     {
         if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
             throw std::invalid_argument(
-                "In the constructor from string, a base of " + std::to_string(base)
+                "In the constructor of integer from string, a base of " + std::to_string(base)
                 + " was specified, but the only valid values are 0 and any value in the [2,62] range");
         }
         MPPP_MAYBE_TLS mpz_raii mpz;
@@ -903,7 +924,7 @@ public:
                                             + std::to_string(base));
             } else {
                 throw std::invalid_argument(std::string("The string '") + s
-                                            + "' is not a valid integer any supported base");
+                                            + "' is not a valid integer in any supported base");
             }
         }
         dispatch_mpz_ctor(&mpz.m_mpz);
@@ -927,7 +948,7 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``n`` is undefined behaviour.
+     *    with an uninitialized ``n`` results in undefined behaviour.
      * \endrststar
      *
      * @param n the input GMP integer.
@@ -991,7 +1012,7 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` is undefined behaviour.
+     *    with an uninitialized ``n`` results in undefined behaviour.
      * \endrststar
      *
      * @param n the input GMP integer.
@@ -1036,6 +1057,40 @@ public:
             copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
         }
         return *this;
+    }
+    /// Assignment from C string.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = integer{s};
+     *
+     * That is, a temporary integer is constructed from ``s`` and it is then move-assigned to ``this``.
+     * \endrststar
+     *
+     * @param s the C string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string.
+     */
+    integer &operator=(const char *s)
+    {
+        return *this = integer{s};
+    }
+    /// Assignment from C++ string (equivalent to the assignment from C string).
+    /**
+     * @param s the C++ string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the assignment operator from C string.
+     */
+    integer &operator=(const std::string &s)
+    {
+        return operator=(s.c_str());
     }
     /// Test for static storage.
     /**
@@ -1207,9 +1262,8 @@ private:
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
     static std::pair<bool, T> mpz_float_conversion(const mpz_struct_t &m)
     {
-        MPPP_MAYBE_TLS mpfr_raii mpfr;
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
-        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(d2));
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         ::mpfr_set_z(&mpfr.m_mpfr, &m, MPFR_RNDN);
         return {true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN)};
     }
@@ -1275,12 +1329,12 @@ public:
 #endif
     explicit operator T() const
     {
-        const auto retval = dispatch_conversion<T>();
+        auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
             throw std::overflow_error("Conversion of the integer " + to_string() + " to the type " + typeid(T).name()
                                       + " results in overflow");
         }
-        return retval.second;
+        return std::move(retval.second);
     }
     /// Promote to dynamic storage.
     /**
@@ -3268,7 +3322,9 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
 #endif
     // General implementation (via the mpz function).
     MPPP_MAYBE_TLS mpz_raii tmp;
-    ::mpz_divexact(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
+    const auto v1 = op1.get_mpz_view();
+    const auto v2 = op2.get_mpz_view();
+    ::mpz_divexact(&tmp.m_mpz, &v1, &v2);
     // Copy over from the tmp struct into q.
     q._mp_size = tmp.m_mpz._mp_size;
     copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + (q._mp_size >= 0 ? q._mp_size : -q._mp_size), q.m_limbs.data());
@@ -3807,7 +3863,9 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
     // results in assertion failures. For now let's keep it like this, the small operand cases are handled above
     // (partially) via mpn_gcd_1(), and in the future we can also think about binary GCD for 1/2 limbs optimisation.
     MPPP_MAYBE_TLS mpz_raii tmp;
-    ::mpz_gcd(&tmp.m_mpz, op1.get_mpz_view(), op2.get_mpz_view());
+    const auto v1 = op1.get_mpz_view();
+    const auto v2 = op2.get_mpz_view();
+    ::mpz_gcd(&tmp.m_mpz, &v1, &v2);
     // Copy over.
     rop._mp_size = tmp.m_mpz._mp_size;
     assert(rop._mp_size > 0);

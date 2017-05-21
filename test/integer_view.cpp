@@ -40,7 +40,7 @@ struct view_tester {
         REQUIRE(n.get_mpz_view().get()->_mp_d == nc._get_union().g_st().m_limbs.data());
         {
             auto v = n.get_mpz_view();
-            REQUIRE(v.m_ptr == v.m_static_view);
+            REQUIRE(v.m_ptr == &v.m_static_view);
         }
         n.promote();
         REQUIRE((mpz_sgn(n.get_mpz_view().get()) == 0));
@@ -55,7 +55,7 @@ struct view_tester {
         REQUIRE(n.get_mpz_view().get()->_mp_d == n._get_union().g_st().m_limbs.data());
         {
             auto v = n.get_mpz_view();
-            REQUIRE(v.m_ptr == v.m_static_view);
+            REQUIRE(v.m_ptr == &v.m_static_view);
         }
         n.promote();
         REQUIRE((mpz_cmp_ui(n.get_mpz_view().get(), 1u) == 0));
@@ -70,7 +70,7 @@ struct view_tester {
         REQUIRE(n.get_mpz_view().get()->_mp_d == n._get_union().g_st().m_limbs.data());
         {
             auto v = n.get_mpz_view();
-            REQUIRE(v.m_ptr == v.m_static_view);
+            REQUIRE(v.m_ptr == &v.m_static_view);
         }
         n.promote();
         REQUIRE((mpz_cmp_ui(n.get_mpz_view().get(), 1u) < 0));
@@ -84,7 +84,7 @@ struct view_tester {
         REQUIRE(n.get_mpz_view().get()->_mp_d == n._get_union().g_st().m_limbs.data());
         {
             auto v = n.get_mpz_view();
-            REQUIRE(v.m_ptr == v.m_static_view);
+            REQUIRE(v.m_ptr == &v.m_static_view);
         }
         n.promote();
         REQUIRE((mpz_cmp_ui(n.get_mpz_view().get(), 1u) > 0));
@@ -100,8 +100,8 @@ struct view_tester {
             auto v2 = std::move(v);
             REQUIRE(v.get()->_mp_d == v2.get()->_mp_d);
             REQUIRE(v2.get()->_mp_d == n._get_union().g_st().m_limbs.data());
-            REQUIRE(v.m_ptr == v.m_static_view);
-            REQUIRE(v2.m_ptr == v2.m_static_view);
+            REQUIRE(v.m_ptr == &v.m_static_view);
+            REQUIRE(v2.m_ptr == &v2.m_static_view);
             REQUIRE(v.m_ptr != v2.m_ptr);
             REQUIRE((mpz_cmp_ui(v2.get(), 5u) == 0));
         }

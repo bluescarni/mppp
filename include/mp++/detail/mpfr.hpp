@@ -33,9 +33,9 @@ using mpfr_struct_t = std::remove_extent<::mpfr_t>::type;
 
 // Simple RAII holder for MPFR floats.
 struct mpfr_raii {
-    mpfr_raii()
+    mpfr_raii(::mpfr_prec_t prec)
     {
-        ::mpfr_init2(&m_mpfr, 53);
+        ::mpfr_init2(&m_mpfr, prec);
     }
     ~mpfr_raii()
     {

@@ -1,6 +1,7 @@
 Multiprecision integers
 =======================
 
+*#include <mp++/integer.hpp>*
 
 The ``integer`` class
 ---------------------
