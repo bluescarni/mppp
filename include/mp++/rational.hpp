@@ -553,12 +553,14 @@ public:
      * are modified manually, or when constructing/assigning from non-canonical ``mpq_t``
      * values.
      * \endrststar
+     *
+     * @return a reference to \p this.
      */
-    void canonicalise()
+    rational &canonicalise()
     {
         if (m_num.is_zero()) {
             m_den = 1;
-            return;
+            return *this;
         }
         // NOTE: this is best in case of small m_num/m_den.
         // For dynamically allocated num/den, it would be better
@@ -580,6 +582,7 @@ public:
             m_den.neg();
         }
         // NOTE: consider attempting demoting num/den. Let's KIS for now.
+        return *this;
     }
     /// Sign.
     /**
@@ -624,6 +627,9 @@ private:
     int_t m_num;
     int_t m_den;
 };
+
+template <std::size_t SSize>
+constexpr std::size_t rational<SSize>::ssize;
 
 inline namespace detail
 {
@@ -779,6 +785,34 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
         mul(rop._get_den(), op1.get_den(), op2.get_den());
         rop.canonicalise();
     }
+}
+
+/// Binary negation.
+/**
+ * This method will set \p rop to <tt>-q</tt>.
+ *
+ * @param rop the return value.
+ * @param q the rational that will be negated.
+ */
+template <std::size_t SSize>
+inline void neg(rational<SSize> &rop, const rational<SSize> &q)
+{
+    rop = q;
+    rop.neg();
+}
+
+/// Unary negation.
+/**
+ * @param q the rational that will be negated.
+ *
+ * @return <tt>-q</tt>.
+ */
+template <std::size_t SSize>
+inline rational<SSize> neg(const rational<SSize> &q)
+{
+    rational<SSize> ret(q);
+    ret.neg();
+    return ret;
 }
 
 /** @} */
@@ -971,6 +1005,24 @@ template <typename T, typename U>
 inline rational_common_t<T, U> operator-(const T &op1, const U &op2)
 {
     return dispatch_binary_sub(op1, op2);
+}
+
+/** @} */
+
+/** @defgroup rational_comparison rational_comparison
+ *  @{
+ */
+
+/// Sign function.
+/**
+ * @param q the rational whose sign will be computed.
+ *
+ * @return 0 if \p q is zero, 1 if \p q is positive, -1 if \p q is negative.
+ */
+template <std::size_t SSize>
+int sgn(const rational<SSize> &q)
+{
+    return q.sgn();
 }
 
 /** @} */

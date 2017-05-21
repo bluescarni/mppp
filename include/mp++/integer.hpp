@@ -3744,7 +3744,7 @@ inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
 /**
  * @param n the integer whose sign will be computed.
  *
- * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
+ * @return 0 if \p n is zero, 1 if \p n is positive, -1 if \p n is negative.
  */
 template <std::size_t SSize>
 inline int sgn(const integer<SSize> &n)
@@ -4153,7 +4153,7 @@ inline integer<SSize> nextprime(const integer<SSize> &n)
  * @param n the integer whose primality will be tested.
  * @param reps the number of tests to run.
  *
- * @return an integer indicating if \p this is a prime.
+ * @return an integer indicating if \p n is a prime.
  *
  * @throws unspecified any exception thrown by integer::probab_prime_p().
  */

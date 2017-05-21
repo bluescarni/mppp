@@ -54,6 +54,14 @@ Arithmetic
 .. doxygengroup:: rational_arithmetic
    :content-only:
 
+.. _rational_comparison:
+
+Comparison
+~~~~~~~~~~
+
+.. doxygengroup:: rational_comparison
+   :content-only:
+
 .. _rational_io:
 
 Input/Output
