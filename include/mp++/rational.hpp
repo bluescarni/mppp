@@ -253,7 +253,7 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``q`` is undefined behaviour. Also, this constructor will **not**
+     *    with an uninitialized ``q`` results in undefined behaviour. Also, this constructor will **not**
      *    canonicalise ``this``: numerator and denominator are constructed
      *    as-is from ``q``.
      * \endrststar
@@ -285,7 +285,7 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``q`` is undefined behaviour. Also, this operator will **not** canonicalise
+     *    with an uninitialized ``q`` results in undefined behaviour. Also, this operator will **not** canonicalise
      *    the assigned value: numerator and denominator are assigned as-is from ``q``.
      * \endrststar
      *

@@ -948,7 +948,7 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``n`` is undefined behaviour.
+     *    with an uninitialized ``n`` results in undefined behaviour.
      * \endrststar
      *
      * @param n the input GMP integer.
@@ -1012,7 +1012,7 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` is undefined behaviour.
+     *    with an uninitialized ``n`` results in undefined behaviour.
      * \endrststar
      *
      * @param n the input GMP integer.
