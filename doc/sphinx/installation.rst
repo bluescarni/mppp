@@ -44,7 +44,7 @@ path, etc.). The available configuration options are:
 * ``MPPP_BUILD_BENCHMARKS``: build the benchmarking suite (off by default).
 
 Since mp++ is a header-only library, there's no compilation step (unless the tests or the benchmarks are being built),
-and the installation of mp++ via ``make install`` or similar will just copy the headers to your ``CMAKE_INSTALL_PREFIX``,
+and the installation of mp++ via ``make install`` or similar will just configure and copy the headers to your ``CMAKE_INSTALL_PREFIX``,
 in the ``include`` subdirectory.
 
 After the installation of the headers, you can test the installation with the following simple ``main.cpp`` program:
