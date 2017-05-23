@@ -80,6 +80,8 @@ struct int_ctor_tester {
         {
             using rational = rational<S::value>;
             REQUIRE((std::is_constructible<rational, Int>::value));
+            REQUIRE((std::is_constructible<rational, Int &&>::value));
+            REQUIRE((std::is_constructible<rational, const Int &>::value));
             REQUIRE(lex_cast(Int(0)) == lex_cast(rational{Int(0)}));
             auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
             REQUIRE(lex_cast(min) == lex_cast(rational{min}));
@@ -115,6 +117,9 @@ struct int_ctor_tester {
         REQUIRE((lex_cast(rational{}) == "0"));
         // Some testing for bool.
         REQUIRE((std::is_constructible<rational, bool>::value));
+        REQUIRE((std::is_constructible<rational, bool &>::value));
+        REQUIRE((std::is_constructible<rational, const bool &>::value));
+        REQUIRE((std::is_constructible<rational, bool &&>::value));
         REQUIRE((lex_cast(rational{false}) == "0"));
         REQUIRE((lex_cast(rational{true}) == "1"));
         REQUIRE((!std::is_constructible<rational, wchar_t>::value));
@@ -657,4 +662,23 @@ struct fp_convert_tester {
 TEST_CASE("floating-point conversions")
 {
     tuple_for_each(sizes{}, fp_convert_tester{});
+}
+
+struct is_canonical_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        rational q;
+        REQUIRE(q.is_canonical());
+        q = "5/10";
+        REQUIRE(q.is_canonical());
+        q = 5;
+        REQUIRE(q.is_canonical());
+    }
+};
+
+TEST_CASE("is_canonical")
+{
+    tuple_for_each(sizes{}, is_canonical_tester{});
 }

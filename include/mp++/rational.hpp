@@ -584,6 +584,27 @@ public:
         // NOTE: consider attempting demoting num/den. Let's KIS for now.
         return *this;
     }
+    /// Check canonical form.
+    /**
+     * @return \p true if \p this is the canonical form for rational numbers, \p false otherwise.
+     */
+    bool is_canonical() const
+    {
+        if (m_num.is_zero()) {
+            // If num is zero, den must be one.
+            return m_den.is_one();
+        }
+        if (m_den.sgn() != 1) {
+            // Den must be strictly positive.
+            return false;
+        }
+        if (m_den.is_one()) {
+            // The rational is an integer.
+            return true;
+        }
+        // Num and den must be coprime.
+        return gcd(m_num, m_den).is_one();
+    }
     /// Sign.
     /**
      * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
