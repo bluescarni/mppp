@@ -394,12 +394,10 @@ struct copy_move_tester {
         REQUIRE(lex_cast(q2) == "-123");
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_dynamic());
-#if !defined(__clang__)
         q2 = std::move(q2);
         REQUIRE(lex_cast(q2) == "-123");
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_dynamic());
-#endif
         q = 1.23;
         REQUIRE(lex_cast(q.get_num()) == lex_cast(rational(1.23).get_num()));
         REQUIRE(lex_cast(q.get_den()) == lex_cast(rational(1.23).get_den()));
@@ -671,10 +669,16 @@ struct is_canonical_tester {
         using rational = rational<S::value>;
         rational q;
         REQUIRE(q.is_canonical());
+        q._get_den() = -1;
+        REQUIRE(!q.is_canonical());
         q = "5/10";
         REQUIRE(q.is_canonical());
+        q._get_den() = -10;
+        REQUIRE(!q.is_canonical());
         q = 5;
         REQUIRE(q.is_canonical());
+        q._get_den() = 0;
+        REQUIRE(!q.is_canonical());
     }
 };
 
