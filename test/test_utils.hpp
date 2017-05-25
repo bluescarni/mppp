@@ -147,6 +147,11 @@ inline std::string lex_cast(const mppp::mpz_raii &m)
     return mppp::mpz_to_str(&m.m_mpz);
 }
 
+inline std::string lex_cast(const mppp::mpq_raii &m)
+{
+    return mppp::rational<1>(&m.m_mpq).to_string();
+}
+
 // Set mpz to random value with n limbs. Top limb is divided by div.
 inline void random_integer(mppp::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
 {

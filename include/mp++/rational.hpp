@@ -883,6 +883,34 @@ inline rational<SSize> neg(const rational<SSize> &q)
     return ret;
 }
 
+/// Binary absolute value.
+/**
+ * This function will set \p rop to the absolute value of \p q.
+ *
+ * @param rop the return value.
+ * @param q the argument.
+ */
+template <std::size_t SSize>
+inline void abs(rational<SSize> &rop, const rational<SSize> &q)
+{
+    rop = q;
+    rop.abs();
+}
+
+/// Unary absolute value.
+/**
+ * @param q the argument.
+ *
+ * @return the absolute value of \p q.
+ */
+template <std::size_t SSize>
+inline rational<SSize> abs(const rational<SSize> &q)
+{
+    rational<SSize> ret(q);
+    ret.abs();
+    return ret;
+}
+
 /** @} */
 
 /** @defgroup rational_io rational_io
