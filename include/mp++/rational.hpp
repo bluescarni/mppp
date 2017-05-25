@@ -668,7 +668,7 @@ public:
      */
     rational &neg()
     {
-        mppp::neg(m_num);
+        m_num.neg();
         return *this;
     }
     /// In-place absolute value.
@@ -679,7 +679,7 @@ public:
      */
     rational &abs()
     {
-        mppp::abs(m_num);
+        m_num.abs();
         return *this;
     }
     /// Test if the value is zero.
