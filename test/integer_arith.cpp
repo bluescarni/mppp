@@ -79,7 +79,7 @@ struct add_tester {
                 add(n1, n2, n3);
                 ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                // Various variations if in-place.
+                // Various variations of in-place.
                 add(n1, n1, n2);
                 ::mpz_add(&m1.m_mpz, &m1.m_mpz, &m2.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
