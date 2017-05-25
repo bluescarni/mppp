@@ -408,7 +408,7 @@ public:
      * This operator will return a string representation of ``this`` in base ``base``.
      * The string format consists of the numerator, followed by the division operator ``/`` and the
      * denominator, but only if the denominator is not unitary. Otherwise, only the numerator will be
-     * present in the returned string.
+     * represented in the returned string.
      * \endrststar
      *
      * @param base the desired base for the string representation.
@@ -594,6 +594,11 @@ public:
      * form. Calling this method, however, might be necessary if the numerator and/or denominator
      * are modified manually, or when constructing/assigning from non-canonical ``mpq_t``
      * values.
+     *
+     * .. warning::
+     *
+     *    Calling this method with on a rational with null denominator will result in undefined
+     *    behaviour.
      * \endrststar
      *
      * @return a reference to \p this.
@@ -1086,6 +1091,18 @@ template <std::size_t SSize>
 int sgn(const rational<SSize> &q)
 {
     return q.sgn();
+}
+
+/// Test if a rational is zero.
+/**
+ * @param q the rational to be tested.
+ *
+ * @return \p true if \p q is zero, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool is_zero(const rational<SSize> &q)
+{
+    return q.is_zero();
 }
 
 /** @} */

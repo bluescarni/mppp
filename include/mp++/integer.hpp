@@ -3806,7 +3806,7 @@ inline bool even_p(const integer<SSize> &n)
     return n.even_p();
 }
 
-/// Test if integer is zero.
+/// Test if an integer is zero.
 /**
  * @param n the integer to be tested.
  *
