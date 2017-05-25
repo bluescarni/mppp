@@ -9,6 +9,7 @@
 #ifndef MPPP_RATIONAL_HPP
 #define MPPP_RATIONAL_HPP
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -101,8 +102,31 @@ public:
     }
     /// Defaulted copy constructor.
     rational(const rational &) = default;
-    /// Defaulted move constructor.
-    rational(rational &&) = default;
+    /// Move constructor.
+    /**
+     * The move constructor will leave \p other in an unspecified but valid state.
+     *
+     * @param other the construction argument.
+     */
+    rational(rational &&other) noexcept : m_num(std::move(other.m_num)), m_den(std::move(other.m_den))
+    {
+        // NOTE: the aim of this is to have other in a valid state. One reason is that,
+        // according to the standard, for use in std::sort() (and possibly other algorithms)
+        // it is required that a moved-from rational is still comparable, but if we simply move
+        // construct num and den we could end up with other in noncanonical form or zero den.
+        // http://stackoverflow.com/questions/26579132/what-is-the-post-condition-of-a-move-constructor
+        //
+        // NOTE: after move construction, other's data members are guaranteed to be static.
+        assert(other.m_num.is_static());
+        assert(other.m_den.is_static());
+        // Set other's numerator to 0 (see integer::set_zero()).
+        other.m_num.m_int.g_st()._mp_size = 0;
+        std::fill(other.m_num.m_int.g_st().m_limbs.begin(), other.m_num.m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+        // Set other's denominator to 1 (see integer::set_one()).
+        other.m_den.m_int.g_st()._mp_size = 1;
+        other.m_den.m_int.g_st().m_limbs[0] = 1;
+        std::fill(other.m_den.m_int.g_st().m_limbs.begin() + 1, other.m_den.m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+    }
 
 private:
     template <typename T, enable_if_t<disjunction<std::is_integral<T>, std::is_same<T, int_t>>::value, int> = 0>
@@ -274,9 +298,27 @@ public:
     rational &operator=(const rational &) = default;
     /// Defaulted move assignment operator.
     /**
+     * After the assignment, \p other is left in an unspecified but valid state.
+     *
+     * @param other the assignment argument.
+     *
      * @return a reference to ``this``.
      */
-    rational &operator=(rational &&) = default;
+    rational &operator=(rational &&other) noexcept
+    {
+        // NOTE: see the rationale in the move ctor about why we don't want
+        // to default this.
+        //
+        // NOTE: we need the self check here because otherwise we will end
+        // up setting this to 0/1, in case of self assignment.
+        if (mppp_likely(this != &other)) {
+            m_num = std::move(other.m_num);
+            m_den = std::move(other.m_den);
+            other.m_num.set_zero();
+            other.m_den.set_one();
+        }
+        return *this;
+    }
     /// Assignment from \p mpq_t.
     /**
      * This assignment operator will copy into \p this the value of the GMP rational \p q.

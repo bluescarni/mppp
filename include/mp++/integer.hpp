@@ -694,6 +694,36 @@ class integer
     // Make friends with rational.
     template <std::size_t>
     friend class rational;
+    // These are used only from rational at the moment. Might make them
+    // public eventually.
+    void set_zero()
+    {
+        if (is_static()) {
+            m_int.g_st()._mp_size = 0;
+            // Zero out the whole limbs array (equivalent to the def ctor of static int).
+            std::fill(m_int.g_st().m_limbs.begin(), m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+        } else {
+            m_int.destroy_dynamic();
+            // Def construction of static results in zero.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage();
+        }
+    }
+    void set_one()
+    {
+        if (is_static()) {
+            m_int.g_st()._mp_size = 1;
+            m_int.g_st().m_limbs[0] = 1;
+            // Zero the unused limbs, for the usual reason that optimised implementations
+            // expect zeroes in unused limbs.
+            std::fill(m_int.g_st().m_limbs.begin() + 1, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+        } else {
+            m_int.destroy_dynamic();
+            // Def ctor will zero out all limbs.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage();
+            m_int.g_st()._mp_size = 1;
+            m_int.g_st().m_limbs[0] = 1;
+        }
+    }
 
 public:
     /// Alias for the template parameter \p SSize.
