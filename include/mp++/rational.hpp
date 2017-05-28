@@ -769,6 +769,8 @@ inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational
     if (u1 && u2) {
         // add() is fine with overlapping args.
         add(rop._get_num(), op1.get_num(), op2.get_num());
+        // Set rop's den to 1.
+        rop._get_den().set_one();
     } else if (u1) {
         integer<SSize> tmp{op2.get_num()};
         // Ok, tmp is a separate variable, won't modify ops.
@@ -787,6 +789,8 @@ inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational
     } else if (op1.get_den() == op2.get_den()) {
         // add() is fine with overlapping args.
         add(rop._get_num(), op1.get_num(), op2.get_num());
+        // Set rop's den to the common den.
+        rop._get_den() = op1.get_den();
         rop.canonicalise();
     } else {
         integer<SSize> tmp;
@@ -821,6 +825,8 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
     if (u1 && u2) {
         // sub() is fine with overlapping args.
         sub(rop._get_num(), op1.get_num(), op2.get_num());
+        // Set rop's den to 1.
+        rop._get_den().set_one();
     } else if (u1) {
         integer<SSize> tmp{op2.get_num()};
         tmp.neg();
@@ -839,6 +845,8 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
     } else if (op1.get_den() == op2.get_den()) {
         // sub() is fine with overlapping args.
         sub(rop._get_num(), op1.get_num(), op2.get_num());
+        // Set rop's den to the common den.
+        rop._get_den() = op1.get_den();
         rop.canonicalise();
     } else {
         integer<SSize> tmp;

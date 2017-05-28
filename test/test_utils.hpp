@@ -170,6 +170,33 @@ inline void random_integer(mppp::mpz_raii &m, unsigned n, std::mt19937 &rng, ::m
     }
 }
 
+// Set mpq to random value with n limbs for num/den.
+inline void random_rational(mppp::mpq_raii &m, unsigned n, std::mt19937 &rng)
+{
+    if (!n) {
+        ::mpq_set_ui(&m.m_mpq, 0, 1);
+        return;
+    }
+    MPPP_MAYBE_TLS mppp::mpz_raii tmp;
+    std::uniform_int_distribution<::mp_limb_t> dist(0u, std::numeric_limits<::mp_limb_t>::max());
+    // Set the first limb.
+    ::mpz_set_str(mpq_numref(&m.m_mpq), lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
+    ::mpz_set_str(mpq_denref(&m.m_mpq), lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
+    for (unsigned i = 1u; i < n; ++i) {
+        ::mpz_set_str(&tmp.m_mpz, lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
+        ::mpz_mul_2exp(mpq_numref(&m.m_mpq), mpq_numref(&m.m_mpq), GMP_NUMB_BITS);
+        ::mpz_add(mpq_numref(&m.m_mpq), mpq_numref(&m.m_mpq), &tmp.m_mpz);
+        ::mpz_set_str(&tmp.m_mpz, lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
+        ::mpz_mul_2exp(mpq_denref(&m.m_mpq), mpq_denref(&m.m_mpq), GMP_NUMB_BITS);
+        ::mpz_add(mpq_denref(&m.m_mpq), mpq_denref(&m.m_mpq), &tmp.m_mpz);
+    }
+    // Take care of zero den.
+    if (mpz_sgn(mpq_denref(&m.m_mpq)) == 0) {
+        ::mpz_set_ui(mpq_denref(&m.m_mpq), 1);
+    }
+    ::mpq_canonicalize(&m.m_mpq);
+}
+
 // Set mpz to the max value with n limbs.
 inline void max_integer(mppp::mpz_raii &m, unsigned n)
 {

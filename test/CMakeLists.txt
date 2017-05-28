@@ -50,4 +50,5 @@ ADD_MPPP_TESTCASE(integer_sqrt)
 ADD_MPPP_TESTCASE(integer_view)
 
 ADD_MPPP_TESTCASE(rational_abs)
+ADD_MPPP_TESTCASE(rational_arith)
 ADD_MPPP_TESTCASE(rational_basic)
