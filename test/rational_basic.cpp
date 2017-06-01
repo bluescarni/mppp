@@ -739,9 +739,6 @@ struct int_convert_tester {
             using rational = rational<S::value>;
             using integer = typename rational::int_t;
             REQUIRE((is_convertible<rational, Int>::value));
-            REQUIRE((!is_convertible<rational, Int &>::value));
-            REQUIRE((!is_convertible<rational, Int &&>::value));
-            REQUIRE((!is_convertible<rational, const Int &>::value));
             REQUIRE(roundtrip_conversion<rational>(0));
             auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
             REQUIRE(roundtrip_conversion<rational>(min));
@@ -786,9 +783,6 @@ struct int_convert_tester {
         using rational = rational<S::value>;
         using integer = typename rational::int_t;
         REQUIRE((is_convertible<rational, bool>::value));
-        REQUIRE((!is_convertible<rational, bool &>::value));
-        REQUIRE((!is_convertible<rational, bool &&>::value));
-        REQUIRE((!is_convertible<rational, const bool &>::value));
         REQUIRE(roundtrip_conversion<rational>(true));
         REQUIRE(roundtrip_conversion<rational>(false));
         // Extra.
@@ -796,9 +790,6 @@ struct int_convert_tester {
         REQUIRE((!is_convertible<rational, no_conv>::value));
         // Conversion to int_t.
         REQUIRE((is_convertible<rational, integer>::value));
-        REQUIRE((!is_convertible<rational, integer &>::value));
-        REQUIRE((!is_convertible<rational, integer &&>::value));
-        REQUIRE((!is_convertible<rational, const integer &>::value));
         REQUIRE(roundtrip_conversion<rational>(integer{42}));
         REQUIRE(roundtrip_conversion<rational>(integer{-42}));
         REQUIRE(static_cast<integer>(rational{1, 2}) == 0);
@@ -820,9 +811,6 @@ struct fp_convert_tester {
         {
             using rational = rational<S::value>;
             REQUIRE((is_convertible<rational, Float>::value));
-            REQUIRE((!is_convertible<rational, Float &>::value));
-            REQUIRE((!is_convertible<rational, Float &&>::value));
-            REQUIRE((!is_convertible<rational, const Float &>::value));
             REQUIRE(static_cast<Float>(rational{0}) == Float(0));
             REQUIRE(static_cast<Float>(rational{1}) == Float(1));
             REQUIRE(static_cast<Float>(rational{-1}) == Float(-1));
