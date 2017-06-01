@@ -6,8 +6,8 @@
 Welcome to mp++'s documentation!
 ================================
 
-mp++ is a small C++11 header-only library for multiprecision integer arithmetic. Based
-on the well-known `GMP <http://www.gmplib.org>`__ library, mp++ places a strong emphasis on
+mp++ is a small C++11 header-only library for multiprecision arithmetic, currently supporting integers
+and rationals. Based on the well-known `GMP <http://www.gmplib.org>`__ library, mp++ places a strong emphasis on
 optimising operations on small values. When dealing with small operands, mp++ will:
 
 * avoid heap memory allocations as much as possible, and
@@ -18,7 +18,7 @@ with respect to GMP (see the :ref:`benchmark <benchmarks>` section). The price t
 small overhead when operating on large operands.
 
 mp++ was created to cater to the requirements of computer algebra systems, which typically need to be able
-to manipulate arbitrarily-large integers but which, in practice, often end up storing many small integers
+to manipulate arbitrarily-large numbers but which, in practice, often end up storing many small values
 (e.g., as coefficients in a polynomial).
 
 mp++ is released under the `MPL2 <https://www.mozilla.org/en-US/MPL/2.0/FAQ/>`__ license.
