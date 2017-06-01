@@ -1142,6 +1142,27 @@ inline bool is_zero(const rational<SSize> &q)
 }
 
 /** @} */
+
+/** @defgroup rational_other rational_other
+ *  @{
+ */
+
+/// Canonicalise.
+/**
+ * \rststar
+ * This function will put ``q`` in canonical form. Internally, this function will employ
+ * :cpp:func:`mppp::rational::canonicalise()`.
+ * \endrststar
+ *
+ * @param q the rational that will be canonicalised.
+ */
+template <std::size_t SSize>
+inline void canonicalise(rational<SSize> &q)
+{
+    q.canonicalise();
+}
+
+/** @} */
 }
 
 #endif

@@ -70,6 +70,14 @@ Input/Output
 .. doxygengroup:: rational_io
    :content-only:
 
+.. _rational_other:
+
+Other
+~~~~~
+
+.. doxygengroup:: rational_other
+   :content-only:
+
 .. _rational_operators:
 
 Operators

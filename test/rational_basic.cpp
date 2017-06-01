@@ -890,3 +890,35 @@ TEST_CASE("is_canonical")
 {
     tuple_for_each(sizes{}, is_canonical_tester{});
 }
+
+struct canonicalise_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        rational q;
+        q.canonicalise().canonicalise();
+        REQUIRE(q.get_num() == 0);
+        REQUIRE(q.get_den() == 1);
+        q._get_num() = 3;
+        q._get_den() = -6;
+        canonicalise(q);
+        REQUIRE(q.get_num() == -1);
+        REQUIRE(q.get_den() == 2);
+        q._get_num() = 0;
+        q._get_den() = -6;
+        canonicalise(q);
+        REQUIRE(q.get_num() == 0);
+        REQUIRE(q.get_den() == 1);
+        q._get_num() = 3;
+        q._get_den() = -7;
+        canonicalise(q);
+        REQUIRE(q.get_num() == -3);
+        REQUIRE(q.get_den() == 7);
+    }
+};
+
+TEST_CASE("canonicalise")
+{
+    tuple_for_each(sizes{}, canonicalise_tester{});
+}
