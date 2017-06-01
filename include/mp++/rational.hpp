@@ -745,23 +745,12 @@ struct rational_common_type<T, rational<SSize>, enable_if_t<is_supported_float<T
 
 template <typename T, typename U>
 using rational_common_t = typename rational_common_type<T, U>::type;
-}
 
-/** @defgroup rational_arithmetic rational_arithmetic
- *  @{
- */
-
-/// Ternary addition.
-/**
- * This function will set \p rop to <tt>op1 + op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- */
-template <std::size_t SSize>
-inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+// Implementation of binary add.
+template <bool ZeroRop, std::size_t SSize>
+inline void add_impl(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
+    assert(!ZeroRop || rop.is_zero());
     const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
     // NOTE: it's important here to take care about overlapping arguments: we cannot use
     // rop as a "temporary" storage space, because if it overlaps with op1/op2 we will be
@@ -769,8 +758,10 @@ inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational
     if (u1 && u2) {
         // add() is fine with overlapping args.
         add(rop._get_num(), op1.get_num(), op2.get_num());
-        // Set rop's den to 1.
-        rop._get_den().set_one();
+        if (!ZeroRop) {
+            // Set rop's den to 1, if rop is not zero.
+            rop._get_den().set_one();
+        }
     } else if (u1) {
         integer<SSize> tmp{op2.get_num()};
         // Ok, tmp is a separate variable, won't modify ops.
@@ -807,17 +798,11 @@ inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational
     }
 }
 
-/// Ternary subtraction.
-/**
- * This function will set \p rop to <tt>op1 - op2</tt>.
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- */
-template <std::size_t SSize>
-inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+// Implementation of binary sub.
+template <bool ZeroRop, std::size_t SSize>
+inline void sub_impl(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
+    assert(!ZeroRop || rop.is_zero());
     const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
     // NOTE: it's important here to take care about overlapping arguments: we cannot use
     // rop as a "temporary" storage space, because if it overlaps with op1/op2 we will be
@@ -825,8 +810,10 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
     if (u1 && u2) {
         // sub() is fine with overlapping args.
         sub(rop._get_num(), op1.get_num(), op2.get_num());
-        // Set rop's den to 1.
-        rop._get_den().set_one();
+        if (!ZeroRop) {
+            // Set rop's den to 1, if rop is not zero.
+            rop._get_den().set_one();
+        }
     } else if (u1) {
         integer<SSize> tmp{op2.get_num()};
         tmp.neg();
@@ -861,6 +848,39 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
         mul(rop._get_den(), op1.get_den(), op2.get_den());
         rop.canonicalise();
     }
+}
+}
+
+/** @defgroup rational_arithmetic rational_arithmetic
+ *  @{
+ */
+
+/// Ternary addition.
+/**
+ * This function will set \p rop to <tt>op1 + op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ */
+template <std::size_t SSize>
+inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    add_impl<false>(rop, op1, op2);
+}
+
+/// Ternary subtraction.
+/**
+ * This function will set \p rop to <tt>op1 - op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ */
+template <std::size_t SSize>
+inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    sub_impl<false>(rop, op1, op2);
 }
 
 /// Binary negation.
@@ -959,7 +979,7 @@ template <std::size_t SSize>
 inline rational<SSize> dispatch_binary_add(const rational<SSize> &op1, const rational<SSize> &op2)
 {
     rational<SSize> retval;
-    add(retval, op1, op2);
+    add_impl<true>(retval, op1, op2);
     return retval;
 }
 
@@ -1037,7 +1057,7 @@ template <std::size_t SSize>
 inline rational<SSize> dispatch_binary_sub(const rational<SSize> &op1, const rational<SSize> &op2)
 {
     rational<SSize> retval;
-    sub(retval, op1, op2);
+    sub_impl<true>(retval, op1, op2);
     return retval;
 }
 
