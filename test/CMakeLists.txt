@@ -43,9 +43,12 @@ ADD_MPPP_TESTCASE(integer_nextprime)
 ADD_MPPP_TESTCASE(integer_pow)
 ADD_MPPP_TESTCASE(integer_probab_prime_p)
 ADD_MPPP_TESTCASE(integer_rel)
+ADD_MPPP_TESTCASE(integer_set_zero_one)
 ADD_MPPP_TESTCASE(integer_sqrt)
 ADD_MPPP_TESTCASE(integer_view)
 
+ADD_MPPP_TESTCASE(rational_abs)
+ADD_MPPP_TESTCASE(rational_arith)
 ADD_MPPP_TESTCASE(rational_basic)
 
 ADD_MPPP_TESTCASE(real_basic)

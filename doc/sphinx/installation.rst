@@ -7,10 +7,11 @@ mp++ is written in modern C++, and it requires a C++11-capable compiler. It is k
 on the following setups:
 
 * GCC 4.8 and later versions on GNU/Linux 32/64-bit,
-* Clang 3.8 on GNU/Linux 64-bit,
+* Clang 3.8 and later versions on GNU/Linux 64-bit,
 * MSVC 2015 on Windows 32/64-bit,
 * Clang 3.9 on Windows 32/64-bit (with the ``clang-cl`` driver for MSVC),
 * MinGW GCC 6 on Windows 64-bit,
+* Clang on OSX 64-bit (Xcode 6.4 and later),
 * Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).
 
 mp++ has been written, tested and benchmarked on x86 processors, but it does not contain any architecture-specific code
@@ -44,7 +45,7 @@ path, etc.). The available configuration options are:
 * ``MPPP_BUILD_BENCHMARKS``: build the benchmarking suite (off by default).
 
 Since mp++ is a header-only library, there's no compilation step (unless the tests or the benchmarks are being built),
-and the installation of mp++ via ``make install`` or similar will just copy the headers to your ``CMAKE_INSTALL_PREFIX``,
+and the installation of mp++ via ``make install`` or similar will just configure and copy the headers to your ``CMAKE_INSTALL_PREFIX``,
 in the ``include`` subdirectory.
 
 After the installation of the headers, you can test the installation with the following simple ``main.cpp`` program:

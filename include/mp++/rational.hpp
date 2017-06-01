@@ -9,6 +9,7 @@
 #ifndef MPPP_RATIONAL_HPP
 #define MPPP_RATIONAL_HPP
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -101,8 +102,31 @@ public:
     }
     /// Defaulted copy constructor.
     rational(const rational &) = default;
-    /// Defaulted move constructor.
-    rational(rational &&) = default;
+    /// Move constructor.
+    /**
+     * The move constructor will leave \p other in an unspecified but valid state.
+     *
+     * @param other the construction argument.
+     */
+    rational(rational &&other) noexcept : m_num(std::move(other.m_num)), m_den(std::move(other.m_den))
+    {
+        // NOTE: the aim of this is to have other in a valid state. One reason is that,
+        // according to the standard, for use in std::sort() (and possibly other algorithms)
+        // it is required that a moved-from rational is still comparable, but if we simply move
+        // construct num and den we could end up with other in noncanonical form or zero den.
+        // http://stackoverflow.com/questions/26579132/what-is-the-post-condition-of-a-move-constructor
+        //
+        // NOTE: after move construction, other's data members are guaranteed to be static.
+        assert(other.m_num.is_static());
+        assert(other.m_den.is_static());
+        // Set other's numerator to 0 (see integer::set_zero()).
+        other.m_num.m_int.g_st()._mp_size = 0;
+        std::fill(other.m_num.m_int.g_st().m_limbs.begin(), other.m_num.m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+        // Set other's denominator to 1 (see integer::set_one()).
+        other.m_den.m_int.g_st()._mp_size = 1;
+        other.m_den.m_int.g_st().m_limbs[0] = 1;
+        std::fill(other.m_den.m_int.g_st().m_limbs.begin() + 1, other.m_den.m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+    }
 
 private:
     template <typename T, enable_if_t<disjunction<std::is_integral<T>, std::is_same<T, int_t>>::value, int> = 0>
@@ -274,9 +298,27 @@ public:
     rational &operator=(const rational &) = default;
     /// Defaulted move assignment operator.
     /**
+     * After the assignment, \p other is left in an unspecified but valid state.
+     *
+     * @param other the assignment argument.
+     *
      * @return a reference to ``this``.
      */
-    rational &operator=(rational &&) = default;
+    rational &operator=(rational &&other) noexcept
+    {
+        // NOTE: see the rationale in the move ctor about why we don't want
+        // to default this.
+        //
+        // NOTE: we need the self check here because otherwise we will end
+        // up setting this to 0/1, in case of self assignment.
+        if (mppp_likely(this != &other)) {
+            m_num = std::move(other.m_num);
+            m_den = std::move(other.m_den);
+            other.m_num.set_zero();
+            other.m_den.set_one();
+        }
+        return *this;
+    }
     /// Assignment from \p mpq_t.
     /**
      * This assignment operator will copy into \p this the value of the GMP rational \p q.
@@ -366,7 +408,7 @@ public:
      * This operator will return a string representation of ``this`` in base ``base``.
      * The string format consists of the numerator, followed by the division operator ``/`` and the
      * denominator, but only if the denominator is not unitary. Otherwise, only the numerator will be
-     * present in the returned string.
+     * represented in the returned string.
      * \endrststar
      *
      * @param base the desired base for the string representation.
@@ -552,6 +594,11 @@ public:
      * form. Calling this method, however, might be necessary if the numerator and/or denominator
      * are modified manually, or when constructing/assigning from non-canonical ``mpq_t``
      * values.
+     *
+     * .. warning::
+     *
+     *    Calling this method with on a rational with null denominator will result in undefined
+     *    behaviour.
      * \endrststar
      *
      * @return a reference to \p this.
@@ -584,6 +631,27 @@ public:
         // NOTE: consider attempting demoting num/den. Let's KIS for now.
         return *this;
     }
+    /// Check canonical form.
+    /**
+     * @return \p true if \p this is the canonical form for rational numbers, \p false otherwise.
+     */
+    bool is_canonical() const
+    {
+        if (m_num.is_zero()) {
+            // If num is zero, den must be one.
+            return m_den.is_one();
+        }
+        if (m_den.sgn() != 1) {
+            // Den must be strictly positive.
+            return false;
+        }
+        if (m_den.is_one()) {
+            // The rational is an integer.
+            return true;
+        }
+        // Num and den must be coprime.
+        return gcd(m_num, m_den).is_one();
+    }
     /// Sign.
     /**
      * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
@@ -600,7 +668,7 @@ public:
      */
     rational &neg()
     {
-        mppp::neg(m_num);
+        m_num.neg();
         return *this;
     }
     /// In-place absolute value.
@@ -611,7 +679,7 @@ public:
      */
     rational &abs()
     {
-        mppp::abs(m_num);
+        m_num.abs();
         return *this;
     }
     /// Test if the value is zero.
@@ -701,6 +769,8 @@ inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational
     if (u1 && u2) {
         // add() is fine with overlapping args.
         add(rop._get_num(), op1.get_num(), op2.get_num());
+        // Set rop's den to 1.
+        rop._get_den().set_one();
     } else if (u1) {
         integer<SSize> tmp{op2.get_num()};
         // Ok, tmp is a separate variable, won't modify ops.
@@ -719,6 +789,8 @@ inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational
     } else if (op1.get_den() == op2.get_den()) {
         // add() is fine with overlapping args.
         add(rop._get_num(), op1.get_num(), op2.get_num());
+        // Set rop's den to the common den.
+        rop._get_den() = op1.get_den();
         rop.canonicalise();
     } else {
         integer<SSize> tmp;
@@ -753,6 +825,8 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
     if (u1 && u2) {
         // sub() is fine with overlapping args.
         sub(rop._get_num(), op1.get_num(), op2.get_num());
+        // Set rop's den to 1.
+        rop._get_den().set_one();
     } else if (u1) {
         integer<SSize> tmp{op2.get_num()};
         tmp.neg();
@@ -771,6 +845,8 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
     } else if (op1.get_den() == op2.get_den()) {
         // sub() is fine with overlapping args.
         sub(rop._get_num(), op1.get_num(), op2.get_num());
+        // Set rop's den to the common den.
+        rop._get_den() = op1.get_den();
         rop.canonicalise();
     } else {
         integer<SSize> tmp;
@@ -812,6 +888,34 @@ inline rational<SSize> neg(const rational<SSize> &q)
 {
     rational<SSize> ret(q);
     ret.neg();
+    return ret;
+}
+
+/// Binary absolute value.
+/**
+ * This function will set \p rop to the absolute value of \p q.
+ *
+ * @param rop the return value.
+ * @param q the argument.
+ */
+template <std::size_t SSize>
+inline void abs(rational<SSize> &rop, const rational<SSize> &q)
+{
+    rop = q;
+    rop.abs();
+}
+
+/// Unary absolute value.
+/**
+ * @param q the argument.
+ *
+ * @return the absolute value of \p q.
+ */
+template <std::size_t SSize>
+inline rational<SSize> abs(const rational<SSize> &q)
+{
+    rational<SSize> ret(q);
+    ret.abs();
     return ret;
 }
 
@@ -1023,6 +1127,39 @@ template <std::size_t SSize>
 int sgn(const rational<SSize> &q)
 {
     return q.sgn();
+}
+
+/// Test if a rational is zero.
+/**
+ * @param q the rational to be tested.
+ *
+ * @return \p true if \p q is zero, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool is_zero(const rational<SSize> &q)
+{
+    return q.is_zero();
+}
+
+/** @} */
+
+/** @defgroup rational_other rational_other
+ *  @{
+ */
+
+/// Canonicalise.
+/**
+ * \rststar
+ * This function will put ``q`` in canonical form. Internally, this function will employ
+ * :cpp:func:`mppp::rational::canonicalise()`.
+ * \endrststar
+ *
+ * @param q the rational that will be canonicalised.
+ */
+template <std::size_t SSize>
+inline void canonicalise(rational<SSize> &q)
+{
+    q.canonicalise();
 }
 
 /** @} */

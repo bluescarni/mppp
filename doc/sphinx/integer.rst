@@ -47,6 +47,14 @@ Much of the functionality of the :cpp:class:`~mppp::integer` class is exposed vi
 mimic the `GMP API <https://gmplib.org/manual/Integer-Functions.html>`_ where appropriate, but a variety of
 convenience/generic overloads is provided as well.
 
+.. _integer_assignment:
+
+Assignment
+~~~~~~~~~~
+
+.. doxygengroup:: integer_assignment
+   :content-only:
+
 .. _integer_arithmetic:
 
 Arithmetic
@@ -102,6 +110,8 @@ Input/Output
 
 .. doxygengroup:: integer_io
    :content-only:
+
+.. _integer_other:
 
 Other
 ~~~~~

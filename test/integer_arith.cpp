@@ -79,13 +79,14 @@ struct add_tester {
                 add(n1, n2, n3);
                 ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                // Various variations if in-place.
+                // Various variations of in-place.
                 add(n1, n1, n2);
                 ::mpz_add(&m1.m_mpz, &m1.m_mpz, &m2.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 add(n2, n1, n2);
                 ::mpz_add(&m2.m_mpz, &m1.m_mpz, &m2.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 add(n1, n1, n1);
                 ::mpz_add(&m1.m_mpz, &m1.m_mpz, &m1.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -340,13 +341,14 @@ struct sub_tester {
                 sub(n1, n2, n3);
                 ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                // Various variations if in-place.
+                // Various variations of in-place.
                 sub(n1, n1, n2);
                 ::mpz_sub(&m1.m_mpz, &m1.m_mpz, &m2.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 sub(n2, n1, n2);
                 ::mpz_sub(&m2.m_mpz, &m1.m_mpz, &m2.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 sub(n1, n1, n1);
                 ::mpz_sub(&m1.m_mpz, &m1.m_mpz, &m1.m_mpz);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));

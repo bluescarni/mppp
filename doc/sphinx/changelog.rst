@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Implement fast assignment functions to zero and plus/minus one for :cpp:class:`~mppp::integer`.
+
 - Add assignment operators from string for :cpp:class:`~mppp::integer`.
 
 - Implement the ``submul()`` primitive for :cpp:class:`~mppp::integer`.

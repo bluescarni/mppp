@@ -1092,6 +1092,85 @@ public:
     {
         return operator=(s.c_str());
     }
+    /// Set to zero.
+    /**
+     * After calling this method, the storage type of \p this will be static and its value will be zero.
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This is a specialised higher-performance alternative to the assignment operator.
+     * \endrststar
+     *
+     * @return a reference to \p this.
+     */
+    integer &set_zero()
+    {
+        if (is_static()) {
+            m_int.g_st()._mp_size = 0;
+            // Zero out the whole limbs array (equivalent to the def ctor of static int).
+            std::fill(m_int.g_st().m_limbs.begin(), m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+        } else {
+            m_int.destroy_dynamic();
+            // Def construction of static results in zero.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage();
+        }
+        return *this;
+    }
+
+private:
+    template <bool PlusOrMinus>
+    integer &set_one_impl()
+    {
+        if (is_static()) {
+            m_int.g_st()._mp_size = PlusOrMinus ? 1 : -1;
+            m_int.g_st().m_limbs[0] = 1;
+            // Zero the unused limbs, for the usual reason that optimised implementations
+            // expect zeroes in unused limbs.
+            std::fill(m_int.g_st().m_limbs.begin() + 1, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+        } else {
+            m_int.destroy_dynamic();
+            // Def ctor will zero out all limbs.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage();
+            m_int.g_st()._mp_size = PlusOrMinus ? 1 : -1;
+            m_int.g_st().m_limbs[0] = 1;
+        }
+        return *this;
+    }
+
+public:
+    /// Set to one.
+    /**
+     * After calling this method, the storage type of \p this will be static and its value will be one.
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This is a specialised higher-performance alternative to the assignment operator.
+     * \endrststar
+     *
+     * @return a reference to \p this.
+     */
+    integer &set_one()
+    {
+        return set_one_impl<true>();
+    }
+    /// Set to minus one.
+    /**
+     * After calling this method, the storage type of \p this will be static and its value will be minus one.
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This is a specialised higher-performance alternative to the assignment operator.
+     * \endrststar
+     *
+     * @return a reference to \p this.
+     */
+    integer &set_negative_one()
+    {
+        return set_one_impl<false>();
+    }
     /// Test for static storage.
     /**
      * @return \p true if the storage type is static, \p false otherwise.
@@ -1603,6 +1682,66 @@ private:
 
 template <std::size_t SSize>
 constexpr std::size_t integer<SSize>::ssize;
+
+/** @defgroup integer_assignment integer_assignment
+ *  @{
+ */
+
+/// Set to zero.
+/**
+ * After calling this function, the storage type of \p n will be static and its value will be zero.
+ *
+ * \rststar
+ * .. note::
+ *
+ *   This is a specialised higher-performance alternative to the assignment operator.
+ * \endrststar
+ *
+ * @param n the assignment argument.
+ */
+template <std::size_t SSize>
+inline void set_zero(integer<SSize> &n)
+{
+    n.set_zero();
+}
+
+/// Set to one.
+/**
+ * After calling this function, the storage type of \p n will be static and its value will be one.
+ *
+ * \rststar
+ * .. note::
+ *
+ *   This is a specialised higher-performance alternative to the assignment operator.
+ * \endrststar
+ *
+ * @param n the assignment argument.
+ */
+template <std::size_t SSize>
+inline void set_one(integer<SSize> &n)
+{
+    n.set_one();
+}
+
+/// Set to minus one.
+/**
+ * After calling this function, the storage type of \p n will be static and its value will be minus one.
+ *
+ * \rststar
+ * .. note::
+ *
+ *   This is a specialised higher-performance alternative to the assignment operator.
+ * \endrststar
+ *
+ * @param n the assignment argument.
+ */
+template <std::size_t SSize>
+inline void set_negative_one(integer<SSize> &n)
+{
+    n.set_negative_one();
+}
+
+/** @} */
 
 inline namespace detail
 {
@@ -3776,7 +3915,7 @@ inline bool even_p(const integer<SSize> &n)
     return n.even_p();
 }
 
-/// Test if integer is zero.
+/// Test if an integer is zero.
 /**
  * @param n the integer to be tested.
  *

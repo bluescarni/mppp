@@ -21,6 +21,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include "test_utils.hpp"
 
@@ -80,6 +81,8 @@ struct int_ctor_tester {
         {
             using rational = rational<S::value>;
             REQUIRE((std::is_constructible<rational, Int>::value));
+            REQUIRE((std::is_constructible<rational, Int &&>::value));
+            REQUIRE((std::is_constructible<rational, const Int &>::value));
             REQUIRE(lex_cast(Int(0)) == lex_cast(rational{Int(0)}));
             auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
             REQUIRE(lex_cast(min) == lex_cast(rational{min}));
@@ -115,6 +118,9 @@ struct int_ctor_tester {
         REQUIRE((lex_cast(rational{}) == "0"));
         // Some testing for bool.
         REQUIRE((std::is_constructible<rational, bool>::value));
+        REQUIRE((std::is_constructible<rational, bool &>::value));
+        REQUIRE((std::is_constructible<rational, const bool &>::value));
+        REQUIRE((std::is_constructible<rational, bool &&>::value));
         REQUIRE((lex_cast(rational{false}) == "0"));
         REQUIRE((lex_cast(rational{true}) == "1"));
         REQUIRE((!std::is_constructible<rational, wchar_t>::value));
@@ -188,6 +194,9 @@ struct fp_ctor_tester {
         {
             using rational = rational<S::value>;
             REQUIRE((std::is_constructible<rational, Float>::value));
+            REQUIRE((std::is_constructible<rational, Float &>::value));
+            REQUIRE((std::is_constructible<rational, Float &&>::value));
+            REQUIRE((std::is_constructible<rational, const Float &>::value));
             if (std::numeric_limits<Float>::is_iec559) {
                 REQUIRE_THROWS_PREDICATE(
                     rational{std::numeric_limits<Float>::infinity()}, std::domain_error,
@@ -256,6 +265,8 @@ struct string_ctor_tester {
         using rational = rational<S::value>;
         REQUIRE((std::is_constructible<rational, const char *>::value));
         REQUIRE((std::is_constructible<rational, std::string>::value));
+        REQUIRE((std::is_constructible<rational, std::string &&>::value));
+        REQUIRE((std::is_constructible<rational, const std::string &>::value));
         REQUIRE((std::is_constructible<rational, char *>::value));
         auto q = rational{"0"};
         REQUIRE((lex_cast(q) == "0"));
@@ -319,6 +330,7 @@ struct mpq_ctor_tester {
     {
         using rational = rational<S::value>;
         mpq_raii m;
+        REQUIRE((std::is_constructible<rational, const ::mpq_t>::value));
         REQUIRE(lex_cast(rational{&m.m_mpq}) == "0");
         ::mpz_set_si(mpq_numref(&m.m_mpq), 1234);
         REQUIRE(lex_cast(rational{&m.m_mpq}) == "1234");
@@ -350,7 +362,9 @@ struct copy_move_tester {
     {
         using rational = rational<S::value>;
         using integer = typename rational::int_t;
-        REQUIRE((!std::is_assignable<rational, const wchar_t &>::value));
+        REQUIRE((!std::is_assignable<rational &, const wchar_t &>::value));
+        REQUIRE((!std::is_assignable<rational &, const std::vector<int> &>::value));
+        REQUIRE((!std::is_assignable<const rational &, int>::value));
         rational q;
         q = 123;
         REQUIRE(lex_cast(q) == "123");
@@ -372,6 +386,10 @@ struct copy_move_tester {
         REQUIRE(q3.get_num().is_static());
         REQUIRE(q3.get_den().is_static());
         rational q4{std::move(q2)};
+        REQUIRE(q2.get_num().is_zero());
+        REQUIRE(q2.get_den().is_one());
+        REQUIRE(q2.get_num().is_static());
+        REQUIRE(q2.get_den().is_static());
         REQUIRE(lex_cast(q4) == "-123");
         REQUIRE(q4.get_num().is_static());
         REQUIRE(q4.get_den().is_dynamic());
@@ -381,6 +399,10 @@ struct copy_move_tester {
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_static());
         q2 = std::move(q4);
+        REQUIRE(q4.get_num().is_zero());
+        REQUIRE(q4.get_den().is_one());
+        REQUIRE(q4.get_num().is_static());
+        REQUIRE(q4.get_den().is_static());
         REQUIRE(lex_cast(q2) == "-123");
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_dynamic());
@@ -389,12 +411,10 @@ struct copy_move_tester {
         REQUIRE(lex_cast(q2) == "-123");
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_dynamic());
-#if !defined(__clang__)
         q2 = std::move(q2);
         REQUIRE(lex_cast(q2) == "-123");
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_dynamic());
-#endif
         q = 1.23;
         REQUIRE(lex_cast(q.get_num()) == lex_cast(rational(1.23).get_num()));
         REQUIRE(lex_cast(q.get_den()) == lex_cast(rational(1.23).get_den()));
@@ -402,6 +422,187 @@ struct copy_move_tester {
         REQUIRE(lex_cast(q) == "-12");
         q = rational{3, -12};
         REQUIRE(lex_cast(q) == "-1/4");
+        // Check that move operations reset to zero the right operand.
+        q = "4/5";
+        auto qa(std::move(q));
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q._get_num().promote();
+        auto qb(std::move(q));
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q._get_den().promote();
+        auto qc(std::move(q));
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q._get_num().promote();
+        q._get_den().promote();
+        auto qd(std::move(q));
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_den().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q._get_den().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q2._get_num().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q2._get_den().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q2._get_num().promote();
+        q2._get_den().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q._get_den().promote();
+        q2._get_num().promote();
+        q2._get_den().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_den().promote();
+        q2._get_num().promote();
+        q2._get_den().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q2._get_num().promote();
+        q2._get_den().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q._get_den().promote();
+        q2._get_den().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q._get_den().promote();
+        q2._get_num().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q2._get_num().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_den().promote();
+        q2._get_num().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_num().promote();
+        q2._get_den().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
+        REQUIRE(q.get_den().is_static());
+        q = "4/5";
+        q2 = "3/4";
+        q._get_den().promote();
+        q2._get_den().promote();
+        q2 = std::move(q);
+        REQUIRE(q.get_num().is_zero());
+        REQUIRE(q.get_den().is_one());
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den().is_static());
     }
 };
 
@@ -416,6 +617,10 @@ struct string_ass_tester {
     {
         using rational = rational<S::value>;
         rational q;
+        REQUIRE((std::is_assignable<rational &, std::string>::value));
+        REQUIRE((std::is_assignable<rational &, std::string &&>::value));
+        REQUIRE((std::is_assignable<rational &, const std::string &>::value));
+        REQUIRE((!std::is_assignable<const rational &, const std::string &>::value));
         q = "1";
         REQUIRE(lex_cast(q) == "1");
         q = "-23";
@@ -444,6 +649,8 @@ struct mpq_ass_tester {
     void operator()(const S &) const
     {
         using rational = rational<S::value>;
+        REQUIRE((std::is_assignable<rational &, ::mpq_t>::value));
+        REQUIRE((!std::is_assignable<const rational &, ::mpq_t>::value));
         rational q;
         mpq_raii m;
         REQUIRE(lex_cast(rational{&m.m_mpq}) == "0");
@@ -657,4 +864,61 @@ struct fp_convert_tester {
 TEST_CASE("floating-point conversions")
 {
     tuple_for_each(sizes{}, fp_convert_tester{});
+}
+
+struct is_canonical_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        rational q;
+        REQUIRE(q.is_canonical());
+        q._get_den() = -1;
+        REQUIRE(!q.is_canonical());
+        q = "5/10";
+        REQUIRE(q.is_canonical());
+        q._get_den() = -10;
+        REQUIRE(!q.is_canonical());
+        q = 5;
+        REQUIRE(q.is_canonical());
+        q._get_den() = 0;
+        REQUIRE(!q.is_canonical());
+    }
+};
+
+TEST_CASE("is_canonical")
+{
+    tuple_for_each(sizes{}, is_canonical_tester{});
+}
+
+struct canonicalise_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        rational q;
+        q.canonicalise().canonicalise();
+        REQUIRE(q.get_num() == 0);
+        REQUIRE(q.get_den() == 1);
+        q._get_num() = 3;
+        q._get_den() = -6;
+        canonicalise(q);
+        REQUIRE(q.get_num() == -1);
+        REQUIRE(q.get_den() == 2);
+        q._get_num() = 0;
+        q._get_den() = -6;
+        canonicalise(q);
+        REQUIRE(q.get_num() == 0);
+        REQUIRE(q.get_den() == 1);
+        q._get_num() = 3;
+        q._get_den() = -7;
+        canonicalise(q);
+        REQUIRE(q.get_num() == -3);
+        REQUIRE(q.get_den() == 7);
+    }
+};
+
+TEST_CASE("canonicalise")
+{
+    tuple_for_each(sizes{}, canonicalise_tester{});
 }
