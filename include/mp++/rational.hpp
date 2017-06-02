@@ -1035,6 +1035,29 @@ inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
     return os << q.to_string();
 }
 
+/// Input stream operator.
+/**
+ * \rststar
+ * This operator is equivalent to extracting a line from the stream, using it to construct a temporary
+ * :cpp:class:`~mppp::rational` and then assigning the temporary to ``q``.
+ * \endrststar
+ *
+ * @param is input stream.
+ * @param q rational to which the contents of the stream will be assigned.
+ *
+ * @return reference to \p is.
+ *
+ * @throws unspecified any exception thrown by the constructor from string of rational.
+ */
+template <std::size_t SSize>
+inline std::istream &operator>>(std::istream &is, rational<SSize> &q)
+{
+    MPPP_MAYBE_TLS std::string tmp_str;
+    std::getline(is, tmp_str);
+    q = rational<SSize>{tmp_str};
+    return is;
+}
+
 /** @} */
 
 /** @defgroup rational_operators rational_operators

@@ -15,6 +15,7 @@
 #include <iostream>
 #include <limits>
 #include <random>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -921,4 +922,77 @@ struct canonicalise_tester {
 TEST_CASE("canonicalise")
 {
     tuple_for_each(sizes{}, canonicalise_tester{});
+}
+
+struct stream_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        {
+            std::ostringstream oss;
+            oss << rational{};
+            REQUIRE(oss.str() == "0");
+        }
+        {
+            std::ostringstream oss;
+            oss << rational{123};
+            REQUIRE(oss.str() == "123");
+        }
+        {
+            std::ostringstream oss;
+            oss << rational{-123};
+            REQUIRE(oss.str() == "-123");
+        }
+        {
+            std::ostringstream oss;
+            oss << rational{6, -12};
+            REQUIRE(oss.str() == "-1/2");
+        }
+        {
+            std::ostringstream oss;
+            oss << rational{12, 6};
+            REQUIRE(oss.str() == "2");
+        }
+        {
+            std::stringstream ss;
+            ss << rational{};
+            rational q(12);
+            ss >> q;
+            REQUIRE(lex_cast(q) == "0");
+        }
+        {
+            std::stringstream ss;
+            ss << rational{-123};
+            rational q;
+            ss >> q;
+            REQUIRE(lex_cast(q) == "-123");
+        }
+        {
+            std::stringstream ss;
+            ss << rational{-12, 6};
+            rational q;
+            ss >> q;
+            REQUIRE(lex_cast(q) == "-2");
+        }
+        {
+            std::stringstream ss;
+            ss << rational{6, 12};
+            rational q;
+            ss >> q;
+            REQUIRE(lex_cast(q) == "1/2");
+        }
+        {
+            std::stringstream ss;
+            ss.str("-42");
+            rational q;
+            ss >> q;
+            REQUIRE(lex_cast(q) == "-42");
+        }
+    }
+};
+
+TEST_CASE("stream")
+{
+    tuple_for_each(sizes{}, stream_tester{});
 }
