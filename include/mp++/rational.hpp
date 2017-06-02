@@ -939,6 +939,14 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
 }
 }
 
+/// Ternary multiplication.
+/**
+ * This function will set \p rop to <tt>op1 * op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ */
 template <std::size_t SSize>
 inline void mul(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
