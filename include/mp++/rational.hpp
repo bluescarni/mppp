@@ -65,6 +65,9 @@ concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<
  * * the denominator is always strictly positive.
  * \endrststar
  */
+// NOTEs:
+// - GMP has a divexact_gcd() function that, I believe, shaves off some complexity in terms of branching
+//   etc. Consider implementing it.
 template <std::size_t SSize>
 class rational
 {
@@ -747,10 +750,10 @@ template <typename T, typename U>
 using rational_common_t = typename rational_common_type<T, U>::type;
 
 // Implementation of binary add.
-template <bool ZeroRop, std::size_t SSize>
+template <bool IntRop, std::size_t SSize>
 inline void add_impl(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
-    assert(!ZeroRop || rop.is_zero());
+    assert(!IntRop || rop.get_den().is_one());
     const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
     // NOTE: it's important here to take care about overlapping arguments: we cannot use
     // rop as a "temporary" storage space, because if it overlaps with op1/op2 we will be
@@ -758,8 +761,8 @@ inline void add_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
     if (u1 && u2) {
         // add() is fine with overlapping args.
         add(rop._get_num(), op1.get_num(), op2.get_num());
-        if (!ZeroRop) {
-            // Set rop's den to 1, if rop is not zero.
+        if (!IntRop) {
+            // Set rop's den to 1, if rop is not already an int.
             rop._get_den().set_one();
         }
     } else if (u1) {
@@ -799,10 +802,10 @@ inline void add_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
 }
 
 // Implementation of binary sub.
-template <bool ZeroRop, std::size_t SSize>
+template <bool IntRop, std::size_t SSize>
 inline void sub_impl(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
-    assert(!ZeroRop || rop.is_zero());
+    assert(!IntRop || rop.get_den().is_one());
     const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
     // NOTE: it's important here to take care about overlapping arguments: we cannot use
     // rop as a "temporary" storage space, because if it overlaps with op1/op2 we will be
@@ -810,8 +813,8 @@ inline void sub_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
     if (u1 && u2) {
         // sub() is fine with overlapping args.
         sub(rop._get_num(), op1.get_num(), op2.get_num());
-        if (!ZeroRop) {
-            // Set rop's den to 1, if rop is not zero.
+        if (!IntRop) {
+            // Set rop's den to 1, if rop is not already an int.
             rop._get_den().set_one();
         }
     } else if (u1) {
@@ -885,10 +888,10 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
 
 inline namespace detail
 {
-template <bool ZeroRop, std::size_t SSize>
+template <bool IntRop, std::size_t SSize>
 inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
-    assert(!ZeroRop || rop.is_zero());
+    assert(!IntRop || rop.get_den().is_one());
     const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
     // NOTE: it's important here to take care about overlapping arguments: we cannot use
     // rop as a "temporary" storage space, because if it overlaps with op1/op2 we will be
@@ -896,8 +899,8 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
     if (u1 && u2) {
         // mul() is fine with overlapping args.
         mul(rop._get_num(), op1.get_num(), op2.get_num());
-        if (!ZeroRop) {
-            // Set rop's den to 1, if rop is not zero.
+        if (!IntRop) {
+            // Set rop's den to 1, if rop is not already an int.
             rop._get_den().set_one();
         }
     } else if (op1.get_den() == op2.get_den()) {
@@ -924,17 +927,20 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
         // General case: a/b * c/d
         // NOTE: like above, we don't want to canonicalise (ac)/(bd),
         // and we trade one big gcd with two smaller gcds.
-        // Compute first gcd(a,d).
-        auto g = gcd(op1.get_num(), op2.get_den());
-        // Discard common factors from a and d.
-        const auto tmp1 = divexact(op1.get_num(), g);
-        const auto tmp2 = divexact(op2.get_den(), g);
-        // The other gcd(b,c).
-        gcd(g, op1.get_den(), op2.get_num());
+        // Compute gcd(a,d) and gcd(b,c).
+        const auto g1 = gcd(op1.get_num(), op2.get_den());
+        const auto g2 = gcd(op1.get_den(), op2.get_num());
+        // Remove common factors from the nums.
+        auto tmp1 = divexact(op1.get_num(), g1);
+        auto tmp2 = divexact(op2.get_num(), g2);
+        // Compute rop's numerator.
         // NOTE: after this line, all nums are tainted.
-        mul(rop._get_num(), divexact(op2.get_num(), g), tmp1);
-        // NOTE: after this line, all dens are tainted.
-        mul(rop._get_den(), divexact(op1.get_den(), g), tmp2);
+        mul(rop._get_num(), tmp1, tmp2);
+        // Remove common factors from the dens.
+        divexact(tmp1, op2.get_den(), g1);
+        divexact(tmp2, op1.get_den(), g2);
+        // Compute rop's denominator.
+        mul(rop._get_den(), tmp1, tmp2);
     }
 }
 }
