@@ -883,8 +883,10 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
     sub_impl<false>(rop, op1, op2);
 }
 
+inline namespace detail
+{
 template <bool ZeroRop, std::size_t SSize>
-inline void mul(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
     assert(!ZeroRop || rop.is_zero());
     const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
@@ -934,6 +936,13 @@ inline void mul(rational<SSize> &rop, const rational<SSize> &op1, const rational
         // NOTE: after this line, all dens are tainted.
         mul(rop._get_den(), divexact(op1.get_den(), g), tmp2);
     }
+}
+}
+
+template <std::size_t SSize>
+inline void mul(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    mul_impl<false>(rop, op1, op2);
 }
 
 /// Binary negation.
