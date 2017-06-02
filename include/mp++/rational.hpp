@@ -883,6 +883,59 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
     sub_impl<false>(rop, op1, op2);
 }
 
+template <bool ZeroRop, std::size_t SSize>
+inline void mul(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    assert(!ZeroRop || rop.is_zero());
+    const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
+    // NOTE: it's important here to take care about overlapping arguments: we cannot use
+    // rop as a "temporary" storage space, because if it overlaps with op1/op2 we will be
+    // altering op1/op2 as well.
+    if (u1 && u2) {
+        // mul() is fine with overlapping args.
+        mul(rop._get_num(), op1.get_num(), op2.get_num());
+        if (!ZeroRop) {
+            // Set rop's den to 1, if rop is not zero.
+            rop._get_den().set_one();
+        }
+    } else if (op1.get_den() == op2.get_den()) {
+        // Special case: equal dens do not require canonicalisation.
+        mul(rop._get_num(), op1.get_num(), op2.get_num());
+        // NOTE: we can use a squaring function here, once implemented in integer.
+        mul(rop._get_den(), op1.get_den(), op2.get_den());
+    } else if (u1) {
+        // This is a * (b/c). Instead of doing (ab)/c and then canonicalise,
+        // we remove the common factors from a and c and we perform
+        // a normal multiplication (without canonicalisation). This allows us to
+        // perform a gcd with smaller operands.
+        const auto g = gcd(op1.get_num(), op2.get_den());
+        // NOTE: after this line, all nums are tainted.
+        mul(rop._get_num(), op2.get_num(), divexact(op1.get_num(), g));
+        // NOTE: after this line, all dens are tainted.
+        divexact(rop._get_den(), op2.get_den(), g);
+    } else if (u2) {
+        // Mirror of the above.
+        const auto g = gcd(op2.get_num(), op1.get_den());
+        mul(rop._get_num(), op1.get_num(), divexact(op2.get_num(), g));
+        divexact(rop._get_den(), op1.get_den(), g);
+    } else {
+        // General case: a/b * c/d
+        // NOTE: like above, we don't want to canonicalise (ac)/(bd),
+        // and we trade one big gcd with two smaller gcds.
+        // Compute first gcd(a,d).
+        auto g = gcd(op1.get_num(), op2.get_den());
+        // Discard common factors from a and d.
+        const auto tmp1 = divexact(op1.get_num(), g);
+        const auto tmp2 = divexact(op2.get_den(), g);
+        // The other gcd(b,c).
+        gcd(g, op1.get_den(), op2.get_num());
+        // NOTE: after this line, all nums are tainted.
+        mul(rop._get_num(), divexact(op2.get_num(), g), tmp1);
+        // NOTE: after this line, all dens are tainted.
+        mul(rop._get_den(), divexact(op1.get_den(), g), tmp2);
+    }
+}
+
 /// Binary negation.
 /**
  * This method will set \p rop to <tt>-q</tt>.
