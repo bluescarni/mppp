@@ -749,107 +749,93 @@ struct rational_common_type<T, rational<SSize>, enable_if_t<is_supported_float<T
 template <typename T, typename U>
 using rational_common_t = typename rational_common_type<T, U>::type;
 
-// Implementation of binary add.
-template <bool IntRop, std::size_t SSize>
-inline void add_impl(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+// Implementation of binary add/sub. The NewRop flag indicates that
+// rop is a def-cted rational distinct from op1 and op2.
+template <bool AddOrSub, bool NewRop, std::size_t SSize>
+inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
-    assert(!IntRop || rop.get_den().is_one());
+    assert(!NewRop || (rop.is_zero() && &rop != &op1 && &rop != &op2));
     const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
     // NOTE: it's important here to take care about overlapping arguments: we cannot use
     // rop as a "temporary" storage space, because if it overlaps with op1/op2 we will be
     // altering op1/op2 as well.
     if (u1 && u2) {
-        // add() is fine with overlapping args.
-        add(rop._get_num(), op1.get_num(), op2.get_num());
-        if (!IntRop) {
-            // Set rop's den to 1, if rop is not already an int.
+        // add/sub() are fine with overlapping args.
+        AddOrSub ? add(rop._get_num(), op1.get_num(), op2.get_num())
+                 : sub(rop._get_num(), op1.get_num(), op2.get_num());
+        if (!NewRop) {
+            // Set rop's den to 1, if rop is not new (otherwise it's 1 already).
             rop._get_den().set_one();
         }
     } else if (u1) {
-        integer<SSize> tmp{op2.get_num()};
-        // Ok, tmp is a separate variable, won't modify ops.
-        addmul(tmp, op1.get_num(), op2.get_den());
-        // Final assignments, potential for self-assignment
-        // in the second one.
-        rop._get_num() = std::move(tmp);
-        rop._get_den() = op2.get_den();
-        // NOTE: gcd(a+m*b,b) == gcd(a,b) for every integer m, no need to canonicalise the result.
+        if (NewRop) {
+            // rop is separate, can write into it directly.
+            rop._get_num() = op2.get_num();
+            if (AddOrSub) {
+                addmul(rop._get_num(), op1.get_num(), op2.get_den());
+            } else {
+                submul(rop._get_num(), op1.get_num(), op2.get_den());
+                rop._get_num().neg();
+            }
+            // NOTE: gcd(a+m*b,b) == gcd(a,b) for every integer m, no need to canonicalise the result.
+            rop._get_den() = op2.get_den();
+        } else {
+            integer<SSize> tmp{op2.get_num()};
+            // Ok, tmp is a separate variable, won't modify ops.
+            if (AddOrSub) {
+                addmul(tmp, op1.get_num(), op2.get_den());
+            } else {
+                submul(tmp, op1.get_num(), op2.get_den());
+                tmp.neg();
+            }
+            // Final assignments, potential for self-assignment
+            // in the second one.
+            rop._get_num() = std::move(tmp);
+            rop._get_den() = op2.get_den();
+        }
     } else if (u2) {
         // Mirror of the above.
-        integer<SSize> tmp{op1.get_num()};
-        addmul(tmp, op2.get_num(), op1.get_den());
-        rop._get_num() = std::move(tmp);
-        rop._get_den() = op1.get_den();
-    } else if (op1.get_den() == op2.get_den()) {
-        // add() is fine with overlapping args.
-        add(rop._get_num(), op1.get_num(), op2.get_num());
-        // Set rop's den to the common den.
-        rop._get_den() = op1.get_den();
-        rop.canonicalise();
-    } else {
-        integer<SSize> tmp;
-        // These two steps are ok, tmp is a separate variable.
-        // NOTE: these implement a*d+b*c. We might have a primitive operation
-        // for that down the line.
-        mul(tmp, op1.get_num(), op2.get_den());
-        addmul(tmp, op1.get_den(), op2.get_num());
-        // After this line, op1/op2's num is tainted, and it cannot be used.
-        rop._get_num() = std::move(tmp);
-        // Ok, we are using only the dens and mul() is ok with overlapping args.
-        mul(rop._get_den(), op1.get_den(), op2.get_den());
-        rop.canonicalise();
-    }
-}
-
-// Implementation of binary sub.
-template <bool IntRop, std::size_t SSize>
-inline void sub_impl(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
-{
-    assert(!IntRop || rop.get_den().is_one());
-    const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
-    // NOTE: it's important here to take care about overlapping arguments: we cannot use
-    // rop as a "temporary" storage space, because if it overlaps with op1/op2 we will be
-    // altering op1/op2 as well.
-    if (u1 && u2) {
-        // sub() is fine with overlapping args.
-        sub(rop._get_num(), op1.get_num(), op2.get_num());
-        if (!IntRop) {
-            // Set rop's den to 1, if rop is not already an int.
-            rop._get_den().set_one();
+        if (NewRop) {
+            rop._get_num() = op1.get_num();
+            AddOrSub ? addmul(rop._get_num(), op2.get_num(), op1.get_den())
+                     : submul(rop._get_num(), op2.get_num(), op1.get_den());
+            rop._get_den() = op1.get_den();
+        } else {
+            integer<SSize> tmp{op1.get_num()};
+            AddOrSub ? addmul(tmp, op2.get_num(), op1.get_den()) : submul(tmp, op2.get_num(), op1.get_den());
+            rop._get_num() = std::move(tmp);
+            rop._get_den() = op1.get_den();
         }
-    } else if (u1) {
-        integer<SSize> tmp{op2.get_num()};
-        tmp.neg();
-        // Ok, tmp is a separate variable, won't modify ops.
-        addmul(tmp, op1.get_num(), op2.get_den());
-        // Final assignments, potential for self-assignment
-        // in the second one.
-        rop._get_num() = std::move(tmp);
-        rop._get_den() = op2.get_den();
-        // NOTE: gcd(a+m*b,b) == gcd(a,b) for every integer m, no need to canonicalise the result.
-    } else if (u2) {
-        integer<SSize> tmp{op1.get_num()};
-        submul(tmp, op2.get_num(), op1.get_den());
-        rop._get_num() = std::move(tmp);
-        rop._get_den() = op1.get_den();
     } else if (op1.get_den() == op2.get_den()) {
-        // sub() is fine with overlapping args.
-        sub(rop._get_num(), op1.get_num(), op2.get_num());
+        // add()/sub() are fine with overlapping args.
+        AddOrSub ? add(rop._get_num(), op1.get_num(), op2.get_num())
+                 : sub(rop._get_num(), op1.get_num(), op2.get_num());
         // Set rop's den to the common den.
         rop._get_den() = op1.get_den();
         rop.canonicalise();
     } else {
-        integer<SSize> tmp;
-        // These two steps are ok, tmp is a separate variable.
-        // NOTE: these implement a*d-b*c. We might have a primitive operation
-        // for that down the line.
-        mul(tmp, op1.get_num(), op2.get_den());
-        submul(tmp, op1.get_den(), op2.get_num());
-        // After this line, op1/op2's num is tainted, and it cannot be used.
-        rop._get_num() = std::move(tmp);
-        // Ok, we are using only the dens and mul() is ok with overlapping args.
-        mul(rop._get_den(), op1.get_den(), op2.get_den());
-        rop.canonicalise();
+        auto g = gcd(op1.get_den(), op2.get_den());
+        if (!g.is_one()) {
+            auto t = divexact(op2.get_den(), g);
+            auto tmp2 = divexact(op1.get_den(), g);
+            auto tmp1 = op1.get_num() * t;
+            mul(t, op2.get_num(), tmp2);
+            AddOrSub ? add(t, tmp1, t) : sub(t, tmp1, t);
+            gcd(g, t, g);
+            if (g.is_one()) {
+                rop._get_num() = std::move(t);
+                mul(rop._get_den(), op2.get_den(), tmp2);
+            } else {
+                divexact(rop._get_num(), t, g);
+                divexact(tmp1, op2.get_den(), g);
+                mul(rop._get_den(), tmp1, tmp2);
+            }
+        } else {
+            auto tmp1 = op1.get_num() * op2.get_den();
+            auto tmp2 = op2.get_num() * op1.get_den();
+            AddOrSub ? add(rop._get_num(), tmp1, tmp2) : sub(rop._get_num(), tmp1, tmp2);
+            mul(rop._get_den(), op1.get_den(), op2.get_den());
+        }
     }
 }
 }
@@ -869,7 +855,7 @@ inline void sub_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
 template <std::size_t SSize>
 inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
-    add_impl<false>(rop, op1, op2);
+    addsub_impl<true, false>(rop, op1, op2);
 }
 
 /// Ternary subtraction.
@@ -883,7 +869,7 @@ inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational
 template <std::size_t SSize>
 inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
-    sub_impl<false>(rop, op1, op2);
+    addsub_impl<false, false>(rop, op1, op2);
 }
 
 inline namespace detail
@@ -1078,7 +1064,7 @@ template <std::size_t SSize>
 inline rational<SSize> dispatch_binary_add(const rational<SSize> &op1, const rational<SSize> &op2)
 {
     rational<SSize> retval;
-    add_impl<true>(retval, op1, op2);
+    addsub_impl<true, true>(retval, op1, op2);
     return retval;
 }
 
@@ -1156,7 +1142,7 @@ template <std::size_t SSize>
 inline rational<SSize> dispatch_binary_sub(const rational<SSize> &op1, const rational<SSize> &op2)
 {
     rational<SSize> retval;
-    sub_impl<true>(retval, op1, op2);
+    addsub_impl<false, true>(retval, op1, op2);
     return retval;
 }
 
