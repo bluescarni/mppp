@@ -814,6 +814,13 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
         rop._get_den() = op1.get_den();
         rop.canonicalise();
     } else {
+        // NOTE: the algorithm here is taken from GMP's aors.c for mpq. The idea
+        // is, as usual, to avoid large canonicalisations and to try to keep
+        // the values as small as possible at every step. We need to do some
+        // testing about this, as I am not 100% sure that this is going to be
+        // a win for our small-operands focus. Let's bookmark here the previous
+        // implementation, at git commit:
+        // a8a397d67d6e2af43592aa99061016398a1457ad
         auto g = gcd(op1.get_den(), op2.get_den());
         if (!g.is_one()) {
             auto t = divexact(op2.get_den(), g);
