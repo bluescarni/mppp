@@ -961,6 +961,86 @@ inline void mul(rational<SSize> &rop, const rational<SSize> &op1, const rational
     mul_impl<false>(rop, op1, op2);
 }
 
+/// Ternary division.
+/**
+ * This function will set \p rop to <tt>op1 / op2</tt>.
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ *
+ * @throws zero_division_error if \p op2 is zero.
+ */
+template <std::size_t SSize>
+inline void div(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    if (mppp_unlikely(op2.is_zero())) {
+        throw zero_division_error("Zero divisor in rational division");
+    }
+    if (mppp_unlikely(&rop == &op2)) {
+        // Following the GMP algorithm, special case in which rop and op2 are the same object.
+        // This allows us to use op2.get_num() safely later, even after setting rop's num, as
+        // we will be sure that rop and op2 do not overlap.
+        if (mppp_unlikely(&rop == &op1)) {
+            // x = x/x = 1.
+            rop._get_num().set_one();
+            rop._get_den().set_one();
+            return;
+        }
+        // Set rop to 1/rop by swapping num/den.
+        // NOTE: we already checked that op2 is nonzero, so inverting it
+        // does not yield division by zero.
+        std::swap(rop._get_num(), rop._get_den());
+        // Fix den sign.
+        if (rop.get_den().sgn() == -1) {
+            rop._get_num().neg();
+            rop._get_den().neg();
+        }
+        // Multiply by op1.
+        mul(rop, rop, op1);
+        return;
+    }
+    const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
+    if ((u1 && u2) || (op1.get_den() == op2.get_den())) {
+        rop._get_num() = op1.get_num();
+        rop._get_den() = op2.get_num();
+        const auto g = gcd(rop.get_num(), rop.get_den());
+        divexact(rop._get_num(), rop.get_num(), g);
+        divexact(rop._get_den(), rop.get_den(), g);
+    } else if (u1) {
+        // Same idea as in the mul().
+        const auto g = gcd(op1.get_num(), op2.get_num());
+        mul(rop._get_num(), op2.get_den(), divexact(op1.get_num(), g));
+        // NOTE: setting rop's num above does not taint op2, only op1, as we
+        // know from earlier that rop and op2 do not overlap.
+        divexact(rop._get_den(), op2.get_num(), g);
+    } else if (u2) {
+        const auto g = gcd(op1.get_num(), op2.get_num());
+        divexact(rop._get_num(), op1.get_num(), g);
+        mul(rop._get_den(), op1.get_den(), divexact(op2.get_num(), g));
+    } else {
+        // (a/b) / (c/d) -> a/b * d/c
+        // The two gcds.
+        const auto g1 = gcd(op1.get_num(), op2.get_num());
+        const auto g2 = gcd(op1.get_den(), op2.get_den());
+        // Remove common factors.
+        auto tmp1 = divexact(op1.get_num(), g1);
+        auto tmp2 = divexact(op2.get_den(), g2);
+        // Compute the numerator.
+        mul(rop._get_num(), tmp1, tmp2);
+        // Remove common factors.
+        divexact(tmp1, op2.get_num(), g1);
+        divexact(tmp2, op1.get_den(), g2);
+        // Denominator.
+        mul(rop._get_den(), tmp1, tmp2);
+    }
+    // Fix wrong sign in the den.
+    if (rop.get_den().sgn() == -1) {
+        rop._get_num().neg();
+        rop._get_den().neg();
+    }
+}
+
 /// Binary negation.
 /**
  * This method will set \p rop to <tt>-q</tt>.

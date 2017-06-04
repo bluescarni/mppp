@@ -509,3 +509,168 @@ TEST_CASE("mul")
 {
     tuple_for_each(sizes{}, mul_tester{});
 }
+
+struct div_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        mpq_raii m1, m2, m3;
+        rational n1, n2, n3;
+        // Some zero testing.
+        REQUIRE_THROWS_PREDICATE(div(n1, n2, n3), zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Zero divisor in rational division";
+        });
+        n2 = 10;
+        REQUIRE_THROWS_PREDICATE(div(n1, n2, n3), zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Zero divisor in rational division";
+        });
+        n2 = 0;
+        n3 = -10;
+        ::mpq_set_si(&m3.m_mpq, -10, 1);
+        div(n1, n2, n3);
+        ::mpq_div(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.get_num().is_static());
+        REQUIRE(n1.get_den().is_static());
+        REQUIRE(n2.get_num().is_static());
+        REQUIRE(n2.get_den().is_static());
+        REQUIRE(n3.get_num().is_static());
+        REQUIRE(n3.get_den().is_static());
+        mpq_raii tmp;
+        std::uniform_int_distribution<int> sdist(0, 1);
+        // Run a variety of tests with operands with x and y number of limbs.
+        auto random_xy = [&](unsigned x, unsigned y) {
+            for (int i = 0; i < ntries; ++i) {
+                random_rational(tmp, x, rng);
+                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                n2 = rational(&tmp.m_mpq);
+                if (sdist(rng)) {
+                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
+                    n2.neg();
+                }
+                if (n2.get_num().is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2._get_num().promote();
+                }
+                if (n2.get_den().is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2._get_den().promote();
+                }
+                random_rational(tmp, y, rng);
+                ::mpq_set(&m3.m_mpq, &tmp.m_mpq);
+                n3 = rational(&tmp.m_mpq);
+                if (sdist(rng)) {
+                    ::mpq_neg(&m3.m_mpq, &m3.m_mpq);
+                    n3.neg();
+                }
+                if (n3.get_num().is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n3._get_num().promote();
+                }
+                if (n3.get_den().is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n3._get_den().promote();
+                }
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset rop every once in a while.
+                    n1 = rational{};
+                }
+                // Handle zero divisor.
+                if (mpq_sgn(&m3.m_mpq) == 0) {
+                    REQUIRE_THROWS_PREDICATE(div(n1, n2, n3), zero_division_error, [](const zero_division_error &ex) {
+                        return std::string(ex.what()) == "Zero divisor in rational division";
+                    });
+                    continue;
+                }
+                div(n1, n2, n3);
+                ::mpq_div(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                // Various variations of in-place.
+                if (n2.sgn() != 0) {
+                    div(n1, n1, n2);
+                    ::mpq_div(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    div(n2, n1, n2);
+                    ::mpq_div(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    REQUIRE((lex_cast(n2) == lex_cast(m2)));
+                }
+                if (n1.sgn() != 0) {
+                    div(n1, n1, n1);
+                    ::mpq_div(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                // Tests with integral arguments.
+                auto n2_copy(n2);
+                auto n3_copy(n3);
+                mpq_raii m2_copy, m3_copy;
+                ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
+                ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
+                n2_copy._get_den() = 1;
+                ::mpz_set_si(mpq_denref(&m2_copy.m_mpq), 1);
+                if (n3_copy.sgn() != 0) {
+                    div(n1, n2_copy, n3_copy);
+                    ::mpq_div(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                if (n2_copy.sgn() != 0) {
+                    div(n1, n3_copy, n2_copy);
+                    ::mpq_div(&m1.m_mpq, &m3_copy.m_mpq, &m2_copy.m_mpq);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                n3_copy._get_den() = 1;
+                ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
+                if (n3_copy.sgn() != 0) {
+                    div(n1, n2_copy, n3_copy);
+                    ::mpq_div(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
+                    REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                }
+                // Tests with equal dens. This checks that
+                // the den of the retval is handled correctly.
+                n1 = "3/2";
+                n2_copy = n2;
+                n3_copy = n3;
+                n2_copy._get_num() = n3_copy.get_den() + 1;
+                n2_copy._get_den() = n3_copy.get_den();
+                if (n3_copy.sgn() != 0) {
+                    div(n1, n2_copy, n3_copy);
+                    REQUIRE((lex_cast(n1) == lex_cast(rational{n3_copy.get_den() + 1, n3_copy.get_num()})));
+                }
+            }
+        };
+
+        random_xy(1, 0);
+        random_xy(0, 1);
+        random_xy(1, 1);
+
+        random_xy(0, 2);
+        random_xy(1, 2);
+        random_xy(2, 0);
+        random_xy(2, 1);
+        random_xy(2, 2);
+
+        random_xy(0, 3);
+        random_xy(1, 3);
+        random_xy(2, 3);
+        random_xy(3, 0);
+        random_xy(3, 1);
+        random_xy(3, 2);
+        random_xy(3, 3);
+
+        random_xy(0, 4);
+        random_xy(1, 4);
+        random_xy(2, 4);
+        random_xy(3, 4);
+        random_xy(4, 0);
+        random_xy(4, 1);
+        random_xy(4, 2);
+        random_xy(4, 3);
+        random_xy(4, 4);
+    }
+};
+
+TEST_CASE("div")
+{
+    tuple_for_each(sizes{}, div_tester{});
+}
