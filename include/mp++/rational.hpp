@@ -823,7 +823,7 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
         // a8a397d67d6e2af43592aa99061016398a1457ad
         auto g = gcd(op1.get_den(), op2.get_den());
         if (g.is_one()) {
-            // This is the case in which num and den are coprime.
+            // This is the case in which the two dens are coprime.
             AddOrSub ? add(rop._get_num(), op1.get_num() * op2.get_den(), op2.get_num() * op1.get_den())
                      : sub(rop._get_num(), op1.get_num() * op2.get_den(), op2.get_num() * op1.get_den());
             mul(rop._get_den(), op1.get_den(), op2.get_den());
@@ -1148,6 +1148,20 @@ template <typename T, typename U>
 inline rational_common_t<T, U> operator+(const T &op1, const U &op2)
 {
     return dispatch_binary_add(op1, op2);
+}
+
+/// Negated copy.
+/**
+ * @param q the rational that will be negated.
+ *
+ * @return a negated copy of \p q.
+ */
+template <std::size_t SSize>
+inline rational<SSize> operator-(const rational<SSize> &q)
+{
+    auto retval(q);
+    retval.neg();
+    return retval;
 }
 
 inline namespace detail

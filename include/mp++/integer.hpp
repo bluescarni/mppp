@@ -4737,6 +4737,10 @@ inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
 template <std::size_t SSize>
 inline integer<SSize> operator+(const integer<SSize> &n)
 {
+    // NOTE: here potentially we could avoid a copy via either
+    // a universal reference or maybe passing by copy n and then
+    // moving in. Not sure how critical this is. Same in the negated
+    // copy operator.
     return n;
 }
 
