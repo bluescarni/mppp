@@ -68,6 +68,8 @@ concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<
 // NOTEs:
 // - GMP has a divexact_gcd() function that, I believe, shaves off some complexity in terms of branching
 //   etc. Consider implementing it.
+// - not clear if the NewRop flag helps at all. Needs to be benchmarked. If it does, its usage could
+//   be expanded in mul/div.
 template <std::size_t SSize>
 class rational
 {
@@ -890,10 +892,10 @@ inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational
 
 inline namespace detail
 {
-template <bool IntRop, std::size_t SSize>
+template <bool NewRop, std::size_t SSize>
 inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
-    assert(!IntRop || rop.get_den().is_one());
+    assert(!NewRop || rop.is_zero());
     const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
     // NOTE: it's important here to take care about overlapping arguments: we cannot use
     // rop as a "temporary" storage space, because if it overlaps with op1/op2 we will be
@@ -901,8 +903,8 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
     if (u1 && u2) {
         // mul() is fine with overlapping args.
         mul(rop._get_num(), op1.get_num(), op2.get_num());
-        if (!IntRop) {
-            // Set rop's den to 1, if rop is not already an int.
+        if (!NewRop) {
+            // Set rop's den to 1, if rop is not a new value (in that case, den is 1 already).
             rop._get_den().set_one();
         }
     } else if (op1.get_den() == op2.get_den()) {
