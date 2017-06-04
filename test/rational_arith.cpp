@@ -121,9 +121,11 @@ struct add_tester {
                 ::mpq_add(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2_copy + n3_copy) == lex_cast(m1)));
+                REQUIRE((lex_cast(n2_copy.get_num() + n3_copy) == lex_cast(m1)));
                 add(n1, n3_copy, n2_copy);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n3_copy + n2_copy) == lex_cast(m1)));
+                REQUIRE((lex_cast(n3_copy + n2_copy.get_num()) == lex_cast(m1)));
                 n3_copy._get_den() = 1;
                 ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 add(n1, n2_copy, n3_copy);
@@ -291,10 +293,12 @@ struct sub_tester {
                 ::mpq_sub(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2_copy - n3_copy) == lex_cast(m1)));
+                REQUIRE((lex_cast(n2_copy.get_num() - n3_copy) == lex_cast(m1)));
                 sub(n1, n3_copy, n2_copy);
                 n1.neg();
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(-(n3_copy - n2_copy)) == lex_cast(m1)));
+                REQUIRE((lex_cast(-(n3_copy - n2_copy.get_num())) == lex_cast(m1)));
                 n3_copy._get_den() = 1;
                 ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 sub(n1, n2_copy, n3_copy);
@@ -385,6 +389,7 @@ struct mul_tester {
         mul(n1, n2, n3);
         ::mpq_mul(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE((lex_cast(n2 * n3) == lex_cast(m1)));
         REQUIRE(n1.get_num().is_static());
         REQUIRE(n1.get_den().is_static());
         REQUIRE(n2.get_num().is_static());
@@ -433,17 +438,24 @@ struct mul_tester {
                 mul(n1, n2, n3);
                 ::mpq_mul(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(n2 * n3) == lex_cast(m1)));
                 // Various variations of in-place.
+                auto n1_old(n1);
+                auto n2_old(n2);
                 mul(n1, n1, n2);
                 ::mpq_mul(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(n1_old * n2) == lex_cast(m1)));
                 mul(n2, n1, n2);
                 ::mpq_mul(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
+                REQUIRE((lex_cast(n2_old * n1) == lex_cast(m2)));
+                n1_old = n1;
                 mul(n1, n1, n1);
                 ::mpq_mul(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(n1_old * n1_old) == lex_cast(m1)));
                 // Tests with integral arguments.
                 auto n2_copy(n2);
                 auto n3_copy(n3);
@@ -455,13 +467,18 @@ struct mul_tester {
                 mul(n1, n2_copy, n3_copy);
                 ::mpq_mul(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(n2_copy * n3_copy) == lex_cast(m1)));
+                REQUIRE((lex_cast(n2_copy.get_num() * n3_copy) == lex_cast(m1)));
                 mul(n1, n3_copy, n2_copy);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(n3_copy * n2_copy) == lex_cast(m1)));
+                REQUIRE((lex_cast(n3_copy * n2.get_num()) == lex_cast(m1)));
                 n3_copy._get_den() = 1;
                 ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
                 mul(n1, n2_copy, n3_copy);
                 ::mpq_mul(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(n2_copy * n3_copy) == lex_cast(m1)));
                 // Tests with equal dens. This checks that
                 // the den of the retval is handled correctly.
                 n1 = "3/2";

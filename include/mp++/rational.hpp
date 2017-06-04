@@ -70,6 +70,8 @@ concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<
 //   etc. Consider implementing it.
 // - not clear if the NewRop flag helps at all. Needs to be benchmarked. If it does, its usage could
 //   be expanded in mul/div.
+// - we might be paying a perf penalty for dynamic storage values due to the lack of pre-allocation for
+//   temporary variables in algorithms such as addsub, mul, div, etc. Needs to be investigated.
 template <std::size_t SSize>
 class rational
 {
@@ -1326,6 +1328,89 @@ template <typename T, typename U>
 inline rational_common_t<T, U> operator-(const T &op1, const U &op2)
 {
     return dispatch_binary_sub(op1, op2);
+}
+
+inline namespace detail
+{
+
+// Dispatching for the binary multiplication operator.
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_mul(const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    rational<SSize> retval;
+    mul_impl<true>(retval, op1, op2);
+    return retval;
+}
+
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_mul(const rational<SSize> &op1, const integer<SSize> &op2)
+{
+    rational<SSize> retval;
+    if (op1.get_den().is_one()) {
+        mul(retval._get_num(), op1.get_num(), op2);
+    } else {
+        auto g = gcd(op1.get_den(), op2);
+        // Set the den first.
+        divexact(retval._get_den(), op1.get_den(), g);
+        // Re-use the g variable as tmp storage.
+        divexact(g, op2, g);
+        mul(retval._get_num(), op1.get_num(), g);
+    }
+    return retval;
+}
+
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_mul(const integer<SSize> &op1, const rational<SSize> &op2)
+{
+    return dispatch_binary_mul(op2, op1);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline rational<SSize> dispatch_binary_mul(const rational<SSize> &op1, T n)
+{
+    return dispatch_binary_mul(op1, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline rational<SSize> dispatch_binary_mul(T n, const rational<SSize> &op2)
+{
+    return dispatch_binary_mul(op2, n);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_mul(const rational<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) * x;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
+{
+    return dispatch_binary_mul(op2, x);
+}
+}
+
+/// Binary multiplication operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::rational`.
+ *
+ * \endrststar
+ *
+ * @param op1 the first factor.
+ * @param op2 the second factor.
+ *
+ * @return <tt>op1 * op2</tt>.
+ */
+template <typename T, typename U>
+inline rational_common_t<T, U> operator*(const T &op1, const U &op2)
+{
+    return dispatch_binary_mul(op1, op2);
 }
 
 /** @} */
