@@ -822,26 +822,35 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
         // implementation, at git commit:
         // a8a397d67d6e2af43592aa99061016398a1457ad
         auto g = gcd(op1.get_den(), op2.get_den());
-        if (!g.is_one()) {
+        if (g.is_one()) {
+            // This is the case in which num and den are coprime.
+            AddOrSub ? add(rop._get_num(), op1.get_num() * op2.get_den(), op2.get_num() * op1.get_den())
+                     : sub(rop._get_num(), op1.get_num() * op2.get_den(), op2.get_num() * op1.get_den());
+            mul(rop._get_den(), op1.get_den(), op2.get_den());
+        } else {
+            // Eliminate common factors between the dens.
             auto t = divexact(op2.get_den(), g);
             auto tmp2 = divexact(op1.get_den(), g);
+
+            // Compute the numerator (will be t).
             auto tmp1 = op1.get_num() * t;
             mul(t, op2.get_num(), tmp2);
             AddOrSub ? add(t, tmp1, t) : sub(t, tmp1, t);
+
+            // Check if the numerator and the den GCD are coprime.
             gcd(g, t, g);
             if (g.is_one()) {
+                // They are coprime: assign the num and compute the final den.
                 rop._get_num() = std::move(t);
                 mul(rop._get_den(), op2.get_den(), tmp2);
             } else {
+                // Assign numerator, reduced by the new gcd.
                 divexact(rop._get_num(), t, g);
+                // Reduced version of the second den.
                 divexact(tmp1, op2.get_den(), g);
+                // Assign final den: tmp1 x the reduced den1.
                 mul(rop._get_den(), tmp1, tmp2);
             }
-        } else {
-            auto tmp1 = op1.get_num() * op2.get_den();
-            auto tmp2 = op2.get_num() * op1.get_den();
-            AddOrSub ? add(rop._get_num(), tmp1, tmp2) : sub(rop._get_num(), tmp1, tmp2);
-            mul(rop._get_den(), op1.get_den(), op2.get_den());
         }
     }
 }
