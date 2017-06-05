@@ -74,9 +74,44 @@ inline void fix_den_sign(rational<SSize> &q)
  * :cpp:class:`integers <mppp::integer>` with static size ``SSize`` as the numerator and denonimator.
  * Rational numbers are represented in the usual canonical form:
  *
- * * 0 is represented as 0/1,
  * * numerator and denominator are coprime,
  * * the denominator is always strictly positive.
+ *
+ * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
+ * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list)
+ * and with :cpp:class:`integers <mppp::integer>` with static size ``SSize``,
+ * and it provides overloaded :ref:`operators <rational_operators>`. Differently from the builtin types,
+ * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
+ * from and  conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
+ *
+ * .. code-block:: c++
+ *
+ *    rational<1> q = 5;
+ *    int m = q;
+ *
+ * will not work, and direct initialization and explicit casting should be used instead:
+ *
+ * .. code-block:: c++
+ *
+ *    rational<1> q{5};
+ *    int m = static_cast<int>(q);
+ *
+ * Most of the functionality is exposed via plain :ref:`functions <rational_functions>`, with the
+ * general convention that the functions are named after the corresponding GMP functions minus the leading ``mpq_``
+ * prefix. For instance, the GMP call
+ *
+ * .. code-block:: c++
+ *
+ *    mpq_add(rop,a,b);
+ *
+ * that writes the result of ``a + b`` into ``rop`` becomes simply
+ *
+ * .. code-block:: c++
+ *
+ *    add(rop,a,b);
+ *
+ * where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
+ * are allowed, unless noted otherwise.
  * \endrststar
  */
 // NOTEs:
