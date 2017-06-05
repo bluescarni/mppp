@@ -538,8 +538,14 @@ struct div_tester {
         REQUIRE_THROWS_PREDICATE(div(n1, n2, n3), zero_division_error, [](const zero_division_error &ex) {
             return std::string(ex.what()) == "Zero divisor in rational division";
         });
+        REQUIRE_THROWS_PREDICATE(n2 / n3, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Zero divisor in rational division";
+        });
         n2 = 10;
         REQUIRE_THROWS_PREDICATE(div(n1, n2, n3), zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Zero divisor in rational division";
+        });
+        REQUIRE_THROWS_PREDICATE(n2 / n3, zero_division_error, [](const zero_division_error &ex) {
             return std::string(ex.what()) == "Zero divisor in rational division";
         });
         n2 = 0;
@@ -548,6 +554,7 @@ struct div_tester {
         div(n1, n2, n3);
         ::mpq_div(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE((lex_cast(n2 / n3) == lex_cast(m1)));
         REQUIRE(n1.get_num().is_static());
         REQUIRE(n1.get_den().is_static());
         REQUIRE(n2.get_num().is_static());
@@ -598,25 +605,35 @@ struct div_tester {
                     REQUIRE_THROWS_PREDICATE(div(n1, n2, n3), zero_division_error, [](const zero_division_error &ex) {
                         return std::string(ex.what()) == "Zero divisor in rational division";
                     });
+                    REQUIRE_THROWS_PREDICATE(n2 / n3, zero_division_error, [](const zero_division_error &ex) {
+                        return std::string(ex.what()) == "Zero divisor in rational division";
+                    });
                     continue;
                 }
                 div(n1, n2, n3);
                 ::mpq_div(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                REQUIRE((lex_cast(n2 / n3) == lex_cast(m1)));
                 // Various variations of in-place.
+                auto n1_old(n1);
+                auto n2_old(n2);
                 if (n2.sgn() != 0) {
                     div(n1, n1, n2);
                     ::mpq_div(&m1.m_mpq, &m1.m_mpq, &m2.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    REQUIRE((lex_cast(n1_old / n2) == lex_cast(m1)));
                     div(n2, n1, n2);
                     ::mpq_div(&m2.m_mpq, &m1.m_mpq, &m2.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     REQUIRE((lex_cast(n2) == lex_cast(m2)));
+                    REQUIRE((lex_cast(n1 / n2_old) == lex_cast(m2)));
                 }
+                n1_old = n1;
                 if (n1.sgn() != 0) {
                     div(n1, n1, n1);
                     ::mpq_div(&m1.m_mpq, &m1.m_mpq, &m1.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    REQUIRE((lex_cast(n1 / n1) == lex_cast(m1)));
                 }
                 // Tests with integral arguments.
                 auto n2_copy(n2);
@@ -630,11 +647,13 @@ struct div_tester {
                     div(n1, n2_copy, n3_copy);
                     ::mpq_div(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    REQUIRE((lex_cast(n2_copy.get_num() / n3_copy) == lex_cast(m1)));
                 }
                 if (n2_copy.sgn() != 0) {
                     div(n1, n3_copy, n2_copy);
                     ::mpq_div(&m1.m_mpq, &m3_copy.m_mpq, &m2_copy.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    REQUIRE((lex_cast(n3_copy / n2_copy.get_num()) == lex_cast(m1)));
                 }
                 n3_copy._get_den() = 1;
                 ::mpz_set_si(mpq_denref(&m3_copy.m_mpq), 1);
@@ -642,6 +661,16 @@ struct div_tester {
                     div(n1, n2_copy, n3_copy);
                     ::mpq_div(&m1.m_mpq, &m2_copy.m_mpq, &m3_copy.m_mpq);
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                    REQUIRE((lex_cast(n2_copy / n3_copy.get_num()) == lex_cast(m1)));
+                    REQUIRE((lex_cast(n2_copy.get_num() / n3_copy) == lex_cast(m1)));
+                    REQUIRE_THROWS_PREDICATE(n2_copy.get_num() / rational{}, zero_division_error,
+                                             [](const zero_division_error &ex) {
+                                                 return std::string(ex.what()) == "Zero divisor in rational division";
+                                             });
+                    REQUIRE_THROWS_PREDICATE(n2_copy / rational{}.get_num(), zero_division_error,
+                                             [](const zero_division_error &ex) {
+                                                 return std::string(ex.what()) == "Zero divisor in rational division";
+                                             });
                 }
                 // Tests with equal dens. This checks that
                 // the den of the retval is handled correctly.

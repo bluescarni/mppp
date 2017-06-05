@@ -53,6 +53,20 @@ template <typename T, std::size_t SSize>
 concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
 #endif
 
+inline namespace detail
+{
+
+// This is useful in various bits below.
+template <std::size_t SSize>
+inline void fix_den_sign(rational<SSize> &q)
+{
+    if (q.get_den().sgn() == -1) {
+        q._get_num().neg();
+        q._get_den().neg();
+    }
+}
+}
+
 /// Multiprecision rational class.
 /**
  * \rststar
@@ -72,6 +86,8 @@ concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<
 //   be expanded in mul/div.
 // - we might be paying a perf penalty for dynamic storage values due to the lack of pre-allocation for
 //   temporary variables in algorithms such as addsub, mul, div, etc. Needs to be investigated.
+// - in the algorithm bits derived from GMP ones, we don't check for unitary GCDs because the original
+//   algos do not. We should investigate if there's perf benefits to be had there.
 template <std::size_t SSize>
 class rational
 {
@@ -631,10 +647,7 @@ public:
             divexact(m_den, m_den, g);
         }
         // Fix mismatch in signs.
-        if (mppp::sgn(m_den) == -1) {
-            m_num.neg();
-            m_den.neg();
-        }
+        fix_den_sign(*this);
         // NOTE: consider attempting demoting num/den. Let's KIS for now.
         return *this;
     }
@@ -1009,10 +1022,7 @@ inline void div(rational<SSize> &rop, const rational<SSize> &op1, const rational
         // does not yield division by zero.
         std::swap(rop._get_num(), rop._get_den());
         // Fix den sign.
-        if (rop.get_den().sgn() == -1) {
-            rop._get_num().neg();
-            rop._get_den().neg();
-        }
+        fix_den_sign(rop);
         // Multiply by op1.
         mul(rop, rop, op1);
         return;
@@ -1071,10 +1081,7 @@ inline void div(rational<SSize> &rop, const rational<SSize> &op1, const rational
         mul(rop._get_den(), tmp1, tmp2);
     }
     // Fix wrong sign in the den.
-    if (rop.get_den().sgn() == -1) {
-        rop._get_num().neg();
-        rop._get_den().neg();
-    }
+    fix_den_sign(rop);
 }
 
 /// Binary negation.
@@ -1449,6 +1456,133 @@ template <typename T, typename U>
 inline rational_common_t<T, U> operator*(const T &op1, const U &op2)
 {
     return dispatch_binary_mul(op1, op2);
+}
+
+inline namespace detail
+{
+
+// Dispatching for the binary division operator.
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_div(const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    rational<SSize> retval;
+    div(retval, op1, op2);
+    return retval;
+}
+
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_div(const rational<SSize> &op1, const integer<SSize> &op2)
+{
+    if (mppp_unlikely(op2.is_zero())) {
+        throw zero_division_error("Zero divisor in rational division");
+    }
+    rational<SSize> retval;
+    auto g = gcd(op1.get_num(), op2);
+    if (op1.get_den().is_one()) {
+        if (g.is_one()) {
+            retval._get_num() = op1.get_num();
+            retval._get_den() = op2;
+        } else {
+            divexact(retval._get_num(), op1.get_num(), g);
+            divexact(retval._get_den(), op2, g);
+        }
+    } else {
+        if (g.is_one()) {
+            retval._get_num() = op1.get_num();
+            mul(retval._get_den(), op1.get_den(), op2);
+        } else {
+            // Set the num first.
+            divexact(retval._get_num(), op1.get_num(), g);
+            // Re-use the g variable as tmp storage.
+            divexact(g, op2, g);
+            mul(retval._get_den(), op1.get_den(), g);
+        }
+    }
+    // Fix den sign.
+    fix_den_sign(retval);
+    return retval;
+}
+
+// NOTE: could not find a way to easily share the implementation above, so there's some repetition here.
+template <std::size_t SSize>
+inline rational<SSize> dispatch_binary_div(const integer<SSize> &op1, const rational<SSize> &op2)
+{
+    if (mppp_unlikely(op2.is_zero())) {
+        throw zero_division_error("Zero divisor in rational division");
+    }
+    rational<SSize> retval;
+    auto g = gcd(op1, op2.get_num());
+    if (op2.get_den().is_one()) {
+        if (g.is_one()) {
+            retval._get_num() = op1;
+            retval._get_den() = op2.get_num();
+        } else {
+            divexact(retval._get_num(), op1, g);
+            divexact(retval._get_den(), op2.get_num(), g);
+        }
+    } else {
+        if (g.is_one()) {
+            mul(retval._get_num(), op1, op2.get_den());
+            retval._get_den() = op2.get_num();
+        } else {
+            divexact(retval._get_den(), op2.get_num(), g);
+            divexact(g, op1, g);
+            mul(retval._get_num(), op2.get_den(), g);
+        }
+    }
+    // Fix den sign.
+    fix_den_sign(retval);
+    return retval;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline rational<SSize> dispatch_binary_div(const rational<SSize> &op1, T n)
+{
+    return dispatch_binary_div(op1, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline rational<SSize> dispatch_binary_div(T n, const rational<SSize> &op2)
+{
+    return dispatch_binary_div(integer<SSize>{n}, op2);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_div(const rational<SSize> &op1, T x)
+{
+    return static_cast<T>(op1) / x;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline T dispatch_binary_div(T x, const rational<SSize> &op2)
+{
+    return x / static_cast<T>(op2);
+}
+}
+
+/// Binary division operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::rational`.
+ *
+ * \endrststar
+ *
+ * @param op1 the dividend.
+ * @param op2 the divisor.
+ *
+ * @return <tt>op1 / op2</tt>.
+ *
+ * @throws zero_division_error if the division does not involve floating-point types and \p op2 is zero.
+ */
+template <typename T, typename U>
+inline rational_common_t<T, U> operator/(const T &op1, const U &op2)
+{
+    return dispatch_binary_div(op1, op2);
 }
 
 /** @} */
