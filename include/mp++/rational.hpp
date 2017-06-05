@@ -1195,6 +1195,18 @@ inline std::istream &operator>>(std::istream &is, rational<SSize> &q)
  *  @{
  */
 
+/// Identity operator.
+/**
+ * @param q the rational that will be copied.
+ *
+ * @return a copy of \p q.
+ */
+template <std::size_t SSize>
+inline rational<SSize> operator+(const rational<SSize> &q)
+{
+    return q;
+}
+
 inline namespace detail
 {
 
