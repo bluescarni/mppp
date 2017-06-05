@@ -919,16 +919,29 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
         // we remove the common factors from a and c and we perform
         // a normal multiplication (without canonicalisation). This allows us to
         // perform a gcd with smaller operands.
-        const auto g = gcd(op1.get_num(), op2.get_den());
-        // NOTE: after this line, all nums are tainted.
-        mul(rop._get_num(), op2.get_num(), divexact(op1.get_num(), g));
-        // NOTE: after this line, all dens are tainted.
-        divexact(rop._get_den(), op2.get_den(), g);
+        auto g = gcd(op1.get_num(), op2.get_den());
+        if (g.is_one()) {
+            // NOTE: after this line, all nums are tainted.
+            mul(rop._get_num(), op2.get_num(), op1.get_num());
+            rop._get_den() = op2.get_den();
+        } else {
+            // NOTE: after this line, all dens are tainted.
+            divexact(rop._get_den(), op2.get_den(), g);
+            // Re-use g.
+            divexact(g, op1.get_num(), g);
+            mul(rop._get_num(), op2.get_num(), g);
+        }
     } else if (u2) {
         // Mirror of the above.
-        const auto g = gcd(op2.get_num(), op1.get_den());
-        mul(rop._get_num(), op1.get_num(), divexact(op2.get_num(), g));
-        divexact(rop._get_den(), op1.get_den(), g);
+        auto g = gcd(op2.get_num(), op1.get_den());
+        if (g.is_one()) {
+            mul(rop._get_num(), op1.get_num(), op2.get_num());
+            rop._get_den() = op1.get_den();
+        } else {
+            divexact(rop._get_den(), op1.get_den(), g);
+            divexact(g, op2.get_num(), g);
+            mul(rop._get_num(), op1.get_num(), g);
+        }
     } else {
         // General case: a/b * c/d
         // NOTE: like above, we don't want to canonicalise (ac)/(bd),
@@ -1006,22 +1019,41 @@ inline void div(rational<SSize> &rop, const rational<SSize> &op1, const rational
     }
     const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
     if ((u1 && u2) || (op1.get_den() == op2.get_den())) {
-        rop._get_num() = op1.get_num();
-        rop._get_den() = op2.get_num();
-        const auto g = gcd(rop.get_num(), rop.get_den());
-        divexact(rop._get_num(), rop.get_num(), g);
-        divexact(rop._get_den(), rop.get_den(), g);
+        const auto g = gcd(op1.get_num(), op2.get_num());
+        if (g.is_one()) {
+            rop._get_num() = op1.get_num();
+            // NOTE: op2 not tainted, as it's separate from rop.
+            rop._get_den() = op2.get_num();
+        } else {
+            divexact(rop._get_num(), op1.get_num(), g);
+            divexact(rop._get_den(), op2.get_num(), g);
+        }
     } else if (u1) {
         // Same idea as in the mul().
-        const auto g = gcd(op1.get_num(), op2.get_num());
-        mul(rop._get_num(), op2.get_den(), divexact(op1.get_num(), g));
-        // NOTE: setting rop's num above does not taint op2, only op1, as we
-        // know from earlier that rop and op2 do not overlap.
-        divexact(rop._get_den(), op2.get_num(), g);
+        auto g = gcd(op1.get_num(), op2.get_num());
+        if (g.is_one()) {
+            mul(rop._get_num(), op2.get_den(), op1.get_num());
+            // NOTE: op2's num is not tainted, as op2 is distinct
+            // from rop.
+            rop._get_den() = op2.get_num();
+        } else {
+            // NOTE: dens tainted after this, apart from op2's
+            // as we have established earlier that rop and op2
+            // are distinct.
+            divexact(rop._get_den(), op2.get_num(), g);
+            divexact(g, op1.get_num(), g);
+            mul(rop._get_num(), op2.get_den(), g);
+        }
     } else if (u2) {
-        const auto g = gcd(op1.get_num(), op2.get_num());
-        divexact(rop._get_num(), op1.get_num(), g);
-        mul(rop._get_den(), op1.get_den(), divexact(op2.get_num(), g));
+        auto g = gcd(op1.get_num(), op2.get_num());
+        if (g.is_one()) {
+            rop._get_num() = op1.get_num();
+            mul(rop._get_den(), op1.get_den(), op2.get_num());
+        } else {
+            divexact(rop._get_num(), op1.get_num(), g);
+            divexact(g, op2.get_num(), g);
+            mul(rop._get_den(), op1.get_den(), g);
+        }
     } else {
         // (a/b) / (c/d) -> a/b * d/c
         // The two gcds.
@@ -1350,11 +1382,17 @@ inline rational<SSize> dispatch_binary_mul(const rational<SSize> &op1, const int
         mul(retval._get_num(), op1.get_num(), op2);
     } else {
         auto g = gcd(op1.get_den(), op2);
-        // Set the den first.
-        divexact(retval._get_den(), op1.get_den(), g);
-        // Re-use the g variable as tmp storage.
-        divexact(g, op2, g);
-        mul(retval._get_num(), op1.get_num(), g);
+        if (g.is_one()) {
+            // Nums will be tainted after this.
+            mul(retval._get_num(), op1.get_num(), op2);
+            retval._get_den() = op1.get_den();
+        } else {
+            // Set the den first. Dens tainted after this.
+            divexact(retval._get_den(), op1.get_den(), g);
+            // Re-use the g variable as tmp storage.
+            divexact(g, op2, g);
+            mul(retval._get_num(), op1.get_num(), g);
+        }
     }
     return retval;
 }
