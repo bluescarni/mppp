@@ -88,3 +88,18 @@ is typically built on top of basic :ref:`functions <rational_functions>`.
 
 .. doxygengroup:: rational_operators
    :content-only:
+
+.. cpp:namespace:: mppp
+
+.. cpp:function:: template <typename T, typename U> bool mppp::operator==(const T &op1, const U &op2)
+
+   A function with parameters and types.
+
+   :tparam T: foobar
+
+   :arg op1: The person sending the message
+   :arg op2: The person sending the message
+
+   :return: Description of a return value.
+
+   :throws: :cpp:class:`zero_division_error`

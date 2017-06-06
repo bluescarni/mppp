@@ -53,6 +53,10 @@ template <typename T, std::size_t SSize>
 concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
 #endif
 
+// Fwd declare this as we need friendship.
+template <std::size_t SSize>
+int cmp(const rational<SSize> &, const rational<SSize> &);
+
 inline namespace detail
 {
 
@@ -134,6 +138,11 @@ class rational
         // No need to use the mask for just 1.
         m_den._get_union().g_st().m_limbs[0] = 1;
     }
+#if !defined(MPPP_DOXYGEN_INVOKED)
+    // Make friends with the comparison function.
+    template <std::size_t S>
+    friend int cmp(const rational<S> &, const rational<S> &);
+#endif
 
 public:
 /// Underlying integral type.
@@ -801,6 +810,25 @@ struct rational_common_type<T, rational<SSize>, enable_if_t<is_supported_float<T
 template <typename T, typename U>
 using rational_common_t = typename rational_common_type<T, U>::type;
 
+// Implementation of the rational op types concept, used in various operators.
+template <typename T, typename U, typename = void>
+struct are_rational_op_types : std::false_type {
+};
+
+template <std::size_t SSize>
+struct are_rational_op_types<rational<SSize>, rational<SSize>> : std::true_type {
+};
+
+template <std::size_t SSize, typename T>
+struct are_rational_op_types<rational<SSize>, T, enable_if_t<is_rational_interoperable<T, SSize>::value>>
+    : std::true_type {
+};
+
+template <typename T, std::size_t SSize>
+struct are_rational_op_types<T, rational<SSize>, enable_if_t<is_rational_interoperable<T, SSize>::value>>
+    : std::true_type {
+};
+
 // Implementation of binary add/sub. The NewRop flag indicates that
 // rop is a def-cted rational distinct from op1 and op2.
 template <bool AddOrSub, bool NewRop, std::size_t SSize>
@@ -907,6 +935,13 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
     }
 }
 }
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RationalOpTypes = are_rational_op_types<T, U>::value;
+#else
+using rational_op_types_enabler = enable_if_t<are_rational_op_types<T, U>::value, int>;
+#endif
 
 /** @defgroup rational_arithmetic rational_arithmetic
  *  @{
@@ -1632,11 +1667,110 @@ inline rational_common_t<T, U> operator/(const T &op1, const U &op2)
     return dispatch_binary_div(op1, op2);
 }
 
+inline namespace detail
+{
+
+template <std::size_t SSize>
+inline bool dispatch_equality(const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    return op1.get_num() == op2.get_num() && op1.get_den() == op2.get_den();
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int> = 0>
+inline bool dispatch_equality(const rational<SSize> &op1, const T &op2)
+{
+    return op1.get_den().is_one() && op1.get_num() == op2;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int> = 0>
+inline bool dispatch_equality(const T &op1, const integer<SSize> &op2)
+{
+    return dispatch_equality(op2, op1);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline bool dispatch_equality(const rational<SSize> &op1, const T &op2)
+{
+    return static_cast<T>(op1) == op2;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
+{
+    return dispatch_equality(op2, op1);
+}
+}
+
+/// Equality operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires RationalOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator==(const T &op1, const U &op2)
+{
+    return dispatch_equality(op1, op2);
+}
+
+/// Inequality operator.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
+ * \endrststar
+ *
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires RationalOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+#endif
+    inline bool operator!=(const T &op1, const U &op2)
+{
+    return !(op1 == op2);
+}
+
 /** @} */
 
 /** @defgroup rational_comparison rational_comparison
  *  @{
  */
+
+/// Comparison function for rationals.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
+ * <tt>op1 > op2</tt>.
+ */
+template <std::size_t SSize>
+inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
+{
+    // NOTE: here we have potential for 2 views referring to the same underlying
+    // object. The same potential issues as described in the mpz_view class may arise.
+    // Keep an eye on it.
+    return ::mpq_cmp(op1.get_mpq_view(), op2.get_mpq_view());
+}
 
 /// Sign function.
 /**
