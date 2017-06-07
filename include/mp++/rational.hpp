@@ -1703,29 +1703,43 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 }
 }
 
-/** @} */
-
+/// Equality operator.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-requires RationalOpTypes<T, U>
+template <typename T>
+inline bool operator==(const T &op1, const RationalOpTypes<T> &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline bool operator==(const T &op1, const U &op2)
 #endif
-    inline bool operator==(const T &op1, const U &op2)
 {
     return dispatch_equality(op1, op2);
 }
 
+/// Inequality operator.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-requires RationalOpTypes<T, U>
+template <typename T>
+inline bool operator!=(const T &op1, const RationalOpTypes<T> &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline bool operator!=(const T &op1, const U &op2)
 #endif
-    inline bool operator!=(const T &op1, const U &op2)
 {
     return !(op1 == op2);
 }
+
+/** @} */
 
 /** @defgroup rational_comparison rational_comparison
  *  @{

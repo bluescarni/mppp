@@ -88,25 +88,3 @@ is typically built on top of basic :ref:`functions <rational_functions>`.
 
 .. doxygengroup:: rational_operators
    :content-only:
-
-.. cpp:function:: template <typename T, typename U> bool mppp::operator==(const T &op1, const U &op2)
-
-   Equality operator.
-
-   This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
-
-   :arg op1: first argument.
-   :arg op2: second argument.
-
-   :return: ``true`` if ``op1 == op2``, ``false`` otherwise.
-
-.. cpp:function:: template <typename T, typename U> bool mppp::operator!=(const T &op1, const U &op2)
-
-   Inequality operator.
-
-   This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
-
-   :arg op1: first argument.
-   :arg op2: second argument.
-
-   :return: ``true`` if ``op1 != op2``, ``false`` otherwise.
