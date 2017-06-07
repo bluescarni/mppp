@@ -13,6 +13,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -1799,6 +1800,29 @@ inline void canonicalise(rational<SSize> &q)
 }
 
 /** @} */
+
+template <std::size_t SSize>
+inline std::size_t hash(const rational<SSize> &q)
+{
+    // NOTE: just return the sum of the hashes. We are already doing
+    // some hashing in the integers, hopefully this is enough to obtain
+    // decent hashing on the rational as well.
+    return hash(q.get_num()) + hash(q.get_den());
+}
+}
+
+namespace std
+{
+
+template <size_t SSize>
+struct hash<mppp::rational<SSize>> {
+    using argument_type = mppp::rational<SSize>;
+    using result_type = size_t;
+    result_type operator()(const argument_type &n) const
+    {
+        return mppp::hash(n);
+    }
+};
 }
 
 #endif
