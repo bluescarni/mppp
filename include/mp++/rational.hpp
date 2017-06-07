@@ -127,6 +127,7 @@ inline void fix_den_sign(rational<SSize> &q)
 //   temporary variables in algorithms such as addsub, mul, div, etc. Needs to be investigated.
 // - in the algorithm bits derived from GMP ones, we don't check for unitary GCDs because the original
 //   algos do not. We should investigate if there's perf benefits to be had there.
+// - cmp() can be improved (see comments there).
 template <std::size_t SSize>
 class rational
 {
@@ -1683,7 +1684,7 @@ inline bool dispatch_equality(const rational<SSize> &op1, const T &op2)
 }
 
 template <std::size_t SSize, typename T, enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int> = 0>
-inline bool dispatch_equality(const T &op1, const integer<SSize> &op2)
+inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 {
     return dispatch_equality(op2, op1);
 }
@@ -1743,6 +1744,12 @@ inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
     // NOTE: here we have potential for 2 views referring to the same underlying
     // object. The same potential issues as described in the mpz_view class may arise.
     // Keep an eye on it.
+    // NOTE: this can probably be improved by implementing the same strategy as in ::mpq_cmp()
+    // but based on our primitives:
+    // - if op1 and op2 are integers, compare the nums,
+    // - try to see if the limb/bit sizes of nums and dens can tell use immediately which
+    //   number is larger,
+    // - otherwise, do the two multiplications and compare.
     return ::mpq_cmp(op1.get_mpq_view(), op2.get_mpq_view());
 }
 
