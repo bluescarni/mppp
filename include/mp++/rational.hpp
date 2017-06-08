@@ -741,11 +741,28 @@ public:
     /**
      * This method will set \p this to its absolute value.
      *
-     * @return reference to \p this.
+     * @return a reference to \p this.
      */
     rational &abs()
     {
         m_num.abs();
+        return *this;
+    }
+    /// In-place inversion.
+    /**
+     * This method will set \p this to its inverse.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws zero_division_error if \p this is zero.
+     */
+    rational &inv()
+    {
+        if (mppp_unlikely(is_zero())) {
+            throw zero_division_error("Cannot invert a zero rational");
+        }
+        std::swap(m_num, m_den);
+        fix_den_sign(*this);
         return *this;
     }
     /// Test if the value is zero.
@@ -1212,6 +1229,38 @@ inline rational<SSize> abs(const rational<SSize> &q)
     return ret;
 }
 
+/// Binary inversion.
+/**
+ * This function will set \p rop to the inverse of \p q.
+ *
+ * @param rop the return value.
+ * @param q the argument.
+ *
+ * @throws unspecified any exception thrown by mppp::rational::inv().
+ */
+template <std::size_t SSize>
+inline void inv(rational<SSize> &rop, const rational<SSize> &q)
+{
+    rop = q;
+    rop.inv();
+}
+
+/// Unary inversion.
+/**
+ * @param q the argument.
+ *
+ * @return the inverse of \p q.
+ *
+ * @throws unspecified any exception thrown by mppp::rational::inv().
+ */
+template <std::size_t SSize>
+inline rational<SSize> inv(const rational<SSize> &q)
+{
+    rational<SSize> ret(q);
+    ret.inv();
+    return ret;
+}
+
 /** @} */
 
 /** @defgroup rational_io rational_io
@@ -1248,7 +1297,7 @@ inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
  * @param is input stream.
  * @param q rational to which the contents of the stream will be assigned.
  *
- * @return reference to \p is.
+ * @return a reference to \p is.
  *
  * @throws unspecified any exception thrown by the constructor from string of rational.
  */
