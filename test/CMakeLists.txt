@@ -32,7 +32,11 @@ ADD_MPPP_TESTCASE(integer_abs)
 ADD_MPPP_TESTCASE(integer_add_ui)
 ADD_MPPP_TESTCASE(integer_arith)
 ADD_MPPP_TESTCASE(integer_arith_ops)
-ADD_MPPP_TESTCASE(integer_basic)
+if(NOT MINGW)
+    # At the moment this test results in a linking error in conjunction
+    # with catch. Needs to be investigated.
+    ADD_MPPP_TESTCASE(integer_basic)
+endif()
 ADD_MPPP_TESTCASE(integer_bin)
 ADD_MPPP_TESTCASE(integer_divexact)
 ADD_MPPP_TESTCASE(integer_even_odd)
