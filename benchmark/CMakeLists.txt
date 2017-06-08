@@ -19,9 +19,6 @@ function(ADD_MPPP_BENCHMARK arg1)
     endif()
     target_include_directories(${arg1} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
     target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_DEBUG_RELEASE}>")
-    if(YACMA_COMPILER_IS_MSVC AND MPPP_MSVC_STATIC_RUNTIME)
-      target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:-MTd>" "$<$<CONFIG:RELEASE>:-MT>")
-    endif()
     if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
       # NOTE: the idea here is that we want to use C++14 if the compilers supports
       # concepts (as variable concepts are essentially template variables).

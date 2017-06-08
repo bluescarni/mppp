@@ -43,9 +43,6 @@ mark_as_advanced(MPPP_BENCHMARK_BOOST)
 option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
 mark_as_advanced(MPPP_BENCHMARK_FLINT)
 option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
-if(YACMA_COMPILER_IS_MSVC)
-    option(MPPP_MSVC_STATIC_RUNTIME "Use the MSVC static runtime instead of the shared runtime." OFF)
-endif()
 
 if(YACMA_COMPILER_IS_GNUCXX)
     # This is just a hackish way of detecting concepts, need to revisit once
