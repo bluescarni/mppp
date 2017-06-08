@@ -4394,7 +4394,7 @@ inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
         pow_ui(rop, base, integer_exp_to_ulong(exp));
     } else if (mppp_unlikely(integer_base_is_zero(base))) {
         // 0**-n is a division by zero.
-        throw zero_division_error("cannot raise zero to the negative power " + integer_exp_to_string(exp));
+        throw zero_division_error("Cannot raise zero to the negative power " + integer_exp_to_string(exp));
     } else if (base.is_one()) {
         // 1**n == 1.
         rop = 1;
