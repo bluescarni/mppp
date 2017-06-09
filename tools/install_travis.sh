@@ -24,7 +24,6 @@ if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 cmake ../ -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir;
     make;
     ./main;
-
 elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
     make -j2 VERBOSE=1;
@@ -62,6 +61,10 @@ elif [[ "${MPPP_BUILD}" == "DebugClang38" ]]; then
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "ReleaseClang38" ]]; then
     CXX=clang++-3.8 CC=clang-3.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
+    make -j2 VERBOSE=1;
+    ctest -V;
+elif [[ "${MPPP_BUILD}" == "OSXDebug" ]]; then
+    CXX=clang++ CC=clang cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
     make -j2 VERBOSE=1;
     ctest -V;
 # elif [[ "${MPPP_BUILD}" == "ICC" ]]; then
