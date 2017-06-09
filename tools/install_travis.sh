@@ -6,8 +6,14 @@ set -x
 # Exit on error.
 set -e
 
+if [[ "${MPPP_BUILD}" != DebugGCC48DebugGMP && "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
+    export deps_dir=$HOME/local
+    export PATH="$HOME/miniconda/bin:$PATH"
+    export PATH="$deps_dir/bin:$PATH"
+fi
+
 if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=/home/travis/.local -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
     make -j2 VERBOSE=1 install;
     ctest -V;
 
@@ -15,12 +21,12 @@ if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
     cd ../tools/sample_project;
     mkdir build;
     cd build;
-    CXX=g++-4.8 CC=gcc-4.8 cmake ../ -DCMAKE_PREFIX_PATH=/home/travis/.local;
+    CXX=g++-4.8 CC=gcc-4.8 cmake ../ -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir;
     make;
     ./main;
 
 elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
@@ -35,7 +41,7 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "CoverageGCC5" ]]; then
-    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
+    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-5;
@@ -51,11 +57,11 @@ elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-6;
 elif [[ "${MPPP_BUILD}" == "DebugClang38" ]]; then
-    CXX=clang++-3.8 CC=clang-3.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
+    CXX=clang++-3.8 CC=clang-3.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "ReleaseClang38" ]]; then
-    CXX=clang++-3.8 CC=clang-3.8 cmake -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
+    CXX=clang++-3.8 CC=clang-3.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
     make -j2 VERBOSE=1;
     ctest -V;
 # elif [[ "${MPPP_BUILD}" == "ICC" ]]; then
@@ -65,30 +71,19 @@ elif [[ "${MPPP_BUILD}" == "ReleaseClang38" ]]; then
 #     docker pull ${DOCKER_IMAGE};
 elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     # Run the configure step to create the doc config files.
-    CXX=g++-5 CC=gcc-5 cmake -DMPPP_WITH_MPFR=yes ../;
+    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DMPPP_WITH_MPFR=yes ../;
 
-    # Install a recent version of Doxygen locally.
-    wget "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.13.src.tar.gz";
-    tar xzf doxygen-1.8.13.src.tar.gz;
-    cd doxygen-1.8.13;
-    mkdir build;
-    cd build;
-    CC=gcc-5 CXX=g++-5 cmake -DCMAKE_INSTALL_PREFIX=/home/travis/.local ../;
-    make -j2;
-    make install;
-    cd ..;
-    cd ..;
     cd ..;
     cd doc/doxygen;
-    export DOXYGEN_OUTPUT=`/home/travis/.local/bin/doxygen 2>&1 >/dev/null`;
+    export DOXYGEN_OUTPUT=`doxygen 2>&1 >/dev/null`;
     if [[ "${DOXYGEN_OUTPUT}" != "" ]]; then
         echo "Doxygen encountered some problem:";
         echo "${DOXYGEN_OUTPUT}";
         exit 1;
     fi
     cd ../sphinx;
-    pip install --user 'sphinx<1.5.6' breathe requests[security]
-    export SPHINX_OUTPUT=`make html SPHINXBUILD=/home/travis/.local/bin/sphinx-build 2>&1 >/dev/null`;
+    pip install --user 'sphinx<1.6' breathe requests[security]
+    export SPHINX_OUTPUT=`make html 2>&1 >/dev/null`;
     if [[ "${SPHINX_OUTPUT}" != "" ]]; then
         echo "Sphinx encountered some problem:";
         echo "${SPHINX_OUTPUT}";
