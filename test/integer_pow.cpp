@@ -132,20 +132,20 @@ struct pow_tester {
                                      });
         }
         REQUIRE_THROWS_PREDICATE(pow(integer{0}, -1), zero_division_error, [](const zero_division_error &zde) {
-            return zde.what() == std::string("cannot raise zero to the negative power -1");
+            return zde.what() == std::string("Cannot raise zero to the negative power -1");
         });
         REQUIRE_THROWS_PREDICATE(pow(integer{0}, -2ll), zero_division_error, [](const zero_division_error &zde) {
-            return zde.what() == std::string("cannot raise zero to the negative power -2");
+            return zde.what() == std::string("Cannot raise zero to the negative power -2");
         });
         REQUIRE_THROWS_PREDICATE(pow(integer{0}, integer{-25}), zero_division_error,
                                  [](const zero_division_error &zde) {
-                                     return zde.what() == std::string("cannot raise zero to the negative power -25");
+                                     return zde.what() == std::string("Cannot raise zero to the negative power -25");
                                  });
         REQUIRE_THROWS_PREDICATE(pow(0, integer{-1}), zero_division_error, [](const zero_division_error &zde) {
-            return zde.what() == std::string("cannot raise zero to the negative power -1");
+            return zde.what() == std::string("Cannot raise zero to the negative power -1");
         });
         REQUIRE_THROWS_PREDICATE(pow(0ll, integer{-2ll}), zero_division_error, [](const zero_division_error &zde) {
-            return zde.what() == std::string("cannot raise zero to the negative power -2");
+            return zde.what() == std::string("Cannot raise zero to the negative power -2");
         });
         // 1 to negative exp.
         REQUIRE(pow(integer{1}, -1) == 1);

@@ -36,6 +36,7 @@
 #include <mp++/detail/mpfr.hpp>
 #endif
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/exceptions.hpp>
 
 // Compiler configuration.
@@ -4121,24 +4122,6 @@ inline namespace detail
 {
 
 // These helpers are used here and in pow() as well.
-template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
-inline bool integer_exp_nonnegative(const T &exp)
-{
-    return exp >= T(0);
-}
-
-template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
-inline bool integer_exp_nonnegative(const T &)
-{
-    return true;
-}
-
-template <std::size_t SSize>
-inline bool integer_exp_nonnegative(const integer<SSize> &exp)
-{
-    return exp.sgn() >= 0;
-}
-
 template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
 inline unsigned long integer_exp_to_ulong(const T &exp)
 {
@@ -4170,7 +4153,7 @@ template <typename T, std::size_t SSize>
 inline integer<SSize> binomial_impl(const integer<SSize> &n, const T &k)
 {
     // NOTE: here we re-use some helper methods used in the implementation of pow().
-    if (integer_exp_nonnegative(k)) {
+    if (sgn(k) >= 0) {
         return bin_ui(n, integer_exp_to_ulong(k));
     }
     // This is the case k < 0, handled according to:
@@ -4348,18 +4331,6 @@ inline namespace detail
 
 // Various helpers for the implementation of pow().
 template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-inline bool integer_base_is_zero(const T &base)
-{
-    return base == T(0);
-}
-
-template <std::size_t SSize>
-inline bool integer_base_is_zero(const integer<SSize> &base)
-{
-    return base.is_zero();
-}
-
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
 inline bool integer_exp_is_odd(const T &exp)
 {
     return (exp % T(2)) != T(0);
@@ -4371,18 +4342,6 @@ inline bool integer_exp_is_odd(const integer<SSize> &exp)
     return exp.odd_p();
 }
 
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-inline std::string integer_exp_to_string(const T &exp)
-{
-    return std::to_string(exp);
-}
-
-template <std::size_t SSize>
-inline std::string integer_exp_to_string(const integer<SSize> &exp)
-{
-    return exp.to_string();
-}
-
 // Implementation of pow().
 // integer -- integral overload.
 template <typename T, std::size_t SSize,
@@ -4390,11 +4349,11 @@ template <typename T, std::size_t SSize,
 inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
 {
     integer<SSize> rop;
-    if (integer_exp_nonnegative(exp)) {
+    if (sgn(exp) >= 0) {
         pow_ui(rop, base, integer_exp_to_ulong(exp));
-    } else if (mppp_unlikely(integer_base_is_zero(base))) {
+    } else if (mppp_unlikely(is_zero(base))) {
         // 0**-n is a division by zero.
-        throw zero_division_error("cannot raise zero to the negative power " + integer_exp_to_string(exp));
+        throw zero_division_error("Cannot raise zero to the negative power " + to_string(exp));
     } else if (base.is_one()) {
         // 1**n == 1.
         rop = 1;
@@ -4737,6 +4696,10 @@ inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
 template <std::size_t SSize>
 inline integer<SSize> operator+(const integer<SSize> &n)
 {
+    // NOTE: here potentially we could avoid a copy via either
+    // a universal reference or maybe passing by copy n and then
+    // moving in. Not sure how critical this is. Same in the negated
+    // copy operator.
     return n;
 }
 
@@ -4765,10 +4728,6 @@ inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
 
 /// In-place addition operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * \endrststar
- *
  * @param rop the augend.
  * @param op the addend.
  *
@@ -4778,14 +4737,12 @@ inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
  * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerOpTypes<T, U>
-#endif
+template <typename T>
+inline T &operator+=(T &rop, const IntegerOpTypes<T> &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+inline T &operator+=(T &rop, const U &op)
 #endif
-    inline T &operator+=(T &rop, const U &op)
 {
     dispatch_in_place_add(rop, op);
     return rop;
@@ -4928,10 +4885,6 @@ inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
 
 /// In-place subtraction operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * \endrststar
- *
  * @param rop the minuend.
  * @param op the subtrahend.
  *
@@ -4941,14 +4894,12 @@ inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
  * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerOpTypes<T, U>
-#endif
+template <typename T>
+inline T &operator-=(T &rop, const IntegerOpTypes<T> &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+inline T &operator-=(T &rop, const U &op)
 #endif
-    inline T &operator-=(T &rop, const U &op)
 {
     dispatch_in_place_sub(rop, op);
     return rop;
@@ -5080,10 +5031,6 @@ inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
 
 /// In-place multiplication operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * \endrststar
- *
  * @param rop the multiplicator.
  * @param op the multiplicand.
  *
@@ -5093,14 +5040,12 @@ inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
  * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerOpTypes<T, U>
-#endif
+template <typename T>
+inline T &operator*=(T &rop, const IntegerOpTypes<T> &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+inline T &operator*=(T &rop, const U &op)
 #endif
-    inline T &operator*=(T &rop, const U &op)
 {
     dispatch_in_place_mul(rop, op);
     return rop;
@@ -5247,10 +5192,6 @@ inline integer_common_t<T, U> operator/(const T &n, const U &d)
 
 /// In-place division operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * \endrststar
- *
  * @param rop the dividend.
  * @param op the divisor.
  *
@@ -5261,14 +5202,12 @@ inline integer_common_t<T, U> operator/(const T &n, const U &d)
  * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerOpTypes<T, U>
-#endif
+template <typename T>
+inline T &operator/=(T &rop, const IntegerOpTypes<T> &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+inline T &operator/=(T &rop, const U &op)
 #endif
-    inline T &operator/=(T &rop, const U &op)
 {
     dispatch_in_place_div(rop, op);
     return rop;
@@ -5303,10 +5242,6 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 
 /// In-place modulo operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * \endrststar
- *
  * @param rop the dividend.
  * @param op the divisor.
  *
@@ -5316,14 +5251,12 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
  * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline T &operator%=(T &rop, const IntegerIntegralOpTypes<T> &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline T &operator%=(T &rop, const U &op)
 #endif
-    inline T &operator%=(T &rop, const U &op)
 {
     dispatch_in_place_mod(rop, op);
     return rop;
@@ -5578,144 +5511,108 @@ inline bool dispatch_greater_than(T x, const integer<SSize> &a)
 
 /// Equality operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * \endrststar
- *
  * @param op1 first argument.
  * @param op2 second argument.
  *
  * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerOpTypes<T, U>
-#endif
+template <typename T>
+inline bool operator==(const T &op1, const IntegerOpTypes<T> &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+inline bool operator==(const T &op1, const U &op2)
 #endif
-    inline bool operator==(const T &op1, const U &op2)
 {
     return dispatch_equality(op1, op2);
 }
 
 /// Inequality operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * \endrststar
- *
  * @param op1 first argument.
  * @param op2 second argument.
  *
  * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerOpTypes<T, U>
-#endif
+template <typename T>
+inline bool operator!=(const T &op1, const IntegerOpTypes<T> &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+inline bool operator!=(const T &op1, const U &op2)
 #endif
-    inline bool operator!=(const T &op1, const U &op2)
 {
     return !(op1 == op2);
 }
 
 /// Less-than operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * \endrststar
- *
  * @param op1 first argument.
  * @param op2 second argument.
  *
  * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerOpTypes<T, U>
-#endif
+template <typename T>
+inline bool operator<(const T &op1, const IntegerOpTypes<T> &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+inline bool operator<(const T &op1, const U &op2)
 #endif
-    inline bool operator<(const T &op1, const U &op2)
 {
     return dispatch_less_than(op1, op2);
 }
 
 /// Less-than or equal operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * \endrststar
- *
  * @param op1 first argument.
  * @param op2 second argument.
  *
  * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerOpTypes<T, U>
-#endif
+template <typename T>
+inline bool operator<=(const T &op1, const IntegerOpTypes<T> &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+inline bool operator<=(const T &op1, const U &op2)
 #endif
-    inline bool operator<=(const T &op1, const U &op2)
 {
     return !(op1 > op2);
 }
 
 /// Greater-than operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * \endrststar
- *
  * @param op1 first argument.
  * @param op2 second argument.
  *
  * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerOpTypes<T, U>
-#endif
+template <typename T>
+inline bool operator>(const T &op1, const IntegerOpTypes<T> &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+inline bool operator>(const T &op1, const U &op2)
 #endif
-    inline bool operator>(const T &op1, const U &op2)
 {
     return dispatch_greater_than(op1, op2);
 }
 
 /// Greater-than or equal operator.
 /**
- * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * \endrststar
- *
  * @param op1 first argument.
  * @param op2 second argument.
  *
  * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerOpTypes<T, U>
-#endif
+template <typename T>
+inline bool operator>=(const T &op1, const IntegerOpTypes<T> &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+inline bool operator>=(const T &op1, const U &op2)
 #endif
-    inline bool operator>=(const T &op1, const U &op2)
 {
     return !(op1 < op2);
 }
