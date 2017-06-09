@@ -36,6 +36,7 @@
 #include <mp++/detail/mpfr.hpp>
 #endif
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/exceptions.hpp>
 
 // Compiler configuration.
@@ -4121,24 +4122,6 @@ inline namespace detail
 {
 
 // These helpers are used here and in pow() as well.
-template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
-inline bool integer_exp_nonnegative(const T &exp)
-{
-    return exp >= T(0);
-}
-
-template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
-inline bool integer_exp_nonnegative(const T &)
-{
-    return true;
-}
-
-template <std::size_t SSize>
-inline bool integer_exp_nonnegative(const integer<SSize> &exp)
-{
-    return exp.sgn() >= 0;
-}
-
 template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
 inline unsigned long integer_exp_to_ulong(const T &exp)
 {
@@ -4170,7 +4153,7 @@ template <typename T, std::size_t SSize>
 inline integer<SSize> binomial_impl(const integer<SSize> &n, const T &k)
 {
     // NOTE: here we re-use some helper methods used in the implementation of pow().
-    if (integer_exp_nonnegative(k)) {
+    if (sgn(k) >= 0) {
         return bin_ui(n, integer_exp_to_ulong(k));
     }
     // This is the case k < 0, handled according to:
@@ -4348,18 +4331,6 @@ inline namespace detail
 
 // Various helpers for the implementation of pow().
 template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-inline bool integer_base_is_zero(const T &base)
-{
-    return base == T(0);
-}
-
-template <std::size_t SSize>
-inline bool integer_base_is_zero(const integer<SSize> &base)
-{
-    return base.is_zero();
-}
-
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
 inline bool integer_exp_is_odd(const T &exp)
 {
     return (exp % T(2)) != T(0);
@@ -4390,9 +4361,9 @@ template <typename T, std::size_t SSize,
 inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
 {
     integer<SSize> rop;
-    if (integer_exp_nonnegative(exp)) {
+    if (sgn(exp) >= 0) {
         pow_ui(rop, base, integer_exp_to_ulong(exp));
-    } else if (mppp_unlikely(integer_base_is_zero(base))) {
+    } else if (mppp_unlikely(is_zero(base))) {
         // 0**-n is a division by zero.
         throw zero_division_error("Cannot raise zero to the negative power " + integer_exp_to_string(exp));
     } else if (base.is_one()) {
