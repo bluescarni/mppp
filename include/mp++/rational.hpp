@@ -767,11 +767,27 @@ public:
     }
     /// Test if the value is zero.
     /**
-     * @return \p true if the value represented by \p this is zero, \p false otherwise.
+     * @return \p true if the value represented by \p this is 0, \p false otherwise.
      */
     bool is_zero() const
     {
         return mppp::is_zero(m_num);
+    }
+    /// Test if the value is one.
+    /**
+     * @return \p true if the value represented by \p this is 1, \p false otherwise.
+     */
+    bool is_one() const
+    {
+        return mppp::is_one(m_num) && mppp::is_one(m_den);
+    }
+    /// Test if the value is minus one.
+    /**
+     * @return \p true if the value represented by \p this is -1, \p false otherwise.
+     */
+    bool is_negative_one() const
+    {
+        return mppp::is_negative_one(m_num) && mppp::is_one(m_den);
     }
 
 private:
@@ -1829,11 +1845,35 @@ int sgn(const rational<SSize> &q)
     return q.sgn();
 }
 
+/// Test if a rational is one.
+/**
+ * @param q the rational to be tested.
+ *
+ * @return \p true if \p q is 1, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool is_one(const rational<SSize> &q)
+{
+    return q.is_one();
+}
+
+/// Test if a rational is minus one.
+/**
+ * @param q the rational to be tested.
+ *
+ * @return \p true if \p q is -1, \p false otherwise.
+ */
+template <std::size_t SSize>
+inline bool is_negative_one(const rational<SSize> &q)
+{
+    return q.is_negative_one();
+}
+
 /// Test if a rational is zero.
 /**
  * @param q the rational to be tested.
  *
- * @return \p true if \p q is zero, \p false otherwise.
+ * @return \p true if \p q is 0, \p false otherwise.
  */
 template <std::size_t SSize>
 inline bool is_zero(const rational<SSize> &q)
