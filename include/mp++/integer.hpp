@@ -4342,18 +4342,6 @@ inline bool integer_exp_is_odd(const integer<SSize> &exp)
     return exp.odd_p();
 }
 
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-inline std::string integer_exp_to_string(const T &exp)
-{
-    return std::to_string(exp);
-}
-
-template <std::size_t SSize>
-inline std::string integer_exp_to_string(const integer<SSize> &exp)
-{
-    return exp.to_string();
-}
-
 // Implementation of pow().
 // integer -- integral overload.
 template <typename T, std::size_t SSize,
@@ -4365,7 +4353,7 @@ inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
         pow_ui(rop, base, integer_exp_to_ulong(exp));
     } else if (mppp_unlikely(is_zero(base))) {
         // 0**-n is a division by zero.
-        throw zero_division_error("Cannot raise zero to the negative power " + integer_exp_to_string(exp));
+        throw zero_division_error("Cannot raise zero to the negative power " + to_string(exp));
     } else if (base.is_one()) {
         // 1**n == 1.
         rop = 1;
