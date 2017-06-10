@@ -165,6 +165,14 @@ struct pow_tester {
         REQUIRE(std::abs(pow(2.l, rational{1, 2}) - std::sqrt(2.l)) < 1E-8);
         REQUIRE(std::abs(pow(rational{2}, .5l) - std::sqrt(2.l)) < 1E-8);
 #endif
+
+        // Some special casing with base 1.
+        REQUIRE((pow(rational{1}, rational{1, 2}) == rational{1}));
+        REQUIRE((pow(rational{1}, integer{-2}) == rational{1}));
+        REQUIRE((pow(rational{1}, 2ull) == rational{1}));
+        REQUIRE((pow(rational{1}, (signed char)(-1)) == rational{1}));
+        REQUIRE((pow(1, rational{3, 4}) == rational{1}));
+        REQUIRE((pow(1, rational{-3, 4}) == rational{1}));
     }
 };
 
