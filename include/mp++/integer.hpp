@@ -573,8 +573,7 @@ public:
  *
  * Note that at this time only a small subset of the GMP API has been wrapped by :cpp:class:`~mppp::integer`.
  *
- * Various :ref:`overloaded operators <integer_operators>` are provided. The operators are resolved via
- * argument-dependent lookup whenever at least one argument is of type :cpp:class:`~mppp::integer`.
+ * Various :ref:`overloaded operators <integer_operators>` are provided.
  * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
  * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
  * is a C++ integral, the result will be of type :cpp:class:`~mppp::integer`, if the other argument is a C++

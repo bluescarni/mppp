@@ -116,7 +116,37 @@ inline void fix_den_sign(rational<SSize> &q)
  *    add(rop,a,b);
  *
  * where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
- * are allowed, unless noted otherwise.
+ * are allowed, unless noted otherwise. In a similar way to the :cpp:class:`~mppp::integer` class, various convenience
+ * overloads are provided for the same functionality. For instance, here are three possible ways of computing the
+ * absolute value:
+ *
+ * .. code-block:: c++
+ *
+ *    rational<1> q1, q2, q{-5};
+ *    abs(q1,q);   // Binary abs(): computes and stores the absolute value
+ *                 // of q into q1.
+ *    q2 = abs(q); // Unary abs(): returns the absolute value of q, which is
+ *                 // then assigned to q2.
+ *    q.abs();     // Member function abs(): replaces the value of q with its
+ *                 // absolute value.
+ *
+ * Various :ref:`overloaded operators <rational_operators>` are provided.
+ * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
+ * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
+ * is a C++ integral or an :cpp:class:`~mppp::integer`, the result will be of type :cpp:class:`~mppp::rational`, if the
+ * other argument is a C++ floating-point the result will be of the same floating-point type. For example:
+ *
+ * .. code-block:: c++
+ *
+ *    rational<1> q1{1}, q2{2};
+ *    integer<1> n{2};
+ *    auto res1 = q1 + q2; // res1 is a rational
+ *    auto res2 = q1 * 2; // res2 is a rational
+ *    auto res3 = q1 * n; // res3 is a rational
+ *    auto res4 = 2 - q2; // res4 is a rational
+ *    auto res5 = q1 / 2.f; // res5 is a float
+ *    auto res6 = 12. / q1; // res6 is a double
+ *
  * \endrststar
  */
 // NOTEs:
