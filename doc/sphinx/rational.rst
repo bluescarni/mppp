@@ -62,6 +62,14 @@ Comparison
 .. doxygengroup:: rational_comparison
    :content-only:
 
+.. _rational_exponentiation:
+
+Exponentiation
+~~~~~~~~~~~~~~
+
+.. doxygengroup:: rational_exponentiation
+   :content-only:
+
 .. _rational_io:
 
 Input/Output

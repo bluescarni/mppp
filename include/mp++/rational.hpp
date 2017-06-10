@@ -1883,6 +1883,127 @@ inline bool is_zero(const rational<SSize> &q)
 
 /** @} */
 
+/** @defgroup rational_exponentiation rational_exponentiation
+ *  @{
+ */
+
+inline namespace detail
+{
+
+// rational base, integral exponent implementation. Assumes exp is non-null.
+template <std::size_t SSize, typename T>
+inline rational<SSize> pow_impl_impl(const rational<SSize> &base, const T &exp, int exp_sign)
+{
+    assert(exp_sign != 0);
+    rational<SSize> retval;
+    if (exp_sign == 1) {
+        retval._get_num() = pow(base.get_num(), exp);
+        retval._get_den() = pow(base.get_den(), exp);
+    } else {
+        // Make integer copy of exp for safe negation.
+        typename rational<SSize>::int_t exp_copy(exp);
+        exp_copy.neg();
+        retval._get_num() = pow(base.get_den(), exp_copy);
+        retval._get_den() = pow(base.get_num(), exp_copy);
+        fix_den_sign(retval);
+    }
+    return retval;
+}
+
+// rational base, rational exponent implementation. Works only if exponent is an integral value, will call the other
+// impl_impl overload or error out.
+template <std::size_t SSize>
+inline rational<SSize> pow_impl_impl(const rational<SSize> &base, const rational<SSize> &exp, int exp_sign)
+{
+    if (mppp_unlikely(!is_one(exp.get_den()))) {
+        throw std::domain_error("Cannot raise the rational base " + base.to_string() + " to the non-integral exponent "
+                                + exp.to_string());
+    }
+    return pow_impl_impl(base, exp.get_num(), exp_sign);
+}
+
+// Rational base, non-floating point exp (i.e., integral or rational exp).
+template <std::size_t SSize, typename T, enable_if_t<!std::is_floating_point<T>::value, int> = 0>
+inline rational<SSize> pow_impl(const rational<SSize> &base, const T &exp)
+{
+    const auto exp_sign = sgn(exp);
+    // Handle special cases first.
+    if (is_one(base) || exp_sign == 0) {
+        // 1**q == 1 ∀ q, q**0 == 1 ∀ q.
+        return rational<SSize>{1};
+    }
+    if (is_zero(base)) {
+        if (exp_sign == 1) {
+            // 0**q == 0 ∀ q > 0.
+            return rational<SSize>{};
+        }
+        // 0**q with q < 0 -> division by zero.
+        throw zero_division_error("Cannot raise rational zero to the negative exponent " + to_string(exp));
+    }
+    return pow_impl_impl(base, exp, exp_sign);
+}
+
+// Integral base, rational exponent.
+template <std::size_t SSize, typename T,
+          enable_if_t<conjunction<negation<std::is_floating_point<T>>,
+                                  negation<std::is_same<T, rational<SSize>>>>::value,
+                      int> = 0>
+inline rational<SSize> pow_impl(const T &base, const rational<SSize> &exp)
+{
+    return pow_impl(rational<SSize>{base}, exp);
+}
+
+// Fp base, rational exponent.
+template <std::size_t SSize, typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline T pow_impl(const rational<SSize> &base, const T &exp)
+{
+    return std::pow(static_cast<T>(base), exp);
+}
+
+// Rational base, fp exponent.
+template <std::size_t SSize, typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline T pow_impl(const T &base, const rational<SSize> &exp)
+{
+    return std::pow(base, static_cast<T>(exp));
+}
+}
+
+/// Binary exponentiation.
+/**
+ * \rststar
+ * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::rational`.
+ *
+ * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
+ * is a floating-point value, then the result will be computed via ``std::pow()`` and it will also be a
+ * floating-point value. Otherwise, the result will be a :cpp:class:`~mppp::rational`.
+ *
+ * When floating-point types are not involved, the implementation is based on the integral exponentiation
+ * of numerator and denominator. Thus, if ``exp`` is a rational value, the exponentiation will be successful
+ * only in a few special cases (e.g., unitary base, zero exponent, etc.).
+ * \endrststar
+ *
+ * @param base the base.
+ * @param exp the exponent.
+ *
+ * @return <tt>base**exp</tt>.
+ *
+ * @throws zero_division_error if floating-point types are not involved, \p base is zero and \p exp is negative.
+ * @throws std::domain_error if floating-point types are not involved and \p exp is a rational value (except
+ * in a handful of special cases).
+ */
+template <typename T, typename U>
+inline rational_common_t<T, U> pow(const T &base, const U &exp)
+{
+    return pow_impl(base, exp);
+}
+
+/** @} */
+
 /** @defgroup rational_other rational_other
  *  @{
  */
