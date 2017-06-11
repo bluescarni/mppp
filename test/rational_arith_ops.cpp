@@ -516,7 +516,7 @@ struct div_tester {
         REQUIRE((rational{3} / 4.f == 3.f / 4));
         REQUIRE((4.f / rational{3} == 4.f / 3));
         REQUIRE((rational{3} / 4. == 3. / 4));
-        REQUIRE((4. / rational{3} == 4. / 3));
+        REQUIRE((std::abs(4. / rational{3} - 4. / 3) < 1E-8));
         REQUIRE((std::is_same<double, decltype(integer{4} / 3.)>::value));
         REQUIRE((std::is_same<float, decltype(3.f / integer{4})>::value));
         if (std::numeric_limits<double>::is_iec559) {
@@ -525,7 +525,7 @@ struct div_tester {
         }
 #if defined(MPPP_WITH_MPFR)
         REQUIRE((rational{3} / 4.l == 3 / 4.l));
-        REQUIRE((4.l / rational{3} == 4.l / 3));
+        REQUIRE((std::abs(4.l / rational{3} - 4.l / 3) < 1E-8));
         REQUIRE((std::is_same<long double, decltype(integer{4} / 3.l)>::value));
 #endif
         REQUIRE((!is_divisible<rational, std::string>::value));
