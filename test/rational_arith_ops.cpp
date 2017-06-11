@@ -444,7 +444,7 @@ TEST_CASE("mul")
 {
     tuple_for_each(sizes{}, mul_tester{});
 }
-#if 0
+
 template <typename T, typename U>
 using divvv_t = decltype(std::declval<const T &>() / std::declval<const U &>());
 
@@ -461,117 +461,152 @@ struct div_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = integer<S::value>;
-        integer n1{4}, n2{-2};
-        REQUIRE((lex_cast(n1 / n2) == "-2"));
-        REQUIRE((std::is_same<decltype(n1 / n2), integer>::value));
-        REQUIRE((lex_cast(n1 / char(4)) == "1"));
-        REQUIRE((lex_cast(char(4) / n2) == "-2"));
-        REQUIRE((std::is_same<decltype(n1 / char(4)), integer>::value));
-        REQUIRE((std::is_same<decltype(char(4) / n2), integer>::value));
-        REQUIRE((lex_cast(n1 / (unsigned char)(4)) == "1"));
-        REQUIRE((lex_cast((unsigned char)(4) / n2) == "-2"));
-        REQUIRE((lex_cast(n1 / short(4)) == "1"));
-        REQUIRE((lex_cast(short(4) / n2) == "-2"));
-        REQUIRE((lex_cast(n1 / 4) == "1"));
-        REQUIRE((lex_cast(4 / n2) == "-2"));
-        REQUIRE((std::is_same<decltype(n1 / 4), integer>::value));
-        REQUIRE((std::is_same<decltype(4 / n2), integer>::value));
-        REQUIRE((lex_cast(n1 / 4u) == "1"));
-        REQUIRE((lex_cast(4u / n2) == "-2"));
-        REQUIRE((n1 / 4.f == 1.f));
-        REQUIRE((4.f / n2 == -2.f));
-        REQUIRE((std::is_same<decltype(n1 / 4.f), float>::value));
-        REQUIRE((std::is_same<decltype(4.f / n2), float>::value));
-        REQUIRE((n1 / 4. == 1.));
-        REQUIRE((4. / n2 == -2.));
-        REQUIRE((std::is_same<decltype(n1 / 4.), double>::value));
-        REQUIRE((std::is_same<decltype(4. / n2), double>::value));
+        using rational = rational<S::value>;
+        using integer = typename rational::int_t;
+        // Binary div.
+        rational n1{1, 2}, n2{2, -3};
+        REQUIRE((lex_cast(n1 / n2) == "-3/4"));
+        REQUIRE((std::is_same<rational, decltype(n1 / n2)>::value));
+        REQUIRE_THROWS_PREDICATE(n1 / rational{0}, zero_division_error, [](const zero_division_error &zde) {
+            return std::string(zde.what()) == "Zero divisor in rational division";
+        });
+        REQUIRE((lex_cast(rational{3} / integer{4}) == "3/4"));
+        REQUIRE_THROWS_PREDICATE(n1 / integer{0}, zero_division_error, [](const zero_division_error &zde) {
+            return std::string(zde.what()) == "Zero divisor in rational division";
+        });
+        REQUIRE((lex_cast(rational{16} / integer{-4}) == "-4"));
+        REQUIRE((lex_cast(integer{16} / rational{-4}) == "-4"));
+        REQUIRE((lex_cast(rational{16, 11} / integer{-4}) == "-4/11"));
+        REQUIRE((lex_cast(integer{16} / rational{-4, 3}) == "-12"));
+        REQUIRE((lex_cast(integer{4} / rational{3}) == "4/3"));
+        REQUIRE_THROWS_PREDICATE(integer{4} / rational{0}, zero_division_error, [](const zero_division_error &zde) {
+            return std::string(zde.what()) == "Zero divisor in rational division";
+        });
+        REQUIRE((std::is_same<rational, decltype(integer{4} / rational{3})>::value));
+        REQUIRE((std::is_same<rational, decltype(rational{3} / integer{4})>::value));
+        REQUIRE((lex_cast(rational{-3, 2} / integer{4}) == "-3/8"));
+        REQUIRE((lex_cast(integer{4} / rational{-3, 2}) == "-8/3"));
+        REQUIRE((lex_cast(rational{3} / 4) == "3/4"));
+        REQUIRE_THROWS_PREDICATE(rational{3} / 0, zero_division_error, [](const zero_division_error &zde) {
+            return std::string(zde.what()) == "Zero divisor in rational division";
+        });
+        REQUIRE((lex_cast(4ul / rational{3}) == "4/3"));
+        REQUIRE_THROWS_PREDICATE(4ul / rational{}, zero_division_error, [](const zero_division_error &zde) {
+            return std::string(zde.what()) == "Zero divisor in rational division";
+        });
+        REQUIRE((std::is_same<rational, decltype(3 / rational{3})>::value));
+        REQUIRE((std::is_same<rational, decltype(rational{3} / 3)>::value));
+        REQUIRE((lex_cast(rational{-3, 2} / (signed char)4) == "-3/8"));
+        REQUIRE((lex_cast(4ll / rational{-3, 2}) == "-8/3"));
+        REQUIRE((rational{3} / 4.f == 3.f / 4));
+        REQUIRE((4.f / rational{3} == 4.f / 3));
+        REQUIRE((rational{3} / 4. == 3. / 4));
+        REQUIRE((4. / rational{3} == 4. / 3));
+        REQUIRE((std::is_same<double, decltype(integer{4} / 3.)>::value));
+        REQUIRE((std::is_same<float, decltype(3.f / integer{4})>::value));
+        if (std::numeric_limits<double>::is_iec559) {
+            REQUIRE((rational{3} / 0. == std::numeric_limits<double>::infinity()));
+            REQUIRE((-1. / rational{} == -std::numeric_limits<double>::infinity()));
+        }
 #if defined(MPPP_WITH_MPFR)
-        REQUIRE((n1 / 4.l == 1.l));
-        REQUIRE((4.l / n2 == -2.l));
-        REQUIRE((std::is_same<decltype(n1 / 4.l), long double>::value));
-        REQUIRE((std::is_same<decltype(4.l / n2), long double>::value));
+        REQUIRE((rational{3} / 4.l == 3 / 4.l));
+        REQUIRE((4.l / rational{3} == 4.l / 3));
+        REQUIRE((std::is_same<long double, decltype(integer{4} / 3.l)>::value));
 #endif
+        REQUIRE((!is_divisible<rational, std::string>::value));
+        REQUIRE((!is_divisible<std::string, rational>::value));
+
         // In-place div.
-        integer retval{2};
-        retval /= n1;
-        REQUIRE((lex_cast(retval) == "0"));
-        retval = 2;
-        retval /= 1;
-        REQUIRE((lex_cast(retval) == "2"));
-        retval /= short(-1);
-        REQUIRE((lex_cast(retval) == "-2"));
-        retval /= (signed char)(-1);
-        REQUIRE((lex_cast(retval) == "2"));
-        retval /= (long long)(-5);
-        REQUIRE((lex_cast(retval) == "0"));
-        retval = -20;
-        retval /= (unsigned long long)(20);
+        rational retval{1, 2};
+        retval /= rational{-2, 3};
+        REQUIRE((std::is_same<rational &, decltype(retval /= rational{-2, 3})>::value));
+        REQUIRE((lex_cast(retval) == "-3/4"));
+        retval /= integer{2};
+        REQUIRE((std::is_same<rational &, decltype(retval /= integer{1})>::value));
+        REQUIRE((lex_cast(retval) == "-3/8"));
+        retval /= integer{-3};
+        REQUIRE((lex_cast(retval) == "1/8"));
+        retval /= integer{-5};
+        REQUIRE((lex_cast(retval) == "-1/40"));
+        REQUIRE_THROWS_PREDICATE(retval /= integer{0}, zero_division_error, [](const zero_division_error &zde) {
+            return std::string(zde.what()) == "Zero divisor in rational division";
+        });
+        retval *= 80;
+        retval /= 2;
         REQUIRE((lex_cast(retval) == "-1"));
-        retval /= 2.5f;
-        REQUIRE((lex_cast(retval) == "0"));
-        retval = 10;
-        retval /= -3.5;
-        REQUIRE((lex_cast(retval) == lex_cast(integer{10. / -3.5})));
+        retval /= integer{-3};
+        REQUIRE((lex_cast(retval) == "1/3"));
+        retval = 5;
+        retval /= integer{-1};
+        REQUIRE((lex_cast(retval) == "-5"));
+        retval = "1/2";
+        retval /= 3;
+        REQUIRE((std::is_same<rational &, decltype(retval /= 3)>::value));
+        REQUIRE((lex_cast(retval) == "1/6"));
+        retval /= 4ull;
+        REQUIRE((lex_cast(retval) == "1/24"));
+        retval /= (short)-1;
+        REQUIRE((lex_cast(retval) == "-1/24"));
+        retval = 12;
+        retval /= 2.f;
+        REQUIRE((std::is_same<rational &, decltype(retval /= 1.)>::value));
+        REQUIRE((lex_cast(retval) == "6"));
+        retval /= 2.;
+        REQUIRE((lex_cast(retval) == "3"));
 #if defined(MPPP_WITH_MPFR)
-        retval /= -1.5l;
-        REQUIRE((lex_cast(retval) == lex_cast(integer{10. / -3.5 / -1.5l})));
+        retval /= -1.l;
+        REQUIRE((lex_cast(retval) == "-3"));
 #endif
-        // In-place with interop on the lhs.
-        short nl = 12;
-        nl /= integer{3};
-        REQUIRE((std::is_same<short &, decltype(nl /= integer{1})>::value));
-        REQUIRE(nl == 4);
-        nl /= integer{-2};
-        REQUIRE(nl == -2);
-        REQUIRE_THROWS_AS(nl /= integer{}, zero_division_error);
-        unsigned long long unl = 24;
-        unl /= integer{2};
-        REQUIRE(unl == 12);
-        REQUIRE_THROWS_AS(unl /= integer{-1}, std::overflow_error);
-        double dl = 1.2;
-        dl /= integer{2};
-        REQUIRE(dl == 1.2 / 2.);
-        REQUIRE((std::is_same<double &, decltype(dl /= integer{1})>::value));
-        if (std::numeric_limits<double>::is_iec559) {
-            dl = std::numeric_limits<double>::infinity();
-            dl /= integer{2};
-            REQUIRE(dl == std::numeric_limits<double>::infinity());
+
+        // Interop on the left.
+        {
+            integer n{5};
+            n /= rational{-4, 3};
+            REQUIRE((std::is_same<integer &, decltype(n /= rational{-4})>::value));
+            REQUIRE((lex_cast(n) == "-3"));
+            n /= rational{-5, 2};
+            REQUIRE((lex_cast(n) == "1"));
         }
-        // Error checking.
-        REQUIRE_THROWS_PREDICATE(integer{1} / integer{0}, zero_division_error, [](const zero_division_error &ex) {
-            return std::string(ex.what()) == "Integer division by zero";
-        });
-        REQUIRE_THROWS_PREDICATE(integer{1} / 0, zero_division_error, [](const zero_division_error &ex) {
-            return std::string(ex.what()) == "Integer division by zero";
-        });
-        REQUIRE_THROWS_PREDICATE(1 / integer{0}, zero_division_error, [](const zero_division_error &ex) {
-            return std::string(ex.what()) == "Integer division by zero";
-        });
-        REQUIRE_THROWS_PREDICATE(retval /= integer{0}, zero_division_error, [](const zero_division_error &ex) {
-            return std::string(ex.what()) == "Integer division by zero";
-        });
-        REQUIRE_THROWS_PREDICATE(retval /= 0, zero_division_error, [](const zero_division_error &ex) {
-            return std::string(ex.what()) == "Integer division by zero";
-        });
-        if (std::numeric_limits<double>::is_iec559) {
-            REQUIRE((integer{4} / 0. == std::numeric_limits<double>::infinity()));
-            REQUIRE((integer{-4} / 0. == -std::numeric_limits<double>::infinity()));
-            REQUIRE_THROWS_PREDICATE(retval /= 0., std::domain_error, [&retval](const std::domain_error &ex) {
-                return std::string(ex.what())
-                       == "Cannot construct an integer from the non-finite floating-point value "
-                              + (retval.sgn() > 0 ? std::to_string(std::numeric_limits<double>::infinity())
-                                                  : std::to_string(-std::numeric_limits<double>::infinity()));
-            });
+        {
+            int n = 5;
+            n /= rational{-4, 3};
+            REQUIRE((lex_cast(n) == "-3"));
+            REQUIRE((std::is_same<int &, decltype(n /= rational{-4})>::value));
+            n /= rational{-5, 2};
+            REQUIRE((lex_cast(n) == "1"));
+            n = std::numeric_limits<int>::max();
+            REQUIRE_THROWS_AS(n /= (rational{1, 2}), std::overflow_error);
+            n = std::numeric_limits<int>::min();
+            REQUIRE_THROWS_AS(n /= (rational{1, 2}), std::overflow_error);
         }
-        // Type traits.
-        REQUIRE((!is_divisible<integer, std::string>::value));
-        REQUIRE((!is_divisible<std::string, integer>::value));
-        REQUIRE((!is_divisible_inplace<integer, std::string>::value));
-        REQUIRE((!is_divisible_inplace<const integer, int>::value));
-        REQUIRE((!is_divisible_inplace<std::string, integer>::value));
-        REQUIRE((!is_divisible_inplace<const int, integer>::value));
+        {
+            if (std::numeric_limits<double>::is_iec559) {
+                double x = 5;
+                x /= rational{-5, 2};
+                REQUIRE((std::is_same<double &, decltype(x /= rational{-4})>::value));
+                REQUIRE((std::abs(-2. - x) < 1E-8));
+                x /= rational{-5, 2};
+                REQUIRE((std::abs(4. / 5 - x) < 1E-8));
+                REQUIRE_THROWS_PREDICATE(retval /= 0., std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot construct a rational from the non-finite floating-point value "
+                                  + std::to_string(-std::numeric_limits<double>::infinity());
+                });
+            }
+        }
+#if defined(MPPP_WITH_MPFR)
+        {
+            if (std::numeric_limits<long double>::is_iec559) {
+                long double x = 5;
+                x /= rational{-5, 2};
+                REQUIRE((std::abs(-2.l - x) < 1E-8));
+                x /= rational{-5, 2};
+                REQUIRE((std::abs(4.l / 5 - x) < 1E-8));
+            }
+        }
+#endif
+        REQUIRE((!is_divisible_inplace<rational, std::string>::value));
+        REQUIRE((!is_divisible_inplace<std::string, rational>::value));
     }
 };
 
@@ -579,7 +614,7 @@ TEST_CASE("div")
 {
     tuple_for_each(sizes{}, div_tester{});
 }
-
+#if 0
 template <typename T, typename U>
 using lshift_t = decltype(std::declval<const T &>() << std::declval<const U &>());
 
