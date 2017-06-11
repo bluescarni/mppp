@@ -572,6 +572,7 @@ struct div_tester {
         retval /= -1.l;
         REQUIRE((lex_cast(retval) == "-3"));
 #endif
+        retval = -3;
 
         // Interop on the left.
         {
