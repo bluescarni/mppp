@@ -1762,6 +1762,79 @@ inline rational_common_t<T, U> operator*(const T &op1, const U &op2)
 inline namespace detail
 {
 
+// Dispatching for in-place mul.
+template <std::size_t SSize>
+inline void dispatch_in_place_mul(rational<SSize> &retval, const rational<SSize> &q)
+{
+    mul(retval, retval, q);
+}
+
+template <std::size_t SSize>
+inline void dispatch_in_place_mul(rational<SSize> &retval, const integer<SSize> &n)
+{
+    if (retval.get_den().is_one()) {
+        // Integer multiplication.
+        mul(retval._get_num(), retval.get_num(), n);
+    } else {
+        auto g = gcd(retval.get_den(), n);
+        if (g.is_one()) {
+            // No common factors, just multiply the numerators. Den is already
+            // assigned.
+            mul(retval._get_num(), retval.get_num(), n);
+        } else {
+            // Set the den first. Dens tainted after this.
+            divexact(retval._get_den(), retval.get_den(), g);
+            // Re-use the g variable as tmp storage.
+            divexact(g, n, g);
+            mul(retval._get_num(), retval.get_num(), g);
+        }
+    }
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_mul(rational<SSize> &retval, const T &n)
+{
+    dispatch_in_place_mul(retval, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_mul(rational<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) * x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
+{
+    rop = static_cast<T>(rop * op);
+}
+}
+
+/// In-place multiplication operator.
+/**
+ * @param rop the multiplicator.
+ * @param op the multiplicand.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::rational rational\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator*=(T &rop, const RationalOpTypes<T> &op)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline T &operator*=(T &rop, const U &op)
+#endif
+{
+    dispatch_in_place_mul(rop, op);
+    return rop;
+}
+
+inline namespace detail
+{
+
 // Dispatching for the binary division operator.
 template <std::size_t SSize>
 inline rational<SSize> dispatch_binary_div(const rational<SSize> &op1, const rational<SSize> &op2)

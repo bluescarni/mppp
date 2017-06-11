@@ -304,7 +304,7 @@ TEST_CASE("sub")
 {
     tuple_for_each(sizes{}, sub_tester{});
 }
-#if 0
+
 template <typename T, typename U>
 using mul_t = decltype(std::declval<const T &>() * std::declval<const U &>());
 
@@ -321,96 +321,122 @@ struct mul_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = integer<S::value>;
-        integer n1{1}, n2{-2};
-        REQUIRE((lex_cast(n1 * n2) == "-2"));
-        REQUIRE((std::is_same<decltype(n1 * n2), integer>::value));
-        REQUIRE((lex_cast(n1 * char(4)) == "4"));
-        REQUIRE((lex_cast(char(4) * n2) == "-8"));
-        REQUIRE((std::is_same<decltype(n1 * char(4)), integer>::value));
-        REQUIRE((std::is_same<decltype(char(4) * n2), integer>::value));
-        REQUIRE((lex_cast(n1 * (unsigned char)(4)) == "4"));
-        REQUIRE((lex_cast((unsigned char)(4) * n2) == "-8"));
-        REQUIRE((lex_cast(n1 * short(4)) == "4"));
-        REQUIRE((lex_cast(short(4) * n2) == "-8"));
-        REQUIRE((lex_cast(n1 * 4) == "4"));
-        REQUIRE((lex_cast(4 * n2) == "-8"));
-        REQUIRE((std::is_same<decltype(n1 * 4), integer>::value));
-        REQUIRE((std::is_same<decltype(4 * n2), integer>::value));
-        REQUIRE((lex_cast(n1 * 4u) == "4"));
-        REQUIRE((lex_cast(4u * n2) == "-8"));
-        REQUIRE((n1 * 4.f == 4.f));
-        REQUIRE((4.f * n2 == -8.f));
-        REQUIRE((std::is_same<decltype(n1 * 4.f), float>::value));
-        REQUIRE((std::is_same<decltype(4.f * n2), float>::value));
-        REQUIRE((n1 * 4. == 4.));
-        REQUIRE((4. * n2 == -8.));
-        REQUIRE((std::is_same<decltype(n1 * 4.), double>::value));
-        REQUIRE((std::is_same<decltype(4. * n2), double>::value));
+        using rational = rational<S::value>;
+        using integer = typename rational::int_t;
+        // Binary mul.
+        rational n1{1, 2}, n2{2, -3};
+        REQUIRE((lex_cast(n1 * n2) == "-1/3"));
+        REQUIRE((std::is_same<rational, decltype(n1 * n2)>::value));
+        REQUIRE((lex_cast(rational{3} * integer{4}) == "12"));
+        REQUIRE((lex_cast(integer{4} * rational{3}) == "12"));
+        REQUIRE((std::is_same<rational, decltype(integer{4} * rational{3})>::value));
+        REQUIRE((std::is_same<rational, decltype(rational{3} * integer{4})>::value));
+        REQUIRE((lex_cast(rational{-3, 2} * integer{4}) == "-6"));
+        REQUIRE((lex_cast(integer{4} * rational{-3, 2}) == "-6"));
+        REQUIRE((lex_cast(rational{3} * 4) == "12"));
+        REQUIRE((lex_cast(4ul * rational{3}) == "12"));
+        REQUIRE((std::is_same<rational, decltype(3 * rational{3})>::value));
+        REQUIRE((std::is_same<rational, decltype(rational{3} * 3)>::value));
+        REQUIRE((lex_cast(rational{-3, 2} * (signed char)4) == "-6"));
+        REQUIRE((lex_cast(4ll * rational{-3, 2}) == "-6"));
+        REQUIRE((rational{3} * 4.f == 12.f));
+        REQUIRE((4.f * rational{3} == 12.f));
+        REQUIRE((rational{3} * 4. == 12.));
+        REQUIRE((4. * rational{3} == 12.));
+        REQUIRE((std::is_same<double, decltype(integer{4} * 3.)>::value));
+        REQUIRE((std::is_same<float, decltype(3.f * integer{4})>::value));
 #if defined(MPPP_WITH_MPFR)
-        REQUIRE((n1 * 4.l == 4.l));
-        REQUIRE((4.l * n2 == -8.l));
-        REQUIRE((std::is_same<decltype(n1 * 4.l), long double>::value));
-        REQUIRE((std::is_same<decltype(4.l * n2), long double>::value));
+        REQUIRE((rational{3} * 4.l == 12.l));
+        REQUIRE((4.l * rational{3} == 12.l));
+        REQUIRE((std::is_same<long double, decltype(integer{4} * 3.l)>::value));
 #endif
+        REQUIRE((!is_multipliable<rational, std::string>::value));
+        REQUIRE((!is_multipliable<std::string, rational>::value));
+
         // In-place mul.
-        integer retval{1};
-        retval *= n1;
-        REQUIRE((lex_cast(retval) == "1"));
-        retval *= 1;
-        REQUIRE((lex_cast(retval) == "1"));
-        retval *= short(-1);
-        REQUIRE((lex_cast(retval) == "-1"));
-        retval *= (signed char)(-1);
-        REQUIRE((lex_cast(retval) == "1"));
-        retval *= (long long)(-5);
+        rational retval{1, 2};
+        retval *= rational{-2, 3};
+        REQUIRE((std::is_same<rational &, decltype(retval *= rational{-2, 3})>::value));
+        REQUIRE((lex_cast(retval) == "-1/3"));
+        retval *= integer{2};
+        REQUIRE((std::is_same<rational &, decltype(retval *= integer{1})>::value));
+        REQUIRE((lex_cast(retval) == "-2/3"));
+        retval *= integer{-3};
+        REQUIRE((lex_cast(retval) == "2"));
+        retval *= integer{-5};
+        REQUIRE((lex_cast(retval) == "-10"));
+        retval = 5;
+        retval *= integer{-1};
         REQUIRE((lex_cast(retval) == "-5"));
-        retval *= (unsigned long long)(20);
-        REQUIRE((lex_cast(retval) == "-100"));
-        retval *= 2.5f;
-        REQUIRE((lex_cast(retval) == "-250"));
-        retval *= -3.5;
-        REQUIRE((lex_cast(retval) == "875"));
+        retval = "1/2";
+        retval *= 3;
+        REQUIRE((std::is_same<rational &, decltype(retval *= 3)>::value));
+        REQUIRE((lex_cast(retval) == "3/2"));
+        retval *= 4ull;
+        REQUIRE((lex_cast(retval) == "6"));
+        retval *= (short)-1;
+        REQUIRE((lex_cast(retval) == "-6"));
+        retval *= 2.f;
+        REQUIRE((std::is_same<rational &, decltype(retval *= 1.)>::value));
+        REQUIRE((lex_cast(retval) == "-12"));
+        retval *= 2.;
+        REQUIRE((lex_cast(retval) == "-24"));
 #if defined(MPPP_WITH_MPFR)
-        retval *= -1.5l;
-        REQUIRE((lex_cast(retval) == "-1312"));
+        retval *= 2.l;
+        REQUIRE((lex_cast(retval) == "-48"));
 #endif
-        if (std::numeric_limits<double>::is_iec559) {
-            retval = 1;
-            REQUIRE_THROWS_PREDICATE(
-                retval *= std::numeric_limits<double>::infinity(), std::domain_error, [](const std::domain_error &ex) {
-                    return std::string(ex.what())
-                           == "Cannot construct an integer from the non-finite floating-point value "
-                                  + std::to_string(std::numeric_limits<double>::infinity());
-                });
+
+        // Interop on the left.
+        {
+            integer n{5};
+            n *= rational{-4, 3};
+            REQUIRE((std::is_same<integer &, decltype(n *= rational{-4})>::value));
+            REQUIRE((lex_cast(n) == "-6"));
+            n *= rational{-5, 2};
+            REQUIRE((lex_cast(n) == "15"));
         }
-        // In-place with interop on the lhs.
-        short nl = 1;
-        nl *= integer{3};
-        REQUIRE((std::is_same<short &, decltype(nl *= integer{1})>::value));
-        REQUIRE(nl == 3);
-        nl *= integer{-3};
-        REQUIRE(nl == -9);
-        unsigned long long unl = 1;
-        unl *= integer{2};
-        REQUIRE(unl == 2);
-        REQUIRE_THROWS_AS(unl *= integer{-1}, std::overflow_error);
-        double dl = 1.2;
-        dl *= integer{2};
-        REQUIRE(dl == 1.2 * 2.);
-        REQUIRE((std::is_same<double &, decltype(dl *= integer{1})>::value));
-        if (std::numeric_limits<double>::is_iec559) {
-            dl = std::numeric_limits<double>::infinity();
-            dl *= integer{2};
-            REQUIRE(dl == std::numeric_limits<double>::infinity());
+        {
+            int n = 5;
+            n *= rational{-4, 3};
+            REQUIRE((lex_cast(n) == "-6"));
+            REQUIRE((std::is_same<int &, decltype(n *= rational{-4})>::value));
+            n *= rational{-5, 2};
+            REQUIRE((lex_cast(n) == "15"));
+            n = std::numeric_limits<int>::max();
+            REQUIRE_THROWS_AS(n *= rational{2}, std::overflow_error);
+            n = std::numeric_limits<int>::min();
+            REQUIRE_THROWS_AS(n *= rational{2}, std::overflow_error);
         }
-        // Type traits.
-        REQUIRE((!is_multipliable<integer, std::string>::value));
-        REQUIRE((!is_multipliable<std::string, integer>::value));
-        REQUIRE((!is_multipliable_inplace<integer, std::string>::value));
-        REQUIRE((!is_multipliable_inplace<const integer, int>::value));
-        REQUIRE((!is_multipliable_inplace<std::string, integer>::value));
-        REQUIRE((!is_multipliable_inplace<const int, integer>::value));
+        {
+            if (std::numeric_limits<double>::is_iec559) {
+                double x = 5;
+                x *= rational{-5, 2};
+                REQUIRE((std::is_same<double &, decltype(x *= rational{-4})>::value));
+                REQUIRE((std::abs(-25. / 2 - x) < 1E-8));
+                x *= rational{-5, 2};
+                REQUIRE((std::abs(125. / 4 - x) < 1E-8));
+                REQUIRE_THROWS_PREDICATE(
+                    retval *= -std::numeric_limits<double>::infinity(), std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return std::string(ex.what())
+                               == "Cannot construct a rational from the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<double>::infinity());
+                    });
+            }
+        }
+#if defined(MPPP_WITH_MPFR)
+        {
+            if (std::numeric_limits<long double>::is_iec559) {
+                long double x = 5;
+                x *= rational{-5, 2};
+                REQUIRE((std::abs(-25. / 2 - x) < 1E-8));
+                x *= rational{-5, 2};
+                REQUIRE((std::abs(125. / 4 - x) < 1E-8));
+            }
+        }
+#endif
+        REQUIRE((!is_multipliable_inplace<rational, std::string>::value));
+        REQUIRE((!is_multipliable_inplace<std::string, rational>::value));
     }
 };
 
@@ -418,7 +444,7 @@ TEST_CASE("mul")
 {
     tuple_for_each(sizes{}, mul_tester{});
 }
-
+#if 0
 template <typename T, typename U>
 using divvv_t = decltype(std::declval<const T &>() / std::declval<const U &>());
 
