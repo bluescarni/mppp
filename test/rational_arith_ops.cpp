@@ -160,6 +160,11 @@ struct add_tester {
 #endif
         REQUIRE((!is_addable_inplace<rational, std::string>::value));
         REQUIRE((!is_addable_inplace<std::string, rational>::value));
+
+        // In-place add with self.
+        retval = "3/4";
+        retval += retval;
+        REQUIRE(retval == rational(3, 2));
     }
 };
 
@@ -297,6 +302,11 @@ struct sub_tester {
 #endif
         REQUIRE((!is_subtractable_inplace<rational, std::string>::value));
         REQUIRE((!is_subtractable_inplace<std::string, rational>::value));
+
+        // In-place sub with self.
+        retval = "3/4";
+        retval -= retval;
+        REQUIRE(retval == rational{});
     }
 };
 
@@ -437,6 +447,11 @@ struct mul_tester {
 #endif
         REQUIRE((!is_multipliable_inplace<rational, std::string>::value));
         REQUIRE((!is_multipliable_inplace<std::string, rational>::value));
+
+        // In-place mul with self.
+        retval = "-3/4";
+        retval *= retval;
+        REQUIRE(retval == rational(9, 16));
     }
 };
 
@@ -607,6 +622,11 @@ struct div_tester {
 #endif
         REQUIRE((!is_divisible_inplace<rational, std::string>::value));
         REQUIRE((!is_divisible_inplace<std::string, rational>::value));
+
+        // In-place div with self.
+        retval = "-3/4";
+        retval /= retval;
+        REQUIRE(retval == rational(1));
     }
 };
 

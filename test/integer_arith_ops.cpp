@@ -177,6 +177,11 @@ struct add_tester {
         REQUIRE((!is_addable_inplace<const integer, int>::value));
         REQUIRE((!is_addable_inplace<std::string, integer>::value));
         REQUIRE((!is_addable_inplace<const int, integer>::value));
+
+        // In-place add with self.
+        retval = -5;
+        retval += retval;
+        REQUIRE(retval == -10);
     }
 };
 
@@ -333,6 +338,11 @@ struct sub_tester {
         REQUIRE((!is_subtractable_inplace<const integer, int>::value));
         REQUIRE((!is_subtractable_inplace<std::string, integer>::value));
         REQUIRE((!is_subtractable_inplace<const int, integer>::value));
+
+        // In-place sub with self.
+        retval = -5;
+        retval -= retval;
+        REQUIRE(retval == 0);
     }
 };
 
@@ -447,6 +457,11 @@ struct mul_tester {
         REQUIRE((!is_multipliable_inplace<const integer, int>::value));
         REQUIRE((!is_multipliable_inplace<std::string, integer>::value));
         REQUIRE((!is_multipliable_inplace<const int, integer>::value));
+
+        // In-place mul with self.
+        retval = -5;
+        retval *= retval;
+        REQUIRE(retval == 25);
     }
 };
 
@@ -582,6 +597,11 @@ struct div_tester {
         REQUIRE((!is_divisible_inplace<const integer, int>::value));
         REQUIRE((!is_divisible_inplace<std::string, integer>::value));
         REQUIRE((!is_divisible_inplace<const int, integer>::value));
+
+        // In-place div with self.
+        retval = -5;
+        retval /= retval;
+        REQUIRE(retval == 1);
     }
 };
 
@@ -823,6 +843,11 @@ struct mod_tester {
         REQUIRE((!is_modable_inplace<const int, integer>::value));
         REQUIRE((!is_modable<int, integer>::value));
         REQUIRE((!is_modable_inplace<int, integer>::value));
+
+        // In-place mod with self.
+        retval = 5;
+        retval %= retval;
+        REQUIRE(retval == 0);
     }
 };
 
