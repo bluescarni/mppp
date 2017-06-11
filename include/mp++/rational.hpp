@@ -54,9 +54,12 @@ template <typename T, std::size_t SSize>
 concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
 #endif
 
-// Fwd declare this as we need friendship.
+// Fwd declare these as we need friendship.
 template <std::size_t SSize>
 int cmp(const rational<SSize> &, const rational<SSize> &);
+
+template <std::size_t SSize>
+int cmp(const rational<SSize> &, const integer<SSize> &);
 
 inline namespace detail
 {
@@ -171,9 +174,11 @@ class rational
         m_den._get_union().g_st().m_limbs[0] = 1;
     }
 #if !defined(MPPP_DOXYGEN_INVOKED)
-    // Make friends with the comparison function.
+    // Make friends with the comparison functions.
     template <std::size_t S>
     friend int cmp(const rational<S> &, const rational<S> &);
+    template <std::size_t S>
+    friend int cmp(const rational<S> &, const integer<S> &);
 #endif
 
 public:
@@ -2137,6 +2142,35 @@ inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
     //   number is larger,
     // - otherwise, do the two multiplications and compare.
     return ::mpq_cmp(op1.get_mpq_view(), op2.get_mpq_view());
+}
+
+/// Comparison function for rational/integer arguments.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
+ * <tt>op1 > op2</tt>.
+ */
+template <std::size_t SSize>
+inline int cmp(const rational<SSize> &op1, const integer<SSize> &op2)
+{
+    return ::mpq_cmp_z(op1.get_mpq_view(), op2.get_mpz_view());
+}
+
+/// Comparison function for integer/rational arguments.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
+ * <tt>op1 > op2</tt>.
+ */
+template <std::size_t SSize>
+inline int cmp(const integer<SSize> &op1, const rational<SSize> &op2)
+{
+    // Let's just hope this is guaranteed to be a smallish number.
+    return -cmp(op2, op1);
 }
 
 /// Sign function.
