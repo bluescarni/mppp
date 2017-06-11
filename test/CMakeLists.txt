@@ -53,6 +53,7 @@ ADD_MPPP_TESTCASE(integer_view)
 
 ADD_MPPP_TESTCASE(rational_abs)
 ADD_MPPP_TESTCASE(rational_arith)
+ADD_MPPP_TESTCASE(rational_arith_ops)
 ADD_MPPP_TESTCASE(rational_basic)
 ADD_MPPP_TESTCASE(rational_inv)
 ADD_MPPP_TESTCASE(rational_is_zero_one)

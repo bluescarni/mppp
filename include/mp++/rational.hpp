@@ -302,7 +302,7 @@ public:
  * @param n the numerator.
  * @param d the denominator.
  *
- * @throws mppp::zero_division_error if the denominator is zero.
+ * @throws zero_division_error if the denominator is zero.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T, typename U>
@@ -335,7 +335,7 @@ public:
      * @param s the input string.
      * @param base the base used in the string representation.
      *
-     * @throws mppp::zero_division_error if the denominator is zero.
+     * @throws zero_division_error if the denominator is zero.
      * @throws unspecified any exception thrown by the string constructor of mppp::integer.
      */
     explicit rational(const char *s, int base = 10)
@@ -1452,6 +1452,67 @@ inline rational_common_t<T, U> operator+(const T &op1, const U &op2)
     return dispatch_binary_add(op1, op2);
 }
 
+inline namespace detail
+{
+
+// Dispatching for in-place add.
+template <std::size_t SSize>
+inline void dispatch_in_place_add(rational<SSize> &retval, const rational<SSize> &q)
+{
+    add(retval, retval, q);
+}
+
+template <std::size_t SSize>
+inline void dispatch_in_place_add(rational<SSize> &retval, const integer<SSize> &n)
+{
+    if (retval.get_den().is_one()) {
+        add(retval._get_num(), retval._get_num(), n);
+    } else {
+        addmul(retval._get_num(), retval.get_den(), n);
+    }
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_add(rational<SSize> &retval, const T &n)
+{
+    dispatch_in_place_add(retval, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_add(rational<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) + x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
+{
+    rop = static_cast<T>(rop + op);
+}
+}
+
+/// In-place addition operator.
+/**
+ * @param rop the augend.
+ * @param op the addend.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::rational rational\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator+=(T &rop, const RationalOpTypes<T> &op)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline T &operator+=(T &rop, const U &op)
+#endif
+{
+    dispatch_in_place_add(rop, op);
+    return rop;
+}
+
 /// Negated copy.
 /**
  * @param q the rational that will be negated.
@@ -1546,6 +1607,67 @@ template <typename T, typename U>
 inline rational_common_t<T, U> operator-(const T &op1, const U &op2)
 {
     return dispatch_binary_sub(op1, op2);
+}
+
+inline namespace detail
+{
+
+// Dispatching for in-place sub.
+template <std::size_t SSize>
+inline void dispatch_in_place_sub(rational<SSize> &retval, const rational<SSize> &q)
+{
+    sub(retval, retval, q);
+}
+
+template <std::size_t SSize>
+inline void dispatch_in_place_sub(rational<SSize> &retval, const integer<SSize> &n)
+{
+    if (retval.get_den().is_one()) {
+        sub(retval._get_num(), retval._get_num(), n);
+    } else {
+        submul(retval._get_num(), retval.get_den(), n);
+    }
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_sub(rational<SSize> &retval, const T &n)
+{
+    dispatch_in_place_sub(retval, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_sub(rational<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) - x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
+{
+    rop = static_cast<T>(rop - op);
+}
+}
+
+/// In-place subtraction operator.
+/**
+ * @param rop the minuend.
+ * @param op the subtrahend.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::rational rational\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator-=(T &rop, const RationalOpTypes<T> &op)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline T &operator-=(T &rop, const U &op)
+#endif
+{
+    dispatch_in_place_sub(rop, op);
+    return rop;
 }
 
 inline namespace detail
