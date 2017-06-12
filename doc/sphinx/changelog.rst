@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Implement the multiprecision :cpp:class:`~mppp::rational` class (`#14 <https://github.com/bluescarni/mppp/pull/14>`__)
+
 - Implement fast assignment functions to zero and plus/minus one for :cpp:class:`~mppp::integer`.
 
 - Add assignment operators from string for :cpp:class:`~mppp::integer`.
@@ -20,6 +22,11 @@ Changes
 ~~~~~~~
 
 - Performance improvements for the copy/move assignment operators of :cpp:class:`~mppp::integer`.
+
+Fix
+~~~
+
+- Various small documentation fixes.
 
 0.2 (2017-05-09)
 ----------------

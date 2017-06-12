@@ -48,7 +48,27 @@ Since mp++ is a header-only library, there's no compilation step (unless the tes
 and the installation of mp++ via ``make install`` or similar will just configure and copy the headers to your ``CMAKE_INSTALL_PREFIX``,
 in the ``include`` subdirectory.
 
-After the installation of the headers, you can test the installation with the following simple ``main.cpp`` program:
+Installation via conda
+----------------------
+
+Since version 0.2, mp++ is available in the `conda <https://conda.io/docs/>`__ package manager from the
+`conda-forge <https://conda-forge.github.io/>`__ channel. Packages for Linux 32/64-bit, Windows 32/64-bit
+and OSX 64-bit are available. In order to install mp++ via conda, you just need to add ``conda-forge`` to the channels:
+
+.. code-block:: bash
+
+   conda config --add channels conda-forge
+   conda install mppp
+
+(note that the `conda package <https://github.com/conda-forge/mppp-feedstock>`__ for mp++ is named ``mppp`` rather than ``mp++``)
+
+Please refer to the `conda documentation <https://conda.io/docs/>`__ for instructions on how to setup and manage
+your conda installation.
+
+Checking the installation
+-------------------------
+
+You can test the installation of mp++ with the following simple ``main.cpp`` program:
 
 .. code-block:: c++
 
@@ -78,7 +98,7 @@ If you installed mp++ with the optional MPFR support turned on, you will need to
 Including mp++ in your project via CMake
 ----------------------------------------
 
-As part of the mp++ installation, a group of CMake files is installed into ``CMAKE_INSTALL_PREFIX/lib/cmake/mp++``.
+As a part of the mp++ installation, a group of CMake files is installed into ``CMAKE_INSTALL_PREFIX/lib/cmake/mp++``.
 This bundle, which is known in the CMake lingo as a `config-file package <https://cmake.org/cmake/help/v3.2/manual/cmake-packages.7.html>`__,
 facilitates the detection and use of mp++ from other CMake-based projects. mp++'s config-file package, once loaded, provides
 an imported target called ``Mp++::mp++`` which encapsulate all the information necessary to use mp++. That is, linking to
