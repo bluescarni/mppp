@@ -1013,6 +1013,11 @@ public:
      *
      *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
      *    with an uninitialized ``n`` results in undefined behaviour.
+     *
+     * .. warning::
+     *
+     *    ``n`` must be distinct from ``this``: if ``n`` is an ``mpz_view`` of ``this``, the behaviour will be
+     *    undefined.
      * \endrststar
      *
      * @param n the input GMP integer.
@@ -1026,9 +1031,7 @@ public:
         if (s && asize <= SSize) {
             // this is static, n fits into static. Copy over.
             m_int.g_st()._mp_size = n->_mp_size;
-            // NOTE: don't use the _no variant (here and below) as n could be a
-            // read-only view of this.
-            copy_limbs(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
             if (SSize <= static_int<SSize>::opt_size) {
                 // Zero the non-copied limbs, but only if the static size is not greater than
                 // the size for which special optimisations kick in. See the documentation
@@ -1056,7 +1059,7 @@ public:
             m_int.g_st()._mp_size = n->_mp_size;
             // NOTE: the upper limbs are guaranteed to be zero by the def
             // initialisation of s_storage above.
-            copy_limbs(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
         }
         return *this;
     }
