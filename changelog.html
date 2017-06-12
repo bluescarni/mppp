@@ -64,10 +64,16 @@
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id1">0.2 (2017-05-09)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#unreleased">0.3 (unreleased)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#new">New</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#changes">Changes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fix">Fix</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">0.2 (2017-05-09)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">New</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Fix</a></li>
 </ul>
 </li>
 </ul>
@@ -100,46 +106,69 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2>0.2 (2017-05-09)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="unreleased">
+<h2>0.3 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="new">
 <h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Provide a CMake config-file package as part of the install process.
-[Francesco Biscani]</li>
-<li>Implement the missing in-place modulo operator with C++ integrals
-on the left. [Francesco Biscani]</li>
-<li>Experimental support for C++ concepts. [Francesco Biscani]</li>
-<li>Support the <code class="docutils literal"><span class="pre">clang-cl</span></code> compiler on Windows. [Francesco Biscani]</li>
-<li>Add input stream operator. [Francesco Biscani]</li>
-<li>Add in-place arithmetic operators with interoperable types on the
-left-hand side. [Francesco Biscani]</li>
-<li>Add convenience overloads for the computation of the binomial
-coefficient. [Francesco Biscani]</li>
-<li>Add convenience overloads for <code class="docutils literal"><span class="pre">pow()</span></code>. [Francesco Biscani]</li>
-<li>Add functions to test if an integer is equal to -1. [Francesco
-Biscani]</li>
-<li>Add a static member to <code class="docutils literal"><span class="pre">integer</span></code> storing the static size. [Francesco
-Biscani]</li>
+<li>Implement the multiprecision <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/14">#14</a>)</li>
+<li>Implement fast assignment functions to zero and plus/minus one for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</li>
+<li>Add assignment operators from string for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</li>
+<li>Implement the <code class="docutils literal"><span class="pre">submul()</span></code> primitive for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</li>
+<li>Implement the assignment operator from <code class="docutils literal"><span class="pre">mpz_t</span></code> in <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>, and use it in various function
+in order to avoid the creation of a temporary.</li>
 </ul>
 </div>
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Split out the library in multiple files. [Francesco Biscani]</li>
-<li>Rename the <code class="docutils literal"><span class="pre">mp_integer</span></code> class to <code class="docutils literal"><span class="pre">integer</span></code>. [Francesco Biscani]</li>
-<li>Various improvements to the documentation. [Francesco Biscani]</li>
-<li>Rework the library interface to use regular functions rather than
-<code class="docutils literal"><span class="pre">inline</span> <span class="pre">friend</span></code> functions. [Francesco Biscani]</li>
-<li>Change the license to MPL2. [Francesco Biscani]</li>
-<li>Remove the allocation cache. [Francesco Biscani]</li>
-<li>Remove the custom namespace option. [Francesco Biscani]</li>
+<li>Performance improvements for the copy/move assignment operators of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</li>
 </ul>
 </div>
 <div class="section" id="fix">
 <h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Fix operators example in the documentation. [Francesco Biscani]</li>
+<li>Various small documentation fixes.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>0.2 (2017-05-09)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>New<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Provide a CMake config-file package as part of the install process.</li>
+<li>Implement the missing in-place modulo operator with C++ integrals
+on the left.</li>
+<li>Experimental support for C++ concepts.</li>
+<li>Support the <code class="docutils literal"><span class="pre">clang-cl</span></code> compiler on Windows.</li>
+<li>Add input stream operator.</li>
+<li>Add in-place arithmetic operators with interoperable types on the
+left-hand side.</li>
+<li>Add convenience overloads for the computation of the binomial
+coefficient.</li>
+<li>Add convenience overloads for <code class="docutils literal"><span class="pre">pow()</span></code>.</li>
+<li>Add functions to test if an integer is equal to -1.</li>
+<li>Add a static member to <code class="docutils literal"><span class="pre">integer</span></code> storing the static size.</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h3>Changes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Split out the library in multiple files.</li>
+<li>Rename the <code class="docutils literal"><span class="pre">mp_integer</span></code> class to <code class="docutils literal"><span class="pre">integer</span></code>.</li>
+<li>Various improvements to the documentation.</li>
+<li>Rework the library interface to use regular functions rather than
+<code class="docutils literal"><span class="pre">inline</span> <span class="pre">friend</span></code> functions.</li>
+<li>Change the license to MPL2.</li>
+<li>Remove the allocation cache.</li>
+<li>Remove the custom namespace option.</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h3>Fix<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fix operators example in the documentation.</li>
 </ul>
 </div>
 </div>
@@ -155,7 +184,7 @@ Biscani]</li>
       &copy;2016-2017, Francesco Biscani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

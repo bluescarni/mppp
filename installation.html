@@ -63,6 +63,8 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation-from-source">Installation from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation-via-conda">Installation via conda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checking-the-installation">Checking the installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#including-mp-in-your-project-via-cmake">Including mp++ in your project via CMake</a></li>
 </ul>
 </li>
@@ -102,10 +104,11 @@
 on the following setups:</p>
 <ul class="simple">
 <li>GCC 4.8 and later versions on GNU/Linux 32/64-bit,</li>
-<li>Clang 3.8 on GNU/Linux 64-bit,</li>
+<li>Clang 3.8 and later versions on GNU/Linux 64-bit,</li>
 <li>MSVC 2015 on Windows 32/64-bit,</li>
 <li>Clang 3.9 on Windows 32/64-bit (with the <code class="docutils literal"><span class="pre">clang-cl</span></code> driver for MSVC),</li>
 <li>MinGW GCC 6 on Windows 64-bit,</li>
+<li>Clang on OSX 64-bit (Xcode 6.4 and later),</li>
 <li>Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).</li>
 </ul>
 <p>mp++ has been written, tested and benchmarked on x86 processors, but it does not contain any architecture-specific code
@@ -136,9 +139,25 @@ path, etc.). The available configuration options are:</p>
 <li><code class="docutils literal"><span class="pre">MPPP_BUILD_BENCHMARKS</span></code>: build the benchmarking suite (off by default).</li>
 </ul>
 <p>Since mp++ is a header-only library, there&#8217;s no compilation step (unless the tests or the benchmarks are being built),
-and the installation of mp++ via <code class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></code> or similar will just copy the headers to your <code class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></code>,
+and the installation of mp++ via <code class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></code> or similar will just configure and copy the headers to your <code class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></code>,
 in the <code class="docutils literal"><span class="pre">include</span></code> subdirectory.</p>
-<p>After the installation of the headers, you can test the installation with the following simple <code class="docutils literal"><span class="pre">main.cpp</span></code> program:</p>
+</div>
+<div class="section" id="installation-via-conda">
+<h2>Installation via conda<a class="headerlink" href="#installation-via-conda" title="Permalink to this headline">¶</a></h2>
+<p>Since version 0.2, mp++ is available in the <a class="reference external" href="https://conda.io/docs/">conda</a> package manager from the
+<a class="reference external" href="https://conda-forge.github.io/">conda-forge</a> channel. Packages for Linux 32/64-bit, Windows 32/64-bit
+and OSX 64-bit are available. In order to install mp++ via conda, you just need to add <code class="docutils literal"><span class="pre">conda-forge</span></code> to the channels:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>conda config --add channels conda-forge
+conda install mppp
+</pre></div>
+</div>
+<p>(note that the <a class="reference external" href="https://github.com/conda-forge/mppp-feedstock">conda package</a> for mp++ is named <code class="docutils literal"><span class="pre">mppp</span></code> rather than <code class="docutils literal"><span class="pre">mp++</span></code>)</p>
+<p>Please refer to the <a class="reference external" href="https://conda.io/docs/">conda documentation</a> for instructions on how to setup and manage
+your conda installation.</p>
+</div>
+<div class="section" id="checking-the-installation">
+<h2>Checking the installation<a class="headerlink" href="#checking-the-installation" title="Permalink to this headline">¶</a></h2>
+<p>You can test the installation of mp++ with the following simple <code class="docutils literal"><span class="pre">main.cpp</span></code> program:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;mp++/mp++.hpp&gt;</span><span class="cp"></span>
 
@@ -162,7 +181,7 @@ in the <code class="docutils literal"><span class="pre">include</span></code> su
 </div>
 <div class="section" id="including-mp-in-your-project-via-cmake">
 <h2>Including mp++ in your project via CMake<a class="headerlink" href="#including-mp-in-your-project-via-cmake" title="Permalink to this headline">¶</a></h2>
-<p>As part of the mp++ installation, a group of CMake files is installed into <code class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX/lib/cmake/mp++</span></code>.
+<p>As a part of the mp++ installation, a group of CMake files is installed into <code class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX/lib/cmake/mp++</span></code>.
 This bundle, which is known in the CMake lingo as a <a class="reference external" href="https://cmake.org/cmake/help/v3.2/manual/cmake-packages.7.html">config-file package</a>,
 facilitates the detection and use of mp++ from other CMake-based projects. mp++&#8217;s config-file package, once loaded, provides
 an imported target called <code class="docutils literal"><span class="pre">Mp++::mp++</span></code> which encapsulate all the information necessary to use mp++. That is, linking to
@@ -204,7 +223,7 @@ on which mp++ depends (e.g., GMP) are brought into the link chain.</p>
       &copy;2016-2017, Francesco Biscani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

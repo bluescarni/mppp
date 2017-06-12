@@ -92,8 +92,8 @@
             
   <div class="section" id="welcome-to-mp-s-documentation">
 <h1>Welcome to mp++&#8217;s documentation!<a class="headerlink" href="#welcome-to-mp-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>mp++ is a small C++11 header-only library for multiprecision integer arithmetic. Based
-on the well-known <a class="reference external" href="http://www.gmplib.org">GMP</a> library, mp++ places a strong emphasis on
+<p>mp++ is a small C++11 header-only library for multiprecision arithmetic, currently supporting integers
+and rationals. Based on the well-known <a class="reference external" href="http://www.gmplib.org">GMP</a> library, mp++ places a strong emphasis on
 optimising operations on small values. When dealing with small operands, mp++ will:</p>
 <ul class="simple">
 <li>avoid heap memory allocations as much as possible, and</li>
@@ -103,13 +103,15 @@ optimising operations on small values. When dealing with small operands, mp++ wi
 with respect to GMP (see the <a class="reference internal" href="benchmarks.html#benchmarks"><span class="std std-ref">benchmark</span></a> section). The price to pay is a
 small overhead when operating on large operands.</p>
 <p>mp++ was created to cater to the requirements of computer algebra systems, which typically need to be able
-to manipulate arbitrarily-large integers but which, in practice, often end up storing many small integers
+to manipulate arbitrarily-large numbers but which, in practice, often end up storing many small values
 (e.g., as coefficients in a polynomial).</p>
 <p>mp++ is released under the <a class="reference external" href="https://www.mozilla.org/en-US/MPL/2.0/FAQ/">MPL2</a> license.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#installation-from-source">Installation from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-via-conda">Installation via conda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#checking-the-installation">Checking the installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#including-mp-in-your-project-via-cmake">Including mp++ in your project via CMake</a></li>
 </ul>
 </li>
@@ -117,10 +119,11 @@ to manipulate arbitrarily-large integers but which, in practice, often end up st
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integer.html">Arbitrary-precision integers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="integer.html#the-integer-class">The <code class="docutils literal"><span class="pre">integer</span></code> class</a></li>
 <li class="toctree-l3"><a class="reference internal" href="integer.html#concepts">Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="integer.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="integer.html#assignment">Assignment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="integer.html#arithmetic">Arithmetic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="integer.html#division">Division</a></li>
 <li class="toctree-l4"><a class="reference internal" href="integer.html#comparison">Comparison</a></li>
@@ -134,18 +137,42 @@ to manipulate arbitrarily-large integers but which, in practice, often end up st
 <li class="toctree-l3"><a class="reference internal" href="integer.html#operators">Operators</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rational.html#the-rational-class">The <code class="docutils literal"><span class="pre">rational</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rational.html#concepts">Concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rational.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rational.html#arithmetic">Arithmetic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rational.html#comparison">Comparison</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rational.html#exponentiation">Exponentiation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rational.html#input-output">Input/Output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rational.html#other">Other</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rational.html#operators">Operators</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#dot-product">Dot product</a></li>
-<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#vector-multiplication">Vector multiplication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#integer-benchmarks">Integer benchmarks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="benchmarks.html#dot-product">Dot product</a></li>
+<li class="toctree-l3"><a class="reference internal" href="benchmarks.html#vector-multiplication">Vector multiplication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="benchmarks.html#sorting">Sorting</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id1">0.2 (2017-05-09)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#unreleased">0.3 (unreleased)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="changelog.html#new">New</a></li>
 <li class="toctree-l3"><a class="reference internal" href="changelog.html#changes">Changes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="changelog.html#fix">Fix</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id1">0.2 (2017-05-09)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#id2">New</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#id3">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#id4">Fix</a></li>
 </ul>
 </li>
 </ul>
@@ -164,7 +191,7 @@ to manipulate arbitrarily-large integers but which, in practice, often end up st
       &copy;2016-2017, Francesco Biscani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

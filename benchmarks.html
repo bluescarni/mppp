@@ -28,7 +28,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Changelog" href="changelog.html" />
-    <link rel="prev" title="Arbitrary-precision integers" href="integer.html" />
+    <link rel="prev" title="Multiprecision rationals" href="rational.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -64,8 +64,12 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Benchmarks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#dot-product">Dot product</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#vector-multiplication">Vector multiplication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#integer-benchmarks">Integer benchmarks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dot-product">Dot product</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vector-multiplication">Vector multiplication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sorting">Sorting</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -75,7 +79,7 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="integer.html" title="previous chapter">Arbitrary-precision integers</a></li>
+      <li>Previous: <a href="rational.html" title="previous chapter">Multiprecision rationals</a></li>
       <li>Next: <a href="changelog.html" title="next chapter">Changelog</a></li>
   </ul></li>
 </ul>
@@ -99,7 +103,7 @@
   <div class="section" id="benchmarks">
 <span id="id1"></span><h1>Benchmarks<a class="headerlink" href="#benchmarks" title="Permalink to this headline">¶</a></h1>
 <p>This section contains various benchmarks comparing mp++ to other multiprecision libraries. All benchmarks
-were run on an Intel Core i7-6700K Skylake in a 64bit GNU/Linux environment, using the GCC compiler.
+were run on an AMD Ryzen 1700 in a 64-bit GNU/Linux environment, using the GCC compiler version 7.1.
 The benchmarking code is available <a class="reference external" href="https://github.com/bluescarni/mppp/tree/master/benchmark">here</a>.</p>
 <p>In addition to mp++, the following libraries are used in the benchmarks:</p>
 <ul class="simple">
@@ -111,18 +115,20 @@ and destruction of GMP objects: all arithmetic operations are implemented by cal
 <li>the <a class="reference external" href="http://flintlib.org/">FLINT</a> library. This library provides a data type called <code class="docutils literal"><span class="pre">fmpz_t</span></code> which, similarly to
 mp++, provides a small-value optimisation on top of GMP.</li>
 </ul>
+<div class="section" id="integer-benchmarks">
+<h2>Integer benchmarks<a class="headerlink" href="#integer-benchmarks" title="Permalink to this headline">¶</a></h2>
+<p>All the integer benchmarks for mp++ are performed with 1 limb (i.e., 64 bits) of static storage.</p>
 <div class="section" id="dot-product">
-<h2>Dot product<a class="headerlink" href="#dot-product" title="Permalink to this headline">¶</a></h2>
+<h3>Dot product<a class="headerlink" href="#dot-product" title="Permalink to this headline">¶</a></h3>
 <p>This benchmark measures the time needed to compute the dot product of two integer vectors of size
-<span class="math">\(3\times 10^7\)</span>. The final result fits in a 64bit value. For each benchmarked library, the timings
+<span class="math">\(3\times 10^7\)</span>. The final result fits in a 64-bit value. For each benchmarked library, the timings
 are split into three bars:</p>
 <ul class="simple">
 <li>the <code class="docutils literal"><span class="pre">init</span></code> bar, which accounts for the time needed to initialise the vectors of integers,</li>
 <li>the <code class="docutils literal"><span class="pre">arithmetic</span></code> bar, which represents the time needed to perform the dot product,</li>
 <li>the <code class="docutils literal"><span class="pre">total</span></code> bar, which represents the total runtime of the benchmark.</li>
 </ul>
-<p>The mp++ timings have been taken using a single 64bit limb for the small-value optimisation. The
-multiply-add primitives of each library are used for the accumulation of the dot product.</p>
+<p>The multiply-add primitives of each library are used for the accumulation of the dot product.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/bench_dot_product_1.svg"><img alt="_images/bench_dot_product_1.svg" src="_images/bench_dot_product_1.svg" width="100%" /></a>
 </div>
@@ -133,7 +139,7 @@ The other integer types all employ a small-value optimisation, and thus avoid th
 in the arithmetic portion of the benchmark. mp++ is also faster than <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT, albeit by a smaller margin.</p>
 </div>
 <div class="section" id="vector-multiplication">
-<h2>Vector multiplication<a class="headerlink" href="#vector-multiplication" title="Permalink to this headline">¶</a></h2>
+<h3>Vector multiplication<a class="headerlink" href="#vector-multiplication" title="Permalink to this headline">¶</a></h3>
 <p>This benchmark is very similar to the dot product benchmark above, with one crucial difference: instead of accumulating
 the dot product into a scalar value, the element-wise product of the two vectors is stored in a third vector, and the final
 dot product is computed as the sum of the values in this third vector.</p>
@@ -147,6 +153,18 @@ into a vector rather than accumulating them directly into a scalar).</p>
 <p>This time mp++ is more than 5 times faster than GMP in the arithmetic portion of the benchmark, while still maintaining
 a performance advantage over <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT.</p>
 </div>
+<div class="section" id="sorting">
+<h3>Sorting<a class="headerlink" href="#sorting" title="Permalink to this headline">¶</a></h3>
+<p>This benchmark consists of the sorting (via <code class="docutils literal"><span class="pre">std::sort()</span></code>) of a randomly-generated vector of <span class="math">\(3\times 10^7\)</span> integers whose values
+are less than <span class="math">\(2^{64}\)</span>.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/bench_sort_1.svg"><img alt="_images/bench_sort_1.svg" src="_images/bench_sort_1.svg" width="100%" /></a>
+</div>
+<p>Here again it can be seen how the small-value optimisation implemented in mp++, <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT pays off on large
+datasets with respect to plain GMP integers. mp++ shows a modest performance increase with respect to <code class="docutils literal"><span class="pre">cpp_int</span></code>
+and FLINT.</p>
+</div>
+</div>
 </div>
 
 
@@ -159,7 +177,7 @@ a performance advantage over <code class="docutils literal"><span class="pre">cp
       &copy;2016-2017, Francesco Biscani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

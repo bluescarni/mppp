@@ -66,7 +66,8 @@
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Exceptions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integer.html">Arbitrary-precision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
@@ -102,12 +103,12 @@
             
   <div class="section" id="exceptions">
 <h1>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h1>
+<p><em>#include &lt;mp++/exceptions.hpp&gt;</em></p>
 <dl class="class">
 <dt id="_CPPv2N4mppp19zero_division_errorE">
 <span id="mppp::zero_division_error"></span><span class="target" id="mp++structmppp_1_1zero__division__error"></span><em class="property">struct </em><code class="descclassname">mppp::</code><code class="descname">zero_division_error</code><a class="headerlink" href="#_CPPv2N4mppp19zero_division_errorE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Exception to signal division by zero. </p>
-<p><p><em>#include &lt;mp++/exceptions.hpp&gt;</em></p>
-<p>This exception inherits all members (including constructors) from
+<p><p>This exception inherits all members (including constructors) from
 <a class="reference external" href="http://en.cppreference.com/w/cpp/error/domain_error">std::domain_error</a>. It will be thrown
 when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
 represent infinities.</p>
@@ -127,7 +128,7 @@ represent infinities.</p>
       &copy;2016-2017, Francesco Biscani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
