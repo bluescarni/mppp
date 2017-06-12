@@ -2473,6 +2473,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
     if (sign1 != sign2) {
         rop._mp_size = -rop._mp_size;
     }
+    // NOTE: here we are sure that res_data != rdata, as we checked it earlier.
     copy_limbs_no(res_data, res_data + asize, rdata);
     return 0u;
 }
