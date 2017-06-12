@@ -1,30 +1,10 @@
-/* Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
-
-This file is part of the mp++ library.
-
-The mp++ library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 3 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
-
-The mp++ library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
-
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the mp++ library.  If not,
-see https://www.gnu.org/licenses/. */
+// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+//
+// This file is part of the mp++ library.
+//
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cstddef>
 #include <gmp.h>
@@ -54,40 +34,42 @@ struct neg_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = integer<S::value>;
+        using rational = rational<S::value>;
         // Start with all zeroes.
-        mpz_raii m1, m2;
-        integer n1, n2;
-        ::mpz_neg(&m1.m_mpz, &m2.m_mpz);
+        mpq_raii m1, m2;
+        rational n1, n2;
+        ::mpq_neg(&m1.m_mpq, &m2.m_mpq);
         neg(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE(n1.is_static());
         // Test the other variants.
         n1.neg();
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE(n1.is_static());
         REQUIRE((lex_cast(neg(n1)) == lex_cast(m1)));
-        mpz_raii tmp;
+        mpq_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
-                    n1 = integer{};
+                    n1 = rational{};
                 }
-                random_integer(tmp, x, rng);
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                random_rational(tmp, x, rng);
+                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
-                if (n2.is_static() && sdist(rng)) {
+                if (n2.get_num().is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
-                    n2.promote();
+                    n2._get_num().promote();
                 }
-                ::mpz_neg(&m1.m_mpz, &m2.m_mpz);
+                if (n2.get_den().is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2._get_den().promote();
+                }
+                ::mpq_neg(&m1.m_mpq, &m2.m_mpq);
                 neg(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n1) == lex_cast(neg(n2))));

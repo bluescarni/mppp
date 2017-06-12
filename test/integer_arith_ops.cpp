@@ -1,30 +1,10 @@
-/* Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
-
-This file is part of the mp++ library.
-
-The mp++ library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 3 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
-
-The mp++ library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
-
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the mp++ library.  If not,
-see https://www.gnu.org/licenses/. */
+// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+//
+// This file is part of the mp++ library.
+//
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cstddef>
 #include <gmp.h>
@@ -124,12 +104,12 @@ struct add_tester {
 #endif
         if (std::numeric_limits<double>::is_iec559) {
             retval = 1;
-            REQUIRE_THROWS_PREDICATE(retval += std::numeric_limits<double>::infinity(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot init integer from the non-finite floating-point value "
-                                                       + std::to_string(std::numeric_limits<double>::infinity());
-                                     });
+            REQUIRE_THROWS_PREDICATE(
+                retval += std::numeric_limits<double>::infinity(), std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot construct an integer from the non-finite floating-point value "
+                                  + std::to_string(std::numeric_limits<double>::infinity());
+                });
         }
         // In-place with interop on the lhs.
         short nl = 1;
@@ -197,6 +177,11 @@ struct add_tester {
         REQUIRE((!is_addable_inplace<const integer, int>::value));
         REQUIRE((!is_addable_inplace<std::string, integer>::value));
         REQUIRE((!is_addable_inplace<const int, integer>::value));
+
+        // In-place add with self.
+        retval = -5;
+        retval += retval;
+        REQUIRE(retval == -10);
     }
 };
 
@@ -278,12 +263,12 @@ struct sub_tester {
 #endif
         if (std::numeric_limits<double>::is_iec559) {
             retval = 1;
-            REQUIRE_THROWS_PREDICATE(retval -= std::numeric_limits<double>::infinity(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot init integer from the non-finite floating-point value "
-                                                       + std::to_string(-std::numeric_limits<double>::infinity());
-                                     });
+            REQUIRE_THROWS_PREDICATE(
+                retval -= std::numeric_limits<double>::infinity(), std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot construct an integer from the non-finite floating-point value "
+                                  + std::to_string(-std::numeric_limits<double>::infinity());
+                });
         }
         // In-place with interop on the lhs.
         short nl = 1;
@@ -353,6 +338,11 @@ struct sub_tester {
         REQUIRE((!is_subtractable_inplace<const integer, int>::value));
         REQUIRE((!is_subtractable_inplace<std::string, integer>::value));
         REQUIRE((!is_subtractable_inplace<const int, integer>::value));
+
+        // In-place sub with self.
+        retval = -5;
+        retval -= retval;
+        REQUIRE(retval == 0);
     }
 };
 
@@ -433,12 +423,12 @@ struct mul_tester {
 #endif
         if (std::numeric_limits<double>::is_iec559) {
             retval = 1;
-            REQUIRE_THROWS_PREDICATE(retval *= std::numeric_limits<double>::infinity(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot init integer from the non-finite floating-point value "
-                                                       + std::to_string(std::numeric_limits<double>::infinity());
-                                     });
+            REQUIRE_THROWS_PREDICATE(
+                retval *= std::numeric_limits<double>::infinity(), std::domain_error, [](const std::domain_error &ex) {
+                    return std::string(ex.what())
+                           == "Cannot construct an integer from the non-finite floating-point value "
+                                  + std::to_string(std::numeric_limits<double>::infinity());
+                });
         }
         // In-place with interop on the lhs.
         short nl = 1;
@@ -467,6 +457,11 @@ struct mul_tester {
         REQUIRE((!is_multipliable_inplace<const integer, int>::value));
         REQUIRE((!is_multipliable_inplace<std::string, integer>::value));
         REQUIRE((!is_multipliable_inplace<const int, integer>::value));
+
+        // In-place mul with self.
+        retval = -5;
+        retval *= retval;
+        REQUIRE(retval == 25);
     }
 };
 
@@ -590,7 +585,7 @@ struct div_tester {
             REQUIRE((integer{-4} / 0. == -std::numeric_limits<double>::infinity()));
             REQUIRE_THROWS_PREDICATE(retval /= 0., std::domain_error, [&retval](const std::domain_error &ex) {
                 return std::string(ex.what())
-                       == "Cannot init integer from the non-finite floating-point value "
+                       == "Cannot construct an integer from the non-finite floating-point value "
                               + (retval.sgn() > 0 ? std::to_string(std::numeric_limits<double>::infinity())
                                                   : std::to_string(-std::numeric_limits<double>::infinity()));
             });
@@ -602,6 +597,11 @@ struct div_tester {
         REQUIRE((!is_divisible_inplace<const integer, int>::value));
         REQUIRE((!is_divisible_inplace<std::string, integer>::value));
         REQUIRE((!is_divisible_inplace<const int, integer>::value));
+
+        // In-place div with self.
+        retval = -5;
+        retval /= retval;
+        REQUIRE(retval == 1);
     }
 };
 
@@ -843,6 +843,11 @@ struct mod_tester {
         REQUIRE((!is_modable_inplace<const int, integer>::value));
         REQUIRE((!is_modable<int, integer>::value));
         REQUIRE((!is_modable_inplace<int, integer>::value));
+
+        // In-place mod with self.
+        retval = 5;
+        retval %= retval;
+        REQUIRE(retval == 0);
     }
 };
 

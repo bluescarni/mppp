@@ -1,30 +1,10 @@
-/* Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
-
-This file is part of the mp++ library.
-
-The mp++ library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 3 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
-
-The mp++ library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
-
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the mp++ library.  If not,
-see https://www.gnu.org/licenses/. */
+// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+//
+// This file is part of the mp++ library.
+//
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <atomic>
 #include <cmath>
@@ -162,24 +142,27 @@ struct fp_ctor_tester {
             using integer = integer<S::value>;
             REQUIRE((std::is_constructible<integer, Float>::value));
             if (std::numeric_limits<Float>::is_iec559) {
-                REQUIRE_THROWS_PREDICATE(integer{std::numeric_limits<Float>::infinity()}, std::domain_error,
-                                         [](const std::domain_error &ex) {
-                                             return ex.what()
-                                                    == "Cannot init integer from the non-finite floating-point value "
-                                                           + std::to_string(std::numeric_limits<Float>::infinity());
-                                         });
-                REQUIRE_THROWS_PREDICATE(integer{-std::numeric_limits<Float>::infinity()}, std::domain_error,
-                                         [](const std::domain_error &ex) {
-                                             return ex.what()
-                                                    == "Cannot init integer from the non-finite floating-point value "
-                                                           + std::to_string(-std::numeric_limits<Float>::infinity());
-                                         });
-                REQUIRE_THROWS_PREDICATE(integer{std::numeric_limits<Float>::quiet_NaN()}, std::domain_error,
-                                         [](const std::domain_error &ex) {
-                                             return ex.what()
-                                                    == "Cannot init integer from the non-finite floating-point value "
-                                                           + std::to_string(std::numeric_limits<Float>::quiet_NaN());
-                                         });
+                REQUIRE_THROWS_PREDICATE(
+                    integer{std::numeric_limits<Float>::infinity()}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct an integer from the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<Float>::infinity());
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    integer{-std::numeric_limits<Float>::infinity()}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct an integer from the non-finite floating-point value "
+                                      + std::to_string(-std::numeric_limits<Float>::infinity());
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    integer{std::numeric_limits<Float>::quiet_NaN()}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct an integer from the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<Float>::quiet_NaN());
+                    });
             }
             REQUIRE(lex_cast(integer{Float(0)}) == "0");
             REQUIRE(lex_cast(integer{Float(1.5)}) == "1");
@@ -226,21 +209,21 @@ struct string_ctor_tester {
         using integer = integer<S::value>;
         REQUIRE_THROWS_PREDICATE((integer{"", 1}), std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what())
-                   == "In the constructor from string, a base of 1"
+                   == "In the constructor of integer from string, a base of 1"
                       " was specified, but the only valid values are 0 and any value in the [2,62] range";
         });
         REQUIRE_THROWS_PREDICATE((integer{"", -10}), std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what())
-                   == "In the constructor from string, a base of -10"
+                   == "In the constructor of integer from string, a base of -10"
                       " was specified, but the only valid values are 0 and any value in the [2,62] range";
         });
         REQUIRE_THROWS_PREDICATE((integer{"", 63}), std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what())
-                   == "In the constructor from string, a base of 63"
+                   == "In the constructor of integer from string, a base of 63"
                       " was specified, but the only valid values are 0 and any value in the [2,62] range";
         });
         REQUIRE_THROWS_PREDICATE((integer{"00x00abba", 0}), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "The string '00x00abba' is not a valid integer any supported base";
+            return std::string(ia.what()) == "The string '00x00abba' is not a valid integer in any supported base";
         });
         REQUIRE_THROWS_PREDICATE(integer{""}, std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
@@ -339,6 +322,7 @@ struct copy_move_tester {
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
+        REQUIRE((!std::is_assignable<integer, const wchar_t &>::value));
         integer n;
         REQUIRE(n.is_static());
         n = 123;
@@ -409,6 +393,87 @@ struct copy_move_tester {
 TEST_CASE("copy and move")
 {
     tuple_for_each(sizes{}, copy_move_tester{});
+}
+
+struct mpz_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        integer n;
+        mpz_raii m;
+        REQUIRE(lex_cast(integer{&m.m_mpz}) == "0");
+        ::mpz_set_si(&m.m_mpz, 1234);
+        n = &m.m_mpz;
+        REQUIRE(n == 1234);
+        ::mpz_set_si(&m.m_mpz, -1234);
+        n = &m.m_mpz;
+        REQUIRE(n == -1234);
+        ::mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        n = &m.m_mpz;
+        REQUIRE(n == integer("3218372891372987328917389127389217398271983712987398127398172389712937819237"));
+        ::mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        n = &m.m_mpz;
+        REQUIRE(n == integer("-3218372891372987328917389127389217398271983712987398127398172389712937819237"));
+        // Random testing.
+        std::atomic<bool> fail(false);
+        auto f = [&fail](unsigned u) {
+            std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
+                                                     std::numeric_limits<long>::max());
+            std::uniform_int_distribution<int> sdist(0, 1);
+            std::mt19937 eng(static_cast<std::mt19937::result_type>(u + mt_rng_seed));
+            for (auto i = 0; i < ntries; ++i) {
+                mpz_raii mpz;
+                auto tmp = dist(eng);
+                ::mpz_set_si(&mpz.m_mpz, tmp);
+                integer z;
+                if (sdist(eng)) {
+                    z.promote();
+                }
+                z = &mpz.m_mpz;
+                if (z != tmp) {
+                    fail.store(false);
+                }
+            }
+        };
+        std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+        t0.join();
+        t1.join();
+        t2.join();
+        t3.join();
+        REQUIRE(!fail.load());
+        mt_rng_seed += 4u;
+    }
+};
+
+TEST_CASE("mpz_t assignment")
+{
+    tuple_for_each(sizes{}, mpz_ass_tester{});
+}
+
+struct string_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        integer n;
+        n = "123";
+        REQUIRE(n == 123);
+        n = " -456 ";
+        REQUIRE(n == -456);
+        n = std::string("123");
+        REQUIRE(n == 123);
+        n = std::string(" -456 ");
+        REQUIRE(n == -456);
+        REQUIRE_THROWS_PREDICATE(n = "", std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
+        });
+    }
+};
+
+TEST_CASE("string assignment")
+{
+    tuple_for_each(sizes{}, string_ass_tester{});
 }
 
 struct promdem_tester {

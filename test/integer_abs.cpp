@@ -1,30 +1,10 @@
-/* Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
-
-This file is part of the mp++ library.
-
-The mp++ library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 3 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
-
-The mp++ library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
-
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the mp++ library.  If not,
-see https://www.gnu.org/licenses/. */
+// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+//
+// This file is part of the mp++ library.
+//
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cstddef>
 #include <gmp.h>
@@ -50,7 +30,7 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 
 static std::mt19937 rng;
 
-struct nextprime_tester {
+struct abs_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
@@ -58,17 +38,15 @@ struct nextprime_tester {
         // Start with all zeroes.
         mpz_raii m1, m2;
         integer n1, n2;
-        ::mpz_nextprime(&m1.m_mpz, &m2.m_mpz);
-        nextprime(n1, n2);
+        ::mpz_abs(&m1.m_mpz, &m2.m_mpz);
+        abs(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         // Test the other variants.
-        n1.nextprime();
-        ::mpz_nextprime(&m1.m_mpz, &m1.m_mpz);
+        n1.abs();
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
-        ::mpz_nextprime(&m1.m_mpz, &m1.m_mpz);
-        REQUIRE((lex_cast(nextprime(n1)) == lex_cast(m1)));
+        REQUIRE((lex_cast(abs(n1)) == lex_cast(m1)));
         mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
@@ -89,11 +67,11 @@ struct nextprime_tester {
                     // Promote sometimes, if possible.
                     n2.promote();
                 }
-                ::mpz_nextprime(&m1.m_mpz, &m2.m_mpz);
-                nextprime(n1, n2);
+                ::mpz_abs(&m1.m_mpz, &m2.m_mpz);
+                abs(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
-                REQUIRE((lex_cast(n1) == lex_cast(nextprime(n2))));
-                n2.nextprime();
+                REQUIRE((lex_cast(n1) == lex_cast(abs(n2))));
+                n2.abs();
                 REQUIRE((lex_cast(n1) == lex_cast(n2)));
             }
         };
@@ -106,7 +84,7 @@ struct nextprime_tester {
     }
 };
 
-TEST_CASE("nextprime")
+TEST_CASE("abs")
 {
-    tuple_for_each(sizes{}, nextprime_tester{});
+    tuple_for_each(sizes{}, abs_tester{});
 }

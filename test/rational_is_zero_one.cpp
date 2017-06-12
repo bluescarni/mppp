@@ -1,30 +1,10 @@
-/* Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
-
-This file is part of the mp++ library.
-
-The mp++ library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 3 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
-
-The mp++ library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
-
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the mp++ library.  If not,
-see https://www.gnu.org/licenses/. */
+// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+//
+// This file is part of the mp++ library.
+//
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cstddef>
 #include <tuple>
@@ -48,80 +28,86 @@ struct is_zero_one_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = integer<S::value>;
-        integer n;
+        using rational = rational<S::value>;
+        rational n;
         REQUIRE(n.is_zero());
         REQUIRE(is_zero(n));
         REQUIRE(!n.is_one());
-        REQUIRE(!is_one(n));
         REQUIRE(!n.is_negative_one());
+        REQUIRE(!is_one(n));
         REQUIRE(!is_negative_one(n));
-        n.promote();
+        n._get_num().promote();
+        REQUIRE(n.is_zero());
+        n._get_den().promote();
         REQUIRE(n.is_zero());
         REQUIRE(is_zero(n));
         REQUIRE(!n.is_one());
-        REQUIRE(!is_one(n));
         REQUIRE(!n.is_negative_one());
+        REQUIRE(!is_one(n));
         REQUIRE(!is_negative_one(n));
         n = 1;
-        REQUIRE(n.is_static());
         REQUIRE(!n.is_zero());
         REQUIRE(!is_zero(n));
         REQUIRE(n.is_one());
-        REQUIRE(is_one(n));
         REQUIRE(!n.is_negative_one());
+        REQUIRE(is_one(n));
         REQUIRE(!is_negative_one(n));
-        n.promote();
+        n._get_num().promote();
         REQUIRE(!n.is_zero());
-        REQUIRE(!is_zero(n));
+        n._get_den().promote();
+        REQUIRE(!n.is_zero());
         REQUIRE(n.is_one());
-        REQUIRE(is_one(n));
         REQUIRE(!n.is_negative_one());
+        REQUIRE(is_one(n));
         REQUIRE(!is_negative_one(n));
         n = -1;
-        REQUIRE(n.is_static());
         REQUIRE(!n.is_zero());
         REQUIRE(!is_zero(n));
         REQUIRE(!n.is_one());
-        REQUIRE(!is_one(n));
         REQUIRE(n.is_negative_one());
+        REQUIRE(!is_one(n));
         REQUIRE(is_negative_one(n));
-        n.promote();
+        n._get_num().promote();
         REQUIRE(!n.is_zero());
-        REQUIRE(!is_zero(n));
+        n._get_den().promote();
+        REQUIRE(!n.is_zero());
         REQUIRE(!n.is_one());
-        REQUIRE(!is_one(n));
         REQUIRE(n.is_negative_one());
+        REQUIRE(!is_one(n));
         REQUIRE(is_negative_one(n));
         n = 12;
-        REQUIRE(n.is_static());
+        REQUIRE(!n.is_zero());
+        REQUIRE(!is_zero(n));
         REQUIRE(!n.is_zero());
         REQUIRE(!is_zero(n));
         REQUIRE(!n.is_one());
-        REQUIRE(!is_one(n));
         REQUIRE(!n.is_negative_one());
+        REQUIRE(!is_one(n));
         REQUIRE(!is_negative_one(n));
-        n.promote();
+        n._get_num().promote();
         REQUIRE(!n.is_zero());
-        REQUIRE(!is_zero(n));
+        n._get_den().promote();
+        REQUIRE(!n.is_zero());
         REQUIRE(!n.is_one());
-        REQUIRE(!is_one(n));
         REQUIRE(!n.is_negative_one());
+        REQUIRE(!is_one(n));
         REQUIRE(!is_negative_one(n));
         n = -12;
-        REQUIRE(n.is_static());
+        REQUIRE(!n.is_zero());
+        REQUIRE(!is_zero(n));
         REQUIRE(!n.is_zero());
         REQUIRE(!is_zero(n));
         REQUIRE(!n.is_one());
-        REQUIRE(!is_one(n));
         REQUIRE(!n.is_negative_one());
+        REQUIRE(!is_one(n));
         REQUIRE(!is_negative_one(n));
-        n.promote();
+        n._get_num().promote();
         REQUIRE(!n.is_zero());
-        REQUIRE(!is_zero(n));
+        n._get_den().promote();
+        REQUIRE(!n.is_zero());
         REQUIRE(!n.is_one());
-        REQUIRE(!is_one(n));
         REQUIRE(!n.is_negative_one());
+        REQUIRE(!is_one(n));
         REQUIRE(!is_negative_one(n));
     }
 };

@@ -1,30 +1,10 @@
-/* Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
-
-This file is part of the mp++ library.
-
-The mp++ library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 3 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
-
-The mp++ library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
-
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the mp++ library.  If not,
-see https://www.gnu.org/licenses/. */
+// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+//
+// This file is part of the mp++ library.
+//
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cmath>
 #include <cstddef>
@@ -152,20 +132,20 @@ struct pow_tester {
                                      });
         }
         REQUIRE_THROWS_PREDICATE(pow(integer{0}, -1), zero_division_error, [](const zero_division_error &zde) {
-            return zde.what() == std::string("cannot raise zero to the negative power -1");
+            return zde.what() == std::string("Cannot raise zero to the negative power -1");
         });
         REQUIRE_THROWS_PREDICATE(pow(integer{0}, -2ll), zero_division_error, [](const zero_division_error &zde) {
-            return zde.what() == std::string("cannot raise zero to the negative power -2");
+            return zde.what() == std::string("Cannot raise zero to the negative power -2");
         });
         REQUIRE_THROWS_PREDICATE(pow(integer{0}, integer{-25}), zero_division_error,
                                  [](const zero_division_error &zde) {
-                                     return zde.what() == std::string("cannot raise zero to the negative power -25");
+                                     return zde.what() == std::string("Cannot raise zero to the negative power -25");
                                  });
         REQUIRE_THROWS_PREDICATE(pow(0, integer{-1}), zero_division_error, [](const zero_division_error &zde) {
-            return zde.what() == std::string("cannot raise zero to the negative power -1");
+            return zde.what() == std::string("Cannot raise zero to the negative power -1");
         });
         REQUIRE_THROWS_PREDICATE(pow(0ll, integer{-2ll}), zero_division_error, [](const zero_division_error &zde) {
-            return zde.what() == std::string("cannot raise zero to the negative power -2");
+            return zde.what() == std::string("Cannot raise zero to the negative power -2");
         });
         // 1 to negative exp.
         REQUIRE(pow(integer{1}, -1) == 1);

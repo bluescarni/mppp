@@ -1,6 +1,8 @@
 Common concepts
 ===============
 
+*#include <mp++/concepts.hpp>*
+
 .. note::
 
    Generic functions and classes in mp++ support `concepts <https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)>`_
@@ -13,10 +15,6 @@ Common concepts
    and refers to concepts in their native C++ form.
 
 .. cpp:concept:: template <typename T> mppp::CppInteroperable
-
-   Interoperable fundamental C++ types.
-
-   *#include <mp++/concepts.hpp>*
 
    This concept is satisfied by any C++ fundamental type with which the multiprecision classes (such as :cpp:class:`~mppp::integer`)
    can interoperate. The full list of types satisfying this concept is:

@@ -1,30 +1,10 @@
-/* Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
-
-This file is part of the mp++ library.
-
-The mp++ library is free software; you can redistribute it and/or modify
-it under the terms of either:
-
-  * the GNU Lesser General Public License as published by the Free
-    Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-or
-
-  * the GNU General Public License as published by the Free Software
-    Foundation; either version 3 of the License, or (at your option) any
-    later version.
-
-or both in parallel, as here.
-
-The mp++ library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
-
-You should have received copies of the GNU General Public License and the
-GNU Lesser General Public License along with the mp++ library.  If not,
-see https://www.gnu.org/licenses/. */
+// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+//
+// This file is part of the mp++ library.
+//
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cstddef>
 #include <gmp.h>
@@ -54,40 +34,54 @@ struct abs_tester {
     template <typename S>
     inline void operator()(const S &) const
     {
-        using integer = integer<S::value>;
+        using rational = rational<S::value>;
         // Start with all zeroes.
-        mpz_raii m1, m2;
-        integer n1, n2;
-        ::mpz_abs(&m1.m_mpz, &m2.m_mpz);
+        mpq_raii m1, m2;
+        rational n1, n2;
+        ::mpq_abs(&m1.m_mpq, &m2.m_mpq);
         abs(n1, n2);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE(n1.is_static());
+        REQUIRE(n1.get_num().is_static());
+        REQUIRE(n1.get_den().is_static());
         // Test the other variants.
         n1.abs();
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
-        REQUIRE(n1.is_static());
+        REQUIRE(n1.get_num().is_static());
+        REQUIRE(n1.get_den().is_static());
         REQUIRE((lex_cast(abs(n1)) == lex_cast(m1)));
-        mpz_raii tmp;
+        mpq_raii tmp;
+        mpz_raii num, den;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
                     // Reset rop every once in a while.
-                    n1 = integer{};
+                    n1 = rational{};
                 }
-                random_integer(tmp, x, rng);
-                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                random_integer(num, x, rng);
+                random_integer(den, x, rng);
+                ::mpz_set(mpq_numref(&tmp.m_mpq), &num.m_mpz);
+                ::mpz_set(mpq_denref(&tmp.m_mpq), &den.m_mpz);
+                if (mpz_sgn(mpq_denref(&tmp.m_mpq)) == 0) {
+                    ::mpz_set_ui(mpq_denref(&tmp.m_mpq), 1u);
+                }
+                ::mpq_canonicalize(&tmp.m_mpq);
+                ::mpq_set(&m2.m_mpq, &tmp.m_mpq);
+                n2 = rational(&tmp.m_mpq);
                 if (sdist(rng)) {
-                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    ::mpq_neg(&m2.m_mpq, &m2.m_mpq);
                     n2.neg();
                 }
-                if (n2.is_static() && sdist(rng)) {
+                if (n2.get_num().is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
-                    n2.promote();
+                    n2._get_num().promote();
                 }
-                ::mpz_abs(&m1.m_mpz, &m2.m_mpz);
+                if (n2.get_den().is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2._get_den().promote();
+                }
+                ::mpq_abs(&m1.m_mpq, &m2.m_mpq);
                 abs(n1, n2);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
                 REQUIRE((lex_cast(n1) == lex_cast(abs(n2))));

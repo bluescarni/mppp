@@ -22,13 +22,8 @@ matrix:
         apt:
           sources:
           - ubuntu-toolchain-r-test
-          - george-edison55-precise-backports
           packages:
           - g++-4.8
-          - libgmp-dev
-          - libmpfr-dev
-          - cmake
-          - cmake-data
     - env: MPPP_BUILD="DebugGCC48"
       compiler: gcc
       os: linux
@@ -36,13 +31,8 @@ matrix:
         apt:
           sources:
           - ubuntu-toolchain-r-test
-          - george-edison55-precise-backports
           packages:
           - g++-4.8
-          - libgmp-dev
-          - libmpfr-dev
-          - cmake
-          - cmake-data
     - env: MPPP_BUILD="DebugGCC48DebugGMP"
       compiler: gcc
       os: linux
@@ -62,14 +52,9 @@ matrix:
         apt:
           sources:
           - ubuntu-toolchain-r-test
-          - george-edison55-precise-backports
           packages:
           - gcc-5
           - g++-5
-          - libgmp-dev
-          - libmpfr-dev
-          - cmake
-          - cmake-data
     - env: MPPP_BUILD="Coverage32GCC6"
       compiler: gcc
       os: linux
@@ -93,48 +78,32 @@ matrix:
       addons:
         apt:
           sources:
-          - llvm-toolchain-precise-3.8
           - ubuntu-toolchain-r-test
-          - george-edison55-precise-backports
+          - llvm-toolchain-precise-3.8
           packages:
           - clang-3.8
-          - libgmp-dev
-          - libmpfr-dev
-          - cmake
-          - cmake-data
     - env: MPPP_BUILD="ReleaseClang38"
       compiler: clang
       os: linux
       addons:
         apt:
           sources:
-          - llvm-toolchain-precise-3.8
           - ubuntu-toolchain-r-test
-          - george-edison55-precise-backports
+          - llvm-toolchain-precise-3.8
           packages:
           - clang-3.8
-          - libgmp-dev
-          - libmpfr-dev
-          - cmake
-          - cmake-data
     - env: MPPP_BUILD="Documentation"
       os: linux
       addons:
         apt:
           sources:
           - ubuntu-toolchain-r-test
-          - george-edison55-precise-backports
           packages:
-          - libgmp-dev
-          - libmpfr-dev
-          - graphviz
-          - graphviz-dev
-          - texlive
           - gcc-5
           - g++-5
-          - cmake
-          - cmake-data
-          - python-pip
+    - env: MPPP_BUILD="OSXDebug"
+      os: osx
+      osx_image: xcode6.4
     # - env: MPPP_BUILD="ICC" DOCKER_IMAGE="bluescarni/icc_ci:v1"
     #   sudo: required
     #   services:
@@ -142,7 +111,8 @@ matrix:
 script:
     - mkdir build
     - cd build
-    - source ../tools/install_travis.sh
+    - bash ../tools/install_deps.sh
+    - bash ../tools/install_travis.sh
 
 notifications:
   email: false
