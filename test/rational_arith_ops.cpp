@@ -635,261 +635,23 @@ TEST_CASE("div")
 {
     tuple_for_each(sizes{}, div_tester{});
 }
-#if 0
-template <typename T, typename U>
-using lshift_t = decltype(std::declval<const T &>() << std::declval<const U &>());
-
-template <typename T, typename U>
-using inplace_lshift_t = decltype(std::declval<T &>() <<= std::declval<const U &>());
-
-template <typename T, typename U>
-using is_lshiftable = is_detected<lshift_t, T, U>;
-
-template <typename T, typename U>
-using is_lshiftable_inplace = is_detected<inplace_lshift_t, T, U>;
-
-template <typename T, typename U>
-using rshift_t = decltype(std::declval<const T &>() >> std::declval<const U &>());
-
-template <typename T, typename U>
-using inplace_rshift_t = decltype(std::declval<T &>() >>= std::declval<const U &>());
-
-template <typename T, typename U>
-using is_rshiftable = is_detected<rshift_t, T, U>;
-
-template <typename T, typename U>
-using is_rshiftable_inplace = is_detected<inplace_rshift_t, T, U>;
-
-struct shift_tester {
-    template <typename S>
-    void operator()(const S &) const
-    {
-        using integer = integer<S::value>;
-        integer ret;
-        REQUIRE((lex_cast(ret << 0) == "0"));
-        REQUIRE((lex_cast(ret << 1u) == "0"));
-        REQUIRE((lex_cast(ret << short(2)) == "0"));
-        ret = 1;
-        REQUIRE((lex_cast(ret << 1) == "2"));
-        REQUIRE((lex_cast(ret << 2ll) == "4"));
-        ret.neg();
-        REQUIRE((lex_cast(ret << 3ull) == "-8"));
-        REQUIRE((lex_cast(ret <<= 3ull) == "-8"));
-        REQUIRE((lex_cast(ret <<= char(1)) == "-16"));
-        REQUIRE((lex_cast(ret <<= (signed char)(0)) == "-16"));
-        REQUIRE((lex_cast(ret >> 0) == "-16"));
-        REQUIRE((lex_cast(ret >> 1) == "-8"));
-        REQUIRE((lex_cast(ret >>= 1ul) == "-8"));
-        REQUIRE((lex_cast(ret >>= short(1)) == "-4"));
-        REQUIRE((lex_cast(ret >> 128) == "0"));
-        // Error handling.
-        REQUIRE_THROWS_PREDICATE(ret << -1, std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot bit shift by -1: negative values are not supported";
-        });
-        REQUIRE_THROWS_PREDICATE(ret <<= -2, std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot bit shift by -2: negative values are not supported";
-        });
-        REQUIRE_THROWS_PREDICATE(ret >> -1, std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot bit shift by -1: negative values are not supported";
-        });
-        REQUIRE_THROWS_PREDICATE(ret >>= -2, std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot bit shift by -2: negative values are not supported";
-        });
-        if (std::numeric_limits<unsigned long long>::max() > std::numeric_limits<::mp_bitcnt_t>::max()) {
-            REQUIRE_THROWS_PREDICATE(ret << std::numeric_limits<unsigned long long>::max(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot bit shift by "
-                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + ": the value is too large";
-                                     });
-            REQUIRE_THROWS_PREDICATE(ret <<= std::numeric_limits<unsigned long long>::max(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot bit shift by "
-                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + ": the value is too large";
-                                     });
-            REQUIRE_THROWS_PREDICATE(ret >> std::numeric_limits<unsigned long long>::max(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot bit shift by "
-                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + ": the value is too large";
-                                     });
-            REQUIRE_THROWS_PREDICATE(ret >>= std::numeric_limits<unsigned long long>::max(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot bit shift by "
-                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + ": the value is too large";
-                                     });
-        }
-        if ((unsigned long long)std::numeric_limits<long long>::max() > std::numeric_limits<::mp_bitcnt_t>::max()) {
-            REQUIRE_THROWS_PREDICATE(
-                ret << std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
-                    return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
-                                  + ": the value is too large";
-                });
-            REQUIRE_THROWS_PREDICATE(
-                ret <<= std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
-                    return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
-                                  + ": the value is too large";
-                });
-            REQUIRE_THROWS_PREDICATE(
-                ret >> std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
-                    return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
-                                  + ": the value is too large";
-                });
-            REQUIRE_THROWS_PREDICATE(
-                ret >>= std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
-                    return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
-                                  + ": the value is too large";
-                });
-        }
-        // Type traits.
-        REQUIRE((!is_lshiftable<integer, double>::value));
-        REQUIRE((!is_lshiftable<integer, integer>::value));
-        REQUIRE((!is_lshiftable<integer, std::string>::value));
-        REQUIRE((!is_lshiftable<std::string, integer>::value));
-        REQUIRE((!is_lshiftable_inplace<integer, std::string>::value));
-        REQUIRE((!is_lshiftable_inplace<const integer, int>::value));
-        REQUIRE((!is_lshiftable_inplace<std::string, integer>::value));
-        REQUIRE((!is_lshiftable_inplace<const int, integer>::value));
-        REQUIRE((!is_lshiftable<int, integer>::value));
-        REQUIRE((!is_lshiftable_inplace<int, integer>::value));
-        REQUIRE((!is_lshiftable_inplace<integer, double>::value));
-        REQUIRE((!is_lshiftable_inplace<integer, integer>::value));
-        REQUIRE((!is_rshiftable<integer, double>::value));
-        REQUIRE((!is_rshiftable<integer, integer>::value));
-        REQUIRE((!is_rshiftable<integer, std::string>::value));
-        REQUIRE((!is_rshiftable<std::string, integer>::value));
-        REQUIRE((!is_rshiftable_inplace<integer, std::string>::value));
-        REQUIRE((!is_rshiftable_inplace<const integer, int>::value));
-        REQUIRE((!is_rshiftable_inplace<std::string, integer>::value));
-        REQUIRE((!is_rshiftable_inplace<const int, integer>::value));
-        REQUIRE((!is_rshiftable<int, integer>::value));
-        REQUIRE((!is_rshiftable_inplace<int, integer>::value));
-        REQUIRE((!is_rshiftable_inplace<integer, double>::value));
-        REQUIRE((!is_rshiftable_inplace<integer, integer>::value));
-    }
-};
-
-TEST_CASE("shift")
-{
-    tuple_for_each(sizes{}, shift_tester{});
-}
-
-template <typename T, typename U>
-using mod_t = decltype(std::declval<const T &>() << std::declval<const U &>());
-
-template <typename T, typename U>
-using inplace_mod_t = decltype(std::declval<T &>() <<= std::declval<const U &>());
-
-template <typename T, typename U>
-using is_modable = is_detected<mod_t, T, U>;
-
-template <typename T, typename U>
-using is_modable_inplace = is_detected<inplace_mod_t, T, U>;
-
-struct mod_tester {
-    template <typename S>
-    void operator()(const S &) const
-    {
-        using integer = integer<S::value>;
-        integer n1{4}, n2{-2};
-        REQUIRE((lex_cast(n1 % n2) == "0"));
-        REQUIRE((std::is_same<decltype(n1 % n2), integer>::value));
-        REQUIRE((lex_cast(n1 % char(3)) == "1"));
-        REQUIRE((lex_cast(char(3) % n2) == "1"));
-        REQUIRE((std::is_same<decltype(n1 % char(4)), integer>::value));
-        REQUIRE((std::is_same<decltype(char(4) % n2), integer>::value));
-        REQUIRE((lex_cast(-n1 % (unsigned char)(3)) == "-1"));
-        REQUIRE((lex_cast((unsigned char)(3) % n2) == "1"));
-        REQUIRE((lex_cast(n1 % short(3)) == "1"));
-        REQUIRE((lex_cast(-short(3) % n2) == "-1"));
-        REQUIRE((lex_cast(n1 % -3) == "1"));
-        REQUIRE((lex_cast(3 % -n2) == "1"));
-        REQUIRE((std::is_same<decltype(n1 % 4), integer>::value));
-        REQUIRE((std::is_same<decltype(4 % n2), integer>::value));
-        REQUIRE((lex_cast(n1 % 3u) == "1"));
-        REQUIRE((lex_cast(3u % n2) == "1"));
-        REQUIRE((lex_cast(0u % n2) == "0"));
-        // In-place mod.
-        integer retval{-2};
-        retval %= n1;
-        REQUIRE((lex_cast(retval) == "-2"));
-        retval = 3;
-        retval %= 2;
-        REQUIRE((lex_cast(retval) == "1"));
-        retval = -3;
-        retval %= short(2);
-        REQUIRE((lex_cast(retval) == "-1"));
-        retval %= (signed char)(-1);
-        REQUIRE((lex_cast(retval) == "0"));
-        retval = 26;
-        retval %= (long long)(-5);
-        REQUIRE((lex_cast(retval) == "1"));
-        retval = -19;
-        retval %= (unsigned long long)(7);
-        REQUIRE((lex_cast(retval) == "-5"));
-        // CppInteroperable on the left.
-        int n = 3;
-        n %= integer{2};
-        REQUIRE(n == 1);
-        n = -3;
-        n %= integer{2};
-        REQUIRE(n == -1);
-        // Error checking.
-        REQUIRE_THROWS_PREDICATE(integer{1} % integer{0}, zero_division_error, [](const zero_division_error &ex) {
-            return std::string(ex.what()) == "Integer division by zero";
-        });
-        REQUIRE_THROWS_PREDICATE(integer{1} % 0, zero_division_error, [](const zero_division_error &ex) {
-            return std::string(ex.what()) == "Integer division by zero";
-        });
-        REQUIRE_THROWS_PREDICATE(1 % integer{0}, zero_division_error, [](const zero_division_error &ex) {
-            return std::string(ex.what()) == "Integer division by zero";
-        });
-        REQUIRE_THROWS_PREDICATE(retval %= integer{0}, zero_division_error, [](const zero_division_error &ex) {
-            return std::string(ex.what()) == "Integer division by zero";
-        });
-        REQUIRE_THROWS_PREDICATE(retval %= 0, zero_division_error, [](const zero_division_error &ex) {
-            return std::string(ex.what()) == "Integer division by zero";
-        });
-        REQUIRE((!is_modable<integer, std::string>::value));
-        REQUIRE((!is_modable<integer, double>::value));
-        REQUIRE((!is_modable<std::string, integer>::value));
-        REQUIRE((!is_modable_inplace<integer, std::string>::value));
-        REQUIRE((!is_modable_inplace<const integer, int>::value));
-        REQUIRE((!is_modable_inplace<std::string, integer>::value));
-        REQUIRE((!is_modable_inplace<const int, integer>::value));
-        REQUIRE((!is_modable<int, integer>::value));
-        REQUIRE((!is_modable_inplace<int, integer>::value));
-    }
-};
-
-TEST_CASE("mod")
-{
-    tuple_for_each(sizes{}, mod_tester{});
-}
 
 struct rel_tester {
     template <typename S>
     void operator()(const S &) const
     {
-        using integer = integer<S::value>;
-        integer n1{4}, n2{-2};
+        using rational = rational<S::value>;
+        using integer = typename rational::int_t;
+        rational n1{4}, n2{-2};
 
         REQUIRE(n1 != n2);
         REQUIRE(n1 == n1);
-        REQUIRE(integer{} == integer{});
-        REQUIRE(integer{} == 0);
-        REQUIRE(0 == integer{});
+        REQUIRE(rational{} == rational{});
+        REQUIRE(rational{} == 0);
+        REQUIRE(0 == rational{});
         REQUIRE(n1 == 4);
+        REQUIRE(n1 == integer{4});
+        REQUIRE(integer{4} == n1);
         REQUIRE(4u == n1);
         REQUIRE(n1 != 3);
         REQUIRE((signed char)-3 != n1);
@@ -913,6 +675,8 @@ struct rel_tester {
 
         REQUIRE(n2 < n1);
         REQUIRE(n2 < 0);
+        REQUIRE(n2 < integer{0});
+        REQUIRE(integer{-100} < n2);
         REQUIRE(-3 < n2);
         REQUIRE(n2 < 0u);
         REQUIRE(-3ll < n2);
@@ -927,6 +691,8 @@ struct rel_tester {
 
         REQUIRE(n1 > n2);
         REQUIRE(0 > n2);
+        REQUIRE(integer{0} > n2);
+        REQUIRE(n2 > integer{-150});
         REQUIRE(n2 > -3);
         REQUIRE(0u > n2);
         REQUIRE(n2 > -3ll);
@@ -941,9 +707,11 @@ struct rel_tester {
 
         REQUIRE(n2 <= n1);
         REQUIRE(n1 <= n1);
-        REQUIRE(integer{} <= integer{});
-        REQUIRE(integer{} <= 0);
-        REQUIRE(0 <= integer{});
+        REQUIRE(rational{} <= rational{});
+        REQUIRE(rational{} <= 0);
+        REQUIRE(0 <= rational{});
+        REQUIRE(rational{} <= integer{0});
+        REQUIRE(integer{0} <= rational{});
         REQUIRE(-2 <= n2);
         REQUIRE(n2 <= -2);
         REQUIRE(n2 <= 0);
@@ -967,9 +735,11 @@ struct rel_tester {
 
         REQUIRE(n1 >= n2);
         REQUIRE(n1 >= n1);
-        REQUIRE(integer{} >= integer{});
-        REQUIRE(integer{} >= 0);
-        REQUIRE(0 >= integer{});
+        REQUIRE(rational{} >= rational{});
+        REQUIRE(rational{} >= 0);
+        REQUIRE(0 >= rational{});
+        REQUIRE(rational{} >= integer{0});
+        REQUIRE(integer{0} >= rational{});
         REQUIRE(-2 >= n2);
         REQUIRE(n2 >= -2);
         REQUIRE(0 >= n2);
@@ -997,4 +767,3 @@ TEST_CASE("rel")
 {
     tuple_for_each(sizes{}, rel_tester{});
 }
-#endif

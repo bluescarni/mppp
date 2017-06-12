@@ -2115,6 +2115,168 @@ inline bool operator!=(const T &op1, const U &op2)
     return !(op1 == op2);
 }
 
+inline namespace detail
+{
+
+// Less-than operator.
+template <std::size_t SSize>
+inline bool dispatch_less_than(const rational<SSize> &a, const rational<SSize> &b)
+{
+    return cmp(a, b) < 0;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_less_than(const rational<SSize> &a, const integer<SSize> &b)
+{
+    return cmp(a, b) < 0;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_less_than(const integer<SSize> &a, const rational<SSize> &b)
+{
+    return cmp(a, b) < 0;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_less_than(const rational<SSize> &a, T n)
+{
+    return dispatch_less_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_less_than(T n, const rational<SSize> &a)
+{
+    return dispatch_greater_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_less_than(const rational<SSize> &a, T x)
+{
+    return static_cast<T>(a) < x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_less_than(T x, const rational<SSize> &a)
+{
+    return dispatch_greater_than(a, x);
+}
+
+// Greater-than operator.
+template <std::size_t SSize>
+inline bool dispatch_greater_than(const rational<SSize> &a, const rational<SSize> &b)
+{
+    return cmp(a, b) > 0;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_greater_than(const rational<SSize> &a, const integer<SSize> &b)
+{
+    return cmp(a, b) > 0;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_greater_than(const integer<SSize> &a, const rational<SSize> &b)
+{
+    return cmp(a, b) > 0;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_greater_than(const rational<SSize> &a, T n)
+{
+    return dispatch_greater_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_greater_than(T n, const rational<SSize> &a)
+{
+    return dispatch_less_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_greater_than(const rational<SSize> &a, T x)
+{
+    return static_cast<T>(a) > x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_greater_than(T x, const rational<SSize> &a)
+{
+    return dispatch_less_than(a, x);
+}
+}
+
+/// Less-than operator.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator<(const T &op1, const RationalOpTypes<T> &op2)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline bool operator<(const T &op1, const U &op2)
+#endif
+{
+    return dispatch_less_than(op1, op2);
+}
+
+/// Less-than or equal operator.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator<=(const T &op1, const RationalOpTypes<T> &op2)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline bool operator<=(const T &op1, const U &op2)
+#endif
+{
+    return !(op1 > op2);
+}
+
+/// Greater-than operator.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator>(const T &op1, const RationalOpTypes<T> &op2)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline bool operator>(const T &op1, const U &op2)
+#endif
+{
+    return dispatch_greater_than(op1, op2);
+}
+
+/// Greater-than or equal operator.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator>=(const T &op1, const RationalOpTypes<T> &op2)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline bool operator>=(const T &op1, const U &op2)
+#endif
+{
+    return !(op1 < op2);
+}
+
 /** @} */
 
 /** @defgroup rational_comparison rational_comparison
