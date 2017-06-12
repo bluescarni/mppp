@@ -573,8 +573,7 @@ public:
  *
  * Note that at this time only a small subset of the GMP API has been wrapped by :cpp:class:`~mppp::integer`.
  *
- * Various :ref:`overloaded operators <integer_operators>` are provided. The operators are resolved via
- * argument-dependent lookup whenever at least one argument is of type :cpp:class:`~mppp::integer`.
+ * Various :ref:`overloaded operators <integer_operators>` are provided.
  * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
  * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
  * is a C++ integral, the result will be of type :cpp:class:`~mppp::integer`, if the other argument is a C++
@@ -1014,6 +1013,11 @@ public:
      *
      *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
      *    with an uninitialized ``n`` results in undefined behaviour.
+     *
+     * .. warning::
+     *
+     *    ``n`` must be distinct from ``this``: if ``n`` is an ``mpz_view`` of ``this``, the behaviour will be
+     *    undefined.
      * \endrststar
      *
      * @param n the input GMP integer.
@@ -2472,6 +2476,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
     if (sign1 != sign2) {
         rop._mp_size = -rop._mp_size;
     }
+    // NOTE: here we are sure that res_data != rdata, as we checked it earlier.
     copy_limbs_no(res_data, res_data + asize, rdata);
     return 0u;
 }

@@ -95,6 +95,12 @@ struct cmp_tester {
                 } else {
                     REQUIRE((n1 == n2));
                 }
+                // Test the integer versions as well.
+                REQUIRE(check_cmp(cmp(n1, n2.get_num()), ::mpq_cmp_z(&m1.m_mpq, mpq_numref(&m2.m_mpq))));
+                REQUIRE(check_cmp(cmp(n2.get_num(), n1), -::mpq_cmp_z(&m1.m_mpq, mpq_numref(&m2.m_mpq))));
+                n2._get_den() = 1;
+                REQUIRE(cmp(n2, n2.get_num()) == 0);
+                REQUIRE(cmp(n2.get_num(), n2) == 0);
                 n2 = n1;
                 ::mpq_set(&m2.m_mpq, &m1.m_mpq);
                 if (n2.get_num().is_static() && sdist(rng)) {

@@ -54,9 +54,12 @@ template <typename T, std::size_t SSize>
 concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
 #endif
 
-// Fwd declare this as we need friendship.
+// Fwd declare these as we need friendship.
 template <std::size_t SSize>
 int cmp(const rational<SSize> &, const rational<SSize> &);
+
+template <std::size_t SSize>
+int cmp(const rational<SSize> &, const integer<SSize> &);
 
 inline namespace detail
 {
@@ -116,7 +119,37 @@ inline void fix_den_sign(rational<SSize> &q)
  *    add(rop,a,b);
  *
  * where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
- * are allowed, unless noted otherwise.
+ * are allowed, unless noted otherwise. In a similar way to the :cpp:class:`~mppp::integer` class, various convenience
+ * overloads are provided for the same functionality. For instance, here are three possible ways of computing the
+ * absolute value:
+ *
+ * .. code-block:: c++
+ *
+ *    rational<1> q1, q2, q{-5};
+ *    abs(q1,q);   // Binary abs(): computes and stores the absolute value
+ *                 // of q into q1.
+ *    q2 = abs(q); // Unary abs(): returns the absolute value of q, which is
+ *                 // then assigned to q2.
+ *    q.abs();     // Member function abs(): replaces the value of q with its
+ *                 // absolute value.
+ *
+ * Various :ref:`overloaded operators <rational_operators>` are provided.
+ * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
+ * rules are a natural extension of the corresponding rules for native C++ types: if the other argument
+ * is a C++ integral or an :cpp:class:`~mppp::integer`, the result will be of type :cpp:class:`~mppp::rational`, if the
+ * other argument is a C++ floating-point the result will be of the same floating-point type. For example:
+ *
+ * .. code-block:: c++
+ *
+ *    rational<1> q1{1}, q2{2};
+ *    integer<1> n{2};
+ *    auto res1 = q1 + q2; // res1 is a rational
+ *    auto res2 = q1 * 2; // res2 is a rational
+ *    auto res3 = q1 * n; // res3 is a rational
+ *    auto res4 = 2 - q2; // res4 is a rational
+ *    auto res5 = q1 / 2.f; // res5 is a float
+ *    auto res6 = 12. / q1; // res6 is a double
+ *
  * \endrststar
  */
 // NOTEs:
@@ -141,9 +174,11 @@ class rational
         m_den._get_union().g_st().m_limbs[0] = 1;
     }
 #if !defined(MPPP_DOXYGEN_INVOKED)
-    // Make friends with the comparison function.
+    // Make friends with the comparison functions.
     template <std::size_t S>
     friend int cmp(const rational<S> &, const rational<S> &);
+    template <std::size_t S>
+    friend int cmp(const rational<S> &, const integer<S> &);
 #endif
 
 public:
@@ -272,7 +307,7 @@ public:
  * @param n the numerator.
  * @param d the denominator.
  *
- * @throws mppp::zero_division_error if the denominator is zero.
+ * @throws zero_division_error if the denominator is zero.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T, typename U>
@@ -305,7 +340,7 @@ public:
      * @param s the input string.
      * @param base the base used in the string representation.
      *
-     * @throws mppp::zero_division_error if the denominator is zero.
+     * @throws zero_division_error if the denominator is zero.
      * @throws unspecified any exception thrown by the string constructor of mppp::integer.
      */
     explicit rational(const char *s, int base = 10)
@@ -1422,6 +1457,67 @@ inline rational_common_t<T, U> operator+(const T &op1, const U &op2)
     return dispatch_binary_add(op1, op2);
 }
 
+inline namespace detail
+{
+
+// Dispatching for in-place add.
+template <std::size_t SSize>
+inline void dispatch_in_place_add(rational<SSize> &retval, const rational<SSize> &q)
+{
+    add(retval, retval, q);
+}
+
+template <std::size_t SSize>
+inline void dispatch_in_place_add(rational<SSize> &retval, const integer<SSize> &n)
+{
+    if (retval.get_den().is_one()) {
+        add(retval._get_num(), retval._get_num(), n);
+    } else {
+        addmul(retval._get_num(), retval.get_den(), n);
+    }
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_add(rational<SSize> &retval, const T &n)
+{
+    dispatch_in_place_add(retval, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_add(rational<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) + x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
+{
+    rop = static_cast<T>(rop + op);
+}
+}
+
+/// In-place addition operator.
+/**
+ * @param rop the augend.
+ * @param op the addend.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::rational rational\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator+=(T &rop, const RationalOpTypes<T> &op)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline T &operator+=(T &rop, const U &op)
+#endif
+{
+    dispatch_in_place_add(rop, op);
+    return rop;
+}
+
 /// Negated copy.
 /**
  * @param q the rational that will be negated.
@@ -1521,6 +1617,67 @@ inline rational_common_t<T, U> operator-(const T &op1, const U &op2)
 inline namespace detail
 {
 
+// Dispatching for in-place sub.
+template <std::size_t SSize>
+inline void dispatch_in_place_sub(rational<SSize> &retval, const rational<SSize> &q)
+{
+    sub(retval, retval, q);
+}
+
+template <std::size_t SSize>
+inline void dispatch_in_place_sub(rational<SSize> &retval, const integer<SSize> &n)
+{
+    if (retval.get_den().is_one()) {
+        sub(retval._get_num(), retval._get_num(), n);
+    } else {
+        submul(retval._get_num(), retval.get_den(), n);
+    }
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_sub(rational<SSize> &retval, const T &n)
+{
+    dispatch_in_place_sub(retval, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_sub(rational<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) - x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
+{
+    rop = static_cast<T>(rop - op);
+}
+}
+
+/// In-place subtraction operator.
+/**
+ * @param rop the minuend.
+ * @param op the subtrahend.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::rational rational\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator-=(T &rop, const RationalOpTypes<T> &op)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline T &operator-=(T &rop, const U &op)
+#endif
+{
+    dispatch_in_place_sub(rop, op);
+    return rop;
+}
+
+inline namespace detail
+{
+
 // Dispatching for the binary multiplication operator.
 template <std::size_t SSize>
 inline rational<SSize> dispatch_binary_mul(const rational<SSize> &op1, const rational<SSize> &op2)
@@ -1605,6 +1762,79 @@ template <typename T, typename U>
 inline rational_common_t<T, U> operator*(const T &op1, const U &op2)
 {
     return dispatch_binary_mul(op1, op2);
+}
+
+inline namespace detail
+{
+
+// Dispatching for in-place mul.
+template <std::size_t SSize>
+inline void dispatch_in_place_mul(rational<SSize> &retval, const rational<SSize> &q)
+{
+    mul(retval, retval, q);
+}
+
+template <std::size_t SSize>
+inline void dispatch_in_place_mul(rational<SSize> &retval, const integer<SSize> &n)
+{
+    if (retval.get_den().is_one()) {
+        // Integer multiplication.
+        mul(retval._get_num(), retval.get_num(), n);
+    } else {
+        auto g = gcd(retval.get_den(), n);
+        if (g.is_one()) {
+            // No common factors, just multiply the numerators. Den is already
+            // assigned.
+            mul(retval._get_num(), retval.get_num(), n);
+        } else {
+            // Set the den first. Dens tainted after this.
+            divexact(retval._get_den(), retval.get_den(), g);
+            // Re-use the g variable as tmp storage.
+            divexact(g, n, g);
+            mul(retval._get_num(), retval.get_num(), g);
+        }
+    }
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_mul(rational<SSize> &retval, const T &n)
+{
+    dispatch_in_place_mul(retval, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_mul(rational<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) * x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
+{
+    rop = static_cast<T>(rop * op);
+}
+}
+
+/// In-place multiplication operator.
+/**
+ * @param rop the multiplicator.
+ * @param op the multiplicand.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::rational rational\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator*=(T &rop, const RationalOpTypes<T> &op)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline T &operator*=(T &rop, const U &op)
+#endif
+{
+    dispatch_in_place_mul(rop, op);
+    return rop;
 }
 
 inline namespace detail
@@ -1737,6 +1967,87 @@ inline rational_common_t<T, U> operator/(const T &op1, const U &op2)
 inline namespace detail
 {
 
+// Dispatching for in-place div.
+template <std::size_t SSize>
+inline void dispatch_in_place_div(rational<SSize> &retval, const rational<SSize> &q)
+{
+    div(retval, retval, q);
+}
+
+template <std::size_t SSize>
+inline void dispatch_in_place_div(rational<SSize> &retval, const integer<SSize> &n)
+{
+    if (mppp_unlikely(n.is_zero())) {
+        throw zero_division_error("Zero divisor in rational division");
+    }
+    auto g = gcd(retval.get_num(), n);
+    if (retval.get_den().is_one()) {
+        if (g.is_one()) {
+            retval._get_den() = n;
+        } else {
+            divexact(retval._get_num(), retval.get_num(), g);
+            divexact(retval._get_den(), n, g);
+        }
+    } else {
+        if (g.is_one()) {
+            mul(retval._get_den(), retval.get_den(), n);
+        } else {
+            // Set the num first.
+            divexact(retval._get_num(), retval.get_num(), g);
+            // Re-use the g variable as tmp storage.
+            divexact(g, n, g);
+            mul(retval._get_den(), retval.get_den(), g);
+        }
+    }
+    // Fix den sign.
+    fix_den_sign(retval);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_div(rational<SSize> &retval, const T &n)
+{
+    dispatch_in_place_div(retval, integer<SSize>{n});
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline void dispatch_in_place_div(rational<SSize> &retval, const T &x)
+{
+    retval = static_cast<T>(retval) / x;
+}
+
+template <typename T, std::size_t SSize>
+inline void dispatch_in_place_div(T &rop, const rational<SSize> &op)
+{
+    rop = static_cast<T>(rop / op);
+}
+}
+
+/// In-place division operator.
+/**
+ * @param rop the dividend.
+ * @param op the divisor.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws zero_division_error if \p op is zero and only integral types are involved in the division.
+ * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
+ * by the conversion operator of \link mppp::rational rational\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator/=(T &rop, const RationalOpTypes<T> &op)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline T &operator/=(T &rop, const U &op)
+#endif
+{
+    dispatch_in_place_div(rop, op);
+    return rop;
+}
+
+inline namespace detail
+{
+
 template <std::size_t SSize>
 inline bool dispatch_equality(const rational<SSize> &op1, const rational<SSize> &op2)
 {
@@ -1804,6 +2115,168 @@ inline bool operator!=(const T &op1, const U &op2)
     return !(op1 == op2);
 }
 
+inline namespace detail
+{
+
+// Less-than operator.
+template <std::size_t SSize>
+inline bool dispatch_less_than(const rational<SSize> &a, const rational<SSize> &b)
+{
+    return cmp(a, b) < 0;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_less_than(const rational<SSize> &a, const integer<SSize> &b)
+{
+    return cmp(a, b) < 0;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_less_than(const integer<SSize> &a, const rational<SSize> &b)
+{
+    return cmp(a, b) < 0;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_less_than(const rational<SSize> &a, T n)
+{
+    return dispatch_less_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_less_than(T n, const rational<SSize> &a)
+{
+    return dispatch_greater_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_less_than(const rational<SSize> &a, T x)
+{
+    return static_cast<T>(a) < x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_less_than(T x, const rational<SSize> &a)
+{
+    return dispatch_greater_than(a, x);
+}
+
+// Greater-than operator.
+template <std::size_t SSize>
+inline bool dispatch_greater_than(const rational<SSize> &a, const rational<SSize> &b)
+{
+    return cmp(a, b) > 0;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_greater_than(const rational<SSize> &a, const integer<SSize> &b)
+{
+    return cmp(a, b) > 0;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_greater_than(const integer<SSize> &a, const rational<SSize> &b)
+{
+    return cmp(a, b) > 0;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_greater_than(const rational<SSize> &a, T n)
+{
+    return dispatch_greater_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline bool dispatch_greater_than(T n, const rational<SSize> &a)
+{
+    return dispatch_less_than(a, integer<SSize>{n});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_greater_than(const rational<SSize> &a, T x)
+{
+    return static_cast<T>(a) > x;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+inline bool dispatch_greater_than(T x, const rational<SSize> &a)
+{
+    return dispatch_less_than(a, x);
+}
+}
+
+/// Less-than operator.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator<(const T &op1, const RationalOpTypes<T> &op2)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline bool operator<(const T &op1, const U &op2)
+#endif
+{
+    return dispatch_less_than(op1, op2);
+}
+
+/// Less-than or equal operator.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator<=(const T &op1, const RationalOpTypes<T> &op2)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline bool operator<=(const T &op1, const U &op2)
+#endif
+{
+    return !(op1 > op2);
+}
+
+/// Greater-than operator.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator>(const T &op1, const RationalOpTypes<T> &op2)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline bool operator>(const T &op1, const U &op2)
+#endif
+{
+    return dispatch_greater_than(op1, op2);
+}
+
+/// Greater-than or equal operator.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator>=(const T &op1, const RationalOpTypes<T> &op2)
+#else
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+inline bool operator>=(const T &op1, const U &op2)
+#endif
+{
+    return !(op1 < op2);
+}
+
 /** @} */
 
 /** @defgroup rational_comparison rational_comparison
@@ -1831,6 +2304,35 @@ inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
     //   number is larger,
     // - otherwise, do the two multiplications and compare.
     return ::mpq_cmp(op1.get_mpq_view(), op2.get_mpq_view());
+}
+
+/// Comparison function for rational/integer arguments.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
+ * <tt>op1 > op2</tt>.
+ */
+template <std::size_t SSize>
+inline int cmp(const rational<SSize> &op1, const integer<SSize> &op2)
+{
+    return ::mpq_cmp_z(op1.get_mpq_view(), op2.get_mpz_view());
+}
+
+/// Comparison function for integer/rational arguments.
+/**
+ * @param op1 first argument.
+ * @param op2 second argument.
+ *
+ * @return \p 0 if <tt>op1 == op2</tt>, a negative value if <tt>op1 < op2</tt>, a positive value if
+ * <tt>op1 > op2</tt>.
+ */
+template <std::size_t SSize>
+inline int cmp(const integer<SSize> &op1, const rational<SSize> &op2)
+{
+    // Let's just hope this is guaranteed to be a smallish number.
+    return -cmp(op2, op1);
 }
 
 /// Sign function.
@@ -1879,6 +2381,127 @@ template <std::size_t SSize>
 inline bool is_zero(const rational<SSize> &q)
 {
     return q.is_zero();
+}
+
+/** @} */
+
+/** @defgroup rational_exponentiation rational_exponentiation
+ *  @{
+ */
+
+inline namespace detail
+{
+
+// rational base, integral exponent implementation. Assumes exp is non-null.
+template <std::size_t SSize, typename T>
+inline rational<SSize> pow_impl_impl(const rational<SSize> &base, const T &exp, int exp_sign)
+{
+    assert(exp_sign != 0);
+    rational<SSize> retval;
+    if (exp_sign == 1) {
+        retval._get_num() = pow(base.get_num(), exp);
+        retval._get_den() = pow(base.get_den(), exp);
+    } else {
+        // Make integer copy of exp for safe negation.
+        typename rational<SSize>::int_t exp_copy(exp);
+        exp_copy.neg();
+        retval._get_num() = pow(base.get_den(), exp_copy);
+        retval._get_den() = pow(base.get_num(), exp_copy);
+        fix_den_sign(retval);
+    }
+    return retval;
+}
+
+// rational base, rational exponent implementation. Works only if exponent is an integral value, will call the other
+// impl_impl overload or error out.
+template <std::size_t SSize>
+inline rational<SSize> pow_impl_impl(const rational<SSize> &base, const rational<SSize> &exp, int exp_sign)
+{
+    if (mppp_unlikely(!is_one(exp.get_den()))) {
+        throw std::domain_error("Cannot raise the rational base " + base.to_string() + " to the non-integral exponent "
+                                + exp.to_string());
+    }
+    return pow_impl_impl(base, exp.get_num(), exp_sign);
+}
+
+// Rational base, non-floating point exp (i.e., integral or rational exp).
+template <std::size_t SSize, typename T, enable_if_t<!std::is_floating_point<T>::value, int> = 0>
+inline rational<SSize> pow_impl(const rational<SSize> &base, const T &exp)
+{
+    const auto exp_sign = sgn(exp);
+    // Handle special cases first.
+    if (is_one(base) || exp_sign == 0) {
+        // 1**q == 1 ∀ q, q**0 == 1 ∀ q.
+        return rational<SSize>{1};
+    }
+    if (is_zero(base)) {
+        if (exp_sign == 1) {
+            // 0**q == 0 ∀ q > 0.
+            return rational<SSize>{};
+        }
+        // 0**q with q < 0 -> division by zero.
+        throw zero_division_error("Cannot raise rational zero to the negative exponent " + to_string(exp));
+    }
+    return pow_impl_impl(base, exp, exp_sign);
+}
+
+// Integral base, rational exponent.
+template <std::size_t SSize, typename T,
+          enable_if_t<conjunction<negation<std::is_floating_point<T>>,
+                                  negation<std::is_same<T, rational<SSize>>>>::value,
+                      int> = 0>
+inline rational<SSize> pow_impl(const T &base, const rational<SSize> &exp)
+{
+    return pow_impl(rational<SSize>{base}, exp);
+}
+
+// Fp base, rational exponent.
+template <std::size_t SSize, typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline T pow_impl(const rational<SSize> &base, const T &exp)
+{
+    return std::pow(static_cast<T>(base), exp);
+}
+
+// Rational base, fp exponent.
+template <std::size_t SSize, typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline T pow_impl(const T &base, const rational<SSize> &exp)
+{
+    return std::pow(base, static_cast<T>(exp));
+}
+}
+
+/// Binary exponentiation.
+/**
+ * \rststar
+ * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
+ * The return type is determined as follows:
+ *
+ * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
+ *   type of the result is ``F``; otherwise,
+ * * the type of the result is :cpp:class:`~mppp::rational`.
+ *
+ * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
+ * is a floating-point value, then the result will be computed via ``std::pow()`` and it will also be a
+ * floating-point value. Otherwise, the result will be a :cpp:class:`~mppp::rational`.
+ *
+ * When floating-point types are not involved, the implementation is based on the integral exponentiation
+ * of numerator and denominator. Thus, if ``exp`` is a rational value, the exponentiation will be successful
+ * only in a few special cases (e.g., unitary base, zero exponent, etc.).
+ * \endrststar
+ *
+ * @param base the base.
+ * @param exp the exponent.
+ *
+ * @return <tt>base**exp</tt>.
+ *
+ * @throws zero_division_error if floating-point types are not involved, \p base is zero and \p exp is negative.
+ * @throws std::domain_error if floating-point types are not involved and \p exp is a rational value (except
+ * in a handful of special cases).
+ */
+template <typename T, typename U>
+inline rational_common_t<T, U> pow(const T &base, const U &exp)
+{
+    return pow_impl(base, exp);
 }
 
 /** @} */

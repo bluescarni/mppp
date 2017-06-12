@@ -43,7 +43,7 @@ Functions
 ---------
 
 Much of the functionality of the :cpp:class:`~mppp::rational` class is exposed via plain functions. These functions
-mimic the `GMP API <https://gmplib.org/manual/Rational-Number-Functions.html>`_ where appropriate, but a variety of
+mimic the `GMP API <https://gmplib.org/manual/Rational-Number-Functions.html>`__ where appropriate, but a variety of
 convenience/generic overloads is provided as well.
 
 .. _rational_arithmetic:
@@ -60,6 +60,14 @@ Comparison
 ~~~~~~~~~~
 
 .. doxygengroup:: rational_comparison
+   :content-only:
+
+.. _rational_exponentiation:
+
+Exponentiation
+~~~~~~~~~~~~~~
+
+.. doxygengroup:: rational_exponentiation
    :content-only:
 
 .. _rational_io:

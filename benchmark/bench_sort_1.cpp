@@ -125,7 +125,9 @@ int main()
         s += "['FLINT','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            std::sort(v.begin(), v.end());
+            std::sort(v.begin(), v.end(), [](const fmpzxx &a, const fmpzxx &b) {
+                return ::fmpz_cmp(a._data().inner, b._data().inner) < 0;
+            });
             s += "['FLINT','sorting'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nSorting runtime: ";
         }
