@@ -4,7 +4,7 @@ Benchmarks
 ==========
 
 This section contains various benchmarks comparing mp++ to other multiprecision libraries. All benchmarks
-were run on an Intel Core i7-6700K Skylake in a 64bit GNU/Linux environment, using the GCC compiler.
+were run on an AMD Ryzen 1700 in a 64-bit GNU/Linux environment, using the GCC compiler version 7.1.
 The benchmarking code is available `here <https://github.com/bluescarni/mppp/tree/master/benchmark>`__.
 
 In addition to mp++, the following libraries are used in the benchmarks:
@@ -17,19 +17,23 @@ In addition to mp++, the following libraries are used in the benchmarks:
 * the `FLINT <http://flintlib.org/>`__ library. This library provides a data type called ``fmpz_t`` which, similarly to
   mp++, provides a small-value optimisation on top of GMP.
 
+Integer benchmarks
+------------------
+
+All the integer benchmarks for mp++ are performed with 1 limb (i.e., 64 bits) of static storage.
+
 Dot product
------------
+^^^^^^^^^^^
 
 This benchmark measures the time needed to compute the dot product of two integer vectors of size
-:math:`3\times 10^7`. The final result fits in a 64bit value. For each benchmarked library, the timings
+:math:`3\times 10^7`. The final result fits in a 64-bit value. For each benchmarked library, the timings
 are split into three bars:
 
 * the ``init`` bar, which accounts for the time needed to initialise the vectors of integers,
 * the ``arithmetic`` bar, which represents the time needed to perform the dot product,
 * the ``total`` bar, which represents the total runtime of the benchmark.
 
-The mp++ timings have been taken using a single 64bit limb for the small-value optimisation. The
-multiply-add primitives of each library are used for the accumulation of the dot product.
+The multiply-add primitives of each library are used for the accumulation of the dot product.
 
 .. figure:: _static/bench_dot_product_1.svg
    :width: 100%
@@ -43,7 +47,7 @@ In this particular benchmark, mp++ is about 3 times faster than GMP (as measured
 in the arithmetic portion of the benchmark. mp++ is also faster than ``cpp_int`` and FLINT, albeit by a smaller margin.
 
 Vector multiplication
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 This benchmark is very similar to the dot product benchmark above, with one crucial difference: instead of accumulating
 the dot product into a scalar value, the element-wise product of the two vectors is stored in a third vector, and the final
@@ -60,3 +64,17 @@ into a vector rather than accumulating them directly into a scalar).
 
 This time mp++ is more than 5 times faster than GMP in the arithmetic portion of the benchmark, while still maintaining
 a performance advantage over ``cpp_int`` and FLINT.
+
+Sorting
+^^^^^^^
+
+This benchmark consists of the sorting (via ``std::sort()``) of a randomly-generated vector of :math:`3\times 10^7` integers whose values
+are less than :math:`2^{64}`.
+
+.. figure:: _static/bench_sort_1.svg
+   :width: 100%
+   :align: center
+
+Here again it can be seen how the small-value optimisation implemented in mp++, ``cpp_int`` and FLINT pays off on large
+datasets with respect to plain GMP integers. mp++ shows a modest performance increase with respect to ``cpp_int``
+and FLINT.
