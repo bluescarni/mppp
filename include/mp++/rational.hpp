@@ -79,7 +79,7 @@ inline void fix_den_sign(rational<SSize> &q)
 /**
  * \rststar
  * This class represents arbitrary-precision rationals. Internally, the class stores a pair of
- * :cpp:class:`integers <mppp::integer>` with static size ``SSize`` as the numerator and denonimator.
+ * :cpp:class:`integers <mppp::integer>` with static size ``SSize`` as the numerator and denominator.
  * Rational numbers are represented in the usual canonical form:
  *
  * * numerator and denominator are coprime,
