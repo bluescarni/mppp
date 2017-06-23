@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Changelog &#8212; mp++ 0.3 documentation</title>
+    <title>Changelog &#8212; mp++ 0.4 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3',
+        VERSION:     '0.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -44,7 +44,7 @@
 
 
 
-<p class="blurb">Multiprecision for C++</p>
+<p class="blurb">Multiprecision for modern C++</p>
 
 
 
@@ -64,16 +64,20 @@
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id1">0.3 (2017-06-12)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#new">New</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#changes">Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#unreleased">0.4 (unreleased)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#fix">Fix</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">0.2 (2017-05-09)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id3">New</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id4">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id5">Fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">0.3 (2017-06-12)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#new">New</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changes">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Fix</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">0.2 (2017-05-09)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">New</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Fix</a></li>
 </ul>
 </li>
 </ul>
@@ -106,6 +110,15 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="unreleased">
+<h2>0.4 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fix">
+<h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Various small documentation fixes.</li>
+</ul>
+</div>
+</div>
 <div class="section" id="id1">
 <h2>0.3 (2017-06-12)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="new">
@@ -125,17 +138,17 @@ in order to avoid the creation of a temporary.</li>
 <li>Performance improvements for the copy/move assignment operators of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</li>
 </ul>
 </div>
-<div class="section" id="fix">
-<h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Fix<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Various small documentation fixes.</li>
 </ul>
 </div>
 </div>
-<div class="section" id="id2">
-<h2>0.2 (2017-05-09)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id3">
-<h3>New<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<h2>0.2 (2017-05-09)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h3>New<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Provide a CMake config-file package as part of the install process.</li>
 <li>Implement the missing in-place modulo operator with C++ integrals
@@ -152,8 +165,8 @@ coefficient.</li>
 <li>Add a static member to <code class="docutils literal"><span class="pre">integer</span></code> storing the static size.</li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h3>Changes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>Changes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Split out the library in multiple files.</li>
 <li>Rename the <code class="docutils literal"><span class="pre">mp_integer</span></code> class to <code class="docutils literal"><span class="pre">integer</span></code>.</li>
@@ -165,8 +178,8 @@ coefficient.</li>
 <li>Remove the custom namespace option.</li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h3>Fix<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h3>Fix<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fix operators example in the documentation.</li>
 </ul>
