@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.4 (unreleased)
+----------------
+
+Fix
+~~~
+
+- Various small documentation fixes.
+
 0.3 (2017-06-12)
 ----------------
 
