@@ -486,7 +486,9 @@ public:
  * This class represents arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
  * a small value optimisation: integers whose size is up to ``SSize`` limbs are stored directly in the storage
  * occupied by the :cpp:class:`~mppp::integer` object, without resorting to dynamic memory allocation. The value of
- * ``SSize`` must be at least 1 and less than an implementation-defined upper limit.
+ * ``SSize`` must be at least 1 and less than an implementation-defined upper limit. On most modern architectures,
+ * a limb contains either 32 or 64 bits of data. Thus, for instance, is ``SSize`` is set to 2 on a 64-bit system,
+ * the small value optimisation will be employed for all integral values less than :math:`2^{64 \times 2} = 2^{128}`.
  *
  * When the value of an :cpp:class:`~mppp::integer` is stored directly within the object, the *storage type* of the
  * integer is said to be *static*. When the limb size of the integer exceeds the maximum value ``SSize``, the storage
@@ -705,7 +707,7 @@ public:
     integer() = default;
     /// Copy constructor.
     /**
-     * The copy constructor deep-copies \p other into \p this, preserving the original storage type.
+     * The copy constructor deep-copies \p other into \p this, copying the original storage type as well.
      *
      * @param other the object that will be copied into \p this.
      */
@@ -959,7 +961,7 @@ public:
     }
     /// Copy assignment operator.
     /**
-     * This operator will perform a deep copy of \p other, preserving its storage type as well.
+     * This operator will perform a deep copy of \p other, copying its storage type as well.
      *
      * @param other the assignment argument.
      *
