@@ -468,6 +468,10 @@ public:
 };
 }
 
+// Fwd declaration.
+template <std::size_t SSize>
+void sqrt(integer<SSize> &, const integer<SSize> &);
+
 // NOTE: a few misc things:
 // - re-visit at one point the issue of the estimators when we need to promote from static to dynamic
 //   in arithmetic ops. Currently they are not 100% optimal since they rely on the information coming out
@@ -1580,7 +1584,19 @@ public:
         }
         return ::mpz_probab_prime_p(get_mpz_view(), reps);
     }
-    integer &sqrt();
+    /// Integer square root (in-place version).
+    /**
+     * This method will set \p this to its integer square root.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::domain_error if \p this is negative.
+     */
+    integer &sqrt()
+    {
+        mppp::sqrt(*this, *this);
+        return *this;
+    }
     /// Test if value is odd.
     /**
      * @return \p true if \p this is odd, \p false otherwise.
@@ -4516,21 +4532,6 @@ inline integer<SSize> sqrt(const integer<SSize> &n)
 }
 
 /** @} */
-
-/// Integer square root (in-place version).
-/**
- * This method will set \p this to its integer square root.
- *
- * @return a reference to \p this.
- *
- * @throws std::domain_error if \p this is negative.
- */
-template <std::size_t SSize>
-inline integer<SSize> &integer<SSize>::sqrt()
-{
-    mppp::sqrt(*this, *this);
-    return *this;
-}
 
 /** @defgroup integer_io integer_io
  *  @{
