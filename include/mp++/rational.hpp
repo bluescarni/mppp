@@ -150,6 +150,18 @@ inline void fix_den_sign(rational<SSize> &q)
  *    auto res5 = q1 / 2.f; // res5 is a float
  *    auto res6 = 12. / q1; // res6 is a double
  *
+ * The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote the arguments to a common type
+ * before comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
+ * promoted to :cpp:class:`~mppp::rational` if no floating-point types are involved, otherwise they are promoted to the
+ * type of the floating-point argument).
+ *
+ * The :cpp:class:`~mppp::rational` class allows to access and manipulate directly the numerator and denominator
+ * via the :cpp:func:`~mppp::rational::get_num()`, :cpp:func:`~mppp::rational::get_den()`,
+ * :cpp:func:`~mppp::rational::_get_num()` and :cpp:func:`~mppp::rational::_get_den()` methods, so that it is possible
+ * to use :cpp:class:`~mppp::integer` functions directly on numerator and denominator. The mutable getters' names
+ * :cpp:func:`~mppp::rational::_get_num()` and :cpp:func:`~mppp::rational::_get_den()` are prefixed with an underscore
+ * ``_`` to highlight their potentially dangerous nature: it is the user's responsibility to ensure that the canonical
+ * form of the rational is preserved after altering the numerator and/or the denominator via the mutable getters.
  * \endrststar
  */
 // NOTEs:
