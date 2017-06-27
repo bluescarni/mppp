@@ -188,6 +188,17 @@ other argument is a C++ floating-point the result will be of the same floating-p
 <span class="k">auto</span> <span class="n">res6</span> <span class="o">=</span> <span class="mf">12.</span> <span class="o">/</span> <span class="n">q1</span><span class="p">;</span> <span class="c1">// res6 is a double</span>
 </pre></div>
 </div>
+<p>The relational operators, <code class="docutils literal"><span class="pre">==</span></code>, <code class="docutils literal"><span class="pre">!=</span></code>, <code class="docutils literal"><span class="pre">&lt;</span></code>, <code class="docutils literal"><span class="pre">&gt;</span></code>, <code class="docutils literal"><span class="pre">&lt;=</span></code> and <code class="docutils literal"><span class="pre">&gt;=</span></code> will promote the arguments to a common type
+before comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
+promoted to <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> if no floating-point types are involved, otherwise they are promoted to the
+type of the floating-point argument).</p>
+<p>The <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> class allows to access and manipulate directly the numerator and denominator
+via the <a class="reference internal" href="#_CPPv2NK4mppp8rational7get_numEv" title="mppp::rational::get_num"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_num()</span></code></a>, <a class="reference internal" href="#_CPPv2NK4mppp8rational7get_denEv" title="mppp::rational::get_den"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_den()</span></code></a>,
+<a class="reference internal" href="#_CPPv2N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal"><span class="pre">_get_num()</span></code></a> and <a class="reference internal" href="#_CPPv2N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal"><span class="pre">_get_den()</span></code></a> methods, so that it is possible
+to use <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> functions directly on numerator and denominator. The mutable getters&#8217; names
+<a class="reference internal" href="#_CPPv2N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal"><span class="pre">_get_num()</span></code></a> and <a class="reference internal" href="#_CPPv2N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal"><span class="pre">_get_den()</span></code></a> are prefixed with an underscore
+<code class="docutils literal"><span class="pre">_</span></code> to highlight their potentially dangerous nature: it is the user&#8217;s responsibility to ensure that the canonical
+form of the rational is preserved after altering the numerator and/or the denominator via the mutable getters.</p>
  </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Types</p>
