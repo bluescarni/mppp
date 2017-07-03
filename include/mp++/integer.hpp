@@ -176,6 +176,43 @@ inline ::mp_limb_t limb_add_overflow(::mp_limb_t a, ::mp_limb_t b, ::mp_limb_t *
     return *res < a;
 }
 
+// Implementation of the function to count the number of leading zeroes
+// in an unsigned integral value. Only GCC and clang for now.
+// NOTE: MSVC seems to have similar intrinsics, but it's not clear if they
+// are available only on certain platforms:
+// https://msdn.microsoft.com/en-us/library/bb384809.aspx
+// https://stackoverflow.com/questions/355967/how-to-use-msvc-intrinsics-to-get-the-equivalent-of-this-gcc-code/20468180
+// Let's implement it only on clang/GCC for now.
+#if defined(__clang__) || defined(__GNUC__)
+
+// Dispatch based on the integer type.
+inline int builtin_clz_impl(unsigned n)
+{
+    return __builtin_clz(n);
+}
+
+inline int builtin_clz_impl(unsigned long n)
+{
+    return __builtin_clzl(n);
+}
+
+inline int builtin_clz_impl(unsigned long long n)
+{
+    return __builtin_clzll(n);
+}
+
+template <typename T,
+          enable_if_t<disjunction<std::is_same<T, unsigned>, std::is_same<T, unsigned long>,
+                                  std::is_same<T, unsigned long long>>::value,
+                      int> = 0>
+inline unsigned builtin_clz(T n)
+{
+    assert(n != 0u);
+    return static_cast<unsigned>(builtin_clz_impl(n));
+}
+
+#endif
+
 // The static integer class.
 template <std::size_t SSize>
 struct static_int {
@@ -1458,10 +1495,43 @@ public:
     /// Size in bits.
     /**
      * @return the number of bits needed to represent \p this. If \p this is zero, zero will be returned.
+     *
+     * @throws std::overflow_error if the size in bits of \p this is larger than an implementation-defined value.
      */
     std::size_t nbits() const
     {
+#if defined(__clang__) || defined(__GNUC__)
+        std::size_t ls;
+        const ::mp_limb_t *lptr;
+        if (is_static()) {
+            ls = static_cast<std::size_t>(m_int.g_st().abs_size());
+            lptr = m_int.g_st().m_limbs.data();
+        } else {
+            // NOTE: mpz_size() returns zero size for zero value.
+            ls = ::mpz_size(&m_int.g_dy());
+            lptr = m_int.g_dy()._mp_d;
+        }
+        if (ls) {
+            // LCOV_EXCL_START
+            if (mppp_unlikely(ls > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
+                throw std::overflow_error("Overflow in the computation of the number of bits required to represent an "
+                                          "integer - the limb size is "
+                                          + std::to_string(ls));
+            }
+            // LCOV_EXCL_STOP
+            // Index of the most significant limb.
+            const std::size_t idx = ls - 1u;
+            // The most significant limb.
+            const ::mp_limb_t msl = lptr[idx] & GMP_NUMB_MASK;
+            // NOTE: here we need GMP_LIMB_BITS (instead of GMP_NUMB_BITS) because builtin_clz() counts zeroes also in
+            // the nail bits.
+            return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS)
+                                            + (unsigned(GMP_LIMB_BITS) - builtin_clz(msl)));
+        }
+        return 0;
+#else
         return m_int.m_st._mp_size ? ::mpz_sizeinbase(get_mpz_view(), 2) : 0u;
+#endif
     }
     /// Size in limbs.
     /**
