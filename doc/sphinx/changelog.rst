@@ -4,6 +4,11 @@ Changelog
 0.4 (unreleased)
 ----------------
 
+Changes
+~~~~~~~
+
+- Performance improvements for :cpp:func:`mppp::integer::nbits()` on GCC and clang (`#17 <https://github.com/bluescarni/mppp/pull/17>`__).
+
 Fix
 ~~~
 
@@ -15,7 +20,7 @@ Fix
 New
 ~~~
 
-- Implement the multiprecision :cpp:class:`~mppp::rational` class (`#14 <https://github.com/bluescarni/mppp/pull/14>`__)
+- Implement the multiprecision :cpp:class:`~mppp::rational` class (`#14 <https://github.com/bluescarni/mppp/pull/14>`__).
 
 - Implement fast assignment functions to zero and plus/minus one for :cpp:class:`~mppp::integer`.
 

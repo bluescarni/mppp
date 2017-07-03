@@ -201,6 +201,9 @@ inline int builtin_clz_impl(unsigned long long n)
     return __builtin_clzll(n);
 }
 
+// NOTE: theoretically, if mp_limb_t is not one of the three supported types here, then
+// we will have a compile-time error as the overload is removed via SFINAE. In practice,
+// mp_limb_t is ul or ull on all current platforms, but let's keep this caveat in mind.
 template <typename T,
           enable_if_t<disjunction<std::is_same<T, unsigned>, std::is_same<T, unsigned long>,
                                   std::is_same<T, unsigned long long>>::value,
