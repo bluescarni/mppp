@@ -44,6 +44,8 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 // is launched it will be inited with a different seed.
 static std::mt19937::result_type mt_rng_seed(0u);
 
+static std::mt19937 rng;
+
 struct no_const {
 };
 
@@ -822,6 +824,27 @@ struct sizes_tester {
         REQUIRE(n.size() == 2u);
         // Static data member.
         REQUIRE(integer::ssize == S::value);
+        // Random testing.
+        mpz_raii tmp;
+        std::uniform_int_distribution<int> sdist(0, 1);
+        auto random_x = [&](unsigned x) {
+            for (int i = 0; i < ntries; ++i) {
+                random_integer(tmp, x, rng);
+                n = &tmp.m_mpz;
+                if (n.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n.promote();
+                }
+                const auto res1 = n.nbits();
+                const auto res2 = n.sgn() ? ::mpz_sizeinbase(&tmp.m_mpz, 2) : 0u;
+                REQUIRE(res1 == res2);
+            }
+        };
+        random_x(0);
+        random_x(1);
+        random_x(2);
+        random_x(3);
+        random_x(4);
     }
 };
 

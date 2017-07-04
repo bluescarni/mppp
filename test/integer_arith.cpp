@@ -52,7 +52,7 @@ struct add_tester {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
@@ -63,7 +63,7 @@ struct add_tester {
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
@@ -94,14 +94,14 @@ struct add_tester {
                 if (y > x) {
                     random_integer(tmp, x, rng);
                     ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    n2 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                         n2.neg();
                     }
                     max_integer(tmp, y);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                         n3.neg();
@@ -114,14 +114,14 @@ struct add_tester {
                 if (x == y) {
                     random_integer(tmp, x, rng);
                     ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    n2 = &tmp.m_mpz;
                     const bool neg = sdist(rng) == 1;
                     if (neg) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                         n2.neg();
                     }
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (!neg) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                         n3.neg();
@@ -135,14 +135,14 @@ struct add_tester {
                 if (x == y) {
                     random_integer(tmp, x, rng);
                     ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    n2 = &tmp.m_mpz;
                     const bool neg = sdist(rng) == 1;
                     if (neg) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                         n2.neg();
                     }
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (!neg) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                         n3.neg();
@@ -314,7 +314,7 @@ struct sub_tester {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
@@ -325,7 +325,7 @@ struct sub_tester {
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
@@ -355,14 +355,14 @@ struct sub_tester {
                 if (y > x) {
                     random_integer(tmp, x, rng);
                     ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    n2 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                         n2.neg();
                     }
                     max_integer(tmp, y);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                         n3.neg();
@@ -374,14 +374,14 @@ struct sub_tester {
                 if (x == y) {
                     random_integer(tmp, x, rng);
                     ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    n2 = &tmp.m_mpz;
                     const bool neg = sdist(rng) == 1;
                     if (neg) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                         n2.neg();
                     }
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (!neg) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                         n3.neg();
@@ -393,14 +393,14 @@ struct sub_tester {
                 if (x == y) {
                     random_integer(tmp, x, rng);
                     ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    n2 = &tmp.m_mpz;
                     const bool neg = sdist(rng) == 1;
                     if (neg) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                         n2.neg();
                     }
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (!neg) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                         n3.neg();
@@ -563,7 +563,7 @@ struct mul_tester {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
@@ -574,7 +574,7 @@ struct mul_tester {
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
@@ -593,14 +593,14 @@ struct mul_tester {
                 // In-place variations.
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
@@ -610,14 +610,14 @@ struct mul_tester {
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
@@ -627,7 +627,7 @@ struct mul_tester {
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
@@ -640,14 +640,14 @@ struct mul_tester {
                     n1 = integer{};
                     random_integer(tmp, 1, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
                     ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    n2 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         n2.neg();
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     }
                     random_integer(tmp, 1, rng, ::mp_limb_t(1) << (GMP_NUMB_BITS / 2));
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         n3.neg();
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
@@ -667,7 +667,7 @@ struct mul_tester {
                     }
                     random_integer(tmp, y, rng);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         n3.neg();
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
@@ -688,7 +688,7 @@ struct mul_tester {
                     }
                     random_integer(tmp, y, rng);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         n3.neg();
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
@@ -770,7 +770,7 @@ struct addmul_tester {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -781,7 +781,7 @@ struct addmul_tester {
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (n3.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n3.promote();
@@ -801,7 +801,7 @@ struct addmul_tester {
                 // In-place variations.
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -812,7 +812,7 @@ struct addmul_tester {
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (n3.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n3.promote();
@@ -826,7 +826,7 @@ struct addmul_tester {
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -837,7 +837,7 @@ struct addmul_tester {
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
@@ -851,7 +851,7 @@ struct addmul_tester {
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -868,7 +868,7 @@ struct addmul_tester {
                     // Check when product succeeds but add fails.
                     max_integer(tmp, 1);
                     ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
-                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    n1 = &tmp.m_mpz;
                     ::mpz_set_ui(&m2.m_mpz, 2);
                     n2 = integer(2);
                     ::mpz_set_ui(&m3.m_mpz, 2);
@@ -912,7 +912,7 @@ struct addmul_tester {
                     }
                     random_integer(tmp, y, rng);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         n3.neg();
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
@@ -925,7 +925,7 @@ struct addmul_tester {
                 if (S::value == 2) {
                     random_integer(tmp, 1, rng);
                     ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
-                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    n1 = &tmp.m_mpz;
                     ::mpz_set_si(&m2.m_mpz, -1);
                     n2 = integer(-1);
                     std::uniform_int_distribution<int> idist(1, 40);
@@ -940,7 +940,7 @@ struct addmul_tester {
                 if (S::value == 2) {
                     max_integer(tmp, 2);
                     ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
-                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    n1 = &tmp.m_mpz;
                     std::uniform_int_distribution<int> idist(1, 40);
                     auto i1 = idist(rng);
                     ::mpz_set_si(&m2.m_mpz, i1);
@@ -956,7 +956,7 @@ struct addmul_tester {
                 if (S::value == 2) {
                     random_integer(tmp, 2, rng);
                     ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
-                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    n1 = &tmp.m_mpz;
                     ::mpz_set_si(&m2.m_mpz, -1);
                     n2 = integer(-1);
                     std::uniform_int_distribution<int> idist(1, 40);
@@ -1054,7 +1054,7 @@ struct submul_tester {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1065,7 +1065,7 @@ struct submul_tester {
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (n3.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n3.promote();
@@ -1085,7 +1085,7 @@ struct submul_tester {
                 // In-place variations.
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1096,7 +1096,7 @@ struct submul_tester {
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (n3.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n3.promote();
@@ -1110,7 +1110,7 @@ struct submul_tester {
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1121,7 +1121,7 @@ struct submul_tester {
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = &tmp.m_mpz;
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();
@@ -1135,7 +1135,7 @@ struct submul_tester {
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1153,7 +1153,7 @@ struct submul_tester {
                     max_integer(tmp, 1);
                     ::mpz_neg(&tmp.m_mpz, &tmp.m_mpz);
                     ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
-                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    n1 = &tmp.m_mpz;
                     ::mpz_set_ui(&m2.m_mpz, 2);
                     n2 = integer(2);
                     ::mpz_set_ui(&m3.m_mpz, 2);
@@ -1197,7 +1197,7 @@ struct submul_tester {
                     }
                     random_integer(tmp, y, rng);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         n3.neg();
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
@@ -1210,7 +1210,7 @@ struct submul_tester {
                 if (S::value == 2) {
                     random_integer(tmp, 1, rng);
                     ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
-                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    n1 = &tmp.m_mpz;
                     ::mpz_set_si(&m2.m_mpz, 1);
                     n2 = integer(1);
                     std::uniform_int_distribution<int> idist(1, 40);
@@ -1225,7 +1225,7 @@ struct submul_tester {
                 if (S::value == 2) {
                     max_integer(tmp, 2);
                     ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
-                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    n1 = &tmp.m_mpz;
                     std::uniform_int_distribution<int> idist(-40, -1);
                     auto i1 = idist(rng);
                     ::mpz_set_si(&m2.m_mpz, i1);
@@ -1241,7 +1241,7 @@ struct submul_tester {
                 if (S::value == 2) {
                     random_integer(tmp, 2, rng);
                     ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
-                    n1 = integer(mpz_to_str(&tmp.m_mpz));
+                    n1 = &tmp.m_mpz;
                     ::mpz_set_si(&m2.m_mpz, -1);
                     n2 = integer(-1);
                     std::uniform_int_distribution<int> idist(-40, -1);
@@ -1347,7 +1347,7 @@ struct div_tester {
                 auto random_34 = [&]() {
                     random_integer(tmp, x, rng);
                     ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                    n3 = integer(mpz_to_str(&tmp.m_mpz));
+                    n3 = &tmp.m_mpz;
                     if (sdist(rng)) {
                         ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                         n3.neg();
@@ -1360,7 +1360,7 @@ struct div_tester {
                     do {
                         random_integer(tmp, y, rng);
                         ::mpz_set(&m4.m_mpz, &tmp.m_mpz);
-                        n4 = integer(mpz_to_str(&tmp.m_mpz));
+                        n4 = &tmp.m_mpz;
                         if (sdist(rng)) {
                             ::mpz_neg(&m4.m_mpz, &m4.m_mpz);
                             n4.neg();
@@ -1506,7 +1506,7 @@ struct lshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bdh(0u, GMP_NUMB_BITS / 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1527,7 +1527,7 @@ struct lshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd1(0u, GMP_NUMB_BITS);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1551,7 +1551,7 @@ struct lshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd1h(0u, GMP_NUMB_BITS + GMP_NUMB_BITS / 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1575,7 +1575,7 @@ struct lshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd2(0u, GMP_NUMB_BITS * 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1599,7 +1599,7 @@ struct lshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd2h(0u, GMP_NUMB_BITS * 2u + GMP_NUMB_BITS / 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1623,7 +1623,7 @@ struct lshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd3(0u, GMP_NUMB_BITS * 3u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1647,7 +1647,7 @@ struct lshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd3h(0u, GMP_NUMB_BITS * 3u + GMP_NUMB_BITS / 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1671,7 +1671,7 @@ struct lshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd4(0u, GMP_NUMB_BITS * 4u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1695,7 +1695,7 @@ struct lshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd4h(0u, GMP_NUMB_BITS * 4u + GMP_NUMB_BITS / 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1719,7 +1719,7 @@ struct lshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd5(0u, GMP_NUMB_BITS * 5u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1801,7 +1801,7 @@ struct rshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bdh(0u, GMP_NUMB_BITS / 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1822,7 +1822,7 @@ struct rshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd1(0u, GMP_NUMB_BITS);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1846,7 +1846,7 @@ struct rshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd1h(0u, GMP_NUMB_BITS + GMP_NUMB_BITS / 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1870,7 +1870,7 @@ struct rshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd2(0u, GMP_NUMB_BITS * 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1894,7 +1894,7 @@ struct rshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd2h(0u, GMP_NUMB_BITS * 2u + GMP_NUMB_BITS / 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1918,7 +1918,7 @@ struct rshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd3(0u, GMP_NUMB_BITS * 3u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1942,7 +1942,7 @@ struct rshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd3h(0u, GMP_NUMB_BITS * 3u + GMP_NUMB_BITS / 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1966,7 +1966,7 @@ struct rshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd4(0u, GMP_NUMB_BITS * 4u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -1990,7 +1990,7 @@ struct rshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd4h(0u, GMP_NUMB_BITS * 4u + GMP_NUMB_BITS / 2u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -2014,7 +2014,7 @@ struct rshift_tester {
                 }
                 random_integer(tmp, x, rng);
                 std::uniform_int_distribution<unsigned> bd5(0u, GMP_NUMB_BITS * 5u);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = &tmp.m_mpz;
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
