@@ -662,7 +662,12 @@ infinities.</p>
 <dd><p>Size in bits. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
-<dd>the number of bits needed to represent <code class="docutils literal"><span class="pre">this</span></code>. If <code class="docutils literal"><span class="pre">this</span></code> is zero, zero will be returned. </dd>
+<dd>the number of bits needed to represent <code class="docutils literal"><span class="pre">this</span></code>. If <code class="docutils literal"><span class="pre">this</span></code> is zero, zero will be returned.</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if the size in bits of <code class="docutils literal"><span class="pre">this</span></code> is larger than an implementation-defined value. </li>
+</ul>
+</dd>
 </dl>
 </p>
 </dd></dl>
