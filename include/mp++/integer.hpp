@@ -1526,10 +1526,10 @@ public:
             const std::size_t idx = ls - 1u;
             // The most significant limb.
             const ::mp_limb_t msl = lptr[idx] & GMP_NUMB_MASK;
-            // NOTE: here we need GMP_LIMB_BITS (instead of GMP_NUMB_BITS) because builtin_clz() counts zeroes also in
-            // the nail bits.
+            // NOTE: here we need std::numeric_limits<::mp_limb_t>::digits (instead of GMP_NUMB_BITS) because
+            // builtin_clz() counts zeroes also in the nail bits.
             return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS)
-                                            + (unsigned(GMP_LIMB_BITS) - builtin_clz(msl)));
+                                            + (unsigned(std::numeric_limits<::mp_limb_t>::digits) - builtin_clz(msl)));
         }
         return 0;
 #else
