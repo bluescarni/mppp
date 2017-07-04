@@ -116,8 +116,9 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
         throw;
     }
 
-    // Setup a suitable mpfr real.
-    MPPP_MAYBE_TLS mpfr_raii mpfr;
+    // Setup a suitable mpfr real. The precision of 53 is just a random value for
+    // init, we will set the actual precision in the following line.
+    MPPP_MAYBE_TLS mpfr_raii mpfr(53);
     // NOTE: make sure ab is not too small either.
     ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(ab >= MPFR_PREC_MIN ? ab : MPFR_PREC_MIN));
     // Extract an mpfr from the arf.
@@ -126,18 +127,15 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
     // Get the string fractional representation via the MPFR function,
     // and wrap it into a smart pointer.
     ::mpfr_exp_t exp(0);
-    char *cptr = ::mpfr_get_str(nullptr, &exp, 10, 0, &mpfr.m_mpfr, MPFR_RNDN);
-    if (mppp_unlikely(!cptr)) {
+    smart_mpfr_str str(::mpfr_get_str(nullptr, &exp, 10, 0, &mpfr.m_mpfr, MPFR_RNDN), ::mpfr_free_str);
+    if (mppp_unlikely(!str)) {
         throw std::runtime_error("Error in the stream operator of real: the call to mpfr_get_str() failed");
     }
-    smart_mpfr_str str(cptr, ::mpfr_free_str);
 
-    // Copy into C++ string.
-    MPPP_MAYBE_TLS std::string cpp_str;
-    cpp_str.assign(str.get());
-
-    // Insert the decimal point after the first digit.
-    auto it = std::find_if(cpp_str.begin(), cpp_str.end(), [](char c) {
+    // Print the string, inserting a decimal point after the first digit.
+    bool dot_added = false;
+    for (auto cptr = str.get(); *cptr != '\0'; ++cptr) {
+        os << (*cptr);
         // NOTE: check this answer:
         // http://stackoverflow.com/questions/13827180/char-ascii-relation
         // """
@@ -145,24 +143,23 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
         // by the Standard: the values of the decimal digits are continguous.
         // (i.e., '1' - '0' == 1, ... '9' - '0' == 9)
         // """
-        return c >= '0' && c <= '9';
-    });
-    // I can't see how cpp_str could not contain at least 1 digit. We already handled
-    // the zero and nonfinite cases above.
-    assert(it != cpp_str.end());
-    cpp_str.insert(it + 1, '.');
+        if (!dot_added && *cptr >= '0' && *cptr <= '9') {
+            os << '.';
+            dot_added = true;
+        }
+    }
+    assert(dot_added);
 
     // Adjust the exponent.
     if (mppp_unlikely(exp == std::numeric_limits<::mpfr_exp_t>::min())) {
         throw std::overflow_error("Overflow in the conversion of a real to string");
     }
     --exp;
-
-    // Add the exponent at the end of the string, if nonzero.
     if (exp) {
-        cpp_str.append("e" + std::to_string(exp));
+        // Add the exponent at the end of the string, if nonzero.
+        os << "e" << exp;
     }
-    return os << cpp_str;
+    return os;
 }
 }
 
