@@ -10,6 +10,8 @@
 #define MPPP_DETAIL_ARB_HPP
 
 #include <arf.h>
+#include <cstdlib>
+#include <flint/flint.h>
 
 namespace mppp
 {
@@ -29,6 +31,29 @@ struct arf_raii {
     }
     ::arf_struct m_arf;
 };
+
+// Machinery to call automatically flint_cleanup() at program shutdown,
+// if this header is included.
+struct arb_cleanup {
+    arb_cleanup()
+    {
+        std::atexit(::flint_cleanup);
+    }
+};
+
+template <typename = void>
+struct arb_cleanup_holder {
+    static arb_cleanup s_cleanup;
+};
+
+template <typename T>
+arb_cleanup arb_cleanup_holder<T>::s_cleanup;
+
+inline void inst_arb_cleanup()
+{
+    auto ptr = &arb_cleanup_holder<>::s_cleanup;
+    (void)ptr;
+}
 }
 }
 
