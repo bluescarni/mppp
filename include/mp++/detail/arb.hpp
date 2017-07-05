@@ -10,7 +10,6 @@
 #define MPPP_DETAIL_ARB_HPP
 
 #include <arf.h>
-#include <utility>
 
 namespace mppp
 {
@@ -30,9 +29,6 @@ struct arf_raii {
     }
     ::arf_struct m_arf;
 };
-
-// This is the 'slong' type used within the ARB api.
-using arb_slong_impl = decltype(::arf_bits(std::declval<const ::arf_struct *>()));
 }
 }
 

@@ -17,6 +17,7 @@ TEST_CASE("real constructors")
 {
     real r;
     std::cout << r << '\n';
+    r.set_prec(53);
     ::arf_set_d(r.get_arf_t(), 1. / (2 << 6) + 1. / (2 << 7));
     std::cout << r << '\n';
     ::arf_set_d(r.get_arf_t(), 1);

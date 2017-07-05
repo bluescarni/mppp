@@ -19,39 +19,83 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 
 #include <mp++/detail/arb.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/type_traits.hpp>
 
 namespace mppp
 {
 
+inline namespace detail
+{
+// constexpr max/min implementations.
+template <typename T>
+constexpr T c_max(T a, T b)
+{
+    return a > b ? a : b;
+}
+
+template <typename T>
+constexpr T c_min(T a, T b)
+{
+    return a < b ? a : b;
+}
+
+using mpfr_min_prec_t = std::make_unsigned<uncvref_t<decltype(MPFR_PREC_MIN)>>::type;
+
+// Minimum precision allowed for real values. It's the max value between the minimum precs of mpfr and arb,
+// and guaranteed to be representable by slong (otherwise, a static assert will fire).
+constexpr mpfr_min_prec_t real_min_prec_impl()
+{
+    // Min prec for arb is 2.
+    return c_max(static_cast<mpfr_min_prec_t>(MPFR_PREC_MIN), static_cast<mpfr_min_prec_t>(2));
+}
+
+static_assert(real_min_prec_impl() <= static_cast<std::make_unsigned<slong>::type>(std::numeric_limits<slong>::max()),
+              "The minimum precision for real cannot be represented by slong.");
+
+// Maximum precision allowed for real values. For MPFR there's a macro, for arb the documentation suggests
+// < 2**24 for 32-bit and < 2**36 for 64-bit.
+// http://arblib.org/issues.html#integer-overflow
+constexpr unsigned long long arb_max_prec()
+{
+    // We use slightly smaller max prec values for arb.
+    // NOTE: the docs of ulong state that it has exactly either 64 or 32 bit width.
+    return std::numeric_limits<ulong>::digits == 64 ? (1ull << 32) : (1ull << 20);
+}
+
+constexpr unsigned long long real_max_prec_impl()
+{
+    return c_min(arb_max_prec(), static_cast<unsigned long long>(MPFR_PREC_MAX));
+}
+
+static_assert(real_max_prec_impl() <= static_cast<std::make_unsigned<slong>::type>(std::numeric_limits<slong>::max()),
+              "The maximum precision for real cannot be represented by slong.");
+
+constexpr slong real_min_prec()
+{
+    return static_cast<slong>(real_min_prec_impl());
+}
+
+constexpr slong real_max_prec()
+{
+    return static_cast<slong>(real_max_prec_impl());
+}
+
+static_assert(real_min_prec() <= real_max_prec(),
+              "The minimum precision for real is larger than the maximum precision.");
+}
+
 class real
 {
 public:
-    using arb_slong = arb_slong_impl;
-
-private:
-    // Make sure that arb_slong can represent the full precision range of MPFR.
-    static_assert(MPFR_PREC_MAX <= std::numeric_limits<arb_slong>::max(), "Overflow error.");
-    // Minimum precision: it's 2 for ARB, MPFR_PREC_MIN for MPFR. Pick the highest value.
-    static constexpr arb_slong min_prec()
-    {
-        return static_cast<arb_slong>((MPFR_PREC_MIN <= 2) ? 2 : (MPFR_PREC_MIN));
-    }
-    // Maximum precision: it's MPFR_PREC_MAX for MPFR, while for ARB we pick arbitrarily
-    // 2**20, based on the ARB documentation. Select the smallest value.
-    // http://arblib.org/issues.html#integer-overflow.
-    static constexpr arb_slong max_prec()
-    {
-        return static_cast<arb_slong>(((2l << 20) <= MPFR_PREC_MAX) ? (2l << 20) : (MPFR_PREC_MAX));
-    }
-
-public:
-    real() : m_prec(min_prec())
+    real()
     {
         ::arf_init(&m_arf);
+        m_prec = real_min_prec();
     }
     ~real()
     {
@@ -65,22 +109,24 @@ public:
     {
         return &m_arf;
     }
-    arb_slong get_prec() const
+    slong get_prec() const
     {
         return m_prec;
     }
-    void set_prec(arb_slong prec)
+    void set_prec(slong prec)
     {
-        if (mppp_unlikely(prec > max_prec() || prec < min_prec())) {
-            // TODO throw.
-            throw std::invalid_argument("");
+        if (mppp_unlikely(prec > real_max_prec() || prec < real_min_prec())) {
+            throw std::invalid_argument("An invalid precision of " + std::to_string(prec)
+                                        + " was specified for a real object (the minimum allowed precision is "
+                                        + std::to_string(real_min_prec()) + ", while the maximum allowed precision is "
+                                        + std::to_string(real_max_prec()) + ")");
         }
         m_prec = prec;
     }
 
 private:
     ::arf_struct m_arf;
-    arb_slong m_prec;
+    slong m_prec;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const real &r)
@@ -101,26 +147,10 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
         return os;
     }
 
-    if (::arf_is_zero(r.get_arf_t())) {
-        os << "0.";
-        return os;
-    }
-
-    // Number of bits needed to represent the mantissa of r.
-    // We will use this value to init an mpfr real with enough bits
-    // to represent exactly r.
-    const auto ab = ::arf_bits(r.get_arf_t());
-    // Sanity check wrt the maximum allowed prec in MPFR.
-    if (mppp_unlikely(ab > MPFR_PREC_MAX)) {
-        // TODO error message.
-        throw;
-    }
-
-    // Setup a suitable mpfr real. The precision of 53 is just a random value for
-    // init, we will set the actual precision in the following line.
-    MPPP_MAYBE_TLS mpfr_raii mpfr(53);
-    // NOTE: make sure ab is not too small either.
-    ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(ab >= MPFR_PREC_MIN ? ab : MPFR_PREC_MIN));
+    // Setup a suitable mpfr real. We will set the actual precision in the following line.
+    MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(real_min_prec()));
+    // NOTE: the precision of r is always guaranteed to be a valid precision for both MPFR and arb.
+    ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(r.get_prec()));
     // Extract an mpfr from the arf.
     ::arf_get_mpfr(&mpfr.m_mpfr, r.get_arf_t(), MPFR_RNDN);
 
@@ -155,8 +185,9 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
         throw std::overflow_error("Overflow in the conversion of a real to string");
     }
     --exp;
-    if (exp) {
-        // Add the exponent at the end of the string, if nonzero.
+    if (exp && !mpfr_zero_p(&mpfr.m_mpfr)) {
+        // Add the exponent at the end of the string, if both the value and the exponent
+        // are nonzero.
         os << "e" << exp;
     }
     return os;
