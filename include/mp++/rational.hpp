@@ -73,6 +73,15 @@ inline void fix_den_sign(rational<SSize> &q)
         q._get_den().neg();
     }
 }
+
+// Detect rational.
+template <typename T>
+struct is_rational : std::false_type {
+};
+
+template <std::size_t SSize>
+struct is_rational<rational<SSize>> : std::true_type {
+};
 }
 
 /// Multiprecision rational class.
