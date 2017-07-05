@@ -22,4 +22,14 @@ TEST_CASE("real constructors")
     std::cout << r << '\n';
     ::arf_set_d(r.get_arf_t(), 1);
     std::cout << r << '\n';
+    real r2(123u);
+    std::cout << r2 << '\n';
+    std::cout << real{integer<1>{"123213218372891837218937218937289137891273892173892713897128937128937"}} << '\n';
+    std::cout << real{1.3}.nbits() << '\n';
+    std::cout << real{1.3f}.nbits() << '\n';
+    std::cout << real{1.3l}.nbits() << '\n';
+    std::cout << real{1.3l, 15}.nbits() << '\n';
+    std::cout << real{1.3l, 15, true}.nbits() << '\n';
+    std::cout << real{1.3l, 15, true} << '\n';
+    std::cout << real{true} << '\n';
 }
