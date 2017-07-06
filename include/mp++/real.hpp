@@ -51,23 +51,23 @@ constexpr T c_min(T a, T b)
 
 using mpfr_min_prec_t = std::make_unsigned<uncvref_t<decltype(MPFR_PREC_MIN)>>::type;
 
-// Minimum precision allowed for real values. It's the max value between the minimum precs of mpfr and arb,
+// Minimum precision allowed for real values. It's the max value between the minimum precs of mpfr and Arb,
 // and guaranteed to be representable by slong (otherwise, a static assert will fire).
 constexpr mpfr_min_prec_t real_min_prec_impl()
 {
-    // Min prec for arb is 2.
+    // Min prec for Arb is 2.
     return c_max(static_cast<mpfr_min_prec_t>(MPFR_PREC_MIN), static_cast<mpfr_min_prec_t>(2));
 }
 
 static_assert(real_min_prec_impl() <= static_cast<std::make_unsigned<slong>::type>(std::numeric_limits<slong>::max()),
               "The minimum precision for real cannot be represented by slong.");
 
-// Maximum precision allowed for real values. For MPFR there's a macro, for arb the documentation suggests
+// Maximum precision allowed for real values. For MPFR there's a macro, for Arb the documentation suggests
 // < 2**24 for 32-bit and < 2**36 for 64-bit.
 // http://arblib.org/issues.html#integer-overflow
 constexpr unsigned long long arb_max_prec()
 {
-    // We use slightly smaller max prec values for arb.
+    // We use slightly smaller max prec values for Arb.
     // NOTE: the docs of ulong state that it has exactly either 64 or 32 bit width.
     return std::numeric_limits<ulong>::digits == 64 ? (1ull << 32) : (1ull << 20);
 }
@@ -134,6 +134,44 @@ using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, 
  */
 class real
 {
+public:
+    /// Default constructor.
+    /**
+     * The default constructor will intialise the value to zero and the precision
+     * to the minimum possible value (as indicated by min_prec()).
+     */
+    real()
+    {
+        ::arf_init(&m_arf);
+        m_prec = min_prec();
+    }
+    /// Copy constructor.
+    /**
+     * The copy constructor will perform a deep copy of \p other (i.e., both the value
+     * and the precision of \p other will be copied).
+     *
+     * @param other the value that will be copied into \p this.
+     */
+    real(const real &other)
+    {
+        ::arf_init(&m_arf);
+        ::arf_set(&m_arf, &other.m_arf);
+        m_prec = other.m_prec;
+    }
+    /// Move constructor.
+    /**
+     * After the move, \p other will be left in an unspecified but valid state.
+     *
+     * @param other the value that will be moved into \p this.
+     */
+    real(real &&other) noexcept
+    {
+        ::arf_init(&m_arf);
+        ::arf_swap(&m_arf, &other.m_arf);
+        m_prec = other.m_prec;
+    }
+
+private:
     template <std::size_t SSize>
     void dispatch_generic_ctor(const integer<SSize> &n, slong prec)
     {
@@ -182,6 +220,7 @@ class real
     {
         ::arf_init(&m_arf);
         ::arf_set_d(&m_arf, static_cast<double>(x));
+        static_assert(std::numeric_limits<T>::radix == 2, "The float/double type's radix is not 2.");
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
         set_prec(prec ? prec : c_max(min_prec(), static_cast<slong>(std::numeric_limits<T>::digits)));
     }
@@ -193,17 +232,12 @@ class real
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
         ::arf_init(&m_arf);
         ::arf_set_mpfr(&m_arf, &mpfr.m_mpfr);
+        static_assert(std::numeric_limits<long double>::radix == 2, "The long double type's radix is not 2.");
         static_assert(std::numeric_limits<long double>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
         set_prec(prec ? prec : c_max(min_prec(), static_cast<slong>(std::numeric_limits<long double>::digits)));
     }
 
 public:
-    /// Default constructor.
-    real()
-    {
-        ::arf_init(&m_arf);
-        m_prec = min_prec();
-    }
 /// Generic constructor.
 #if defined(MPPP_HAVE_CONCEPTS)
     explicit real(const RealInteroperable &x
