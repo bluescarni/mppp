@@ -105,6 +105,33 @@ using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, 
 #endif
 
 /// Multiprecision floating-point class.
+/**
+ * \rststar
+ * This class represents arbitrary-precision floating-point values, that is, floating-point values whose
+ * significand size and exponent range are limited only by the available memory.
+ * The implementation is based on the `arf_t <http://arblib.org/arf.html#c.arf_t>`__ type from the
+ * `Arb library <http://arblib.org>`__.
+ *
+ * The :cpp:class:`~mppp::real` class stores internally two data members:
+ *
+ * * an `arf_struct <http://arblib.org/arf.html#c.arf_t>`__, representing the floating-point value as a
+ *   significand-exponent pair,
+ * * an integral value representing the *precision* (in bits) associated to the :cpp:class:`~mppp::real` object.
+ *
+ * Contrary to other multiprecision floating-point libraries (e.g., MPFR), the precision of a
+ * :cpp:class:`~mppp::real` is, in general, unrelated to the number of bits used by the significand. Rather,
+ * it specifies the target precision of mathematical operations involving :cpp:class:`~mppp::real` objects.
+ *
+ * For instance, regardless of the selected precision, the significand of a :cpp:class:`~mppp::real` representing
+ * the integral value :math:`2` always uses exactly 2 bits of storage (as :math:`2` can be represented exactly
+ * using only 2 bits). Subsequent operations on the
+ * :cpp:class:`~mppp::real` object will be performed with the selected precision. E.g., the computation
+ * of :math:`\sqrt{2}` will yield a :cpp:class:`~mppp::real` object whose significand uses a number of bits
+ * equal (roughly) to the target precision (:math:`\sqrt{2}` is an irrational number, thus :cpp:class:`~mppp::real` will
+ * use all the bits specified by the desired precision in order to provide an approximation to the exact value as
+ * accurate as possible).
+ * \endrststar
+ */
 class real
 {
     template <std::size_t SSize>

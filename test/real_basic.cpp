@@ -15,9 +15,12 @@ using namespace mppp;
 
 TEST_CASE("real constructors")
 {
-    real r;
+    real r(2);
     std::cout << r << '\n';
     r.set_prec(53);
+    ::arf_sqrt(r.get_arf_t(), r.get_arf_t(), 53, ARF_RND_NEAR);
+    std::cout << r << '\n';
+    std::cout << r.nbits() << '\n';
     ::arf_set_d(r.get_arf_t(), 1. / (2 << 6) + 1. / (2 << 7));
     std::cout << r << '\n';
     ::arf_set_d(r.get_arf_t(), 1);

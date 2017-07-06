@@ -1,6 +1,11 @@
 Multiprecision reals
 ====================
 
+.. note::
+
+   The :cpp:class:`~mppp::real` class and its ancillary functions are available only if mp++ was configured with the
+   ``MPPP_WITH_ARB`` option enabled (see the :ref:`installation instructions <installation>`).
+
 .. versionadded:: 0.4
 
 *#include <mp++/real.hpp>*
