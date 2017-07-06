@@ -61,4 +61,6 @@ ADD_MPPP_TESTCASE(rational_neg)
 ADD_MPPP_TESTCASE(rational_pow)
 ADD_MPPP_TESTCASE(rational_rel)
 
-ADD_MPPP_TESTCASE(real_basic)
+if(MPPP_WITH_ARB)
+    ADD_MPPP_TESTCASE(real_basic)
+endif()
