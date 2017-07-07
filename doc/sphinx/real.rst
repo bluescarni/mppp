@@ -36,11 +36,12 @@ Concepts
 
 .. cpp:concept:: template <typename T> mppp::RealInteroperable
 
-   This concept is satisfied if the type ``T`` can interoperate with a :cpp:class:`~mppp::rational`
-   with static size ``SSize``. Specifically, this concept will be ``true`` if either:
+   This concept is satisfied if the type ``T`` can interoperate with :cpp:class:`~mppp::real`.
+   Specifically, this concept will be ``true`` if either:
 
    * ``T`` is :cpp:concept:`CppInteroperable`, or
-   * ``T`` is an :cpp:class:`~mppp::integer` with static size ``SSize``.
+   * ``T`` is :cpp:class:`~mppp::integer`, or
+   * ``T`` is :cpp:class:`~mppp::rational`.
 
 .. _real_functions:
 

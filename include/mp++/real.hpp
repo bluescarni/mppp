@@ -120,15 +120,9 @@ using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, 
  *
  * Contrary to other multiprecision floating-point libraries (e.g., MPFR), the precision of a
  * :cpp:class:`~mppp::real` is, in general, unrelated to the number of bits used by the significand. Rather,
- * it specifies the target precision of mathematical operations involving :cpp:class:`~mppp::real` objects.
- *
- * For instance, regardless of the selected precision, the significand of a :cpp:class:`~mppp::real` representing
- * the integral value :math:`2` always uses exactly 2 bits of storage (as :math:`2` can be represented exactly
- * using only 2 bits). The computation of :math:`\sqrt{2}`, on the other hand, will yield a :cpp:class:`~mppp::real`
- * object whose significand uses a number of bits equal (roughly) to the target precision: :math:`\sqrt{2}`
- * is an irrational number, thus :cpp:class:`~mppp::real` will
- * use all the bits specified by the desired precision in order to provide an approximation to the exact value as
- * accurate as possible.
+ * it specifies the target precision of operations involving :cpp:class:`~mppp::real` objects.
+ * See the documentation of the individual methods and functions for a detailed explanation of how the precision
+ * attribute is used in different situations.
  * \endrststar
  */
 class real
@@ -239,6 +233,37 @@ private:
 
 public:
 /// Generic constructor.
+/**
+ * \rststar
+ * This constructor will initialise the value of ``this`` with ``x``. If ``prec`` is 0
+ * (the default), then the ``round`` parameter is ignored, ``this`` will contain the *exact* value of ``x``,
+ * and the precision of ``this`` will be set using the following heuristic:
+ *
+ * * if the type of ``x`` is a C++ integral type ``I``, then the precision will be set to the bit
+ *   width of ``I``;
+ * * if the type of ``x`` is a C++ floating-point type ``F``, then the precision will be set to the bit
+ *   width of the significand of ``F``;
+ * * if ``x`` is an instance of :cpp:class:`~mppp::integer`, then the precision will be set to the number
+ *   of bits used by the representation of ``x`` (rounded up to next multiple of the limb size);
+ * * if ``x`` is an instance of :cpp:class:`~mppp::rational`, then the precision will be set to the sum of the number
+ *   of bits used by the representation of the numerator and denominator of ``x`` (both rounded up to next multiple of
+ *   the limb size).
+ *
+ * If the ``prec`` parameter is nonzero and ``round`` is ``false``, then ``this`` will contain the exact value of ``x``
+ * and the precision will be set to the value of ``prec`` (rather than being automatically determined by the procedure
+ * described above). If the ``prec`` parameter is nonzero and ``round`` is
+ * ``true``, then ``this`` will be first set to exact value of ``x`` and it will then be rounded to ``prec`` bits
+ * to the nearest representable number.
+ * \endrststar
+ *
+ * @param x the construction argument.
+ * @param prec the desired precision.
+ * @param round a boolean flag indicating whether a rounding operations should
+ * be performed on \p this after construction.
+ *
+ * @throws std::overflow_error if the determination of the required precision overflows.
+ * @throws unspecified any exception thrown by set_prec(),
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
     explicit real(const RealInteroperable &x
 #else
@@ -258,23 +283,53 @@ public:
     {
         ::arf_clear(&m_arf);
     }
-    /// Get const reference to the internal structure.
+    /// Get a const pointer to the internal Arb structure.
+    /**
+     * The returned value can be used as a ``const arf_t`` parameter in the Arb API.
+     *
+     * @return a const pointer to the internal Arb structure holding the value of \p this.
+     */
     const ::arf_struct *get_arf_t() const
     {
         return &m_arf;
     }
-    /// Get mutable reference to the internal structure.
-    ::arf_struct *get_arf_t()
+    /// Get a pointer to the internal Arb structure.
+    /**
+     * \rststar
+     * The returned value can be used as an ``arf_t`` parameter in the Arb API.
+     *
+     * .. warning::
+     *    ``arf_clear()`` should never be called on the returned pointer, as ``this``
+     *    will also call ``arf_clear()`` on destruction, thus leading to unpredictable results.
+     *    If ``arf_clear()`` is called on the returned pointer, care must be taken to re-initialise
+     *    the internal Arb struct before the destruction of ``this``.
+     * \endrststar
+     *
+     * @return a mutable pointer to the internal Arb structure holding the value of \p this.
+     */
+    ::arf_struct *_get_arf_t()
     {
         return &m_arf;
     }
     /// Get the precision.
+    /**
+     * @return the precision associated to \p this.
+     */
     slong get_prec() const
     {
         return m_prec;
     }
     /// Set the precision.
-    void set_prec(slong prec)
+    /**
+     * This method will set the precision of \p this to \p prec.
+     *
+     * @param prec the desired precision.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::invalid_argument if \p prec is not in the range established by min_prec() and max_prec().
+     */
+    real &set_prec(slong prec)
     {
         if (mppp_unlikely(prec > max_prec() || prec < min_prec())) {
             throw std::invalid_argument("An invalid precision of " + std::to_string(prec)
@@ -283,18 +338,39 @@ public:
                                         + std::to_string(max_prec()) + ")");
         }
         m_prec = prec;
+        return *this;
     }
-    /// Size in bits.
-    slong nbits() const
+    /// Size of the significand in bits.
+    /**
+     * @return the number of bits needed to represent the absolute value of the significand of \p this.
+     */
+    slong bits() const
     {
         return ::arf_bits(&m_arf);
     }
     /// Minimum precision.
+    /**
+     * \rststar
+     * This function will return the minimum allowed precision for a :cpp:class:`~mppp::real`. The value
+     * is guaranteed to be strictly greater than 1.
+     * \endrststar
+     *
+     * @return the minimum allowed precision for an mppp::real.
+     */
     static constexpr slong min_prec()
     {
         return real_min_prec();
     }
     /// Maximum precision.
+    /**
+     * \rststar
+     * This function will return an implementation-defined positive value representing the maximum allowed
+     * precision for a :cpp:class:`~mppp::real`. The value depends on the target architecture (it will be
+     * larger in 64-bit environments).
+     * \endrststar
+     *
+     * @return the maximum allowed precision for an mppp::real.
+     */
     static constexpr slong max_prec()
     {
         return real_max_prec();
@@ -305,6 +381,25 @@ private:
     slong m_prec;
 };
 
+/** @defgroup real_io real_io
+ *  @{
+ */
+
+/// Output stream operator.
+/**
+ * \rststar
+ * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real` ``r`` in base-10 scientific
+ * notation.
+ * \endrststar
+ *
+ * @param os the target stream.
+ * @param r the input real.
+ *
+ * @return a reference to \p os.
+ *
+ * @throws unspecified any exception thrown by integer::to_string().
+ */
+// TODO exception.
 inline std::ostream &operator<<(std::ostream &os, const real &r)
 {
     // Handle special values first.
@@ -368,6 +463,8 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
     }
     return os;
 }
+
+/** @} */
 }
 
 #else
