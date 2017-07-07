@@ -21,7 +21,15 @@ Types
 
 .. cpp:type:: slong = implementation_defined
 
+   This type is defined by the Arb library. It is a signed integral type with a bit size of 32 or 64 bits, depending
+   on the platform.
+
 .. cpp:type:: ulong = implementation_defined
+
+   This type is defined by the Arb library. It is an unsigned integral type with a bit size of 32 or 64 bits, depending
+   on the platform.
+
+.. seealso :: http://arblib.org/issues.html#integer-types
 
 Concepts
 --------

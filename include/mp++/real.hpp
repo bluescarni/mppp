@@ -124,12 +124,11 @@ using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, 
  *
  * For instance, regardless of the selected precision, the significand of a :cpp:class:`~mppp::real` representing
  * the integral value :math:`2` always uses exactly 2 bits of storage (as :math:`2` can be represented exactly
- * using only 2 bits). Subsequent operations on the
- * :cpp:class:`~mppp::real` object will be performed with the selected precision. E.g., the computation
- * of :math:`\sqrt{2}` will yield a :cpp:class:`~mppp::real` object whose significand uses a number of bits
- * equal (roughly) to the target precision (:math:`\sqrt{2}` is an irrational number, thus :cpp:class:`~mppp::real` will
+ * using only 2 bits). The computation of :math:`\sqrt{2}`, on the other hand, will yield a :cpp:class:`~mppp::real`
+ * object whose significand uses a number of bits equal (roughly) to the target precision: :math:`\sqrt{2}`
+ * is an irrational number, thus :cpp:class:`~mppp::real` will
  * use all the bits specified by the desired precision in order to provide an approximation to the exact value as
- * accurate as possible).
+ * accurate as possible.
  * \endrststar
  */
 class real
@@ -160,6 +159,7 @@ public:
     }
     /// Move constructor.
     /**
+     * Both the value and the precision of \p other will be moved into \p this.
      * After the move, \p other will be left in an unspecified but valid state.
      *
      * @param other the value that will be moved into \p this.
