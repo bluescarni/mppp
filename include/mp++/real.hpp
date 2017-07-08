@@ -92,6 +92,24 @@ constexpr slong real_max_prec()
 
 static_assert(real_min_prec() <= real_max_prec(),
               "The minimum precision for real is larger than the maximum precision.");
+
+// Utility function to convert an arf to an mpfr with checks on the exponent range (arf has multiprecision
+// exponents, mpfr has fixed precision exponents).
+inline void arf_to_mpfr(::mpfr_t m, const ::arf_t a)
+{
+    // Get the min/max exponents allowed in MPFR.
+    const ::mpfr_exp_t e_min = ::mpfr_get_emin(), e_max = ::mpfr_get_emax();
+    // We need to make sure the exponent of a is within range.
+    if (mppp_unlikely(e_min < std::numeric_limits<slong>::min() || e_max > std::numeric_limits<slong>::max()
+                      || ::fmpz_cmp_si(&a->exp, static_cast<slong>(e_min)) < 0
+                      || ::fmpz_cmp_si(&a->exp, static_cast<slong>(e_max)) > 0)) {
+        throw std::invalid_argument("In the conversion of an arf_t to an mpfr_t, the exponent of the arf_t object "
+                                    "overflows the exponent range of MPFR (the minimum allowed MPFR exponent is "
+                                    + std::to_string(e_min) + ", the maximum is " + std::to_string(e_max) + ")");
+    }
+    // Extract an mpfr from the arf.
+    ::arf_get_mpfr(m, a, MPFR_RNDN);
+}
 }
 
 template <typename T>
@@ -169,31 +187,85 @@ private:
     template <std::size_t SSize>
     void dispatch_generic_ctor(const integer<SSize> &n, slong prec)
     {
-        ::arf_init(&m_arf);
-        ::arf_set_mpz(&m_arf, n.get_mpz_view());
         if (prec) {
+            // prec is given explicitly. Attempt to set it (this will check it as well).
+            set_prec(prec);
+            // Init and set the mpz with the desired rounding. All noexcept.
+            ::arf_init(&m_arf);
+            ::arf_set_round_mpz(&m_arf, n.get_mpz_view(), get_prec(), ARF_RND_NEAR);
+        } else {
+            // Compute the number of bits used by n.
+            const auto ls = n.size();
+            // Check that ls * GMP_NUMB_BITS <= max_prec.
+            if (mppp_unlikely(ls
+                              > static_cast<std::make_unsigned<slong>::type>(max_prec()) / unsigned(GMP_NUMB_BITS))) {
+                throw std::invalid_argument(
+                    "The deduced precision for a real constructed from an integer is too large");
+            }
+            // Set the precision directly. We already know it's a non-negative value not greater
+            // than the max allowed precision. We just need to make sure it's not smaller than the
+            // min allowed precision.
+            m_prec = c_max(static_cast<slong>(static_cast<slong>(ls) * int(GMP_NUMB_BITS)), min_prec());
+            // Init and set the mpz. All noexcept.
+            ::arf_init(&m_arf);
+            ::arf_set_mpz(&m_arf, n.get_mpz_view());
+        }
+    }
+    template <std::size_t SSize>
+    void dispatch_generic_ctor(const rational<SSize> &q, slong prec)
+    {
+        // Setup a temporary mpfr real. We will set the actual precision later as needed.
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(min_prec()));
+
+        if (prec) {
+            // prec is given explicitly. Attempt to set it (this will check it as well).
             set_prec(prec);
         } else {
-            // The precision will be set to the number of limbs multiplied by the effective bit width
-            // of each limb.
-            const auto ls = n.size();
-            // Check we do not overflow the slong range.
-            if (mppp_unlikely(ls > static_cast<std::make_unsigned<slong>::type>(std::numeric_limits<slong>::max())
-                                       / unsigned(GMP_NUMB_BITS))) {
-                throw std::overflow_error("Overflow in the computation of the precision for a real constructed from an "
-                                          "integer - the limb size is "
-                                          + std::to_string(ls));
+            // Compute the number of bits used by q.
+            const auto n_size = q.get_num().size();
+            const auto d_size = q.get_den().size();
+            const auto tot_size = n_size + d_size;
+            // Size checks.
+            if (mppp_unlikely(
+                    // Overflow in tot_size.
+                    (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
+                    // Check that tot_size * GMP_NUMB_BITS <= max_prec.
+                    || (tot_size
+                        > static_cast<std::make_unsigned<slong>::type>(max_prec()) / unsigned(GMP_NUMB_BITS)))) {
+                throw std::invalid_argument(
+                    "The deduced precision for a real constructed from a rational is too large");
             }
-            set_prec(c_max(min_prec(), static_cast<slong>(ls) * static_cast<slong>(GMP_NUMB_BITS)));
+            // Set the precision directly. We already know it's a non-negative value not greater
+            // than the max allowed precision. We just need to make sure it's not smaller than the
+            // min allowed precision.
+            m_prec = c_max(static_cast<slong>(static_cast<slong>(tot_size) * int(GMP_NUMB_BITS)), min_prec());
         }
+
+        // Set the precision of the tmp mpfr.
+        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(get_prec()));
+        // mpq to mpfr.
+        ::mpfr_set_q(&mpfr.m_mpfr, q.get_mpq_view(), MPFR_RNDN);
+        // mpfr to arf. All noexcept from now on.
+        ::arf_init(&m_arf);
+        ::arf_set_mpfr(&m_arf, &mpfr.m_mpfr);
     }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n, slong prec)
     {
         if (n <= std::numeric_limits<ulong>::max()) {
-            ::arf_init_set_ui(&m_arf, static_cast<ulong>(n));
-            static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
-            set_prec(prec ? prec : c_max(min_prec(), static_cast<slong>(std::numeric_limits<T>::digits)));
+            if (prec) {
+                // Check and set the desired precision.
+                set_prec(prec);
+                // Init and then set with rounding. All noexcept.
+                ::arf_init(&m_arf);
+                ::arf_set_round_ui(&m_arf, static_cast<ulong>(n), get_prec(), ARF_RND_NEAR);
+            } else {
+                static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
+                // Check and set the detected precision.
+                set_prec(c_max(min_prec(), static_cast<slong>(std::numeric_limits<T>::digits)));
+                // Init and set exactly.
+                ::arf_init_set_ui(&m_arf, static_cast<ulong>(n));
+            }
         } else {
             dispatch_generic_ctor(integer<1>{n}, prec);
         }
@@ -202,9 +274,19 @@ private:
     void dispatch_generic_ctor(T n, slong prec)
     {
         if (n <= std::numeric_limits<slong>::max() && n >= std::numeric_limits<slong>::min()) {
-            ::arf_init_set_si(&m_arf, static_cast<slong>(n));
-            static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
-            set_prec(prec ? prec : c_max(min_prec(), static_cast<slong>(std::numeric_limits<T>::digits)));
+            if (prec) {
+                // Check and set the desired precision.
+                set_prec(prec);
+                // Init and then set with rounding. All noexcept.
+                ::arf_init(&m_arf);
+                ::arf_set_round_si(&m_arf, static_cast<slong>(n), get_prec(), ARF_RND_NEAR);
+            } else {
+                static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
+                // Check and set the detected precision.
+                set_prec(c_max(min_prec(), static_cast<slong>(std::numeric_limits<T>::digits)));
+                // Init and set exactly.
+                ::arf_init_set_si(&m_arf, static_cast<slong>(n));
+            }
         } else {
             dispatch_generic_ctor(integer<1>{n}, prec);
         }
@@ -212,32 +294,46 @@ private:
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     void dispatch_generic_ctor(T x, slong prec)
     {
-        ::arf_init(&m_arf);
-        ::arf_set_d(&m_arf, static_cast<double>(x));
         static_assert(std::numeric_limits<T>::radix == 2, "The float/double type's radix is not 2.");
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
+        // Check and set the precision, either autodetected or specified.
         set_prec(prec ? prec : c_max(min_prec(), static_cast<slong>(std::numeric_limits<T>::digits)));
+        // Init and set exactly. All noexcept from now on.
+        ::arf_init(&m_arf);
+        ::arf_set_d(&m_arf, static_cast<double>(x));
+        // If the configured precision is less than the precision of the significand of T,
+        // we need to round.
+        if (get_prec() < std::numeric_limits<T>::digits) {
+            round();
+        }
     }
     void dispatch_generic_ctor(long double x, slong prec)
     {
-        // NOTE: static checks for overflows are done in mpfr.hpp.
-        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
-        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
-        ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
-        ::arf_init(&m_arf);
-        ::arf_set_mpfr(&m_arf, &mpfr.m_mpfr);
         static_assert(std::numeric_limits<long double>::radix == 2, "The long double type's radix is not 2.");
         static_assert(std::numeric_limits<long double>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
+        // Check and set the precision, either autodetected or specified.
         set_prec(prec ? prec : c_max(min_prec(), static_cast<slong>(std::numeric_limits<long double>::digits)));
+
+        // Setup the temp mpfr.
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(min_prec()));
+        // Set the configured precision.
+        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(get_prec()));
+        // Set the value.
+        ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
+        // Init and set exactly. All noexcept from now on.
+        ::arf_init(&m_arf);
+        ::arf_set_mpfr(&m_arf, &mpfr.m_mpfr);
     }
 
 public:
 /// Generic constructor.
 /**
  * \rststar
- * This constructor will initialise the value of ``this`` with ``x``. If ``prec`` is 0
- * (the default), then the ``round`` parameter is ignored, ``this`` will contain the *exact* value of ``x``,
- * and the precision of ``this`` will be set using the following heuristic:
+ * This constructor will initialise the value of ``this`` with ``x``. The precision of ``this``
+ * is either automatically deduced (if ``prec`` is zero), or explicitly specified by the user
+ * (if ``prec`` is nonzero).
+ *
+ * If ``prec`` is zero, then the precision of ``this`` will be set according to the following heuristic:
  *
  * * if the type of ``x`` is a C++ integral type ``I``, then the precision will be set to the bit
  *   width of ``I``;
@@ -246,22 +342,22 @@ public:
  * * if ``x`` is an instance of :cpp:class:`~mppp::integer`, then the precision will be set to the number
  *   of bits used by the representation of ``x`` (rounded up to next multiple of the limb size);
  * * if ``x`` is an instance of :cpp:class:`~mppp::rational`, then the precision will be set to the sum of the number
- *   of bits used by the representation of the numerator and denominator of ``x`` (both rounded up to next multiple of
+ *   of bits used by the representations of the numerator and denominator of ``x`` (both rounded up to next multiple of
  *   the limb size).
  *
- * If the ``prec`` parameter is nonzero and ``round`` is ``false``, then ``this`` will contain the exact value of ``x``
- * and the precision will be set to the value of ``prec`` (rather than being automatically determined by the procedure
- * described above). If the ``prec`` parameter is nonzero and ``round`` is
- * ``true``, then ``this`` will be first set to exact value of ``x`` and it will then be rounded to ``prec`` bits
- * to the nearest representable number.
+ * If ``x`` is *not* a :cpp:class:`~mppp::rational`, then ``this`` will be set to the exact value of ``x``, and no
+ * rounding takes place during construction. If ``x`` is a :cpp:class:`~mppp::rational`, then the value of ``this``
+ * will be rounded to the closest value to ``x`` representable with the automatically-deduced precision.
+ *
+ * If ``prec`` is nonzero, then the precision of ``this`` is set to ``prec``, and the value of ``this`` will be
+ * rounded the closest value to ``x`` representable with the specified precision.
  * \endrststar
  *
  * @param x the construction argument.
  * @param prec the desired precision.
- * @param round a boolean flag indicating whether a rounding operations should
- * be performed on \p this after construction.
  *
- * @throws std::overflow_error if the determination of the required precision overflows.
+ * @throws std::invalid_argument if the deduced precision when constructing from an mppp::integer or an mppp::rational
+ * is larger than an implementation-defined value.
  * @throws unspecified any exception thrown by set_prec(),
  */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -271,16 +367,14 @@ public:
     explicit real(const T &x
 #endif
                   ,
-                  slong prec = 0, bool round = false)
+                  slong prec = 0)
     {
         dispatch_generic_ctor(x, prec);
-        if (prec && round) {
-            ::arf_set_round(&m_arf, &m_arf, m_prec, ARF_RND_NEAR);
-        }
     }
     /// Destructor.
     ~real()
     {
+        assert(m_prec <= max_prec() && m_prec >= min_prec());
         ::arf_clear(&m_arf);
     }
     /// Get a const pointer to the internal Arb structure.
@@ -319,6 +413,18 @@ public:
     {
         return m_prec;
     }
+    /// Round.
+    /**
+     * This method will round \p this to its associated precision in the direction of the nearest representable
+     * number.
+     *
+     * @return a reference to \p this.
+     */
+    real &round()
+    {
+        ::arf_set_round(_get_arf_t(), get_arf_t(), get_prec(), ARF_RND_NEAR);
+        return *this;
+    }
     /// Set the precision.
     /**
      * This method will set the precision of \p this to \p prec.
@@ -346,7 +452,7 @@ public:
      */
     slong bits() const
     {
-        return ::arf_bits(&m_arf);
+        return ::arf_bits(get_arf_t());
     }
     /// Minimum precision.
     /**
@@ -389,7 +495,16 @@ private:
 /**
  * \rststar
  * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real` ``r`` in base-10 scientific
- * notation.
+ * notation. In order to provide a visual clue for the precision associated to ``r``, ``r`` will be copied
+ * into temporary storage and rounded to its associated precision before being printed. As a consequence,
+ * two :cpp:class:`~mppp::real` objects that compare equal (that is, they represent identical values) will
+ * be printed differently if their associated precisions do not match.
+ *
+ * This operator uses internally the MPFR API. Note that in MPFR the exponent of floating-point values has a fixed
+ * range, while in Arb the exponent is a multiprecision integer. As a consequence, if the exponent of ``r``
+ * overflows an implementation-defined range, an error will be raised.
+ *
+ * The special values are printed as ``"nan"``, ``"inf"`` and ``"-inf"``.
  * \endrststar
  *
  * @param os the target stream.
@@ -397,9 +512,10 @@ private:
  *
  * @return a reference to \p os.
  *
- * @throws unspecified any exception thrown by integer::to_string().
+ * @throws std::invalid_argument if the exponent of \p r is outside an implementation-defined range.
+ * @throws std::runtime_error in case of other unspecified errors (e.g., nonzero return values from the MPFR API).
+ * @throws unspecified any exception raised by the use of the public API of \p std::ostream.
  */
-// TODO exception.
 inline std::ostream &operator<<(std::ostream &os, const real &r)
 {
     // Handle special values first.
@@ -423,7 +539,7 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
     // NOTE: the precision of r is always guaranteed to be a valid precision for both MPFR and arb.
     ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(r.get_prec()));
     // Extract an mpfr from the arf.
-    ::arf_get_mpfr(&mpfr.m_mpfr, r.get_arf_t(), MPFR_RNDN);
+    arf_to_mpfr(&mpfr.m_mpfr, r.get_arf_t());
 
     // Get the string fractional representation via the MPFR function,
     // and wrap it into a smart pointer.
@@ -451,15 +567,13 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
     }
     assert(dot_added);
 
-    // Adjust the exponent.
-    if (mppp_unlikely(exp == std::numeric_limits<::mpfr_exp_t>::min())) {
-        throw std::overflow_error("Overflow in the conversion of a real to string");
-    }
-    --exp;
-    if (exp && !mpfr_zero_p(&mpfr.m_mpfr)) {
+    // Adjust the exponent. Do it in multiprec in order to avoid potential overflow.
+    integer<1> z_exp{exp};
+    --z_exp;
+    if (z_exp && !mpfr_zero_p(&mpfr.m_mpfr)) {
         // Add the exponent at the end of the string, if both the value and the exponent
         // are nonzero.
-        os << "e" << exp;
+        os << "e" << z_exp;
     }
     return os;
 }

@@ -32,7 +32,17 @@ TEST_CASE("real constructors")
     std::cout << real{1.3f}.bits() << '\n';
     std::cout << real{1.3l}.bits() << '\n';
     std::cout << real{1.3l, 15}.bits() << '\n';
-    std::cout << real{1.3l, 15, true}.bits() << '\n';
-    std::cout << real{1.3l, 15, true} << '\n';
+    std::cout << real{1.3l, 15} << '\n';
     std::cout << real{true} << '\n';
+    std::cout << real{rational<1>{"321938201983012839208312/210938120938010101029381298"}} << '\n';
+    std::cout << real{rational<1>{"34/89"}, 18} << '\n';
+    std::cout << real{rational<1>{"34/89"}, 18}.bits() << '\n';
+    std::cout << real{rational<1>{"34/89"}, 20} << '\n';
+    std::cout << real{rational<1>{"34/89"}, 20}.bits() << '\n';
+    std::cout << real{rational<1>{"34/89"}} << '\n';
+    std::cout << real{rational<1>{"34/89"}}.bits() << '\n';
+    std::cout << real{rational<1>{"1/3"}} << '\n';
+    std::cout << real{rational<1>{"1/3"}, 64} << '\n';
+    std::cout << real{rational<1>{"1/3"}, 256} << '\n';
+    std::cout << real{1233495ll, 5} << '\n';
 }
