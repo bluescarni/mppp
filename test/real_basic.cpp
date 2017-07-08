@@ -44,5 +44,5 @@ TEST_CASE("real constructors")
     std::cout << real{rational<1>{"1/3"}} << '\n';
     std::cout << real{rational<1>{"1/3"}, 64} << '\n';
     std::cout << real{rational<1>{"1/3"}, 256} << '\n';
-    std::cout << real{1233495ll, 5} << '\n';
+    std::cout << real{1233495l, 10} << '\n';
 }

@@ -394,7 +394,7 @@ public:
      *
      * .. warning::
      *    ``arf_clear()`` should never be called on the returned pointer, as ``this``
-     *    will also call ``arf_clear()`` on destruction, thus leading to unpredictable results.
+     *    will also call ``arf_clear()`` on destruction, thus leading to memory errors.
      *    If ``arf_clear()`` is called on the returned pointer, care must be taken to re-initialise
      *    the internal Arb struct before the destruction of ``this``.
      * \endrststar
