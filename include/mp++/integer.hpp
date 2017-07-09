@@ -323,7 +323,6 @@ struct static_int {
 // {static_int,mpz} union.
 template <std::size_t SSize>
 union integer_union {
-public:
     using s_storage = static_int<SSize>;
     using d_storage = mpz_struct_t;
     // Def ctor, will init to static.
