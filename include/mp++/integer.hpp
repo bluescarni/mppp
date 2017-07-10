@@ -1056,12 +1056,9 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` results in undefined behaviour.
-     *
-     * .. warning::
-     *
-     *    ``n`` must be distinct from ``this``: if ``n`` is an ``mpz_view`` of ``this``, the behaviour will be
-     *    undefined.
+     *    with an uninitialized ``n`` results in undefined behaviour. Also, no aliasing is allowed: the data in ``n``
+     *    must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of ``this`` then
+     *    it might point to internal data of ``this``, and the behaviour of this operator will thus be undefined).
      * \endrststar
      *
      * @param n the input GMP integer.

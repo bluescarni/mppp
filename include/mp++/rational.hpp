@@ -394,6 +394,24 @@ public:
     explicit rational(const std::string &s, int base = 10) : rational(s.c_str(), base)
     {
     }
+    /// Constructor from \p mpz_t.
+    /**
+     * This constructor will initialise the numerator of \p this with the input GMP integer \p n,
+     * and the denominator to 1.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
+     *    with an uninitialized ``n`` results in undefined behaviour.
+     * \endrststar
+     *
+     * @param n the input GMP integer.
+     */
+    explicit rational(const ::mpz_t n) : m_num(n)
+    {
+        fast_set_den_one();
+    }
     /// Constructor from \p mpq_t.
     /**
      * This constructor will initialise the numerator and denominator of \p this with those of the GMP rational \p q.
@@ -403,16 +421,13 @@ public:
      *
      *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
      *    with an uninitialized ``q`` results in undefined behaviour. Also, this constructor will **not**
-     *    canonicalise ``this``: numerator and denominator are constructed
-     *    as-is from ``q``.
+     *    canonicalise ``this``: numerator and denominator are constructed as-is from ``q``.
      * \endrststar
      *
      * @param q the input GMP rational.
      */
-    explicit rational(const ::mpq_t q)
+    explicit rational(const ::mpq_t q) : m_num(mpq_numref(q)), m_den(mpq_denref(q))
     {
-        m_num.dispatch_mpz_ctor(mpq_numref(q));
-        m_den.dispatch_mpz_ctor(mpq_denref(q));
     }
     /// Defaulted copy-assignment operator.
     /**
@@ -444,6 +459,31 @@ public:
         }
         return *this;
     }
+    /// Assignment from \p mpz_t.
+    /**
+     * \rststar
+     * This assignment operator will copy into the numerator of ``this`` the value of the GMP integer ``n``,
+     * and it will set the denominator to 1 via :cpp:func:`mppp::integer::set_one()`.
+     *
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
+     *    with an uninitialized ``n`` results in undefined behaviour. Also, no aliasing is allowed:
+     *    the data in ``n`` must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of
+     *    the numerator of ``this`` then it might point to internal data of ``this``, and the behaviour of this operator
+     *    will thus be undefined).
+     * \endrststar
+     *
+     * @param n the input GMP integer.
+     *
+     * @return a reference to \p this.
+     */
+    rational &operator=(const ::mpz_t n)
+    {
+        m_num = n;
+        m_den.set_one();
+        return *this;
+    }
     /// Assignment from \p mpq_t.
     /**
      * This assignment operator will copy into \p this the value of the GMP rational \p q.
@@ -453,7 +493,8 @@ public:
      *
      *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this operator
      *    with an uninitialized ``q`` results in undefined behaviour. Also, this operator will **not** canonicalise
-     *    the assigned value: numerator and denominator are assigned as-is from ``q``.
+     *    the assigned value: numerator and denominator are assigned as-is from ``q``. Finally, no aliasing is allowed:
+     *    the data in ``q`` must be completely distinct from the data in ``this``.
      * \endrststar
      *
      * @param q the input GMP rational.
