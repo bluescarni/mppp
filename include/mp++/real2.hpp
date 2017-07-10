@@ -113,7 +113,7 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
     // Adjust the exponent. Do it in multiprec in order to avoid potential overflow.
     integer<1> z_exp{exp};
     --z_exp;
-    if (z_exp && !mpfr_zero_p(r)) {
+    if (z_exp.sgn() && !mpfr_zero_p(r)) {
         // Add the exponent at the end of the string, if both the value and the exponent
         // are nonzero.
         os << "e" << z_exp;
