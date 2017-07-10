@@ -346,9 +346,8 @@ union integer_union {
         if (other.is_static()) {
             ::new (static_cast<void *>(&m_st)) s_storage(std::move(other.g_st()));
         } else {
-            ::new (static_cast<void *>(&m_dy)) d_storage;
-            // NOTE: this copies the mpz struct members (shallow copy).
-            m_dy = other.g_dy();
+            // Activate dynamic member and shallow copy it from other.
+            ::new (static_cast<void *>(&m_dy)) d_storage(other.g_dy());
             // Downgrade the other to an empty static.
             other.g_dy().~d_storage();
             ::new (static_cast<void *>(&other.m_st)) s_storage();
