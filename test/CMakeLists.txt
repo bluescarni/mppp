@@ -64,3 +64,7 @@ ADD_MPPP_TESTCASE(rational_rel)
 if(MPPP_WITH_ARB)
     ADD_MPPP_TESTCASE(real_basic)
 endif()
+
+if(MPPP_WITH_MPFR)
+    ADD_MPPP_TESTCASE(real2_basic)
+endif()

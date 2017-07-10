@@ -371,6 +371,37 @@ public:
     {
         dispatch_generic_ctor(x, prec);
     }
+    explicit real(const char *str, slong prec)
+    {
+        set_prec(prec);
+
+        // Setup the temp mpfr.
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(min_prec()));
+        // Set the configured precision.
+        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(get_prec()));
+        // Convert the string.
+        ::mpfr_set_str(&mpfr.m_mpfr, str, 10, MPFR_RNDN);
+
+        // Init and set exactly. All noexcept from now on.
+        ::arf_init(&m_arf);
+        ::arf_set_mpfr(&m_arf, &mpfr.m_mpfr);
+    }
+    real &operator=(const real &other)
+    {
+        if (mppp_likely(this != &other)) {
+            ::arf_set(&m_arf, &other.m_arf);
+            m_prec = other.m_prec;
+        }
+        return *this;
+    }
+    real &operator=(real &&other) noexcept
+    {
+        if (mppp_likely(this != &other)) {
+            ::arf_swap(&m_arf, &other.m_arf);
+            m_prec = other.m_prec;
+        }
+        return *this;
+    }
     /// Destructor.
     ~real()
     {
@@ -413,18 +444,6 @@ public:
     {
         return m_prec;
     }
-    /// Round.
-    /**
-     * This method will round \p this to its associated precision in the direction of the nearest representable
-     * number.
-     *
-     * @return a reference to \p this.
-     */
-    real &round()
-    {
-        ::arf_set_round(_get_arf_t(), get_arf_t(), get_prec(), ARF_RND_NEAR);
-        return *this;
-    }
     /// Set the precision.
     /**
      * This method will set the precision of \p this to \p prec.
@@ -444,6 +463,22 @@ public:
                                         + std::to_string(max_prec()) + ")");
         }
         m_prec = prec;
+        return *this;
+    }
+    void _set_prec(slong prec)
+    {
+        m_prec = prec;
+    }
+    /// Round.
+    /**
+     * This method will round \p this to its associated precision in the direction of the nearest representable
+     * number.
+     *
+     * @return a reference to \p this.
+     */
+    real &round()
+    {
+        ::arf_set_round(_get_arf_t(), get_arf_t(), get_prec(), ARF_RND_NEAR);
         return *this;
     }
     /// Size of the significand in bits.
@@ -579,6 +614,20 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
 }
 
 /** @} */
+
+inline void add(real &rop, const real &op1, const real &op2)
+{
+    const auto r_prec = c_max(op1.get_prec(), op2.get_prec());
+    ::arf_add(rop._get_arf_t(), op1.get_arf_t(), op2.get_arf_t(), r_prec, ARF_RND_NEAR);
+    rop._set_prec(r_prec);
+}
+
+inline void mul(real &rop, const real &op1, const real &op2)
+{
+    const auto r_prec = c_max(op1.get_prec(), op2.get_prec());
+    arf_mul(rop._get_arf_t(), op1.get_arf_t(), op2.get_arf_t(), r_prec, ARF_RND_NEAR);
+    rop._set_prec(r_prec);
+}
 }
 
 #else
