@@ -220,7 +220,7 @@ inline unsigned builtin_clz(T n)
 template <std::size_t SSize>
 struct static_int {
     // Let's put a hard cap and sanity check on the static size.
-    static_assert(SSize > 0u && SSize <= 64u, "Invalid static size.");
+    static_assert(SSize > 0u && SSize <= 64u, "Invalid static size for integer.");
     using limbs_type = std::array<::mp_limb_t, SSize>;
     // Cast it to mpz_size_t for convenience.
     static const mpz_size_t s_size = SSize;
