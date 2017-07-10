@@ -159,9 +159,11 @@ struct static_real {
     }
     static constexpr ::mpfr_prec_t max_prec()
     {
-        // NOTE: it's checked elsewhere that the value of real_prec_min() fits in
-        // static storage.
-        return max_prec_impl(real_prec_min());
+        // NOTE: the impl() function assumes there's enough storage for minimum precision.
+        static_assert(mpfr_custom_get_size(real_prec_min()) <= SSize * sizeof(::mp_limb_t),
+                      "Not enough storage in static_real to represent a real with minimum precision.");
+        // Make sure the output is never greater than real_prec_max().
+        return c_min(real_prec_max(), max_prec_impl(real_prec_min()));
     }
     ::mpfr_prec_t _mpfr_prec;
     ::mpfr_sign_t _mpfr_sign;
