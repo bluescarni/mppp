@@ -75,15 +75,9 @@ static_assert(real_prec_min() <= real_prec_max(),
 
 // TODO mpfr struct checks (see integer)
 
-// Helper function to print an mpfr to stream in a specified base.
-inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
+// Helper function to print an mpfr to stream in base 10.
+inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os)
 {
-    // Check the base.
-    if (mppp_unlikely(base < 2 || base > 62)) {
-        throw std::invalid_argument("In the conversion of a real to string, a base of " + std::to_string(base)
-                                    + " was specified, but the only valid values are in the [2,62] range");
-    }
-
     // Get the string fractional representation via the MPFR function,
     // and wrap it into a smart pointer.
     ::mpfr_exp_t exp(0);
@@ -143,6 +137,8 @@ struct static_real {
                    // Overflow check first.
                    ? (throw std::overflow_error(
                          "Overflow in the determination of the maximum precision for a static real."))
+                   // NOTE: here and elsewhere we assume overflows in SSize * sizeof(::mp_limb_t) will
+                   // be caught when m_limbs is instantiated.
                    : (mpfr_custom_get_size(n) <= SSize * sizeof(::mp_limb_t)
                           // For the current precision n, we have enough storage. Try 1 bit more of precision.
                           ? max_prec_impl(static_cast<::mpfr_prec_t>(n + 1))
@@ -159,7 +155,7 @@ struct static_real {
     }
     static constexpr ::mpfr_prec_t max_prec()
     {
-        // NOTE: the impl() function assumes there's enough storage for minimum precision.
+        // NOTE: the impl() function assumes there's enough storage for the minimum precision.
         static_assert(mpfr_custom_get_size(real_prec_min()) <= SSize * sizeof(::mp_limb_t),
                       "Not enough storage in static_real to represent a real with minimum precision.");
         // Make sure the output is never greater than real_prec_max().
@@ -240,6 +236,17 @@ union real_union {
             r.g_dy().~d_storage();
             r.default_init();
         }
+    }
+    real_union &operator=(const real_union &other)
+    {
+        const bool s1 = is_static(), s2 = other.is_static();
+        if (s1 && s2) {
+            // Self assignment is fine.
+            g_st() = other.g_st();
+        }
+    }
+    real_union &operator=(real_union &&other) noexcept
+    {
     }
     ~real_union()
     {
@@ -324,9 +331,9 @@ inline std::ostream &operator<<(std::ostream &os, const real2<SSize> &r)
 {
     if (r.is_static()) {
         const auto m = r._get_union().g_st().get_mpfr_c();
-        mpfr_to_stream(&m, os, 10);
+        mpfr_to_stream(&m, os);
     } else {
-        mpfr_to_stream(&r._get_union().g_dy(), os, 10);
+        mpfr_to_stream(&r._get_union().g_dy(), os);
     }
     return os;
 }
