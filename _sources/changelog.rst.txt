@@ -7,6 +7,9 @@ Changelog
 Changes
 ~~~~~~~
 
+- Implement the assignment operator and the constructor from ``mpz_t`` in :cpp:class:`~mppp::rational`
+  (`#19 <https://github.com/bluescarni/mppp/pull/19>`__).
+
 - Performance improvements for :cpp:func:`mppp::integer::nbits()` on GCC and clang (`#17 <https://github.com/bluescarni/mppp/pull/17>`__).
 
 Fix

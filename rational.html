@@ -337,6 +337,27 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 </dd></dl>
 
 <dl class="function">
+<dt id="_CPPv2N4mppp8rational8rationalEK5mpz_t">
+<span id="mppp::rational::rational__mpz_tC"></span><span class="target" id="mp++classmppp_1_1rational_1a7d893a097af766545dc29019034d8806"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
+<p>This constructor will initialise the numerator of <code class="docutils literal"><span class="pre">this</span></code> with the input GMP integer <code class="docutils literal"><span class="pre">n</span></code>, and the denominator to 1.</p>
+<p><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">It is the user&#8217;s responsibility to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this constructor
+with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> results in undefined behaviour.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the input GMP integer. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalEK5mpq_t">
 <span id="mppp::rational::rational__mpq_tC"></span><span class="target" id="mp++classmppp_1_1rational_1a849d38261dd51a49652db607aaf9d617"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> mpq_t <em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEK5mpq_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from <code class="docutils literal"><span class="pre">mpq_t</span></code>. </p>
@@ -345,8 +366,7 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 <p class="first admonition-title">Warning</p>
 <p class="last">It is the user&#8217;s responsibility to ensure that <code class="docutils literal"><span class="pre">q</span></code> has been correctly initialized. Calling this constructor
 with an uninitialized <code class="docutils literal"><span class="pre">q</span></code> results in undefined behaviour. Also, this constructor will <strong>not</strong>
-canonicalise <code class="docutils literal"><span class="pre">this</span></code>: numerator and denominator are constructed
-as-is from <code class="docutils literal"><span class="pre">q</span></code>.</p>
+canonicalise <code class="docutils literal"><span class="pre">this</span></code>: numerator and denominator are constructed as-is from <code class="docutils literal"><span class="pre">q</span></code>.</p>
 </div>
 </p>
 <p><dl class="docutils">
@@ -388,6 +408,33 @@ as-is from <code class="docutils literal"><span class="pre">q</span></code>.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="_CPPv2N4mppp8rationalaSEK5mpz_t">
+<span id="mppp::rational::assign-operator__mpz_tC"></span><span class="target" id="mp++classmppp_1_1rational_1ab6bd9113f5891c91548aba16ca5f9ae1"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assignment from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
+<p><p>This assignment operator will copy into the numerator of <code class="docutils literal"><span class="pre">this</span></code> the value of the GMP integer <code class="docutils literal"><span class="pre">n</span></code>,
+and it will set the denominator to 1 via <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer7set_oneEv" title="mppp::integer::set_one"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::set_one()</span></code></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">It is the user&#8217;s responsibility to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this operator
+with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> results in undefined behaviour. Also, no aliasing is allowed:
+the data in <code class="docutils literal"><span class="pre">n</span></code> must be completely distinct from the data in <code class="docutils literal"><span class="pre">this</span></code> (e.g., if <code class="docutils literal"><span class="pre">n</span></code> is an <code class="docutils literal"><span class="pre">mpz_view</span></code> of
+the numerator of <code class="docutils literal"><span class="pre">this</span></code> then it might point to internal data of <code class="docutils literal"><span class="pre">this</span></code>, and the behaviour of this operator
+will thus be undefined).</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the input GMP integer.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv2N4mppp8rationalaSEK5mpq_t">
 <span id="mppp::rational::assign-operator__mpq_tC"></span><span class="target" id="mp++classmppp_1_1rational_1aa37146ad247896396571968872f2dfb0"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> mpq_t <em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSEK5mpq_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from <code class="docutils literal"><span class="pre">mpq_t</span></code>. </p>
@@ -396,7 +443,8 @@ as-is from <code class="docutils literal"><span class="pre">q</span></code>.</p>
 <p class="first admonition-title">Warning</p>
 <p class="last">It is the user&#8217;s responsibility to ensure that <code class="docutils literal"><span class="pre">q</span></code> has been correctly initialized. Calling this operator
 with an uninitialized <code class="docutils literal"><span class="pre">q</span></code> results in undefined behaviour. Also, this operator will <strong>not</strong> canonicalise
-the assigned value: numerator and denominator are assigned as-is from <code class="docutils literal"><span class="pre">q</span></code>.</p>
+the assigned value: numerator and denominator are assigned as-is from <code class="docutils literal"><span class="pre">q</span></code>. Finally, no aliasing is allowed:
+the data in <code class="docutils literal"><span class="pre">q</span></code> must be completely distinct from the data in <code class="docutils literal"><span class="pre">this</span></code>.</p>
 </div>
 </p>
 <p><dl class="docutils">

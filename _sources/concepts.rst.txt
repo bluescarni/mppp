@@ -16,8 +16,8 @@ Common concepts
 
 .. cpp:concept:: template <typename T> mppp::CppInteroperable
 
-   This concept is satisfied by any C++ fundamental type with which the multiprecision classes (such as :cpp:class:`~mppp::integer`)
-   can interoperate. The full list of types satisfying this concept is:
+   This concept is satisfied by any C++ fundamental type with which the multiprecision classes (such as :cpp:class:`~mppp::integer`,
+   :cpp:class:`~mppp::rational`, etc.) can interoperate. The full list of types satisfying this concept is:
 
    * ``bool``,
    * ``char``, ``signed char`` and ``unsigned char``,

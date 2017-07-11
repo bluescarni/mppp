@@ -442,12 +442,9 @@ with an uninitialized <code class="docutils literal"><span class="pre">n</span><
 <p><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">It is the user&#8217;s responsibility to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this operator
-with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> results in undefined behaviour.</p>
-</div>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last"><code class="docutils literal"><span class="pre">n</span></code> must be distinct from <code class="docutils literal"><span class="pre">this</span></code>: if <code class="docutils literal"><span class="pre">n</span></code> is an <code class="docutils literal"><span class="pre">mpz_view</span></code> of <code class="docutils literal"><span class="pre">this</span></code>, the behaviour will be
-undefined.</p>
+with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> results in undefined behaviour. Also, no aliasing is allowed: the data in <code class="docutils literal"><span class="pre">n</span></code>
+must be completely distinct from the data in <code class="docutils literal"><span class="pre">this</span></code> (e.g., if <code class="docutils literal"><span class="pre">n</span></code> is an <code class="docutils literal"><span class="pre">mpz_view</span></code> of <code class="docutils literal"><span class="pre">this</span></code> then
+it might point to internal data of <code class="docutils literal"><span class="pre">this</span></code>, and the behaviour of this operator will thus be undefined).</p>
 </div>
 </p>
 <p><dl class="docutils">
