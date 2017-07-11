@@ -344,7 +344,8 @@ union integer_union {
     integer_union(integer_union &&other) noexcept
     {
         if (other.is_static()) {
-            ::new (static_cast<void *>(&m_st)) s_storage(std::move(other.g_st()));
+            // Activate the static member with a copy.
+            ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
             // Activate dynamic member and shallow copy it from other.
             ::new (static_cast<void *>(&m_dy)) d_storage(other.g_dy());
@@ -390,9 +391,9 @@ union integer_union {
         } else if (s1 && !s2) {
             // Destroy static.
             g_st().~s_storage();
-            // Construct the dynamic struct.
-            ::new (static_cast<void *>(&m_dy)) d_storage;
-            m_dy = other.g_dy();
+            // Construct the dynamic struct, shallow-copying from
+            // other.
+            ::new (static_cast<void *>(&m_dy)) d_storage(other.g_dy());
             // Downgrade the other to an empty static.
             other.g_dy().~d_storage();
             ::new (static_cast<void *>(&other.m_st)) s_storage();
