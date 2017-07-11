@@ -357,6 +357,46 @@ TEST_CASE("mpq_t constructor")
     tuple_for_each(sizes{}, mpq_ctor_tester{});
 }
 
+struct mpz_ctor_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        using integer = integer<S::value>;
+        mpz_raii m;
+        REQUIRE((std::is_constructible<rational, const ::mpz_t>::value));
+        REQUIRE(rational{&m.m_mpz}.is_zero());
+        REQUIRE(rational{&m.m_mpz}.get_num().is_static());
+        REQUIRE(rational{&m.m_mpz}.get_den().is_one());
+        REQUIRE(rational{&m.m_mpz}.get_den().is_static());
+        ::mpz_set_si(&m.m_mpz, 1234);
+        REQUIRE(rational{&m.m_mpz}.get_num() == 1234);
+        REQUIRE(rational{&m.m_mpz}.get_num().is_static());
+        REQUIRE(rational{&m.m_mpz}.get_den().is_one());
+        REQUIRE(rational{&m.m_mpz}.get_den().is_static());
+        ::mpz_set_si(&m.m_mpz, -1234);
+        REQUIRE(rational{&m.m_mpz}.get_num() == -1234);
+        REQUIRE(rational{&m.m_mpz}.get_num().is_static());
+        REQUIRE(rational{&m.m_mpz}.get_den().is_one());
+        REQUIRE(rational{&m.m_mpz}.get_den().is_static());
+        ::mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        REQUIRE(rational{&m.m_mpz}.get_num()
+                == integer{"3218372891372987328917389127389217398271983712987398127398172389712937819237"});
+        REQUIRE(rational{&m.m_mpz}.get_den().is_one());
+        REQUIRE(rational{&m.m_mpz}.get_den().is_static());
+        ::mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        REQUIRE(rational{&m.m_mpz}.get_num()
+                == -integer{"3218372891372987328917389127389217398271983712987398127398172389712937819237"});
+        REQUIRE(rational{&m.m_mpz}.get_den().is_one());
+        REQUIRE(rational{&m.m_mpz}.get_den().is_static());
+    }
+};
+
+TEST_CASE("mpz_t constructor")
+{
+    tuple_for_each(sizes{}, mpz_ctor_tester{});
+}
+
 struct copy_move_tester {
     template <typename S>
     void operator()(const S &) const
@@ -673,6 +713,62 @@ struct mpq_ass_tester {
 TEST_CASE("mpq_t assignment")
 {
     tuple_for_each(sizes{}, mpq_ass_tester{});
+}
+
+struct mpz_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        using integer = integer<S::value>;
+        REQUIRE((std::is_assignable<rational &, ::mpz_t>::value));
+        REQUIRE((!std::is_assignable<const rational &, ::mpz_t>::value));
+        rational q{6, 5};
+        mpz_raii m;
+        ::mpz_set_si(&m.m_mpz, 1234);
+        q = &m.m_mpz;
+        REQUIRE(q.get_num() == 1234);
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den() == 1);
+        REQUIRE(q.get_den().is_static());
+        q = "-7/3";
+        ::mpz_set_si(&m.m_mpz, -1234);
+        q = &m.m_mpz;
+        REQUIRE(q.get_num() == -1234);
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den() == 1);
+        REQUIRE(q.get_den().is_static());
+        q = "3218372891372987328917389127389217398271983712987398127398172389712937819237/"
+            "1232137219837921379128378921738971982713918723";
+        q = &m.m_mpz;
+        REQUIRE(q.get_num() == -1234);
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den() == 1);
+        REQUIRE(q.get_den().is_static());
+        q = "-3218372891372987328917389127389217398271983712987398127398172389712937819237/"
+            "1232137219837921379128378921738971982713918723";
+        q = &m.m_mpz;
+        REQUIRE(q.get_num() == -1234);
+        REQUIRE(q.get_num().is_static());
+        REQUIRE(q.get_den() == 1);
+        REQUIRE(q.get_den().is_static());
+        ::mpz_set_str(&m.m_mpz, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        q = &m.m_mpz;
+        REQUIRE(q.get_num() == integer{"3218372891372987328917389127389217398271983712987398127398172389712937819237"});
+        REQUIRE(q.get_den() == 1);
+        REQUIRE(q.get_den().is_static());
+        ::mpz_set_str(&m.m_mpz, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        q = &m.m_mpz;
+        REQUIRE(q.get_num()
+                == -integer{"3218372891372987328917389127389217398271983712987398127398172389712937819237"});
+        REQUIRE(q.get_den() == 1);
+        REQUIRE(q.get_den().is_static());
+    }
+};
+
+TEST_CASE("mpz_t assignment")
+{
+    tuple_for_each(sizes{}, mpz_ass_tester{});
 }
 
 struct gen_ass_tester {

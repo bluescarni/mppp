@@ -220,7 +220,7 @@ inline unsigned builtin_clz(T n)
 template <std::size_t SSize>
 struct static_int {
     // Let's put a hard cap and sanity check on the static size.
-    static_assert(SSize > 0u && SSize <= 64u, "Invalid static size.");
+    static_assert(SSize > 0u && SSize <= 64u, "Invalid static size for integer.");
     using limbs_type = std::array<::mp_limb_t, SSize>;
     // Cast it to mpz_size_t for convenience.
     static const mpz_size_t s_size = SSize;
@@ -323,7 +323,6 @@ struct static_int {
 // {static_int,mpz} union.
 template <std::size_t SSize>
 union integer_union {
-public:
     using s_storage = static_int<SSize>;
     using d_storage = mpz_struct_t;
     // Def ctor, will init to static.
@@ -347,9 +346,8 @@ public:
         if (other.is_static()) {
             ::new (static_cast<void *>(&m_st)) s_storage(std::move(other.g_st()));
         } else {
-            ::new (static_cast<void *>(&m_dy)) d_storage;
-            // NOTE: this copies the mpz struct members (shallow copy).
-            m_dy = other.g_dy();
+            // Activate dynamic member and shallow copy it from other.
+            ::new (static_cast<void *>(&m_dy)) d_storage(other.g_dy());
             // Downgrade the other to an empty static.
             other.g_dy().~d_storage();
             ::new (static_cast<void *>(&other.m_st)) s_storage();
@@ -1058,12 +1056,9 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` results in undefined behaviour.
-     *
-     * .. warning::
-     *
-     *    ``n`` must be distinct from ``this``: if ``n`` is an ``mpz_view`` of ``this``, the behaviour will be
-     *    undefined.
+     *    with an uninitialized ``n`` results in undefined behaviour. Also, no aliasing is allowed: the data in ``n``
+     *    must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of ``this`` then
+     *    it might point to internal data of ``this``, and the behaviour of this operator will thus be undefined).
      * \endrststar
      *
      * @param n the input GMP integer.
@@ -1526,10 +1521,10 @@ public:
             const std::size_t idx = ls - 1u;
             // The most significant limb.
             const ::mp_limb_t msl = lptr[idx] & GMP_NUMB_MASK;
-            // NOTE: here we need GMP_LIMB_BITS (instead of GMP_NUMB_BITS) because builtin_clz() counts zeroes also in
-            // the nail bits.
+            // NOTE: here we need std::numeric_limits<::mp_limb_t>::digits (instead of GMP_NUMB_BITS) because
+            // builtin_clz() counts zeroes also in the nail bits.
             return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS)
-                                            + (unsigned(GMP_LIMB_BITS) - builtin_clz(msl)));
+                                            + (unsigned(std::numeric_limits<::mp_limb_t>::digits) - builtin_clz(msl)));
         }
         return 0;
 #else
