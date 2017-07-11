@@ -203,6 +203,12 @@ union real_union {
         m_st._mpfr_sign = tmp._mpfr_sign;
         m_st._mpfr_exp = tmp._mpfr_exp;
     }
+    // Clear the dynamic mpfr and destroy the dynamic member.
+    void destroy_dynamic()
+    {
+        ::mpfr_clear(&g_dy());
+        g_dy().~d_storage();
+    }
     real_union()
     {
         default_init();
@@ -218,9 +224,6 @@ union real_union {
             // Init with same precision as r, then set.
             ::mpfr_init2(&m_dy, mpfr_get_prec(&r.g_dy()));
             ::mpfr_set(&m_dy, &r.g_dy(), MPFR_RNDN);
-            // NOTE: use the function (rather than the macro) in order
-            // to avoid a warning about identical branches in recent GCC versions.
-            assert((mpfr_get_prec)(&m_dy) > 0);
         }
     }
     real_union(real_union &&r) noexcept
@@ -241,21 +244,69 @@ union real_union {
     {
         const bool s1 = is_static(), s2 = other.is_static();
         if (s1 && s2) {
-            // Self assignment is fine.
+            // Self assignment of the array in static_real *should* be fine.
             g_st() = other.g_st();
+        } else if (s1 && !s2) {
+            // Destroy static.
+            g_st().~s_storage();
+
+            // Construct the dynamic struct.
+            ::new (static_cast<void *>(&m_dy)) d_storage;
+            // Init with same precision as other, then set.
+            ::mpfr_init2(&m_dy, mpfr_get_prec(&other.g_dy()));
+            ::mpfr_set(&m_dy, &other.g_dy(), MPFR_RNDN);
+        } else if (!s1 && s2) {
+            // Destroy the dynamic member.
+            destroy_dynamic();
+
+            // Init-copy the static from other.
+            ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
+        } else {
+            // If the two precisions do not match, resize this.
+            if (mpfr_get_prec(&other.g_dy()) != mpfr_get_prec(&g_dy())) {
+                // NOTE: mpfr_set_prec() also sets to nan.
+                ::mpfr_set_prec(&g_dy(), mpfr_get_prec(&other.g_dy()));
+            }
+            ::mpfr_set(&g_dy(), &other.g_dy(), MPFR_RNDN);
         }
+        return *this;
     }
     real_union &operator=(real_union &&other) noexcept
     {
+        const bool s1 = is_static(), s2 = other.is_static();
+        if (s1 && s2) {
+            // Same as copy here.
+            g_st() = other.g_st();
+        } else if (s1 && !s2) {
+            // Destroy static.
+            g_st().~s_storage();
+
+            // Construct the dynamic struct, shallow-copying from
+            // other.
+            ::new (static_cast<void *>(&m_dy)) d_storage(other.g_dy());
+            // Downgrade the other to an empty static.
+            other.g_dy().~d_storage();
+            other.default_init();
+        } else if (!s1 && s2) {
+            // Same as copy assignment: destroy and copy-construct.
+            destroy_dynamic();
+            ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
+        } else {
+            // Swap with other. Self-assignment is fine, mpfr_swap() can have
+            // aliasing arguments.
+            ::mpfr_swap(&g_dy(), &other.g_dy());
+        }
+        return *this;
     }
     ~real_union()
     {
         assert(m_st._mpfr_prec);
         if (is_static()) {
+            assert(g_st()._mpfr_prec < 0);
             g_st().~s_storage();
         } else {
-            ::mpfr_clear(&g_dy());
-            g_dy().~d_storage();
+            assert(g_dy()._mpfr_prec > 0);
+            destroy_dynamic();
         }
     }
     // Check storage type.
