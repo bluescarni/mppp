@@ -232,30 +232,31 @@ struct static_int {
     // take care of ensuring that this invariant is respected (see dtor_checks() and
     // zero_unused_limbs(), for instance).
     static const std::size_t opt_size = 2;
-    // NOTE: init limbs to zero: in some few-limbs optimisations we operate on the whole limb
-    // array regardless of the integer size, for performance reasons. If we didn't init to zero,
-    // we would read from uninited storage and we would have wrong results as well.
+    // NOTE: init limbs to zero, in order to avoid reading uninited limbs during copies/moves
+    // (additionally, in some few-limbs optimisations we operate on the whole limb
+    // array regardless of the integer size, for performance reasons - if we didn't init to zero,
+    // we would have wrong results as well).
+    // NOTE: it might be possible here to avoid the zero init of the limbs, at least in case
+    // of static sizes > opt_size, but it's not clear to me if it is worth it to go down this path.
+    // Let's just mention it for now.
     static_int() : _mp_size(0), m_limbs()
     {
     }
     // The defaults here are good.
     static_int(const static_int &) = default;
     static_int(static_int &&) = default;
-    // Implement specifically the assignment operators, in order to ensure
-    // it is safe to self-assign. This allows us to skip self-assignment
-    // checks in the union and in integer.
-    // NOTE: I am not 100% sure there are occasions in which we need the self
-    // assignment, we are engaging in some defensive programming.
+    // Let's avoid copying the _mp_alloc member, as it is never written to and it must always
+    // have the same value.
     static_int &operator=(const static_int &other)
     {
         _mp_size = other._mp_size;
-        for (std::size_t i = 0u; i < SSize; ++i) {
-            m_limbs[i] = other.m_limbs[i];
-        }
+        // NOTE: self assignment of std::array should be fine.
+        m_limbs = other.m_limbs;
         return *this;
     }
     static_int &operator=(static_int &&other) noexcept
     {
+        // Just forward to the copy assignment.
         return operator=(other);
     }
     bool dtor_checks() const
@@ -344,7 +345,8 @@ union integer_union {
     integer_union(integer_union &&other) noexcept
     {
         if (other.is_static()) {
-            ::new (static_cast<void *>(&m_st)) s_storage(std::move(other.g_st()));
+            // Activate the static member with a copy.
+            ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
             // Activate dynamic member and shallow copy it from other.
             ::new (static_cast<void *>(&m_dy)) d_storage(other.g_dy());
@@ -390,9 +392,9 @@ union integer_union {
         } else if (s1 && !s2) {
             // Destroy static.
             g_st().~s_storage();
-            // Construct the dynamic struct.
-            ::new (static_cast<void *>(&m_dy)) d_storage;
-            m_dy = other.g_dy();
+            // Construct the dynamic struct, shallow-copying from
+            // other.
+            ::new (static_cast<void *>(&m_dy)) d_storage(other.g_dy());
             // Downgrade the other to an empty static.
             other.g_dy().~d_storage();
             ::new (static_cast<void *>(&other.m_st)) s_storage();
