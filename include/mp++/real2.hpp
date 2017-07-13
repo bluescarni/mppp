@@ -13,7 +13,6 @@
 
 #if defined(MPPP_WITH_MPFR)
 
-#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstddef>
@@ -118,6 +117,30 @@ template <std::size_t SSize>
 struct static_real {
     // Let's put a hard cap and sanity check on the static size.
     static_assert(SSize > 0u && SSize <= 64u, "Invalid static size for real2.");
+    // Zero-fill the limbs array on init. The reason we do this
+    // is that we are not sure the mpfr api will init the whole array,
+    // so we could be left with uninited values in the array, thus
+    // ending up reading uninited values during copy/move. It's not
+    // clear 100% if this is UB, but better safe than sorry.
+    // Also, the precision will be the minimum value.
+    static_real() : _mpfr_prec(-real_prec_min()), m_limbs()
+    {
+        // A temporary mpfr struct for use with the mpfr custom interface.
+        mpfr_struct_t tmp;
+        // Init the limbs first, as indicated by the mpfr docs. But first assert the static
+        // storage is enough to store a real with minimum precision.
+        static_assert(mpfr_custom_get_size(real_prec_min()) <= SSize * sizeof(::mp_limb_t),
+                      "Not enough storage in static_real to represent a real with minimum precision.");
+        mpfr_custom_init(m_limbs.data(), real_prec_min());
+        // Do the custom init with a zero value, exponent 0 (unused), minimum precision (must match
+        // the previous mpfr_custom_init() call), and the limbs array pointer.
+        mpfr_custom_init_set(&tmp, MPFR_ZERO_KIND, 0, real_prec_min(), m_limbs.data());
+
+        // Copy over from tmp. Precision has already been set.
+        assert(tmp._mpfr_prec == real_prec_min());
+        _mpfr_sign = tmp._mpfr_sign;
+        _mpfr_exp = tmp._mpfr_exp;
+    }
     mpfr_struct_t get_mpfr()
     {
         // NOTE: here we will assume the precision is set to a value which can
@@ -171,47 +194,14 @@ template <std::size_t SSize>
 union real_union {
     using s_storage = static_real<SSize>;
     using d_storage = mpfr_struct_t;
-    // Implementation of default ctor. This assumes that no member is currently active,
-    // and it will construct the static storage member with zero value and minimum precision.
-    void default_init()
-    {
-        // Activate the static member.
-        ::new (static_cast<void *>(&m_st)) s_storage;
-
-        // Static member is active. Init it with a minimum precision zero.
-        // Start by zero filling the limbs array. The reason we do this
-        // is that we are not sure the mpfr api will init the whole array,
-        // so we could be left with uninited values in the array, thus
-        // ending up reading uninited values during copy/move. It's not
-        // clear 100% if this is UB, but better safe than sorry.
-        std::fill(m_st.m_limbs.begin(), m_st.m_limbs.end(), ::mp_limb_t(0));
-
-        // A temporary mpfr struct for use with the mpfr custom interface.
-        mpfr_struct_t tmp;
-        // Init the limbs first, as indicated by the mpfr docs. But first assert the static
-        // storage is enough to store a real with minimum precision.
-        static_assert(mpfr_custom_get_size(real_prec_min()) <= SSize * sizeof(::mp_limb_t),
-                      "Not enough storage in static_real to represent a real with minimum precision.");
-        mpfr_custom_init(m_st.m_limbs.data(), real_prec_min());
-        // Do the custom init with a zero value, exponent 0 (unused), minimum precision (must match
-        // the previous mpfr_custom_init() call), and the limbs array pointer.
-        mpfr_custom_init_set(&tmp, MPFR_ZERO_KIND, 0, real_prec_min(), m_st.m_limbs.data());
-
-        // Copy over from tmp. The precision is set to the negative of the actual precision to signal static storage.
-        assert(tmp._mpfr_prec == real_prec_min());
-        m_st._mpfr_prec = -real_prec_min();
-        m_st._mpfr_sign = tmp._mpfr_sign;
-        m_st._mpfr_exp = tmp._mpfr_exp;
-    }
     // Clear the dynamic mpfr and destroy the dynamic member.
     void destroy_dynamic()
     {
         ::mpfr_clear(&g_dy());
         g_dy().~d_storage();
     }
-    real_union()
+    real_union() : m_st()
     {
-        default_init();
     }
     real_union(const real_union &r)
     {
@@ -237,7 +227,7 @@ union real_union {
 
             // Deactivate the static storage in r, and default-init to static.
             r.g_dy().~d_storage();
-            r.default_init();
+            ::new (static_cast<void *>(&r.m_st)) s_storage();
         }
     }
     real_union &operator=(const real_union &other)
@@ -286,7 +276,7 @@ union real_union {
             ::new (static_cast<void *>(&m_dy)) d_storage(other.g_dy());
             // Downgrade the other to an empty static.
             other.g_dy().~d_storage();
-            other.default_init();
+            ::new (static_cast<void *>(&other.m_st)) s_storage();
         } else if (!s1 && s2) {
             // Same as copy assignment: destroy and copy-construct.
             destroy_dynamic();
