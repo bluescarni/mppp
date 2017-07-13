@@ -238,6 +238,11 @@ struct static_int {
     static_int() : _mp_size(0), m_limbs()
     {
     }
+    // Default the rest.
+    static_int(const static_int &) = default;
+    static_int(static_int &&) = default;
+    static_int &operator=(const static_int &) = default;
+    static_int &operator=(static_int &&) = default;
     bool dtor_checks() const
     {
         // LCOV_EXCL_START
