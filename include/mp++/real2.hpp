@@ -252,11 +252,10 @@ union real_union {
             // Init-copy the static from other.
             ::new (static_cast<void *>(&m_st)) s_storage(other.g_st());
         } else {
-            // If the two precisions do not match, resize this.
-            if (mpfr_get_prec(&other.g_dy()) != mpfr_get_prec(&g_dy())) {
-                // NOTE: mpfr_set_prec() also sets to nan.
-                ::mpfr_set_prec(&g_dy(), mpfr_get_prec(&other.g_dy()));
-            }
+            // Set the precision of this to the precision of other.
+            // NOTE: mpfr_set_prec() also sets to nan.
+            ::mpfr_set_prec(&g_dy(), mpfr_get_prec(&other.g_dy()));
+            // Set the value.
             ::mpfr_set(&g_dy(), &other.g_dy(), MPFR_RNDN);
         }
         return *this;
@@ -338,9 +337,15 @@ union real_union {
 template <std::size_t SSize>
 class real2
 {
+    using s_storage = typename real_union<SSize>::s_storage;
+    using d_storage = typename real_union<SSize>::d_storage;
+
 public:
     real2() = default;
     real2(const real2 &) = default;
+    real2(real2 &&) = default;
+    real2 &operator=(const real2 &) = default;
+    real2 &operator=(real2 &&) = default;
     bool is_static() const
     {
         return m_real.is_static();
@@ -353,6 +358,86 @@ public:
     {
         return static_cast<::mpfr_prec_t>(m_real.m_st._mpfr_prec > 0 ? m_real.m_st._mpfr_prec
                                                                      : -m_real.m_st._mpfr_prec);
+    }
+
+private:
+    static void check_prec(::mpfr_prec_t prec)
+    {
+        if (mppp_unlikely(prec > real_prec_max() || prec < real_prec_min())) {
+            throw std::invalid_argument("An invalid precision of " + std::to_string(prec)
+                                        + " was specified for a real object (the minimum allowed precision is "
+                                        + std::to_string(real_prec_min()) + ", while the maximum allowed precision is "
+                                        + std::to_string(real_prec_max()) + ")");
+        }
+    }
+
+public:
+    real2 &set_prec(::mpfr_prec_t prec)
+    {
+        check_prec(prec);
+        mpfr_struct_t tmp;
+        if (is_static()) {
+            if (prec <= static_real<SSize>::max_prec()) {
+                // The new precision still fits in static storage. We will first create a new MPFR
+                // with the custom interface, using the old value and the new precision. We will then copy
+                // it to this.
+                // NOTE: zero init the limbs array, as usual.
+                std::array<::mp_limb_t, SSize> limbs{};
+                mpfr_custom_init(limbs.data(), prec);
+                mpfr_custom_init_set(&tmp, MPFR_NAN_KIND, 0, prec, limbs.data());
+                // Now assign the existing static to tmp, using the new precision.
+                const auto cur = m_real.g_st().get_mpfr_c();
+                ::mpfr_set(&tmp, &cur, MPFR_RNDN);
+                // Finally, copy over from tmp to the static.
+                assert(tmp._mpfr_prec == prec);
+                m_real.g_st()._mpfr_prec = -prec;
+                m_real.g_st()._mpfr_sign = tmp._mpfr_sign;
+                m_real.g_st()._mpfr_exp = tmp._mpfr_exp;
+                m_real.g_st().m_limbs = limbs;
+            } else {
+                // The desired precision exceeds the maximum static precision. We will build a normal
+                // mpfr_t and then move it into the dynamic storage.
+                ::mpfr_init2(&tmp, prec);
+                // NOTE: everything is no except from now on, no risk of memory leaks.
+                // Now assign the existing static to tmp.
+                const auto cur = m_real.g_st().get_mpfr_c();
+                ::mpfr_set(&tmp, &cur, MPFR_RNDN);
+                // Destroy the static, shallow init the dynamic.
+                m_real.g_st().~s_storage();
+                ::new (static_cast<void *>(&m_real.m_dy)) d_storage(tmp);
+            }
+        } else {
+            if (prec <= static_real<SSize>::max_prec()) {
+                // We can demote from dynamic to static. First we create a new MPFR with the custom
+                // interface, using the old value and the new precision. We will then copy
+                // it to this.
+                std::array<::mp_limb_t, SSize> limbs{};
+                mpfr_custom_init(limbs.data(), prec);
+                mpfr_custom_init_set(&tmp, MPFR_NAN_KIND, 0, prec, limbs.data());
+                ::mpfr_set(&tmp, &m_real.g_dy(), MPFR_RNDN);
+                // Now we can destroy the dynamic member of this, and init the static one.
+                m_real.destroy_dynamic();
+                // NOTE: there is some overhead here, as we are spending time initing
+                // a static member with min prec and zero value. Consider in the future
+                // providing an alternate init form which does less work, to be used here.
+                ::new (static_cast<void *>(&m_real.m_st)) s_storage();
+                // Finally, copy over from tmp to the static.
+                assert(tmp._mpfr_prec == prec);
+                m_real.g_st()._mpfr_prec = -prec;
+                m_real.g_st()._mpfr_sign = tmp._mpfr_sign;
+                m_real.g_st()._mpfr_exp = tmp._mpfr_exp;
+                m_real.g_st().m_limbs = limbs;
+            } else {
+                // Store a copy of this, as mpfr_set_prec() will erase the value.
+                MPPP_MAYBE_TLS mpfr_raii mpfr(real_prec_min());
+                ::mpfr_set_prec(&mpfr.m_mpfr, mpfr_get_prec(&m_real.g_dy()));
+                ::mpfr_set(&mpfr.m_mpfr, &m_real.g_dy(), MPFR_RNDN);
+                // Set the new precision, recover old value from the tmp copy.
+                ::mpfr_set_prec(&m_real.g_dy(), prec);
+                ::mpfr_set(&m_real.g_dy(), &mpfr.m_mpfr, MPFR_RNDN);
+            }
+        }
+        return *this;
     }
     const real_union<SSize> &_get_union() const
     {
