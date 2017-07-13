@@ -238,26 +238,6 @@ struct static_int {
     static_int() : _mp_size(0), m_limbs()
     {
     }
-    // The defaults here are good.
-    static_int(const static_int &) = default;
-    static_int(static_int &&) = default;
-    // Implement specifically the assignment operators, in order to ensure
-    // it is safe to self-assign. This allows us to skip self-assignment
-    // checks in the union and in integer.
-    // NOTE: I am not 100% sure there are occasions in which we need the self
-    // assignment, we are engaging in some defensive programming.
-    static_int &operator=(const static_int &other)
-    {
-        _mp_size = other._mp_size;
-        for (std::size_t i = 0u; i < SSize; ++i) {
-            m_limbs[i] = other.m_limbs[i];
-        }
-        return *this;
-    }
-    static_int &operator=(static_int &&other) noexcept
-    {
-        return operator=(other);
-    }
     bool dtor_checks() const
     {
         // LCOV_EXCL_START
