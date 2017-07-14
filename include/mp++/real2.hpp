@@ -16,6 +16,7 @@
 #include <array>
 #include <cassert>
 #include <cstddef>
+#include <initializer_list>
 #include <iostream>
 #include <limits>
 #include <mp++/detail/mpfr.hpp>
@@ -77,6 +78,19 @@ static_assert(real_prec_min() <= real_prec_max(),
 // Helper function to print an mpfr to stream in base 10.
 inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os)
 {
+    // Special values first.
+    if (mpfr_nan_p(r)) {
+        os << "nan";
+        return;
+    }
+    if (mpfr_inf_p(r)) {
+        if (mpfr_sgn(r) < 0) {
+            os << "-";
+        }
+        os << "inf";
+        return;
+    }
+
     // Get the string fractional representation via the MPFR function,
     // and wrap it into a smart pointer.
     ::mpfr_exp_t exp(0);
@@ -382,7 +396,10 @@ public:
                 // with the custom interface, using the old value and the new precision. We will then copy
                 // it to this.
                 // NOTE: zero init the limbs array, as usual.
-                std::array<::mp_limb_t, SSize> limbs{};
+                // NOTE: use the double nested brackets syntax to work around a GCC<5 warning bug. This should
+                // be ok, as std::array is guaranteed to have the same semantics as a class with an array member,
+                // and the inner {} value-inits that member.
+                std::array<::mp_limb_t, SSize> limbs{{}};
                 mpfr_custom_init(limbs.data(), prec);
                 mpfr_custom_init_set(&tmp, MPFR_NAN_KIND, 0, prec, limbs.data());
                 // Now assign the existing static to tmp, using the new precision.
@@ -411,7 +428,7 @@ public:
                 // We can demote from dynamic to static. First we create a new MPFR with the custom
                 // interface, using the old value and the new precision. We will then copy
                 // it to this.
-                std::array<::mp_limb_t, SSize> limbs{};
+                std::array<::mp_limb_t, SSize> limbs{{}};
                 mpfr_custom_init(limbs.data(), prec);
                 mpfr_custom_init_set(&tmp, MPFR_NAN_KIND, 0, prec, limbs.data());
                 ::mpfr_set(&tmp, &m_real.g_dy(), MPFR_RNDN);
