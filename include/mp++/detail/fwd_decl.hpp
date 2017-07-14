@@ -22,7 +22,8 @@ class integer;
 template <std::size_t>
 class rational;
 
-#if defined(MPPP_WITH_ARB)
+#if defined(MPPP_WITH_MPFR)
+template <std::size_t>
 class real;
 #endif
 }

@@ -15,7 +15,7 @@ using namespace mppp;
 
 TEST_CASE("real constructors")
 {
-    real2<1> r, r2{r};
+    real<1> r, r2{r};
     std::cout << real_prec_min() << '\n';
     std::cout << real_prec_max() << '\n';
     std::cout << r << '\n';

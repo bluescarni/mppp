@@ -6,8 +6,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#ifndef MPPP_REAL2_HPP
-#define MPPP_REAL2_HPP
+#ifndef MPPP_REAL_HPP
+#define MPPP_REAL_HPP
 
 #include <mp++/config.hpp>
 
@@ -19,8 +19,12 @@
 #include <initializer_list>
 #include <iostream>
 #include <limits>
+#include <mp++/concepts.hpp>
+#include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -130,7 +134,7 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os)
 template <std::size_t SSize>
 struct static_real {
     // Let's put a hard cap and sanity check on the static size.
-    static_assert(SSize > 0u && SSize <= 64u, "Invalid static size for real2.");
+    static_assert(SSize > 0u && SSize <= 64u, "Invalid static size for real.");
     // Zero-fill the limbs array on init. The reason we do this
     // is that we are not sure the mpfr api will init the whole array,
     // so we could be left with uninited values in the array, thus
@@ -348,18 +352,28 @@ union real_union {
 };
 }
 
+template <typename T>
+using is_real_interoperable = disjunction<is_cpp_interoperable<T>, is_integer<T>, is_rational<T>>;
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RealInteroperable = is_real_interoperable<T>::value;
+#else
+using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, int>;
+#endif
+
 template <std::size_t SSize>
-class real2
+class real
 {
     using s_storage = typename real_union<SSize>::s_storage;
     using d_storage = typename real_union<SSize>::d_storage;
 
 public:
-    real2() = default;
-    real2(const real2 &) = default;
-    real2(real2 &&) = default;
-    real2 &operator=(const real2 &) = default;
-    real2 &operator=(real2 &&) = default;
+    real() = default;
+    real(const real &) = default;
+    real(real &&) = default;
+    real &operator=(const real &) = default;
+    real &operator=(real &&) = default;
     bool is_static() const
     {
         return m_real.is_static();
@@ -386,7 +400,7 @@ private:
     }
 
 public:
-    real2 &set_prec(::mpfr_prec_t prec)
+    real &set_prec(::mpfr_prec_t prec)
     {
         check_prec(prec);
         mpfr_struct_t tmp;
@@ -470,7 +484,7 @@ private:
 };
 
 template <std::size_t SSize>
-inline std::ostream &operator<<(std::ostream &os, const real2<SSize> &r)
+inline std::ostream &operator<<(std::ostream &os, const real<SSize> &r)
 {
     if (r.is_static()) {
         const auto m = r._get_union().g_st().get_mpfr_c();
@@ -484,7 +498,7 @@ inline std::ostream &operator<<(std::ostream &os, const real2<SSize> &r)
 
 #else
 
-#error The real2.hpp header was included but mp++ was not configured with the MPPP_WITH_MPFR option.
+#error The real.hpp header was included but mp++ was not configured with the MPPP_WITH_MPFR option.
 
 #endif
 
