@@ -49,4 +49,33 @@ TEST_CASE("real constructors")
     std::cout << real<1>{integer<1>{"20392183092138120398120938109283091283098120938019283091283"}, 32} << '\n';
     std::cout << real<1>{integer<1>{"20392183092138120398120938109283091283098120938019283091283"}, 32}.get_prec()
               << '\n';
+    std::cout << real<1>{rational<1>{"20392183092138120398120938109/283091283098120938019283091283"}} << '\n';
+    std::cout << real<1>{rational<1>{"20392183092138120398120938109/283091283098120938019283091283"}}.get_prec()
+              << '\n';
+    std::cout << real<1>{rational<1>{"20392183092138120398120938109/283091283098120938019283091283"}, 32} << '\n';
+    std::cout << real<1>{rational<1>{"20392183092138120398120938109/283091283098120938019283091283"}, 32}.get_prec()
+              << '\n';
+    std::cout << real<1>{12345678u} << '\n';
+    std::cout << real<1>{12345678u}.get_prec() << '\n';
+    std::cout << real<1>{12345678u, 12} << '\n';
+    std::cout << real<1>{12345678u, 12}.get_prec() << '\n';
+    std::cout << real<1>{-12345678l} << '\n';
+    std::cout << real<1>{-12345678l}.get_prec() << '\n';
+    std::cout << real<1>{-12345678l, 12} << '\n';
+    std::cout << real<1>{-12345678l, 12}.get_prec() << '\n';
+
+    std::cout << real<1>{-1.1f} << '\n';
+    std::cout << real<1>{-1.1f}.get_prec() << '\n';
+    std::cout << real<1>{-1.1f, 12} << '\n';
+    std::cout << real<1>{-1.1f, 12}.get_prec() << '\n';
+
+    std::cout << real<1>{-1.1} << '\n';
+    std::cout << real<1>{-1.1}.get_prec() << '\n';
+    std::cout << real<1>{-1.1, 12} << '\n';
+    std::cout << real<1>{-1.1, 12}.get_prec() << '\n';
+
+    std::cout << real<1>{-1.1l} << '\n';
+    std::cout << real<1>{-1.1l}.get_prec() << '\n';
+    std::cout << real<1>{-1.1l, 12} << '\n';
+    std::cout << real<1>{-1.1l, 12}.get_prec() << '\n';
 }

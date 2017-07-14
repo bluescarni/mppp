@@ -414,17 +414,11 @@ private:
             ::mpfr_set_z(&m_real.g_dy(), n.get_mpz_view(), MPFR_RNDN);
         }
     }
-#if 0
-    template <std::size_t SSize>
-    void dispatch_generic_ctor(const rational<SSize> &q, slong prec)
+    template <std::size_t S>
+    void dispatch_generic_ctor(const rational<S> &q, ::mpfr_prec_t prec)
     {
-        // Setup a temporary mpfr real. We will set the actual precision later as needed.
-        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(min_prec()));
-
-        if (prec) {
-            // prec is given explicitly. Attempt to set it (this will check it as well).
-            set_prec(prec);
-        } else {
+        if (!prec) {
+            // If the precision is not given explicitly, we will infer it.
             // Compute the number of bits used by q.
             const auto n_size = q.get_num().size();
             const auto d_size = q.get_den().size();
@@ -434,101 +428,97 @@ private:
                     // Overflow in tot_size.
                     (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
                     // Check that tot_size * GMP_NUMB_BITS <= max_prec.
-                    || (tot_size
-                        > static_cast<std::make_unsigned<slong>::type>(max_prec()) / unsigned(GMP_NUMB_BITS)))) {
+                    || (tot_size > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(real_prec_max())
+                                       / unsigned(GMP_NUMB_BITS)))) {
                 throw std::invalid_argument(
                     "The deduced precision for a real constructed from a rational is too large");
             }
-            // Set the precision directly. We already know it's a non-negative value not greater
+            // Compute the precision. We already know it's a non-negative value not greater
             // than the max allowed precision. We just need to make sure it's not smaller than the
             // min allowed precision.
-            m_prec = c_max(static_cast<slong>(static_cast<slong>(tot_size) * int(GMP_NUMB_BITS)), min_prec());
+            prec = c_max(static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(tot_size) * int(GMP_NUMB_BITS)),
+                         real_prec_min());
         }
-
-        // Set the precision of the tmp mpfr.
-        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(get_prec()));
-        // mpq to mpfr.
-        ::mpfr_set_q(&mpfr.m_mpfr, q.get_mpq_view(), MPFR_RNDN);
-        // mpfr to arf. All noexcept from now on.
-        ::arf_init(&m_arf);
-        ::arf_set_mpfr(&m_arf, &mpfr.m_mpfr);
+        // Set the precision (manually specified or deduced).
+        set_prec(prec);
+        if (is_static()) {
+            auto tmp = m_real.g_st().get_mpfr();
+            ::mpfr_set_q(&tmp, q.get_mpq_view(), MPFR_RNDN);
+            // Copy over.
+            m_real.g_st().set_mpfr_nl(tmp);
+        } else {
+            ::mpfr_set_q(&m_real.g_dy(), q.get_mpq_view(), MPFR_RNDN);
+        }
     }
+    // NOTE: for signed/unsigned int init, there are MPFR functions working with (u)intmax_t. However, they
+    // create constraints on the inclusion order, so let's just use the (u)long functions for now.
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
-    void dispatch_generic_ctor(T n, slong prec)
+    void dispatch_generic_ctor(T n, ::mpfr_prec_t prec)
     {
-        if (n <= std::numeric_limits<ulong>::max()) {
-            if (prec) {
-                // Check and set the desired precision.
-                set_prec(prec);
-                // Init and then set with rounding. All noexcept.
-                ::arf_init(&m_arf);
-                ::arf_set_round_ui(&m_arf, static_cast<ulong>(n), get_prec(), ARF_RND_NEAR);
+        if (n <= std::numeric_limits<unsigned long>::max()) {
+            if (!prec) {
+                static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(),
+                              "Overflow error.");
+                prec = c_max(real_prec_min(), static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits));
+            }
+            set_prec(prec);
+            if (is_static()) {
+                auto tmp = m_real.g_st().get_mpfr();
+                ::mpfr_set_ui(&tmp, static_cast<unsigned long>(n), MPFR_RNDN);
+                m_real.g_st().set_mpfr_nl(tmp);
             } else {
-                static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
-                // Check and set the detected precision.
-                set_prec(c_max(min_prec(), static_cast<slong>(std::numeric_limits<T>::digits)));
-                // Init and set exactly.
-                ::arf_init_set_ui(&m_arf, static_cast<ulong>(n));
+                ::mpfr_set_ui(&m_real.g_dy(), static_cast<unsigned long>(n), MPFR_RNDN);
             }
         } else {
             dispatch_generic_ctor(integer<1>{n}, prec);
         }
     }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
-    void dispatch_generic_ctor(T n, slong prec)
+    void dispatch_generic_ctor(T n, ::mpfr_prec_t prec)
     {
-        if (n <= std::numeric_limits<slong>::max() && n >= std::numeric_limits<slong>::min()) {
-            if (prec) {
-                // Check and set the desired precision.
-                set_prec(prec);
-                // Init and then set with rounding. All noexcept.
-                ::arf_init(&m_arf);
-                ::arf_set_round_si(&m_arf, static_cast<slong>(n), get_prec(), ARF_RND_NEAR);
+        if (n <= std::numeric_limits<long>::max() && n >= std::numeric_limits<long>::min()) {
+            if (!prec) {
+                static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(),
+                              "Overflow error.");
+                prec = c_max(real_prec_min(), static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits));
+            }
+            set_prec(prec);
+            if (is_static()) {
+                auto tmp = m_real.g_st().get_mpfr();
+                ::mpfr_set_si(&tmp, static_cast<long>(n), MPFR_RNDN);
+                m_real.g_st().set_mpfr_nl(tmp);
             } else {
-                static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
-                // Check and set the detected precision.
-                set_prec(c_max(min_prec(), static_cast<slong>(std::numeric_limits<T>::digits)));
-                // Init and set exactly.
-                ::arf_init_set_si(&m_arf, static_cast<slong>(n));
+                ::mpfr_set_si(&m_real.g_dy(), static_cast<long>(n), MPFR_RNDN);
             }
         } else {
             dispatch_generic_ctor(integer<1>{n}, prec);
         }
     }
-    template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
-    void dispatch_generic_ctor(T x, slong prec)
+    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    void dispatch_generic_ctor(T x, ::mpfr_prec_t prec)
     {
         static_assert(std::numeric_limits<T>::radix == 2, "The float/double type's radix is not 2.");
-        static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
+        static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
         // Check and set the precision, either autodetected or specified.
-        set_prec(prec ? prec : c_max(min_prec(), static_cast<slong>(std::numeric_limits<T>::digits)));
-        // Init and set exactly. All noexcept from now on.
-        ::arf_init(&m_arf);
-        ::arf_set_d(&m_arf, static_cast<double>(x));
-        // If the configured precision is less than the precision of the significand of T,
-        // we need to round.
-        if (get_prec() < std::numeric_limits<T>::digits) {
-            round();
+        set_prec(prec ? prec : c_max(real_prec_min(), static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)));
+        // Helper to invoke the correct mpfr function.
+        auto setter = [x](::mpfr_t m) {
+            if (std::is_same<T, float>::value) {
+                ::mpfr_set_flt(m, static_cast<float>(x), MPFR_RNDN);
+            } else if (std::is_same<T, double>::value) {
+                ::mpfr_set_d(m, static_cast<double>(x), MPFR_RNDN);
+            } else {
+                ::mpfr_set_ld(m, static_cast<long double>(x), MPFR_RNDN);
+            }
+        };
+        if (is_static()) {
+            auto tmp = m_real.g_st().get_mpfr();
+            setter(&tmp);
+            m_real.g_st().set_mpfr_nl(tmp);
+        } else {
+            setter(&m_real.g_dy());
         }
     }
-    void dispatch_generic_ctor(long double x, slong prec)
-    {
-        static_assert(std::numeric_limits<long double>::radix == 2, "The long double type's radix is not 2.");
-        static_assert(std::numeric_limits<long double>::digits <= std::numeric_limits<slong>::max(), "Overflow error.");
-        // Check and set the precision, either autodetected or specified.
-        set_prec(prec ? prec : c_max(min_prec(), static_cast<slong>(std::numeric_limits<long double>::digits)));
-
-        // Setup the temp mpfr.
-        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(min_prec()));
-        // Set the configured precision.
-        ::mpfr_set_prec(&mpfr.m_mpfr, static_cast<::mpfr_prec_t>(get_prec()));
-        // Set the value.
-        ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
-        // Init and set exactly. All noexcept from now on.
-        ::arf_init(&m_arf);
-        ::arf_set_mpfr(&m_arf, &mpfr.m_mpfr);
-    }
-#endif
 
 public:
 /// Generic constructor.
