@@ -44,4 +44,9 @@ TEST_CASE("real constructors")
     std::cout << static_real<5>::max_prec() << '\n';
     std::cout << static_real<6>::max_prec() << '\n';
     constexpr auto foo = static_real<1>::max_prec();
+    std::cout << real<1>{integer<1>{"20392183092138120398120938109283091283098120938019283091283"}} << '\n';
+    std::cout << real<1>{integer<1>{"20392183092138120398120938109283091283098120938019283091283"}}.get_prec() << '\n';
+    std::cout << real<1>{integer<1>{"20392183092138120398120938109283091283098120938019283091283"}, 32} << '\n';
+    std::cout << real<1>{integer<1>{"20392183092138120398120938109283091283098120938019283091283"}, 32}.get_prec()
+              << '\n';
 }
