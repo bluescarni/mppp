@@ -232,11 +232,32 @@ struct static_int {
     // take care of ensuring that this invariant is respected (see dtor_checks() and
     // zero_unused_limbs(), for instance).
     static const std::size_t opt_size = 2;
-    // NOTE: init limbs to zero: in some few-limbs optimisations we operate on the whole limb
-    // array regardless of the integer size, for performance reasons. If we didn't init to zero,
-    // we would read from uninited storage and we would have wrong results as well.
+    // NOTE: init limbs to zero, in order to avoid reading uninited limbs during copies/moves
+    // (additionally, in some few-limbs optimisations we operate on the whole limb
+    // array regardless of the integer size, for performance reasons - if we didn't init to zero,
+    // we would have wrong results as well).
+    // NOTE: it might be possible here to avoid the zero init of the limbs, at least in case
+    // of static sizes > opt_size, but it's not clear to me if it is worth it to go down this path.
+    // Let's just mention it for now.
     static_int() : _mp_size(0), m_limbs()
     {
+    }
+    // The defaults here are good.
+    static_int(const static_int &) = default;
+    static_int(static_int &&) = default;
+    // Let's avoid copying the _mp_alloc member, as it is never written to and it must always
+    // have the same value.
+    static_int &operator=(const static_int &other)
+    {
+        _mp_size = other._mp_size;
+        // NOTE: self assignment of std::array should be fine.
+        m_limbs = other.m_limbs;
+        return *this;
+    }
+    static_int &operator=(static_int &&other) noexcept
+    {
+        // Just forward to the copy assignment.
+        return operator=(other);
     }
     bool dtor_checks() const
     {
