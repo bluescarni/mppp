@@ -9,6 +9,18 @@ The ``integer`` class
 .. doxygenclass:: mppp::integer
    :members:
 
+Types
+-----
+
+.. cpp:type:: mp_bitcnt_t
+
+   This type is defined by the GMP library. It is an unsigned integral type used to count bits in a multiprecision
+   number.
+
+   .. seealso::
+
+      https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types
+
 Concepts
 --------
 
