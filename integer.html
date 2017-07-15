@@ -68,6 +68,7 @@
 <li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Multiprecision integers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#the-integer-class">The <code class="docutils literal"><span class="pre">integer</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#types">Types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#concepts">Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#assignment">Assignment</a></li>
@@ -907,6 +908,20 @@ pointer.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="types">
+<h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv211mp_bitcnt_t">
+<span id="mp_bitcnt_t"></span><em class="property">type </em><code class="descclassname"></code><code class="descname">mp_bitcnt_t</code><a class="headerlink" href="#_CPPv211mp_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This type is defined by the GMP library. It is an unsigned integral type used to count bits in a multiprecision
+number.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types">https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types</a></p>
+</div>
+</dd></dl>
+
+</div>
 <div class="section" id="concepts">
 <h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
 <dl class="concept">
@@ -1137,7 +1152,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp8mul_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t">
-<span id="mppp::mul_2exp__integer:SSize:R.integer:SSize:CR.mp_bitcnt_t"></span><span class="target" id="mp++group__integer__arithmetic_1ga125e8846815bb9d69be0849aa95e8a95"></span>void <code class="descclassname">mppp::</code><code class="descname">mul_2exp</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, mp_bitcnt_t <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8mul_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mul_2exp__integer:SSize:R.integer:SSize:CR.mp_bitcnt_t"></span><span class="target" id="mp++group__integer__arithmetic_1ga125e8846815bb9d69be0849aa95e8a95"></span>void <code class="descclassname">mppp::</code><code class="descname">mul_2exp</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv211mp_bitcnt_t" title="mp_bitcnt_t">mp_bitcnt_t</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8mul_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary left shift. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">n</span></code> multiplied by <code class="docutils literal"><span class="pre">2**s</span></code>.</p>
 <p><dl class="docutils">
@@ -1305,7 +1320,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp11tdiv_q_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t">
-<span id="mppp::tdiv_q_2exp__integer:SSize:R.integer:SSize:CR.mp_bitcnt_t"></span><span class="target" id="mp++group__integer__division_1ga8a002045a55b187aae38172de1245cb7"></span>void <code class="descclassname">mppp::</code><code class="descname">tdiv_q_2exp</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, mp_bitcnt_t <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp11tdiv_q_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::tdiv_q_2exp__integer:SSize:R.integer:SSize:CR.mp_bitcnt_t"></span><span class="target" id="mp++group__integer__division_1ga8a002045a55b187aae38172de1245cb7"></span>void <code class="descclassname">mppp::</code><code class="descname">tdiv_q_2exp</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv211mp_bitcnt_t" title="mp_bitcnt_t">mp_bitcnt_t</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp11tdiv_q_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary right shift. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">n</span></code> divided by <code class="docutils literal"><span class="pre">2**s</span></code>. <code class="docutils literal"><span class="pre">rop</span></code> will be the truncated result of the division.</p>
 <p><dl class="docutils">
