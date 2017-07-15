@@ -13,8 +13,8 @@
 #include <mp++/exceptions.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
-#if defined(MPPP_WITH_ARB)
-#include <mp++/real.hpp>
+#if defined(MPPP_WITH_MPFR)
+#include <mp++/real2.hpp>
 #endif
 
 #endif

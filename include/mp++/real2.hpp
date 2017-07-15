@@ -298,8 +298,7 @@ union real_union {
             // Destroy static.
             g_st().~s_storage();
 
-            // Construct the dynamic struct, shallow-copying from
-            // other.
+            // Construct the dynamic struct, shallow-copying from other.
             ::new (static_cast<void *>(&m_dy)) d_storage(other.g_dy());
             // Downgrade the other to an empty static.
             other.g_dy().~d_storage();
@@ -596,9 +595,22 @@ private:
 public:
     real &set_prec(::mpfr_prec_t prec)
     {
+        // Determine storage type and current prec.
+        bool st = false;
+        ::mpfr_prec_t cur_prec = m_real.m_st._mpfr_prec;
+        if (cur_prec < 0) {
+            st = true;
+            cur_prec = -cur_prec;
+        }
+
+        // Shortcut if there's nothing to do.
+        if (cur_prec == prec) {
+            return *this;
+        }
+
         check_prec(prec);
         mpfr_struct_t tmp;
-        if (is_static()) {
+        if (st) {
             if (prec <= static_real<SSize>::max_prec()) {
                 // The new precision still fits in static storage. We will first create a new MPFR
                 // with the custom interface, using the old value and the new precision. We will then copy
@@ -683,6 +695,58 @@ inline std::ostream &operator<<(std::ostream &os, const real<SSize> &r)
         mpfr_to_stream(&r._get_union().g_dy(), os);
     }
     return os;
+}
+
+inline namespace detail
+{
+
+template <int (*FPtr)(::mpfr_ptr, ::mpfr_srcptr, ::mpfr_srcptr, ::mpfr_rnd_t), std::size_t SSize>
+inline void mpfr_binary_op(real<SSize> &rop, const real<SSize> &op1, const real<SSize> &op2)
+{
+    // Determine storage type of the two operands, and the precision of rop.
+    bool s1 = false, s2 = false;
+    ::mpfr_prec_t p1 = op1._get_union().m_st._mpfr_prec, p2 = op1._get_union().m_st._mpfr_prec;
+    if (p1 < 0) {
+        s1 = true;
+        p1 = -p1;
+    }
+    if (p2 < 0) {
+        s2 = true;
+        p2 = -p2;
+    }
+    // Set the output precision.
+    // TODO preserve?
+    rop.set_prec(c_max(p1, p2));
+
+    if (s1 && s2) {
+        // Both are static, rp also static as a consequence.
+        const auto m1 = op1._get_union().g_st().get_mpfr_c();
+        const auto m2 = op2._get_union().g_st().get_mpfr_c();
+        auto mr = rop._get_union().g_st().get_mpfr();
+        FPtr(&mr, &m1, &m2, MPFR_RNDN);
+        rop._get_union().g_st().set_mpfr_nl(mr);
+    } else if (s1 && !s2) {
+        const auto m1 = op1._get_union().g_st().get_mpfr_c();
+        FPtr(&rop._get_union().g_dy(), &m1, &op2._get_union().g_dy(), MPFR_RNDN);
+    } else if (!s1 && s2) {
+        const auto m2 = op2._get_union().g_st().get_mpfr_c();
+        FPtr(&rop._get_union().g_dy(), &op1._get_union().g_dy(), &m2, MPFR_RNDN);
+    } else {
+        FPtr(&rop._get_union().g_dy(), &op1._get_union().g_dy(), &op2._get_union().g_dy(), MPFR_RNDN);
+    }
+}
+}
+
+template <std::size_t SSize>
+inline void add(real<SSize> &rop, const real<SSize> &op1, const real<SSize> &op2)
+{
+    mpfr_binary_op<::mpfr_add>(rop, op1, op2);
+}
+
+template <std::size_t SSize>
+inline void mul(real<SSize> &rop, const real<SSize> &op1, const real<SSize> &op2)
+{
+    mpfr_binary_op<::mpfr_mul>(rop, op1, op2);
 }
 }
 

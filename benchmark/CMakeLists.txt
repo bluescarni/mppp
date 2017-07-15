@@ -30,6 +30,6 @@ ADD_MPPP_BENCHMARK(bench_vec_mul_2)
 ADD_MPPP_BENCHMARK(bench_vec_mul_3)
 ADD_MPPP_BENCHMARK(bench_sort_1)
 
-if(MPPP_WITH_ARB)
+if(MPPP_WITH_MPFR)
   ADD_MPPP_BENCHMARK(real_vec_mul)
 endif()
