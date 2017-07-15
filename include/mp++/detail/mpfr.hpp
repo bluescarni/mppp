@@ -9,11 +9,9 @@
 #ifndef MPPP_DETAIL_MPFR_HPP
 #define MPPP_DETAIL_MPFR_HPP
 
-#include <mp++/config.hpp>
-
-#if defined(MPPP_WITH_MPFR)
-
+#include <cstdlib>
 #include <limits>
+#include <memory>
 #include <mpfr.h>
 #include <type_traits>
 
@@ -46,7 +44,9 @@ struct mpfr_raii {
     }
     mpfr_struct_t m_mpfr;
 };
-}
+
+// Smart pointer to handle the string output from mpfr.
+using smart_mpfr_str = std::unique_ptr<char, void (*)(char *)>;
 
 // A couple of sanity checks when constructing temporary mpfrs/mpfs from long double.
 static_assert(std::numeric_limits<long double>::digits10 < std::numeric_limits<int>::max() / 4, "Overflow error.");
@@ -54,12 +54,30 @@ static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limi
               "Overflow error.");
 static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limits<::mp_bitcnt_t>::max(),
               "Overflow error.");
+
+// Machinery to call automatically mpfr_free_cache() at program shutdown,
+// if this header is included.
+struct mpfr_cleanup {
+    mpfr_cleanup()
+    {
+        std::atexit(::mpfr_free_cache);
+    }
+};
+
+template <typename = void>
+struct mpfr_cleanup_holder {
+    static mpfr_cleanup s_cleanup;
+};
+
+template <typename T>
+mpfr_cleanup mpfr_cleanup_holder<T>::s_cleanup;
+
+inline void inst_mpfr_cleanup()
+{
+    auto ptr = &mpfr_cleanup_holder<>::s_cleanup;
+    (void)ptr;
 }
-
-#else
-
-#error The 'mpfr.hpp' header was included but mp++ was not installed with MPFR support.
-
-#endif
+}
+}
 
 #endif
