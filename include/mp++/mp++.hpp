@@ -13,5 +13,8 @@
 #include <mp++/exceptions.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
+#if defined(MPPP_WITH_QUADMATH)
+#include <mp++/real128.hpp>
+#endif
 
 #endif
