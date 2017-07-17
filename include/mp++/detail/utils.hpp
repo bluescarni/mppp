@@ -49,16 +49,6 @@ inline std::string to_string(const T &x)
 {
     return x.to_string();
 }
-
-// Compute a power of 2 value of the signed integer type T that can be safely negated.
-template <typename T>
-constexpr T safe_abs(T cur_p = T(1), T cur_n = T(-1))
-{
-    static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
-    return (cur_p > std::numeric_limits<T>::max() / T(2) || cur_n < std::numeric_limits<T>::min() / T(2))
-               ? cur_p
-               : safe_abs(static_cast<T>(cur_p * 2), static_cast<T>(cur_n * 2));
-}
 }
 }
 

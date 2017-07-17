@@ -827,10 +827,20 @@ private:
         assert(false);
     }
     // Dispatch for generic constructor.
+    // Move this outside the method below in order to avoid a GCC warning.
+    template <typename T>
+    static bool uint_fits_single_limb(T n)
+    {
+        return n <= GMP_NUMB_MAX;
+    }
+    static bool uint_fits_single_limb(bool)
+    {
+        return true;
+    }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
-        if (n <= GMP_NUMB_MAX) {
+        if (uint_fits_single_limb(n)) {
             // Special codepath if n fits directly in a single limb.
             m_int.g_st()._mp_size = (n != 0u);
             // NOTE: all limbs have been set to zero by the def init
@@ -850,21 +860,10 @@ private:
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
-        if (n >= T(0)) {
-            // n is nonegative: cast to the unsigned counterpart and construct.
-            dispatch_generic_ctor(static_cast<typename std::make_unsigned<T>::type>(n));
-            return;
-        }
-        // n is negative. Let's see if we can safely negate.
-        if (n >= -safe_abs<T>()) {
-            dispatch_generic_ctor(static_cast<typename std::make_unsigned<T>::type>(-n));
-            neg();
-            return;
-        }
-
-        // NOTE: here we are using cast + unary minus to extract the abs value of n as an unsigned long long. See:
+        // NOTE: here we are using cast to unsigned + unary minus to extract the abs value of a signed negative
+        // integral. See:
         // http://stackoverflow.com/questions/4536095/unary-minus-and-signed-to-unsigned-conversion
-        // When operating on a negative value, this technique is not 100% portable: it requires an implementation
+        // This technique is not 100% portable: it requires an implementation
         // of signed integers such that the absolute value of the minimum (negative) value is not greater than
         // the maximum value of the unsigned counterpart. This is guaranteed on all computer architectures in use today,
         // but in theory there could be architectures where the assumption is not respected. See for instance the
@@ -874,16 +873,16 @@ private:
         // we could init the integer with the wrong value. We should be able to test for this in the unit tests.
         // Let's keep this in mind in the remote case this ever becomes a problem. In such case, we would probably need
         // to specialise the implementation for negative values to use bit shifting and modulo operations.
-        //
-        // NOTE: there are performance gains to be made here, as shown in the sorting benchmark comparing the cpp_int
-        // init time (after switching to signed integers for the benchmark). In general, we should try have efficient
-        // codepaths for the special cases in which we can construct directly a single-limb integer. Still not clear
-        // to me how to best proceed for the signed case.
-        const auto nu = static_cast<unsigned long long>(n);
-        if (n >= T(0)) {
-            dispatch_generic_ctor(nu);
-        } else {
-            dispatch_generic_ctor(-nu);
+        // NOTE: for a negative n, we upcast to long long before applying the trick above. The reason is that
+        // in case T is a short integral type then the unary minus will trigger integral promotion to int/unsigned int,
+        // and I am *not* 100% sure in this case the technique still works. (unsigned) long long are the widest
+        // supported integral types, so we are sure we are safe with any T.
+        using u_type = typename std::make_unsigned<T>::type;
+        const bool nneg = n < T(0);
+        dispatch_generic_ctor(nneg ? static_cast<u_type>(-static_cast<unsigned long long>(static_cast<long long>(n)))
+                                   : static_cast<u_type>(n));
+        // Fix the sign.
+        if (nneg) {
             neg();
         }
     }
