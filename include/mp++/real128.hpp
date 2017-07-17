@@ -23,6 +23,7 @@
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/quadmath.hpp>
 #include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
 
 namespace mppp
 {
@@ -100,6 +101,10 @@ public:
         if (n_sgn == -1) {
             m_value = -m_value;
         }
+    }
+    template <std::size_t SSize>
+    explicit real128(const rational<SSize> &q) : m_value(real128{q.get_num()}.value() / real128{q.get_den()}.value())
+    {
     }
     real128(const real128 &) = default;
     real128(real128 &&) = default;

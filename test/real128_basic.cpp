@@ -31,4 +31,7 @@ TEST_CASE("real128 constructors")
     real128 blap4{integer<1>{1} << 500};
     float128_stream(std::cout, blap4.value());
     std::cout << "\n";
+    real128 blap5{rational<1>{"3232338832138213/-43834982310"}};
+    float128_stream(std::cout, blap5.value());
+    std::cout << "\n";
 }
