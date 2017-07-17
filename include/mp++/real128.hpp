@@ -39,7 +39,13 @@ public:
     constexpr explicit real128(::__float128 x) : m_value(x)
     {
     }
-    constexpr explicit real128(CppInteroperable x) : m_value(x)
+#if defined(MPPP_HAVE_CONCEPTS)
+    constexpr explicit real128(CppInteroperable x)
+#else
+    template <typename T, cpp_interoperable_enabler<T> = 0>
+    constexpr explicit real128(T x)
+#endif
+        : m_value(x)
     {
     }
     template <std::size_t SSize>
@@ -99,11 +105,12 @@ public:
     real128(real128 &&) = default;
     real128 &operator=(const real128 &) = default;
     real128 &operator=(real128 &&) = default;
-    constexpr ::__float128 &value()
+    // NOTE: drop the "::" here as it confuses clang-format.
+    MPPP_MAYBE_CONSTEXPR __float128 &value()
     {
         return m_value;
     }
-    constexpr const ::__float128 &value() const
+    MPPP_MAYBE_CONSTEXPR const ::__float128 &value() const
     {
         return m_value;
     }

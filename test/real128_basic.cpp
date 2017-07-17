@@ -8,8 +8,6 @@
 
 #include <mp++/real128.hpp>
 
-#include <boost/multiprecision/float128.hpp>
-
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
@@ -19,7 +17,6 @@ TEST_CASE("real128 constructors")
 {
     __float128 x = str_to_float128("1.1");
     float128_stream(std::cout, x);
-    std::cout << "\nadasda " << boost::multiprecision::float128(" 1.1") << '\n';
     constexpr real128 r1{1.l}, r2{2}, r3{__float128{1}};
     real128 blap{integer<1>{
         "1231238012938120938201938029138901283029138012983091283091283091283091201310012301301029381318240752987"}};
