@@ -1286,7 +1286,7 @@ private:
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        return {true, m_int.m_st._mp_size != 0};
+        return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
     // Try to convert this to an unsigned long long. The abs value of this will be considered for the conversion.
     // Requires nonzero this.
@@ -1306,19 +1306,19 @@ private:
                 // We need to shift left the current limb. If the shift is too large, we run into UB
                 // and it also means that the value does not fit in unsigned long long (and, by extension,
                 // in any other unsigned integral type).
-                return {false, 0ull};
+                return std::make_pair(false, 0ull);
             }
             const auto l = static_cast<unsigned long long>(ptr[i] & GMP_NUMB_MASK);
             if (l >> (ull_bits - shift)) {
                 // Shifting the current limb is well-defined from the point of view of the language, but the result
                 // wraps around: the value does not fit in unsigned long long.
                 // NOTE: I suspect this branch can be triggered on common architectures only with nail builds.
-                return {false, 0ull};
+                return std::make_pair(false, 0ull);
             }
             // This will not overflow, as there is no carry from retval and l << shift is fine.
             retval += l << shift;
         }
-        return {true, retval};
+        return std::make_pair(true, retval);
     }
     // Conversion to unsigned ints, excluding bool.
     template <typename T,
@@ -1328,24 +1328,24 @@ private:
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
-            return {true, T(0)};
+            return std::make_pair(true, T(0));
         }
         // Handle negative value.
         if (m_int.m_st._mp_size < 0) {
-            return {false, T(0)};
+            return std::make_pair(false, T(0));
         }
         // Attempt conversion to ull.
         const auto candidate = convert_to_ull();
         if (!candidate.first) {
             // The conversion to ull failed.
-            return {false, T(0)};
+            return std::make_pair(false, T(0));
         }
         if (candidate.second > std::numeric_limits<T>::max()) {
             // The conversion to ull succeeded, but the value exceeds the limit of T.
-            return {false, T(0)};
+            return std::make_pair(false, T(0));
         }
         // The conversion to the target unsigned integral type is fine.
-        return {true, static_cast<T>(candidate.second)};
+        return std::make_pair(true, static_cast<T>(candidate.second));
     }
     // Conversion to signed ints.
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
@@ -1358,21 +1358,21 @@ private:
         using uT = typename std::make_unsigned<T>::type;
         // Handle zero.
         if (!m_int.m_st._mp_size) {
-            return {true, T(0)};
+            return std::make_pair(true, T(0));
         }
         // Attempt conversion to ull.
         const auto candidate = convert_to_ull();
         if (!candidate.first) {
             // The conversion to ull failed: the value is too large to be represented by any integer type.
-            return {false, T(0)};
+            return std::make_pair(false, T(0));
         }
         if (m_int.m_st._mp_size > 0) {
             // If the value is positive, we check that the candidate does not exceed the
             // max value of the type.
             if (candidate.second > uT(std::numeric_limits<T>::max())) {
-                return {false, T(0)};
+                return std::make_pair(false, T(0));
             }
-            return {true, static_cast<T>(candidate.second)};
+            return std::make_pair(true, static_cast<T>(candidate.second));
         } else {
             // For negative values, we need to establish if the value fits the negative range of the
             // target type, and we must make sure to take the negative of the candidate correctly.
@@ -1382,7 +1382,7 @@ private:
             constexpr auto max = static_cast<unsigned long long>(std::numeric_limits<T>::max());
             if (candidate.second > min_abs) {
                 // The value is too small.
-                return {false, T(0)};
+                return std::make_pair(false, T(0));
             }
             // The abs of min might be greater than max. The idea then is that we decrease the magnitude
             // of the candidate to the safe negation range via division, we negate it and then we recover the
@@ -1394,14 +1394,14 @@ private:
             static_assert(ceil_ratio <= uT(std::numeric_limits<T>::max()), "Overflow error.");
             retval = static_cast<T>(retval * static_cast<T>(ceil_ratio));
             retval = static_cast<T>(retval - static_cast<T>(r));
-            return {true, retval};
+            return std::make_pair(true, retval);
         }
     }
     // Implementation of the conversion to floating-point through GMP/MPFR routines.
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     static std::pair<bool, T> mpz_float_conversion(const mpz_struct_t &m)
     {
-        return {true, static_cast<T>(::mpz_get_d(&m))};
+        return std::make_pair(true, static_cast<T>(::mpz_get_d(&m)));
     }
 #if defined(MPPP_WITH_MPFR)
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
@@ -1410,7 +1410,7 @@ private:
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         ::mpfr_set_z(&mpfr.m_mpfr, &m, MPFR_RNDN);
-        return {true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN)};
+        return std::make_pair(true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN));
     }
 #endif
     // Conversion to floating-point.
@@ -1419,7 +1419,7 @@ private:
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
-            return {true, T(0)};
+            return std::make_pair(true, T(0));
         }
         if (std::numeric_limits<T>::is_iec559) {
             // Optimization for single-limb integers.
@@ -1441,10 +1441,10 @@ private:
             // Get the pointer to the limbs.
             const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
             if (m_int.m_st._mp_size == 1) {
-                return {true, static_cast<T>(ptr[0] & GMP_NUMB_MASK)};
+                return std::make_pair(true, static_cast<T>(ptr[0] & GMP_NUMB_MASK));
             }
             if (m_int.m_st._mp_size == -1) {
-                return {true, -static_cast<T>(ptr[0] & GMP_NUMB_MASK)};
+                return std::make_pair(true, -static_cast<T>(ptr[0] & GMP_NUMB_MASK));
             }
         }
         // For all the other cases, just delegate to the GMP/MPFR routines.
