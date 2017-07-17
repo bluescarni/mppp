@@ -52,7 +52,7 @@ static inline std::vector<T> get_init_vector(double &init_time)
 {
     simple_timer st;
     std::vector<T> retval(size);
-    std::uniform_int_distribution<unsigned long> dist(0ul, 30000000ul);
+    std::uniform_int_distribution<int> dist(-300000l, 300000l);
     std::generate(retval.begin(), retval.end(), [&dist]() { return T(dist(rng)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();

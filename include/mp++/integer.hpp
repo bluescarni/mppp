@@ -828,21 +828,40 @@ private:
     }
     // Dispatch for generic constructor.
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
-    void dispatch_generic_ctor(const T &n)
+    void dispatch_generic_ctor(T n)
     {
-        // NOTE: try special codepath if n fits directly in a single limb.
-        auto nu = static_cast<unsigned long long>(n);
-        while (nu) {
-            push_limb(static_cast<::mp_limb_t>(nu & GMP_NUMB_MASK));
-            if (GMP_NUMB_BITS >= unsigned(std::numeric_limits<unsigned long long>::digits)) {
+        if (n <= GMP_NUMB_MAX) {
+            // Special codepath if n fits directly in a single limb.
+            m_int.g_st()._mp_size = (n != 0u);
+            // NOTE: all limbs have been set to zero by the def init
+            // of the static member. If n is zero we will just re-zero.
+            // No need for the mask as we are sure that n <= GMP_NUMB_MAX.
+            m_int.g_st().m_limbs[0] = static_cast<::mp_limb_t>(n);
+            return;
+        }
+        while (n) {
+            push_limb(static_cast<::mp_limb_t>(n & GMP_NUMB_MASK));
+            if (GMP_NUMB_BITS >= unsigned(std::numeric_limits<T>::digits)) {
                 break;
             }
-            checked_rshift(nu);
+            checked_rshift(n);
         }
     }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
-    void dispatch_generic_ctor(const T &n)
+    void dispatch_generic_ctor(T n)
     {
+        if (n >= T(0)) {
+            // n is nonegative: cast to the unsigned counterpart and construct.
+            dispatch_generic_ctor(static_cast<typename std::make_unsigned<T>::type>(n));
+            return;
+        }
+        // n is negative. Let's see if we can safely negate.
+        if (n >= -safe_abs<T>()) {
+            dispatch_generic_ctor(static_cast<typename std::make_unsigned<T>::type>(-n));
+            neg();
+            return;
+        }
+
         // NOTE: here we are using cast + unary minus to extract the abs value of n as an unsigned long long. See:
         // http://stackoverflow.com/questions/4536095/unary-minus-and-signed-to-unsigned-conversion
         // When operating on a negative value, this technique is not 100% portable: it requires an implementation
