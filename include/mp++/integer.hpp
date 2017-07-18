@@ -1291,6 +1291,55 @@ private:
     {
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
+    // Implementation of the conversion to unsigned types which fit in a limb.
+    template <typename T, enable_if_t<(unsigned(std::numeric_limits<T>::digits) <= unsigned(GMP_NUMB_BITS)), int> = 0>
+    std::pair<bool, T> convert_to_unsigned() const
+    {
+        static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+        const auto asize = size();
+        assert(asize);
+        // Get the pointer to the limbs.
+        const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
+        if (asize > 1u || (ptr[0] & GMP_NUMB_MASK) > std::numeric_limits<T>::max()) {
+            // There's more than 1 limb, or the only limb has a value which exceeds the limit of T.
+            return std::make_pair(false, T(0));
+        }
+        // There's a single limb and the result fits.
+        return std::make_pair(true, static_cast<T>(ptr[0] & GMP_NUMB_MASK));
+    }
+    // Implementation of the conversion to unsigned types which do not fit in a limb.
+    template <typename T, enable_if_t<(unsigned(std::numeric_limits<T>::digits) > unsigned(GMP_NUMB_BITS)), int> = 0>
+    std::pair<bool, T> convert_to_unsigned() const
+    {
+        static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+        const auto asize = size();
+        assert(asize);
+        // Get the pointer to the limbs.
+        const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
+        // Init the retval with the first limb. This is safe as T has more bits than the limb type.
+        auto retval = static_cast<T>(ptr[0] & GMP_NUMB_MASK);
+        // Add the other limbs, if any.
+        constexpr unsigned u_bits = std::numeric_limits<T>::digits;
+        unsigned shift(GMP_NUMB_BITS);
+        for (std::size_t i = 1u; i < asize; ++i, shift += unsigned(GMP_NUMB_BITS)) {
+            if (shift >= u_bits) {
+                // We need to shift left the current limb. If the shift is too large, we run into UB
+                // and it also means that the value does not fit in T.
+                return std::make_pair(false, T(0));
+            }
+            // Get the current limb. Safe as T has more bits than the limb type.
+            const auto l = static_cast<T>(ptr[i] & GMP_NUMB_MASK);
+            if (l >> (u_bits - shift)) {
+                // Left-shifting the current limb is well-defined from the point of view of the language, but the result
+                // overflows: the value does not fit in T.
+                // NOTE: I suspect this branch can be triggered on common architectures only with nail builds.
+                return std::make_pair(false, T(0));
+            }
+            // This will not overflow, as there is no carry from retval and l << shift is fine.
+            retval = static_cast<T>(retval + (l << shift));
+        }
+        return std::make_pair(true, retval);
+    }
     // Try to convert this to an unsigned long long. The abs value of this will be considered for the conversion.
     // Requires nonzero this.
     std::pair<bool, unsigned long long> convert_to_ull() const
@@ -1337,18 +1386,7 @@ private:
         if (m_int.m_st._mp_size < 0) {
             return std::make_pair(false, T(0));
         }
-        // Attempt conversion to ull.
-        const auto candidate = convert_to_ull();
-        if (!candidate.first) {
-            // The conversion to ull failed.
-            return std::make_pair(false, T(0));
-        }
-        if (candidate.second > std::numeric_limits<T>::max()) {
-            // The conversion to ull succeeded, but the value exceeds the limit of T.
-            return std::make_pair(false, T(0));
-        }
-        // The conversion to the target unsigned integral type is fine.
-        return std::make_pair(true, static_cast<T>(candidate.second));
+        return convert_to_unsigned<T>();
     }
     // Conversion to signed ints.
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
