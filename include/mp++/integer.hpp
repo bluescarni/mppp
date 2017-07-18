@@ -837,12 +837,15 @@ private:
     {
         return true;
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    // The Neg flag will negate the integer after construction. It is for use in
+    // the constructor from signed ints.
+    template <typename T, bool Neg = false,
+              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
         if (uint_fits_single_limb(n)) {
             // Special codepath if n fits directly in a single limb.
-            m_int.g_st()._mp_size = (n != 0u);
+            m_int.g_st()._mp_size = Neg ? -(n != 0u) : (n != 0u);
             // NOTE: all limbs have been set to zero by the def init
             // of the static member. If n is zero we will just re-zero.
             // No need for the mask as we are sure that n <= GMP_NUMB_MAX.
@@ -855,6 +858,10 @@ private:
                 break;
             }
             checked_rshift(n);
+        }
+        // Negate if requested.
+        if (Neg) {
+            neg();
         }
     }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
@@ -870,20 +877,19 @@ private:
         // discussion here:
         // http://stackoverflow.com/questions/11372044/unsigned-vs-signed-range-guarantees
         // Note that in any case we never run into UB, the only consequence is that for very large negative values
-        // we could init the integer with the wrong value. We should be able to test for this in the unit tests.
+        // we could init the integer with the wrong value, and we should be able to detect this in the unit tests.
         // Let's keep this in mind in the remote case this ever becomes a problem. In such case, we would probably need
         // to specialise the implementation for negative values to use bit shifting and modulo operations.
-        // NOTE: for a negative n, we upcast to long long before applying the trick above. The reason is that
-        // in case T is a short integral type then the unary minus will trigger integral promotion to int/unsigned int,
-        // and I am *not* 100% sure in this case the technique still works. (unsigned) long long are the widest
-        // supported integral types, so we are sure we are safe with any T.
         using u_type = typename std::make_unsigned<T>::type;
-        const bool nneg = n < T(0);
-        dispatch_generic_ctor(nneg ? static_cast<u_type>(-static_cast<unsigned long long>(static_cast<long long>(n)))
-                                   : static_cast<u_type>(n));
-        // Fix the sign.
-        if (nneg) {
-            neg();
+        if (n >= T(0)) {
+            dispatch_generic_ctor(static_cast<u_type>(n));
+        } else {
+            // NOTE: for a negative n, we upcast to long long before applying the trick above. The reason is that
+            // in case T is a short integral type then the unary minus will trigger integral promotion to int/unsigned
+            // int, and I am *not* 100% sure in this case the technique still works. (unsigned) long long are the widest
+            // supported integral types, so we are sure we are safe with any T.
+            dispatch_generic_ctor<u_type, true>(
+                static_cast<u_type>(-static_cast<unsigned long long>(static_cast<long long>(n))));
         }
     }
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
