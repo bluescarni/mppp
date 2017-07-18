@@ -4,11 +4,19 @@ Changelog
 0.4 (unreleased)
 ----------------
 
-Changes
-~~~~~~~
+New
+~~~
 
 - Implement the assignment operator and the constructor from ``mpz_t`` in :cpp:class:`~mppp::rational`
   (`#19 <https://github.com/bluescarni/mppp/pull/19>`__).
+
+Changes
+~~~~~~~
+
+- Performance improvements for the :cpp:class:`~mppp::integer` constructors from C++ integrals
+  (`#23 <https://github.com/bluescarni/mppp/pull/23>`__).
+
+- Make sure the MPFR cleanup routine is automatically called on shutdown (`#22 <https://github.com/bluescarni/mppp/pull/22>`__).
 
 - Performance improvements for :cpp:func:`mppp::integer::nbits()` on GCC and clang (`#17 <https://github.com/bluescarni/mppp/pull/17>`__).
 
