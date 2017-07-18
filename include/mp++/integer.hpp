@@ -827,15 +827,12 @@ private:
         assert(false);
     }
     // Dispatch for generic constructor.
-    // Move this outside the method below in order to avoid a GCC warning.
-    template <typename T>
-    static bool uint_fits_single_limb(T n)
+    // Special casing for bool.
+    void dispatch_generic_ctor(bool b)
     {
-        return n <= GMP_NUMB_MAX;
-    }
-    static bool uint_fits_single_limb(bool)
-    {
-        return true;
+        m_int.g_st()._mp_size = static_cast<mpz_size_t>(b);
+        // No need for masking here.
+        m_int.g_st().m_limbs[0] = static_cast<::mp_limb_t>(b);
     }
     // The Neg flag will negate the integer after construction. It is for use in
     // the constructor from signed ints.
@@ -843,7 +840,7 @@ private:
               enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
-        if (uint_fits_single_limb(n)) {
+        if (n <= GMP_NUMB_MAX) {
             // Special codepath if n fits directly in a single limb.
             m_int.g_st()._mp_size = Neg ? -(n != 0u) : (n != 0u);
             // NOTE: all limbs have been set to zero by the def init
