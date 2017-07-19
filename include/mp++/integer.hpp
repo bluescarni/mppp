@@ -53,6 +53,7 @@
 // Disable some warnings for MSVC.
 #pragma warning(push)
 #pragma warning(disable : 4127)
+#pragma warning(disable : 4146)
 #pragma warning(disable : 4804)
 
 // Checked iterators functionality.
