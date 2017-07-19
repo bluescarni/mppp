@@ -864,29 +864,13 @@ private:
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
-        // NOTE: here we are using cast to unsigned + unary minus to extract the abs value of a signed negative
-        // integral. See:
-        // http://stackoverflow.com/questions/4536095/unary-minus-and-signed-to-unsigned-conversion
-        // This technique is not 100% portable: it requires an implementation
-        // of signed integers such that the absolute value of the minimum (negative) value is not greater than
-        // the maximum value of the unsigned counterpart. This is guaranteed on all computer architectures in use today,
-        // but in theory there could be architectures where the assumption is not respected. See for instance the
-        // discussion here:
-        // http://stackoverflow.com/questions/11372044/unsigned-vs-signed-range-guarantees
-        // Note that in any case we never run into UB, the only consequence is that for very large negative values
-        // we could init the integer with the wrong value, and we should be able to detect this in the unit tests.
-        // Let's keep this in mind in the remote case this ever becomes a problem. In such case, we would probably need
-        // to specialise the implementation for negative values to use bit shifting and modulo operations.
         using u_type = typename std::make_unsigned<T>::type;
         if (n >= T(0)) {
+            // Positive value, just cast to unsigned.
             dispatch_generic_ctor(static_cast<u_type>(n));
         } else {
-            // NOTE: for a negative n, we upcast to long long before applying the trick above. The reason is that
-            // in case T is a short integral type then the unary minus will trigger integral promotion to int/unsigned
-            // int, and I am *not* 100% sure in this case the technique still works. (unsigned) long long are the widest
-            // supported integral types, so we are sure we are safe with any T.
-            dispatch_generic_ctor<u_type, true>(
-                static_cast<u_type>(-static_cast<unsigned long long>(static_cast<long long>(n))));
+            // Negative value, use its abs.
+            dispatch_generic_ctor<u_type, true>(nint_abs(n));
         }
     }
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
@@ -1340,38 +1324,6 @@ private:
         }
         return std::make_pair(true, retval);
     }
-    // Try to convert this to an unsigned long long. The abs value of this will be considered for the conversion.
-    // Requires nonzero this.
-    std::pair<bool, unsigned long long> convert_to_ull() const
-    {
-        const auto asize = size();
-        assert(asize);
-        // Get the pointer to the limbs.
-        const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
-        // Init retval with the first limb.
-        auto retval = static_cast<unsigned long long>(ptr[0] & GMP_NUMB_MASK);
-        // Add the other limbs, if any.
-        unsigned long long shift = GMP_NUMB_BITS;
-        constexpr unsigned ull_bits = std::numeric_limits<unsigned long long>::digits;
-        for (std::size_t i = 1u; i < asize; ++i, shift += GMP_NUMB_BITS) {
-            if (shift >= ull_bits) {
-                // We need to shift left the current limb. If the shift is too large, we run into UB
-                // and it also means that the value does not fit in unsigned long long (and, by extension,
-                // in any other unsigned integral type).
-                return std::make_pair(false, 0ull);
-            }
-            const auto l = static_cast<unsigned long long>(ptr[i] & GMP_NUMB_MASK);
-            if (l >> (ull_bits - shift)) {
-                // Shifting the current limb is well-defined from the point of view of the language, but the result
-                // wraps around: the value does not fit in unsigned long long.
-                // NOTE: I suspect this branch can be triggered on common architectures only with nail builds.
-                return std::make_pair(false, 0ull);
-            }
-            // This will not overflow, as there is no carry from retval and l << shift is fine.
-            retval += l << shift;
-        }
-        return std::make_pair(true, retval);
-    }
     // Conversion to unsigned ints, excluding bool.
     template <typename T,
               enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>, negation<std::is_same<bool, T>>>::value,
@@ -1392,19 +1344,19 @@ private:
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        // NOTE: here we will assume that unsigned long long can represent the absolute value of any
-        // machine integer. This is not necessarily the case on any possible implementation, but it holds
-        // true on any current architecture. See the comments below and in the generic constructor regarding
-        // the method of computing the absolute value of a negative int.
+        // The unsigned counterpart of T.
         using uT = typename std::make_unsigned<T>::type;
         // Handle zero.
         if (!m_int.m_st._mp_size) {
             return std::make_pair(true, T(0));
         }
-        // Attempt conversion to ull.
-        const auto candidate = convert_to_ull();
+        // Attempt conversion to the unsigned counterpart the absolute value of this.
+        const auto candidate = convert_to_unsigned<uT>();
         if (!candidate.first) {
-            // The conversion to ull failed: the value is too large to be represented by any integer type.
+            // The conversion failed: if this is positive, its value is bigger than the
+            // max of the unsigned counterpart (hence, also bigger than the max of T). If negative,
+            // we assume (as in nint_abs()) that the absolute value of the min of T fits within the
+            // range of uT, which is here exceeded.
             return std::make_pair(false, T(0));
         }
         if (m_int.m_st._mp_size > 0) {
@@ -1415,24 +1367,33 @@ private:
             }
             return std::make_pair(true, static_cast<T>(candidate.second));
         } else {
-            // For negative values, we need to establish if the value fits the negative range of the
-            // target type, and we must make sure to take the negative of the candidate correctly.
-            // NOTE: see the comments in the generic ctor about the portability of this technique
-            // for computing the absolute value.
-            constexpr auto min_abs = -static_cast<unsigned long long>(std::numeric_limits<T>::min());
-            constexpr auto max = static_cast<unsigned long long>(std::numeric_limits<T>::max());
+            // this is negative. We need 2 steps:
+            // - establish if the candidate fits in the negative range of T, and, it that case,
+            // - compute its negative.
+            // Compute the abs value of the min (negative) value for T.
+            constexpr uT min_abs = nint_abs(std::numeric_limits<T>::min());
             if (candidate.second > min_abs) {
-                // The value is too small.
+                // this is too negative to fit in T.
                 return std::make_pair(false, T(0));
             }
-            // The abs of min might be greater than max. The idea then is that we decrease the magnitude
-            // of the candidate to the safe negation range via division, we negate it and then we recover the
-            // original candidate value. If the abs of min is not greater than max, ceil_ratio will be 1, r will be zero
+            // Now we know that the conversion is valid, but we need to compute the negative of the candidate.
+            // We cannot directly convert the candidate to T, as the positive range of T might be insufficient
+            // to represent the candidate. The idea is then to reduce the candidate until T can represent it,
+            // negate it (which is ok as we established earlier that the conversion to T is valid) and then
+            // restore the the eliminated bits in the candidate.
+            // The max value for T.
+            constexpr uT max = static_cast<uT>(std::numeric_limits<T>::max());
+            // NOTE: if the abs of min is not greater than max, ceil_ratio will be 1, r will be zero
             // and everything will still work.
-            constexpr auto ceil_ratio = min_abs / max + unsigned((min_abs % max) != 0u);
-            const unsigned long long q = candidate.second / ceil_ratio, r = candidate.second % ceil_ratio;
+            constexpr uT ceil_ratio = static_cast<uT>(min_abs / max + unsigned((min_abs % max) != 0u));
+            // q will be the candidate divided by a quantity big enough to make it representable by T
+            // (regardless of its value).
+            const uT q = static_cast<uT>(candidate.second / ceil_ratio),
+                     r = static_cast<uT>(candidate.second % ceil_ratio);
+            // Convert to T and negate.
             auto retval = static_cast<T>(-static_cast<T>(q));
             static_assert(ceil_ratio <= uT(std::numeric_limits<T>::max()), "Overflow error.");
+            // Recover the original value, now that we have negated.
             retval = static_cast<T>(retval * static_cast<T>(ceil_ratio));
             retval = static_cast<T>(retval - static_cast<T>(r));
             return std::make_pair(true, retval);
