@@ -53,7 +53,6 @@
 // Disable some warnings for MSVC.
 #pragma warning(push)
 #pragma warning(disable : 4127)
-#pragma warning(disable : 4146)
 #pragma warning(disable : 4804)
 
 // Checked iterators functionality.
@@ -1276,11 +1275,15 @@ private:
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
     // Implementation of the conversion to unsigned types which fit in a limb.
-    template <typename T, enable_if_t<(unsigned(std::numeric_limits<T>::digits) <= unsigned(GMP_NUMB_BITS)), int> = 0>
+    // The SurePositive flag indicates that this is strictly positive, thus avoiding
+    // a branch in the body of the function.
+    template <typename T, bool SurePositive = false,
+              enable_if_t<(unsigned(std::numeric_limits<T>::digits) <= unsigned(GMP_NUMB_BITS)), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
-        const auto asize = size();
+        assert(!SurePositive || (SurePositive && m_int.m_st._mp_size > 0));
+        const auto asize = SurePositive ? static_cast<std::size_t>(m_int.m_st._mp_size) : size();
         assert(asize);
         // Get the pointer to the limbs.
         const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
@@ -1292,11 +1295,13 @@ private:
         return std::make_pair(true, static_cast<T>(ptr[0] & GMP_NUMB_MASK));
     }
     // Implementation of the conversion to unsigned types which do not fit in a limb.
-    template <typename T, enable_if_t<(unsigned(std::numeric_limits<T>::digits) > unsigned(GMP_NUMB_BITS)), int> = 0>
+    template <typename T, bool SurePositive = false,
+              enable_if_t<(unsigned(std::numeric_limits<T>::digits) > unsigned(GMP_NUMB_BITS)), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
-        const auto asize = size();
+        assert(!SurePositive || (SurePositive && m_int.m_st._mp_size > 0));
+        const auto asize = SurePositive ? static_cast<std::size_t>(m_int.m_st._mp_size) : size();
         assert(asize);
         // Get the pointer to the limbs.
         const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
@@ -1338,7 +1343,7 @@ private:
         if (m_int.m_st._mp_size < 0) {
             return std::make_pair(false, T(0));
         }
-        return convert_to_unsigned<T>();
+        return convert_to_unsigned<T, true>();
     }
     // Conversion to signed ints.
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
