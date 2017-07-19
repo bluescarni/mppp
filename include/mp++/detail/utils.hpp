@@ -51,6 +51,14 @@ inline std::string to_string(const T &x)
     return x.to_string();
 }
 
+#if defined(_MSC_VER)
+
+// Disable some warnings for MSVC.
+#pragma warning(push)
+#pragma warning(disable : 4146)
+
+#endif
+
 // Compute the absolute value of a negative integer, returning the result as an instance
 // of the corresponding unsigned type. Requires T to be a signed integral type and n
 // to be negative.
@@ -83,6 +91,12 @@ constexpr typename std::make_unsigned<T>::type nint_abs(T n)
         -static_cast<typename std::conditional<(std::numeric_limits<uT>::max() <= std::numeric_limits<unsigned>::max()),
                                                unsigned, uT>::type>(n));
 }
+
+#if defined(_MSC_VER)
+
+#pragma warning(pop)
+
+#endif
 }
 }
 
