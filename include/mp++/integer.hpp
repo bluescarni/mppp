@@ -97,6 +97,12 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
                   && std::numeric_limits<mpz_size_t>::max() <= std::numeric_limits<::mp_size_t>::max(),
               "Invalid mpz_t struct layout and/or GMP types.");
 
+// Small helper to get the size in limbs from an mpz_t. Will return zero if n is zero.
+std::size_t inline get_mpz_size(const ::mpz_t n)
+{
+    return (n->_mp_size >= 0) ? static_cast<std::size_t>(n->_mp_size) : static_cast<std::size_t>(nint_abs(n->_mp_size));
+}
+
 // Helper function to init an mpz to zero with nlimbs preallocated limbs.
 inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 {
@@ -118,7 +124,7 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 // Combined init+set.
 inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
 {
-    mpz_init_nlimbs(m0, ::mpz_size(&m1));
+    mpz_init_nlimbs(m0, get_mpz_size(&m1));
     ::mpz_set(&m0, &m1);
 }
 
@@ -483,7 +489,7 @@ union integer_union {
     bool demote()
     {
         assert(is_dynamic());
-        const auto dyn_size = ::mpz_size(&g_dy());
+        const auto dyn_size = get_mpz_size(&g_dy());
         // If the dynamic size is greater than the static size, we cannot demote.
         if (dyn_size > SSize) {
             return false;
@@ -904,7 +910,7 @@ private:
     // Ctor from mpz_t.
     void dispatch_mpz_ctor(const ::mpz_t n)
     {
-        const auto asize = ::mpz_size(n);
+        const auto asize = get_mpz_size(n);
         if (asize > SSize) {
             // Too big, need to promote.
             // Destroy static.
@@ -1074,7 +1080,7 @@ public:
      */
     integer &operator=(const ::mpz_t n)
     {
-        const auto asize = ::mpz_size(n);
+        const auto asize = get_mpz_size(n);
         const auto s = is_static();
         if (s && asize <= SSize) {
             // this is static, n fits into static. Copy over.
@@ -1533,16 +1539,8 @@ public:
     std::size_t nbits() const
     {
 #if defined(__clang__) || defined(__GNUC__)
-        std::size_t ls;
-        const ::mp_limb_t *lptr;
-        if (is_static()) {
-            ls = static_cast<std::size_t>(m_int.g_st().abs_size());
-            lptr = m_int.g_st().m_limbs.data();
-        } else {
-            // NOTE: mpz_size() returns zero size for zero value.
-            ls = ::mpz_size(&m_int.g_dy());
-            lptr = m_int.g_dy()._mp_d;
-        }
+        const std::size_t ls = size();
+        const ::mp_limb_t *lptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
         if (ls) {
             // LCOV_EXCL_START
             if (mppp_unlikely(ls > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
@@ -1571,10 +1569,8 @@ public:
      */
     std::size_t size() const
     {
-        if (is_static()) {
-            return std::size_t(m_int.g_st().abs_size());
-        }
-        return ::mpz_size(&m_int.g_dy());
+        return (m_int.m_st._mp_size) >= 0 ? static_cast<std::size_t>(m_int.m_st._mp_size)
+                                          : static_cast<std::size_t>(nint_abs(m_int.m_st._mp_size));
     }
     /// Sign.
     /**
@@ -4704,17 +4700,10 @@ inline std::istream &operator>>(std::istream &is, integer<SSize> &n)
 template <std::size_t SSize>
 inline std::size_t hash(const integer<SSize> &n)
 {
-    std::size_t asize;
-    // NOTE: size is part of the common initial sequence.
     const mpz_size_t size = n._get_union().m_st._mp_size;
-    const ::mp_limb_t *ptr;
-    if (n._get_union().is_static()) {
-        asize = static_cast<std::size_t>((size >= 0) ? size : -size);
-        ptr = n._get_union().g_st().m_limbs.data();
-    } else {
-        asize = ::mpz_size(&n._get_union().g_dy());
-        ptr = n._get_union().g_dy()._mp_d;
-    }
+    const std::size_t asize = size >= 0 ? static_cast<std::size_t>(size) : static_cast<std::size_t>(nint_abs(size));
+    const ::mp_limb_t *ptr
+        = n._get_union().is_static() ? n._get_union().g_st().m_limbs.data() : n._get_union().g_dy()._mp_d;
     // Init the retval as the signed size.
     auto retval = static_cast<std::size_t>(size);
     // Combine the limbs.
@@ -5505,20 +5494,10 @@ inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
     if (size_a != size_b) {
         return false;
     }
-    const ::mp_limb_t *ptr_a, *ptr_b;
-    std::size_t asize;
-    if (a.is_static()) {
-        ptr_a = a._get_union().g_st().m_limbs.data();
-        asize = static_cast<std::size_t>((size_a >= 0) ? size_a : -size_a);
-    } else {
-        ptr_a = a._get_union().g_dy()._mp_d;
-        asize = ::mpz_size(&a._get_union().g_dy());
-    }
-    if (b.is_static()) {
-        ptr_b = b._get_union().g_st().m_limbs.data();
-    } else {
-        ptr_b = b._get_union().g_dy()._mp_d;
-    }
+    const std::size_t asize
+        = size_a >= 0 ? static_cast<std::size_t>(size_a) : static_cast<std::size_t>(nint_abs(size_a));
+    const ::mp_limb_t *ptr_a = a.is_static() ? a._get_union().g_st().m_limbs.data() : a._get_union().g_dy()._mp_d;
+    const ::mp_limb_t *ptr_b = b.is_static() ? b._get_union().g_st().m_limbs.data() : b._get_union().g_dy()._mp_d;
     auto limb_cmp
         = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
 #if defined(_MSC_VER)
