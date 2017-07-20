@@ -112,7 +112,7 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
     }
     // NOTE: nbits == 0 is allowed.
     ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
-    assert(std::make_unsigned<mpz_size_t>::type(rop._mp_alloc) >= nlimbs);
+    assert(make_unsigned<mpz_size_t>(rop._mp_alloc) >= nlimbs);
 }
 
 // Combined init+set.
@@ -864,7 +864,7 @@ private:
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
-        using u_type = typename std::make_unsigned<T>::type;
+        using u_type = make_unsigned<T>;
         if (n >= T(0)) {
             // Positive value, just cast to unsigned.
             dispatch_generic_ctor(static_cast<u_type>(n));
@@ -1351,12 +1351,12 @@ private:
     std::pair<bool, T> dispatch_conversion() const
     {
         // The unsigned counterpart of T.
-        using uT = typename std::make_unsigned<T>::type;
+        using uT = make_unsigned<T>;
         // Handle zero.
         if (!m_int.m_st._mp_size) {
             return std::make_pair(true, T(0));
         }
-        // Attempt conversion to the unsigned counterpart the absolute value of this.
+        // Attempt conversion to the unsigned counterpart for the absolute value of this.
         const auto candidate = convert_to_unsigned<uT>();
         if (!candidate.first) {
             // The conversion failed: if this is positive, its value is bigger than the
@@ -4247,9 +4247,8 @@ inline unsigned long integer_exp_to_ulong(const T &exp)
 #if !defined(__INTEL_COMPILER)
     assert(exp >= T(0));
 #endif
-    // NOTE: make_unsigned<T>::type is T if T is already unsigned.
-    if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(exp)
-                      > std::numeric_limits<unsigned long>::max())) {
+    // NOTE: make_unsigned<T> is T if T is already unsigned.
+    if (mppp_unlikely(static_cast<make_unsigned<T>>(exp) > std::numeric_limits<unsigned long>::max())) {
         throw std::overflow_error("Cannot convert the integral value " + std::to_string(exp)
                                   + " to unsigned long: the value is too large.");
     }
@@ -5386,8 +5385,7 @@ inline ::mp_bitcnt_t integer_cast_to_bitcnt(T n)
     if (mppp_unlikely(n < T(0))) {
         throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": negative values are not supported");
     }
-    if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(n)
-                      > std::numeric_limits<::mp_bitcnt_t>::max())) {
+    if (mppp_unlikely(static_cast<make_unsigned<T>>(n) > std::numeric_limits<::mp_bitcnt_t>::max())) {
         throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
     }
     return static_cast<::mp_bitcnt_t>(n);
