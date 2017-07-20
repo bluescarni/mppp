@@ -1276,20 +1276,26 @@ private:
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
     // Implementation of the conversion to unsigned types which fit in a limb.
-    // The SurePositive flag indicates that this is strictly positive, thus avoiding
-    // a branch in the body of the function.
+    // The SurePositive flag indicates that this is strictly positive.
     template <typename T, bool SurePositive = false,
               enable_if_t<(unsigned(std::numeric_limits<T>::digits) <= unsigned(GMP_NUMB_BITS)), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
         assert(!SurePositive || (SurePositive && m_int.m_st._mp_size > 0));
-        const auto asize = SurePositive ? static_cast<std::size_t>(m_int.m_st._mp_size) : size();
-        assert(asize);
+        if (SurePositive) {
+            if (m_int.m_st._mp_size != 1) {
+                return std::make_pair(false, T(0));
+            }
+        } else {
+            if (m_int.m_st._mp_size != 1 && m_int.m_st._mp_size != -1) {
+                return std::make_pair(false, T(0));
+            }
+        }
         // Get the pointer to the limbs.
         const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
-        if (asize > 1u || (ptr[0] & GMP_NUMB_MASK) > std::numeric_limits<T>::max()) {
-            // There's more than 1 limb, or the only limb has a value which exceeds the limit of T.
+        if ((ptr[0] & GMP_NUMB_MASK) > std::numeric_limits<T>::max()) {
+            // The only limb has a value which exceeds the limit of T.
             return std::make_pair(false, T(0));
         }
         // There's a single limb and the result fits.

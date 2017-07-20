@@ -97,6 +97,19 @@ constexpr typename std::make_unsigned<T>::type nint_abs(T n)
 #pragma warning(pop)
 
 #endif
+
+// constexpr max/min implementations with copy semantics.
+template <typename T>
+constexpr T c_max(T a, T b)
+{
+    return a > b ? a : b;
+}
+
+template <typename T>
+constexpr T c_min(T a, T b)
+{
+    return a < b ? a : b;
+}
 }
 }
 
