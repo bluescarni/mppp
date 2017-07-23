@@ -1282,21 +1282,13 @@ private:
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
     // Implementation of the conversion to unsigned types which fit in a limb.
-    // The SurePositive flag indicates that this is strictly positive.
-    template <typename T, bool SurePositive = false,
-              enable_if_t<(unsigned(std::numeric_limits<T>::digits) <= unsigned(GMP_NUMB_BITS)), int> = 0>
+    template <typename T, enable_if_t<(unsigned(std::numeric_limits<T>::digits) <= unsigned(GMP_NUMB_BITS)), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
-        assert(!SurePositive || (SurePositive && m_int.m_st._mp_size > 0));
-        if (SurePositive) {
-            if (m_int.m_st._mp_size != 1) {
-                return std::make_pair(false, T(0));
-            }
-        } else {
-            if (m_int.m_st._mp_size != 1 && m_int.m_st._mp_size != -1) {
-                return std::make_pair(false, T(0));
-            }
+        assert(m_int.m_st._mp_size > 0);
+        if (m_int.m_st._mp_size != 1) {
+            return std::make_pair(false, T(0));
         }
         // Get the pointer to the limbs.
         const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
@@ -1308,14 +1300,12 @@ private:
         return std::make_pair(true, static_cast<T>(ptr[0] & GMP_NUMB_MASK));
     }
     // Implementation of the conversion to unsigned types which do not fit in a limb.
-    template <typename T, bool SurePositive = false,
-              enable_if_t<(unsigned(std::numeric_limits<T>::digits) > unsigned(GMP_NUMB_BITS)), int> = 0>
+    template <typename T, enable_if_t<(unsigned(std::numeric_limits<T>::digits) > unsigned(GMP_NUMB_BITS)), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
-        assert(!SurePositive || (SurePositive && m_int.m_st._mp_size > 0));
-        const auto asize = SurePositive ? static_cast<std::size_t>(m_int.m_st._mp_size) : size();
-        assert(asize);
+        assert(m_int.m_st._mp_size > 0);
+        const auto asize = static_cast<std::size_t>(m_int.m_st._mp_size);
         // Get the pointer to the limbs.
         const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
         // Init the retval with the first limb. This is safe as T has more bits than the limb type.
@@ -1356,66 +1346,73 @@ private:
         if (m_int.m_st._mp_size < 0) {
             return std::make_pair(false, T(0));
         }
-        return convert_to_unsigned<T, true>();
+        return convert_to_unsigned<T>();
     }
     // Conversion to signed ints.
+    // Overload if the all the absolute values of T fit into a limb.
+    template <typename T,
+              enable_if_t<(c_max(static_cast<make_unsigned<T>>(std::numeric_limits<T>::max()),
+                                 nint_abs(std::numeric_limits<T>::min()))
+                           <= GMP_NUMB_MAX),
+                          int> = 0>
+    std::pair<bool, T> convert_to_signed() const
+    {
+        static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
+        assert(size());
+        // Cache a couple of quantities for convenience.
+        constexpr auto Tmax = static_cast<make_unsigned<T>>(std::numeric_limits<T>::max());
+        constexpr auto Tmin_abs = nint_abs(std::numeric_limits<T>::min());
+        if (m_int.m_st._mp_size != 1 && m_int.m_st._mp_size != -1) {
+            // this consists of more than 1 limb, the conversion is not possible.
+            return std::make_pair(false, T(0));
+        }
+        // Get the pointer to the limbs.
+        const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
+        // The candidate output value.
+        const ::mp_limb_t candidate = ptr[0] & GMP_NUMB_MASK;
+        if (mppp_likely(candidate <= c_min(Tmax, Tmin_abs))) {
+            // Optimise the case in which the candidate value fits both Tmax and Tmin_abs. This means
+            // we can convert safely and negate safely, if needed.
+            return std::make_pair(
+                true, m_int.m_st._mp_size > 0 ? static_cast<T>(candidate) : static_cast<T>(-static_cast<T>(candidate)));
+        }
+        // The candidate does not fit in the absolute value range of T.
+        if (m_int.m_st._mp_size > 0) {
+            // This is positive, it needs to fit within max().
+            if (candidate > Tmax) {
+                return std::make_pair(false, T(0));
+            }
+            return std::make_pair(true, static_cast<T>(candidate));
+        } else {
+            // This is negative, it needs to fit within the abs of min().
+            if (candidate > Tmin_abs) {
+                return std::make_pair(false, T(0));
+            }
+            if (Tmin_abs <= Tmax || candidate <= Tmax) {
+                // Either the negative range of T is leq than the positive one, or the candidate
+                // is not greater than Tmax: we can convert to T and negate safely.
+                return std::make_pair(true, static_cast<T>(-static_cast<T>(candidate)));
+            }
+            // The negative range is greater than the positive one and the candidate larger than Tmax:
+            // we cannot directly convert the candidate to T.
+            auto retval = static_cast<T>(-static_cast<T>(Tmax));
+            const auto q = static_cast<make_unsigned<T>>(candidate / Tmax),
+                       r = static_cast<make_unsigned<T>>(candidate % Tmax);
+            for (make_unsigned<T> i = 0; i < q - 1u; ++i) {
+                retval = static_cast<T>(retval - static_cast<T>(Tmax));
+            }
+            retval = static_cast<T>(retval - static_cast<T>(r));
+            return std::make_pair(true, retval);
+        }
+    }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        // The unsigned counterpart of T.
-        using uT = make_unsigned<T>;
         // Handle zero.
         if (!m_int.m_st._mp_size) {
             return std::make_pair(true, T(0));
         }
-        // Attempt conversion to the unsigned counterpart for the absolute value of this.
-        const auto candidate = convert_to_unsigned<uT>();
-        if (!candidate.first) {
-            // The conversion failed: if this is positive, its value is bigger than the
-            // max of the unsigned counterpart (hence, also bigger than the max of T). If negative,
-            // we assume (as in nint_abs()) that the absolute value of the min of T fits within the
-            // range of uT, which is here exceeded.
-            return std::make_pair(false, T(0));
-        }
-        if (m_int.m_st._mp_size > 0) {
-            // If the value is positive, we check that the candidate does not exceed the
-            // max value of the type.
-            if (candidate.second > uT(std::numeric_limits<T>::max())) {
-                return std::make_pair(false, T(0));
-            }
-            return std::make_pair(true, static_cast<T>(candidate.second));
-        } else {
-            // this is negative. We need 2 steps:
-            // - establish if the candidate fits in the negative range of T, and, it that case,
-            // - compute its negative.
-            // Compute the abs value of the min (negative) value for T.
-            constexpr uT min_abs = nint_abs(std::numeric_limits<T>::min());
-            if (candidate.second > min_abs) {
-                // this is too negative to fit in T.
-                return std::make_pair(false, T(0));
-            }
-            // Now we know that the conversion is valid, but we need to compute the negative of the candidate.
-            // We cannot directly convert the candidate to T, as the positive range of T might be insufficient
-            // to represent the candidate. The idea is then to reduce the candidate until T can represent it,
-            // negate it (which is ok as we established earlier that the conversion to T is valid) and then
-            // restore the the eliminated bits in the candidate.
-            // The max value for T.
-            constexpr uT max = static_cast<uT>(std::numeric_limits<T>::max());
-            // NOTE: if the abs of min is not greater than max, ceil_ratio will be 1, r will be zero
-            // and everything will still work.
-            constexpr uT ceil_ratio = static_cast<uT>(min_abs / max + unsigned((min_abs % max) != 0u));
-            // q will be the candidate divided by a quantity big enough to make it representable by T
-            // (regardless of its value).
-            const uT q = static_cast<uT>(candidate.second / ceil_ratio),
-                     r = static_cast<uT>(candidate.second % ceil_ratio);
-            // Convert to T and negate.
-            auto retval = static_cast<T>(-static_cast<T>(q));
-            static_assert(ceil_ratio <= uT(std::numeric_limits<T>::max()), "Overflow error.");
-            // Recover the original value, now that we have negated.
-            retval = static_cast<T>(retval * static_cast<T>(ceil_ratio));
-            retval = static_cast<T>(retval - static_cast<T>(r));
-            return std::make_pair(true, retval);
-        }
+        return convert_to_signed<T>();
     }
     // Implementation of the conversion to floating-point through GMP/MPFR routines.
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
