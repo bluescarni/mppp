@@ -28,7 +28,11 @@ using namespace mppp;
 using namespace mppp_bench;
 
 #if defined(MPPP_BENCHMARK_BOOST)
-using cpp_int = boost::multiprecision::cpp_int;
+// Make sure we use the cpp_int version that does the overflow check, in order to
+// match mp++'s behaviour.
+using cpp_int = boost::multiprecision::
+    number<boost::multiprecision::cpp_int_backend<0, 0, boost::multiprecision::signed_magnitude,
+                                                  boost::multiprecision::checked>>;
 using mpz_int = boost::multiprecision::mpz_int;
 #endif
 
@@ -45,7 +49,7 @@ static inline std::vector<T> get_init_vector(double &init_time)
     rng.seed(0);
     simple_timer st;
     std::vector<T> retval(size);
-    std::uniform_int_distribution<unsigned> dist(0, 30000u);
+    std::uniform_int_distribution<int> dist(-30000, 30000);
     std::generate(retval.begin(), retval.end(), [&dist]() { return T(dist(rng)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
@@ -68,15 +72,14 @@ int main()
         double init_time;
         auto v = get_init_vector<integer_t>(init_time);
         s += "['mp++','init'," + std::to_string(init_time) + "],";
-        std::vector<unsigned> c_out(size);
+        std::vector<int> c_out(size);
         {
             simple_timer st2;
-            std::transform(v.begin(), v.end(), c_out.begin(),
-                           [](const integer_t &n) { return static_cast<unsigned long>(n); });
+            std::transform(v.begin(), v.end(), c_out.begin(), [](const integer_t &n) { return static_cast<int>(n); });
             s += "['mp++','convert'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nConvert runtime: ";
         }
-        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0u) << '\n';
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0) << '\n';
         s += "['mp++','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
     }
@@ -87,15 +90,14 @@ int main()
         double init_time;
         auto v = get_init_vector<cpp_int>(init_time);
         s += "['Boost (cpp_int)','init'," + std::to_string(init_time) + "],";
-        std::vector<unsigned> c_out(size);
+        std::vector<int> c_out(size);
         {
             simple_timer st2;
-            std::transform(v.begin(), v.end(), c_out.begin(),
-                           [](const cpp_int &n) { return static_cast<unsigned>(n); });
+            std::transform(v.begin(), v.end(), c_out.begin(), [](const cpp_int &n) { return static_cast<int>(n); });
             s += "['Boost (cpp_int)','convert'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nConvert runtime: ";
         }
-        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0u) << '\n';
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0) << '\n';
         s += "['Boost (cpp_int)','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
     }
@@ -105,15 +107,15 @@ int main()
         double init_time;
         auto v = get_init_vector<mpz_int>(init_time);
         s += "['Boost (mpz_int)','init'," + std::to_string(init_time) + "],";
-        std::vector<unsigned> c_out(size);
+        std::vector<int> c_out(size);
         {
             simple_timer st2;
             std::transform(v.begin(), v.end(), c_out.begin(),
-                           [](const mpz_int &n) { return static_cast<unsigned>(::mpz_get_ui(n.backend().data())); });
+                           [](const mpz_int &n) { return static_cast<int>(::mpz_get_si(n.backend().data())); });
             s += "['Boost (mpz_int)','convert'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nConvert runtime: ";
         }
-        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0u) << '\n';
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0) << '\n';
         s += "['Boost (mpz_int)','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
     }
