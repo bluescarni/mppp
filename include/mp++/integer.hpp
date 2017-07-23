@@ -1308,7 +1308,7 @@ private:
         static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
         const auto asize = Sign ? static_cast<std::size_t>(m_int.m_st._mp_size)
-                                : static_cast<std::size_t>(nint_sabs(m_int.m_st._mp_size));
+                                : static_cast<std::size_t>(nint_abs(m_int.m_st._mp_size));
         // Get the pointer to the limbs.
         const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
         // Init the retval with the first limb. This is safe as T has more bits than the limb type.

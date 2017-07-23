@@ -75,14 +75,14 @@ inline std::string to_string(const T &x)
 // we could init the integer with the wrong value, and we should be able to detect this in the unit tests.
 // Let's keep this in mind in the remote case this ever becomes a problem.
 template <typename T>
-constexpr typename std::make_unsigned<T>::type nint_abs(T n)
+constexpr make_unsigned<T> nint_abs(T n)
 {
     // NOTE: we should assert about negative n, but this is guaranteed to work properly only
     // from C++17:
     // https://stackoverflow.com/questions/26072709/alternative-to-asserts-for-constexpr-functions
     static_assert(std::is_integral<T>::value && std::is_signed<T>::value,
                   "The sint_abs() function can be used only with signed integral types.");
-    using uT = typename std::make_unsigned<T>::type;
+    using uT = make_unsigned<T>;
     // NOTE: the potential cast to "unsigned", rather than uT, is for when uT is a short integral type.
     // In such a case, the unary minus will trigger integral promotion to int/unsigned
     // int, and I am *not* 100% sure in this case the technique still works. Written like this, the cast
