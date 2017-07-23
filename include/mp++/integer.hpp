@@ -2004,8 +2004,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     // something into rop (via the mpn functions below), only to realize later that the computation overflows.
     // This would be bad because, in case of overlapping arguments, it would destroy one or two operands without
     // possibility of recovering. The alternative would be to do the computation in some local buffer and then
-    // copy
-    // it out, but that is rather costly. Note that this means that in principle a computation that could fit in
+    // copy it out, but that is rather costly. Note that this means that in principle a computation that could fit in
     // static storage ends up triggering a promotion.
     const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
     const bool c2 = std::size_t(asize2) == SSize && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
