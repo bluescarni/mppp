@@ -950,8 +950,14 @@ private:
     int_t m_den;
 };
 
+#if __cplusplus < 201703L
+
+// NOTE: see the explanation in integer.hpp regarding static constexpr variables in C++17.
+
 template <std::size_t SSize>
 constexpr std::size_t rational<SSize>::ssize;
+
+#endif
 
 inline namespace detail
 {

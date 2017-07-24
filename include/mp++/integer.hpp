@@ -1906,8 +1906,16 @@ private:
     integer_union<SSize> m_int;
 };
 
+#if __cplusplus < 201703L
+
+// NOTE: from C++17 static constexpr members are implicitly inline, and it's not necessary
+// any more (actually, it's deprecated) to re-declare them outside the class.
+// https://stackoverflow.com/questions/39646958/constexpr-static-member-before-after-c17
+
 template <std::size_t SSize>
 constexpr std::size_t integer<SSize>::ssize;
+
+#endif
 
 /** @defgroup integer_assignment integer_assignment
  *  @{
