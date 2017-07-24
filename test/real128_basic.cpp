@@ -39,4 +39,8 @@ TEST_CASE("real128 constructors")
     const char *mystr = "1.1";
     std::cout << static_cast<double>(real128{mystr, mystr + 3}) << '\n';
     std::cout << static_cast<long double>(real128{mystr, mystr + 3}) << '\n';
+    std::cout << static_cast<integer<1>>(real128{mystr, mystr + 3}) << '\n';
+    std::cout << static_cast<integer<1>>(real128{integer<1>{"1231238012938120938201938029138901283029138012983091283091"
+                                                            "283091283091201310012301301029381318240752987"}})
+              << '\n';
 }

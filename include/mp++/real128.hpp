@@ -136,10 +136,29 @@ public:
         return m_value;
     }
     template <std::size_t SSize>
-    constexpr explicit operator integer<SSize>() const
+    explicit operator integer<SSize>() const
     {
+        // Build the union and assign the value.
         ieee_float128 ief;
         ief.value = m_value;
+        // Get the sign.
+        const bool neg = ief.i_eee.negative;
+        // TODO.
+        integer<2> tmp{1u};
+        tmp <<= 112u;
+        tmp += integer<2>{ief.i_eee.mant_high} << 64u;
+        tmp += ief.i_eee.mant_low;
+        // Determine the exponent.
+        long exponent = static_cast<long>(ief.i_eee.exponent) - 16383 - 112;
+        if (exponent >= 0) {
+            tmp <<= static_cast<unsigned long>(exponent);
+        } else {
+            tmp >>= static_cast<unsigned long>(-exponent);
+        }
+        if (neg) {
+            tmp.neg();
+        }
+        return integer<SSize>{tmp.get_mpz_view()};
     }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
