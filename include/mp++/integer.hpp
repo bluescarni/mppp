@@ -1392,12 +1392,16 @@ private:
         retval = static_cast<T>(retval - static_cast<T>(r));
         return std::make_pair(true, retval);
     }
-    // Overload if the all the absolute values of T fit into a limb.
+    // Helper type trait to detect conversion to small signed integers (i.e., the absolute values of T fit
+    // into a limb). We need this instead of just typedeffing an std::integral_constant because MSVC
+    // chokes on constexpr functions in a SFINAE context.
     template <typename T>
-    using sconv_is_small
-        = std::integral_constant<bool, (c_max(static_cast<make_unsigned<T>>(std::numeric_limits<T>::max()),
-                                              nint_abs(std::numeric_limits<T>::min()))
-                                        <= GMP_NUMB_MAX)>;
+    struct sconv_is_small {
+        static const bool value = c_max(static_cast<make_unsigned<T>>(std::numeric_limits<T>::max()),
+                                        nint_abs(std::numeric_limits<T>::min()))
+                                  <= GMP_NUMB_MAX;
+    };
+    // Overload if the all the absolute values of T fit into a limb.
     template <typename T, enable_if_t<sconv_is_small<T>::value, int> = 0>
     std::pair<bool, T> convert_to_signed() const
     {
