@@ -13,15 +13,17 @@
 
 #if defined(MPPP_WITH_QUADMATH)
 
-#include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <mp++/concepts.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/quadmath.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
@@ -77,7 +79,7 @@ public:
         static_assert(sig_digits <= std::numeric_limits<unsigned>::max() - unsigned(GMP_NUMB_BITS), "Overflow error.");
         while (ls && read_bits < sig_digits) {
             // Number of bits to be read from the current limb: GMP_NUMB_BITS or less.
-            const unsigned rbits = std::min(unsigned(GMP_NUMB_BITS), sig_digits - read_bits);
+            const unsigned rbits = c_min(unsigned(GMP_NUMB_BITS), sig_digits - read_bits);
             // Shift m_value by rbits.
             m_value = ::scalbnq(m_value, static_cast<int>(rbits));
             // Add the bottom part, and move to the next limb. We might need to remove lower bits
@@ -87,14 +89,15 @@ public:
             read_bits += rbits;
         }
         if (read_bits < n_bits) {
-            // We have extra bits in n, we will have to shift m_value accordingly.
-            // Use the long variant to maximise the range.
+            // We did not read from n all its bits. This means that n has more bits than the quad-precision
+            // significand, and thus we need to multiply this by 2**unread_bits.
             if (mppp_unlikely(n_bits - read_bits > static_cast<unsigned long>(std::numeric_limits<long>::max()))) {
                 throw std::overflow_error(
                     "Overflow in the construction of a real128 from an integer: the second argument to scalblnq() is "
                     + std::to_string(n_bits - read_bits) + ", but the max allowed value is "
                     + std::to_string(std::numeric_limits<long>::max()));
             }
+            // Use the long variant of scalbn() to maximise the range.
             m_value = ::scalblnq(m_value, static_cast<long>(n_bits - read_bits));
         }
         // Fix the sign as needed.
@@ -104,6 +107,19 @@ public:
     }
     template <std::size_t SSize>
     explicit real128(const rational<SSize> &q) : m_value(real128{q.get_num()}.value() / real128{q.get_den()}.value())
+    {
+    }
+    explicit real128(const char *s) : m_value(str_to_float128(s))
+    {
+    }
+    explicit real128(const char *begin, const char *end)
+    {
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        buffer.assign(begin, end);
+        buffer.emplace_back('\0');
+        m_value = str_to_float128(buffer.data());
+    }
+    explicit real128(const std::string &s) : real128(s.c_str())
     {
     }
     real128(const real128 &) = default;
@@ -119,10 +135,31 @@ public:
     {
         return m_value;
     }
+    template <std::size_t SSize>
+    constexpr explicit operator integer<SSize>() const
+    {
+        ieee_float128 ief;
+        ief.value = m_value;
+    }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <CppInteroperable T>
+#else
+    template <typename T, cpp_interoperable_enabler<T> = 0>
+#endif
+    constexpr explicit operator T() const
+    {
+        return static_cast<T>(m_value);
+    }
 
 private:
     ::__float128 m_value;
 };
+
+inline std::ostream &operator<<(std::ostream &os, const real128 &r)
+{
+    float128_stream(os, r.value());
+    return os;
+}
 }
 
 #else

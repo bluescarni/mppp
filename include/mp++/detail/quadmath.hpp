@@ -9,7 +9,6 @@
 #ifndef MPPP_DETAIL_QUADMATH_HPP
 #define MPPP_DETAIL_QUADMATH_HPP
 
-#include <cstdint>
 #include <iostream>
 // NOTE: extern "C" is already included in quadmath.h since GCC 4.8:
 // https://stackoverflow.com/questions/13780219/link-libquadmath-with-c-on-linux
@@ -24,6 +23,11 @@ inline namespace detail
 {
 // Machinery for low-level manipulation of __float128. Inspired by:
 // https://github.com/gcc-mirror/gcc/blob/master/libquadmath/quadmath-imp.h
+// Note that the union machinery is technically UB, but well-defined on GCC as
+// an extension:
+// https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#Type%2Dpunning
+// quadmath so far is limited to GCC and perhaps clang, which I'd imagine
+// implements the same extension for GCC compatibility. So we should be ok.
 
 // The ieee fields.
 struct ieee_t
@@ -36,11 +40,13 @@ struct ieee_t
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     unsigned negative : 1;
     unsigned exponent : 15;
-    std::uint_least64_t mant_high : 48;
-    std::uint_least64_t mant_low : 64;
+    // ull provides at least 64 bits of storage, so it is ok
+    // to use it here.
+    unsigned long long mant_high : 48;
+    unsigned long long mant_low : 64;
 #else
-    std::uint_least64_t mant_low : 64;
-    std::uint_least64_t mant_high : 48;
+    unsigned long long mant_low : 64;
+    unsigned long long mant_high : 48;
     unsigned exponent : 15;
     unsigned negative : 1;
 #endif
@@ -55,6 +61,8 @@ union ieee_float128 {
 inline void float128_stream(std::ostream &os, const ::__float128 &x)
 {
     char buf[100];
+    // NOTE: 36 decimal digits ensures that reading back the string always produces the same value.
+    // https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
     const auto n = ::quadmath_snprintf(buf, sizeof(buf), "%.36Qe", x);
     if (mppp_unlikely(n < 0)) {
         // TODO.

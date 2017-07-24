@@ -34,4 +34,9 @@ TEST_CASE("real128 constructors")
     real128 blap5{rational<1>{"3232338832138213/-43834982310"}};
     float128_stream(std::cout, blap5.value());
     std::cout << "\n";
+    std::cout << real128{"1.1"} << '\n';
+    std::cout << real128{1.1} << '\n';
+    const char *mystr = "1.1";
+    std::cout << static_cast<double>(real128{mystr, mystr + 3}) << '\n';
+    std::cout << static_cast<long double>(real128{mystr, mystr + 3}) << '\n';
 }
