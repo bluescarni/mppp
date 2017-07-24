@@ -7,13 +7,18 @@ Changelog
 New
 ~~~
 
+- Implement the constructors from a range of characters and from ``std::string_view`` for :cpp:class:`~mppp::integer`
+  and :cpp:class:`~mppp::rational` (`#23 <https://github.com/bluescarni/mppp/pull/23>`__).
+
 - Implement the assignment operator and the constructor from ``mpz_t`` in :cpp:class:`~mppp::rational`
   (`#19 <https://github.com/bluescarni/mppp/pull/19>`__).
 
 Changes
 ~~~~~~~
 
-- Performance improvements for the :cpp:class:`~mppp::integer` constructors from C++ integrals
+- Performance improvements for :cpp:func:`mppp::integer::size()` (`#23 <https://github.com/bluescarni/mppp/pull/23>`__).
+
+- Performance improvements for the construction/conversion of :cpp:class:`~mppp::integer` from/to C++ integrals
   (`#23 <https://github.com/bluescarni/mppp/pull/23>`__).
 
 - Make sure the MPFR cleanup routine is automatically called on shutdown (`#22 <https://github.com/bluescarni/mppp/pull/22>`__).
@@ -23,7 +28,7 @@ Changes
 Fix
 ~~~
 
-- Various small documentation fixes.
+- Various small documentation and build system fixes.
 
 0.3 (2017-06-12)
 ----------------
