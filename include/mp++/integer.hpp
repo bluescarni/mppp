@@ -23,6 +23,9 @@
 #include <new>
 #include <stdexcept>
 #include <string>
+#if __cplusplus >= 201703L
+#include <string_view>
+#endif
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
@@ -948,6 +951,30 @@ public:
     {
         dispatch_generic_ctor(x);
     }
+
+private:
+    // Implementation of the constructor from C string. Requires a def-cted object.
+    void dispatch_c_string_ctor(const char *s, int base)
+    {
+        if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
+            throw std::invalid_argument(
+                "In the constructor of integer from string, a base of " + std::to_string(base)
+                + " was specified, but the only valid values are 0 and any value in the [2,62] range");
+        }
+        MPPP_MAYBE_TLS mpz_raii mpz;
+        if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
+            if (base) {
+                throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
+                                            + std::to_string(base));
+            } else {
+                throw std::invalid_argument(std::string("The string '") + s
+                                            + "' is not a valid integer in any supported base");
+            }
+        }
+        dispatch_mpz_ctor(&mpz.m_mpz);
+    }
+
+public:
     /// Constructor from C string.
     /**
      * This constructor will initialize \p this from the null-terminated string \p s, which must represent
@@ -969,22 +996,7 @@ public:
      */
     explicit integer(const char *s, int base = 10)
     {
-        if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
-            throw std::invalid_argument(
-                "In the constructor of integer from string, a base of " + std::to_string(base)
-                + " was specified, but the only valid values are 0 and any value in the [2,62] range");
-        }
-        MPPP_MAYBE_TLS mpz_raii mpz;
-        if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
-            if (base) {
-                throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
-                                            + std::to_string(base));
-            } else {
-                throw std::invalid_argument(std::string("The string '") + s
-                                            + "' is not a valid integer in any supported base");
-            }
-        }
-        dispatch_mpz_ctor(&mpz.m_mpz);
+        dispatch_c_string_ctor(s, base);
     }
     /// Constructor from C++ string (equivalent to the constructor from C string).
     /**
@@ -996,6 +1008,51 @@ public:
     explicit integer(const std::string &s, int base = 10) : integer(s.c_str(), base)
     {
     }
+    /// Constructor from range of characters.
+    /**
+     * This constructor will initialise \p this from the content of the input half-open range,
+     * which is interpreted as the string representation of an integer in base \p base.
+     *
+     * Internally, the constructor will copy the content of the range to a local buffer, add a
+     * string terminator, and invoke the constructor from C string.
+     *
+     * @param begin the begin of the input range.
+     * @param end the end of the input range.
+     * @param base the base used in the string representation.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
+    explicit integer(const char *begin, const char *end, int base = 10)
+    {
+        // Copy the range into a local buffer.
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        buffer.assign(begin, end);
+        buffer.emplace_back('\0');
+        dispatch_c_string_ctor(buffer.data(), base);
+    }
+#if __cplusplus >= 201703L
+    /// Constructor from string view.
+    /**
+     * This constructor will initialise \p this from the content of the input string view,
+     * which is interpreted as the string representation of an integer in base \p base.
+     *
+     * Internally, the constructor will invoke the constructor from a range of characters.
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This constructor is available only if at least C++17 is being used.
+     * \endrststar
+     *
+     * @param s the \p std::string view that will be used for construction.
+     * @param base the base used in the string representation.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
+    explicit integer(const std::string_view &s, int base = 10) : integer(s.data(), s.data() + s.size(), base)
+    {
+    }
+#endif
     /// Constructor from \p mpz_t.
     /**
      * This constructor will initialize \p this with the value of the GMP integer \p n. The storage type of \p this
@@ -1392,12 +1449,16 @@ private:
         retval = static_cast<T>(retval - static_cast<T>(r));
         return std::make_pair(true, retval);
     }
-    // Overload if the all the absolute values of T fit into a limb.
+    // Helper type trait to detect conversion to small signed integers (i.e., the absolute values of T fit
+    // into a limb). We need this instead of just typedeffing an std::integral_constant because MSVC
+    // chokes on constexpr functions in a SFINAE context.
     template <typename T>
-    using sconv_is_small
-        = std::integral_constant<bool, (c_max(static_cast<make_unsigned<T>>(std::numeric_limits<T>::max()),
-                                              nint_abs(std::numeric_limits<T>::min()))
-                                        <= GMP_NUMB_MAX)>;
+    struct sconv_is_small {
+        static const bool value = c_max(static_cast<make_unsigned<T>>(std::numeric_limits<T>::max()),
+                                        nint_abs(std::numeric_limits<T>::min()))
+                                  <= GMP_NUMB_MAX;
+    };
+    // Overload if the all the absolute values of T fit into a limb.
     template <typename T, enable_if_t<sconv_is_small<T>::value, int> = 0>
     std::pair<bool, T> convert_to_signed() const
     {
@@ -1844,9 +1905,6 @@ public:
 private:
     integer_union<SSize> m_int;
 };
-
-template <std::size_t SSize>
-constexpr std::size_t integer<SSize>::ssize;
 
 /** @defgroup integer_assignment integer_assignment
  *  @{

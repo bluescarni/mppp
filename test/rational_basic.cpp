@@ -18,6 +18,9 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#if __cplusplus >= 201703L
+#include <string_view>
+#endif
 #include <thread>
 #include <tuple>
 #include <type_traits>
@@ -317,6 +320,37 @@ struct string_ctor_tester {
                                  [](const std::invalid_argument &ia) {
                                      return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
                                  });
+        // Constructor from range of chars.
+        std::string s = "-1234";
+        REQUIRE((rational{s.data(), s.data() + 5} == -1234));
+        REQUIRE((rational{s.data(), s.data() + 4} == -123));
+        s = "-1234/345";
+        REQUIRE((rational{s.data(), s.data() + 9} == rational{-1234, 345}));
+        REQUIRE((rational{s.data(), s.data() + 8} == rational{-617, 17}));
+        s = "0x7b";
+        REQUIRE((rational{s.data(), s.data() + 4, 0} == 123));
+        s = "1E45";
+        REQUIRE_THROWS_PREDICATE(
+            (rational{s.data(), s.data() + 4, 12}), std::invalid_argument, [](const std::invalid_argument &ia) {
+                return std::string(ia.what()) == "The string '1E45' is not a valid integer in base 12";
+            });
+        // Try with an already terminated string.
+        const char *cs = "-1234/345\0";
+        REQUIRE((rational{cs, cs + 9} == rational{-1234, 345}));
+        REQUIRE((rational{cs, cs + 8} == rational{-617, 17}));
+#if __cplusplus >= 201703L
+        std::string_view sv = "-1234/345";
+        REQUIRE((rational{sv} == rational{-1234, 345}));
+        REQUIRE((rational{std::string_view{sv.data(), 8u}} == rational{-617, 17}));
+        sv = "0x7b";
+        REQUIRE((rational{sv, 0} == 123));
+        sv = "1E45";
+        REQUIRE_THROWS_PREDICATE((rational{sv, 12}), std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "The string '1E45' is not a valid integer in base 12";
+        });
+        REQUIRE((rational{std::string_view{cs, 9}} == rational{-1234, 345}));
+        REQUIRE((rational{std::string_view{cs, 8}} == rational{-617, 17}));
+#endif
     }
 };
 
