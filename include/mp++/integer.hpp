@@ -1393,11 +1393,12 @@ private:
         return std::make_pair(true, retval);
     }
     // Overload if the all the absolute values of T fit into a limb.
-    template <typename T,
-              enable_if_t<(c_max(static_cast<make_unsigned<T>>(std::numeric_limits<T>::max()),
-                                 nint_abs(std::numeric_limits<T>::min()))
-                           <= GMP_NUMB_MAX),
-                          int> = 0>
+    template <typename T>
+    using sconv_is_small
+        = std::integral_constant<bool, (c_max(static_cast<make_unsigned<T>>(std::numeric_limits<T>::max()),
+                                              nint_abs(std::numeric_limits<T>::min()))
+                                        <= GMP_NUMB_MAX)>;
+    template <typename T, enable_if_t<sconv_is_small<T>::value, int> = 0>
     std::pair<bool, T> convert_to_signed() const
     {
         static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
@@ -1424,11 +1425,7 @@ private:
         }
     }
     // Overload if not all the absolute values of T fit into a limb.
-    template <typename T,
-              enable_if_t<(c_max(static_cast<make_unsigned<T>>(std::numeric_limits<T>::max()),
-                                 nint_abs(std::numeric_limits<T>::min()))
-                           > GMP_NUMB_MAX),
-                          int> = 0>
+    template <typename T, enable_if_t<!sconv_is_small<T>::value, int> = 0>
     std::pair<bool, T> convert_to_signed() const
     {
         // Cache a couple of quantities for convenience.
