@@ -1906,6 +1906,9 @@ private:
     integer_union<SSize> m_int;
 };
 
+template <std::size_t SSize>
+constexpr std::size_t integer<SSize>::ssize;
+
 /** @defgroup integer_assignment integer_assignment
  *  @{
  */

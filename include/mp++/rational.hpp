@@ -950,6 +950,9 @@ private:
     int_t m_den;
 };
 
+template <std::size_t SSize>
+constexpr std::size_t rational<SSize>::ssize;
+
 inline namespace detail
 {
 
