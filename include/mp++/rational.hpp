@@ -637,7 +637,7 @@ private:
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        return {true, m_num.m_int.m_st._mp_size != 0};
+        return std::make_pair(true, m_num.m_int.m_st._mp_size != 0);
     }
     // Conversion to integral types other than bool.
     template <typename T,
@@ -650,7 +650,7 @@ private:
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        return {true, static_cast<T>(::mpq_get_d(get_mpq_view()))};
+        return std::make_pair(true, static_cast<T>(::mpq_get_d(get_mpq_view())));
     }
 #if defined(MPPP_WITH_MPFR)
     // Conversion to long double.
@@ -663,7 +663,7 @@ private:
         MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(d2));
         ::mpf_set_q(&mpf.m_mpf, get_mpq_view());
         ::mpfr_set_f(&mpfr.m_mpfr, &mpf.m_mpf, MPFR_RNDN);
-        return {true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN)};
+        return std::make_pair(true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN));
     }
 #endif
 

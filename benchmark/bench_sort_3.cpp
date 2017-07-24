@@ -40,8 +40,8 @@ using mpz_int = boost::multiprecision::mpz_int;
 using fmpzxx = flint::fmpzxx;
 #endif
 
-using integer_t = integer<1>;
-static const std::string name = "bench_sort_1";
+using integer_t = integer<3>;
+static const std::string name = "bench_sort_3";
 
 constexpr auto size = 30000000ul;
 
