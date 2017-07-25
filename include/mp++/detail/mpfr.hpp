@@ -62,7 +62,7 @@ static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limi
 extern "C" {
 
 // NOTE: the cleanup function should have C linkage, as it will be passed to atexit()
-// which is a function fomr the C standard library.
+// which is a function from the C standard library.
 void mpfr_cleanup_function();
 }
 
