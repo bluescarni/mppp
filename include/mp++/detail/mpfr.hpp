@@ -66,6 +66,7 @@ extern "C" {
 void mpfr_cleanup_function();
 }
 
+// The actual implementation.
 inline void mpfr_cleanup_function()
 {
 #if !defined(NDEBUG)

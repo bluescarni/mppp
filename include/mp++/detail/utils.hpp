@@ -9,6 +9,7 @@
 #ifndef MPPP_DETAIL_UTILS_HPP
 #define MPPP_DETAIL_UTILS_HPP
 
+#include <cassert>
 #include <limits>
 #include <string>
 #include <type_traits>
@@ -77,9 +78,12 @@ inline std::string to_string(const T &x)
 template <typename T>
 constexpr make_unsigned<T> nint_abs(T n)
 {
-    // NOTE: we should assert about negative n, but this is guaranteed to work properly only
-    // from C++17:
-    // https://stackoverflow.com/questions/26072709/alternative-to-asserts-for-constexpr-functions
+// NOTE: we should assert about negative n, but this is guaranteed to work properly only
+// from C++17:
+// https://stackoverflow.com/questions/26072709/alternative-to-asserts-for-constexpr-functions
+#if __cplusplus >= 201703L
+    assert(n < T(0));
+#endif
     static_assert(std::is_integral<T>::value && std::is_signed<T>::value,
                   "The sint_abs() function can be used only with signed integral types.");
     using uT = make_unsigned<T>;
