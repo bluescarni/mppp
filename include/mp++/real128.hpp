@@ -141,24 +141,46 @@ public:
         // Build the union and assign the value.
         ieee_float128 ief;
         ief.value = m_value;
+        if (ief.i_eee.exponent == 32767u) {
+            // Inf or nan, not representable by integer.
+            throw std::domain_error("Cannot convert a non-finite real128 to an integer");
+        }
+        // Determine the real exponent.
+        const auto exponent = static_cast<long>(ief.i_eee.exponent) - 16383 - 112;
+        if (!ief.i_eee.exponent || exponent < -112) {
+            // Zero stored exponent means subnormal number, and if the real exponent is too small
+            // we end up with a value with abs less than 1. In such cases, just return 0.
+            return integer<SSize>{};
+        }
+        // Value is normalised and not less than 1 in abs. We can proceed.
         // Get the sign.
         const bool neg = ief.i_eee.negative;
-        // TODO.
-        integer<2> tmp{1u};
-        tmp <<= 112u;
-        tmp += integer<2>{ief.i_eee.mant_high} << 64u;
-        tmp += ief.i_eee.mant_low;
-        // Determine the exponent.
-        long exponent = static_cast<long>(ief.i_eee.exponent) - 16383 - 112;
+        integer<SSize> retval{1u};
         if (exponent >= 0) {
-            tmp <<= static_cast<unsigned long>(exponent);
+            retval <<= 112u;
+            retval += integer<SSize>{ief.i_eee.mant_high} << 64u;
+            retval += ief.i_eee.mant_low;
+            retval <<= static_cast<unsigned long>(exponent);
         } else {
-            tmp >>= static_cast<unsigned long>(-exponent);
+            // NOTE: the idea here is to avoid shifting up and then shifting back down,
+            // as that might trigger a promotion to dynamic storage in retval. Instead,
+            // we offset the shifts by the (negative) exponent, which is here guaranteed
+            // to be in the [-112,-1] range.
+            retval <<= static_cast<unsigned>(112 + exponent);
+            if (exponent + 64 >= 0) {
+                retval += integer<SSize>{ief.i_eee.mant_high} << static_cast<unsigned>(exponent + 64);
+            } else {
+                retval += integer<SSize>{ief.i_eee.mant_high} >> static_cast<unsigned>(-(exponent + 64));
+            }
+            if (exponent > -64) {
+                retval += ief.i_eee.mant_low >> static_cast<unsigned>(-exponent);
+            }
         }
+        // Adjust the sign.
         if (neg) {
-            tmp.neg();
+            retval.neg();
         }
-        return integer<SSize>{tmp.get_mpz_view()};
+        return retval;
     }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
