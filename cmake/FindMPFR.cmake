@@ -29,8 +29,8 @@
 # ------------------------------------------------------------------------------------------
 
 if(MPFR_INCLUDE_DIR AND MPFR_LIBRARY)
-	# Already in cache, be silent
-	set(MPFR_FIND_QUIETLY TRUE)
+    # Already in cache, be silent
+    set(MPFR_FIND_QUIETLY TRUE)
 endif()
 
 find_path(MPFR_INCLUDE_DIR NAMES mpfr.h)
