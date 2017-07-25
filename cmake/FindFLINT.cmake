@@ -29,8 +29,8 @@
 # ------------------------------------------------------------------------------------------
 
 if(FLINT_INCLUDE_DIR AND FLINT_LIBRARY)
-	# Already in cache, be silent
-	set(FLINT_FIND_QUIETLY TRUE)
+    # Already in cache, be silent
+    set(FLINT_FIND_QUIETLY TRUE)
 endif()
 
 find_path(FLINT_INCLUDE_DIR NAMES flint/fmpz.h)
@@ -44,7 +44,7 @@ mark_as_advanced(FLINT_INCLUDE_DIR FLINT_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
 if(FLINT_FOUND AND NOT TARGET FLINT::FLINT)
-	add_library(FLINT::FLINT UNKNOWN IMPORTED)
+    add_library(FLINT::FLINT UNKNOWN IMPORTED)
     set_target_properties(FLINT::FLINT PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${FLINT_INCLUDE_DIR};${FLINT_INCLUDE_DIR}/flint"
         IMPORTED_LINK_INTERFACE_LANGUAGES "C"
         IMPORTED_LOCATION "${FLINT_LIBRARY}")
