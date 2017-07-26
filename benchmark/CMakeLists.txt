@@ -1,5 +1,11 @@
 if(MPPP_BENCHMARK_BOOST)
   find_package(Boost 1.55.0 REQUIRED)
+  if(NOT TARGET Boost::boost)
+    # Depending on the CMake version, Boost::boost might not have been created.
+    message(STATUS "The 'Boost::boost' target is missing, creating it.")
+    add_library(Boost::boost INTERFACE IMPORTED)
+    set_target_properties(Boost::boost PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIRS}")
+  endif()
 endif()
 
 if(MPPP_BENCHMARK_FLINT)

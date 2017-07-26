@@ -2443,7 +2443,9 @@ inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
 template <std::size_t SSize>
 inline int cmp(const rational<SSize> &op1, const integer<SSize> &op2)
 {
-    return ::mpq_cmp_z(op1.get_mpq_view(), op2.get_mpz_view());
+    // NOTE: mpq_cmp_z() is a macro or a function, depending on the GMP version. Don't
+    // call it with "::".
+    return mpq_cmp_z(op1.get_mpq_view(), op2.get_mpz_view());
 }
 
 /// Comparison function for integer/rational arguments.
