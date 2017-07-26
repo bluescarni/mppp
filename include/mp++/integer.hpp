@@ -2776,10 +2776,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
     }
     if (asize1 == 1 && asize2 == 1) {
         rop.m_limbs[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &rop.m_limbs[1]);
-        rop._mp_size = static_cast<mpz_size_t>((asize1 + asize2) - mpz_size_t(rop.m_limbs[1] == 0u));
-        if (sign1 != sign2) {
-            rop._mp_size = -rop._mp_size;
-        }
+        rop._mp_size = sign1 * sign2 * static_cast<mpz_size_t>(2 - mpz_size_t(rop.m_limbs[1] == 0u));
         return 0u;
     }
     if (asize1 != asize2) {
@@ -2805,10 +2802,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
         const mpz_size_t asize = 2 + mpz_size_t(tmp2 != 0u);
         if (asize == 2) {
             // Size is good, write out the result.
-            rop._mp_size = asize;
-            if (sign1 != sign2) {
-                rop._mp_size = -rop._mp_size;
-            }
+            rop._mp_size = sign1 * sign2 * asize;
             rop.m_limbs[0] = tmp0;
             rop.m_limbs[1] = tmp1;
             return 0u;
@@ -2888,7 +2882,7 @@ using integer_static_addmul_algo
                                         : 0)>;
 
 // NOTE: same return value as mul: 0 for success, otherwise a hint for the size of the result.
-template <bool, std::size_t SSize>
+template <std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
                                       const static_int<SSize> &op2, mpz_size_t asizer, mpz_size_t asize1,
                                       mpz_size_t asize2, int signr, int sign1, int sign2,
@@ -2916,10 +2910,10 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     return 0u;
 }
 
-template <bool AddOrSub, std::size_t SSize>
+template <std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
-                                      const static_int<SSize> &op2, mpz_size_t, mpz_size_t, mpz_size_t, int signr, int,
-                                      int, const std::integral_constant<int, 1> &)
+                                      const static_int<SSize> &op2, mpz_size_t, mpz_size_t, mpz_size_t, int signr,
+                                      int sign1, int sign2, const std::integral_constant<int, 1> &)
 {
     // First we do op1 * op2.
     ::mp_limb_t tmp;
@@ -2928,7 +2922,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
         return 3u;
     }
     // Determine the sign of the product: 0, 1 or -1.
-    const int sign_prod = static_cast<int>(op1._mp_size * (AddOrSub ? op2._mp_size : -op2._mp_size));
+    const int sign_prod = sign1 * sign2;
     // Now add/sub.
     if (signr == sign_prod) {
         // Same sign, do addition with overflow check.
@@ -2944,10 +2938,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
             // abs(rop) >= abs(prod).
             tmp = rop.m_limbs[0] - prod;
             // asize is either 1 or 0 (0 iff rop == prod).
-            rop._mp_size = signr;
-            if (mppp_unlikely(!tmp)) {
-                rop._mp_size = 0;
-            }
+            rop._mp_size = signr * static_cast<int>(tmp != 0u);
             rop.m_limbs[0] = tmp;
         } else {
             // NOTE: this cannot be zero, as rop and prod cannot be equal.
@@ -2958,7 +2949,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     return 0u;
 }
 
-template <bool, std::size_t SSize>
+template <std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
                                       const static_int<SSize> &op2, mpz_size_t asizer, mpz_size_t asize1,
                                       mpz_size_t asize2, int signr, int sign1, int sign2,
@@ -3083,8 +3074,8 @@ inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSi
         asize2 = -asize2;
         sign2 = -1;
     }
-    const std::size_t retval = static_addmul_impl<AddOrSub>(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
-                                                            integer_static_addmul_algo<static_int<SSize>>{});
+    const std::size_t retval = static_addmul_impl(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
+                                                  integer_static_addmul_algo<static_int<SSize>>{});
     if (integer_static_addmul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
         rop.zero_unused_limbs();
     }
