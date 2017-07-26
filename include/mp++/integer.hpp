@@ -2342,7 +2342,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             assert(data2[0] >= data1[0] || data2[1] > data1[1]);
             const auto hi = data2[1] - data1[1] - static_cast<::mp_limb_t>(data2[0] < data1[0]);
             // asize can be 1 or 2, but not zero as we know abs(op1) != abs(op2). Same idea as above.
-            rop._mp_size = sign2 * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
+            rop._mp_size = sign2 * (static_cast<int>(hi != 0u) + 1);
             rdata[0] = lo;
             rdata[1] = hi;
         }
@@ -2767,16 +2767,12 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
                                    mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                    const std::integral_constant<int, 2> &)
 {
-    if (mppp_unlikely(!asize1 || !asize2)) {
-        // Handle zeroes.
-        rop._mp_size = 0;
-        rop.m_limbs[0] = 0u;
-        rop.m_limbs[1] = 0u;
-        return 0u;
-    }
-    if (asize1 == 1 && asize2 == 1) {
+    if (asize1 <= 1 && asize2 <= 1) {
+        // NOTE: this handles zeroes as well: we know that the limbs are all zeroes in such
+        // a case (as we always guarantee unused limbs are zeroed), and the sign1 * sign2 multiplication takes care of
+        // the size.
         rop.m_limbs[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &rop.m_limbs[1]);
-        rop._mp_size = sign1 * sign2 * static_cast<mpz_size_t>(2 - mpz_size_t(rop.m_limbs[1] == 0u));
+        rop._mp_size = sign1 * sign2 * static_cast<mpz_size_t>(2 - (rop.m_limbs[1] == 0u));
         return 0u;
     }
     if (asize1 != asize2) {
@@ -2961,14 +2957,11 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     }
     // Handle op1 * op2.
     std::array<::mp_limb_t, 2> prod;
-    int sign_prod = 1;
-    if (sign1 != sign2) {
-        sign_prod = -1;
-    }
+    const int sign_prod = sign1 * sign2;
     mpz_size_t asize_prod;
     if (asize1 == 1 && asize2 == 1) {
         prod[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &prod[1]);
-        asize_prod = (asize1 + asize2) - mpz_size_t(prod[1] == 0u);
+        asize_prod = (asize1 + asize2) - (prod[1] == 0u);
     } else {
         // The only possibility of success is 2limbs x 1limb.
         //
@@ -3014,10 +3007,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
         // - cannot be zero, as prod is not zero,
         // - if signr == +-1, then the size is either +-1 or +-2: asize is 2 if the result
         //   has a nonzero 2nd limb, otherwise asize is 1.
-        rop._mp_size = signr;
-        if (hi2) {
-            rop._mp_size = signr + signr;
-        }
+        rop._mp_size = signr * (static_cast<int>(hi2 != 0u) + 1);
         rop.m_limbs[0] = lo;
         rop.m_limbs[1] = hi2;
     } else {
@@ -3031,12 +3021,8 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
             // This can never wrap around, at most it goes to zero.
             const auto hi = rop.m_limbs[1] - prod[1] - static_cast<::mp_limb_t>(rop.m_limbs[0] < prod[0]);
             // asize can be 0, 1 or 2.
-            rop._mp_size = 0;
-            if (hi) {
-                rop._mp_size = signr + signr;
-            } else if (lo) {
-                rop._mp_size = signr;
-            }
+            // NOTE: see the comments in the 2-limb specialisation for addition.
+            rop._mp_size = signr * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
             rop.m_limbs[0] = lo;
             rop.m_limbs[1] = hi;
         } else {
@@ -3045,10 +3031,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
             assert(prod[0] >= rop.m_limbs[0] || prod[1] > rop.m_limbs[1]);
             const auto hi = prod[1] - rop.m_limbs[1] - static_cast<::mp_limb_t>(prod[0] < rop.m_limbs[0]);
             // asize can be 1 or 2, but not zero as we know abs(prod) != abs(rop).
-            rop._mp_size = sign_prod;
-            if (hi) {
-                rop._mp_size = sign_prod + sign_prod;
-            }
+            rop._mp_size = sign_prod * (static_cast<int>(hi != 0u) + 1);
             rop.m_limbs[0] = lo;
             rop.m_limbs[1] = hi;
         }
