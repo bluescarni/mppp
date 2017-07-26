@@ -16,13 +16,13 @@
 #include <utility>
 #include <vector>
 
-#include "simple_timer.hpp"
-
 #if defined(MPPP_BENCHMARK_BOOST)
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/gmp.hpp>
 #include <gmp.h>
 #endif
+
+#include "simple_timer.hpp"
 
 using namespace mppp;
 using namespace mppp_bench;
@@ -36,8 +36,8 @@ using cpp_int = boost::multiprecision::
 using mpz_int = boost::multiprecision::mpz_int;
 #endif
 
-using integer_t = integer<1>;
-static const std::string name = "bench_convert_1";
+using integer_t = integer<2>;
+static const std::string name = "integer2_int_conversion";
 
 constexpr auto size = 30000000ul;
 
@@ -49,7 +49,7 @@ static inline std::vector<T> get_init_vector(double &init_time)
     rng.seed(0);
     simple_timer st;
     std::vector<T> retval(size);
-    std::uniform_int_distribution<int> dist(-30000, 30000);
+    std::uniform_int_distribution<int> dist(-10000, 10000);
     std::generate(retval.begin(), retval.end(), [&dist]() { return T(dist(rng)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
@@ -79,8 +79,8 @@ int main()
             s += "['mp++','convert'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nConvert runtime: ";
         }
-        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0) << '\n';
         s += "['mp++','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0l) << '\n';
         std::cout << "\nTotal runtime: ";
     }
 #if defined(MPPP_BENCHMARK_BOOST)
@@ -97,8 +97,8 @@ int main()
             s += "['Boost (cpp_int)','convert'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nConvert runtime: ";
         }
-        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0) << '\n';
         s += "['Boost (cpp_int)','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0l) << '\n';
         std::cout << "\nTotal runtime: ";
     }
     {
@@ -115,8 +115,8 @@ int main()
             s += "['Boost (mpz_int)','convert'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nConvert runtime: ";
         }
-        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0) << '\n';
         s += "['Boost (mpz_int)','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0l) << '\n';
         std::cout << "\nTotal runtime: ";
     }
 #endif
@@ -132,7 +132,7 @@ int main()
          "    df = get_data()\n"
          "    g = sns.factorplot(x='Library', y = 'Runtime (ms)', hue='Task', data=df, kind='bar', palette='muted', "
          "legend = False, size = 5.5, aspect = 1.5)\n"
-         "    legend(loc='upper right')\n"
+         "    legend(loc='upper left')\n"
          "    g.fig.suptitle('"
          + name + "')\n"
                   "    g.savefig('"
