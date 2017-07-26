@@ -2750,18 +2750,16 @@ inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 // 1-limb optimization via dlimb.
 template <std::size_t SSize>
 inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
-                                   mpz_size_t, mpz_size_t, int sign1, int sign2, const std::integral_constant<int, 1> &)
+                                   mpz_size_t, mpz_size_t, int, int, const std::integral_constant<int, 1> &)
 {
     ::mp_limb_t hi;
     const ::mp_limb_t lo = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &hi);
     if (mppp_unlikely(hi)) {
         return 2u;
     }
-    const mpz_size_t asize = (lo != 0u);
-    rop._mp_size = asize;
-    if (sign1 != sign2) {
-        rop._mp_size = -rop._mp_size;
-    }
+    // The size will be zero if at least one operand is zero, otherwise +-1
+    // depending on the signs of the operands.
+    rop._mp_size = op1._mp_size * op2._mp_size;
     rop.m_limbs[0] = lo;
     return 0u;
 }
@@ -2923,8 +2921,8 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
 
 template <std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
-                                      const static_int<SSize> &op2, mpz_size_t, mpz_size_t, mpz_size_t, int signr,
-                                      int sign1, int sign2, const std::integral_constant<int, 1> &)
+                                      const static_int<SSize> &op2, mpz_size_t, mpz_size_t, mpz_size_t, int signr, int,
+                                      int, const std::integral_constant<int, 1> &)
 {
     // First we do op1 * op2.
     ::mp_limb_t tmp;
@@ -2933,10 +2931,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
         return 3u;
     }
     // Determine the sign of the product: 0, 1 or -1.
-    int sign_prod = prod != 0u;
-    if (sign1 != sign2) {
-        sign_prod = -sign_prod;
-    }
+    int sign_prod = static_cast<int>(op1._mp_size * op2._mp_size);
     // Now add/sub.
     if (signr == sign_prod) {
         // Same sign, do addition with overflow check.
