@@ -803,6 +803,7 @@ private:
             // Recover the upper limb.
             m_int.g_dy()._mp_d[SSize - 1u] = limb_copy;
         }
+        // LCOV_EXCL_START
         if (m_int.g_dy()._mp_alloc == asize) {
             // There is not enough space for the extra limb, we need to reallocate.
             // NOTE: same as above, make sure the top limb contains something. mpz_realloc2() seems not to care,
@@ -818,6 +819,7 @@ private:
             }
             m_int.g_dy()._mp_d[asize - 1] = limb_copy;
         }
+        // LCOV_EXCL_STOP
         // Write the extra limb, update the size.
         ++m_int.g_dy()._mp_size;
         m_int.g_dy()._mp_d[asize] = l;
@@ -1382,12 +1384,14 @@ private:
             }
             // Get the current limb. Safe as T has more bits than the limb type.
             const auto l = static_cast<T>(ptr[i] & GMP_NUMB_MASK);
+            // LCOV_EXCL_START
             if (l >> (u_bits - shift)) {
                 // Left-shifting the current limb is well-defined from the point of view of the language, but the result
                 // overflows: the value does not fit in T.
                 // NOTE: I suspect this branch can be triggered on common architectures only with nail builds.
                 return std::make_pair(false, T(0));
             }
+            // LCOV_EXCL_STOP
             // This will not overflow, as there is no carry from retval and l << shift is fine.
             retval = static_cast<T>(retval + (l << shift));
         }
@@ -1434,18 +1438,28 @@ private:
         if (n > Tmin_abs) {
             return std::make_pair(false, T(0));
         }
-        if (Tmin_abs <= Tmax || n <= Tmax) {
-            // Either the negative range of T is leq than the positive one, or n
-            // is not greater than Tmax: we can convert to T and negate safely.
+        // LCOV_EXCL_START
+        if (Tmin_abs <= Tmax) {
+            // The negative range of T is leq than the positive one: we can convert to T and negate safely.
+            // NOTE: this is never hit on current architectures.
             return std::make_pair(true, static_cast<T>(-static_cast<T>(n)));
         }
+        // LCOV_EXCL_STOP
+        // NOTE: double check this, since:
+        // - Tmin_abs > Tmax (as checked just above),
+        // - n > c_min(Tmax, Tmin_abs) (as checked earlier).
+        assert(n > Tmax);
         // The negative range is greater than the positive one and n larger than Tmax:
         // we cannot directly convert n to T. The idea then is to init retval to -Tmax
         // and then to subtract from it Tmax as many times as needed.
         auto retval = static_cast<T>(-static_cast<T>(Tmax));
         const auto q = static_cast<make_unsigned<T>>(n / Tmax), r = static_cast<make_unsigned<T>>(n % Tmax);
         for (make_unsigned<T> i = 0; i < q - 1u; ++i) {
+            // LCOV_EXCL_START
+            // NOTE: this is never hit on current archs, as Tmax differs from Tmin_abs
+            // by just 1: we will use only the remainder r.
             retval = static_cast<T>(retval - static_cast<T>(Tmax));
+            // LCOV_EXCL_STOP
         }
         retval = static_cast<T>(retval - static_cast<T>(r));
         return std::make_pair(true, retval);
