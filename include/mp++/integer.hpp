@@ -2931,7 +2931,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
         return 3u;
     }
     // Determine the sign of the product: 0, 1 or -1.
-    int sign_prod = static_cast<int>(op1._mp_size * op2._mp_size);
+    const int sign_prod = static_cast<int>(op1._mp_size * op2._mp_size);
     // Now add/sub.
     if (signr == sign_prod) {
         // Same sign, do addition with overflow check.
