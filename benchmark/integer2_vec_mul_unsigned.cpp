@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <mp++/mp++.hpp>
+#include <random>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -39,18 +40,22 @@ using mpz_int = boost::multiprecision::mpz_int;
 using fmpzxx = flint::fmpzxx;
 #endif
 
-using integer_t = integer<3>;
-static const std::string name = "bench_vec_mul_3";
+static std::mt19937 rng;
+
+using integer_t = integer<2>;
+static const std::string name = "integer2_vec_mul_unsigned";
 
 constexpr auto size = 30000000ul;
 
 template <typename T>
 static inline std::tuple<std::vector<T>, std::vector<T>, std::vector<T>> get_init_vectors(double &init_time)
 {
+    rng.seed(0);
+    std::uniform_int_distribution<unsigned> dist(1u, 7u);
     simple_timer st;
     std::vector<T> v1(size), v2(size), v3(size);
-    std::fill(v1.begin(), v1.end(), T(2));
-    std::fill(v2.begin(), v2.end(), T(2));
+    std::generate(v1.begin(), v1.end(), [&dist]() { return T(dist(rng)); });
+    std::generate(v2.begin(), v2.end(), [&dist]() { return T(dist(rng)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
     return std::make_tuple(std::move(v1), std::move(v2), std::move(v3));
