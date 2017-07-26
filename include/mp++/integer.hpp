@@ -2891,7 +2891,7 @@ using integer_static_addmul_algo
                                         : 0)>;
 
 // NOTE: same return value as mul: 0 for success, otherwise a hint for the size of the result.
-template <std::size_t SSize>
+template <bool, std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
                                       const static_int<SSize> &op2, mpz_size_t asizer, mpz_size_t asize1,
                                       mpz_size_t asize2, int signr, int sign1, int sign2,
@@ -2919,7 +2919,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     return 0u;
 }
 
-template <std::size_t SSize>
+template <bool AddOrSub, std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
                                       const static_int<SSize> &op2, mpz_size_t, mpz_size_t, mpz_size_t, int signr, int,
                                       int, const std::integral_constant<int, 1> &)
@@ -2931,7 +2931,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
         return 3u;
     }
     // Determine the sign of the product: 0, 1 or -1.
-    const int sign_prod = static_cast<int>(op1._mp_size * op2._mp_size);
+    const int sign_prod = static_cast<int>(op1._mp_size * (AddOrSub ? op2._mp_size : -op2._mp_size));
     // Now add/sub.
     if (signr == sign_prod) {
         // Same sign, do addition with overflow check.
@@ -2961,7 +2961,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     return 0u;
 }
 
-template <std::size_t SSize>
+template <bool, std::size_t SSize>
 inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<SSize> &op1,
                                       const static_int<SSize> &op2, mpz_size_t asizer, mpz_size_t asize1,
                                       mpz_size_t asize2, int signr, int sign1, int sign2,
@@ -3086,8 +3086,8 @@ inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSi
         asize2 = -asize2;
         sign2 = -1;
     }
-    const std::size_t retval = static_addmul_impl(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
-                                                  integer_static_addmul_algo<static_int<SSize>>{});
+    const std::size_t retval = static_addmul_impl<AddOrSub>(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
+                                                            integer_static_addmul_algo<static_int<SSize>>{});
     if (integer_static_addmul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
         rop.zero_unused_limbs();
     }

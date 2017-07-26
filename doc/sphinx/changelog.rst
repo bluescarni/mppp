@@ -30,9 +30,9 @@ Changes
 Fix
 ~~~
 
-- Fix a build failure on older GMP versions.
+- Fix a build failure on older GMP versions (`#25 <https://github.com/bluescarni/mppp/pull/25>`__).
 
-- Fix a build system bug when building the benchmarks with older CMake versions.
+- Fix a build system bug when building the benchmarks with older CMake versions (`#25 <https://github.com/bluescarni/mppp/pull/25>`__).
 
 - Various minor fixes.
 
