@@ -200,6 +200,11 @@ class rational
     friend int cmp(const rational<S> &, const rational<S> &);
     template <std::size_t S>
     friend int cmp(const rational<S> &, const integer<S> &);
+#if defined(MPPP_WITH_MPFR)
+    // Make friends with real (for the mpq view).
+    template <std::size_t>
+    friend class real;
+#endif
 #endif
 
 public:
