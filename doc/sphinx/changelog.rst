@@ -7,6 +7,8 @@ Changelog
 Changes
 ~~~~~~~
 
+- Update the internal copy of Catch to the latest version, 1.9.6 (`#24 <https://github.com/bluescarni/mppp/pull/24>`__).
+
 - Implement the assignment operator and the constructor from ``mpz_t`` in :cpp:class:`~mppp::rational`
   (`#19 <https://github.com/bluescarni/mppp/pull/19>`__).
 
