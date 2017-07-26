@@ -18,8 +18,12 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#if __cplusplus >= 201703L
+#include <string_view>
+#endif
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <mp++/concepts.hpp>
 #include <mp++/config.hpp>
@@ -348,23 +352,10 @@ public:
         }
         canonicalise();
     }
-    /// Constructor from C string.
-    /**
-     * \rststar
-     * This constructor will initialize ``this`` from the null-terminated string ``s``, which must represent
-     * a rational value in base ``base``. The expected format is either a numerator-denominator pair separated
-     * by the division operator ``/``, or just a numerator (in which case the denominator will be set to one).
-     * The format for numerator and denominator is described in the documentation of the constructor from string
-     * of :cpp:class:`~mppp::integer`.
-     * \endrststar
-     *
-     * @param s the input string.
-     * @param base the base used in the string representation.
-     *
-     * @throws zero_division_error if the denominator is zero.
-     * @throws unspecified any exception thrown by the string constructor of mppp::integer.
-     */
-    explicit rational(const char *s, int base = 10)
+
+private:
+    // Implementation of the constructor from C string. Requires a def-cted object.
+    void dispatch_c_string_ctor(const char *s, int base)
     {
         MPPP_MAYBE_TLS std::string tmp_str;
         auto ptr = s;
@@ -384,6 +375,28 @@ public:
             canonicalise();
         }
     }
+
+public:
+    /// Constructor from C string.
+    /**
+     * \rststar
+     * This constructor will initialize ``this`` from the null-terminated string ``s``, which must represent
+     * a rational value in base ``base``. The expected format is either a numerator-denominator pair separated
+     * by the division operator ``/``, or just a numerator (in which case the denominator will be set to one).
+     * The format for numerator and denominator is described in the documentation of the constructor from string
+     * of :cpp:class:`~mppp::integer`.
+     * \endrststar
+     *
+     * @param s the input string.
+     * @param base the base used in the string representation.
+     *
+     * @throws zero_division_error if the denominator is zero.
+     * @throws unspecified any exception thrown by the string constructor of mppp::integer.
+     */
+    explicit rational(const char *s, int base = 10)
+    {
+        dispatch_c_string_ctor(s, base);
+    }
     /// Constructor from C++ string (equivalent to the constructor from C string).
     /**
      * @param s the input string.
@@ -394,6 +407,51 @@ public:
     explicit rational(const std::string &s, int base = 10) : rational(s.c_str(), base)
     {
     }
+    /// Constructor from range of characters.
+    /**
+     * This constructor will initialise \p this from the content of the input half-open range,
+     * which is interpreted as the string representation of a rational in base \p base.
+     *
+     * Internally, the constructor will copy the content of the range to a local buffer, add a
+     * string terminator, and invoke the constructor from C string.
+     *
+     * @param begin the begin of the input range.
+     * @param end the end of the input range.
+     * @param base the base used in the string representation.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
+    explicit rational(const char *begin, const char *end, int base = 10)
+    {
+        // Copy the range into a local buffer.
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        buffer.assign(begin, end);
+        buffer.emplace_back('\0');
+        dispatch_c_string_ctor(buffer.data(), base);
+    }
+#if __cplusplus >= 201703L
+    /// Constructor from string view.
+    /**
+     * This constructor will initialise \p this from the content of the input string view,
+     * which is interpreted as the string representation of a rational in base \p base.
+     *
+     * Internally, the constructor will invoke the constructor from a range of characters.
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This constructor is available only if at least C++17 is being used.
+     * \endrststar
+     *
+     * @param s the \p std::string view that will be used for construction.
+     * @param base the base used in the string representation.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
+    explicit rational(const std::string_view &s, int base = 10) : rational(s.data(), s.data() + s.size(), base)
+    {
+    }
+#endif
     /// Constructor from \p mpz_t.
     /**
      * This constructor will initialise the numerator of \p this with the input GMP integer \p n,
@@ -637,7 +695,7 @@ private:
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        return {true, m_num.m_int.m_st._mp_size != 0};
+        return std::make_pair(true, m_num.m_int.m_st._mp_size != 0);
     }
     // Conversion to integral types other than bool.
     template <typename T,
@@ -650,7 +708,7 @@ private:
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        return {true, static_cast<T>(::mpq_get_d(get_mpq_view()))};
+        return std::make_pair(true, static_cast<T>(::mpq_get_d(get_mpq_view())));
     }
 #if defined(MPPP_WITH_MPFR)
     // Conversion to long double.
@@ -663,7 +721,7 @@ private:
         MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(d2));
         ::mpf_set_q(&mpf.m_mpf, get_mpq_view());
         ::mpfr_set_f(&mpfr.m_mpfr, &mpf.m_mpf, MPFR_RNDN);
-        return {true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN)};
+        return std::make_pair(true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN));
     }
 #endif
 
@@ -892,8 +950,14 @@ private:
     int_t m_den;
 };
 
+#if __cplusplus < 201703L
+
+// NOTE: see the explanation in integer.hpp regarding static constexpr variables in C++17.
+
 template <std::size_t SSize>
 constexpr std::size_t rational<SSize>::ssize;
+
+#endif
 
 inline namespace detail
 {

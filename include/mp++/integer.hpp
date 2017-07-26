@@ -23,6 +23,9 @@
 #include <new>
 #include <stdexcept>
 #include <string>
+#if __cplusplus >= 201703L
+#include <string_view>
+#endif
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
@@ -97,6 +100,12 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
                   && std::numeric_limits<mpz_size_t>::max() <= std::numeric_limits<::mp_size_t>::max(),
               "Invalid mpz_t struct layout and/or GMP types.");
 
+// Small helper to get the size in limbs from an mpz_t. Will return zero if n is zero.
+std::size_t inline get_mpz_size(const ::mpz_t n)
+{
+    return (n->_mp_size >= 0) ? static_cast<std::size_t>(n->_mp_size) : static_cast<std::size_t>(nint_abs(n->_mp_size));
+}
+
 // Helper function to init an mpz to zero with nlimbs preallocated limbs.
 inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 {
@@ -112,13 +121,13 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
     }
     // NOTE: nbits == 0 is allowed.
     ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
-    assert(std::make_unsigned<mpz_size_t>::type(rop._mp_alloc) >= nlimbs);
+    assert(make_unsigned<mpz_size_t>(rop._mp_alloc) >= nlimbs);
 }
 
 // Combined init+set.
 inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
 {
-    mpz_init_nlimbs(m0, ::mpz_size(&m1));
+    mpz_init_nlimbs(m0, get_mpz_size(&m1));
     ::mpz_set(&m0, &m1);
 }
 
@@ -483,7 +492,7 @@ union integer_union {
     bool demote()
     {
         assert(is_dynamic());
-        const auto dyn_size = ::mpz_size(&g_dy());
+        const auto dyn_size = get_mpz_size(&g_dy());
         // If the dynamic size is greater than the static size, we cannot demote.
         if (dyn_size > SSize) {
             return false;
@@ -827,45 +836,50 @@ private:
         assert(false);
     }
     // Dispatch for generic constructor.
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
-    void dispatch_generic_ctor(const T &n)
+    // Special casing for bool.
+    void dispatch_generic_ctor(bool b)
     {
-        // NOTE: try special codepath if n fits directly in a single limb.
-        auto nu = static_cast<unsigned long long>(n);
-        while (nu) {
-            push_limb(static_cast<::mp_limb_t>(nu & GMP_NUMB_MASK));
-            if (GMP_NUMB_BITS >= unsigned(std::numeric_limits<unsigned long long>::digits)) {
+        m_int.g_st()._mp_size = static_cast<mpz_size_t>(b);
+        // No need for masking here.
+        m_int.g_st().m_limbs[0] = static_cast<::mp_limb_t>(b);
+    }
+    // The Neg flag will negate the integer after construction. It is for use in
+    // the constructor from signed ints.
+    template <typename T, bool Neg = false,
+              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    void dispatch_generic_ctor(T n)
+    {
+        if (n <= GMP_NUMB_MAX) {
+            // Special codepath if n fits directly in a single limb.
+            m_int.g_st()._mp_size = Neg ? -(n != 0u) : (n != 0u);
+            // NOTE: all limbs have been set to zero by the def init
+            // of the static member. If n is zero we will just re-zero.
+            // No need for the mask as we are sure that n <= GMP_NUMB_MAX.
+            m_int.g_st().m_limbs[0] = static_cast<::mp_limb_t>(n);
+            return;
+        }
+        while (n) {
+            push_limb(static_cast<::mp_limb_t>(n & GMP_NUMB_MASK));
+            if (GMP_NUMB_BITS >= unsigned(std::numeric_limits<T>::digits)) {
                 break;
             }
-            checked_rshift(nu);
+            checked_rshift(n);
+        }
+        // Negate if requested.
+        if (Neg) {
+            neg();
         }
     }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
-    void dispatch_generic_ctor(const T &n)
+    void dispatch_generic_ctor(T n)
     {
-        // NOTE: here we are using cast + unary minus to extract the abs value of n as an unsigned long long. See:
-        // http://stackoverflow.com/questions/4536095/unary-minus-and-signed-to-unsigned-conversion
-        // When operating on a negative value, this technique is not 100% portable: it requires an implementation
-        // of signed integers such that the absolute value of the minimum (negative) value is not greater than
-        // the maximum value of the unsigned counterpart. This is guaranteed on all computer architectures in use today,
-        // but in theory there could be architectures where the assumption is not respected. See for instance the
-        // discussion here:
-        // http://stackoverflow.com/questions/11372044/unsigned-vs-signed-range-guarantees
-        // Note that in any case we never run into UB, the only consequence is that for very large negative values
-        // we could init the integer with the wrong value. We should be able to test for this in the unit tests.
-        // Let's keep this in mind in the remote case this ever becomes a problem. In such case, we would probably need
-        // to specialise the implementation for negative values to use bit shifting and modulo operations.
-        //
-        // NOTE: there are performance gains to be made here, as shown in the sorting benchmark comparing the cpp_int
-        // init time (after switching to signed integers for the benchmark). In general, we should try have efficient
-        // codepaths for the special cases in which we can construct directly a single-limb integer. Still not clear
-        // to me how to best proceed for the signed case.
-        const auto nu = static_cast<unsigned long long>(n);
+        using u_type = make_unsigned<T>;
         if (n >= T(0)) {
-            dispatch_generic_ctor(nu);
+            // Positive value, just cast to unsigned.
+            dispatch_generic_ctor(static_cast<u_type>(n));
         } else {
-            dispatch_generic_ctor(-nu);
-            neg();
+            // Negative value, use its abs.
+            dispatch_generic_ctor<u_type, true>(nint_abs(n));
         }
     }
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
@@ -899,7 +913,7 @@ private:
     // Ctor from mpz_t.
     void dispatch_mpz_ctor(const ::mpz_t n)
     {
-        const auto asize = ::mpz_size(n);
+        const auto asize = get_mpz_size(n);
         if (asize > SSize) {
             // Too big, need to promote.
             // Destroy static.
@@ -937,6 +951,30 @@ public:
     {
         dispatch_generic_ctor(x);
     }
+
+private:
+    // Implementation of the constructor from C string. Requires a def-cted object.
+    void dispatch_c_string_ctor(const char *s, int base)
+    {
+        if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
+            throw std::invalid_argument(
+                "In the constructor of integer from string, a base of " + std::to_string(base)
+                + " was specified, but the only valid values are 0 and any value in the [2,62] range");
+        }
+        MPPP_MAYBE_TLS mpz_raii mpz;
+        if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
+            if (base) {
+                throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
+                                            + std::to_string(base));
+            } else {
+                throw std::invalid_argument(std::string("The string '") + s
+                                            + "' is not a valid integer in any supported base");
+            }
+        }
+        dispatch_mpz_ctor(&mpz.m_mpz);
+    }
+
+public:
     /// Constructor from C string.
     /**
      * This constructor will initialize \p this from the null-terminated string \p s, which must represent
@@ -958,22 +996,7 @@ public:
      */
     explicit integer(const char *s, int base = 10)
     {
-        if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
-            throw std::invalid_argument(
-                "In the constructor of integer from string, a base of " + std::to_string(base)
-                + " was specified, but the only valid values are 0 and any value in the [2,62] range");
-        }
-        MPPP_MAYBE_TLS mpz_raii mpz;
-        if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
-            if (base) {
-                throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
-                                            + std::to_string(base));
-            } else {
-                throw std::invalid_argument(std::string("The string '") + s
-                                            + "' is not a valid integer in any supported base");
-            }
-        }
-        dispatch_mpz_ctor(&mpz.m_mpz);
+        dispatch_c_string_ctor(s, base);
     }
     /// Constructor from C++ string (equivalent to the constructor from C string).
     /**
@@ -985,6 +1008,51 @@ public:
     explicit integer(const std::string &s, int base = 10) : integer(s.c_str(), base)
     {
     }
+    /// Constructor from range of characters.
+    /**
+     * This constructor will initialise \p this from the content of the input half-open range,
+     * which is interpreted as the string representation of an integer in base \p base.
+     *
+     * Internally, the constructor will copy the content of the range to a local buffer, add a
+     * string terminator, and invoke the constructor from C string.
+     *
+     * @param begin the begin of the input range.
+     * @param end the end of the input range.
+     * @param base the base used in the string representation.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
+    explicit integer(const char *begin, const char *end, int base = 10)
+    {
+        // Copy the range into a local buffer.
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        buffer.assign(begin, end);
+        buffer.emplace_back('\0');
+        dispatch_c_string_ctor(buffer.data(), base);
+    }
+#if __cplusplus >= 201703L
+    /// Constructor from string view.
+    /**
+     * This constructor will initialise \p this from the content of the input string view,
+     * which is interpreted as the string representation of an integer in base \p base.
+     *
+     * Internally, the constructor will invoke the constructor from a range of characters.
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This constructor is available only if at least C++17 is being used.
+     * \endrststar
+     *
+     * @param s the \p std::string view that will be used for construction.
+     * @param base the base used in the string representation.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
+    explicit integer(const std::string_view &s, int base = 10) : integer(s.data(), s.data() + s.size(), base)
+    {
+    }
+#endif
     /// Constructor from \p mpz_t.
     /**
      * This constructor will initialize \p this with the value of the GMP integer \p n. The storage type of \p this
@@ -1069,7 +1137,7 @@ public:
      */
     integer &operator=(const ::mpz_t n)
     {
-        const auto asize = ::mpz_size(n);
+        const auto asize = get_mpz_size(n);
         const auto s = is_static();
         if (s && asize <= SSize) {
             // this is static, n fits into static. Copy over.
@@ -1268,39 +1336,62 @@ private:
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        return {true, m_int.m_st._mp_size != 0};
+        return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
-    // Try to convert this to an unsigned long long. The abs value of this will be considered for the conversion.
-    // Requires nonzero this.
-    std::pair<bool, unsigned long long> convert_to_ull() const
+    // Implementation of the conversion to unsigned types which fit in a limb.
+    template <typename T, bool Sign,
+              enable_if_t<(unsigned(std::numeric_limits<T>::digits) <= unsigned(GMP_NUMB_BITS)), int> = 0>
+    std::pair<bool, T> convert_to_unsigned() const
     {
-        const auto asize = size();
-        assert(asize);
+        static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+        assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
+        if ((Sign && m_int.m_st._mp_size != 1) || (!Sign && m_int.m_st._mp_size != -1)) {
+            // If the asize is not 1, the conversion will fail.
+            return std::make_pair(false, T(0));
+        }
         // Get the pointer to the limbs.
         const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
-        // Init retval with the first limb.
-        auto retval = static_cast<unsigned long long>(ptr[0] & GMP_NUMB_MASK);
+        if ((ptr[0] & GMP_NUMB_MASK) > std::numeric_limits<T>::max()) {
+            // The only limb has a value which exceeds the limit of T.
+            return std::make_pair(false, T(0));
+        }
+        // There's a single limb and the result fits.
+        return std::make_pair(true, static_cast<T>(ptr[0] & GMP_NUMB_MASK));
+    }
+    // Implementation of the conversion to unsigned types which do not fit in a limb.
+    template <typename T, bool Sign,
+              enable_if_t<(unsigned(std::numeric_limits<T>::digits) > unsigned(GMP_NUMB_BITS)), int> = 0>
+    std::pair<bool, T> convert_to_unsigned() const
+    {
+        static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+        assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
+        const auto asize = Sign ? static_cast<std::size_t>(m_int.m_st._mp_size)
+                                : static_cast<std::size_t>(nint_abs(m_int.m_st._mp_size));
+        // Get the pointer to the limbs.
+        const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
+        // Init the retval with the first limb. This is safe as T has more bits than the limb type.
+        auto retval = static_cast<T>(ptr[0] & GMP_NUMB_MASK);
         // Add the other limbs, if any.
-        unsigned long long shift = GMP_NUMB_BITS;
-        constexpr unsigned ull_bits = std::numeric_limits<unsigned long long>::digits;
-        for (std::size_t i = 1u; i < asize; ++i, shift += GMP_NUMB_BITS) {
-            if (shift >= ull_bits) {
+        constexpr unsigned u_bits = std::numeric_limits<T>::digits;
+        unsigned shift(GMP_NUMB_BITS);
+        for (std::size_t i = 1u; i < asize; ++i, shift += unsigned(GMP_NUMB_BITS)) {
+            if (shift >= u_bits) {
                 // We need to shift left the current limb. If the shift is too large, we run into UB
-                // and it also means that the value does not fit in unsigned long long (and, by extension,
-                // in any other unsigned integral type).
-                return {false, 0ull};
+                // and it also means that the value does not fit in T.
+                return std::make_pair(false, T(0));
             }
-            const auto l = static_cast<unsigned long long>(ptr[i] & GMP_NUMB_MASK);
-            if (l >> (ull_bits - shift)) {
-                // Shifting the current limb is well-defined from the point of view of the language, but the result
-                // wraps around: the value does not fit in unsigned long long.
+            // Get the current limb. Safe as T has more bits than the limb type.
+            const auto l = static_cast<T>(ptr[i] & GMP_NUMB_MASK);
+            if (l >> (u_bits - shift)) {
+                // Left-shifting the current limb is well-defined from the point of view of the language, but the result
+                // overflows: the value does not fit in T.
                 // NOTE: I suspect this branch can be triggered on common architectures only with nail builds.
-                return {false, 0ull};
+                return std::make_pair(false, T(0));
             }
             // This will not overflow, as there is no carry from retval and l << shift is fine.
-            retval += l << shift;
+            retval = static_cast<T>(retval + (l << shift));
         }
-        return {true, retval};
+        return std::make_pair(true, retval);
     }
     // Conversion to unsigned ints, excluding bool.
     template <typename T,
@@ -1310,80 +1401,133 @@ private:
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
-            return {true, T(0)};
+            return std::make_pair(true, T(0));
         }
         // Handle negative value.
         if (m_int.m_st._mp_size < 0) {
-            return {false, T(0)};
+            return std::make_pair(false, T(0));
         }
-        // Attempt conversion to ull.
-        const auto candidate = convert_to_ull();
-        if (!candidate.first) {
-            // The conversion to ull failed.
-            return {false, T(0)};
-        }
-        if (candidate.second > std::numeric_limits<T>::max()) {
-            // The conversion to ull succeeded, but the value exceeds the limit of T.
-            return {false, T(0)};
-        }
-        // The conversion to the target unsigned integral type is fine.
-        return {true, static_cast<T>(candidate.second)};
+        return convert_to_unsigned<T, true>();
     }
     // Conversion to signed ints.
+    //
+    // NOTE: the implementation of conversion to signed at the moment is split into 2 branches:
+    // a specialised implementation for T not larger than the limb type, and a slower implementation
+    // for T larger than the limb type. The slower implementation is based on the conversion
+    // to the unsigned counterpart of T, and it can probably be improved performance-wise.
+    //
+    // A small helper to convert the input unsigned n to -n, represented as the signed T.
+    template <typename T, typename U>
+    static std::pair<bool, T> unsigned_to_nsigned(U n)
+    {
+        static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
+        static_assert(std::is_integral<U>::value && std::is_unsigned<U>::value, "Invalid type.");
+        // Cache a couple of quantities.
+        constexpr auto Tmax = static_cast<make_unsigned<T>>(std::numeric_limits<T>::max());
+        constexpr auto Tmin_abs = nint_abs(std::numeric_limits<T>::min());
+        if (mppp_likely(n <= c_min(Tmax, Tmin_abs))) {
+            // Optimise the case in which n fits both Tmax and Tmin_abs. This means
+            // we can convert and negate safely.
+            return std::make_pair(true, static_cast<T>(-static_cast<T>(n)));
+        }
+        // n needs to fit within the abs of min().
+        if (n > Tmin_abs) {
+            return std::make_pair(false, T(0));
+        }
+        if (Tmin_abs <= Tmax || n <= Tmax) {
+            // Either the negative range of T is leq than the positive one, or n
+            // is not greater than Tmax: we can convert to T and negate safely.
+            return std::make_pair(true, static_cast<T>(-static_cast<T>(n)));
+        }
+        // The negative range is greater than the positive one and n larger than Tmax:
+        // we cannot directly convert n to T. The idea then is to init retval to -Tmax
+        // and then to subtract from it Tmax as many times as needed.
+        auto retval = static_cast<T>(-static_cast<T>(Tmax));
+        const auto q = static_cast<make_unsigned<T>>(n / Tmax), r = static_cast<make_unsigned<T>>(n % Tmax);
+        for (make_unsigned<T> i = 0; i < q - 1u; ++i) {
+            retval = static_cast<T>(retval - static_cast<T>(Tmax));
+        }
+        retval = static_cast<T>(retval - static_cast<T>(r));
+        return std::make_pair(true, retval);
+    }
+    // Helper type trait to detect conversion to small signed integers (i.e., the absolute values of T fit
+    // into a limb). We need this instead of just typedeffing an std::integral_constant because MSVC
+    // chokes on constexpr functions in a SFINAE context.
+    template <typename T>
+    struct sconv_is_small {
+        static const bool value = c_max(static_cast<make_unsigned<T>>(std::numeric_limits<T>::max()),
+                                        nint_abs(std::numeric_limits<T>::min()))
+                                  <= GMP_NUMB_MAX;
+    };
+    // Overload if the all the absolute values of T fit into a limb.
+    template <typename T, enable_if_t<sconv_is_small<T>::value, int> = 0>
+    std::pair<bool, T> convert_to_signed() const
+    {
+        static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
+        assert(size());
+        // Cache a couple of quantities for convenience.
+        constexpr auto Tmax = static_cast<make_unsigned<T>>(std::numeric_limits<T>::max());
+        if (m_int.m_st._mp_size != 1 && m_int.m_st._mp_size != -1) {
+            // this consists of more than 1 limb, the conversion is not possible.
+            return std::make_pair(false, T(0));
+        }
+        // Get the pointer to the limbs.
+        const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
+        // The candidate output value.
+        const ::mp_limb_t candidate = ptr[0] & GMP_NUMB_MASK;
+        // Branch out on the sign.
+        if (m_int.m_st._mp_size > 0) {
+            // This is positive, it needs to fit within max().
+            if (candidate <= Tmax) {
+                return std::make_pair(true, static_cast<T>(candidate));
+            }
+            return std::make_pair(false, T(0));
+        } else {
+            return unsigned_to_nsigned<T>(candidate);
+        }
+    }
+    // Overload if not all the absolute values of T fit into a limb.
+    template <typename T, enable_if_t<!sconv_is_small<T>::value, int> = 0>
+    std::pair<bool, T> convert_to_signed() const
+    {
+        // Cache a couple of quantities for convenience.
+        constexpr auto Tmax = static_cast<make_unsigned<T>>(std::numeric_limits<T>::max());
+        // Branch out depending on the sign of this.
+        if (m_int.m_st._mp_size > 0) {
+            // Attempt conversion to the unsigned counterpart.
+            const auto candidate = convert_to_unsigned<make_unsigned<T>, true>();
+            if (candidate.first && candidate.second <= Tmax) {
+                // The conversion to unsigned was successful, and the result fits in
+                // the positive range of T. Return the result.
+                return std::make_pair(true, static_cast<T>(candidate.second));
+            }
+            // The conversion to unsigned failed, or the result does not fit.
+            return std::make_pair(false, T(0));
+        } else {
+            // Attempt conversion to the unsigned counterpart.
+            const auto candidate = convert_to_unsigned<make_unsigned<T>, false>();
+            if (candidate.first) {
+                // The converstion to unsigned was successful, try to negate now.
+                return unsigned_to_nsigned<T>(candidate.second);
+            }
+            // The conversion to unsigned failed.
+            return std::make_pair(false, T(0));
+        }
+    }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        // NOTE: here we will assume that unsigned long long can represent the absolute value of any
-        // machine integer. This is not necessarily the case on any possible implementation, but it holds
-        // true on any current architecture. See the comments below and in the generic constructor regarding
-        // the method of computing the absolute value of a negative int.
-        using uT = typename std::make_unsigned<T>::type;
         // Handle zero.
         if (!m_int.m_st._mp_size) {
-            return {true, T(0)};
+            return std::make_pair(true, T(0));
         }
-        // Attempt conversion to ull.
-        const auto candidate = convert_to_ull();
-        if (!candidate.first) {
-            // The conversion to ull failed: the value is too large to be represented by any integer type.
-            return {false, T(0)};
-        }
-        if (m_int.m_st._mp_size > 0) {
-            // If the value is positive, we check that the candidate does not exceed the
-            // max value of the type.
-            if (candidate.second > uT(std::numeric_limits<T>::max())) {
-                return {false, T(0)};
-            }
-            return {true, static_cast<T>(candidate.second)};
-        } else {
-            // For negative values, we need to establish if the value fits the negative range of the
-            // target type, and we must make sure to take the negative of the candidate correctly.
-            // NOTE: see the comments in the generic ctor about the portability of this technique
-            // for computing the absolute value.
-            constexpr auto min_abs = -static_cast<unsigned long long>(std::numeric_limits<T>::min());
-            constexpr auto max = static_cast<unsigned long long>(std::numeric_limits<T>::max());
-            if (candidate.second > min_abs) {
-                // The value is too small.
-                return {false, T(0)};
-            }
-            // The abs of min might be greater than max. The idea then is that we decrease the magnitude
-            // of the candidate to the safe negation range via division, we negate it and then we recover the
-            // original candidate value. If the abs of min is not greater than max, ceil_ratio will be 1, r will be zero
-            // and everything will still work.
-            constexpr auto ceil_ratio = min_abs / max + unsigned((min_abs % max) != 0u);
-            const unsigned long long q = candidate.second / ceil_ratio, r = candidate.second % ceil_ratio;
-            auto retval = static_cast<T>(-static_cast<T>(q));
-            static_assert(ceil_ratio <= uT(std::numeric_limits<T>::max()), "Overflow error.");
-            retval = static_cast<T>(retval * static_cast<T>(ceil_ratio));
-            retval = static_cast<T>(retval - static_cast<T>(r));
-            return {true, retval};
-        }
+        return convert_to_signed<T>();
     }
     // Implementation of the conversion to floating-point through GMP/MPFR routines.
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     static std::pair<bool, T> mpz_float_conversion(const mpz_struct_t &m)
     {
-        return {true, static_cast<T>(::mpz_get_d(&m))};
+        return std::make_pair(true, static_cast<T>(::mpz_get_d(&m)));
     }
 #if defined(MPPP_WITH_MPFR)
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
@@ -1392,7 +1536,7 @@ private:
         constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         ::mpfr_set_z(&mpfr.m_mpfr, &m, MPFR_RNDN);
-        return {true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN)};
+        return std::make_pair(true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN));
     }
 #endif
     // Conversion to floating-point.
@@ -1401,7 +1545,7 @@ private:
     {
         // Handle zero.
         if (!m_int.m_st._mp_size) {
-            return {true, T(0)};
+            return std::make_pair(true, T(0));
         }
         if (std::numeric_limits<T>::is_iec559) {
             // Optimization for single-limb integers.
@@ -1423,10 +1567,10 @@ private:
             // Get the pointer to the limbs.
             const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
             if (m_int.m_st._mp_size == 1) {
-                return {true, static_cast<T>(ptr[0] & GMP_NUMB_MASK)};
+                return std::make_pair(true, static_cast<T>(ptr[0] & GMP_NUMB_MASK));
             }
             if (m_int.m_st._mp_size == -1) {
-                return {true, -static_cast<T>(ptr[0] & GMP_NUMB_MASK)};
+                return std::make_pair(true, -static_cast<T>(ptr[0] & GMP_NUMB_MASK));
             }
         }
         // For all the other cases, just delegate to the GMP/MPFR routines.
@@ -1501,16 +1645,8 @@ public:
     std::size_t nbits() const
     {
 #if defined(__clang__) || defined(__GNUC__)
-        std::size_t ls;
-        const ::mp_limb_t *lptr;
-        if (is_static()) {
-            ls = static_cast<std::size_t>(m_int.g_st().abs_size());
-            lptr = m_int.g_st().m_limbs.data();
-        } else {
-            // NOTE: mpz_size() returns zero size for zero value.
-            ls = ::mpz_size(&m_int.g_dy());
-            lptr = m_int.g_dy()._mp_d;
-        }
+        const std::size_t ls = size();
+        const ::mp_limb_t *lptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
         if (ls) {
             // LCOV_EXCL_START
             if (mppp_unlikely(ls > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
@@ -1539,10 +1675,8 @@ public:
      */
     std::size_t size() const
     {
-        if (is_static()) {
-            return std::size_t(m_int.g_st().abs_size());
-        }
-        return ::mpz_size(&m_int.g_dy());
+        return (m_int.m_st._mp_size) >= 0 ? static_cast<std::size_t>(m_int.m_st._mp_size)
+                                          : static_cast<std::size_t>(nint_abs(m_int.m_st._mp_size));
     }
     /// Sign.
     /**
@@ -1773,8 +1907,16 @@ private:
     integer_union<SSize> m_int;
 };
 
+#if __cplusplus < 201703L
+
+// NOTE: from C++17 static constexpr members are implicitly inline, and it's not necessary
+// any more (actually, it's deprecated) to re-declare them outside the class.
+// https://stackoverflow.com/questions/39646958/constexpr-static-member-before-after-c17
+
 template <std::size_t SSize>
 constexpr std::size_t integer<SSize>::ssize;
+
+#endif
 
 /** @defgroup integer_assignment integer_assignment
  *  @{
@@ -1979,8 +2121,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     // something into rop (via the mpn functions below), only to realize later that the computation overflows.
     // This would be bad because, in case of overlapping arguments, it would destroy one or two operands without
     // possibility of recovering. The alternative would be to do the computation in some local buffer and then
-    // copy
-    // it out, but that is rather costly. Note that this means that in principle a computation that could fit in
+    // copy it out, but that is rather costly. Note that this means that in principle a computation that could fit in
     // static storage ends up triggering a promotion.
     const bool c1 = std::size_t(asize1) == SSize && ((data1[asize1 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
     const bool c2 = std::size_t(asize2) == SSize && ((data2[asize2 - 1] & GMP_NUMB_MASK) >> (GMP_NUMB_BITS - 1));
@@ -4221,9 +4362,8 @@ inline unsigned long integer_exp_to_ulong(const T &exp)
 #if !defined(__INTEL_COMPILER)
     assert(exp >= T(0));
 #endif
-    // NOTE: make_unsigned<T>::type is T if T is already unsigned.
-    if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(exp)
-                      > std::numeric_limits<unsigned long>::max())) {
+    // NOTE: make_unsigned<T> is T if T is already unsigned.
+    if (mppp_unlikely(static_cast<make_unsigned<T>>(exp) > std::numeric_limits<unsigned long>::max())) {
         throw std::overflow_error("Cannot convert the integral value " + std::to_string(exp)
                                   + " to unsigned long: the value is too large.");
     }
@@ -4673,17 +4813,10 @@ inline std::istream &operator>>(std::istream &is, integer<SSize> &n)
 template <std::size_t SSize>
 inline std::size_t hash(const integer<SSize> &n)
 {
-    std::size_t asize;
-    // NOTE: size is part of the common initial sequence.
     const mpz_size_t size = n._get_union().m_st._mp_size;
-    const ::mp_limb_t *ptr;
-    if (n._get_union().is_static()) {
-        asize = static_cast<std::size_t>((size >= 0) ? size : -size);
-        ptr = n._get_union().g_st().m_limbs.data();
-    } else {
-        asize = ::mpz_size(&n._get_union().g_dy());
-        ptr = n._get_union().g_dy()._mp_d;
-    }
+    const std::size_t asize = size >= 0 ? static_cast<std::size_t>(size) : static_cast<std::size_t>(nint_abs(size));
+    const ::mp_limb_t *ptr
+        = n._get_union().is_static() ? n._get_union().g_st().m_limbs.data() : n._get_union().g_dy()._mp_d;
     // Init the retval as the signed size.
     auto retval = static_cast<std::size_t>(size);
     // Combine the limbs.
@@ -5360,8 +5493,7 @@ inline ::mp_bitcnt_t integer_cast_to_bitcnt(T n)
     if (mppp_unlikely(n < T(0))) {
         throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": negative values are not supported");
     }
-    if (mppp_unlikely(static_cast<typename std::make_unsigned<T>::type>(n)
-                      > std::numeric_limits<::mp_bitcnt_t>::max())) {
+    if (mppp_unlikely(static_cast<make_unsigned<T>>(n) > std::numeric_limits<::mp_bitcnt_t>::max())) {
         throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
     }
     return static_cast<::mp_bitcnt_t>(n);
@@ -5475,20 +5607,10 @@ inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
     if (size_a != size_b) {
         return false;
     }
-    const ::mp_limb_t *ptr_a, *ptr_b;
-    std::size_t asize;
-    if (a.is_static()) {
-        ptr_a = a._get_union().g_st().m_limbs.data();
-        asize = static_cast<std::size_t>((size_a >= 0) ? size_a : -size_a);
-    } else {
-        ptr_a = a._get_union().g_dy()._mp_d;
-        asize = ::mpz_size(&a._get_union().g_dy());
-    }
-    if (b.is_static()) {
-        ptr_b = b._get_union().g_st().m_limbs.data();
-    } else {
-        ptr_b = b._get_union().g_dy()._mp_d;
-    }
+    const std::size_t asize
+        = size_a >= 0 ? static_cast<std::size_t>(size_a) : static_cast<std::size_t>(nint_abs(size_a));
+    const ::mp_limb_t *ptr_a = a.is_static() ? a._get_union().g_st().m_limbs.data() : a._get_union().g_dy()._mp_d;
+    const ::mp_limb_t *ptr_b = b.is_static() ? b._get_union().g_st().m_limbs.data() : b._get_union().g_dy()._mp_d;
     auto limb_cmp
         = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
 #if defined(_MSC_VER)

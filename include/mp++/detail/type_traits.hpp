@@ -90,9 +90,12 @@ struct negation : std::integral_constant<bool, !B::value> {
 template <typename T>
 using uncvref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
-// Just a small helper, like C++14.
+// Small helpers, like C++14.
 template <bool B, typename T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
+
+template <typename T>
+using make_unsigned = typename std::make_unsigned<T>::type;
 }
 }
 

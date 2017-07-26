@@ -29,8 +29,8 @@
 # ------------------------------------------------------------------------------------------
 
 if(MPFR_INCLUDE_DIR AND MPFR_LIBRARY)
-	# Already in cache, be silent
-	set(MPFR_FIND_QUIETLY TRUE)
+    # Already in cache, be silent
+    set(MPFR_FIND_QUIETLY TRUE)
 endif()
 
 find_path(MPFR_INCLUDE_DIR NAMES mpfr.h)
@@ -44,9 +44,7 @@ mark_as_advanced(MPFR_INCLUDE_DIR MPFR_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
 if(MPFR_FOUND AND NOT TARGET MPFR::MPFR)
-	add_library(MPFR::MPFR UNKNOWN IMPORTED)
-    set_target_properties(MPFR::MPFR PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPFR_INCLUDE_DIR}")
-    set_target_properties(MPFR::MPFR PROPERTIES
-        IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-        IMPORTED_LOCATION "${MPFR_LIBRARY}")
+    add_library(MPFR::MPFR UNKNOWN IMPORTED)
+    set_target_properties(MPFR::MPFR PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPFR_INCLUDE_DIR}"
+        IMPORTED_LINK_INTERFACE_LANGUAGES "C" IMPORTED_LOCATION "${MPFR_LIBRARY}")
 endif()
