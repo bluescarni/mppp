@@ -65,20 +65,21 @@
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#unreleased">0.4 (unreleased)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#new">New</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#changes">Changes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fix">Fix</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#id1">0.3 (2017-06-12)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#new">New</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id2">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id3">Fix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">New</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Fix</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#id4">0.2 (2017-05-09)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id5">New</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id6">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id7">Fix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">0.2 (2017-05-09)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id6">New</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Fix</a></li>
 </ul>
 </li>
 </ul>
@@ -113,25 +114,37 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="unreleased">
 <h2>0.4 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="new">
+<h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Implement the constructors from a range of characters and from <code class="docutils literal"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
+<li>Implement the assignment operator and the constructor from <code class="docutils literal"><span class="pre">mpz_t</span></code> in <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/19">#19</a>).</li>
+</ul>
+</div>
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Implement the assignment operator and the constructor from <code class="docutils literal"><span class="pre">mpz_t</span></code> in <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>
-(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/19">#19</a>).</li>
+<li>Update the internal copy of Catch to the latest version, 1.9.6 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/24">#24</a>).</li>
+<li>Performance improvements for <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer4sizeEv" title="mppp::integer::size"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::size()</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
+<li>Performance improvements for the construction/conversion of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> from/to C++ integrals
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
+<li>Make sure the MPFR cleanup routine is automatically called on shutdown (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/22">#22</a>).</li>
 <li>Performance improvements for <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer5nbitsEv" title="mppp::integer::nbits"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::nbits()</span></code></a> on GCC and clang (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/17">#17</a>).</li>
 </ul>
 </div>
 <div class="section" id="fix">
 <h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Various small documentation fixes.</li>
+<li>Various small documentation, build system and benchmark fixes.</li>
 </ul>
 </div>
 </div>
 <div class="section" id="id1">
 <h2>0.3 (2017-06-12)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="new">
-<h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>New<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Implement the multiprecision <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/14">#14</a>).</li>
 <li>Implement fast assignment functions to zero and plus/minus one for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</li>
@@ -141,23 +154,23 @@
 in order to avoid the creation of a temporary.</li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h3>Changes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Changes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Performance improvements for the copy/move assignment operators of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h3>Fix<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Fix<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Various small documentation fixes.</li>
 </ul>
 </div>
 </div>
-<div class="section" id="id4">
-<h2>0.2 (2017-05-09)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id5">
-<h3>New<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<h2>0.2 (2017-05-09)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h3>New<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Provide a CMake config-file package as part of the install process.</li>
 <li>Implement the missing in-place modulo operator with C++ integrals
@@ -174,8 +187,8 @@ coefficient.</li>
 <li>Add a static member to <code class="docutils literal"><span class="pre">integer</span></code> storing the static size.</li>
 </ul>
 </div>
-<div class="section" id="id6">
-<h3>Changes<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h3>Changes<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Split out the library in multiple files.</li>
 <li>Rename the <code class="docutils literal"><span class="pre">mp_integer</span></code> class to <code class="docutils literal"><span class="pre">integer</span></code>.</li>
@@ -187,8 +200,8 @@ coefficient.</li>
 <li>Remove the custom namespace option.</li>
 </ul>
 </div>
-<div class="section" id="id7">
-<h3>Fix<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id8">
+<h3>Fix<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fix operators example in the documentation.</li>
 </ul>

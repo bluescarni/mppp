@@ -337,6 +337,56 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 </dd></dl>
 
 <dl class="function">
+<dt id="_CPPv2N4mppp8rational8rationalEPKcPKci">
+<span id="mppp::rational::rational__cCP.cCP.i"></span><span class="target" id="mp++classmppp_1_1rational_1af8f2af54f3e3b5a5f882f3c7289311dd"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>begin</em>, <em class="property">const</em> char *<em>end</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEPKcPKci" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor from range of characters. </p>
+<p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> from the content of the input half-open range, which is interpreted as the string representation of a rational in base <code class="docutils literal"><span class="pre">base</span></code>.</p>
+<p>Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and invoke the constructor from C string.</p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">begin</span></code>: the begin of the input range. </li>
+<li><code class="docutils literal"><span class="pre">end</span></code>: the end of the input range. </li>
+<li><code class="docutils literal"><span class="pre">base</span></code>: the base used in the string representation.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from C string. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp8rational8rationalERKNSt11string_viewEi">
+<span id="mppp::rational::rational__std::string_viewCR.i"></span><span class="target" id="mp++classmppp_1_1rational_1a2b3bbd472378ae2c56757bd0824db819"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERKNSt11string_viewEi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor from string view. </p>
+<p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> from the content of the input string view, which is interpreted as the string representation of a rational in base <code class="docutils literal"><span class="pre">base</span></code>.</p>
+<p>Internally, the constructor will invoke the constructor from a range of characters.</p>
+<p><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This constructor is available only if at least C++17 is being used.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">s</span></code>: the <code class="docutils literal"><span class="pre">std::string</span></code> view that will be used for construction. </li>
+<li><code class="docutils literal"><span class="pre">base</span></code>: the base used in the string representation.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from C string. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalEK5mpz_t">
 <span id="mppp::rational::rational__mpz_tC"></span><span class="target" id="mp++classmppp_1_1rational_1a7d893a097af766545dc29019034d8806"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
