@@ -30,7 +30,11 @@ Changes
 Fix
 ~~~
 
-- Various small documentation, build system and benchmark fixes.
+- Fix a build failure on older GMP versions.
+
+- Fix a build system bug when building the benchmarks with older CMake versions.
+
+- Various minor fixes.
 
 0.3 (2017-06-12)
 ----------------
