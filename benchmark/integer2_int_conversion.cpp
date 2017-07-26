@@ -47,9 +47,9 @@ template <typename T>
 static inline std::vector<T> get_init_vector(double &init_time)
 {
     rng.seed(0);
+    std::uniform_int_distribution<int> dist(-10000, 10000);
     simple_timer st;
     std::vector<T> retval(size);
-    std::uniform_int_distribution<int> dist(-10000, 10000);
     std::generate(retval.begin(), retval.end(), [&dist]() { return T(dist(rng)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
