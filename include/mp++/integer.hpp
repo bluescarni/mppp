@@ -2242,10 +2242,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // op1 is not smaller than op2.
             tmp = data1[0] - data2[0];
             // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
-            rop._mp_size = sign1;
-            if (mppp_unlikely(!tmp)) {
-                rop._mp_size = 0;
-            }
+            rop._mp_size = sign1 * static_cast<int>(tmp != 0u);
             rdata[0] = tmp;
         } else {
             // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
@@ -2312,10 +2309,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         // - if sign1 == 0, size is zero,
         // - if sign1 == +-1, then the size is either +-1 or +-2: asize is 2 if the result
         //   has a nonzero 2nd limb, otherwise asize is 1.
-        rop._mp_size = sign1;
-        if (hi2) {
-            rop._mp_size = sign1 + sign1;
-        }
+        rop._mp_size = sign1 * (static_cast<int>(hi2 != 0u) + 1);
         rdata[0] = lo;
         rdata[1] = hi2;
     } else {
@@ -2329,12 +2323,17 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // This can never wrap around, at most it goes to zero.
             const auto hi = data1[1] - data2[1] - static_cast<::mp_limb_t>(data1[0] < data2[0]);
             // asize can be 0, 1 or 2.
-            rop._mp_size = 0;
-            if (hi) {
-                rop._mp_size = sign1 + sign1;
-            } else if (lo) {
-                rop._mp_size = sign1;
-            }
+            // NOTE: this contraption ensures the correct result. The possibilities for hi/lo
+            // nonzero are:
+            // hi | lo | asize
+            // ---------------
+            //  1 |  1 |     2
+            //  1 |  0 |     2
+            //  0 |  1 |     1
+            //  0 |  0 |     0
+            // The sign1 (which cannot be zero due to the branch we are in) takes care of the sign of the size.
+            // Use '|' instead of '||' as we don't need to short circuit on this.
+            rop._mp_size = sign1 * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
             rdata[0] = lo;
             rdata[1] = hi;
         } else {
@@ -2342,11 +2341,8 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             const auto lo = data2[0] - data1[0];
             assert(data2[0] >= data1[0] || data2[1] > data1[1]);
             const auto hi = data2[1] - data1[1] - static_cast<::mp_limb_t>(data2[0] < data1[0]);
-            // asize can be 1 or 2, but not zero as we know abs(op1) != abs(op2).
-            rop._mp_size = sign2;
-            if (hi) {
-                rop._mp_size = sign2 + sign2;
-            }
+            // asize can be 1 or 2, but not zero as we know abs(op1) != abs(op2). Same idea as above.
+            rop._mp_size = sign2 * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
             rdata[0] = lo;
             rdata[1] = hi;
         }
@@ -2528,7 +2524,8 @@ inline bool static_add_ui_impl(static_int<SSize> &rop, const static_int<SSize> &
             return false;
         }
         // Compute the new size. It can be 0, 1 or 2.
-        rop._mp_size = hi ? 2 : (lo ? 1 : 0);
+        // NOTE: see the comments in the 2-limb specialisation for addition.
+        rop._mp_size = static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
         // Write out.
         rdata[0] = lo;
         rdata[1] = hi;
@@ -2540,7 +2537,7 @@ inline bool static_add_ui_impl(static_int<SSize> &rop, const static_int<SSize> &
             // Sub from hi the borrow.
             const auto hi = data1[1] - static_cast<::mp_limb_t>(data1[0] < l2);
             // The final size can be -2, -1 or 0.
-            rop._mp_size = hi ? -2 : (lo ? -1 : 0);
+            rop._mp_size = -(static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1));
             rdata[0] = lo;
             rdata[1] = hi;
         } else {
