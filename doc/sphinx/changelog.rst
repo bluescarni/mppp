@@ -10,13 +10,13 @@ New
 - Implement the constructors from a range of characters and from ``std::string_view`` for :cpp:class:`~mppp::integer`
   and :cpp:class:`~mppp::rational` (`#23 <https://github.com/bluescarni/mppp/pull/23>`__).
 
-- Update the internal copy of Catch to the latest version, 1.9.6 (`#24 <https://github.com/bluescarni/mppp/pull/24>`__).
-
 - Implement the assignment operator and the constructor from ``mpz_t`` in :cpp:class:`~mppp::rational`
   (`#19 <https://github.com/bluescarni/mppp/pull/19>`__).
 
 Changes
 ~~~~~~~
+
+- Update the internal copy of Catch to the latest version, 1.9.6 (`#24 <https://github.com/bluescarni/mppp/pull/24>`__).
 
 - Performance improvements for :cpp:func:`mppp::integer::size()` (`#23 <https://github.com/bluescarni/mppp/pull/23>`__).
 
@@ -30,7 +30,7 @@ Changes
 Fix
 ~~~
 
-- Various small documentation and build system fixes.
+- Various small documentation, build system and benchmark fixes.
 
 0.3 (2017-06-12)
 ----------------
