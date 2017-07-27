@@ -767,6 +767,8 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
 // - pow() can probably benefit for some specialised static implementation, especially in conjunction with
 //   mpn_sqr().
 // - gcd() can be improved (see notes).
+// - functions still to be de-branched: div, divexact, right shift, etc. + all the mpn implementations, if worth it.
+//   Probably better to wait for benchmarks before moving.
 /// Multiprecision integer class.
 /**
  * \rststar
