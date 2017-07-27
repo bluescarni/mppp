@@ -3299,11 +3299,8 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
         }
         rop.m_limbs[1u] = n.m_limbs[0u];
         rop.m_limbs[0u] = 0u;
-        // The size has to be 2.
-        rop._mp_size = 2;
-        if (sign == -1) {
-            rop._mp_size = -2;
-        }
+        // The asize has to be 2.
+        rop._mp_size = 2 * sign;
         return 0u;
     }
     // Temp hi lo limbs to store the result that will eventually go into rop.
@@ -3333,10 +3330,7 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
     rop.m_limbs[0u] = lo;
     rop.m_limbs[1u] = hi;
     // asize is at least 1.
-    rop._mp_size = 1 + (hi != 0u);
-    if (sign == -1) {
-        rop._mp_size = -rop._mp_size;
-    }
+    rop._mp_size = sign * (1 + (hi != 0u));
     return 0u;
 }
 
