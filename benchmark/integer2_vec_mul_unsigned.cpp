@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <gmp.h>
 #include <iostream>
 #include <mp++/mp++.hpp>
 #include <random>

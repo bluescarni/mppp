@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <gmp.h>
 #include <iostream>
 #include <mp++/mp++.hpp>
 #include <random>
@@ -54,8 +55,12 @@ static inline std::pair<std::vector<T>, std::vector<T>> get_init_vectors(double 
     std::uniform_int_distribution<int> dist(1, 10), sign(0, 1);
     simple_timer st;
     std::vector<T> v1(size), v2(size);
-    std::generate(v1.begin(), v1.end(), [&dist, &sign]() { return T(dist(rng) * (sign(rng) ? 1 : -1)); });
-    std::generate(v2.begin(), v2.end(), [&dist, &sign]() { return T(dist(rng) * (sign(rng) ? 1 : -1)); });
+    std::generate(v1.begin(), v1.end(), [&dist, &sign]() {
+        return static_cast<T>(T(dist(rng) * (sign(rng) ? 1 : -1)) << (GMP_NUMB_BITS / 2));
+    });
+    std::generate(v2.begin(), v2.end(), [&dist, &sign]() {
+        return static_cast<T>(T(dist(rng) * (sign(rng) ? 1 : -1)) << (GMP_NUMB_BITS / 2));
+    });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
     return std::make_pair(std::move(v1), std::move(v2));

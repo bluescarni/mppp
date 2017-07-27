@@ -251,11 +251,14 @@ struct static_int {
     static_int() : _mp_size(0), m_limbs()
     {
     }
-    // The defaults here are good.
-    static_int(const static_int &) = default;
-    static_int(static_int &&) = default;
     // Let's avoid copying the _mp_alloc member, as it is never written to and it must always
     // have the same value.
+    static_int(const static_int &other) : _mp_size(other._mp_size), m_limbs(other.m_limbs)
+    {
+    }
+    static_int(static_int &&other) noexcept : static_int(other)
+    {
+    }
     static_int &operator=(const static_int &other)
     {
         _mp_size = other._mp_size;
