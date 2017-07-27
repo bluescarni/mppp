@@ -32,8 +32,9 @@ using namespace mppp_bench;
 // match mp++'s behaviour.
 using cpp_int = boost::multiprecision::
     number<boost::multiprecision::cpp_int_backend<0, 0, boost::multiprecision::signed_magnitude,
-                                                  boost::multiprecision::checked>>;
-using mpz_int = boost::multiprecision::mpz_int;
+                                                  boost::multiprecision::checked>,
+           boost::multiprecision::et_off>;
+using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, boost::multiprecision::et_off>;
 #endif
 
 using integer_t = integer<2>;
