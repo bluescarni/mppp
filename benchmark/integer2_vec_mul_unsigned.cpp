@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <gmp.h>
 #include <iostream>
 #include <mp++/mp++.hpp>
 #include <random>
@@ -54,8 +55,8 @@ static inline std::tuple<std::vector<T>, std::vector<T>, std::vector<T>> get_ini
     std::uniform_int_distribution<unsigned> dist(1u, 7u);
     simple_timer st;
     std::vector<T> v1(size), v2(size), v3(size);
-    std::generate(v1.begin(), v1.end(), [&dist]() { return T(dist(rng)); });
-    std::generate(v2.begin(), v2.end(), [&dist]() { return T(dist(rng)); });
+    std::generate(v1.begin(), v1.end(), [&dist]() { return static_cast<T>(T(dist(rng)) << (GMP_NUMB_BITS / 2)); });
+    std::generate(v2.begin(), v2.end(), [&dist]() { return static_cast<T>(T(dist(rng)) << (GMP_NUMB_BITS / 2)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
     return std::make_tuple(std::move(v1), std::move(v2), std::move(v3));
