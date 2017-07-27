@@ -41,7 +41,7 @@ using fmpzxx = flint::fmpzxx;
 #endif
 
 using integer_t = integer<1>;
-static const std::string name = "bench_sort_1";
+static const std::string name = "integer1_sort_unsigned";
 
 constexpr auto size = 30000000ul;
 
@@ -50,9 +50,10 @@ static std::mt19937 rng;
 template <typename T>
 static inline std::vector<T> get_init_vector(double &init_time)
 {
+    rng.seed(0);
+    std::uniform_int_distribution<unsigned long> dist(0, 600000ul);
     simple_timer st;
     std::vector<T> retval(size);
-    std::uniform_int_distribution<int> dist(-300000l, 300000l);
     std::generate(retval.begin(), retval.end(), [&dist]() { return T(dist(rng)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
