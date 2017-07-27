@@ -273,8 +273,8 @@ private:
         }
         MPPP_MAYBE_TLS mpq_raii q;
         ::mpq_set_d(&q.m_mpq, static_cast<double>(x));
-        m_num.dispatch_mpz_ctor(mpq_numref(&q.m_mpq));
-        m_den.dispatch_mpz_ctor(mpq_denref(&q.m_mpq));
+        m_num = mpq_numref(&q.m_mpq);
+        m_den = mpq_denref(&q.m_mpq);
     }
 #if defined(MPPP_WITH_MPFR)
     void dispatch_generic_construction(const long double &x)
@@ -293,8 +293,8 @@ private:
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
         ::mpfr_get_f(&mpf.m_mpf, &mpfr.m_mpfr, MPFR_RNDN);
         ::mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
-        m_num.dispatch_mpz_ctor(mpq_numref(&mpq.m_mpq));
-        m_den.dispatch_mpz_ctor(mpq_denref(&mpq.m_mpq));
+        m_num = mpq_numref(&mpq.m_mpq);
+        m_den = mpq_denref(&mpq.m_mpq);
     }
 #endif
 
