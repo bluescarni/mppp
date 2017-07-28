@@ -32,8 +32,10 @@ namespace mppp
 
 class real128
 {
-    // Number of digits in the significand (113).
-    static constexpr unsigned sig_digits = FLT128_MANT_DIG;
+    // Number of digits in the significand.
+    static constexpr unsigned sig_digits = 113;
+    // Double check our assumption.
+    static_assert(FLT128_MANT_DIG == sig_digits, "Invalid number of digits.");
 
 public:
     constexpr real128() : m_value(0)
@@ -167,13 +169,11 @@ public:
             // we offset the shifts by the (negative) exponent, which is here guaranteed
             // to be in the [-112,-1] range.
             retval <<= static_cast<unsigned>(112 + exponent);
-            if (exponent + 64 >= 0) {
+            if (exponent > -64) {
                 retval += integer<SSize>{ief.i_eee.mant_high} << static_cast<unsigned>(exponent + 64);
+                retval += ief.i_eee.mant_low >> static_cast<unsigned>(-exponent);
             } else {
                 retval += integer<SSize>{ief.i_eee.mant_high} >> static_cast<unsigned>(-(exponent + 64));
-            }
-            if (exponent > -64) {
-                retval += ief.i_eee.mant_low >> static_cast<unsigned>(-exponent);
             }
         }
         // Adjust the sign.
@@ -190,6 +190,10 @@ public:
     constexpr explicit operator T() const
     {
         return static_cast<T>(m_value);
+    }
+    constexpr explicit operator ::__float128() const
+    {
+        return m_value;
     }
 
 private:
