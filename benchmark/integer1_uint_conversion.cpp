@@ -10,12 +10,11 @@
 #include <fstream>
 #include <iostream>
 #include <mp++/mp++.hpp>
+#include <numeric>
 #include <random>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "simple_timer.hpp"
 
 #if defined(MPPP_BENCHMARK_BOOST)
 #include <boost/multiprecision/cpp_int.hpp>
@@ -23,25 +22,23 @@
 #include <gmp.h>
 #endif
 
-#if defined(MPPP_BENCHMARK_FLINT)
-#include <flint/flint.h>
-#include <flint/fmpzxx.h>
-#endif
+#include "simple_timer.hpp"
 
 using namespace mppp;
 using namespace mppp_bench;
 
 #if defined(MPPP_BENCHMARK_BOOST)
-using cpp_int = boost::multiprecision::cpp_int;
-using mpz_int = boost::multiprecision::mpz_int;
-#endif
-
-#if defined(MPPP_BENCHMARK_FLINT)
-using fmpzxx = flint::fmpzxx;
+// Make sure we use the cpp_int version that does the overflow check, in order to
+// match mp++'s behaviour.
+using cpp_int = boost::multiprecision::
+    number<boost::multiprecision::cpp_int_backend<0, 0, boost::multiprecision::signed_magnitude,
+                                                  boost::multiprecision::checked>,
+           boost::multiprecision::et_off>;
+using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, boost::multiprecision::et_off>;
 #endif
 
 using integer_t = integer<1>;
-static const std::string name = "bench_sort_1";
+static const std::string name = "integer1_uint_conversion";
 
 constexpr auto size = 30000000ul;
 
@@ -50,9 +47,10 @@ static std::mt19937 rng;
 template <typename T>
 static inline std::vector<T> get_init_vector(double &init_time)
 {
+    rng.seed(0);
+    std::uniform_int_distribution<unsigned> dist(0u, 10000u);
     simple_timer st;
     std::vector<T> retval(size);
-    std::uniform_int_distribution<int> dist(-300000l, 300000l);
     std::generate(retval.begin(), retval.end(), [&dist]() { return T(dist(rng)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
@@ -75,13 +73,16 @@ int main()
         double init_time;
         auto v = get_init_vector<integer_t>(init_time);
         s += "['mp++','init'," + std::to_string(init_time) + "],";
+        std::vector<unsigned> c_out(size);
         {
             simple_timer st2;
-            std::sort(v.begin(), v.end());
-            s += "['mp++','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            std::transform(v.begin(), v.end(), c_out.begin(),
+                           [](const integer_t &n) { return static_cast<unsigned>(n); });
+            s += "['mp++','convert'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nConvert runtime: ";
         }
         s += "['mp++','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0ul) << '\n';
         std::cout << "\nTotal runtime: ";
     }
 #if defined(MPPP_BENCHMARK_BOOST)
@@ -91,13 +92,16 @@ int main()
         double init_time;
         auto v = get_init_vector<cpp_int>(init_time);
         s += "['Boost (cpp_int)','init'," + std::to_string(init_time) + "],";
+        std::vector<unsigned> c_out(size);
         {
             simple_timer st2;
-            std::sort(v.begin(), v.end());
-            s += "['Boost (cpp_int)','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            std::transform(v.begin(), v.end(), c_out.begin(),
+                           [](const cpp_int &n) { return static_cast<unsigned>(n); });
+            s += "['Boost (cpp_int)','convert'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nConvert runtime: ";
         }
         s += "['Boost (cpp_int)','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0ul) << '\n';
         std::cout << "\nTotal runtime: ";
     }
     {
@@ -106,32 +110,16 @@ int main()
         double init_time;
         auto v = get_init_vector<mpz_int>(init_time);
         s += "['Boost (mpz_int)','init'," + std::to_string(init_time) + "],";
+        std::vector<unsigned> c_out(size);
         {
             simple_timer st2;
-            std::sort(v.begin(), v.end());
-            s += "['Boost (mpz_int)','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            std::transform(v.begin(), v.end(), c_out.begin(),
+                           [](const mpz_int &n) { return static_cast<unsigned>(::mpz_get_ui(n.backend().data())); });
+            s += "['Boost (mpz_int)','convert'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nConvert runtime: ";
         }
         s += "['Boost (mpz_int)','total'," + std::to_string(st1.elapsed()) + "],";
-        std::cout << "\nTotal runtime: ";
-    }
-#endif
-#if defined(MPPP_BENCHMARK_FLINT)
-    {
-        std::cout << "\n\nBenchmarking fmpzxx.";
-        simple_timer st1;
-        double init_time;
-        auto v = get_init_vector<fmpzxx>(init_time);
-        s += "['FLINT','init'," + std::to_string(init_time) + "],";
-        {
-            simple_timer st2;
-            std::sort(v.begin(), v.end(), [](const fmpzxx &a, const fmpzxx &b) {
-                return ::fmpz_cmp(a._data().inner, b._data().inner) < 0;
-            });
-            s += "['FLINT','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
-        }
-        s += "['FLINT','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0ul) << '\n';
         std::cout << "\nTotal runtime: ";
     }
 #endif
@@ -147,7 +135,7 @@ int main()
          "    df = get_data()\n"
          "    g = sns.factorplot(x='Library', y = 'Runtime (ms)', hue='Task', data=df, kind='bar', palette='muted', "
          "legend = False, size = 5.5, aspect = 1.5)\n"
-         "    legend(loc='upper right')\n"
+         "    legend(loc='upper left')\n"
          "    g.fig.suptitle('"
          + name + "')\n"
                   "    g.savefig('"

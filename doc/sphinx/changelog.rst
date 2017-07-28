@@ -16,6 +16,9 @@ New
 Changes
 ~~~~~~~
 
+- Various performance improvements in :cpp:class:`~mppp::integer` thanks to the reduction of the number of branches
+  in the implementation of basic arithmetic for the 1/2-limb specialisations (`#25 <https://github.com/bluescarni/mppp/pull/25>`__).
+
 - Update the internal copy of Catch to the latest version, 1.9.6 (`#24 <https://github.com/bluescarni/mppp/pull/24>`__).
 
 - Performance improvements for :cpp:func:`mppp::integer::size()` (`#23 <https://github.com/bluescarni/mppp/pull/23>`__).
@@ -30,7 +33,11 @@ Changes
 Fix
 ~~~
 
-- Various small documentation, build system and benchmark fixes.
+- Fix a build failure on older GMP versions (`#25 <https://github.com/bluescarni/mppp/pull/25>`__).
+
+- Fix a build system bug when building the benchmarks with older CMake versions (`#25 <https://github.com/bluescarni/mppp/pull/25>`__).
+
+- Various minor fixes.
 
 0.3 (2017-06-12)
 ----------------

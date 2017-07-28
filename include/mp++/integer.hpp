@@ -251,11 +251,38 @@ struct static_int {
     static_int() : _mp_size(0), m_limbs()
     {
     }
-    // The defaults here are good.
-    static_int(const static_int &) = default;
-    static_int(static_int &&) = default;
     // Let's avoid copying the _mp_alloc member, as it is never written to and it must always
     // have the same value.
+    static_int(const static_int &other) : _mp_size(other._mp_size), m_limbs(other.m_limbs)
+    {
+    }
+    static_int(static_int &&other) noexcept : static_int(other)
+    {
+    }
+    // These 2 constructors are used in the generic constructor of integer_union.
+    //
+    // Constructor from a size and a single limb (will be the least significant limb).
+    explicit static_int(mpz_size_t size, ::mp_limb_t l) : _mp_size(size)
+    {
+        // Input sanity checks.
+        assert(size <= s_size && size >= -s_size);
+        m_limbs[0] = l;
+        // Zero fill the remaining limbs.
+        std::fill(m_limbs.begin() + 1, m_limbs.end(), ::mp_limb_t(0));
+    }
+    // Constructor from a (signed) size and a limb range. The limbs in the range will be
+    // copied as the least significant limbs.
+    explicit static_int(mpz_size_t size, const ::mp_limb_t *begin, std::size_t asize) : _mp_size(size)
+    {
+        // Input sanity checks.
+        assert(asize <= SSize);
+        assert(size <= s_size && size >= -s_size);
+        assert(size == static_cast<mpz_size_t>(asize) || size == -static_cast<mpz_size_t>(asize));
+        // Copy the input limbs.
+        std::copy(begin, begin + asize, m_limbs.begin());
+        // Zero the remaining limbs, if any.
+        std::fill(m_limbs.begin() + asize, m_limbs.end(), ::mp_limb_t(0));
+    }
     static_int &operator=(const static_int &other)
     {
         _mp_size = other._mp_size;
@@ -363,6 +390,204 @@ union integer_union {
             other.g_dy().~d_storage();
             ::new (static_cast<void *>(&other.m_st)) s_storage();
         }
+    }
+    // Machinery for the implementation of the generic ctor follows.
+    // NOTE: the idea of having the generic ctors and the ctors from string implemented in the union
+    // is that it allows the direct construction of the integer object. If the constructors' logic
+    // were implemented in the integer class, we would have first to def-init the union and then
+    // modify it. Like this, we directly initialise just once the data.
+    //
+    // Add a limb at the top of the integer (that is, the new limb will be the new most
+    // significant limb). Requires a non-negative integer. This is used only during generic construction,
+    // do **NOT** use it anywhere else.
+    void push_limb(::mp_limb_t l)
+    {
+        const auto asize = m_st._mp_size;
+        assert(asize >= 0);
+        if (is_static()) {
+            if (std::size_t(asize) < SSize) {
+                // If there's space for an extra limb, write it, update the size,
+                // and return.
+                ++g_st()._mp_size;
+                g_st().m_limbs[std::size_t(asize)] = l;
+                return;
+            }
+            // Store the upper limb.
+            const auto limb_copy = g_st().m_limbs[SSize - 1u];
+            // Make sure the upper limb contains something.
+            // NOTE: This is necessary because this method is used while building an integer during generic
+            // construction, and it might be possible that the current top limb is zero. If that is the case,
+            // the promotion below triggers an assertion failure when destroying
+            // the static int in debug mode.
+            g_st().m_limbs[SSize - 1u] = 1u;
+            // There's no space for the extra limb. Promote the integer and move on.
+            promote(SSize + 1u);
+            // Recover the upper limb.
+            g_dy()._mp_d[SSize - 1u] = limb_copy;
+        }
+        // LCOV_EXCL_START
+        if (g_dy()._mp_alloc == asize) {
+            // There is not enough space for the extra limb, we need to reallocate.
+            // NOTE: same as above, make sure the top limb contains something. mpz_realloc2() seems not to care,
+            // but better safe than sorry.
+            // NOTE: in practice this is never hit on current architectures: the only case we end up here is initing
+            // with a 64bit integer when the limb is 32bit, but in that case we already promoted to size 2 above.
+            const auto limb_copy = g_dy()._mp_d[asize - 1];
+            g_dy()._mp_d[asize - 1] = 1u;
+            ::mpz_realloc2(&g_dy(), static_cast<::mp_bitcnt_t>(asize) * 2u * GMP_NUMB_BITS);
+            if (mppp_unlikely(g_dy()._mp_alloc / 2 != asize)) {
+                // This means that there was some overflow in the determination of the bit size above.
+                std::abort();
+            }
+            g_dy()._mp_d[asize - 1] = limb_copy;
+        }
+        // LCOV_EXCL_STOP
+        // Write the extra limb, update the size.
+        ++g_dy()._mp_size;
+        g_dy()._mp_d[asize] = l;
+    }
+    // This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
+    // If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
+    // little helper in order to avoid compiler warnings.
+    template <typename T, enable_if_t<(GMP_NUMB_BITS < unsigned(std::numeric_limits<T>::digits)), int> = 0>
+    static void checked_rshift(T &n)
+    {
+        n >>= GMP_NUMB_BITS;
+    }
+    template <typename T, enable_if_t<(GMP_NUMB_BITS >= unsigned(std::numeric_limits<T>::digits)), int> = 0>
+    static void checked_rshift(T &)
+    {
+        assert(false);
+    }
+    // Special casing for bool.
+    void dispatch_generic_ctor(bool b)
+    {
+        // Construct the static. No need for masking in the only limb.
+        ::new (static_cast<void *>(&m_st)) s_storage{static_cast<mpz_size_t>(b), static_cast<::mp_limb_t>(b)};
+    }
+    // Construction from unsigned ints. The Neg flag will negate the integer after construction, it is for use in
+    // the constructor from signed ints.
+    template <typename T, bool Neg = false,
+              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    void dispatch_generic_ctor(T n)
+    {
+        if (n <= GMP_NUMB_MAX) {
+            // Special codepath if n fits directly in a single limb.
+            // No need for the mask as we are sure that n <= GMP_NUMB_MAX.
+            ::new (static_cast<void *>(&m_st)) s_storage{Neg ? -(n != 0u) : (n != 0u), static_cast<::mp_limb_t>(n)};
+            return;
+        }
+        // Def construct a static before building a multi-limb integer.
+        ::new (static_cast<void *>(&m_st)) s_storage();
+        while (n) {
+            push_limb(static_cast<::mp_limb_t>(n & GMP_NUMB_MASK));
+            if (GMP_NUMB_BITS >= unsigned(std::numeric_limits<T>::digits)) {
+                break;
+            }
+            checked_rshift(n);
+        }
+        // Negate if requested.
+        if (Neg) {
+            neg();
+        }
+    }
+    // Construction from signed ints.
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    void dispatch_generic_ctor(T n)
+    {
+        if (n >= T(0)) {
+            // Positive value, just cast to unsigned.
+            dispatch_generic_ctor(static_cast<make_unsigned<T>>(n));
+        } else {
+            // Negative value, use its abs.
+            dispatch_generic_ctor<make_unsigned<T>, true>(nint_abs(n));
+        }
+    }
+    // Construction from float/double.
+    template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
+    void dispatch_generic_ctor(T x)
+    {
+        if (mppp_unlikely(!std::isfinite(x))) {
+            throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
+                                    + std::to_string(x));
+        }
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
+        dispatch_mpz_ctor(&tmp.m_mpz);
+    }
+#if defined(MPPP_WITH_MPFR)
+    // Construction from long double, requires MPFR.
+    template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
+    void dispatch_generic_ctor(T x)
+    {
+        if (mppp_unlikely(!std::isfinite(x))) {
+            throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
+                                    + std::to_string(x));
+        }
+        // NOTE: static checks for overflows are done in mpfr.hpp.
+        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
+        ::mpfr_get_z(&tmp.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
+        dispatch_mpz_ctor(&tmp.m_mpz);
+    }
+#endif
+    // The generic constructor.
+    template <typename T>
+    explicit integer_union(const T &x)
+    {
+        dispatch_generic_ctor(x);
+    }
+    // Implementation of the constructor from string. Abstracted into separate function because it is re-used.
+    void dispatch_c_string_ctor(const char *s, int base)
+    {
+        if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
+            throw std::invalid_argument(
+                "In the constructor of integer from string, a base of " + std::to_string(base)
+                + " was specified, but the only valid values are 0 and any value in the [2,62] range");
+        }
+        MPPP_MAYBE_TLS mpz_raii mpz;
+        if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
+            if (base) {
+                throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
+                                            + std::to_string(base));
+            } else {
+                throw std::invalid_argument(std::string("The string '") + s
+                                            + "' is not a valid integer in any supported base");
+            }
+        }
+        dispatch_mpz_ctor(&mpz.m_mpz);
+    }
+    // Constructor from C string and base.
+    explicit integer_union(const char *s, int base)
+    {
+        dispatch_c_string_ctor(s, base);
+    }
+    // Constructor from string range and base.
+    explicit integer_union(const char *begin, const char *end, int base)
+    {
+        // Copy the range into a local buffer.
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        buffer.assign(begin, end);
+        buffer.emplace_back('\0');
+        dispatch_c_string_ctor(buffer.data(), base);
+    }
+    // Constructor from mpz_t. Abstracted into separate function because it is re-used.
+    void dispatch_mpz_ctor(const ::mpz_t n)
+    {
+        const auto asize = get_mpz_size(n);
+        if (asize > SSize) {
+            // Too big, need to use dynamic.
+            ::new (static_cast<void *>(&m_dy)) d_storage;
+            mpz_init_set_nlimbs(m_dy, *n);
+        } else {
+            ::new (static_cast<void *>(&m_st)) s_storage{n->_mp_size, n->_mp_d, asize};
+        }
+    }
+    explicit integer_union(const ::mpz_t n)
+    {
+        dispatch_mpz_ctor(n);
     }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
@@ -503,13 +728,18 @@ union integer_union {
         const auto signed_size = g_dy()._mp_size;
         // Destroy the dynamic storage.
         destroy_dynamic();
-        // Init the static storage and copy over the data.
-        // NOTE: here the ctor makes sure the static limbs are zeroed
-        // out and we don't get stray limbs when copying below.
-        ::new (static_cast<void *>(&m_st)) s_storage();
-        g_st()._mp_size = signed_size;
-        copy_limbs_no(tmp.data(), tmp.data() + dyn_size, g_st().m_limbs.data());
+        // Init the static storage with the saved data..
+        ::new (static_cast<void *>(&m_st)) s_storage{signed_size, tmp.data(), dyn_size};
         return true;
+    }
+    // Negation.
+    void neg()
+    {
+        if (is_static()) {
+            g_st()._mp_size = -g_st()._mp_size;
+        } else {
+            ::mpz_neg(&g_dy(), &g_dy());
+        }
     }
     // NOTE: keep these public as we need them below.
     s_storage m_st;
@@ -533,6 +763,8 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
 // - pow() can probably benefit for some specialised static implementation, especially in conjunction with
 //   mpn_sqr().
 // - gcd() can be improved (see notes).
+// - functions still to be de-branched: div, divexact, right shift, etc. + all the mpn implementations, if worth it.
+//   Probably better to wait for benchmarks before moving.
 /// Multiprecision integer class.
 /**
  * \rststar
@@ -773,164 +1005,6 @@ public:
      * @param other the object that will be moved into \p this.
      */
     integer(integer &&other) = default;
-
-private:
-    // Add a limb at the top of the integer (that is, the new limb will be the new most
-    // significant limb). Requires a non-negative integer. This is used only during generic construction,
-    // do **NOT** use it anywhere else.
-    void push_limb(::mp_limb_t l)
-    {
-        const auto asize = m_int.m_st._mp_size;
-        assert(asize >= 0);
-        if (is_static()) {
-            if (std::size_t(asize) < SSize) {
-                // If there's space for an extra limb, write it, update the size,
-                // and return.
-                ++m_int.g_st()._mp_size;
-                m_int.g_st().m_limbs[std::size_t(asize)] = l;
-                return;
-            }
-            // Store the upper limb.
-            const auto limb_copy = m_int.g_st().m_limbs[SSize - 1u];
-            // Make sure the upper limb contains something.
-            // NOTE: This is necessary because this method is used while building an integer during generic
-            // construction, and it might be possible that the current top limb is zero. If that is the case,
-            // the promotion below triggers an assertion failure when destroying
-            // the static int in debug mode.
-            m_int.g_st().m_limbs[SSize - 1u] = 1u;
-            // There's no space for the extra limb. Promote the integer and move on.
-            m_int.promote(SSize + 1u);
-            // Recover the upper limb.
-            m_int.g_dy()._mp_d[SSize - 1u] = limb_copy;
-        }
-        if (m_int.g_dy()._mp_alloc == asize) {
-            // There is not enough space for the extra limb, we need to reallocate.
-            // NOTE: same as above, make sure the top limb contains something. mpz_realloc2() seems not to care,
-            // but better safe than sorry.
-            // NOTE: in practice this is never hit on current architectures: the only case we end up here is initing
-            // with a 64bit integer when the limb is 32bit, but in that case we already promoted to size 2 above.
-            const auto limb_copy = m_int.g_dy()._mp_d[asize - 1];
-            m_int.g_dy()._mp_d[asize - 1] = 1u;
-            ::mpz_realloc2(&m_int.g_dy(), static_cast<::mp_bitcnt_t>(asize) * 2u * GMP_NUMB_BITS);
-            if (mppp_unlikely(m_int.g_dy()._mp_alloc / 2 != asize)) {
-                // This means that there was some overflow in the determination of the bit size above.
-                std::abort();
-            }
-            m_int.g_dy()._mp_d[asize - 1] = limb_copy;
-        }
-        // Write the extra limb, update the size.
-        ++m_int.g_dy()._mp_size;
-        m_int.g_dy()._mp_d[asize] = l;
-    }
-    // This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
-    // If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
-    // little helper in order to avoid compiler warnings.
-    template <typename T, enable_if_t<(GMP_NUMB_BITS < unsigned(std::numeric_limits<T>::digits)), int> = 0>
-    static void checked_rshift(T &n)
-    {
-        n >>= GMP_NUMB_BITS;
-    }
-    template <typename T, enable_if_t<(GMP_NUMB_BITS >= unsigned(std::numeric_limits<T>::digits)), int> = 0>
-    static void checked_rshift(T &)
-    {
-        assert(false);
-    }
-    // Dispatch for generic constructor.
-    // Special casing for bool.
-    void dispatch_generic_ctor(bool b)
-    {
-        m_int.g_st()._mp_size = static_cast<mpz_size_t>(b);
-        // No need for masking here.
-        m_int.g_st().m_limbs[0] = static_cast<::mp_limb_t>(b);
-    }
-    // The Neg flag will negate the integer after construction. It is for use in
-    // the constructor from signed ints.
-    template <typename T, bool Neg = false,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
-    void dispatch_generic_ctor(T n)
-    {
-        if (n <= GMP_NUMB_MAX) {
-            // Special codepath if n fits directly in a single limb.
-            m_int.g_st()._mp_size = Neg ? -(n != 0u) : (n != 0u);
-            // NOTE: all limbs have been set to zero by the def init
-            // of the static member. If n is zero we will just re-zero.
-            // No need for the mask as we are sure that n <= GMP_NUMB_MAX.
-            m_int.g_st().m_limbs[0] = static_cast<::mp_limb_t>(n);
-            return;
-        }
-        while (n) {
-            push_limb(static_cast<::mp_limb_t>(n & GMP_NUMB_MASK));
-            if (GMP_NUMB_BITS >= unsigned(std::numeric_limits<T>::digits)) {
-                break;
-            }
-            checked_rshift(n);
-        }
-        // Negate if requested.
-        if (Neg) {
-            neg();
-        }
-    }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
-    void dispatch_generic_ctor(T n)
-    {
-        using u_type = make_unsigned<T>;
-        if (n >= T(0)) {
-            // Positive value, just cast to unsigned.
-            dispatch_generic_ctor(static_cast<u_type>(n));
-        } else {
-            // Negative value, use its abs.
-            dispatch_generic_ctor<u_type, true>(nint_abs(n));
-        }
-    }
-    template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
-    void dispatch_generic_ctor(const T &x)
-    {
-        if (mppp_unlikely(!std::isfinite(x))) {
-            throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
-                                    + std::to_string(x));
-        }
-        MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
-        dispatch_mpz_ctor(&tmp.m_mpz);
-    }
-#if defined(MPPP_WITH_MPFR)
-    template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
-    void dispatch_generic_ctor(const T &x)
-    {
-        if (mppp_unlikely(!std::isfinite(x))) {
-            throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
-                                    + std::to_string(x));
-        }
-        // NOTE: static checks for overflows are done in mpfr.hpp.
-        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
-        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
-        MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
-        ::mpfr_get_z(&tmp.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
-        dispatch_mpz_ctor(&tmp.m_mpz);
-    }
-#endif
-    // Ctor from mpz_t.
-    void dispatch_mpz_ctor(const ::mpz_t n)
-    {
-        const auto asize = get_mpz_size(n);
-        if (asize > SSize) {
-            // Too big, need to promote.
-            // Destroy static.
-            m_int.g_st().~s_storage();
-            // Init dynamic.
-            ::new (static_cast<void *>(&m_int.m_dy)) d_storage;
-            mpz_init_set_nlimbs(m_int.m_dy, *n);
-        } else {
-            // All this is noexcept.
-            // NOTE: m_st() inits to zero the whole array of static limbs, and we copy
-            // in only the used limbs.
-            m_int.g_st()._mp_size = n->_mp_size;
-            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
-        }
-    }
-
-public:
 /// Generic constructor.
 /**
  * This constructor will initialize an integer with the value of \p x. The initialization is always
@@ -948,33 +1022,9 @@ public:
     template <typename T, cpp_interoperable_enabler<T> = 0>
     explicit integer(const T &x)
 #endif
+        : m_int(x)
     {
-        dispatch_generic_ctor(x);
     }
-
-private:
-    // Implementation of the constructor from C string. Requires a def-cted object.
-    void dispatch_c_string_ctor(const char *s, int base)
-    {
-        if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
-            throw std::invalid_argument(
-                "In the constructor of integer from string, a base of " + std::to_string(base)
-                + " was specified, but the only valid values are 0 and any value in the [2,62] range");
-        }
-        MPPP_MAYBE_TLS mpz_raii mpz;
-        if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
-            if (base) {
-                throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
-                                            + std::to_string(base));
-            } else {
-                throw std::invalid_argument(std::string("The string '") + s
-                                            + "' is not a valid integer in any supported base");
-            }
-        }
-        dispatch_mpz_ctor(&mpz.m_mpz);
-    }
-
-public:
     /// Constructor from C string.
     /**
      * This constructor will initialize \p this from the null-terminated string \p s, which must represent
@@ -994,9 +1044,8 @@ public:
      *    https://gmplib.org/manual/Assigning-Integers.html
      * \endrststar
      */
-    explicit integer(const char *s, int base = 10)
+    explicit integer(const char *s, int base = 10) : m_int(s, base)
     {
-        dispatch_c_string_ctor(s, base);
     }
     /// Constructor from C++ string (equivalent to the constructor from C string).
     /**
@@ -1022,13 +1071,8 @@ public:
      *
      * @throws unspecified any exception thrown by the constructor from C string.
      */
-    explicit integer(const char *begin, const char *end, int base = 10)
+    explicit integer(const char *begin, const char *end, int base = 10) : m_int(begin, end, base)
     {
-        // Copy the range into a local buffer.
-        MPPP_MAYBE_TLS std::vector<char> buffer;
-        buffer.assign(begin, end);
-        buffer.emplace_back('\0');
-        dispatch_c_string_ctor(buffer.data(), base);
     }
 #if __cplusplus >= 201703L
     /// Constructor from string view.
@@ -1067,9 +1111,8 @@ public:
      *
      * @param n the input GMP integer.
      */
-    explicit integer(const ::mpz_t n)
+    explicit integer(const ::mpz_t n) : m_int(n)
     {
-        dispatch_mpz_ctor(n);
     }
     /// Copy assignment operator.
     /**
@@ -1164,13 +1207,8 @@ public:
             assert(!s && asize <= SSize);
             // Destroy the dynamic storage.
             m_int.destroy_dynamic();
-            // Init an empty static.
-            ::new (static_cast<void *>(&m_int.m_st)) s_storage();
-            // Copy over from n.
-            m_int.g_st()._mp_size = n->_mp_size;
-            // NOTE: the upper limbs are guaranteed to be zero by the def
-            // initialisation of s_storage above.
-            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+            // Init a static with the content from n.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage{n->_mp_size, n->_mp_d, asize};
         }
         return *this;
     }
@@ -1246,10 +1284,8 @@ private:
             std::fill(m_int.g_st().m_limbs.begin() + 1, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
         } else {
             m_int.destroy_dynamic();
-            // Def ctor will zero out all limbs.
-            ::new (static_cast<void *>(&m_int.m_st)) s_storage();
-            m_int.g_st()._mp_size = PlusOrMinus ? 1 : -1;
-            m_int.g_st().m_limbs[0] = 1;
+            // Construct from a single limb the static. This will zero any unused limb.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage{PlusOrMinus ? 1 : -1, 1u};
         }
         return *this;
     }
@@ -1382,12 +1418,14 @@ private:
             }
             // Get the current limb. Safe as T has more bits than the limb type.
             const auto l = static_cast<T>(ptr[i] & GMP_NUMB_MASK);
+            // LCOV_EXCL_START
             if (l >> (u_bits - shift)) {
                 // Left-shifting the current limb is well-defined from the point of view of the language, but the result
                 // overflows: the value does not fit in T.
                 // NOTE: I suspect this branch can be triggered on common architectures only with nail builds.
                 return std::make_pair(false, T(0));
             }
+            // LCOV_EXCL_STOP
             // This will not overflow, as there is no carry from retval and l << shift is fine.
             retval = static_cast<T>(retval + (l << shift));
         }
@@ -1434,18 +1472,28 @@ private:
         if (n > Tmin_abs) {
             return std::make_pair(false, T(0));
         }
-        if (Tmin_abs <= Tmax || n <= Tmax) {
-            // Either the negative range of T is leq than the positive one, or n
-            // is not greater than Tmax: we can convert to T and negate safely.
+        // LCOV_EXCL_START
+        if (Tmin_abs <= Tmax) {
+            // The negative range of T is leq than the positive one: we can convert to T and negate safely.
+            // NOTE: this is never hit on current architectures.
             return std::make_pair(true, static_cast<T>(-static_cast<T>(n)));
         }
+        // LCOV_EXCL_STOP
+        // NOTE: double check this, since:
+        // - Tmin_abs > Tmax (as checked just above),
+        // - n > c_min(Tmax, Tmin_abs) (as checked earlier).
+        assert(n > Tmax);
         // The negative range is greater than the positive one and n larger than Tmax:
         // we cannot directly convert n to T. The idea then is to init retval to -Tmax
         // and then to subtract from it Tmax as many times as needed.
         auto retval = static_cast<T>(-static_cast<T>(Tmax));
         const auto q = static_cast<make_unsigned<T>>(n / Tmax), r = static_cast<make_unsigned<T>>(n % Tmax);
         for (make_unsigned<T> i = 0; i < q - 1u; ++i) {
+            // LCOV_EXCL_START
+            // NOTE: this is never hit on current archs, as Tmax differs from Tmin_abs
+            // by just 1: we will use only the remainder r.
             retval = static_cast<T>(retval - static_cast<T>(Tmax));
+            // LCOV_EXCL_STOP
         }
         retval = static_cast<T>(retval - static_cast<T>(r));
         return std::make_pair(true, retval);
@@ -1730,11 +1778,7 @@ public:
      */
     integer &neg()
     {
-        if (is_static()) {
-            m_int.g_st()._mp_size = -m_int.g_st()._mp_size;
-        } else {
-            ::mpz_neg(&m_int.g_dy(), &m_int.g_dy());
-        }
+        m_int.neg();
         return *this;
     }
     /// In-place absolute value.
@@ -2228,10 +2272,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // op1 is not smaller than op2.
             tmp = data1[0] - data2[0];
             // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
-            rop._mp_size = sign1;
-            if (mppp_unlikely(!tmp)) {
-                rop._mp_size = 0;
-            }
+            rop._mp_size = sign1 * static_cast<int>(tmp != 0u);
             rdata[0] = tmp;
         } else {
             // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
@@ -2298,10 +2339,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         // - if sign1 == 0, size is zero,
         // - if sign1 == +-1, then the size is either +-1 or +-2: asize is 2 if the result
         //   has a nonzero 2nd limb, otherwise asize is 1.
-        rop._mp_size = sign1;
-        if (hi2) {
-            rop._mp_size = sign1 + sign1;
-        }
+        rop._mp_size = sign1 * (static_cast<int>(hi2 != 0u) + 1);
         rdata[0] = lo;
         rdata[1] = hi2;
     } else {
@@ -2315,12 +2353,17 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // This can never wrap around, at most it goes to zero.
             const auto hi = data1[1] - data2[1] - static_cast<::mp_limb_t>(data1[0] < data2[0]);
             // asize can be 0, 1 or 2.
-            rop._mp_size = 0;
-            if (hi) {
-                rop._mp_size = sign1 + sign1;
-            } else if (lo) {
-                rop._mp_size = sign1;
-            }
+            // NOTE: this contraption ensures the correct result. The possibilities for hi/lo
+            // nonzero are:
+            // hi | lo | asize
+            // ---------------
+            //  1 |  1 |     2
+            //  1 |  0 |     2
+            //  0 |  1 |     1
+            //  0 |  0 |     0
+            // The sign1 (which cannot be zero due to the branch we are in) takes care of the sign of the size.
+            // Use '|' instead of '||' as we don't need to short circuit on this.
+            rop._mp_size = sign1 * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
             rdata[0] = lo;
             rdata[1] = hi;
         } else {
@@ -2328,11 +2371,8 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             const auto lo = data2[0] - data1[0];
             assert(data2[0] >= data1[0] || data2[1] > data1[1]);
             const auto hi = data2[1] - data1[1] - static_cast<::mp_limb_t>(data2[0] < data1[0]);
-            // asize can be 1 or 2, but not zero as we know abs(op1) != abs(op2).
-            rop._mp_size = sign2;
-            if (hi) {
-                rop._mp_size = sign2 + sign2;
-            }
+            // asize can be 1 or 2, but not zero as we know abs(op1) != abs(op2). Same idea as above.
+            rop._mp_size = sign2 * (static_cast<int>(hi != 0u) + 1);
             rdata[0] = lo;
             rdata[1] = hi;
         }
@@ -2514,7 +2554,8 @@ inline bool static_add_ui_impl(static_int<SSize> &rop, const static_int<SSize> &
             return false;
         }
         // Compute the new size. It can be 0, 1 or 2.
-        rop._mp_size = hi ? 2 : (lo ? 1 : 0);
+        // NOTE: see the comments in the 2-limb specialisation for addition.
+        rop._mp_size = static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
         // Write out.
         rdata[0] = lo;
         rdata[1] = hi;
@@ -2526,7 +2567,7 @@ inline bool static_add_ui_impl(static_int<SSize> &rop, const static_int<SSize> &
             // Sub from hi the borrow.
             const auto hi = data1[1] - static_cast<::mp_limb_t>(data1[0] < l2);
             // The final size can be -2, -1 or 0.
-            rop._mp_size = hi ? -2 : (lo ? -1 : 0);
+            rop._mp_size = -(static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1));
             rdata[0] = lo;
             rdata[1] = hi;
         } else {
@@ -2736,18 +2777,16 @@ inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 // 1-limb optimization via dlimb.
 template <std::size_t SSize>
 inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
-                                   mpz_size_t, mpz_size_t, int sign1, int sign2, const std::integral_constant<int, 1> &)
+                                   mpz_size_t, mpz_size_t, int, int, const std::integral_constant<int, 1> &)
 {
     ::mp_limb_t hi;
     const ::mp_limb_t lo = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &hi);
     if (mppp_unlikely(hi)) {
         return 2u;
     }
-    const mpz_size_t asize = (lo != 0u);
-    rop._mp_size = asize;
-    if (sign1 != sign2) {
-        rop._mp_size = -rop._mp_size;
-    }
+    // The size will be zero if at least one operand is zero, otherwise +-1
+    // depending on the signs of the operands.
+    rop._mp_size = op1._mp_size * op2._mp_size;
     rop.m_limbs[0] = lo;
     return 0u;
 }
@@ -2758,19 +2797,12 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
                                    mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                    const std::integral_constant<int, 2> &)
 {
-    if (mppp_unlikely(!asize1 || !asize2)) {
-        // Handle zeroes.
-        rop._mp_size = 0;
-        rop.m_limbs[0] = 0u;
-        rop.m_limbs[1] = 0u;
-        return 0u;
-    }
-    if (asize1 == 1 && asize2 == 1) {
+    if (asize1 <= 1 && asize2 <= 1) {
+        // NOTE: this handles zeroes as well: we know that the limbs are all zeroes in such
+        // a case (as we always guarantee unused limbs are zeroed), and the sign1 * sign2 multiplication takes care of
+        // the size.
         rop.m_limbs[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &rop.m_limbs[1]);
-        rop._mp_size = static_cast<mpz_size_t>((asize1 + asize2) - mpz_size_t(rop.m_limbs[1] == 0u));
-        if (sign1 != sign2) {
-            rop._mp_size = -rop._mp_size;
-        }
+        rop._mp_size = sign1 * sign2 * static_cast<mpz_size_t>(2 - (rop.m_limbs[1] == 0u));
         return 0u;
     }
     if (asize1 != asize2) {
@@ -2796,10 +2828,7 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
         const mpz_size_t asize = 2 + mpz_size_t(tmp2 != 0u);
         if (asize == 2) {
             // Size is good, write out the result.
-            rop._mp_size = asize;
-            if (sign1 != sign2) {
-                rop._mp_size = -rop._mp_size;
-            }
+            rop._mp_size = sign1 * sign2 * asize;
             rop.m_limbs[0] = tmp0;
             rop.m_limbs[1] = tmp1;
             return 0u;
@@ -2919,10 +2948,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
         return 3u;
     }
     // Determine the sign of the product: 0, 1 or -1.
-    int sign_prod = prod != 0u;
-    if (sign1 != sign2) {
-        sign_prod = -sign_prod;
-    }
+    const int sign_prod = sign1 * sign2;
     // Now add/sub.
     if (signr == sign_prod) {
         // Same sign, do addition with overflow check.
@@ -2938,10 +2964,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
             // abs(rop) >= abs(prod).
             tmp = rop.m_limbs[0] - prod;
             // asize is either 1 or 0 (0 iff rop == prod).
-            rop._mp_size = signr;
-            if (mppp_unlikely(!tmp)) {
-                rop._mp_size = 0;
-            }
+            rop._mp_size = signr * static_cast<int>(tmp != 0u);
             rop.m_limbs[0] = tmp;
         } else {
             // NOTE: this cannot be zero, as rop and prod cannot be equal.
@@ -2964,14 +2987,11 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
     }
     // Handle op1 * op2.
     std::array<::mp_limb_t, 2> prod;
-    int sign_prod = 1;
-    if (sign1 != sign2) {
-        sign_prod = -1;
-    }
+    const int sign_prod = sign1 * sign2;
     mpz_size_t asize_prod;
     if (asize1 == 1 && asize2 == 1) {
         prod[0] = dlimb_mul(op1.m_limbs[0], op2.m_limbs[0], &prod[1]);
-        asize_prod = (asize1 + asize2) - mpz_size_t(prod[1] == 0u);
+        asize_prod = (asize1 + asize2) - (prod[1] == 0u);
     } else {
         // The only possibility of success is 2limbs x 1limb.
         //
@@ -3017,10 +3037,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
         // - cannot be zero, as prod is not zero,
         // - if signr == +-1, then the size is either +-1 or +-2: asize is 2 if the result
         //   has a nonzero 2nd limb, otherwise asize is 1.
-        rop._mp_size = signr;
-        if (hi2) {
-            rop._mp_size = signr + signr;
-        }
+        rop._mp_size = signr * (static_cast<int>(hi2 != 0u) + 1);
         rop.m_limbs[0] = lo;
         rop.m_limbs[1] = hi2;
     } else {
@@ -3034,12 +3051,8 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
             // This can never wrap around, at most it goes to zero.
             const auto hi = rop.m_limbs[1] - prod[1] - static_cast<::mp_limb_t>(rop.m_limbs[0] < prod[0]);
             // asize can be 0, 1 or 2.
-            rop._mp_size = 0;
-            if (hi) {
-                rop._mp_size = signr + signr;
-            } else if (lo) {
-                rop._mp_size = signr;
-            }
+            // NOTE: see the comments in the 2-limb specialisation for addition.
+            rop._mp_size = signr * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
             rop.m_limbs[0] = lo;
             rop.m_limbs[1] = hi;
         } else {
@@ -3048,10 +3061,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
             assert(prod[0] >= rop.m_limbs[0] || prod[1] > rop.m_limbs[1]);
             const auto hi = prod[1] - rop.m_limbs[1] - static_cast<::mp_limb_t>(prod[0] < rop.m_limbs[0]);
             // asize can be 1 or 2, but not zero as we know abs(prod) != abs(rop).
-            rop._mp_size = sign_prod;
-            if (hi) {
-                rop._mp_size = sign_prod + sign_prod;
-            }
+            rop._mp_size = sign_prod * (static_cast<int>(hi != 0u) + 1);
             rop.m_limbs[0] = lo;
             rop.m_limbs[1] = hi;
         }
@@ -3280,11 +3290,8 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
         }
         rop.m_limbs[1u] = n.m_limbs[0u];
         rop.m_limbs[0u] = 0u;
-        // The size has to be 2.
-        rop._mp_size = 2;
-        if (sign == -1) {
-            rop._mp_size = -2;
-        }
+        // The asize has to be 2.
+        rop._mp_size = 2 * sign;
         return 0u;
     }
     // Temp hi lo limbs to store the result that will eventually go into rop.
@@ -3314,10 +3321,7 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
     rop.m_limbs[0u] = lo;
     rop.m_limbs[1u] = hi;
     // asize is at least 1.
-    rop._mp_size = 1 + (hi != 0u);
-    if (sign == -1) {
-        rop._mp_size = -rop._mp_size;
-    }
+    rop._mp_size = sign * (1 + (hi != 0u));
     return 0u;
 }
 

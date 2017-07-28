@@ -10,11 +10,11 @@
 #include <fstream>
 #include <iostream>
 #include <mp++/mp++.hpp>
+#include <numeric>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "simple_timer.hpp"
 
 #if defined(MPPP_BENCHMARK_BOOST)
 #include <boost/multiprecision/cpp_int.hpp>
@@ -22,38 +22,39 @@
 #include <gmp.h>
 #endif
 
-#if defined(MPPP_BENCHMARK_FLINT)
-#include <flint/flint.h>
-#include <flint/fmpzxx.h>
-#endif
+#include "simple_timer.hpp"
 
 using namespace mppp;
 using namespace mppp_bench;
 
 #if defined(MPPP_BENCHMARK_BOOST)
-using cpp_int = boost::multiprecision::cpp_int;
-using mpz_int = boost::multiprecision::mpz_int;
+// Make sure we use the cpp_int version that does the overflow check, in order to
+// match mp++'s behaviour.
+using cpp_int = boost::multiprecision::
+    number<boost::multiprecision::cpp_int_backend<0, 0, boost::multiprecision::signed_magnitude,
+                                                  boost::multiprecision::checked>,
+           boost::multiprecision::et_off>;
+using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, boost::multiprecision::et_off>;
 #endif
 
-#if defined(MPPP_BENCHMARK_FLINT)
-using fmpzxx = flint::fmpzxx;
-#endif
-
-using integer_t = integer<1>;
-static const std::string name = "bench_dot_product_1";
+using integer_t = integer<2>;
+static const std::string name = "integer2_int_conversion";
 
 constexpr auto size = 30000000ul;
 
+static std::mt19937 rng;
+
 template <typename T>
-static inline std::pair<std::vector<T>, std::vector<T>> get_init_vectors(double &init_time)
+static inline std::vector<T> get_init_vector(double &init_time)
 {
+    rng.seed(0);
+    std::uniform_int_distribution<int> dist(-10000, 10000);
     simple_timer st;
-    std::vector<T> v1(size), v2(size);
-    std::fill(v1.begin(), v1.end(), T(2));
-    std::fill(v2.begin(), v2.end(), T(2));
+    std::vector<T> retval(size);
+    std::generate(retval.begin(), retval.end(), [&dist]() { return T(dist(rng)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
-    return std::make_pair(std::move(v1), std::move(v2));
+    return retval;
 }
 
 int main()
@@ -70,19 +71,17 @@ int main()
         std::cout << "\n\nBenchmarking mp++.";
         simple_timer st1;
         double init_time;
-        auto p = get_init_vectors<integer_t>(init_time);
+        auto v = get_init_vector<integer_t>(init_time);
         s += "['mp++','init'," + std::to_string(init_time) + "],";
+        std::vector<int> c_out(size);
         {
             simple_timer st2;
-            integer_t ret(0);
-            for (auto i = 0ul; i < size; ++i) {
-                addmul(ret, p.first[i], p.second[i]);
-            }
-            std::cout << ret << '\n';
-            s += "['mp++','arithmetic'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nArithmetic runtime: ";
+            std::transform(v.begin(), v.end(), c_out.begin(), [](const integer_t &n) { return static_cast<int>(n); });
+            s += "['mp++','convert'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nConvert runtime: ";
         }
         s += "['mp++','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0l) << '\n';
         std::cout << "\nTotal runtime: ";
     }
 #if defined(MPPP_BENCHMARK_BOOST)
@@ -90,59 +89,35 @@ int main()
         std::cout << "\n\nBenchmarking cpp_int.";
         simple_timer st1;
         double init_time;
-        auto p = get_init_vectors<cpp_int>(init_time);
+        auto v = get_init_vector<cpp_int>(init_time);
         s += "['Boost (cpp_int)','init'," + std::to_string(init_time) + "],";
+        std::vector<int> c_out(size);
         {
             simple_timer st2;
-            cpp_int ret(0);
-            for (auto i = 0ul; i < size; ++i) {
-                ret += p.first[i] * p.second[i];
-            }
-            std::cout << ret << '\n';
-            s += "['Boost (cpp_int)','arithmetic'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nArithmetic runtime: ";
+            std::transform(v.begin(), v.end(), c_out.begin(), [](const cpp_int &n) { return static_cast<int>(n); });
+            s += "['Boost (cpp_int)','convert'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nConvert runtime: ";
         }
         s += "['Boost (cpp_int)','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0l) << '\n';
         std::cout << "\nTotal runtime: ";
     }
     {
         std::cout << "\n\nBenchmarking mpz_int.";
         simple_timer st1;
         double init_time;
-        auto p = get_init_vectors<mpz_int>(init_time);
+        auto v = get_init_vector<mpz_int>(init_time);
         s += "['Boost (mpz_int)','init'," + std::to_string(init_time) + "],";
+        std::vector<int> c_out(size);
         {
             simple_timer st2;
-            mpz_int ret(0);
-            for (auto i = 0ul; i < size; ++i) {
-                ::mpz_addmul(ret.backend().data(), p.first[i].backend().data(), p.second[i].backend().data());
-            }
-            std::cout << ret << '\n';
-            s += "['Boost (mpz_int)','arithmetic'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nArithmetic runtime: ";
+            std::transform(v.begin(), v.end(), c_out.begin(),
+                           [](const mpz_int &n) { return static_cast<int>(::mpz_get_si(n.backend().data())); });
+            s += "['Boost (mpz_int)','convert'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nConvert runtime: ";
         }
         s += "['Boost (mpz_int)','total'," + std::to_string(st1.elapsed()) + "],";
-        std::cout << "\nTotal runtime: ";
-    }
-#endif
-#if defined(MPPP_BENCHMARK_FLINT)
-    {
-        std::cout << "\n\nBenchmarking fmpzxx.";
-        simple_timer st1;
-        double init_time;
-        auto p = get_init_vectors<fmpzxx>(init_time);
-        s += "['FLINT','init'," + std::to_string(init_time) + "],";
-        {
-            simple_timer st2;
-            fmpzxx ret(0);
-            for (auto i = 0ul; i < size; ++i) {
-                ::fmpz_addmul(ret._data().inner, p.first[i]._data().inner, p.second[i]._data().inner);
-            }
-            std::cout << ret << '\n';
-            s += "['FLINT','arithmetic'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nArithmetic runtime: ";
-        }
-        s += "['FLINT','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << std::accumulate(c_out.begin(), c_out.end(), 0l) << '\n';
         std::cout << "\nTotal runtime: ";
     }
 #endif
@@ -158,7 +133,7 @@ int main()
          "    df = get_data()\n"
          "    g = sns.factorplot(x='Library', y = 'Runtime (ms)', hue='Task', data=df, kind='bar', palette='muted', "
          "legend = False, size = 5.5, aspect = 1.5)\n"
-         "    legend(loc='upper right')\n"
+         "    legend(loc='upper left')\n"
          "    g.fig.suptitle('"
          + name + "')\n"
                   "    g.savefig('"

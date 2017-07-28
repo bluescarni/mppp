@@ -12,7 +12,7 @@
 #include <mp++/mp++.hpp>
 #include <random>
 #include <string>
-#include <utility>
+#include <tuple>
 #include <vector>
 
 #include "simple_timer.hpp"
@@ -32,31 +32,33 @@ using namespace mppp;
 using namespace mppp_bench;
 
 #if defined(MPPP_BENCHMARK_BOOST)
-using cpp_int = boost::multiprecision::cpp_int;
-using mpz_int = boost::multiprecision::mpz_int;
+using cpp_int = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_off>;
+using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, boost::multiprecision::et_off>;
 #endif
 
 #if defined(MPPP_BENCHMARK_FLINT)
 using fmpzxx = flint::fmpzxx;
 #endif
 
-using integer_t = integer<2>;
-static const std::string name = "bench_sort_2";
+static std::mt19937 rng;
+
+using integer_t = integer<1>;
+static const std::string name = "integer1_vec_mul_signed";
 
 constexpr auto size = 30000000ul;
 
-static std::mt19937 rng;
-
 template <typename T>
-static inline std::vector<T> get_init_vector(double &init_time)
+static inline std::tuple<std::vector<T>, std::vector<T>, std::vector<T>> get_init_vectors(double &init_time)
 {
+    rng.seed(1);
+    std::uniform_int_distribution<int> dist(1, 10), sign(0, 1);
     simple_timer st;
-    std::vector<T> retval(size);
-    std::uniform_int_distribution<int> dist(-300000l, 300000l);
-    std::generate(retval.begin(), retval.end(), [&dist]() { return T(dist(rng)); });
+    std::vector<T> v1(size), v2(size), v3(size);
+    std::generate(v1.begin(), v1.end(), [&dist, &sign]() { return T(dist(rng) * (sign(rng) ? 1 : -1)); });
+    std::generate(v2.begin(), v2.end(), [&dist, &sign]() { return T(dist(rng) * (sign(rng) ? 1 : -1)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
-    return retval;
+    return std::make_tuple(std::move(v1), std::move(v2), std::move(v3));
 }
 
 int main()
@@ -73,13 +75,20 @@ int main()
         std::cout << "\n\nBenchmarking mp++.";
         simple_timer st1;
         double init_time;
-        auto v = get_init_vector<integer_t>(init_time);
+        auto p = get_init_vectors<integer_t>(init_time);
         s += "['mp++','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            std::sort(v.begin(), v.end());
-            s += "['mp++','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            integer_t ret(0);
+            for (auto i = 0ul; i < size; ++i) {
+                mul(std::get<2>(p)[i], std::get<0>(p)[i], std::get<1>(p)[i]);
+            }
+            for (auto i = 0ul; i < size; ++i) {
+                add(ret, ret, std::get<2>(p)[i]);
+            }
+            std::cout << ret << '\n';
+            s += "['mp++','arithmetic'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nArithmetic runtime: ";
         }
         s += "['mp++','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
@@ -89,13 +98,20 @@ int main()
         std::cout << "\n\nBenchmarking cpp_int.";
         simple_timer st1;
         double init_time;
-        auto v = get_init_vector<cpp_int>(init_time);
+        auto p = get_init_vectors<cpp_int>(init_time);
         s += "['Boost (cpp_int)','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            std::sort(v.begin(), v.end());
-            s += "['Boost (cpp_int)','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            cpp_int ret(0);
+            for (auto i = 0ul; i < size; ++i) {
+                std::get<2>(p)[i] = std::get<0>(p)[i] * std::get<1>(p)[i];
+            }
+            for (auto i = 0ul; i < size; ++i) {
+                ret += std::get<2>(p)[i];
+            }
+            std::cout << ret << '\n';
+            s += "['Boost (cpp_int)','arithmetic'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nArithmetic runtime: ";
         }
         s += "['Boost (cpp_int)','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
@@ -104,13 +120,21 @@ int main()
         std::cout << "\n\nBenchmarking mpz_int.";
         simple_timer st1;
         double init_time;
-        auto v = get_init_vector<mpz_int>(init_time);
+        auto p = get_init_vectors<mpz_int>(init_time);
         s += "['Boost (mpz_int)','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            std::sort(v.begin(), v.end());
-            s += "['Boost (mpz_int)','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            mpz_int ret(0);
+            for (auto i = 0ul; i < size; ++i) {
+                ::mpz_mul(std::get<2>(p)[i].backend().data(), std::get<0>(p)[i].backend().data(),
+                          std::get<1>(p)[i].backend().data());
+            }
+            for (auto i = 0ul; i < size; ++i) {
+                ::mpz_add(ret.backend().data(), ret.backend().data(), std::get<2>(p)[i].backend().data());
+            }
+            std::cout << ret << '\n';
+            s += "['Boost (mpz_int)','arithmetic'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nArithmetic runtime: ";
         }
         s += "['Boost (mpz_int)','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
@@ -121,15 +145,21 @@ int main()
         std::cout << "\n\nBenchmarking fmpzxx.";
         simple_timer st1;
         double init_time;
-        auto v = get_init_vector<fmpzxx>(init_time);
+        auto p = get_init_vectors<fmpzxx>(init_time);
         s += "['FLINT','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            std::sort(v.begin(), v.end(), [](const fmpzxx &a, const fmpzxx &b) {
-                return ::fmpz_cmp(a._data().inner, b._data().inner) < 0;
-            });
-            s += "['FLINT','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            fmpzxx ret(0);
+            for (auto i = 0ul; i < size; ++i) {
+                ::fmpz_mul(std::get<2>(p)[i]._data().inner, std::get<0>(p)[i]._data().inner,
+                           std::get<1>(p)[i]._data().inner);
+            }
+            for (auto i = 0ul; i < size; ++i) {
+                ::fmpz_add(ret._data().inner, ret._data().inner, std::get<2>(p)[i]._data().inner);
+            }
+            std::cout << ret << '\n';
+            s += "['FLINT','arithmetic'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nArithmetic runtime: ";
         }
         s += "['FLINT','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
