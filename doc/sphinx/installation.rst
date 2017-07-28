@@ -52,7 +52,7 @@ Installation via conda
 ----------------------
 
 Since version 0.2, mp++ is available in the `conda <https://conda.io/docs/>`__ package manager from the
-`conda-forge <https://conda-forge.github.io/>`__ channel. Packages for Linux 32/64-bit, Windows 32/64-bit
+`conda-forge <https://conda-forge.github.io/>`__ channel. Packages for Linux 64-bit, Windows 32/64-bit
 and OSX 64-bit are available. In order to install mp++ via conda, you just need to add ``conda-forge`` to the channels:
 
 .. code-block:: bash
