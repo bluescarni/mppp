@@ -16,6 +16,8 @@ New
 Changes
 ~~~~~~~
 
+- Update the internal copy of Catch to the latest version, 1.9.6 (`#24 <https://github.com/bluescarni/mppp/pull/24>`__).
+
 - Performance improvements for :cpp:func:`mppp::integer::size()` (`#23 <https://github.com/bluescarni/mppp/pull/23>`__).
 
 - Performance improvements for the construction/conversion of :cpp:class:`~mppp::integer` from/to C++ integrals
@@ -28,7 +30,7 @@ Changes
 Fix
 ~~~
 
-- Various small documentation and build system fixes.
+- Various small documentation, build system and benchmark fixes.
 
 0.3 (2017-06-12)
 ----------------

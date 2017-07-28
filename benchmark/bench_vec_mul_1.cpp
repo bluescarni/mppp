@@ -159,6 +159,7 @@ int main()
         s += "['FLINT','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
     }
+#endif
     s += "]\n"
          "    retval = pandas.DataFrame(data)\n"
          "    retval.columns = ['Library','Task','Runtime (ms)']\n"
@@ -178,5 +179,4 @@ int main()
          + name + ".svg', bbox_inches='tight')\n";
     std::ofstream of(name + ".py", std::ios_base::trunc);
     of << s;
-#endif
 }

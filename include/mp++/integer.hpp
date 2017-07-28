@@ -1346,6 +1346,7 @@ private:
         static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
         if ((Sign && m_int.m_st._mp_size != 1) || (!Sign && m_int.m_st._mp_size != -1)) {
+            // If the asize is not 1, the conversion will fail.
             return std::make_pair(false, T(0));
         }
         // Get the pointer to the limbs.
