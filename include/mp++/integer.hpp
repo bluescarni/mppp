@@ -728,12 +728,8 @@ union integer_union {
         const auto signed_size = g_dy()._mp_size;
         // Destroy the dynamic storage.
         destroy_dynamic();
-        // Init the static storage and copy over the data.
-        // NOTE: here the ctor makes sure the static limbs are zeroed
-        // out and we don't get stray limbs when copying below.
-        ::new (static_cast<void *>(&m_st)) s_storage();
-        g_st()._mp_size = signed_size;
-        copy_limbs_no(tmp.data(), tmp.data() + dyn_size, g_st().m_limbs.data());
+        // Init the static storage with the saved data..
+        ::new (static_cast<void *>(&m_st)) s_storage{signed_size, tmp.data(), dyn_size};
         return true;
     }
     // Negation.
@@ -1211,13 +1207,8 @@ public:
             assert(!s && asize <= SSize);
             // Destroy the dynamic storage.
             m_int.destroy_dynamic();
-            // Init an empty static.
-            ::new (static_cast<void *>(&m_int.m_st)) s_storage();
-            // Copy over from n.
-            m_int.g_st()._mp_size = n->_mp_size;
-            // NOTE: the upper limbs are guaranteed to be zero by the def
-            // initialisation of s_storage above.
-            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+            // Init a static with the content from n.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage{n->_mp_size, n->_mp_d, asize};
         }
         return *this;
     }
@@ -1293,10 +1284,8 @@ private:
             std::fill(m_int.g_st().m_limbs.begin() + 1, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
         } else {
             m_int.destroy_dynamic();
-            // Def ctor will zero out all limbs.
-            ::new (static_cast<void *>(&m_int.m_st)) s_storage();
-            m_int.g_st()._mp_size = PlusOrMinus ? 1 : -1;
-            m_int.g_st().m_limbs[0] = 1;
+            // Construct from a single limb the static. This will zero any unused limb.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage{PlusOrMinus ? 1 : -1, 1u};
         }
         return *this;
     }
