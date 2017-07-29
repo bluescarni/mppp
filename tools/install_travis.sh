@@ -40,10 +40,15 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "CoverageGCC5" ]]; then
-    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
+    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_CXX_STANDARD=14 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-5;
+elif [[ "${MPPP_BUILD}" == "CoverageGCC7" ]]; then
+    CXX=g++-7 CC=gcc-7 cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="--coverage -fconcepts" ../;
+    make -j2 VERBOSE=1;
+    ctest -V;
+    bash <(curl -s https://codecov.io/bash) -x gcov-7;
 elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     wget ftp://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.bz2;
     tar xjvf gmp-6.1.2.tar.bz2;
