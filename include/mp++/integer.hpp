@@ -279,7 +279,7 @@ struct static_int {
         assert(size <= s_size && size >= -s_size);
         assert(size == static_cast<mpz_size_t>(asize) || size == -static_cast<mpz_size_t>(asize));
         // Copy the input limbs.
-        std::copy(begin, begin + asize, m_limbs.begin());
+        copy_limbs(begin, begin + asize, m_limbs.data());
         // Zero the remaining limbs, if any.
         std::fill(m_limbs.begin() + asize, m_limbs.end(), ::mp_limb_t(0));
     }
