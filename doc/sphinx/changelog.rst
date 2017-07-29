@@ -16,6 +16,10 @@ New
 Changes
 ~~~~~~~
 
+- Improve testing coverage (`#25 <https://github.com/bluescarni/mppp/pull/25>`__).
+
+- Various extensions to the benchmark suite (`#25 <https://github.com/bluescarni/mppp/pull/25>`__).
+
 - Various performance improvements in :cpp:class:`~mppp::integer` thanks to the reduction of the number of branches
   in the implementation of basic arithmetic for the 1/2-limb specialisations (`#25 <https://github.com/bluescarni/mppp/pull/25>`__).
 

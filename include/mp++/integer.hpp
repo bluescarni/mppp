@@ -279,7 +279,9 @@ struct static_int {
         assert(size <= s_size && size >= -s_size);
         assert(size == static_cast<mpz_size_t>(asize) || size == -static_cast<mpz_size_t>(asize));
         // Copy the input limbs.
-        std::copy(begin, begin + asize, m_limbs.begin());
+        // NOTE: here we are constructing a *new* object, thus I don't think it's possible that begin
+        // overlaps with m_limbs.data() (unless some UBish stuff is being attempted).
+        copy_limbs_no(begin, begin + asize, m_limbs.data());
         // Zero the remaining limbs, if any.
         std::fill(m_limbs.begin() + asize, m_limbs.end(), ::mp_limb_t(0));
     }
@@ -765,6 +767,10 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
 // - gcd() can be improved (see notes).
 // - functions still to be de-branched: div, divexact, right shift, etc. + all the mpn implementations, if worth it.
 //   Probably better to wait for benchmarks before moving.
+// - performance improvements for the assignment operators to integrals, at least (maybe floats as well?): avoid
+//   cting temporary.
+// - performance improvements for arithmetic with C++ integrals? (e.g., use add_ui() and similar rather than cting
+//   temporary).
 /// Multiprecision integer class.
 /**
  * \rststar
