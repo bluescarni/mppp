@@ -16,6 +16,8 @@ New
 Changes
 ~~~~~~~
 
+- Expand CI to include GCC 7 in C++17 mode (`#27 <https://github.com/bluescarni/mppp/pull/27>`__).
+
 - Improve testing coverage (`#25 <https://github.com/bluescarni/mppp/pull/25>`__).
 
 - Various extensions to the benchmark suite (`#25 <https://github.com/bluescarni/mppp/pull/25>`__).
