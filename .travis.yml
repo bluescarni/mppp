@@ -36,6 +36,16 @@ matrix:
         apt:
           packages:
           - g++-4.8
+    - env: MPPP_BUILD="CoverageGCC5"
+      compiler: gcc
+      os: linux
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - gcc-5
+          - g++-5
     - env: MPPP_BUILD="CoverageGCC7"
       compiler: gcc
       os: linux
