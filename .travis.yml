@@ -36,11 +36,23 @@ matrix:
         apt:
           packages:
           - g++-4.8
+    - env: MPPP_BUILD="DebugGCC7"
+      compiler: gcc
+      os: linux
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - gcc-7
+          - g++-7
     - env: MPPP_BUILD="CoverageGCC5"
       compiler: gcc
       os: linux
       addons:
         apt:
+          sources:
+          - ubuntu-toolchain-r-test
           packages:
           - gcc-5
           - g++-5
@@ -49,6 +61,8 @@ matrix:
       os: linux
       addons:
         apt:
+          sources:
+          - ubuntu-toolchain-r-test
           packages:
           - gcc-multilib
           - g++-multilib
@@ -78,6 +92,8 @@ matrix:
       os: linux
       addons:
         apt:
+          sources:
+          - ubuntu-toolchain-r-test
           packages:
           - gcc-5
           - g++-5
