@@ -20,8 +20,6 @@ matrix:
       os: linux
       addons:
         apt:
-          sources:
-          - ubuntu-toolchain-r-test
           packages:
           - g++-4.8
     - env: MPPP_BUILD="DebugGCC48"
@@ -29,8 +27,6 @@ matrix:
       os: linux
       addons:
         apt:
-          sources:
-          - ubuntu-toolchain-r-test
           packages:
           - g++-4.8
     - env: MPPP_BUILD="DebugGCC48DebugGMP"
@@ -38,20 +34,13 @@ matrix:
       os: linux
       addons:
         apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          - george-edison55-precise-backports
           packages:
           - g++-4.8
-          - cmake
-          - cmake-data
     - env: MPPP_BUILD="CoverageGCC5"
       compiler: gcc
       os: linux
       addons:
         apt:
-          sources:
-          - ubuntu-toolchain-r-test
           packages:
           - gcc-5
           - g++-5
@@ -60,9 +49,6 @@ matrix:
       os: linux
       addons:
         apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          - george-edison55-precise-backports
           packages:
           - gcc-multilib
           - g++-multilib
@@ -70,16 +56,13 @@ matrix:
           - gcc-6-multilib
           - g++-6
           - g++-6-multilib
-          - cmake
-          - cmake-data
     - env: MPPP_BUILD="DebugClang38"
       compiler: clang
       os: linux
       addons:
         apt:
           sources:
-          - ubuntu-toolchain-r-test
-          - llvm-toolchain-precise-3.8
+          - llvm-toolchain-trusty-3.8
           packages:
           - clang-3.8
     - env: MPPP_BUILD="ReleaseClang38"
@@ -88,16 +71,13 @@ matrix:
       addons:
         apt:
           sources:
-          - ubuntu-toolchain-r-test
-          - llvm-toolchain-precise-3.8
+          - llvm-toolchain-trusty-3.8
           packages:
           - clang-3.8
     - env: MPPP_BUILD="Documentation"
       os: linux
       addons:
         apt:
-          sources:
-          - ubuntu-toolchain-r-test
           packages:
           - gcc-5
           - g++-5
