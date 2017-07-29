@@ -43,6 +43,7 @@ mark_as_advanced(MPPP_BENCHMARK_BOOST)
 option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
 mark_as_advanced(MPPP_BENCHMARK_FLINT)
 option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
+option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 
 if(YACMA_COMPILER_IS_GNUCXX)
     # This is just a hackish way of detecting concepts, need to revisit once
@@ -54,13 +55,22 @@ find_package(GMP REQUIRED)
 
 # Setup of the mp++ interface library.
 add_library(mp++ INTERFACE)
+
+# Optional dependency on MPFR.
 if(MPPP_WITH_MPFR)
     find_package(MPFR REQUIRED)
     target_link_libraries(mp++ INTERFACE MPFR::MPFR)
     set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
 
-# mp++ depends on GMP.
+# Optional dependency on quadmath.
+if(MPPP_WITH_QUADMATH)
+    find_package(Quadmath REQUIRED)
+    target_link_libraries(mp++ INTERFACE Quadmath::quadmath)
+    set(MPPP_ENABLE_QUADMATH "#define MPPP_WITH_QUADMATH")
+endif()
+
+# Mandatory dependency on GMP.
 # NOTE: depend on GMP *after* optionally depending on MPFR, as the order
 # of the libraries matters on some platforms.
 target_link_libraries(mp++ INTERFACE GMP::GMP)

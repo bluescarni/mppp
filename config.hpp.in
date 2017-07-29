@@ -15,6 +15,7 @@
 #define MPPP_VERSION_MAJOR @mp++_VERSION_MAJOR@
 #define MPPP_VERSION_MINOR @mp++_VERSION_MINOR@
 @MPPP_ENABLE_MPFR@
+@MPPP_ENABLE_QUADMATH@
 // clang-format on
 // End of defines instantiated by CMake.
 
@@ -68,6 +69,17 @@
 #if defined(__cpp_concepts)
 
 #define MPPP_HAVE_CONCEPTS
+
+#endif
+
+// Some constexpr support is flaky in earlier GCC. In that case, disable it.
+#if !defined(__clang__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+
+#define MPPP_MAYBE_CONSTEXPR
+
+#else
+
+#define MPPP_MAYBE_CONSTEXPR constexpr
 
 #endif
 
