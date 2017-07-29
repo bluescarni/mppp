@@ -126,6 +126,10 @@ and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" ti
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Improve testing coverage (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
+<li>Various extensions to the benchmark suite (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
+<li>Various performance improvements in <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> thanks to the reduction of the number of branches
+in the implementation of basic arithmetic for the 1/2-limb specialisations (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 1.9.6 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/24">#24</a>).</li>
 <li>Performance improvements for <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer4sizeEv" title="mppp::integer::size"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::size()</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
 <li>Performance improvements for the construction/conversion of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> from/to C++ integrals
@@ -137,7 +141,9 @@ and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" ti
 <div class="section" id="fix">
 <h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Various small documentation, build system and benchmark fixes.</li>
+<li>Fix a build failure on older GMP versions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
+<li>Fix a build system bug when building the benchmarks with older CMake versions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
+<li>Various minor fixes.</li>
 </ul>
 </div>
 </div>

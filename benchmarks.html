@@ -65,9 +65,27 @@
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Benchmarks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#integer-benchmarks">Integer benchmarks</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#dot-product">Dot product</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#vector-multiplication">Vector multiplication</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#sorting">Sorting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dot-product">Dot product</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#limb-unsigned-integers">1-limb unsigned integers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#limb-signed-integers">1-limb signed integers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#integer2-dot-product-unsigned">2-limb unsigned integers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">2-limb signed integers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#vector-multiplication">Vector multiplication</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#integer1-vec-mul-unsigned">1-limb unsigned integers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">1-limb signed integers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#integer2-vec-mul-unsigned">2-limb unsigned integers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id7">2-limb signed integers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#sorting">Sorting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id8">1-limb unsigned integers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id9">1-limb signed integers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id10">2-limb unsigned integers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id11">2-limb signed integers</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -103,7 +121,7 @@
   <div class="section" id="benchmarks">
 <span id="id1"></span><h1>Benchmarks<a class="headerlink" href="#benchmarks" title="Permalink to this headline">¶</a></h1>
 <p>This section contains various benchmarks comparing mp++ to other multiprecision libraries. All benchmarks
-were run on an AMD Ryzen 1700 in a 64-bit GNU/Linux environment, using the GCC compiler version 7.1.
+were run on an AMD Ryzen 1700 in a 64-bit GNU/Linux environment, using the GCC compiler.
 The benchmarking code is available <a class="reference external" href="https://github.com/bluescarni/mppp/tree/master/benchmark">here</a>.</p>
 <p>In addition to mp++, the following libraries are used in the benchmarks:</p>
 <ul class="simple">
@@ -115,22 +133,35 @@ and destruction of GMP objects: all arithmetic operations are implemented by cal
 <li>the <a class="reference external" href="http://flintlib.org/">FLINT</a> library. This library provides a data type called <code class="docutils literal"><span class="pre">fmpz_t</span></code> which, similarly to
 mp++, provides a small-value optimisation on top of GMP.</li>
 </ul>
+<p>The benchmark results were last updated on <strong>20170728</strong>, using the following package versions:</p>
+<ul class="simple">
+<li>GCC 7.1,</li>
+<li>mp++ 0.4,</li>
+<li>GMP 6.1.2,</li>
+<li>MPFR 3.1.5,</li>
+<li>Boost 1.63.0,</li>
+<li>FLINT 2.5.2.</li>
+</ul>
 <div class="section" id="integer-benchmarks">
 <h2>Integer benchmarks<a class="headerlink" href="#integer-benchmarks" title="Permalink to this headline">¶</a></h2>
-<p>All the integer benchmarks for mp++ are performed with 1 limb (i.e., 64 bits) of static storage.</p>
 <div class="section" id="dot-product">
-<h3>Dot product<a class="headerlink" href="#dot-product" title="Permalink to this headline">¶</a></h3>
+<span id="integer-dot-product"></span><h3>Dot product<a class="headerlink" href="#dot-product" title="Permalink to this headline">¶</a></h3>
 <p>This benchmark measures the time needed to compute the dot product of two integer vectors of size
-<span class="math">\(3\times 10^7\)</span>. The final result fits in a 64-bit value. For each benchmarked library, the timings
+<span class="math">\(3\times 10^7\)</span> containing randomly-generated values. For each benchmarked library, the timings
 are split into three bars:</p>
 <ul class="simple">
 <li>the <code class="docutils literal"><span class="pre">init</span></code> bar, which accounts for the time needed to initialise the vectors of integers,</li>
 <li>the <code class="docutils literal"><span class="pre">arithmetic</span></code> bar, which represents the time needed to perform the dot product,</li>
 <li>the <code class="docutils literal"><span class="pre">total</span></code> bar, which represents the total runtime of the benchmark.</li>
 </ul>
-<p>The multiply-add primitives of each library are used for the accumulation of the dot product.</p>
+<p>The multiply-add primitives of each library are used for the accumulation of the dot product. The benchmark
+is run in a variety of different setups.</p>
+<div class="section" id="limb-unsigned-integers">
+<span id="integer1-dot-product-unsigned"></span><h4>1-limb unsigned integers<a class="headerlink" href="#limb-unsigned-integers" title="Permalink to this headline">¶</a></h4>
+<p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values, and the final dot product
+is less than <span class="math">\(2^{64}\)</span>. mp++ integers with 1 limb of static size are employed.</p>
 <div class="figure align-center">
-<a class="reference internal image-reference" href="_images/bench_dot_product_1.svg"><img alt="_images/bench_dot_product_1.svg" src="_images/bench_dot_product_1.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="_images/integer1_dot_product_unsigned.svg"><img alt="_images/integer1_dot_product_unsigned.svg" src="_images/integer1_dot_product_unsigned.svg" width="100%" /></a>
 </div>
 <p>It can be immediately seen how the initialisation cost for the <code class="docutils literal"><span class="pre">mpz_int</span></code> class is much higher than for the other
 integer types. This is due to the fact that the GMP API always uses dynamically-allocated memory, even for small values.
@@ -138,31 +169,124 @@ The other integer types all employ a small-value optimisation, and thus avoid th
 <p>In this particular benchmark, mp++ is about 3 times faster than GMP (as measured via the <code class="docutils literal"><span class="pre">mpz_int</span></code> wrapper)
 in the arithmetic portion of the benchmark. mp++ is also faster than <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT, albeit by a smaller margin.</p>
 </div>
+<div class="section" id="limb-signed-integers">
+<h4>1-limb signed integers<a class="headerlink" href="#limb-signed-integers" title="Permalink to this headline">¶</a></h4>
+<p>This setup is almost identical to the <a class="reference internal" href="#integer1-dot-product-unsigned"><span class="std std-ref">previous one</span></a>, but this time the vectors
+are initialised with both positive <em>and</em> negative values.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer1_dot_product_signed.svg"><img alt="_images/integer1_dot_product_signed.svg" src="_images/integer1_dot_product_signed.svg" width="100%" /></a>
+</div>
+<p>The presence of both positive and negative values has a noticeable performance impact with respect to the previous test
+for all libraries, both during the initialisation of the vectors and in the arithmetic part of the benchmark.
+This is due to the fact that sign handling in multiprecision computations is typically implemented
+with branches, and when positive and negative values are equally likely the effectiveness of the CPU&#8217;s branch predictor
+is much reduced.</p>
+<p>The performance advantage of mp++ with respect to the other libraries is retained, albeit by a smaller margin.</p>
+</div>
+<div class="section" id="integer2-dot-product-unsigned">
+<span id="id2"></span><h4>2-limb unsigned integers<a class="headerlink" href="#integer2-dot-product-unsigned" title="Permalink to this headline">¶</a></h4>
+<p>This setup is the 2-limb version of the <a class="reference internal" href="#integer1-dot-product-unsigned"><span class="std std-ref">1-limb unsigned benchmark</span></a>:
+the vectors are initialised with larger non-negative values, the final result is less than <span class="math">\(2^{128}\)</span>, and
+mp++ integers with 2 limbs of static size are now employed.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer2_dot_product_unsigned.svg"><img alt="_images/integer2_dot_product_unsigned.svg" src="_images/integer2_dot_product_unsigned.svg" width="100%" /></a>
+</div>
+<p>The benchmark shows that mp++&#8217;s specialised arithmetic functions pay off in terms of raw performance in this scenario.</p>
+</div>
+<div class="section" id="id3">
+<h4>2-limb signed integers<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>This setup is the signed version of the <a class="reference internal" href="#integer2-dot-product-unsigned"><span class="std std-ref">previous benchmark</span></a>.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer2_dot_product_signed.svg"><img alt="_images/integer2_dot_product_signed.svg" src="_images/integer2_dot_product_signed.svg" width="100%" /></a>
+</div>
+<p>As explained earlier, arithmetic with mixed positive and negative values is more expensive than arithmetic with only
+non-negative values.</p>
+</div>
+</div>
 <div class="section" id="vector-multiplication">
 <h3>Vector multiplication<a class="headerlink" href="#vector-multiplication" title="Permalink to this headline">¶</a></h3>
-<p>This benchmark is very similar to the dot product benchmark above, with one crucial difference: instead of accumulating
-the dot product into a scalar value, the element-wise product of the two vectors is stored in a third vector, and the final
+<p>This benchmark is very similar to the <a class="reference internal" href="#integer-dot-product"><span class="std std-ref">dot product benchmark</span></a>, with one crucial difference:
+instead of accumulating the dot product of two randomly-generated vectors of size <span class="math">\(3\times 10^7\)</span> into a scalar
+value, the element-wise product of the two vectors is stored in a third vector, and the final
 dot product is computed as the sum of the values in this third vector.</p>
 <p>This allows to measure the efficiency
-of the multiplication and addition operations (whereas in the previous benchmark the multiply-add primitives were
+of the multiplication and addition operations (whereas in the dot product benchmark the multiply-add primitives were
 employed), and it also increases the pressure on the memory subsystem (due to the need to write the elements&#8217; products
 into a vector rather than accumulating them directly into a scalar).</p>
+<div class="section" id="integer1-vec-mul-unsigned">
+<span id="id4"></span><h4>1-limb unsigned integers<a class="headerlink" href="#integer1-vec-mul-unsigned" title="Permalink to this headline">¶</a></h4>
+<p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values, and the final result
+is less than <span class="math">\(2^{64}\)</span>. mp++ integers with 1 limb of static size are employed.</p>
 <div class="figure align-center">
-<a class="reference internal image-reference" href="_images/bench_vec_mul_1.svg"><img alt="_images/bench_vec_mul_1.svg" src="_images/bench_vec_mul_1.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="_images/integer1_vec_mul_unsigned.svg"><img alt="_images/integer1_vec_mul_unsigned.svg" src="_images/integer1_vec_mul_unsigned.svg" width="100%" /></a>
 </div>
 <p>This time mp++ is more than 5 times faster than GMP in the arithmetic portion of the benchmark, while still maintaining
-a performance advantage over <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT.</p>
+a performance advantage over <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT. The performance of <code class="docutils literal"><span class="pre">cpp_int</span></code> might be hurt by its relatively large
+memory footprint (32 bytes vs mp++&#8217;s 16 and FLINT&#8217;s 8).</p>
+</div>
+<div class="section" id="id5">
+<h4>1-limb signed integers<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>In this setup, the vectors are initialised with both positive <em>and</em> negative values.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer1_vec_mul_signed.svg"><img alt="_images/integer1_vec_mul_signed.svg" src="_images/integer1_vec_mul_signed.svg" width="100%" /></a>
+</div>
+<p>We can see again how the introduction of mixed positive and negative values impacts performance negatively with respect
+to the <a class="reference internal" href="#integer1-vec-mul-unsigned"><span class="std std-ref">unsigned setup</span></a>.</p>
+</div>
+<div class="section" id="integer2-vec-mul-unsigned">
+<span id="id6"></span><h4>2-limb unsigned integers<a class="headerlink" href="#integer2-vec-mul-unsigned" title="Permalink to this headline">¶</a></h4>
+<p>This setup is the 2-limb version of the <a class="reference internal" href="#integer1-vec-mul-unsigned"><span class="std std-ref">1-limb unsigned benchmark</span></a>:
+the vectors are initialised with larger non-negative values, the final result is less than <span class="math">\(2^{128}\)</span>, and
+mp++ integers with 2 limbs of static size are now employed.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer2_vec_mul_unsigned.svg"><img alt="_images/integer2_vec_mul_unsigned.svg" src="_images/integer2_vec_mul_unsigned.svg" width="100%" /></a>
+</div>
+<p>The benchmark shows again that mp++&#8217;s specialised arithmetic functions deliver strong performance.</p>
+</div>
+<div class="section" id="id7">
+<h4>2-limb signed integers<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<p>This setup is the signed version of the <a class="reference internal" href="#integer2-vec-mul-unsigned"><span class="std std-ref">previous benchmark</span></a>.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer2_vec_mul_signed.svg"><img alt="_images/integer2_vec_mul_signed.svg" src="_images/integer2_vec_mul_signed.svg" width="100%" /></a>
+</div>
+</div>
 </div>
 <div class="section" id="sorting">
 <h3>Sorting<a class="headerlink" href="#sorting" title="Permalink to this headline">¶</a></h3>
-<p>This benchmark consists of the sorting (via <code class="docutils literal"><span class="pre">std::sort()</span></code>) of a randomly-generated vector of <span class="math">\(3\times 10^7\)</span> integers whose values
-are less than <span class="math">\(2^{64}\)</span>.</p>
+<p>This benchmark consists of the sorting (via <code class="docutils literal"><span class="pre">std::sort()</span></code>) of a randomly-generated vector of <span class="math">\(3\times 10^7\)</span> integers.</p>
+<div class="section" id="id8">
+<h4>1-limb unsigned integers<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<p>In this setup, the integer vector is initialised with small <em>non-negative</em> values. mp++ integers with 1 limb of static size are employed.</p>
 <div class="figure align-center">
-<a class="reference internal image-reference" href="_images/bench_sort_1.svg"><img alt="_images/bench_sort_1.svg" src="_images/bench_sort_1.svg" width="100%" /></a>
+<a class="reference internal image-reference" href="_images/integer1_sort_unsigned.svg"><img alt="_images/integer1_sort_unsigned.svg" src="_images/integer1_sort_unsigned.svg" width="100%" /></a>
 </div>
 <p>Here again it can be seen how the small-value optimisation implemented in mp++, <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT pays off on large
 datasets with respect to plain GMP integers. mp++ shows a modest performance increase with respect to <code class="docutils literal"><span class="pre">cpp_int</span></code>
 and FLINT.</p>
+</div>
+<div class="section" id="id9">
+<h4>1-limb signed integers<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<p>In this setup, the vector is initialised with both positive <em>and</em> negative values.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer1_sort_signed.svg"><img alt="_images/integer1_sort_signed.svg" src="_images/integer1_sort_signed.svg" width="100%" /></a>
+</div>
+</div>
+<div class="section" id="id10">
+<h4>2-limb unsigned integers<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<p>In this setup, the integer vector is initialised with <em>non-negative</em> values in the <span class="math">\(\left[2^{64},2^{128}\right)\)</span> range.
+mp++ integers with 2 limbs of static size are employed.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer2_sort_unsigned.svg"><img alt="_images/integer2_sort_unsigned.svg" src="_images/integer2_sort_unsigned.svg" width="100%" /></a>
+</div>
+</div>
+<div class="section" id="id11">
+<h4>2-limb signed integers<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
+<p>In this setup, the vector is initialised with both positive <em>and</em> negative values in the <span class="math">\(\left(-2^{128},2^{128}\right)\)</span> range.
+mp++ integers with 2 limbs of static size are employed.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer2_sort_signed.svg"><img alt="_images/integer2_sort_signed.svg" src="_images/integer2_sort_signed.svg" width="100%" /></a>
+</div>
+</div>
 </div>
 </div>
 </div>
