@@ -8,8 +8,10 @@
 
 #include <algorithm>
 #include <fstream>
+#include <gmp.h>
 #include <iostream>
 #include <mp++/mp++.hpp>
+#include <random>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -31,26 +33,30 @@ using namespace mppp;
 using namespace mppp_bench;
 
 #if defined(MPPP_BENCHMARK_BOOST)
-using cpp_int = boost::multiprecision::cpp_int;
-using mpz_int = boost::multiprecision::mpz_int;
+using cpp_int = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_off>;
+using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, boost::multiprecision::et_off>;
 #endif
 
 #if defined(MPPP_BENCHMARK_FLINT)
 using fmpzxx = flint::fmpzxx;
 #endif
 
+static std::mt19937 rng;
+
 using integer_t = integer<2>;
-static const std::string name = "bench_vec_mul_2";
+static const std::string name = "integer2_vec_mul_unsigned";
 
 constexpr auto size = 30000000ul;
 
 template <typename T>
 static inline std::tuple<std::vector<T>, std::vector<T>, std::vector<T>> get_init_vectors(double &init_time)
 {
+    rng.seed(0);
+    std::uniform_int_distribution<unsigned> dist(1u, 7u);
     simple_timer st;
     std::vector<T> v1(size), v2(size), v3(size);
-    std::fill(v1.begin(), v1.end(), T(2));
-    std::fill(v2.begin(), v2.end(), T(2));
+    std::generate(v1.begin(), v1.end(), [&dist]() { return static_cast<T>(T(dist(rng)) << (GMP_NUMB_BITS / 2)); });
+    std::generate(v2.begin(), v2.end(), [&dist]() { return static_cast<T>(T(dist(rng)) << (GMP_NUMB_BITS / 2)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
     return std::make_tuple(std::move(v1), std::move(v2), std::move(v3));
