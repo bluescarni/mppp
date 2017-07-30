@@ -143,7 +143,7 @@ public:
         // Build the union and assign the value.
         ieee_float128 ief;
         ief.value = m_value;
-        if (ief.i_eee.exponent == 32767u) {
+        if (mppp_unlikely(ief.i_eee.exponent == 32767u)) {
             // Inf or nan, not representable by integer.
             throw std::domain_error("Cannot convert a non-finite real128 to an integer");
         }
@@ -176,11 +176,16 @@ public:
             if (exponent > -64) {
                 // We need to right shift less than 64 bits. This means that some bits from the low
                 // word of the significand survive.
+                // NOTE: need to do the left shift in multiprecision here, as the final result
+                // might spill over the 64 bit range.
                 retval += integer<SSize>{ief.i_eee.mant_high} << static_cast<unsigned>(exponent + 64);
                 retval += ief.i_eee.mant_low >> static_cast<unsigned>(-exponent);
             } else {
                 // We need to right shift more than 64 bits, so none of the bits in the low word survive.
-                retval += integer<SSize>{ief.i_eee.mant_high} >> static_cast<unsigned>(-(exponent + 64));
+                // NOTE: here the right shift will be in the [0,48] range, so we can do it directly
+                // on a C++ builtin type (i_eee.mant_high gives an ull, which is guaranteed to be
+                // at least 64 bit).
+                retval += (ief.i_eee.mant_high >> static_cast<unsigned>(-(exponent + 64)));
             }
         }
         // Adjust the sign.
