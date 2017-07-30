@@ -185,7 +185,7 @@ public:
                 // NOTE: here the right shift will be in the [0,48] range, so we can do it directly
                 // on a C++ builtin type (i_eee.mant_high gives an ull, which is guaranteed to be
                 // at least 64 bit).
-                retval += (ief.i_eee.mant_high >> static_cast<unsigned>(-(exponent + 64)));
+                retval += ief.i_eee.mant_high >> static_cast<unsigned>(-(exponent + 64));
             }
         }
         // Adjust the sign.
