@@ -175,6 +175,27 @@ struct int_ctor_tester {
         REQUIRE((lex_cast(q) == "-9/17"));
         REQUIRE((lex_cast(q.get_num()) == "-9"));
         REQUIRE((lex_cast(q.get_den()) == "17"));
+        // Examples with make_canonical = false.
+        q = rational{-9, 17, false};
+        REQUIRE((lex_cast(q) == "-9/17"));
+        REQUIRE((lex_cast(q.get_num()) == "-9"));
+        REQUIRE((lex_cast(q.get_den()) == "17"));
+        q = rational{-9, -17, false};
+        REQUIRE(q.get_num() == -9);
+        REQUIRE(q.get_den() == -17);
+        q = rational{0, -17, false};
+        REQUIRE(q.get_num() == 0);
+        REQUIRE(q.get_den() == -17);
+        q = rational{2, -4, false};
+        REQUIRE(q.get_num() == 2);
+        REQUIRE(q.get_den() == -4);
+        q.canonicalise();
+        REQUIRE(q.get_num() == -1);
+        REQUIRE(q.get_den() == 2);
+        q = rational{0, -17, false};
+        q.canonicalise();
+        REQUIRE(q.get_num() == 0);
+        REQUIRE(q.get_den() == 1);
     }
 };
 
