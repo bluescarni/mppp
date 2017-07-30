@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.5 (unreleased)
+----------------
+
+Fix
+~~~
+
+- Fix some MSVC warnings when compiling the tests in release mode (`#28 <https://github.com/bluescarni/mppp/pull/28>`__).
+
 0.4 (2017-07-29)
 ----------------
 
