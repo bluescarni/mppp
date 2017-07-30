@@ -69,7 +69,7 @@ public:
         std::size_t ls = n_bits / unsigned(GMP_NUMB_BITS) + static_cast<bool>(n_bits % unsigned(GMP_NUMB_BITS));
         assert(ls && n_bits && ls == n.size());
 
-        // Init value with the most significand limb, and move to the next limb.
+        // Init value with the most significant limb, and move to the next limb.
         m_value = ptr[--ls] & GMP_NUMB_MASK;
         // Number of bits read so far from n: it is the size in bits of the top limb.
         auto read_bits = static_cast<unsigned>((n_bits % unsigned(GMP_NUMB_BITS)) ? (n_bits % unsigned(GMP_NUMB_BITS))
@@ -147,8 +147,10 @@ public:
             // Inf or nan, not representable by integer.
             throw std::domain_error("Cannot convert a non-finite real128 to an integer");
         }
-        // Determine the real exponent.
-        const auto exponent = static_cast<long>(ief.i_eee.exponent) - 16383 - 112;
+        // Determine the real exponent. 16383 is the offset of the representation,
+        // 112 is because we need to left shift the significand by 112 positions
+        // in order to turn it into an integral value.
+        const auto exponent = static_cast<long>(ief.i_eee.exponent) - (16383l + 112);
         if (!ief.i_eee.exponent || exponent < -112) {
             // Zero stored exponent means subnormal number, and if the real exponent is too small
             // we end up with a value with abs less than 1. In such cases, just return 0.
@@ -159,6 +161,8 @@ public:
         const bool neg = ief.i_eee.negative;
         integer<SSize> retval{1u};
         if (exponent >= 0) {
+            // Non-negative exponent means that we will have to take the significand
+            // converted to an integer and further left shift it.
             retval <<= 112u;
             retval += integer<SSize>{ief.i_eee.mant_high} << 64u;
             retval += ief.i_eee.mant_low;
@@ -170,9 +174,12 @@ public:
             // to be in the [-112,-1] range.
             retval <<= static_cast<unsigned>(112 + exponent);
             if (exponent > -64) {
+                // We need to right shift less than 64 bits. This means that some bits from the low
+                // word of the significand survive.
                 retval += integer<SSize>{ief.i_eee.mant_high} << static_cast<unsigned>(exponent + 64);
                 retval += ief.i_eee.mant_low >> static_cast<unsigned>(-exponent);
             } else {
+                // We need to right shift more than 64 bits, so none of the bits in the low word survive.
                 retval += integer<SSize>{ief.i_eee.mant_high} >> static_cast<unsigned>(-(exponent + 64));
             }
         }
