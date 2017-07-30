@@ -4,6 +4,18 @@ Changelog
 0.5 (unreleased)
 ----------------
 
+New
+~~~
+
+- Add the possibility of constructing non-canonical :cpp:class:`~mppp::rational` objects from numerator/denominator pairs
+  (`#28 <https://github.com/bluescarni/mppp/pull/28>`__).
+
+Changes
+~~~~~~~
+
+- Performance improvements and simplifications in the :cpp:class:`~mppp::rational` constructors
+  (`#28 <https://github.com/bluescarni/mppp/pull/28>`__).
+
 Fix
 ~~~
 
