@@ -6,6 +6,14 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#if defined(_MSC_VER)
+
+// Disable some warnings for MSVC. These arise only in release mode apparently.
+#pragma warning(push)
+#pragma warning(disable : 4723)
+
+#endif
+
 #include <cstddef>
 #include <gmp.h>
 #include <limits>
@@ -976,3 +984,9 @@ TEST_CASE("rel")
 {
     tuple_for_each(sizes{}, rel_tester{});
 }
+
+#if defined(_MSC_VER)
+
+#pragma warning(pop)
+
+#endif
