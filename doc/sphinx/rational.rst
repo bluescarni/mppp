@@ -27,6 +27,11 @@ Concepts
    This concept is satisfied if ``T`` is a :cpp:concept:`~mppp::RationalInteroperable` type and it is not
    a floating-point type.
 
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalFPInteroperable
+
+   This concept is satisfied if ``T`` is both a :cpp:concept:`~mppp::RationalInteroperable` and
+   a floating-point type.
+
 .. cpp:concept:: template <typename T, typename U> mppp::RationalOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
