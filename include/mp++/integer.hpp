@@ -247,7 +247,11 @@ struct static_int {
     // we would have wrong results as well).
     // NOTE: it might be possible here to avoid the zero init of the limbs, at least in case
     // of static sizes > opt_size, but it's not clear to me if it is worth it to go down this path.
-    // Let's just mention it for now.
+    // Let's just mention it for now. Note that the matter of zeroing the unused limbs is not
+    // always dealt consistenly throughout the code: here and elsewhere (e.g., set_zero(), and see
+    // also some equivalent bits in rational) we zero regardless, but in zero_unused_limbs() we check
+    // about opt_size. Let's leave this discussion for when we optimize the mpn_ implementations
+    // (if ever).
     static_int() : _mp_size(0), m_limbs()
     {
     }
