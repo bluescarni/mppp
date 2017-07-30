@@ -198,14 +198,6 @@ struct is_rational<rational<SSize>> : std::true_type {
 template <std::size_t SSize>
 class rational
 {
-    // Set denominator to 1. To be used **exclusively** in constructors,
-    // only on def-cted den.
-    void fast_set_den_one()
-    {
-        m_den._get_union().g_st()._mp_size = 1;
-        // No need to use the mask for just 1.
-        m_den._get_union().g_st().m_limbs[0] = 1;
-    }
 #if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends with the comparison functions.
     template <std::size_t S>
@@ -395,9 +387,7 @@ private:
         }
         tmp_str.assign(s, ptr);
         m_num = int_t{tmp_str, base};
-        if (*ptr == '\0') {
-            fast_set_den_one();
-        } else {
+        if (*ptr != '\0') {
             tmp_str.assign(ptr + 1);
             m_den = int_t{tmp_str, base};
             if (mppp_unlikely(m_den.is_zero())) {
@@ -425,7 +415,7 @@ public:
      * @throws zero_division_error if the denominator is zero.
      * @throws unspecified any exception thrown by the string constructor of mppp::integer.
      */
-    explicit rational(const char *s, int base = 10)
+    explicit rational(const char *s, int base = 10) : m_den(1u)
     {
         dispatch_c_string_ctor(s, base);
     }
@@ -453,7 +443,7 @@ public:
      *
      * @throws unspecified any exception thrown by the constructor from C string.
      */
-    explicit rational(const char *begin, const char *end, int base = 10)
+    explicit rational(const char *begin, const char *end, int base = 10) : m_den(1u)
     {
         // Copy the range into a local buffer.
         MPPP_MAYBE_TLS std::vector<char> buffer;
