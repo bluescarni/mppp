@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Multiprecision integers &#8212; mp++ 0.4 documentation</title>
+    <title>Multiprecision integers &#8212; mp++ 0.5 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.4',
+        VERSION:     '0.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -247,7 +247,9 @@ method, which allows to use <a class="reference internal" href="#_CPPv2N4mppp7in
                                <span class="c1">// it in m using the GMP API.</span>
 </pre></div>
 </div>
-<p>See the documentation of <a class="reference internal" href="#_CPPv2NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_view()</span></code></a> for more details about the <code class="docutils literal"><span class="pre">mpz_view</span></code> class.</p>
+<p>See the documentation of <a class="reference internal" href="#_CPPv2NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_view()</span></code></a> for more details about the <code class="docutils literal"><span class="pre">mpz_view</span></code> class.
+Via the GMP interfacing facilities, it is thus possible to use directly the GMP C API with
+<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects whenever necessary (e.g., if a GMP function has not been wrapped yet by mp++).</p>
  </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>

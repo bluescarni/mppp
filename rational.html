@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Multiprecision rationals &#8212; mp++ 0.4 documentation</title>
+    <title>Multiprecision rationals &#8212; mp++ 0.5 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.4',
+        VERSION:     '0.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -243,22 +243,38 @@ denominator.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N4mppp8rational8rationalERK21RationalInteroperableI5SSizeE">
-<span id="mppp::rational::rational__RationalInteroperable:SSize:CR"></span><span class="target" id="mp++classmppp_1_1rational_1a0f29a81ec3972201860fd6897f57e0ef"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable">RationalInteroperable</a>&lt;SSize&gt; &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERK21RationalInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Generic constructor. </p>
-<p>This constructor will initialize a rational with the value of <code class="docutils literal"><span class="pre">x</span></code>. The initialization is always
-successful if <code class="docutils literal"><span class="pre">x</span></code> is an integral value (construction from <code class="docutils literal"><span class="pre">bool</span></code> yields 1 for <code class="docutils literal"><span class="pre">true</span></code>, 0 for <code class="docutils literal"><span class="pre">false</span></code>)
-or an instance of <a class="reference internal" href="#_CPPv2N4mppp8rational5int_tE" title="mppp::rational::int_t"><code class="xref cpp cpp-type docutils literal"><span class="pre">int_t</span></code></a>.
-If <code class="docutils literal"><span class="pre">x</span></code> is a floating-point value, the construction will fail if <code class="docutils literal"><span class="pre">x</span></code> is not finite.</p>
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mppp8rational8rationalERR1T">
+<span id="mppp::rational::rational__TRR"></span><span class="target" id="mp++classmppp_1_1rational_1aed79deddde586b207486329098e5e738"></span><code class="descname">rational</code><span class="sig-paren">(</span>T &amp;&amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Integral constructor. </p>
+<p>This constructor is enabled only if <code class="docutils literal"><span class="pre">T</span></code> satisfies the <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="mppp::RationalIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalIntegralInteroperable</span></code></a> concept.
+The constructor will initialize the numerator with <code class="docutils literal"><span class="pre">n</span></code> and the denominator will be set to 1.</p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: value that will be used to initialize <code class="docutils literal"><span class="pre">this</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: the integral value that will be used to initialize <code class="docutils literal"><span class="pre">this</span></code>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp8rational8rationalERK23RationalFPInteroperableI5SSizeE">
+<span id="mppp::rational::rational__RationalFPInteroperable:SSize:CR"></span><span class="target" id="mp++classmppp_1_1rational_1a9378fa804c1d1e8787701fb2bddef626"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp23RationalFPInteroperableE" title="mppp::RationalFPInteroperable">RationalFPInteroperable</a>&lt;SSize&gt; &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERK23RationalFPInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Floating-point constructor. </p>
+<p>This constructor will initialize a rational with the floating-point value <code class="docutils literal"><span class="pre">x</span></code>. The construction will fail if <code class="docutils literal"><span class="pre">x</span></code>
+is not finite.</p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">x</span></code>: the floating-point value that will be used to initialize <code class="docutils literal"><span class="pre">this</span></code>.</li>
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">x</span></code> is a non-finite floating-point value. </li>
+<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">x</span></code> is not finite. </li>
 </ul>
 </dd>
 </dl>
@@ -268,17 +284,27 @@ If <code class="docutils literal"><span class="pre">x</span></code> is a floatin
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mppp8rational8rationalERK1TRK1U">
-<span id="mppp::rational::rational__TCR.UCR"></span><span class="target" id="mp++classmppp_1_1rational_1ae90412dc3be42b78a3a5760c6ad0f981"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>n</em>, <em class="property">const</em> U &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mppp8rational8rationalERR1TRR1Ub">
+<span id="mppp::rational::rational__TRR.URR.b"></span><span class="target" id="mp++classmppp_1_1rational_1af358e3b13dd8c3a51f2e4369c74c8ed8"></span><code class="descname">rational</code><span class="sig-paren">(</span>T &amp;&amp;<em>n</em>, U &amp;&amp;<em>d</em>, bool <em>make_canonical</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERR1TRR1Ub" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from numerator and denominator. </p>
-<p>This constructor is enabled only if both <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy the
+<p><p>This constructor is enabled only if both <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy the
 <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="mppp::RationalIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalIntegralInteroperable</span></code></a> concept. The input value <code class="docutils literal"><span class="pre">n</span></code> will be used to initialise the
-numerator, while <code class="docutils literal"><span class="pre">d</span></code> will be used to initialise the denominator.</p>
+numerator, while <code class="docutils literal"><span class="pre">d</span></code> will be used to initialise the denominator. If <code class="docutils literal"><span class="pre">make_canonical</span></code> is <code class="docutils literal"><span class="pre">true</span></code>
+(the default), then <a class="reference internal" href="#_CPPv2N4mppp8rational12canonicaliseEv" title="mppp::rational::canonicalise"><code class="xref cpp cpp-func docutils literal"><span class="pre">canonicalise()</span></code></a> will be called after the construction
+of numerator and denominator.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If this constructor is called with <code class="docutils literal"><span class="pre">make_canonical</span></code> set to <code class="docutils literal"><span class="pre">false</span></code>, it will be the user&#8217;s responsibility
+to ensure that <code class="docutils literal"><span class="pre">this</span></code> is canonicalised before using it with other mp++ functions. Failure to do
+so will result in undefined behaviour.</p>
+</div>
+</p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">n</span></code>: the numerator. </li>
-<li><code class="docutils literal"><span class="pre">d</span></code>: the denominator.</li>
+<li><code class="docutils literal"><span class="pre">d</span></code>: the denominator. </li>
+<li><code class="docutils literal"><span class="pre">make_canonical</span></code>: if <code class="docutils literal"><span class="pre">true</span></code>, the rational will be canonicalised after the construction of numerator and denominator.</li>
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt>
@@ -845,6 +871,13 @@ with static size <code class="docutils literal"><span class="pre">SSize</span></
 <dt id="_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE">
 template&lt;typename <code class="descname">T</code>, std::size_t <code class="descclassname"></code><code class="descname">SSize</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">RationalIntegralInteroperable</code><a class="headerlink" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if <code class="docutils literal"><span class="pre">T</span></code> is a <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalInteroperable</span></code></a> type and it is not
+a floating-point type.</p>
+</dd></dl>
+
+<dl class="concept">
+<dt id="_CPPv2I0_NSt6size_tEEN4mppp23RationalFPInteroperableE">
+template&lt;typename <code class="descname">T</code>, std::size_t <code class="descclassname"></code><code class="descname">SSize</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">RationalFPInteroperable</code><a class="headerlink" href="#_CPPv2I0_NSt6size_tEEN4mppp23RationalFPInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if <code class="docutils literal"><span class="pre">T</span></code> is both a <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalInteroperable</span></code></a> and
 a floating-point type.</p>
 </dd></dl>
 
