@@ -58,6 +58,14 @@ template <typename T, std::size_t SSize>
 concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
 #endif
 
+template <typename T, std::size_t SSize>
+using is_rational_fp_interoperable = conjunction<is_rational_interoperable<T, SSize>, std::is_floating_point<T>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, std::size_t SSize>
+concept bool RationalFPInteroperable = is_rational_fp_interoperable<T, SSize>::value;
+#endif
+
 // Fwd declare these as we need friendship.
 template <std::size_t SSize>
 int cmp(const rational<SSize> &, const rational<SSize> &);
@@ -190,14 +198,6 @@ struct is_rational<rational<SSize>> : std::true_type {
 template <std::size_t SSize>
 class rational
 {
-    // Set denominator to 1. To be used **exclusively** in constructors,
-    // only on def-cted den.
-    void fast_set_den_one()
-    {
-        m_den._get_union().g_st()._mp_size = 1;
-        // No need to use the mask for just 1.
-        m_den._get_union().g_st().m_limbs[0] = 1;
-    }
 #if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends with the comparison functions.
     template <std::size_t S>
@@ -225,9 +225,8 @@ public:
     /**
      * The default constructor will initialize ``this`` to 0 (represented as 0/1).
      */
-    rational()
+    rational() : m_den(1u)
     {
-        fast_set_den_one();
     }
     /// Defaulted copy constructor.
     rational(const rational &) = default;
@@ -256,16 +255,30 @@ public:
         other.m_den.m_int.g_st().m_limbs[0] = 1;
         std::fill(other.m_den.m_int.g_st().m_limbs.begin() + 1, other.m_den.m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
     }
+/// Integral constructor.
+/**
+ * \rststar
+ * This constructor is enabled only if ``T`` satisfies the :cpp:concept:`~mppp::RationalIntegralInteroperable` concept.
+ * The constructor will initialize the numerator with ``n`` and the denominator will be set to 1.
+ * \endrststar
+ *
+ * @param n the integral value that will be used to initialize \p this.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <typename T>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+    requires RationalIntegralInteroperable<uncvref_t<T>, SSize>
+#endif
+#else
+    template <typename T, enable_if_t<is_rational_integral_interoperable<uncvref_t<T>, SSize>::value, int> = 0>
+#endif
+        explicit rational(T &&n) : m_num(std::forward<T>(n)), m_den(1u)
+    {
+    }
 
 private:
-    template <typename T, enable_if_t<disjunction<std::is_integral<T>, std::is_same<T, int_t>>::value, int> = 0>
-    void dispatch_generic_construction(const T &n)
-    {
-        m_num = n;
-        fast_set_den_one();
-    }
     template <typename T, enable_if_t<disjunction<std::is_same<float, T>, std::is_same<double, T>>::value, int> = 0>
-    void dispatch_generic_construction(const T &x)
+    void dispatch_fp_construction(const T &x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
@@ -277,7 +290,7 @@ private:
         m_den = mpq_denref(&q.m_mpq);
     }
 #if defined(MPPP_WITH_MPFR)
-    void dispatch_generic_construction(const long double &x)
+    void dispatch_fp_construction(const long double &x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
@@ -299,58 +312,69 @@ private:
 #endif
 
 public:
-/// Generic constructor.
+/// Floating-point constructor.
 /**
  * \rststar
- * This constructor will initialize a rational with the value of ``x``. The initialization is always
- * successful if ``x`` is an integral value (construction from ``bool`` yields 1 for ``true``, 0 for ``false``)
- * or an instance of :cpp:type:`~mppp::rational::int_t`.
- * If ``x`` is a floating-point value, the construction will fail if ``x`` is not finite.
+ * This constructor will initialize a rational with the floating-point value ``x``. The construction will fail if ``x``
+ * is not finite.
  * \endrststar
  *
- * @param x value that will be used to initialize \p this.
+ * @param x the floating-point value that will be used to initialize \p this.
  *
- * @throws std::domain_error if \p x is a non-finite floating-point value.
+ * @throws std::domain_error if \p x is not finite.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    explicit rational(const RationalInteroperable<SSize> &x)
+    explicit rational(const RationalFPInteroperable<SSize> &x)
 #else
-    template <typename T, rational_interoperable_enabler<T, SSize> = 0>
+    template <typename T, enable_if_t<is_rational_fp_interoperable<T, SSize>::value, int> = 0>
     explicit rational(const T &x)
 #endif
     {
-        dispatch_generic_construction(x);
+        dispatch_fp_construction(x);
     }
 /// Constructor from numerator and denominator.
 /**
  * \rststar
  * This constructor is enabled only if both ``T`` and ``U`` satisfy the
  * :cpp:concept:`~mppp::RationalIntegralInteroperable` concept. The input value ``n`` will be used to initialise the
- * numerator, while ``d`` will be used to initialise the denominator.
+ * numerator, while ``d`` will be used to initialise the denominator. If ``make_canonical`` is ``true``
+ * (the default), then :cpp:func:`~mppp::rational::canonicalise()` will be called after the construction
+ * of numerator and denominator.
+ *
+ * .. warning::
+ *
+ *    If this constructor is called with ``make_canonical`` set to ``false``, it will be the user's responsibility
+ *    to ensure that ``this`` is canonicalised before using it with other mp++ functions. Failure to do
+ *    so will result in undefined behaviour.
  * \endrststar
  *
  * @param n the numerator.
  * @param d the denominator.
+ * @param make_canonical if \p true, the rational will be canonicalised after the construction
+ * of numerator and denominator.
  *
  * @throws zero_division_error if the denominator is zero.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T, typename U>
 #if !defined(MPPP_DOXYGEN_INVOKED)
-    requires RationalIntegralInteroperable<T, SSize> &&RationalIntegralInteroperable<U, SSize>
+    requires RationalIntegralInteroperable<uncvref_t<T>, SSize> &&RationalIntegralInteroperable<uncvref_t<U>, SSize>
 #endif
 #else
     template <typename T, typename U,
-              enable_if_t<conjunction<is_rational_integral_interoperable<T, SSize>,
-                                      is_rational_integral_interoperable<U, SSize>>::value,
+              enable_if_t<conjunction<is_rational_integral_interoperable<uncvref_t<T>, SSize>,
+                                      is_rational_integral_interoperable<uncvref_t<U>, SSize>>::value,
                           int> = 0>
 #endif
-        explicit rational(const T &n, const U &d) : m_num(n), m_den(d)
+        explicit rational(T &&n, U &&d, bool make_canonical = true)
+        : m_num(std::forward<T>(n)), m_den(std::forward<U>(d))
     {
         if (mppp_unlikely(m_den.is_zero())) {
             throw zero_division_error("Cannot construct a rational with zero as denominator");
         }
-        canonicalise();
+        if (make_canonical) {
+            canonicalise();
+        }
     }
 
 private:
@@ -363,9 +387,7 @@ private:
         }
         tmp_str.assign(s, ptr);
         m_num = int_t{tmp_str, base};
-        if (*ptr == '\0') {
-            fast_set_den_one();
-        } else {
+        if (*ptr != '\0') {
             tmp_str.assign(ptr + 1);
             m_den = int_t{tmp_str, base};
             if (mppp_unlikely(m_den.is_zero())) {
@@ -393,7 +415,7 @@ public:
      * @throws zero_division_error if the denominator is zero.
      * @throws unspecified any exception thrown by the string constructor of mppp::integer.
      */
-    explicit rational(const char *s, int base = 10)
+    explicit rational(const char *s, int base = 10) : m_den(1u)
     {
         dispatch_c_string_ctor(s, base);
     }
@@ -421,7 +443,7 @@ public:
      *
      * @throws unspecified any exception thrown by the constructor from C string.
      */
-    explicit rational(const char *begin, const char *end, int base = 10)
+    explicit rational(const char *begin, const char *end, int base = 10) : m_den(1u)
     {
         // Copy the range into a local buffer.
         MPPP_MAYBE_TLS std::vector<char> buffer;
@@ -466,9 +488,8 @@ public:
      *
      * @param n the input GMP integer.
      */
-    explicit rational(const ::mpz_t n) : m_num(n)
+    explicit rational(const ::mpz_t n) : m_num(n), m_den(1u)
     {
-        fast_set_den_one();
     }
     /// Constructor from \p mpq_t.
     /**
