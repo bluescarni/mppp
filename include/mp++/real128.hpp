@@ -137,6 +137,19 @@ public:
     {
         return m_value;
     }
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <CppInteroperable T>
+#else
+    template <typename T, cpp_interoperable_enabler<T> = 0>
+#endif
+    constexpr explicit operator T() const
+    {
+        return static_cast<T>(m_value);
+    }
+    constexpr explicit operator ::__float128() const
+    {
+        return m_value;
+    }
     template <std::size_t SSize>
     explicit operator integer<SSize>() const
     {
@@ -194,18 +207,54 @@ public:
         }
         return retval;
     }
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <CppInteroperable T>
-#else
-    template <typename T, cpp_interoperable_enabler<T> = 0>
-#endif
-    constexpr explicit operator T() const
+    template <std::size_t SSize>
+    explicit operator rational<SSize>() const
     {
-        return static_cast<T>(m_value);
-    }
-    constexpr explicit operator ::__float128() const
-    {
-        return m_value;
+        // Build the union and assign the value.
+        ieee_float128 ief;
+        ief.value = m_value;
+        if (mppp_unlikely(ief.i_eee.exponent == 32767u)) {
+            // Inf or nan, not representable by rational.
+            throw std::domain_error("Cannot convert a non-finite real128 to a rational");
+        }
+        // Get the sign.
+        const bool neg = ief.i_eee.negative;
+        rational<SSize> retval;
+        if (ief.i_eee.exponent) {
+            // Normal number.
+            // Determine the real exponent.
+            const auto exponent = static_cast<long>(ief.i_eee.exponent) - (16383l + 112);
+            retval._get_num() = 1u;
+            retval._get_num() <<= 112u;
+            retval._get_num() += integer<SSize>{ief.i_eee.mant_high} << 64u;
+            retval._get_num() += ief.i_eee.mant_low;
+            if (exponent >= 0) {
+                // The result is an integer: no need to canonicalise or to try
+                // to demote. Den is already set to 1.
+                retval._get_num() <<= static_cast<unsigned long>(exponent);
+            } else {
+                retval._get_den() <<= static_cast<unsigned long>(-exponent);
+                // Put in canonical form.
+                canonicalise(retval);
+                // Try demoting, after having possibly removed common factors.
+                retval._get_num().demote();
+                retval._get_den().demote();
+            }
+        } else {
+            // Subnormal number.
+            retval._get_num() = ief.i_eee.mant_high;
+            retval._get_num() <<= 64u;
+            retval._get_num() += ief.i_eee.mant_low;
+            retval._get_den() <<= static_cast<unsigned long>(16382l + 112);
+            canonicalise(retval);
+            retval._get_num().demote();
+            retval._get_den().demote();
+        }
+        // Adjust the sign.
+        if (neg) {
+            retval.neg();
+        }
+        return retval;
     }
 
 private:
