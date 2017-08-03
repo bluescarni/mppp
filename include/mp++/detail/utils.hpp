@@ -11,9 +11,13 @@
 
 #include <cassert>
 #include <limits>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <typeinfo>
+#include <utility>
 
+#include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
 
 namespace mppp
@@ -21,6 +25,14 @@ namespace mppp
 
 inline namespace detail
 {
+
+#if defined(_MSC_VER)
+
+// Disable some warnings for MSVC.
+#pragma warning(push)
+#pragma warning(disable : 4146)
+
+#endif
 
 // These are overloads useful to treat in a generic way mppp classes and standard numeric types.
 
@@ -51,14 +63,6 @@ inline std::string to_string(const T &x)
 {
     return x.to_string();
 }
-
-#if defined(_MSC_VER)
-
-// Disable some warnings for MSVC.
-#pragma warning(push)
-#pragma warning(disable : 4146)
-
-#endif
 
 // Compute the absolute value of a negative integer, returning the result as an instance
 // of the corresponding unsigned type. Requires T to be a signed integral type and n
@@ -96,12 +100,6 @@ constexpr make_unsigned<T> nint_abs(T n)
                                                unsigned, uT>::type>(n));
 }
 
-#if defined(_MSC_VER)
-
-#pragma warning(pop)
-
-#endif
-
 // constexpr max/min implementations with copy semantics.
 template <typename T>
 constexpr T c_max(T a, T b)
@@ -114,6 +112,137 @@ constexpr T c_min(T a, T b)
 {
     return a < b ? a : b;
 }
+
+// A small helper to convert the input unsigned n to -n, represented as the signed T.
+template <typename T, typename U>
+// NOTE: C++17 because we are using assert().
+#if __cplusplus >= 201703L
+constexpr
+#else
+inline
+#endif
+    std::pair<bool, T>
+    unsigned_to_nsigned(U n)
+{
+    static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
+    static_assert(std::is_integral<U>::value && std::is_unsigned<U>::value, "Invalid type.");
+    // Cache a couple of quantities.
+    constexpr auto Tmax = static_cast<make_unsigned<T>>(std::numeric_limits<T>::max());
+    constexpr auto Tmin_abs = nint_abs(std::numeric_limits<T>::min());
+    if (mppp_likely(n <= c_min(Tmax, Tmin_abs))) {
+        // Optimise the case in which n fits both Tmax and Tmin_abs. This means
+        // we can convert and negate safely.
+        return std::make_pair(true, static_cast<T>(-static_cast<T>(n)));
+    }
+    // n needs to fit within the abs of min().
+    if (n > Tmin_abs) {
+        return std::make_pair(false, T(0));
+    }
+    // LCOV_EXCL_START
+    if (Tmin_abs <= Tmax) {
+        // The negative range of T is leq than the positive one: we can convert to T and negate safely.
+        // NOTE: this is never hit on current architectures.
+        return std::make_pair(true, static_cast<T>(-static_cast<T>(n)));
+    }
+    // LCOV_EXCL_STOP
+    // NOTE: double check this, since:
+    // - Tmin_abs > Tmax (as checked just above),
+    // - n > c_min(Tmax, Tmin_abs) (as checked earlier).
+    assert(n > Tmax);
+    // The negative range is greater than the positive one and n larger than Tmax:
+    // we cannot directly convert n to T. The idea then is to init retval to -Tmax
+    // and then to subtract from it Tmax as many times as needed.
+    auto retval = static_cast<T>(-static_cast<T>(Tmax));
+    const auto q = static_cast<make_unsigned<T>>(n / Tmax), r = static_cast<make_unsigned<T>>(n % Tmax);
+    for (make_unsigned<T> i = 0; i < q - 1u; ++i) {
+        // LCOV_EXCL_START
+        // NOTE: this is never hit on current archs, as Tmax differs from Tmin_abs
+        // by just 1: we will use only the remainder r.
+        retval = static_cast<T>(retval - static_cast<T>(Tmax));
+        // LCOV_EXCL_STOP
+    }
+    retval = static_cast<T>(retval - static_cast<T>(r));
+    return std::make_pair(true, retval);
+}
+
+// Like above, but throw on failure.
+template <typename T, typename U>
+#if __cplusplus >= 201703L
+constexpr
+#else
+inline
+#endif
+    T
+    negate_unsigned(U n)
+{
+    const auto retval = unsigned_to_nsigned<T>(n);
+    return retval.first ? retval.second
+                        : throw std::overflow_error(
+                              "Error while trying to negate the unsigned integral value " + std::to_string(n)
+                              + ": the result does not fit in the range of the target type " + typeid(T).name());
+}
+
+// Safe casting functionality between integral types. It will throw if the conversion overflows the range
+// of the target type T.
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_unsigned<T>, std::is_unsigned<U>>::value,
+                int> = 0>
+constexpr T safe_cast(const U &n)
+{
+    return n <= std::numeric_limits<T>::max()
+               ? static_cast<T>(n)
+               : throw std::overflow_error(
+                     "Error in the safe conversion between unsigned integral types: the input value "
+                     + std::to_string(n) + " does not fit in the range of the target type " + typeid(T).name());
+}
+
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_signed<T>, std::is_signed<U>>::value,
+                int> = 0>
+constexpr T safe_cast(const U &n)
+{
+    return (n <= std::numeric_limits<T>::max() && n >= std::numeric_limits<T>::min())
+               ? static_cast<T>(n)
+               : throw std::overflow_error(
+                     "Error in the safe conversion between signed integral types: the input value " + std::to_string(n)
+                     + " does not fit in the range of the target type " + typeid(T).name());
+}
+
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_unsigned<T>, std::is_signed<U>>::value,
+                int> = 0>
+constexpr T safe_cast(const U &n)
+{
+    return (n >= U(0) && static_cast<make_unsigned<U>>(n) <= std::numeric_limits<T>::max())
+               ? static_cast<T>(n)
+               : throw std::overflow_error("Error in the safe conversion from a signed integral type to an unsigned "
+                                           "integral type: the input value "
+                                           + std::to_string(n) + " does not fit in the range of the target type "
+                                           + typeid(T).name());
+}
+
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_signed<T>, std::is_unsigned<U>>::value,
+                int> = 0>
+constexpr T safe_cast(const U &n)
+{
+    return n <= static_cast<make_unsigned<T>>(std::numeric_limits<T>::max())
+               ? static_cast<T>(n)
+               : throw std::overflow_error("Error in the safe conversion from an unsigned integral type to a signed "
+                                           "integral type: the input value "
+                                           + std::to_string(n) + " does not fit in the range of the target type "
+                                           + typeid(T).name());
+}
+
+#if defined(_MSC_VER)
+
+#pragma warning(pop)
+
+#endif
 }
 }
 
