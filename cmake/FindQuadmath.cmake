@@ -50,8 +50,8 @@ if(NOT Quadmath_INCLUDE_DIR OR NOT Quadmath_LIBRARY)
     Quadmath_USE_DIRECTLY)
     cmake_pop_check_state()
     if (Quadmath_USE_DIRECTLY)
-        set(Quadmath_INCLUDE_DIR "unused")
-        set(Quadmath_LIBRARY "quadmath")
+        set(Quadmath_INCLUDE_DIR "unused" CACHE PATH "" FORCE)
+        set(Quadmath_LIBRARY "quadmath" CACHE FILEPATH "" FORCE)
     endif()
 endif()
 
@@ -65,6 +65,7 @@ mark_as_advanced(Quadmath_INCLUDE_DIR Quadmath_LIBRARY)
 
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
 if(Quadmath_FOUND AND NOT TARGET Quadmath::quadmath)
+    message(STATUS "Creating the 'Quadmath::quadmath' imported target.")
     if(Quadmath_USE_DIRECTLY)
         # If we are using it directly, we must define an interface library,
         # as we do not have the full path to the shared library.
