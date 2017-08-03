@@ -71,6 +71,7 @@ matrix:
           - gcc-6-multilib
           - g++-6
           - g++-6-multilib
+          - cmake3
     - env: MPPP_BUILD="DebugClang38"
       compiler: clang
       os: linux
