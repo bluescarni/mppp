@@ -28,11 +28,15 @@ using sint_types = std::tuple<signed char, short, int, long, long long>;
 struct uint_uint_safe_cast_tester {
     template <typename T>
     struct runner {
-        template <typename U, enable_if_t<(std::numeric_limits<T>::max() <= std::numeric_limits<U>::max()), int> = 0>
+        template <typename U>
+        struct enabler {
+            static const bool value = std::numeric_limits<T>::max() <= std::numeric_limits<U>::max();
+        };
+        template <typename U, enable_if_t<enabler<U>::value, int> = 0>
         void operator()(const U &) const
         {
         }
-        template <typename U, enable_if_t<(std::numeric_limits<T>::max() > std::numeric_limits<U>::max()), int> = 0>
+        template <typename U, enable_if_t<!enabler<U>::value, int> = 0>
         void operator()(const U &) const
         {
             REQUIRE((std::is_same<T, decltype(safe_cast<T>(U(0)))>::value));
@@ -72,17 +76,16 @@ TEST_CASE("uint_uint_safe_cast")
 struct sint_sint_safe_cast_tester {
     template <typename T>
     struct runner {
-        template <typename U,
-                  enable_if_t<(std::numeric_limits<T>::max() <= std::numeric_limits<U>::max()
-                               && std::numeric_limits<T>::min() >= std::numeric_limits<U>::min()),
-                              int> = 0>
+        template <typename U>
+        struct enabler {
+            static const bool value = std::numeric_limits<T>::max() <= std::numeric_limits<U>::max()
+                                      && std::numeric_limits<T>::min() >= std::numeric_limits<U>::min();
+        };
+        template <typename U, enable_if_t<enabler<U>::value, int> = 0>
         void operator()(const U &) const
         {
         }
-        template <typename U,
-                  enable_if_t<(std::numeric_limits<T>::max() > std::numeric_limits<U>::max()
-                               && std::numeric_limits<T>::min() < std::numeric_limits<U>::min()),
-                              int> = 0>
+        template <typename U, enable_if_t<!enabler<U>::value, int> = 0>
         void operator()(const U &) const
         {
             REQUIRE((std::is_same<T, decltype(safe_cast<T>(U(0)))>::value));

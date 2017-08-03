@@ -26,6 +26,14 @@ namespace mppp
 inline namespace detail
 {
 
+#if defined(_MSC_VER)
+
+// Disable some warnings for MSVC.
+#pragma warning(push)
+#pragma warning(disable : 4146)
+
+#endif
+
 // These are overloads useful to treat in a generic way mppp classes and standard numeric types.
 
 // Sign function for integral types.
@@ -55,14 +63,6 @@ inline std::string to_string(const T &x)
 {
     return x.to_string();
 }
-
-#if defined(_MSC_VER)
-
-// Disable some warnings for MSVC.
-#pragma warning(push)
-#pragma warning(disable : 4146)
-
-#endif
 
 // Compute the absolute value of a negative integer, returning the result as an instance
 // of the corresponding unsigned type. Requires T to be a signed integral type and n
@@ -99,12 +99,6 @@ constexpr make_unsigned<T> nint_abs(T n)
         -static_cast<typename std::conditional<(std::numeric_limits<uT>::max() <= std::numeric_limits<unsigned>::max()),
                                                unsigned, uT>::type>(n));
 }
-
-#if defined(_MSC_VER)
-
-#pragma warning(pop)
-
-#endif
 
 // constexpr max/min implementations with copy semantics.
 template <typename T>
@@ -243,6 +237,12 @@ constexpr T safe_cast(const U &n)
                                            + std::to_string(n) + " does not fit in the range of the target type "
                                            + typeid(T).name());
 }
+
+#if defined(_MSC_VER)
+
+#pragma warning(pop)
+
+#endif
 }
 }
 
