@@ -7,7 +7,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <limits>
-#include <mp++/detail/utils.hpp>
+#include <mp++/mp++.hpp>
 #include <stdexcept>
 #include <string>
 #include <tuple>
