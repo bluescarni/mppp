@@ -11,8 +11,10 @@
 
 #include <cassert>
 #include <limits>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <typeinfo>
 #include <utility>
 
 #include <mp++/config.hpp>
@@ -167,6 +169,79 @@ inline
     }
     retval = static_cast<T>(retval - static_cast<T>(r));
     return std::make_pair(true, retval);
+}
+
+// Like above, but throw on failure.
+template <typename T, typename U>
+#if __cplusplus >= 201703L
+constexpr
+#else
+inline
+#endif
+    T
+    negate_unsigned(U n)
+{
+    const auto retval = unsigned_to_nsigned<T>(n);
+    return retval.first ? retval.second
+                        : throw std::overflow_error(
+                              "Error while trying to negate the unsigned integral value " + std::to_string(n)
+                              + ": the result does not fit in the range of the target type " + typeid(T).name());
+}
+
+// Safe casting functionality between integral types. It will throw if the conversion overflows the range
+// of the target type T.
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_unsigned<T>, std::is_unsigned<U>>::value,
+                int> = 0>
+constexpr T safe_cast(const U &n)
+{
+    return n <= std::numeric_limits<T>::max()
+               ? static_cast<T>(n)
+               : throw std::overflow_error(
+                     "Error in the safe conversion between unsigned integral types: the input value "
+                     + std::to_string(n) + " does not fit in the range of the target type " + typeid(T).name());
+}
+
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_signed<T>, std::is_signed<U>>::value,
+                int> = 0>
+constexpr T safe_cast(const U &n)
+{
+    return (n <= std::numeric_limits<T>::max() && n >= std::numeric_limits<T>::min())
+               ? static_cast<T>(n)
+               : throw std::overflow_error(
+                     "Error in the safe conversion between signed integral types: the input value " + std::to_string(n)
+                     + " does not fit in the range of the target type " + typeid(T).name());
+}
+
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_unsigned<T>, std::is_signed<U>>::value,
+                int> = 0>
+constexpr T safe_cast(const U &n)
+{
+    return (n >= U(0) && static_cast<make_unsigned<U>>(n) <= std::numeric_limits<T>::max())
+               ? static_cast<T>(n)
+               : throw std::overflow_error("Error in the safe conversion from a signed integral type to an unsigned "
+                                           "integral type: the input value "
+                                           + std::to_string(n) + " does not fit in the range of the target type "
+                                           + typeid(T).name());
+}
+
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_signed<T>, std::is_unsigned<U>>::value,
+                int> = 0>
+constexpr T safe_cast(const U &n)
+{
+    return n <= static_cast<make_unsigned<T>>(std::numeric_limits<T>::max())
+               ? static_cast<T>(n)
+               : throw std::overflow_error("Error in the safe conversion from an unsigned integral type to a signed "
+                                           "integral type: the input value "
+                                           + std::to_string(n) + " does not fit in the range of the target type "
+                                           + typeid(T).name());
 }
 }
 }
