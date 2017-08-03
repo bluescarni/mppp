@@ -117,6 +117,7 @@ public:
             // Number of bits to be read from the current limb: GMP_NUMB_BITS or less.
             const unsigned rbits = c_min(unsigned(GMP_NUMB_BITS), sig_digits - read_bits);
             // Shift m_value by rbits.
+            // NOTE: safe to cast to int here, as rbits is not greater than GMP_NUMB_BITS which in turn fits in int.
             m_value = ::scalbnq(m_value, static_cast<int>(rbits));
             // Add the bottom part, and move to the next limb. We might need to remove lower bits
             // in case rbits is not exactly GMP_NUMB_BITS.
@@ -127,14 +128,8 @@ public:
         if (read_bits < n_bits) {
             // We did not read from n all its bits. This means that n has more bits than the quad-precision
             // significand, and thus we need to multiply this by 2**unread_bits.
-            if (mppp_unlikely(n_bits - read_bits > static_cast<unsigned long>(std::numeric_limits<long>::max()))) {
-                throw std::overflow_error(
-                    "Overflow in the construction of a real128 from an integer: the second argument to scalblnq() is "
-                    + std::to_string(n_bits - read_bits) + ", but the max allowed value is "
-                    + std::to_string(std::numeric_limits<long>::max()));
-            }
             // Use the long variant of scalbn() to maximise the range.
-            m_value = ::scalblnq(m_value, static_cast<long>(n_bits - read_bits));
+            m_value = ::scalblnq(m_value, safe_cast<long>(n_bits - read_bits));
         }
         // Fix the sign as needed.
         if (n_sgn == -1) {
