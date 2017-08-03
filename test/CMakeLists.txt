@@ -64,3 +64,5 @@ ADD_MPPP_TESTCASE(rational_is_zero_one)
 ADD_MPPP_TESTCASE(rational_neg)
 ADD_MPPP_TESTCASE(rational_pow)
 ADD_MPPP_TESTCASE(rational_rel)
+
+ADD_MPPP_TESTCASE(utils)
