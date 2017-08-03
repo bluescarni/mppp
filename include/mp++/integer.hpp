@@ -799,7 +799,7 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
  * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list),
  * and it provides overloaded :ref:`operators <integer_operators>`. Differently from the builtin types,
  * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
- * from and  conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
+ * from and conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
  *
  * .. code-block:: c++
  *
