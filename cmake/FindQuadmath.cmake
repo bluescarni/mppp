@@ -30,6 +30,7 @@
 
 include(FindPackageHandleStandardArgs)
 include(CMakePushCheckState)
+include(CheckCXXSourceCompiles)
 
 if(Quadmath_INCLUDE_DIR AND Quadmath_LIBRARY)
 	# Already in cache, be silent
