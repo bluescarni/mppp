@@ -2,7 +2,7 @@ cmake_policy(SET CMP0048 NEW)
 
 project(mp++ VERSION 0.5 LANGUAGES CXX C)
 
-cmake_minimum_required(VERSION 3.2.0)
+cmake_minimum_required(VERSION 3.3.0)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 

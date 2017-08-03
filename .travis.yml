@@ -36,6 +36,7 @@ matrix:
         apt:
           packages:
           - g++-4.8
+          - cmake3
     - env: MPPP_BUILD="CoverageGCC5"
       compiler: gcc
       os: linux
