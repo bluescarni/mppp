@@ -30,13 +30,7 @@ inline namespace detail
 // implements the same extension for GCC compatibility. So we should be ok.
 
 // The ieee fields.
-struct ieee_t
-#ifdef __MINGW32__
-    // On mingw targets the ms-bitfields option is active by default.
-    // Therefore enforce gnu-bitfield style.
-    __attribute__((gcc_struct))
-#endif
-{
+struct ieee_t {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     unsigned negative : 1;
     unsigned exponent : 15;
@@ -50,7 +44,13 @@ struct ieee_t
     unsigned exponent : 15;
     unsigned negative : 1;
 #endif
-};
+}
+#ifdef __MINGW32__
+// On mingw targets the ms-bitfields option is active by default.
+// Therefore enforce gnu-bitfield style.
+__attribute__((gcc_struct))
+#endif
+;
 
 // The union.
 union ieee_float128 {
