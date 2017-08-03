@@ -54,4 +54,7 @@ TEST_CASE("real128 constructors")
     std::cout << static_cast<integer<1>>(real128{-123.1}) << '\n';
     std::cout << static_cast<integer<1>>(real128{"1E-4964"}) << '\n';
     std::cout << static_cast<integer<1>>(real128{"-1E-4964"}) << '\n';
+    std::cout << real128{"-1E-4964"} << '\n';
+    std::cout << static_cast<rational<1>>(real128{"-1E-4964"}) << '\n';
+    std::cout << real128{static_cast<rational<1>>(real128{"-1E-4964"})} << '\n';
 }

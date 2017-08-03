@@ -108,8 +108,44 @@ public:
         }
     }
     template <std::size_t SSize>
-    explicit real128(const rational<SSize> &q) : m_value(real128{q.get_num()}.value() / real128{q.get_den()}.value())
+    explicit real128(const rational<SSize> &q)
     {
+        const auto n_bits = q.get_num().nbits();
+        const auto d_bits = q.get_den().nbits();
+        if (n_bits <= sig_digits && d_bits <= sig_digits) {
+            // Both num/den don't have more bits than quad's significand. We can just convert
+            // them and divide.
+            m_value = real128{q.get_num()}.value() / real128{q.get_den()}.value();
+        } else if (n_bits > sig_digits && d_bits <= sig_digits) {
+            // Num's bit size is larger than quad's significand, den's is not. We will shift num down,
+            // do the conversion, and then recover the shifted bits in the float128.
+            integer<SSize> n;
+            const auto shift = n_bits - sig_digits;
+            tdiv_q_2exp(n, q.get_num(), safe_cast<::mp_bitcnt_t>(shift));
+            m_value = real128{n}.value() / real128{q.get_den()}.value();
+            m_value = ::scalblnq(m_value, safe_cast<long>(shift));
+        } else if (n_bits <= sig_digits && d_bits > sig_digits) {
+            // The opposite of above.
+            integer<SSize> d;
+            const auto shift = d_bits - sig_digits;
+            tdiv_q_2exp(d, q.get_den(), safe_cast<::mp_bitcnt_t>(shift));
+            m_value = real128{q.get_num()}.value() / real128{d}.value();
+            m_value = ::scalblnq(m_value, negate_unsigned<long>(shift));
+        } else {
+            // Both num and den have more bits than quad's significand. We will downshift
+            // both until they have 113 bits, do the division, and then recover the shifted bits.
+            integer<SSize> n, d;
+            const auto n_shift = n_bits - sig_digits;
+            const auto d_shift = d_bits - sig_digits;
+            tdiv_q_2exp(n, q.get_num(), safe_cast<::mp_bitcnt_t>(n_shift));
+            tdiv_q_2exp(d, q.get_den(), safe_cast<::mp_bitcnt_t>(d_shift));
+            m_value = real128{n}.value() / real128{d}.value();
+            if (n_shift >= d_shift) {
+                m_value = ::scalblnq(m_value, safe_cast<long>(n_shift - d_shift));
+            } else {
+                m_value = ::scalblnq(m_value, negate_unsigned<long>(d_shift - n_shift));
+            }
+        }
     }
     explicit real128(const char *s) : m_value(str_to_float128(s))
     {
