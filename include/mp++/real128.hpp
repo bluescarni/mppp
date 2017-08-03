@@ -30,6 +30,40 @@
 namespace mppp
 {
 
+/// Quadruple-precision floating-point class.
+/**
+ * \rststar
+ * This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
+ * (which features up to 36 decimal digits of precision).
+ * The class is a thin wrapper around the ``__float128`` type available in GCC on some platforms, additionally
+ * providing:
+ *
+ * * interoperability with other mp++ classes,
+ * * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
+ *   default-initialised to zero rather than to indefinite values, conversions must be explicit, etc.).
+ *
+ * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
+ * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list),
+ * :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`,
+ * and it provides overloaded :ref:`operators <real128_operators>`. Differently from the builtin types,
+ * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
+ * from and conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
+ *
+ * .. code-block:: c++
+ *
+ *    real128 r = 5.23;
+ *    int m = r;
+ *
+ * will not work, and direct initialization and explicit casting should be used instead:
+ *
+ * .. code-block:: c++
+ *
+ *    real128 r{5.23};
+ *    int m = static_cast<int>(r);
+ *
+ * It is always possible to access freely the inner ``__float128`` instance via trivial getters.
+ * \endrststar
+ */
 class real128
 {
     // Number of digits in the significand.
