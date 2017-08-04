@@ -732,6 +732,23 @@ struct string_ass_tester {
             return std::string(ia.what())
                    == "A zero denominator was detected in the constructor of a rational from string";
         });
+#if __cplusplus >= 201703L
+        q = std::string_view{"1"};
+        REQUIRE(q == 1);
+        q = std::string_view{"-23"};
+        REQUIRE(q == -23);
+        q = std::string_view{"-2/-4"};
+        REQUIRE((q == rational{1, 2}));
+        q = std::string_view{"3/-9"};
+        REQUIRE((q == rational{-1, 3}));
+        REQUIRE_THROWS_PREDICATE(q = std::string_view{""}, std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
+        });
+        REQUIRE_THROWS_PREDICATE(q = std::string_view{"-3/0"}, zero_division_error, [](const zero_division_error &ia) {
+            return std::string(ia.what())
+                   == "A zero denominator was detected in the constructor of a rational from string";
+        });
+#endif
     }
 };
 

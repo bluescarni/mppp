@@ -465,7 +465,7 @@ public:
      *   This constructor is available only if at least C++17 is being used.
      * \endrststar
      *
-     * @param s the \p std::string view that will be used for construction.
+     * @param s the \p std::string_view that will be used for construction.
      * @param base the base used in the string representation.
      *
      * @throws unspecified any exception thrown by the constructor from C string.
@@ -647,6 +647,35 @@ public:
     {
         return operator=(s.c_str());
     }
+#if __cplusplus >= 201703L
+    /// Assignment from string view.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = rational{s};
+     *
+     * That is, a temporary rational is constructed from ``s`` and it is then move-assigned to ``this``.
+     *
+     * .. note::
+     *
+     *   This operator is available only if at least C++17 is being used.
+     *
+     * \endrststar
+     *
+     * @param s the \p std::string_view that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string view.
+     */
+    rational &operator=(const std::string_view &s)
+    {
+        return *this = rational{s};
+    }
+#endif
     /// Convert to string.
     /**
      * \rststar
