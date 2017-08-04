@@ -775,6 +775,9 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
 //   cting temporary.
 // - performance improvements for arithmetic with C++ integrals? (e.g., use add_ui() and similar rather than cting
 //   temporary).
+// - for divisions, right shifts, etc. it might make sense to force the demotion of rop in the ternary forms
+//   if num and den are both static, as the result will be static. This should be weighted against potential
+//   ping-pong in the promotion/demotion of rop however, if this is likely to happen. Need to think about it.
 
 /// Multiprecision integer class.
 /**
