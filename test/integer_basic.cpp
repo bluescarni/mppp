@@ -501,6 +501,15 @@ struct string_ass_tester {
         REQUIRE_THROWS_PREDICATE(n = "", std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
         });
+#if __cplusplus >= 201703L
+        n = std::string_view(" -123 ");
+        REQUIRE(n == -123);
+        n = std::string_view("4563 ");
+        REQUIRE(n == 4563);
+        REQUIRE_THROWS_PREDICATE(n = std::string_view(""), std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
+        });
+#endif
     }
 };
 

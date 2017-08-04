@@ -1104,7 +1104,7 @@ public:
      *   This constructor is available only if at least C++17 is being used.
      * \endrststar
      *
-     * @param s the \p std::string view that will be used for construction.
+     * @param s the \p std::string_view that will be used for construction.
      * @param base the base used in the string representation.
      *
      * @throws unspecified any exception thrown by the constructor from C string.
@@ -1262,6 +1262,35 @@ public:
     {
         return operator=(s.c_str());
     }
+#if __cplusplus >= 201703L
+    /// Assignment from string view.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = integer{s};
+     *
+     * That is, a temporary integer is constructed from ``s`` and it is then move-assigned to ``this``.
+     *
+     * .. note::
+     *
+     *   This operator is available only if at least C++17 is being used.
+     *
+     * \endrststar
+     *
+     * @param s the \p std::string_view that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string view.
+     */
+    integer &operator=(const std::string_view &s)
+    {
+        return *this = integer{s};
+    }
+#endif
     /// Set to zero.
     /**
      * After calling this method, the storage type of \p this will be static and its value will be zero.
