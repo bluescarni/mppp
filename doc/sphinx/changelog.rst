@@ -13,6 +13,8 @@ New
 Changes
 ~~~~~~~
 
+- Bump up the minimum required CMake version to 3.3 (`#31 <https://github.com/bluescarni/mppp/pull/31>`__).
+
 - Performance improvements and simplifications in the :cpp:class:`~mppp::rational` constructors
   (`#28 <https://github.com/bluescarni/mppp/pull/28>`__).
 

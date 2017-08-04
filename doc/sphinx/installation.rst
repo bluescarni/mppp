@@ -31,7 +31,7 @@ mp++ has the following dependencies:
   only in the benchmarking suite.
 
 Additionally, `CMake <http://www.cmake.org/>`__ is the build system used by mp++ and it must also be available when
-installing from source (the minimum required version is 3.2).
+installing from source (the minimum required version is 3.3).
 
 Installation from source
 ------------------------
@@ -99,7 +99,7 @@ Including mp++ in your project via CMake
 ----------------------------------------
 
 As a part of the mp++ installation, a group of CMake files is installed into ``CMAKE_INSTALL_PREFIX/lib/cmake/mp++``.
-This bundle, which is known in the CMake lingo as a `config-file package <https://cmake.org/cmake/help/v3.2/manual/cmake-packages.7.html>`__,
+This bundle, which is known in the CMake lingo as a `config-file package <https://cmake.org/cmake/help/v3.3/manual/cmake-packages.7.html>`__,
 facilitates the detection and use of mp++ from other CMake-based projects. mp++'s config-file package, once loaded, provides
 an imported target called ``Mp++::mp++`` which encapsulate all the information necessary to use mp++. That is, linking to
 ``Mp++::mp++`` ensures that mp++'s include directories are added to the include path of the compiler, and that the libraries
@@ -109,8 +109,8 @@ For instance, a ``CMakeLists.txt`` file for the simple ``main.cpp`` program pres
 
 .. code-block:: cmake
 
-   # mp++ needs at least CMake 3.2.
-   cmake_minimum_required(VERSION 3.2.0)
+   # mp++ needs at least CMake 3.3.
+   cmake_minimum_required(VERSION 3.3.0)
 
    # The name of our project.
    project(sample_project)

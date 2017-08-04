@@ -1,5 +1,5 @@
-# mp++ needs at least CMake 3.2.
-cmake_minimum_required(VERSION 3.2.0)
+# mp++ needs at least CMake 3.3.
+cmake_minimum_required(VERSION 3.3.0)
 
 # The name of our project.
 project(sample_project)
