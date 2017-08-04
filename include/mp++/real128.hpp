@@ -18,6 +18,9 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#if __cplusplus >= 201703L
+#include <string_view>
+#endif
 #include <vector>
 
 #include <mp++/concepts.hpp>
@@ -78,6 +81,8 @@ public:
     constexpr explicit real128(::__float128 x) : m_value(x)
     {
     }
+    real128(const real128 &) = default;
+    real128(real128 &&) = default;
 #if defined(MPPP_HAVE_CONCEPTS)
     constexpr explicit real128(CppInteroperable x)
 #else
@@ -144,21 +149,21 @@ public:
         if (n_bits <= sig_digits && d_bits <= sig_digits) {
             // Both num/den don't have more bits than quad's significand. We can just convert
             // them and divide.
-            m_value = real128{q.get_num()}.value() / real128{q.get_den()}.value();
+            m_value = real128{q.get_num()}.m_value / real128{q.get_den()}.m_value;
         } else if (n_bits > sig_digits && d_bits <= sig_digits) {
             // Num's bit size is larger than quad's significand, den's is not. We will shift num down,
             // do the conversion, and then recover the shifted bits in the float128.
             integer<SSize> n;
             const auto shift = n_bits - sig_digits;
             tdiv_q_2exp(n, q.get_num(), safe_cast<::mp_bitcnt_t>(shift));
-            m_value = real128{n}.value() / real128{q.get_den()}.value();
+            m_value = real128{n}.m_value / real128{q.get_den()}.m_value;
             m_value = ::scalblnq(m_value, safe_cast<long>(shift));
         } else if (n_bits <= sig_digits && d_bits > sig_digits) {
             // The opposite of above.
             integer<SSize> d;
             const auto shift = d_bits - sig_digits;
             tdiv_q_2exp(d, q.get_den(), safe_cast<::mp_bitcnt_t>(shift));
-            m_value = real128{q.get_num()}.value() / real128{d}.value();
+            m_value = real128{q.get_num()}.m_value / real128{d}.m_value;
             m_value = ::scalblnq(m_value, negate_unsigned<long>(shift));
         } else {
             // Both num and den have more bits than quad's significand. We will downshift
@@ -168,7 +173,7 @@ public:
             const auto d_shift = d_bits - sig_digits;
             tdiv_q_2exp(n, q.get_num(), safe_cast<::mp_bitcnt_t>(n_shift));
             tdiv_q_2exp(d, q.get_den(), safe_cast<::mp_bitcnt_t>(d_shift));
-            m_value = real128{n}.value() / real128{d}.value();
+            m_value = real128{n}.m_value / real128{d}.m_value;
             if (n_shift >= d_shift) {
                 m_value = ::scalblnq(m_value, safe_cast<long>(n_shift - d_shift));
             } else {
@@ -179,6 +184,9 @@ public:
     explicit real128(const char *s) : m_value(str_to_float128(s))
     {
     }
+    explicit real128(const std::string &s) : real128(s.c_str())
+    {
+    }
     explicit real128(const char *begin, const char *end)
     {
         MPPP_MAYBE_TLS std::vector<char> buffer;
@@ -186,31 +194,13 @@ public:
         buffer.emplace_back('\0');
         m_value = str_to_float128(buffer.data());
     }
-    explicit real128(const std::string &s) : real128(s.c_str())
+#if __cplusplus >= 201703L
+    explicit real128(const std::string_view &s) : real128(s.data(), s.data() + s.size())
     {
     }
-    real128(const real128 &) = default;
-    real128(real128 &&) = default;
+#endif
     real128 &operator=(const real128 &) = default;
     real128 &operator=(real128 &&) = default;
-// NOTE: we can overload correctly these getters, wrt constexpr, only since C++14:
-// https://akrzemi1.wordpress.com/2013/06/20/constexpr-function-is-not-const/
-#if __cplusplus >= 201402L
-    constexpr
-#endif
-        ::__float128 &
-        value()
-    {
-        return m_value;
-    }
-#if __cplusplus >= 201402L
-    constexpr
-#endif
-        const ::__float128 &
-        value() const
-    {
-        return m_value;
-    }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -244,8 +234,6 @@ public:
             return integer<SSize>{};
         }
         // Value is normalised and not less than 1 in abs. We can proceed.
-        // Get the sign.
-        const bool neg = ief.i_eee.negative;
         integer<SSize> retval{1u};
         if (exponent >= 0) {
             // Non-negative exponent means that we will have to take the significand
@@ -276,7 +264,7 @@ public:
             }
         }
         // Adjust the sign.
-        if (neg) {
+        if (ief.i_eee.negative) {
             retval.neg();
         }
         return retval;
@@ -291,8 +279,6 @@ public:
             // Inf or nan, not representable by rational.
             throw std::domain_error("Cannot convert a non-finite real128 to a rational");
         }
-        // Get the sign.
-        const bool neg = ief.i_eee.negative;
         rational<SSize> retval;
         if (ief.i_eee.exponent) {
             // Normal number.
@@ -325,19 +311,18 @@ public:
             retval._get_den().demote();
         }
         // Adjust the sign.
-        if (neg) {
+        if (ief.i_eee.negative) {
             retval.neg();
         }
         return retval;
     }
 
-private:
     ::__float128 m_value;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const real128 &r)
 {
-    float128_stream(os, r.value());
+    float128_stream(os, r.m_value);
     return os;
 }
 }

@@ -20,19 +20,19 @@ TEST_CASE("real128 constructors")
     constexpr real128 r1{1.l}, r2{2}, r3{__float128{1}};
     real128 blap{integer<1>{
         "1231238012938120938201938029138901283029138012983091283091283091283091201310012301301029381318240752987"}};
-    float128_stream(std::cout, blap.value());
+    float128_stream(std::cout, blap.m_value);
     std::cout << "\n";
     real128 blap2{integer<1>{1} << 120};
-    float128_stream(std::cout, blap2.value());
+    float128_stream(std::cout, blap2.m_value);
     std::cout << "\n";
     real128 blap3{integer<1>{1} << 50};
-    float128_stream(std::cout, blap3.value());
+    float128_stream(std::cout, blap3.m_value);
     std::cout << "\n";
     real128 blap4{integer<1>{1} << 500};
-    float128_stream(std::cout, blap4.value());
+    float128_stream(std::cout, blap4.m_value);
     std::cout << "\n";
     real128 blap5{rational<1>{"3232338832138213/-43834982310"}};
-    float128_stream(std::cout, blap5.value());
+    float128_stream(std::cout, blap5.m_value);
     std::cout << "\n";
     std::cout << real128{"1.1"} << '\n';
     std::cout << real128{1.1} << '\n';
