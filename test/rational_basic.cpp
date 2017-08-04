@@ -138,6 +138,8 @@ struct int_ctor_tester {
         REQUIRE((lex_cast(rational{integer{-12}}) == "-12"));
         REQUIRE((lex_cast(rational{integer{123}}) == "123"));
         REQUIRE((lex_cast(rational{integer{-123}}) == "-123"));
+        integer tmp_int{-123};
+        REQUIRE((lex_cast(rational{tmp_int}) == "-123"));
         // Testing for the ctor from num/den.
         REQUIRE((std::is_constructible<rational, integer, integer>::value));
         REQUIRE((std::is_constructible<rational, integer, int>::value));
@@ -856,6 +858,9 @@ struct gen_ass_tester {
         REQUIRE(lex_cast(q) == "-11");
         q = integer{"-2323232312312311"};
         REQUIRE(lex_cast(q) == "-2323232312312311");
+        integer tmp_int{"-4323232312312311"};
+        q = tmp_int;
+        REQUIRE(lex_cast(q) == "-4323232312312311");
         if (std::numeric_limits<double>::radix == 2) {
             q = -1.5;
             REQUIRE(lex_cast(q) == "-3/2");

@@ -586,7 +586,32 @@ public:
         m_den = mpq_denref(q);
         return *this;
     }
-/// Generic assignment operator.
+/// Assignment from integrals.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` satisfies the :cpp:concept:`~mppp::RationalIntegralInteroperable` concept.
+ * ``n`` will be assigned to the numerator, and :cpp:func:`mppp::integer::set_one()` will be called on the denominator.
+ * \endrststar
+ *
+ * @param n the integral value that will be assigned to \p this.
+ *
+ * @return a reference to \p this.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <typename T>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+    requires RationalIntegralInteroperable<uncvref_t<T>, SSize>
+#endif
+#else
+    template <typename T, enable_if_t<is_rational_integral_interoperable<uncvref_t<T>, SSize>::value, int> = 0>
+#endif
+        rational &operator=(T &&n)
+    {
+        m_num = std::forward<T>(n);
+        m_den.set_one();
+        return *this;
+    }
+/// Assignment from floating-point values.
 /**
  * \rststar
  * The body of this operator is equivalent to:
@@ -598,16 +623,16 @@ public:
  * That is, a temporary rational is constructed from ``x`` and it is then move-assigned to ``this``.
  * \endrststar
  *
- * @param x the assignment argument.
+ * @param x the floating-point assignment argument.
  *
  * @return a reference to \p this.
  *
- * @throws unspecified any exception thrown by the generic constructor.
+ * @throws unspecified any exception thrown by the constructor from floating-point.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    rational &operator=(const RationalInteroperable<SSize> &x)
+    rational &operator=(const RationalFPInteroperable<SSize> &x)
 #else
-    template <typename T, rational_interoperable_enabler<T, SSize> = 0>
+    template <typename T, enable_if_t<is_rational_fp_interoperable<T, SSize>::value, int> = 0>
     rational &operator=(const T &x)
 #endif
     {

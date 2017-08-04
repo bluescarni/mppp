@@ -16,8 +16,8 @@ New
 Changes
 ~~~~~~~
 
-- Performance improvements and simplifications in the :cpp:class:`~mppp::rational` constructors
-  (`#28 <https://github.com/bluescarni/mppp/pull/28>`__).
+- Performance improvements and simplifications in the :cpp:class:`~mppp::rational` constructors and assignment operators
+  (`#28 <https://github.com/bluescarni/mppp/pull/28>`__, `#32 <https://github.com/bluescarni/mppp/pull/32>`__).
 
 Fix
 ~~~
