@@ -15,3 +15,15 @@ The ``real128`` class
 
 .. doxygenclass:: mppp::real128
    :members:
+
+Types
+-----
+
+.. cpp:type:: __float128
+
+   A quadruple-precision floating-point type available in the GCC compiler on most contemporary platforms.
+   This is the type wrapped by the :cpp:class:`~mppp::real128` class.
+
+   .. seealso::
+
+      https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html

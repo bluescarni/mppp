@@ -38,12 +38,13 @@ namespace mppp
  * \rststar
  * This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
  * (which features up to 36 decimal digits of precision).
- * The class is a thin wrapper around the ``__float128`` type available in GCC on some platforms, additionally
- * providing:
+ * The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available in GCC
+ * on most contemporary platforms, on top of which it provides the following additions:
  *
  * * interoperability with other mp++ classes,
  * * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
- *   default-initialised to zero rather than to indefinite values, conversions must be explicit, etc.).
+ *   default-initialised to zero rather than to indefinite values, conversions must be explicit, etc.),
+ * * a generic C++ API.
  *
  * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
  * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list),
@@ -64,7 +65,27 @@ namespace mppp
  *    real128 r{5.23};
  *    int m = static_cast<int>(r);
  *
- * It is always possible to access freely the inner ``__float128`` instance via trivial getters.
+ * Most of the functionality is exposed via plain :ref:`functions <real128_functions>`, with the
+ * general convention that the functions are named after the corresponding quadmath functions minus the trailing ``q``
+ * suffix. For instance, the quadmath call
+ *
+ * .. code-block:: c++
+ *
+ *    ::__float128 a = .5;
+ *    auto b = ::sinq(a);
+ *
+ * that computes the sine of 0.5 in quadruple precision, storing the result in ``b``, becomes
+ *
+ * .. code-block:: c++
+ *
+ *    mppp::real128 a{.5};
+ *    auto b = sin(a);
+ *
+ * where the ``sin()`` function is resolved via argument-dependent lookup.
+ *
+ * .. seealso::
+ *    https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+ *    https://gcc.gnu.org/onlinedocs/libquadmath/
  * \endrststar
  */
 class real128
@@ -75,14 +96,18 @@ class real128
     static_assert(FLT128_MANT_DIG == sig_digits, "Invalid number of digits.");
 
 public:
+    /// Default constructor.
+    /**
+     * The default constructor will set \p this to zero.
+     */
     constexpr real128() : m_value(0)
-    {
-    }
-    constexpr explicit real128(::__float128 x) : m_value(x)
     {
     }
     real128(const real128 &) = default;
     real128(real128 &&) = default;
+    constexpr explicit real128(::__float128 x) : m_value(x)
+    {
+    }
 #if defined(MPPP_HAVE_CONCEPTS)
     constexpr explicit real128(CppInteroperable x)
 #else
@@ -316,7 +341,13 @@ public:
         }
         return retval;
     }
-
+    /// The internal value.
+    /**
+     * \rststar
+     * This class member gives direct access to the :cpp:type:`__float128` instance stored
+     * inside :cpp:class:`~mppp::real128`.
+     * \endrststar
+     */
     ::__float128 m_value;
 };
 
