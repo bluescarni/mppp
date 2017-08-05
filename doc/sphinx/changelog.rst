@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Add assignment operator from ``std::string_view`` for :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
+  (`#32 <https://github.com/bluescarni/mppp/pull/32>`__).
+
 - Add the possibility of constructing non-canonical :cpp:class:`~mppp::rational` objects from numerator/denominator pairs
   (`#28 <https://github.com/bluescarni/mppp/pull/28>`__).
 
@@ -15,8 +18,8 @@ Changes
 
 - Bump up the minimum required CMake version to 3.3 (`#31 <https://github.com/bluescarni/mppp/pull/31>`__).
 
-- Performance improvements and simplifications in the :cpp:class:`~mppp::rational` constructors
-  (`#28 <https://github.com/bluescarni/mppp/pull/28>`__).
+- Performance improvements and simplifications in the :cpp:class:`~mppp::rational` constructors and assignment operators
+  (`#28 <https://github.com/bluescarni/mppp/pull/28>`__, `#32 <https://github.com/bluescarni/mppp/pull/32>`__).
 
 Fix
 ~~~
@@ -24,6 +27,8 @@ Fix
 - Fix missing tests for :cpp:class:`~mppp::rational` hashing (`#29 <https://github.com/bluescarni/mppp/pull/29>`__).
 
 - Fix some MSVC warnings when compiling the tests in release mode (`#28 <https://github.com/bluescarni/mppp/pull/28>`__).
+
+- Various minor documentation fixes.
 
 0.4 (2017-07-29)
 ----------------

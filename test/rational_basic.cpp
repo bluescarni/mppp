@@ -138,6 +138,8 @@ struct int_ctor_tester {
         REQUIRE((lex_cast(rational{integer{-12}}) == "-12"));
         REQUIRE((lex_cast(rational{integer{123}}) == "123"));
         REQUIRE((lex_cast(rational{integer{-123}}) == "-123"));
+        integer tmp_int{-123};
+        REQUIRE((lex_cast(rational{tmp_int}) == "-123"));
         // Testing for the ctor from num/den.
         REQUIRE((std::is_constructible<rational, integer, integer>::value));
         REQUIRE((std::is_constructible<rational, integer, int>::value));
@@ -732,6 +734,23 @@ struct string_ass_tester {
             return std::string(ia.what())
                    == "A zero denominator was detected in the constructor of a rational from string";
         });
+#if __cplusplus >= 201703L
+        q = std::string_view{"1"};
+        REQUIRE(q == 1);
+        q = std::string_view{"-23"};
+        REQUIRE(q == -23);
+        q = std::string_view{"-2/-4"};
+        REQUIRE((q == rational{1, 2}));
+        q = std::string_view{"3/-9"};
+        REQUIRE((q == rational{-1, 3}));
+        REQUIRE_THROWS_PREDICATE(q = std::string_view{""}, std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
+        });
+        REQUIRE_THROWS_PREDICATE(q = std::string_view{"-3/0"}, zero_division_error, [](const zero_division_error &ia) {
+            return std::string(ia.what())
+                   == "A zero denominator was detected in the constructor of a rational from string";
+        });
+#endif
     }
 };
 
@@ -839,6 +858,9 @@ struct gen_ass_tester {
         REQUIRE(lex_cast(q) == "-11");
         q = integer{"-2323232312312311"};
         REQUIRE(lex_cast(q) == "-2323232312312311");
+        integer tmp_int{"-4323232312312311"};
+        q = tmp_int;
+        REQUIRE(lex_cast(q) == "-4323232312312311");
         if (std::numeric_limits<double>::radix == 2) {
             q = -1.5;
             REQUIRE(lex_cast(q) == "-3/2");
