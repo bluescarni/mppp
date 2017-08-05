@@ -775,6 +775,9 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
 //   cting temporary.
 // - performance improvements for arithmetic with C++ integrals? (e.g., use add_ui() and similar rather than cting
 //   temporary).
+// - for divisions, right shifts, etc. it might make sense to force the demotion of rop in the ternary forms
+//   if num and den are both static, as the result will be static. This should be weighted against potential
+//   ping-pong in the promotion/demotion of rop however, if this is likely to happen. Need to think about it.
 
 /// Multiprecision integer class.
 /**
@@ -799,7 +802,7 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
  * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list),
  * and it provides overloaded :ref:`operators <integer_operators>`. Differently from the builtin types,
  * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
- * from and  conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
+ * from and conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
  *
  * .. code-block:: c++
  *
@@ -1101,7 +1104,7 @@ public:
      *   This constructor is available only if at least C++17 is being used.
      * \endrststar
      *
-     * @param s the \p std::string view that will be used for construction.
+     * @param s the \p std::string_view that will be used for construction.
      * @param base the base used in the string representation.
      *
      * @throws unspecified any exception thrown by the constructor from C string.
@@ -1259,6 +1262,35 @@ public:
     {
         return operator=(s.c_str());
     }
+#if __cplusplus >= 201703L
+    /// Assignment from string view.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = integer{s};
+     *
+     * That is, a temporary integer is constructed from ``s`` and it is then move-assigned to ``this``.
+     *
+     * .. note::
+     *
+     *   This operator is available only if at least C++17 is being used.
+     *
+     * \endrststar
+     *
+     * @param s the \p std::string_view that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string view.
+     */
+    integer &operator=(const std::string_view &s)
+    {
+        return *this = integer{s};
+    }
+#endif
     /// Set to zero.
     /**
      * After calling this method, the storage type of \p this will be static and its value will be zero.
