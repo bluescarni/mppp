@@ -148,7 +148,7 @@ dynamic, the usual <code class="docutils literal"><span class="pre">mpz_</span><
 floating-point primitive types (see the <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> concept for the full list),
 and it provides overloaded <a class="reference internal" href="#integer-operators"><span class="std std-ref">operators</span></a>. Differently from the builtin types,
 however, this class does not allow any implicit conversion to/from other types (apart from <code class="docutils literal"><span class="pre">bool</span></code>): construction
-from and  conversion to primitive types must always be requested explicitly. As a side effect, syntax such as</p>
+from and conversion to primitive types must always be requested explicitly. As a side effect, syntax such as</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
 <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="n">n</span><span class="p">;</span>
 </pre></div>
@@ -392,7 +392,7 @@ Via the GMP interfacing facilities, it is thus possible to use directly the GMP 
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the <code class="docutils literal"><span class="pre">std::string</span></code> view that will be used for construction. </li>
+<li><code class="docutils literal"><span class="pre">s</span></code>: the <code class="docutils literal"><span class="pre">std::string_view</span></code> that will be used for construction. </li>
 <li><code class="docutils literal"><span class="pre">base</span></code>: the base used in the string representation.</li>
 </ul>
 </dd>
@@ -554,6 +554,37 @@ it might point to internal data of <code class="docutils literal"><span class="p
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment operator from C string. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp7integeraSERKNSt11string_viewE">
+<span id="mppp::integer::assign-operator__std::string_viewCR"></span><span class="target" id="mp++classmppp_1_1integer_1a6ab17b1579a21c1661d76ad0c119244c"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integeraSERKNSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assignment from string view. </p>
+<p><p>The body of this operator is equivalent to:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">integer</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
+</pre></div>
+</div>
+<p>That is, a temporary integer is constructed from <code class="docutils literal"><span class="pre">s</span></code> and it is then move-assigned to <code class="docutils literal"><span class="pre">this</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This operator is available only if at least C++17 is being used.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">s</span></code>: the <code class="docutils literal"><span class="pre">std::string_view</span></code> that will be used for the assignment.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string view. </li>
 </ul>
 </dd>
 </dl>
