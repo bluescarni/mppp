@@ -103,11 +103,36 @@ public:
     constexpr real128() : m_value(0)
     {
     }
-    real128(const real128 &) = default;
-    real128(real128 &&) = default;
+    /// Copy constructor.
+    /**
+     * @param other the real128 that will be copied.
+     */
+    constexpr real128(const real128 &other) : m_value(other)
+    {
+    }
+    /// Move constructor.
+    /**
+     * @param other the real128 that will be moved.
+     */
+    constexpr real128(real128 &&other) : real128(other)
+    {
+    }
+    /// Constructor from quadruple-precision floating-point value.
+    /**
+     * This constructor will initialise the internal value with \p x.
+     *
+     * @param x the quadruple-precision floating-point variable that will be
+     * used to initialise the internal value.
+     */
     constexpr explicit real128(::__float128 x) : m_value(x)
     {
     }
+/// Constructor from C++ interoperable type.
+/**
+ * This constructor will initialise the internal value with \p x.
+ *
+ * @param x the value that will be used for initialisation.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
     constexpr explicit real128(CppInteroperable x)
 #else
@@ -117,6 +142,18 @@ public:
         : m_value(x)
     {
     }
+    /// Constructor from \link mppp::integer integer \endlink.
+    /**
+     * This constructor will initialise the internal value with \p n. If the absolute value of \p n is large
+     * enough, \p this may not be exactly equal to \p n after initialisation. If \p n is **extremely**
+     * large, an exception will be raised.
+     *
+     * @param n the \link mppp::integer integer \endlink that will be used for the initialisation of the
+     * internal value.
+     *
+     * @throws std::overflow_error if the absolute value of \p n is larger than an implementation-defined
+     * limit.
+     */
     template <std::size_t SSize>
     explicit real128(const integer<SSize> &n)
     {
@@ -166,6 +203,16 @@ public:
             m_value = -m_value;
         }
     }
+    /// Constructor from \link mppp::rational rational \endlink.
+    /**
+     * This constructor will initialise the internal value with \p q.
+     *
+     * @param q the \link mppp::rational rational \endlink that will be used for the initialisation of the
+     * internal value.
+     *
+     * @throws std::overflow_error if the absolute values of the numerator and/or denominator of \p q are larger than an
+     * implementation-defined limit.
+     */
     template <std::size_t SSize>
     explicit real128(const rational<SSize> &q)
     {
