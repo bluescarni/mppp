@@ -90,7 +90,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
         exit 1;
     fi
     cd ../sphinx;
-    pip install --user 'sphinx<1.6' breathe requests[security]
+    pip install --user sphinx breathe requests[security]
     export SPHINX_OUTPUT=`make html 2>&1 >/dev/null`;
     if [[ "${SPHINX_OUTPUT}" != "" ]]; then
         echo "Sphinx encountered some problem:";
