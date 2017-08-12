@@ -1107,7 +1107,7 @@ public:
      * @param s the \p std::string_view that will be used for construction.
      * @param base the base used in the string representation.
      *
-     * @throws unspecified any exception thrown by the constructor from C string.
+     * @throws unspecified any exception thrown by the constructor from a range of characters.
      */
     explicit integer(const std::string_view &s, int base = 10) : integer(s.data(), s.data() + s.size(), base)
     {
