@@ -13,6 +13,8 @@
 // NOTE: extern "C" is already included in quadmath.h since GCC 4.8:
 // https://stackoverflow.com/questions/13780219/link-libquadmath-with-c-on-linux
 #include <quadmath.h>
+#include <stdexcept>
+#include <string>
 
 #include <mp++/config.hpp>
 
@@ -83,8 +85,8 @@ inline ::__float128 str_to_float128(const char *s)
         // NOTE: the first condition handles an empty string.
         // endptr will point to the first character in the string which
         // did not contribute to the construction of retval.
-        // TODO.
-        throw;
+        throw std::invalid_argument("The string '" + std::string(s)
+                                    + "' does not represent a valid quadruple-precision floating-point value");
     }
     return retval;
 }

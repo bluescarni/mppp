@@ -145,8 +145,7 @@ public:
     /// Constructor from \link mppp::integer integer \endlink.
     /**
      * This constructor will initialise the internal value with \p n. If the absolute value of \p n is large
-     * enough, \p this may not be exactly equal to \p n after initialisation. If \p n is **extremely**
-     * large, an exception will be raised.
+     * enough, \p this may not be exactly equal to \p n after initialisation.
      *
      * @param n the \link mppp::integer integer \endlink that will be used for the initialisation of the
      * internal value.
@@ -253,12 +252,45 @@ public:
             }
         }
     }
+    /// Constructor from C string.
+    /**
+     * \rststar
+     * This constructor will initialise \p this from the null-terminated string ``s``.
+     *
+     * .. seealso::
+     *    https://gcc.gnu.org/onlinedocs/libquadmath/strtoflt128.html
+     * \endrststar
+     *
+     * @param s the null-terminated string that will be used to initialise \p this.
+     *
+     * @throws std::invalid_argument if \p s does not represent a valid quadruple-precision
+     * floating-point value.
+     */
     explicit real128(const char *s) : m_value(str_to_float128(s))
     {
     }
+    /// Constructor from C++ string (equivalent to the constructor from C string).
+    /**
+     * @param s the input string.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
     explicit real128(const std::string &s) : real128(s.c_str())
     {
     }
+    /// Constructor from range of characters.
+    /**
+     * This constructor will initialise \p this from the content of the input half-open range, which is interpreted
+     * as the string representation of a floating-point value.
+     *
+     * Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and
+     * invoke the constructor from C string.
+     *
+     * @param begin the begin of the input range.
+     * @param end the end of the input range.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
     explicit real128(const char *begin, const char *end)
     {
         MPPP_MAYBE_TLS std::vector<char> buffer;
@@ -267,12 +299,52 @@ public:
         m_value = str_to_float128(buffer.data());
     }
 #if __cplusplus >= 201703L
+    /// Constructor from string view.
+    /**
+     * This constructor will initialise \p this from the content of the input string view,
+     * which is interpreted as the string representation of a floating-point value.
+     *
+     * Internally, the constructor will invoke the constructor from a range of characters.
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This constructor is available only if at least C++17 is being used.
+     * \endrststar
+     *
+     * @param s the \p std::string_view that will be used for construction.
+     *
+     * @throws unspecified any exception thrown by the constructor from a range of characters.
+     */
     explicit real128(const std::string_view &s) : real128(s.data(), s.data() + s.size())
     {
     }
 #endif
-    real128 &operator=(const real128 &) = default;
-    real128 &operator=(real128 &&) = default;
+    /// Defaulted copy assignment operator.
+    /**
+     * @param other the assignment argument.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &operator=(const real128 &other) = default;
+    /// Defaulted move assignment operator.
+    /**
+     * @param other the assignment argument.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &operator=(real128 &&other) = default;
+/// Conversion to interoperable C++ types.
+/**
+ * \rststar
+ * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppInteroperable` type. The conversion uses
+ * a direct ``static_cast()`` of the internal :cpp:member:`~mppp::real128::m_value` member to the target type,
+ * and thus no checks are performed to ensure that the value of ``this`` can be represented by the target type.
+ * Conversion to integral types will produce the truncated counterpart of ``this``.
+ * \endrststar
+ *
+ * @return \p this converted to \p T.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -282,10 +354,29 @@ public:
     {
         return static_cast<T>(m_value);
     }
-    constexpr explicit operator ::__float128() const
+    /// Conversion to quadruple-precision floating-point.
+    /**
+     * \rststar
+     * This operator will convert ``this`` to :cpp:type:`__float128`.
+     * \endrststar
+     *
+     * @return a copy of the quadruple-precision floating-point value stored internally.
+     */
+    constexpr explicit operator __float128() const
     {
         return m_value;
     }
+    /// Conversion to \link mppp::integer integer \endlink.
+    /**
+     * \rststar
+     * This operator will convert ``this`` to an :cpp:type:`~mppp::integer`. If ``this`` does not represent
+     * an integral value, the conversion will yield the truncated counterpart of ``this``.
+     * \endrststar
+     *
+     * @return \p this converted to \link mppp::integer integer \endlink.
+     *
+     * @throws std::domain_error if \p this represents a non-finite value.
+     */
     template <std::size_t SSize>
     explicit operator integer<SSize>() const
     {
@@ -341,6 +432,17 @@ public:
         }
         return retval;
     }
+    /// Conversion to \link mppp::rational rational \endlink.
+    /**
+     * \rststar
+     * This operator will convert ``this`` to a :cpp:type:`~mppp::rational`. The conversion,
+     * if successful, is exact.
+     * \endrststar
+     *
+     * @return \p this converted to \link mppp::rational rational \endlink.
+     *
+     * @throws std::domain_error if \p this represents a non-finite value.
+     */
     template <std::size_t SSize>
     explicit operator rational<SSize>() const
     {
@@ -379,6 +481,7 @@ public:
             retval._get_num() += ief.i_eee.mant_low;
             retval._get_den() <<= static_cast<unsigned long>(16382l + 112);
             canonicalise(retval);
+            // Try demoting.
             retval._get_num().demote();
             retval._get_den().demote();
         }
