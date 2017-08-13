@@ -36,6 +36,15 @@ matrix:
         apt:
           packages:
           - g++-4.8
+    - env: MPPP_BUILD="DebugGCC48DebugGMPUnstable"
+      compiler: gcc
+      os: linux
+      addons:
+        apt:
+          packages:
+          - g++-4.8
+          - mercurial
+          - autoconf
     - env: MPPP_BUILD="CoverageGCC5"
       compiler: gcc
       os: linux
