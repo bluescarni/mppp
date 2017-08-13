@@ -72,4 +72,11 @@
 
 #endif
 
+// constexpr setup.
+#if __cplusplus >= 201402L
+#define MPPP_CONSTEXPR_14 constexpr
+#else
+#define MPPP_CONSTEXPR_14
+#endif
+
 #endif

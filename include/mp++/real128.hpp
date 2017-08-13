@@ -117,7 +117,7 @@ public:
     constexpr real128(real128 &&other) : real128(other)
     {
     }
-    /// Constructor from quadruple-precision floating-point value.
+    /// Constructor from a quadruple-precision floating-point value.
     /**
      * This constructor will initialise the internal value with \p x.
      *
@@ -127,7 +127,7 @@ public:
     constexpr explicit real128(::__float128 x) : m_value(x)
     {
     }
-/// Constructor from C++ interoperable type.
+/// Constructor from C++ interoperable types.
 /**
  * This constructor will initialise the internal value with \p x.
  *
@@ -334,6 +334,159 @@ public:
      * @return a reference to \p this.
      */
     real128 &operator=(real128 &&other) = default;
+    /// Assignment from a quadruple-precision floating-point value.
+    /**
+     * \rststar
+     * .. note::
+     *
+     *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
+     * \endrststar
+     *
+     * @param x the quadruple-precision floating-point variable that will be
+     * assigned to the internal value.
+     *
+     * @return a reference to \p this.
+     */
+    MPPP_CONSTEXPR_14 real128 &operator=(const ::__float128 &x)
+    {
+        m_value = x;
+        return *this;
+    }
+/// Assignment from C++ interoperable types.
+/**
+ * \rststar
+ * .. note::
+ *
+ *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
+ * \endrststar
+ *
+ * @param x the assignment argument.
+ *
+ * @return a reference to \p this.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    MPPP_CONSTEXPR_14 real128 &operator=(const CppInteroperable &x)
+#else
+    template <typename T, cpp_interoperable_enabler<T> = 0>
+    MPPP_CONSTEXPR_14 real128 &operator=(const T &x)
+#endif
+    {
+        m_value = x;
+        return *this;
+    }
+    /// Assignment from \link mppp::integer integer \endlink.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = real128{n};
+     *
+     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``n`` and it is then move-assigned to
+     * ``this``.
+     * \endrststar
+     *
+     * @param n the assignment argument.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from \link mppp::integer integer \endlink.
+     */
+    template <std::size_t SSize>
+    real128 &operator=(const integer<SSize> &n)
+    {
+        return *this = real128{n};
+    }
+    /// Assignment from \link mppp::rational rational \endlink.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = real128{q};
+     *
+     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``q`` and it is then move-assigned to
+     * ``this``.
+     * \endrststar
+     *
+     * @param q the assignment argument.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from \link mppp::rational rational \endlink.
+     */
+    template <std::size_t SSize>
+    real128 &operator=(const rational<SSize> &q)
+    {
+        return *this = real128{q};
+    }
+    /// Assignment from C string.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = real128{s};
+     *
+     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``s`` and it is then move-assigned to
+     * ``this``.
+     * \endrststar
+     *
+     * @param s the C string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string.
+     */
+    real128 &operator=(const char *s)
+    {
+        return *this = real128{s};
+    }
+    /// Assignment from C++ string (equivalent to the assignment from C string).
+    /**
+     * @param s the C++ string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the assignment operator from C string.
+     */
+    real128 &operator=(const std::string &s)
+    {
+        return operator=(s.c_str());
+    }
+#if __cplusplus >= 201703L
+    /// Assignment from string view.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = real128{s};
+     *
+     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``s`` and it is then move-assigned to
+     * ``this``.
+     *
+     * .. note::
+     *
+     *   This operator is available only if at least C++17 is being used.
+     *
+     * \endrststar
+     *
+     * @param s the \p std::string_view that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string view.
+     */
+    real128 &operator=(const std::string_view &s)
+    {
+        return *this = real128{s};
+    }
+#endif
 /// Conversion to interoperable C++ types.
 /**
  * \rststar
@@ -501,11 +654,31 @@ public:
     ::__float128 m_value;
 };
 
+/** @defgroup real128_io real128_io
+ *  @{
+ */
+
+/// Output stream operator.
+/**
+ * \rststar
+ * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real128` ``r``. Internally it uses
+ * the :cpp:func:`mppp::real128::to_string()` method.
+ * \endrststar
+ *
+ * @param os the target stream.
+ * @param r the input \link mppp::real128 real128 \endlink.
+ *
+ * @return a reference to \p os.
+ *
+ * @throws unspecified any exception thrown by real128::to_string().
+ */
 inline std::ostream &operator<<(std::ostream &os, const real128 &r)
 {
     float128_stream(os, r.m_value);
     return os;
 }
+
+/** @} */
 }
 
 #else

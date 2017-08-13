@@ -27,3 +27,16 @@ Types
    .. seealso::
 
       https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+
+.. _real128_functions:
+
+Functions
+---------
+
+.. _real128_io:
+
+Input/Output
+~~~~~~~~~~~~
+
+.. doxygengroup:: real128_io
+   :content-only:
