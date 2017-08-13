@@ -45,6 +45,7 @@ matrix:
           - g++-4.8
           - mercurial
           - autoconf
+          - texinfo
     - env: MPPP_BUILD="CoverageGCC5"
       compiler: gcc
       os: linux
