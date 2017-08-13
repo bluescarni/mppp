@@ -1,16 +1,13 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Multiprecision rationals &#8212; mp++ 0.5 documentation</title>
-    
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -24,7 +21,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Benchmarks" href="benchmarks.html" />
@@ -36,7 +33,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">
+  <body>
   <div class="document">
     
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -124,7 +121,7 @@
 <h2>The <code class="docutils literal"><span class="pre">rational</span></code> class<a class="headerlink" href="#the-rational-class" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt>
-<span class="target" id="mp++classmppp_1_1rational"></span><em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<span class="target" id="classmppp_1_1rational"></span><em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp8rationalE">
 <span id="mppp::rational"></span><em class="property">class </em><code class="descclassname">mppp::</code><code class="descname">rational</code><a class="headerlink" href="#_CPPv2N4mppp8rationalE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Multiprecision rational class. </p>
@@ -135,7 +132,7 @@ Rational numbers are represented in the usual canonical form:</p>
 <li>numerator and denominator are coprime,</li>
 <li>the denominator is always strictly positive.</li>
 </ul>
-<p>This class has the look and feel of a C++ builtin type: it can interact with most of C++&#8217;s integral and
+<p>This class has the look and feel of a C++ builtin type: it can interact with most of C++’s integral and
 floating-point primitive types (see the <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> concept for the full list)
 and with <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integers</span></code></a> with static size <code class="docutils literal"><span class="pre">SSize</span></code>,
 and it provides overloaded <a class="reference internal" href="#rational-operators"><span class="std std-ref">operators</span></a>. Differently from the builtin types,
@@ -195,16 +192,16 @@ type of the floating-point argument).</p>
 <p>The <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> class allows to access and manipulate directly the numerator and denominator
 via the <a class="reference internal" href="#_CPPv2NK4mppp8rational7get_numEv" title="mppp::rational::get_num"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_num()</span></code></a>, <a class="reference internal" href="#_CPPv2NK4mppp8rational7get_denEv" title="mppp::rational::get_den"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_den()</span></code></a>,
 <a class="reference internal" href="#_CPPv2N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal"><span class="pre">_get_num()</span></code></a> and <a class="reference internal" href="#_CPPv2N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal"><span class="pre">_get_den()</span></code></a> methods, so that it is possible
-to use <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> functions directly on numerator and denominator. The mutable getters&#8217; names
+to use <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> functions directly on numerator and denominator. The mutable getters’ names
 <a class="reference internal" href="#_CPPv2N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal"><span class="pre">_get_num()</span></code></a> and <a class="reference internal" href="#_CPPv2N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal"><span class="pre">_get_den()</span></code></a> are prefixed with an underscore
-<code class="docutils literal"><span class="pre">_</span></code> to highlight their potentially dangerous nature: it is the user&#8217;s responsibility to ensure that the canonical
+<code class="docutils literal"><span class="pre">_</span></code> to highlight their potentially dangerous nature: it is the user’s responsibility to ensure that the canonical
 form of the rational is preserved after altering the numerator and/or the denominator via the mutable getters.</p>
  </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Types</p>
 <dl class="type">
 <dt id="_CPPv2N4mppp8rational5int_tE">
-<span id="mppp::rational::int_t"></span><span class="target" id="mp++classmppp_1_1rational_1a7a2a53780ae6aac2236fb221369808b1"></span><em class="property">typedef </em><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descname">int_t</code><a class="headerlink" href="#_CPPv2N4mppp8rational5int_tE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::int_t"></span><span class="target" id="classmppp_1_1rational_1a7a2a53780ae6aac2236fb221369808b1"></span><em class="property">typedef </em><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descname">int_t</code><a class="headerlink" href="#_CPPv2N4mppp8rational5int_tE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Underlying integral type. </p>
 <p><p>This is the <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> type used for the representation of numerator and
 denominator.</p>
@@ -216,20 +213,20 @@ denominator.</p>
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalEv">
-<span id="mppp::rational::rational"></span><span class="target" id="mp++classmppp_1_1rational_1a3c48fe9c90a228bb3ae09e4720f81d7a"></span><code class="descname">rational</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational"></span><span class="target" id="classmppp_1_1rational_1a3c48fe9c90a228bb3ae09e4720f81d7a"></span><code class="descname">rational</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Default constructor. </p>
 <p>The default constructor will initialize <code class="docutils literal"><span class="pre">this</span></code> to 0 (represented as 0/1). </p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalERK8rational">
-<span id="mppp::rational::rational__rationalCR"></span><span class="target" id="mp++classmppp_1_1rational_1ae3b7d8460fa46f139fd2e4274bcb053d"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rational8rationalEv" title="mppp::rational::rational">rational</a>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERK8rational" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__rationalCR"></span><span class="target" id="classmppp_1_1rational_1ae3b7d8460fa46f139fd2e4274bcb053d"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rational8rationalEv" title="mppp::rational::rational">rational</a>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERK8rational" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Defaulted copy constructor. </p>
 </dd></dl>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalERR8rational">
-<span id="mppp::rational::rational__rationalRR"></span><span class="target" id="mp++classmppp_1_1rational_1a661283f4c927e4567f96a0caff80889e"></span><code class="descname">rational</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rational8rationalEv" title="mppp::rational::rational">rational</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERR8rational" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__rationalRR"></span><span class="target" id="classmppp_1_1rational_1a661283f4c927e4567f96a0caff80889e"></span><code class="descname">rational</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rational8rationalEv" title="mppp::rational::rational">rational</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERR8rational" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Move constructor. </p>
 <p>The move constructor will leave <code class="docutils literal"><span class="pre">other</span></code> in an unspecified but valid state.</p>
 <p><dl class="docutils">
@@ -246,7 +243,7 @@ denominator.</p>
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mppp8rational8rationalERR1T">
-<span id="mppp::rational::rational__TRR"></span><span class="target" id="mp++classmppp_1_1rational_1aed79deddde586b207486329098e5e738"></span><code class="descname">rational</code><span class="sig-paren">(</span>T &amp;&amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__TRR"></span><span class="target" id="classmppp_1_1rational_1aed79deddde586b207486329098e5e738"></span><code class="descname">rational</code><span class="sig-paren">(</span>T &amp;&amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Integral constructor. </p>
 <p>This constructor is enabled only if <code class="docutils literal"><span class="pre">T</span></code> satisfies the <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="mppp::RationalIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalIntegralInteroperable</span></code></a> concept.
 The constructor will initialize the numerator with <code class="docutils literal"><span class="pre">n</span></code> and the denominator will be set to 1.</p>
@@ -262,7 +259,7 @@ The constructor will initialize the numerator with <code class="docutils literal
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalERK23RationalFPInteroperableI5SSizeE">
-<span id="mppp::rational::rational__RationalFPInteroperable:SSize:CR"></span><span class="target" id="mp++classmppp_1_1rational_1a9378fa804c1d1e8787701fb2bddef626"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp23RationalFPInteroperableE" title="mppp::RationalFPInteroperable">RationalFPInteroperable</a>&lt;SSize&gt; &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERK23RationalFPInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__RationalFPInteroperable:SSize:CR"></span><span class="target" id="classmppp_1_1rational_1a9378fa804c1d1e8787701fb2bddef626"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp23RationalFPInteroperableE" title="mppp::RationalFPInteroperable">RationalFPInteroperable</a>&lt;SSize&gt; &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERK23RationalFPInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Floating-point constructor. </p>
 <p>This constructor will initialize a rational with the floating-point value <code class="docutils literal"><span class="pre">x</span></code>. The construction will fail if <code class="docutils literal"><span class="pre">x</span></code>
 is not finite.</p>
@@ -285,7 +282,7 @@ is not finite.</p>
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2N4mppp8rational8rationalERR1TRR1Ub">
-<span id="mppp::rational::rational__TRR.URR.b"></span><span class="target" id="mp++classmppp_1_1rational_1af358e3b13dd8c3a51f2e4369c74c8ed8"></span><code class="descname">rational</code><span class="sig-paren">(</span>T &amp;&amp;<em>n</em>, U &amp;&amp;<em>d</em>, bool <em>make_canonical</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERR1TRR1Ub" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__TRR.URR.b"></span><span class="target" id="classmppp_1_1rational_1af358e3b13dd8c3a51f2e4369c74c8ed8"></span><code class="descname">rational</code><span class="sig-paren">(</span>T &amp;&amp;<em>n</em>, U &amp;&amp;<em>d</em>, bool <em>make_canonical</em> = true<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERR1TRR1Ub" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from numerator and denominator. </p>
 <p><p>This constructor is enabled only if both <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy the
 <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="mppp::RationalIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalIntegralInteroperable</span></code></a> concept. The input value <code class="docutils literal"><span class="pre">n</span></code> will be used to initialise the
@@ -294,7 +291,7 @@ numerator, while <code class="docutils literal"><span class="pre">d</span></code
 of numerator and denominator.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">If this constructor is called with <code class="docutils literal"><span class="pre">make_canonical</span></code> set to <code class="docutils literal"><span class="pre">false</span></code>, it will be the user&#8217;s responsibility
+<p class="last">If this constructor is called with <code class="docutils literal"><span class="pre">make_canonical</span></code> set to <code class="docutils literal"><span class="pre">false</span></code>, it will be the user’s responsibility
 to ensure that <code class="docutils literal"><span class="pre">this</span></code> is canonicalised before using it with other mp++ functions. Failure to do
 so will result in undefined behaviour.</p>
 </div>
@@ -309,7 +306,7 @@ so will result in undefined behaviour.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#mp++structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the denominator is zero. </li>
+<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the denominator is zero. </li>
 </ul>
 </dd>
 </dl>
@@ -318,7 +315,7 @@ so will result in undefined behaviour.</p>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalEPKci">
-<span id="mppp::rational::rational__cCP.i"></span><span class="target" id="mp++classmppp_1_1rational_1a8a6aaadffc797aa05310882103f6b584"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEPKci" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__cCP.i"></span><span class="target" id="classmppp_1_1rational_1a8a6aaadffc797aa05310882103f6b584"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEPKci" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from C string. </p>
 <p>This constructor will initialize <code class="docutils literal"><span class="pre">this</span></code> from the null-terminated string <code class="docutils literal"><span class="pre">s</span></code>, which must represent
 a rational value in base <code class="docutils literal"><span class="pre">base</span></code>. The expected format is either a numerator-denominator pair separated
@@ -334,8 +331,8 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#mp++structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the denominator is zero. </li>
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the string constructor of <a class="reference internal" href="integer.html#mp++classmppp_1_1integer"><span class="std std-ref">mppp::integer</span></a>. </li>
+<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the denominator is zero. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the string constructor of <a class="reference internal" href="integer.html#classmppp_1_1integer"><span class="std std-ref">mppp::integer</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -344,7 +341,7 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalERKNSt6stringEi">
-<span id="mppp::rational::rational__ssCR.i"></span><span class="target" id="mp++classmppp_1_1rational_1ad1c7406ebd962a0c5133bc29a9187928"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERKNSt6stringEi" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__ssCR.i"></span><span class="target" id="classmppp_1_1rational_1ad1c7406ebd962a0c5133bc29a9187928"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERKNSt6stringEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from C++ string (equivalent to the constructor from C string). </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
@@ -364,7 +361,7 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalEPKcPKci">
-<span id="mppp::rational::rational__cCP.cCP.i"></span><span class="target" id="mp++classmppp_1_1rational_1af8f2af54f3e3b5a5f882f3c7289311dd"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>begin</em>, <em class="property">const</em> char *<em>end</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEPKcPKci" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__cCP.cCP.i"></span><span class="target" id="classmppp_1_1rational_1af8f2af54f3e3b5a5f882f3c7289311dd"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>begin</em>, <em class="property">const</em> char *<em>end</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEPKcPKci" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from range of characters. </p>
 <p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> from the content of the input half-open range, which is interpreted as the string representation of a rational in base <code class="docutils literal"><span class="pre">base</span></code>.</p>
 <p>Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and invoke the constructor from C string.</p>
@@ -387,7 +384,7 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalERKNSt11string_viewEi">
-<span id="mppp::rational::rational__std::string_viewCR.i"></span><span class="target" id="mp++classmppp_1_1rational_1a2b3bbd472378ae2c56757bd0824db819"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERKNSt11string_viewEi" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__std::string_viewCR.i"></span><span class="target" id="classmppp_1_1rational_1a2b3bbd472378ae2c56757bd0824db819"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERKNSt11string_viewEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from string view. </p>
 <p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> from the content of the input string view, which is interpreted as the string representation of a rational in base <code class="docutils literal"><span class="pre">base</span></code>.</p>
 <p>Internally, the constructor will invoke the constructor from a range of characters.</p>
@@ -414,12 +411,12 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalEK5mpz_t">
-<span id="mppp::rational::rational__mpz_tC"></span><span class="target" id="mp++classmppp_1_1rational_1a7d893a097af766545dc29019034d8806"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__mpz_tC"></span><span class="target" id="classmppp_1_1rational_1a7d893a097af766545dc29019034d8806"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
 <p>This constructor will initialise the numerator of <code class="docutils literal"><span class="pre">this</span></code> with the input GMP integer <code class="docutils literal"><span class="pre">n</span></code>, and the denominator to 1.</p>
 <p><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">It is the user&#8217;s responsibility to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this constructor
+<p class="last">It is the user’s responsibility to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this constructor
 with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> results in undefined behaviour.</p>
 </div>
 </p>
@@ -435,12 +432,12 @@ with an uninitialized <code class="docutils literal"><span class="pre">n</span><
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8rationalEK5mpq_t">
-<span id="mppp::rational::rational__mpq_tC"></span><span class="target" id="mp++classmppp_1_1rational_1a849d38261dd51a49652db607aaf9d617"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> mpq_t <em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEK5mpq_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::rational__mpq_tC"></span><span class="target" id="classmppp_1_1rational_1a849d38261dd51a49652db607aaf9d617"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> mpq_t <em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEK5mpq_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from <code class="docutils literal"><span class="pre">mpq_t</span></code>. </p>
 <p>This constructor will initialise the numerator and denominator of <code class="docutils literal"><span class="pre">this</span></code> with those of the GMP rational <code class="docutils literal"><span class="pre">q</span></code>.</p>
 <p><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">It is the user&#8217;s responsibility to ensure that <code class="docutils literal"><span class="pre">q</span></code> has been correctly initialized. Calling this constructor
+<p class="last">It is the user’s responsibility to ensure that <code class="docutils literal"><span class="pre">q</span></code> has been correctly initialized. Calling this constructor
 with an uninitialized <code class="docutils literal"><span class="pre">q</span></code> results in undefined behaviour. Also, this constructor will <strong>not</strong>
 canonicalise <code class="docutils literal"><span class="pre">this</span></code>: numerator and denominator are constructed as-is from <code class="docutils literal"><span class="pre">q</span></code>.</p>
 </div>
@@ -457,7 +454,7 @@ canonicalise <code class="docutils literal"><span class="pre">this</span></code>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rationalaSERK8rational">
-<span id="mppp::rational::assign-operator__rationalCR"></span><span class="target" id="mp++classmppp_1_1rational_1a8349e8c65433dd7c1104210fd5c3f2a8"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERK8rational" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::assign-operator__rationalCR"></span><span class="target" id="classmppp_1_1rational_1a8349e8c65433dd7c1104210fd5c3f2a8"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERK8rational" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Defaulted copy-assignment operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -468,7 +465,7 @@ canonicalise <code class="docutils literal"><span class="pre">this</span></code>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rationalaSERR8rational">
-<span id="mppp::rational::assign-operator__rationalRR"></span><span class="target" id="mp++classmppp_1_1rational_1a7d55e28c994cad3507b140d2af952d7a"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERR8rational" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::assign-operator__rationalRR"></span><span class="target" id="classmppp_1_1rational_1a7d55e28c994cad3507b140d2af952d7a"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERR8rational" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Defaulted move assignment operator. </p>
 <p>After the assignment, <code class="docutils literal"><span class="pre">other</span></code> is left in an unspecified but valid state.</p>
 <p><dl class="docutils">
@@ -485,13 +482,13 @@ canonicalise <code class="docutils literal"><span class="pre">this</span></code>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rationalaSEK5mpz_t">
-<span id="mppp::rational::assign-operator__mpz_tC"></span><span class="target" id="mp++classmppp_1_1rational_1ab6bd9113f5891c91548aba16ca5f9ae1"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::assign-operator__mpz_tC"></span><span class="target" id="classmppp_1_1rational_1ab6bd9113f5891c91548aba16ca5f9ae1"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
 <p><p>This assignment operator will copy into the numerator of <code class="docutils literal"><span class="pre">this</span></code> the value of the GMP integer <code class="docutils literal"><span class="pre">n</span></code>,
 and it will set the denominator to 1 via <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer7set_oneEv" title="mppp::integer::set_one"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::set_one()</span></code></a>.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">It is the user&#8217;s responsibility to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this operator
+<p class="last">It is the user’s responsibility to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this operator
 with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> results in undefined behaviour. Also, no aliasing is allowed:
 the data in <code class="docutils literal"><span class="pre">n</span></code> must be completely distinct from the data in <code class="docutils literal"><span class="pre">this</span></code> (e.g., if <code class="docutils literal"><span class="pre">n</span></code> is an <code class="docutils literal"><span class="pre">mpz_view</span></code> of
 the numerator of <code class="docutils literal"><span class="pre">this</span></code> then it might point to internal data of <code class="docutils literal"><span class="pre">this</span></code>, and the behaviour of this operator
@@ -512,12 +509,12 @@ will thus be undefined).</p>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rationalaSEK5mpq_t">
-<span id="mppp::rational::assign-operator__mpq_tC"></span><span class="target" id="mp++classmppp_1_1rational_1aa37146ad247896396571968872f2dfb0"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> mpq_t <em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSEK5mpq_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::assign-operator__mpq_tC"></span><span class="target" id="classmppp_1_1rational_1aa37146ad247896396571968872f2dfb0"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> mpq_t <em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSEK5mpq_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from <code class="docutils literal"><span class="pre">mpq_t</span></code>. </p>
 <p>This assignment operator will copy into <code class="docutils literal"><span class="pre">this</span></code> the value of the GMP rational <code class="docutils literal"><span class="pre">q</span></code>.</p>
 <p><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">It is the user&#8217;s responsibility to ensure that <code class="docutils literal"><span class="pre">q</span></code> has been correctly initialized. Calling this operator
+<p class="last">It is the user’s responsibility to ensure that <code class="docutils literal"><span class="pre">q</span></code> has been correctly initialized. Calling this operator
 with an uninitialized <code class="docutils literal"><span class="pre">q</span></code> results in undefined behaviour. Also, this operator will <strong>not</strong> canonicalise
 the assigned value: numerator and denominator are assigned as-is from <code class="docutils literal"><span class="pre">q</span></code>. Finally, no aliasing is allowed:
 the data in <code class="docutils literal"><span class="pre">q</span></code> must be completely distinct from the data in <code class="docutils literal"><span class="pre">this</span></code>.</p>
@@ -539,7 +536,7 @@ the data in <code class="docutils literal"><span class="pre">q</span></code> mus
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mppp8rationalaSERR1T">
-<span id="mppp::rational::assign-operator__TRR"></span><span class="target" id="mp++classmppp_1_1rational_1af9d3c3dc9b609cacb825598814c0621b"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span>T &amp;&amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::assign-operator__TRR"></span><span class="target" id="classmppp_1_1rational_1af9d3c3dc9b609cacb825598814c0621b"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span>T &amp;&amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from integrals. </p>
 <p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> satisfies the <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="mppp::RationalIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalIntegralInteroperable</span></code></a> concept.
 <code class="docutils literal"><span class="pre">n</span></code> will be assigned to the numerator, and <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer7set_oneEv" title="mppp::integer::set_one"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::set_one()</span></code></a> will be called on the denominator.</p>
@@ -557,7 +554,7 @@ the data in <code class="docutils literal"><span class="pre">q</span></code> mus
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rationalaSERK23RationalFPInteroperableI5SSizeE">
-<span id="mppp::rational::assign-operator__RationalFPInteroperable:SSize:CR"></span><span class="target" id="mp++classmppp_1_1rational_1ae423cc45f58ef5d4d11d9fe664eb3f64"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp23RationalFPInteroperableE" title="mppp::RationalFPInteroperable">RationalFPInteroperable</a>&lt;SSize&gt; &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERK23RationalFPInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::assign-operator__RationalFPInteroperable:SSize:CR"></span><span class="target" id="classmppp_1_1rational_1ae423cc45f58ef5d4d11d9fe664eb3f64"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp23RationalFPInteroperableE" title="mppp::RationalFPInteroperable">RationalFPInteroperable</a>&lt;SSize&gt; &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERK23RationalFPInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from floating-point values. </p>
 <p><p>The body of this operator is equivalent to:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">rational</span><span class="p">{</span><span class="n">x</span><span class="p">};</span>
@@ -584,7 +581,7 @@ the data in <code class="docutils literal"><span class="pre">q</span></code> mus
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rationalaSEPKc">
-<span id="mppp::rational::assign-operator__cCP"></span><span class="target" id="mp++classmppp_1_1rational_1a517bec1d090f98a83ec315ecdc4ea69b"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::assign-operator__cCP"></span><span class="target" id="classmppp_1_1rational_1a517bec1d090f98a83ec315ecdc4ea69b"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from C string. </p>
 <p><p>The body of this operator is equivalent to:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">rational</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
@@ -611,7 +608,7 @@ the data in <code class="docutils literal"><span class="pre">q</span></code> mus
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rationalaSERKNSt6stringE">
-<span id="mppp::rational::assign-operator__ssCR"></span><span class="target" id="mp++classmppp_1_1rational_1a1994249d6db3e17139f2b8e7bffc4da3"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::assign-operator__ssCR"></span><span class="target" id="classmppp_1_1rational_1a1994249d6db3e17139f2b8e7bffc4da3"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from C++ string (equivalent to the assignment from C string). </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -632,7 +629,7 @@ the data in <code class="docutils literal"><span class="pre">q</span></code> mus
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rationalaSERKNSt11string_viewE">
-<span id="mppp::rational::assign-operator__std::string_viewCR"></span><span class="target" id="mp++classmppp_1_1rational_1ae11810679b956149bf0faae7ec16f4aa"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERKNSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::assign-operator__std::string_viewCR"></span><span class="target" id="classmppp_1_1rational_1ae11810679b956149bf0faae7ec16f4aa"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERKNSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from string view. </p>
 <p><p>The body of this operator is equivalent to:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">rational</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
@@ -663,7 +660,7 @@ the data in <code class="docutils literal"><span class="pre">q</span></code> mus
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp8rational9to_stringEi">
-<span id="mppp::rational::to_string__iC"></span><span class="target" id="mp++classmppp_1_1rational_1a021f2a3687c0cf9a56c3484a514776e9"></span>std::string <code class="descname">to_string</code><span class="sig-paren">(</span>int <em>base</em> = 10<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational9to_stringEi" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::to_string__iC"></span><span class="target" id="classmppp_1_1rational_1a021f2a3687c0cf9a56c3484a514776e9"></span>std::string <code class="descname">to_string</code><span class="sig-paren">(</span>int <em>base</em> = 10<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational9to_stringEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Convert to string. </p>
 <p>This operator will return a string representation of <code class="docutils literal"><span class="pre">this</span></code> in base <code class="docutils literal"><span class="pre">base</span></code>.
 The string format consists of the numerator, followed by the division operator <code class="docutils literal"><span class="pre">/</span></code> and the
@@ -679,7 +676,7 @@ represented in the returned string.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="integer.html#mp++classmppp_1_1integer_1a44da76950f17f77a05e95e1f1581266c"><span class="std std-ref">mppp::integer::to_string()</span></a>. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="integer.html#classmppp_1_1integer_1a44da76950f17f77a05e95e1f1581266c"><span class="std std-ref">mppp::integer::to_string()</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -690,7 +687,7 @@ represented in the returned string.</p>
 <dt>
 <em class="property">template </em>&lt;RationalInteroperable&lt; SSize &gt; <em>T</em>&gt;</dt>
 <dt id="_CPPv2NK4mppp8rationalcv1TEv">
-<span id="mppp::rational::castto-T-operatorC"></span><span class="target" id="mp++classmppp_1_1rational_1a4d76f611aad75ce3a8c867ae42f24610"></span><code class="descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rationalcv1TEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::castto-T-operatorC"></span><span class="target" id="classmppp_1_1rational_1a4d76f611aad75ce3a8c867ae42f24610"></span><code class="descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rationalcv1TEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic conversion operator. </p>
 <p>This operator will convert <code class="docutils literal"><span class="pre">this</span></code> to a <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalInteroperable</span></code></a> type.
 Conversion to <code class="docutils literal"><span class="pre">bool</span></code> yields <code class="docutils literal"><span class="pre">false</span></code> if <code class="docutils literal"><span class="pre">this</span></code> is zero,
@@ -712,7 +709,7 @@ infinities.</p>
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp8rational7get_numEv">
-<span id="mppp::rational::get_numC"></span><span class="target" id="mp++classmppp_1_1rational_1a3fac026998f425baaba7857b7fa36142"></span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">get_num</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational7get_numEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::get_numC"></span><span class="target" id="classmppp_1_1rational_1a3fac026998f425baaba7857b7fa36142"></span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">get_num</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational7get_numEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Const numerator getter. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -723,7 +720,7 @@ infinities.</p>
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp8rational7get_denEv">
-<span id="mppp::rational::get_denC"></span><span class="target" id="mp++classmppp_1_1rational_1ae46a3d8422ca21e9c74894bb0708400d"></span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">get_den</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational7get_denEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::get_denC"></span><span class="target" id="classmppp_1_1rational_1ae46a3d8422ca21e9c74894bb0708400d"></span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">get_den</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational7get_denEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Const denominator getter. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -734,11 +731,11 @@ infinities.</p>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8_get_numEv">
-<span id="mppp::rational::_get_num"></span><span class="target" id="mp++classmppp_1_1rational_1ae1636a4008f72bf3f213efaa53f566fa"></span><a class="reference internal" href="#_CPPv2N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">_get_num</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8_get_numEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::_get_num"></span><span class="target" id="classmppp_1_1rational_1ae1636a4008f72bf3f213efaa53f566fa"></span><a class="reference internal" href="#_CPPv2N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">_get_num</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8_get_numEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Mutable numerator getter. </p>
 <p><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">It is the user&#8217;s responsibility to ensure that, after changing the numerator
+<p class="last">It is the user’s responsibility to ensure that, after changing the numerator
 via this getter, the rational is kept in canonical form.</p>
 </div>
 </p>
@@ -751,11 +748,11 @@ via this getter, the rational is kept in canonical form.</p>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational8_get_denEv">
-<span id="mppp::rational::_get_den"></span><span class="target" id="mp++classmppp_1_1rational_1a13af65c8e1a50afbc54171e7850a0b28"></span><a class="reference internal" href="#_CPPv2N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">_get_den</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8_get_denEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::_get_den"></span><span class="target" id="classmppp_1_1rational_1a13af65c8e1a50afbc54171e7850a0b28"></span><a class="reference internal" href="#_CPPv2N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">_get_den</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8_get_denEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Mutable denominator getter. </p>
 <p><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">It is the user&#8217;s responsibility to ensure that, after changing the denominator
+<p class="last">It is the user’s responsibility to ensure that, after changing the denominator
 via this getter, the rational is kept in canonical form.</p>
 </div>
 </p>
@@ -768,7 +765,7 @@ via this getter, the rational is kept in canonical form.</p>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational12canonicaliseEv">
-<span id="mppp::rational::canonicalise"></span><span class="target" id="mp++classmppp_1_1rational_1a05fae17560bf806ecee6dd68a5d11e8f"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">canonicalise</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational12canonicaliseEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::canonicalise"></span><span class="target" id="classmppp_1_1rational_1a05fae17560bf806ecee6dd68a5d11e8f"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">canonicalise</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational12canonicaliseEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Canonicalise. </p>
 <p><p>This method will put <code class="docutils literal"><span class="pre">this</span></code> in canonical form. In particular, this method
 will make sure that:</p>
@@ -798,7 +795,7 @@ behaviour.</p>
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp8rational12is_canonicalEv">
-<span id="mppp::rational::is_canonicalC"></span><span class="target" id="mp++classmppp_1_1rational_1a11304a33649064627ab816dc036c60b0"></span>bool <code class="descname">is_canonical</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational12is_canonicalEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::is_canonicalC"></span><span class="target" id="classmppp_1_1rational_1a11304a33649064627ab816dc036c60b0"></span>bool <code class="descname">is_canonical</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational12is_canonicalEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Check canonical form. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -809,7 +806,7 @@ behaviour.</p>
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp8rational3sgnEv">
-<span id="mppp::rational::sgnC"></span><span class="target" id="mp++classmppp_1_1rational_1a6fe27d7aba70926eae73a2d02cd2b73c"></span>int <code class="descname">sgn</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational3sgnEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::sgnC"></span><span class="target" id="classmppp_1_1rational_1a6fe27d7aba70926eae73a2d02cd2b73c"></span>int <code class="descname">sgn</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational3sgnEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Sign. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -820,7 +817,7 @@ behaviour.</p>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational3negEv">
-<span id="mppp::rational::neg"></span><span class="target" id="mp++classmppp_1_1rational_1a3a1169a57c6e89978eab94a32a6cedeb"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">neg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational3negEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::neg"></span><span class="target" id="classmppp_1_1rational_1a3a1169a57c6e89978eab94a32a6cedeb"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">neg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational3negEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Negate in-place. </p>
 <p>This method will set <code class="docutils literal"><span class="pre">this</span></code> to <code class="docutils literal"><span class="pre">-this</span></code>.</p>
 <p><dl class="docutils">
@@ -832,7 +829,7 @@ behaviour.</p>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational3absEv">
-<span id="mppp::rational::abs"></span><span class="target" id="mp++classmppp_1_1rational_1ae7c09653e4309bc03f5605c2748684be"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">abs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational3absEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::abs"></span><span class="target" id="classmppp_1_1rational_1ae7c09653e4309bc03f5605c2748684be"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">abs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational3absEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place absolute value. </p>
 <p>This method will set <code class="docutils literal"><span class="pre">this</span></code> to its absolute value.</p>
 <p><dl class="docutils">
@@ -844,7 +841,7 @@ behaviour.</p>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp8rational3invEv">
-<span id="mppp::rational::inv"></span><span class="target" id="mp++classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">inv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational3invEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::inv"></span><span class="target" id="classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">inv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational3invEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place inversion. </p>
 <p>This method will set <code class="docutils literal"><span class="pre">this</span></code> to its inverse.</p>
 <p><dl class="docutils">
@@ -852,7 +849,7 @@ behaviour.</p>
 <dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#mp++structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal"><span class="pre">this</span></code> is zero. </li>
+<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal"><span class="pre">this</span></code> is zero. </li>
 </ul>
 </dd>
 </dl>
@@ -861,7 +858,7 @@ behaviour.</p>
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp8rational7is_zeroEv">
-<span id="mppp::rational::is_zeroC"></span><span class="target" id="mp++classmppp_1_1rational_1a9b63b700ec9a9569055b26a314d0be6e"></span>bool <code class="descname">is_zero</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational7is_zeroEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::is_zeroC"></span><span class="target" id="classmppp_1_1rational_1a9b63b700ec9a9569055b26a314d0be6e"></span>bool <code class="descname">is_zero</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational7is_zeroEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if the value is zero. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -872,7 +869,7 @@ behaviour.</p>
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp8rational6is_oneEv">
-<span id="mppp::rational::is_oneC"></span><span class="target" id="mp++classmppp_1_1rational_1a79ab8ba6ed09f53ee0b6d5238c711e97"></span>bool <code class="descname">is_one</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational6is_oneEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::is_oneC"></span><span class="target" id="classmppp_1_1rational_1a79ab8ba6ed09f53ee0b6d5238c711e97"></span>bool <code class="descname">is_one</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational6is_oneEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if the value is one. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -883,7 +880,7 @@ behaviour.</p>
 
 <dl class="function">
 <dt id="_CPPv2NK4mppp8rational15is_negative_oneEv">
-<span id="mppp::rational::is_negative_oneC"></span><span class="target" id="mp++classmppp_1_1rational_1aa0d419df3c3d55582c48be8879dd0edf"></span>bool <code class="descname">is_negative_one</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational15is_negative_oneEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::is_negative_oneC"></span><span class="target" id="classmppp_1_1rational_1aa0d419df3c3d55582c48be8879dd0edf"></span>bool <code class="descname">is_negative_one</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational15is_negative_oneEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if the value is minus one. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -897,7 +894,7 @@ behaviour.</p>
 <p class="breathe-sectiondef-title rubric">Public Static Attributes</p>
 <dl class="member">
 <dt id="_CPPv2N4mppp8rational5ssizeE">
-<span id="mppp::rational::ssize__std::s"></span><span class="target" id="mp++classmppp_1_1rational_1aa79497871e8d96a8fe70fc286ed7aa5e"></span><em class="property">constexpr</em> std::size_t <code class="descname">ssize</code> = SSize<a class="headerlink" href="#_CPPv2N4mppp8rational5ssizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rational::ssize__std::s"></span><span class="target" id="classmppp_1_1rational_1aa79497871e8d96a8fe70fc286ed7aa5e"></span><em class="property">constexpr</em> std::size_t <code class="descname">ssize</code> = SSize<a class="headerlink" href="#_CPPv2N4mppp8rational5ssizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Alias for the template parameter <code class="docutils literal"><span class="pre">SSize</span></code>. </p>
 </dd></dl>
 
@@ -957,7 +954,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3addER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE">
-<span id="mppp::add__rational:SSize:R.rational:SSize:CR.rational:SSize:CR"></span><span class="target" id="mp++group__rational__arithmetic_1ga7f57c2e665f66f9b1fb778d829a7be1b"></span>void <code class="descclassname">mppp::</code><code class="descname">add</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3addER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::add__rational:SSize:R.rational:SSize:CR.rational:SSize:CR"></span><span class="target" id="group__rational__arithmetic_1ga7f57c2e665f66f9b1fb778d829a7be1b"></span>void <code class="descclassname">mppp::</code><code class="descname">add</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3addER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary addition. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">+</span> <span class="pre">op2</span></code>.</p>
 <p><dl class="docutils">
@@ -976,7 +973,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3subER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE">
-<span id="mppp::sub__rational:SSize:R.rational:SSize:CR.rational:SSize:CR"></span><span class="target" id="mp++group__rational__arithmetic_1ga493d8960624eb92ffac127c10e9632f9"></span>void <code class="descclassname">mppp::</code><code class="descname">sub</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3subER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::sub__rational:SSize:R.rational:SSize:CR.rational:SSize:CR"></span><span class="target" id="group__rational__arithmetic_1ga493d8960624eb92ffac127c10e9632f9"></span>void <code class="descclassname">mppp::</code><code class="descname">sub</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3subER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary subtraction. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">-</span> <span class="pre">op2</span></code>.</p>
 <p><dl class="docutils">
@@ -995,7 +992,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3mulER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE">
-<span id="mppp::mul__rational:SSize:R.rational:SSize:CR.rational:SSize:CR"></span><span class="target" id="mp++group__rational__arithmetic_1gac84d06ceb79d685bb45c4bcfe630e87d"></span>void <code class="descclassname">mppp::</code><code class="descname">mul</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3mulER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mul__rational:SSize:R.rational:SSize:CR.rational:SSize:CR"></span><span class="target" id="group__rational__arithmetic_1gac84d06ceb79d685bb45c4bcfe630e87d"></span>void <code class="descclassname">mppp::</code><code class="descname">mul</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3mulER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary multiplication. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">*</span> <span class="pre">op2</span></code>.</p>
 <p><dl class="docutils">
@@ -1014,7 +1011,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3divER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE">
-<span id="mppp::div__rational:SSize:R.rational:SSize:CR.rational:SSize:CR"></span><span class="target" id="mp++group__rational__arithmetic_1ga89078975a701749bad2079f29a420a60"></span>void <code class="descclassname">mppp::</code><code class="descname">div</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3divER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::div__rational:SSize:R.rational:SSize:CR.rational:SSize:CR"></span><span class="target" id="group__rational__arithmetic_1ga89078975a701749bad2079f29a420a60"></span>void <code class="descclassname">mppp::</code><code class="descname">div</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3divER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary division. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">/</span> <span class="pre">op2</span></code>.</p>
 <p><dl class="docutils">
@@ -1027,7 +1024,7 @@ convenience/generic overloads is provided as well.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#mp++structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal"><span class="pre">op2</span></code> is zero. </li>
+<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal"><span class="pre">op2</span></code> is zero. </li>
 </ul>
 </dd>
 </dl>
@@ -1038,7 +1035,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3negER8rationalI5SSizeERK8rationalI5SSizeE">
-<span id="mppp::neg__rational:SSize:R.rational:SSize:CR"></span><span class="target" id="mp++group__rational__arithmetic_1gacb7def1fc1570f6c1fbdefe359290cac"></span>void <code class="descclassname">mppp::</code><code class="descname">neg</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3negER8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::neg__rational:SSize:R.rational:SSize:CR"></span><span class="target" id="group__rational__arithmetic_1gacb7def1fc1570f6c1fbdefe359290cac"></span>void <code class="descclassname">mppp::</code><code class="descname">neg</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3negER8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary negation. </p>
 <p>This method will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">-q</span></code>.</p>
 <p><dl class="docutils">
@@ -1056,7 +1053,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3negERK8rationalI5SSizeE">
-<span id="mppp::neg__rational:SSize:CR"></span><span class="target" id="mp++group__rational__arithmetic_1ga6908b8c5b5fb967edb6d95fc0fdb1bf1"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">neg</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3negERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::neg__rational:SSize:CR"></span><span class="target" id="group__rational__arithmetic_1ga6908b8c5b5fb967edb6d95fc0fdb1bf1"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">neg</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3negERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Unary negation. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1074,7 +1071,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3absER8rationalI5SSizeERK8rationalI5SSizeE">
-<span id="mppp::abs__rational:SSize:R.rational:SSize:CR"></span><span class="target" id="mp++group__rational__arithmetic_1ga7fd4c9aba6705fe70e2ab3a710de6376"></span>void <code class="descclassname">mppp::</code><code class="descname">abs</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3absER8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::abs__rational:SSize:R.rational:SSize:CR"></span><span class="target" id="group__rational__arithmetic_1ga7fd4c9aba6705fe70e2ab3a710de6376"></span>void <code class="descclassname">mppp::</code><code class="descname">abs</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3absER8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary absolute value. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the absolute value of <code class="docutils literal"><span class="pre">q</span></code>.</p>
 <p><dl class="docutils">
@@ -1092,7 +1089,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3absERK8rationalI5SSizeE">
-<span id="mppp::abs__rational:SSize:CR"></span><span class="target" id="mp++group__rational__arithmetic_1ga0adbcf55e25ae3a8ab6abdb1acd779e3"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">abs</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3absERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::abs__rational:SSize:CR"></span><span class="target" id="group__rational__arithmetic_1ga0adbcf55e25ae3a8ab6abdb1acd779e3"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">abs</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3absERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Unary absolute value. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1110,7 +1107,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3invER8rationalI5SSizeERK8rationalI5SSizeE">
-<span id="mppp::inv__rational:SSize:R.rational:SSize:CR"></span><span class="target" id="mp++group__rational__arithmetic_1gac671593988b476baaf781228ecd729a1"></span>void <code class="descclassname">mppp::</code><code class="descname">inv</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3invER8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::inv__rational:SSize:R.rational:SSize:CR"></span><span class="target" id="group__rational__arithmetic_1gac671593988b476baaf781228ecd729a1"></span>void <code class="descclassname">mppp::</code><code class="descname">inv</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3invER8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary inversion. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the inverse of <code class="docutils literal"><span class="pre">q</span></code>.</p>
 <p><dl class="docutils">
@@ -1122,7 +1119,7 @@ convenience/generic overloads is provided as well.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#mp++classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"><span class="std std-ref">mppp::rational::inv()</span></a>. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"><span class="std std-ref">mppp::rational::inv()</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -1133,7 +1130,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3invERK8rationalI5SSizeE">
-<span id="mppp::inv__rational:SSize:CR"></span><span class="target" id="mp++group__rational__arithmetic_1ga50aeaad94352dc9d0ba5f13818f3e717"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">inv</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3invERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::inv__rational:SSize:CR"></span><span class="target" id="group__rational__arithmetic_1ga50aeaad94352dc9d0ba5f13818f3e717"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">inv</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3invERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Unary inversion. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1145,7 +1142,7 @@ convenience/generic overloads is provided as well.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#mp++classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"><span class="std std-ref">mppp::rational::inv()</span></a>. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"><span class="std std-ref">mppp::rational::inv()</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -1159,7 +1156,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3cmpERK8rationalI5SSizeERK8rationalI5SSizeE">
-<span id="mppp::cmp__rational:SSize:CR.rational:SSize:CR"></span><span class="target" id="mp++group__rational__comparison_1gaa70907f2459776e8b922a5bfc0bbed68"></span>int <code class="descclassname">mppp::</code><code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3cmpERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::cmp__rational:SSize:CR.rational:SSize:CR"></span><span class="target" id="group__rational__comparison_1gaa70907f2459776e8b922a5bfc0bbed68"></span>int <code class="descclassname">mppp::</code><code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3cmpERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Comparison function for rationals. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1178,7 +1175,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3cmpERK8rationalI5SSizeERK7integerI5SSizeE">
-<span id="mppp::cmp__rational:SSize:CR.integer:SSize:CR"></span><span class="target" id="mp++group__rational__comparison_1ga95607f7de9084fc9b5875441ca8aaaf5"></span>int <code class="descclassname">mppp::</code><code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3cmpERK8rationalI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::cmp__rational:SSize:CR.integer:SSize:CR"></span><span class="target" id="group__rational__comparison_1ga95607f7de9084fc9b5875441ca8aaaf5"></span>int <code class="descclassname">mppp::</code><code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3cmpERK8rationalI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Comparison function for rational/integer arguments. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1197,7 +1194,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3cmpERK7integerI5SSizeERK8rationalI5SSizeE">
-<span id="mppp::cmp__integer:SSize:CR.rational:SSize:CR"></span><span class="target" id="mp++group__rational__comparison_1ga1b704f0153b089b5d833025cbf958f1f"></span>int <code class="descclassname">mppp::</code><code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3cmpERK7integerI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::cmp__integer:SSize:CR.rational:SSize:CR"></span><span class="target" id="group__rational__comparison_1ga1b704f0153b089b5d833025cbf958f1f"></span>int <code class="descclassname">mppp::</code><code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3cmpERK7integerI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Comparison function for integer/rational arguments. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1216,7 +1213,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3sgnERK8rationalI5SSizeE">
-<span id="mppp::sgn__rational:SSize:CR"></span><span class="target" id="mp++group__rational__comparison_1gacbbf14408a3f0bbaf2ba0c313ec31b06"></span>int <code class="descclassname">mppp::</code><code class="descname">sgn</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3sgnERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::sgn__rational:SSize:CR"></span><span class="target" id="group__rational__comparison_1gacbbf14408a3f0bbaf2ba0c313ec31b06"></span>int <code class="descclassname">mppp::</code><code class="descname">sgn</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3sgnERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Sign function. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1234,7 +1231,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp6is_oneERK8rationalI5SSizeE">
-<span id="mppp::is_one__rational:SSize:CR"></span><span class="target" id="mp++group__rational__comparison_1gafdb16c343943c5c7752d3f898fc4a8fc"></span>bool <code class="descclassname">mppp::</code><code class="descname">is_one</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6is_oneERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::is_one__rational:SSize:CR"></span><span class="target" id="group__rational__comparison_1gafdb16c343943c5c7752d3f898fc4a8fc"></span>bool <code class="descclassname">mppp::</code><code class="descname">is_one</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6is_oneERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if a rational is one. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1252,7 +1249,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp15is_negative_oneERK8rationalI5SSizeE">
-<span id="mppp::is_negative_one__rational:SSize:CR"></span><span class="target" id="mp++group__rational__comparison_1gadf78f52c66b921788910db9aa4527732"></span>bool <code class="descclassname">mppp::</code><code class="descname">is_negative_one</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp15is_negative_oneERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::is_negative_one__rational:SSize:CR"></span><span class="target" id="group__rational__comparison_1gadf78f52c66b921788910db9aa4527732"></span>bool <code class="descclassname">mppp::</code><code class="descname">is_negative_one</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp15is_negative_oneERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if a rational is minus one. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1270,7 +1267,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp7is_zeroERK8rationalI5SSizeE">
-<span id="mppp::is_zero__rational:SSize:CR"></span><span class="target" id="mp++group__rational__comparison_1gaf7125fea843a943692e7c34f242332a4"></span>bool <code class="descclassname">mppp::</code><code class="descname">is_zero</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7is_zeroERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::is_zero__rational:SSize:CR"></span><span class="target" id="group__rational__comparison_1gaf7125fea843a943692e7c34f242332a4"></span>bool <code class="descclassname">mppp::</code><code class="descname">is_zero</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7is_zeroERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if a rational is zero. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1291,7 +1288,7 @@ convenience/generic overloads is provided as well.</p>
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2N4mppp3powERK1TRK1U">
-<span id="mppp::pow__TCR.UCR"></span><span class="target" id="mp++group__rational__exponentiation_1ga18fa8c7d7911f290bfafced170f9b25e"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">pow</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>base</em>, <em class="property">const</em> U &amp;<em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3powERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::pow__TCR.UCR"></span><span class="target" id="group__rational__exponentiation_1ga18fa8c7d7911f290bfafced170f9b25e"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">pow</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>base</em>, <em class="property">const</em> U &amp;<em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3powERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary exponentiation. </p>
 <p><p>This function is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalOpTypes</span></code></a>.
 The return type is determined as follows:</p>
@@ -1318,7 +1315,7 @@ only in a few special cases (e.g., unitary base, zero exponent, etc.).</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#mp++structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if floating-point types are not involved, <code class="docutils literal"><span class="pre">base</span></code> is zero and <code class="docutils literal"><span class="pre">exp</span></code> is negative. </li>
+<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if floating-point types are not involved, <code class="docutils literal"><span class="pre">base</span></code> is zero and <code class="docutils literal"><span class="pre">exp</span></code> is negative. </li>
 <li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if floating-point types are not involved and <code class="docutils literal"><span class="pre">exp</span></code> is a rational value (except in a handful of special cases). </li>
 </ul>
 </dd>
@@ -1333,7 +1330,7 @@ only in a few special cases (e.g., unitary base, zero exponent, etc.).</p>
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppplsERNSt7ostreamERK8rationalI5SSizeE">
-<span id="mppp::lshift-operator__osR.rational:SSize:CR"></span><span class="target" id="mp++group__rational__io_1ga921345f6ebee5dd32dad109bebe469d6"></span>std::ostream &amp;<code class="descclassname">mppp::</code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span>std::ostream &amp;<em>os</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppplsERNSt7ostreamERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::lshift-operator__osR.rational:SSize:CR"></span><span class="target" id="group__rational__io_1ga921345f6ebee5dd32dad109bebe469d6"></span>std::ostream &amp;<code class="descclassname">mppp::</code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span>std::ostream &amp;<em>os</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppplsERNSt7ostreamERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Output stream operator. </p>
 <p>This operator will print to the stream <code class="docutils literal"><span class="pre">os</span></code> the <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> <code class="docutils literal"><span class="pre">q</span></code> in base 10.
 The printing format is described in <a class="reference internal" href="#_CPPv2NK4mppp8rational9to_stringEi" title="mppp::rational::to_string"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::rational::to_string()</span></code></a>.</p>
@@ -1348,7 +1345,7 @@ The printing format is described in <a class="reference internal" href="#_CPPv2N
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#mp++classmppp_1_1rational_1a021f2a3687c0cf9a56c3484a514776e9"><span class="std std-ref">mppp::rational::to_string()</span></a>. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1rational_1a021f2a3687c0cf9a56c3484a514776e9"><span class="std std-ref">mppp::rational::to_string()</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -1359,7 +1356,7 @@ The printing format is described in <a class="reference internal" href="#_CPPv2N
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppprsERNSt7istreamER8rationalI5SSizeE">
-<span id="mppp::rshift-operator__isR.rational:SSize:R"></span><span class="target" id="mp++group__rational__io_1gae10c345ac27825e91c56afdf16298cb9"></span>std::istream &amp;<code class="descclassname">mppp::</code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span>std::istream &amp;<em>is</em>, <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprsERNSt7istreamER8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::rshift-operator__isR.rational:SSize:R"></span><span class="target" id="group__rational__io_1gae10c345ac27825e91c56afdf16298cb9"></span>std::istream &amp;<code class="descclassname">mppp::</code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span>std::istream &amp;<em>is</em>, <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprsERNSt7istreamER8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Input stream operator. </p>
 <p>This operator is equivalent to extracting a line from the stream, using it to construct a temporary
 <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> and then assigning the temporary to <code class="docutils literal"><span class="pre">q</span></code>.</p>
@@ -1388,7 +1385,7 @@ The printing format is described in <a class="reference internal" href="#_CPPv2N
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp12canonicaliseER8rationalI5SSizeE">
-<span id="mppp::canonicalise__rational:SSize:R"></span><span class="target" id="mp++group__rational__other_1ga6898ea275181962c4bf2d4896373dbc0"></span>void <code class="descclassname">mppp::</code><code class="descname">canonicalise</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp12canonicaliseER8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::canonicalise__rational:SSize:R"></span><span class="target" id="group__rational__other_1ga6898ea275181962c4bf2d4896373dbc0"></span>void <code class="descclassname">mppp::</code><code class="descname">canonicalise</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp12canonicaliseER8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Canonicalise. </p>
 <p>This function will put <code class="docutils literal"><span class="pre">q</span></code> in canonical form. Internally, this function will employ
 <a class="reference internal" href="#_CPPv2N4mppp8rational12canonicaliseEv" title="mppp::rational::canonicalise"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::rational::canonicalise()</span></code></a>.</p>
@@ -1406,7 +1403,7 @@ The printing format is described in <a class="reference internal" href="#_CPPv2N
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp4hashERK8rationalI5SSizeE">
-<span id="mppp::hash__rational:SSize:CR"></span><span class="target" id="mp++group__rational__other_1gaf1eb15ff76a2fad2de1579a8c081bb6c"></span>std::size_t <code class="descclassname">mppp::</code><code class="descname">hash</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp4hashERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::hash__rational:SSize:CR"></span><span class="target" id="group__rational__other_1gaf1eb15ff76a2fad2de1579a8c081bb6c"></span>std::size_t <code class="descclassname">mppp::</code><code class="descname">hash</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp4hashERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Hash value. </p>
 <p><p>This function will return a hash value for <code class="docutils literal"><span class="pre">q</span></code>.</p>
 <p>A specialisation of the standard <code class="docutils literal"><span class="pre">std::hash</span></code> functor is also provided, so that it is possible to use
@@ -1434,7 +1431,7 @@ is typically built on top of basic <a class="reference internal" href="#rational
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mpppplERK8rationalI5SSizeE">
-<span id="mppp::add-operator__rational:SSize:CR"></span><span class="target" id="mp++group__rational__operators_1gaddf7e296ae7c8541ba70c7327f7441b8"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::add-operator__rational:SSize:CR"></span><span class="target" id="group__rational__operators_1gaddf7e296ae7c8541ba70c7327f7441b8"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Identity operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1452,7 +1449,7 @@ is typically built on top of basic <a class="reference internal" href="#rational
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2N4mpppplERK1TRK1U">
-<span id="mppp::add-operator__TCR.UCR"></span><span class="target" id="mp++group__rational__operators_1ga3b82a25ca521cc58a747fd17d9e63fdd"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::add-operator__TCR.UCR"></span><span class="target" id="group__rational__operators_1ga3b82a25ca521cc58a747fd17d9e63fdd"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary addition operator. </p>
 <p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalOpTypes</span></code></a>.
 The return type is determined as follows:</p>
@@ -1479,7 +1476,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mppppLER1TRK15RationalOpTypesI1TE">
-<span id="mppp::add-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="mp++group__rational__operators_1gac2b0fa08c303fde8d49405669b6f73e7"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator+=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppppLER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::add-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1gac2b0fa08c303fde8d49405669b6f73e7"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator+=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppppLER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place addition operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1492,7 +1489,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#mp++classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -1503,7 +1500,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mpppmiERK8rationalI5SSizeE">
-<span id="mppp::sub-operator__rational:SSize:CR"></span><span class="target" id="mp++group__rational__operators_1ga26ea5e90afe2b592de66cdb889576916"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::sub-operator__rational:SSize:CR"></span><span class="target" id="group__rational__operators_1ga26ea5e90afe2b592de66cdb889576916"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Negated copy. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1521,7 +1518,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2N4mpppmiERK1TRK1U">
-<span id="mppp::sub-operator__TCR.UCR"></span><span class="target" id="mp++group__rational__operators_1gad72c6dfc2507a2fd68474e3e52a01a07"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::sub-operator__TCR.UCR"></span><span class="target" id="group__rational__operators_1gad72c6dfc2507a2fd68474e3e52a01a07"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary subtraction operator. </p>
 <p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalOpTypes</span></code></a>.
 The return type is determined as follows:</p>
@@ -1548,7 +1545,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmIER1TRK15RationalOpTypesI1TE">
-<span id="mppp::sub-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="mp++group__rational__operators_1gafd853682b796919fbab07f98d0a07119"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator-=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmIER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::sub-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1gafd853682b796919fbab07f98d0a07119"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator-=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmIER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place subtraction operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1561,7 +1558,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#mp++classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -1572,7 +1569,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2N4mpppmlERK1TRK1U">
-<span id="mppp::mul-operator__TCR.UCR"></span><span class="target" id="mp++group__rational__operators_1ga1238b9f0c25ea3d7ca0147872ddf1421"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmlERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mul-operator__TCR.UCR"></span><span class="target" id="group__rational__operators_1ga1238b9f0c25ea3d7ca0147872ddf1421"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmlERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary multiplication operator. </p>
 <p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalOpTypes</span></code></a>.
 The return type is determined as follows:</p>
@@ -1599,7 +1596,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmLER1TRK15RationalOpTypesI1TE">
-<span id="mppp::mul-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="mp++group__rational__operators_1gac2432e9c6d2a359fd8056d07a73790cc"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator*=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmLER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mul-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1gac2432e9c6d2a359fd8056d07a73790cc"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator*=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmLER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place multiplication operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1612,7 +1609,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#mp++classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -1623,7 +1620,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
 <dt id="_CPPv2N4mpppdvERK1TRK1U">
-<span id="mppp::div-operator__TCR.UCR"></span><span class="target" id="mp++group__rational__operators_1ga67aade0367e5e37cbb9784bf98f7f9fd"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdvERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::div-operator__TCR.UCR"></span><span class="target" id="group__rational__operators_1ga67aade0367e5e37cbb9784bf98f7f9fd"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdvERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary division operator. </p>
 <p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalOpTypes</span></code></a>.
 The return type is determined as follows:</p>
@@ -1644,7 +1641,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#mp++structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the division does not involve floating-point types and <code class="docutils literal"><span class="pre">op2</span></code> is zero. </li>
+<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the division does not involve floating-point types and <code class="docutils literal"><span class="pre">op2</span></code> is zero. </li>
 </ul>
 </dd>
 </dl>
@@ -1655,7 +1652,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppdVER1TRK15RationalOpTypesI1TE">
-<span id="mppp::div-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="mp++group__rational__operators_1ga5c078a6aeaf8d7294eb99c7634a09734"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator/=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdVER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::div-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga5c078a6aeaf8d7294eb99c7634a09734"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator/=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdVER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place division operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1668,8 +1665,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#mp++structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal"><span class="pre">op</span></code> is zero and only integral types are involved in the division. </li>
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#mp++classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
+<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal"><span class="pre">op</span></code> is zero and only integral types are involved in the division. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -1680,7 +1677,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppeqERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::eq-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="mp++group__rational__operators_1ga7bb53add7c94449c1f70bb1a24e2081a"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeqERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::eq-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga7bb53add7c94449c1f70bb1a24e2081a"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeqERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Equality operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1699,7 +1696,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppneERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::neq-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="mp++group__rational__operators_1ga521dfee45ad39a1de85e006160473632"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::neq-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga521dfee45ad39a1de85e006160473632"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Inequality operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1718,7 +1715,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppltERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::lt-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="mp++group__rational__operators_1ga1bec5fef12870390638ff5d45cfc9978"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppltERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::lt-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga1bec5fef12870390638ff5d45cfc9978"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppltERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Less-than operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1737,7 +1734,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppleERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::lte-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="mp++group__rational__operators_1ga9092a9305783c4c8493874b24f5bfdd5"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppleERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::lte-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga9092a9305783c4c8493874b24f5bfdd5"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppleERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Less-than or equal operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1756,7 +1753,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppgtERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::gt-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="mp++group__rational__operators_1ga22eef9e9823d3e65017f46254dfc0429"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgtERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::gt-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga22eef9e9823d3e65017f46254dfc0429"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgtERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Greater-than operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1775,7 +1772,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppgeERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::gte-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="mp++group__rational__operators_1ga6ba9627ffac4c491589844f08100b2b7"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgeERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::gte-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga6ba9627ffac4c491589844f08100b2b7"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgeERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Greater-than or equal operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1803,7 +1800,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
       &copy;2016-2017, Francesco Biscani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

@@ -1,16 +1,13 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Benchmarks &#8212; mp++ 0.5 documentation</title>
-    
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -24,7 +21,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Changelog" href="changelog.html" />
@@ -36,7 +33,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">
+  <body>
   <div class="document">
     
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -179,7 +176,7 @@ are initialised with both positive <em>and</em> negative values.</p>
 <p>The presence of both positive and negative values has a noticeable performance impact with respect to the previous test
 for all libraries, both during the initialisation of the vectors and in the arithmetic part of the benchmark.
 This is due to the fact that sign handling in multiprecision computations is typically implemented
-with branches, and when positive and negative values are equally likely the effectiveness of the CPU&#8217;s branch predictor
+with branches, and when positive and negative values are equally likely the effectiveness of the CPU’s branch predictor
 is much reduced.</p>
 <p>The performance advantage of mp++ with respect to the other libraries is retained, albeit by a smaller margin.</p>
 </div>
@@ -191,7 +188,7 @@ mp++ integers with 2 limbs of static size are now employed.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer2_dot_product_unsigned.svg"><img alt="_images/integer2_dot_product_unsigned.svg" src="_images/integer2_dot_product_unsigned.svg" width="100%" /></a>
 </div>
-<p>The benchmark shows that mp++&#8217;s specialised arithmetic functions pay off in terms of raw performance in this scenario.</p>
+<p>The benchmark shows that mp++’s specialised arithmetic functions pay off in terms of raw performance in this scenario.</p>
 </div>
 <div class="section" id="id3">
 <h4>2-limb signed integers<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
@@ -211,7 +208,7 @@ value, the element-wise product of the two vectors is stored in a third vector, 
 dot product is computed as the sum of the values in this third vector.</p>
 <p>This allows to measure the efficiency
 of the multiplication and addition operations (whereas in the dot product benchmark the multiply-add primitives were
-employed), and it also increases the pressure on the memory subsystem (due to the need to write the elements&#8217; products
+employed), and it also increases the pressure on the memory subsystem (due to the need to write the elements’ products
 into a vector rather than accumulating them directly into a scalar).</p>
 <div class="section" id="integer1-vec-mul-unsigned">
 <span id="id4"></span><h4>1-limb unsigned integers<a class="headerlink" href="#integer1-vec-mul-unsigned" title="Permalink to this headline">¶</a></h4>
@@ -222,7 +219,7 @@ is less than <span class="math">\(2^{64}\)</span>. mp++ integers with 1 limb of 
 </div>
 <p>This time mp++ is more than 5 times faster than GMP in the arithmetic portion of the benchmark, while still maintaining
 a performance advantage over <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT. The performance of <code class="docutils literal"><span class="pre">cpp_int</span></code> might be hurt by its relatively large
-memory footprint (32 bytes vs mp++&#8217;s 16 and FLINT&#8217;s 8).</p>
+memory footprint (32 bytes vs mp++’s 16 and FLINT’s 8).</p>
 </div>
 <div class="section" id="id5">
 <h4>1-limb signed integers<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
@@ -241,7 +238,7 @@ mp++ integers with 2 limbs of static size are now employed.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer2_vec_mul_unsigned.svg"><img alt="_images/integer2_vec_mul_unsigned.svg" src="_images/integer2_vec_mul_unsigned.svg" width="100%" /></a>
 </div>
-<p>The benchmark shows again that mp++&#8217;s specialised arithmetic functions deliver strong performance.</p>
+<p>The benchmark shows again that mp++’s specialised arithmetic functions deliver strong performance.</p>
 </div>
 <div class="section" id="id7">
 <h4>2-limb signed integers<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
@@ -301,7 +298,7 @@ mp++ integers with 2 limbs of static size are employed.</p>
       &copy;2016-2017, Francesco Biscani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
