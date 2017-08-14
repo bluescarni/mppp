@@ -39,6 +39,17 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a ../;
     make -j2 VERBOSE=1;
     ctest -V;
+elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMPUnstable" ]]; then
+    # Download and compile locally the latest GMP in debug mode.
+    hg clone https://gmplib.org/repo/gmp/ gmp_unstable;
+    cd gmp_unstable;
+    ./.bootstrap
+    CXX=g++-4.8 CC=gcc-4.8 ./configure --disable-shared --enable-assert --enable-alloca=debug --disable-assembly CFLAGS="-g -fsanitize=address";
+    make -j2;
+    cd ..;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp_unstable -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp_unstable/.libs/libgmp.a ../;
+    make -j2 VERBOSE=1;
+    ctest -V;
 elif [[ "${MPPP_BUILD}" == "CoverageGCC5" ]]; then
     CXX=g++-5 CC=gcc-5 cmake -DCMAKE_CXX_STANDARD=14 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
     make -j2 VERBOSE=1;
