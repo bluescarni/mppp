@@ -37,6 +37,16 @@ matrix:
           packages:
           - g++-4.8
           - cmake3
+    - env: MPPP_BUILD="DebugGCC48DebugGMPUnstable"
+      compiler: gcc
+      os: linux
+      addons:
+        apt:
+          packages:
+          - g++-4.8
+          - mercurial
+          - autoconf
+          - texinfo
     - env: MPPP_BUILD="CoverageGCC5"
       compiler: gcc
       os: linux
@@ -106,6 +116,8 @@ matrix:
     #   sudo: required
     #   services:
     #   - docker
+  allow_failures:
+    - env: MPPP_BUILD="DebugGCC48DebugGMPUnstable"
 script:
     - mkdir build
     - cd build

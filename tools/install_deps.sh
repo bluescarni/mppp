@@ -6,7 +6,7 @@ set -x
 # Exit on error.
 set -e
 
-if [[ "${MPPP_BUILD}" != DebugGCC48DebugGMP && "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
+if [[ "${MPPP_BUILD}" != DebugGCC48DebugGMP* && "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
         wget https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh -O miniconda.sh;
     else
