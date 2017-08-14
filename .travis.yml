@@ -114,6 +114,8 @@ matrix:
     #   sudo: required
     #   services:
     #   - docker
+  allow_failures:
+    - env: MPPP_BUILD="DebugGCC48DebugGMPUnstable"
 script:
     - mkdir build
     - cd build
