@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Add a CI build testing against the latest unstable GMP branch (`#34 <https://github.com/bluescarni/mppp/pull/34>`__).
+
 - Add assignment operator from ``std::string_view`` for :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
   (`#32 <https://github.com/bluescarni/mppp/pull/32>`__).
 
