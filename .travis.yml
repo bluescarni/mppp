@@ -44,6 +44,7 @@ matrix:
         apt:
           packages:
           - g++-4.8
+          - cmake3
           - mercurial
           - autoconf
           - texinfo
