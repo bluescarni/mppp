@@ -7,7 +7,9 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cstdint>
+#include <gmp.h>
 #include <limits>
+#include <quadmath.h>
 #include <random>
 #include <utility>
 
@@ -19,6 +21,7 @@
 using namespace mppp;
 
 using int_t = integer<1>;
+using rat_t = rational<1>;
 
 static int ntries = 1000;
 
@@ -85,5 +88,43 @@ TEST_CASE("real128 constructors")
         auto cmp_r = ::scalbnq(::scalbnq(::__float128(hi) * sign, 64) + lo, ebits);
         REQUIRE((tmp_r.m_value == cmp_r));
         REQUIRE(static_cast<int_t>(tmp_r) == ((int_t{hi} << 64) * sign + lo) << ebits);
+        tmp_r = real128{(int_t{hi} << (64 - ebits)) * sign + (lo >> ebits)};
+        cmp_r = ::scalbnq(::__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
+        REQUIRE((tmp_r.m_value == cmp_r));
+        REQUIRE(static_cast<int_t>(tmp_r) == (int_t{hi} << (64 - ebits)) * sign + (lo >> ebits));
     }
+    // Constructor from rational.
+    // A few simple cases.
+    REQUIRE((real128{rat_t{0}}.m_value == 0));
+    REQUIRE((real128{rat_t{1, 2}}.m_value == 0.5));
+    REQUIRE((real128{rat_t{3, -2}}.m_value == -1.5));
+    // Num's bit size > 113, den not.
+    // These have been checked with mpmath.
+    REQUIRE((::fabsq(real128{rat_t{int_t{"-38534035372951953445309927667133500127"},
+                                   int_t{"276437038692051021425869207346"}}}
+                         .m_value
+                     - real128{"-139395341.359732211699141193741051607"}.m_value)
+             < 1E-34 / 139395341.));
+    // Opposite of above.
+    REQUIRE((::fabsq(real128{rat_t{int_t{"861618639356201333739137018526"},
+                                   int_t{"-30541779607702874593949544341902312610"}}}
+                         .m_value
+                     - real128{"-0.0000000282111471703140181436825504811494878"}.m_value)
+             < 1E-34 / 0.000000028211147170));
+    // Both num and den large.
+    REQUIRE((::fabsq(real128{rat_t{int_t{"-32304709999587426335154241885499878925"},
+                                   int_t{"41881836637791190397532909138415249190"}}}
+                         .m_value
+                     - real128{"-0.77132983156803476500525887410811607"}.m_value)
+             < 1E-34));
+    REQUIRE((::fabsq(real128{rat_t{int_t{"41881836637791190397532909138415249190"} / 2,
+                                   int_t{"-32304709999587426335154241885499878925"}}}
+                         .m_value
+                     - real128{"-0.648231119213360475524695260458732616"}.m_value)
+             < 1E-34));
+    // Subnormal numbers.
+    REQUIRE((real128{rat_t{1, int_t{1} << 16493}}.m_value
+             == real128{"1.295035023887605022184887791645529310e-4965"}.m_value));
+    REQUIRE((real128{rat_t{-1, int_t{1} << 16494}}.m_value
+             == real128{"-6.47517511943802511092443895822764655e-4966"}.m_value));
 }
