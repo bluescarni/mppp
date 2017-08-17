@@ -166,14 +166,14 @@ public:
         const ::mp_limb_t *ptr = n.is_static() ? n._get_union().g_st().m_limbs.data() : n._get_union().g_dy()._mp_d;
         const std::size_t n_bits = n.nbits();
         // Let's get the size in limbs from the size in bits, as we already made the effort.
-        std::size_t ls = n_bits / unsigned(GMP_NUMB_BITS) + static_cast<bool>(n_bits % unsigned(GMP_NUMB_BITS));
+        const auto rem_bits = n_bits % unsigned(GMP_NUMB_BITS);
+        std::size_t ls = n_bits / unsigned(GMP_NUMB_BITS) + static_cast<bool>(rem_bits);
         assert(ls && n_bits && ls == n.size());
 
         // Init value with the most significant limb, and move to the next limb.
         m_value = ptr[--ls] & GMP_NUMB_MASK;
         // Number of bits read so far from n: it is the size in bits of the top limb.
-        auto read_bits = static_cast<unsigned>((n_bits % unsigned(GMP_NUMB_BITS)) ? (n_bits % unsigned(GMP_NUMB_BITS))
-                                                                                  : unsigned(GMP_NUMB_BITS));
+        auto read_bits = static_cast<unsigned>(rem_bits ? rem_bits : unsigned(GMP_NUMB_BITS));
         assert(read_bits);
         // Keep on reading as long as we have limbs and as long as we haven't read enough bits
         // to fill up the significand of m_value.

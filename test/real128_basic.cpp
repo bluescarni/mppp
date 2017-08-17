@@ -6,6 +6,9 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <cstdint>
+#include <limits>
+#include <random>
 #include <utility>
 
 #include <mp++/mp++.hpp>
@@ -16,6 +19,10 @@
 using namespace mppp;
 
 using int_t = integer<1>;
+
+static int ntries = 1000;
+
+static std::mt19937 rng;
 
 TEST_CASE("real128 constructors")
 {
@@ -62,4 +69,21 @@ TEST_CASE("real128 constructors")
     n.promote();
     n.neg();
     REQUIRE((real128{n}.m_value == ::scalbnq(::__float128(2), 2 * GMP_NUMB_BITS - 1)));
+    // Random testing.
+    constexpr auto delta64 = std::numeric_limits<std::uint_least64_t>::digits - 64;
+    constexpr auto delta49 = std::numeric_limits<std::uint_least64_t>::digits - 49;
+    std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (std::uint_least64_t(-1) << delta64) >> delta64);
+    std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (std::uint_least64_t(-1) << delta49) >> delta49);
+    std::uniform_int_distribution<int> sdist(0, 1);
+    std::uniform_int_distribution<int> extra_bits(0, 8);
+    for (int i = 0; i < ntries; ++i) {
+        const auto hi = dist49(rng);
+        const auto lo = dist64(rng);
+        const auto sign = sdist(rng) ? 1 : -1;
+        const auto ebits = extra_bits(rng);
+        auto tmp_r = real128{((int_t{hi} << 64) * sign + lo) << ebits};
+        auto cmp_r = ::scalbnq(::scalbnq(::__float128(hi) * sign, 64) + lo, ebits);
+        REQUIRE((tmp_r.m_value == cmp_r));
+        REQUIRE(static_cast<int_t>(tmp_r) == ((int_t{hi} << 64) * sign + lo) << ebits);
+    }
 }
