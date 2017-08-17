@@ -9,6 +9,7 @@
 #ifndef MPPP_DETAIL_QUADMATH_HPP
 #define MPPP_DETAIL_QUADMATH_HPP
 
+#include <cstdint>
 #include <iostream>
 // NOTE: extern "C" is already included in quadmath.h since GCC 4.8:
 // https://stackoverflow.com/questions/13780219/link-libquadmath-with-c-on-linux
@@ -36,13 +37,11 @@ struct ieee_t {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     unsigned negative : 1;
     unsigned exponent : 15;
-    // ull provides at least 64 bits of storage, so it is ok
-    // to use it here.
-    unsigned long long mant_high : 48;
-    unsigned long long mant_low : 64;
+    std::uint_least64_t mant_high : 48;
+    std::uint_least64_t mant_low : 64;
 #else
-    unsigned long long mant_low : 64;
-    unsigned long long mant_high : 48;
+    std::uint_least64_t mant_low : 64;
+    std::uint_least64_t mant_high : 48;
     unsigned exponent : 15;
     unsigned negative : 1;
 #endif
