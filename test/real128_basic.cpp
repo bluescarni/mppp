@@ -96,8 +96,8 @@ TEST_CASE("real128 constructors")
     // Constructor from rational.
     // A few simple cases.
     REQUIRE((real128{rat_t{0}}.m_value == 0));
-    REQUIRE((real128{rat_t{1, 2}}.m_value == 0.5));
-    REQUIRE((real128{rat_t{3, -2}}.m_value == -1.5));
+    REQUIRE((real128{rat_t{1, 2}}.m_value == real128{"0.5"}.m_value));
+    REQUIRE((real128{rat_t{3, -2}}.m_value == real128{"-1.5"}.m_value));
     // Num's bit size > 113, den not.
     // These have been checked with mpmath.
     REQUIRE((::fabsq(real128{rat_t{int_t{"-38534035372951953445309927667133500127"},
