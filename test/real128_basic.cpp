@@ -11,9 +11,18 @@
 #include <limits>
 #include <quadmath.h>
 #include <random>
+#include <stdexcept>
+#include <string>
+#if __cplusplus >= 201703L
+#include <string_view>
+#endif
+#include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <mp++/mp++.hpp>
+
+#include "test_utils.hpp"
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -51,6 +60,7 @@ TEST_CASE("real128 constructors")
     real128 r8a{1.5l};
     REQUIRE((r8a.m_value == 1.5l));
 #endif
+    REQUIRE((!std::is_constructible<real128, std::vector<int>>::value));
     // Construction from integer.
     REQUIRE((real128{int_t{0}}.m_value == 0));
     int_t n{123};
@@ -127,4 +137,73 @@ TEST_CASE("real128 constructors")
              == real128{"1.295035023887605022184887791645529310e-4965"}.m_value));
     REQUIRE((real128{rat_t{-1, int_t{1} << 16494}}.m_value
              == real128{"-6.47517511943802511092443895822764655e-4966"}.m_value));
+    // String ctors.
+    REQUIRE((real128{"0"}.m_value == 0));
+    REQUIRE((real128{"-0"}.m_value == 0));
+    REQUIRE((real128{"+0"}.m_value == 0));
+    REQUIRE((real128{"123"}.m_value == 123));
+    REQUIRE((real128{"-123"}.m_value == -123));
+    REQUIRE((real128{".123E3"}.m_value == 123));
+    REQUIRE((real128{"-.123e3"}.m_value == -123));
+    REQUIRE((real128{"12300E-2"}.m_value == 123));
+    REQUIRE((real128{"-12300e-2"}.m_value == -123));
+    REQUIRE((real128{std::string{"12300E-2"}}.m_value == 123));
+    REQUIRE((real128{std::string{"-12300e-2"}}.m_value == -123));
+    const char tmp_char[] = "foobar-1234 baz";
+    REQUIRE((real128{tmp_char + 6, tmp_char + 11}.m_value == -1234));
+    REQUIRE_THROWS_PREDICATE(
+        (real128{tmp_char + 6, tmp_char + 12}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return std::string(ex.what())
+                   == "The string '-1234 ' does not represent a valid quadruple-precision floating-point value";
+        });
+#if __cplusplus >= 201703L
+    REQUIRE((real128{std::string_view{tmp_char + 6, 5}}.m_value == -1234));
+    REQUIRE_THROWS_PREDICATE(
+        (real128{std::string_view{tmp_char + 6, 6}}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return std::string(ex.what())
+                   == "The string '-1234 ' does not represent a valid quadruple-precision floating-point value";
+        });
+#endif
+    REQUIRE((real128{"  -12300e-2"}.m_value == -123));
+    REQUIRE_THROWS_PREDICATE(real128{""}, std::invalid_argument, [](const std::invalid_argument &ex) {
+        return std::string(ex.what())
+               == "The string '' does not represent a valid quadruple-precision floating-point value";
+    });
+    REQUIRE_THROWS_PREDICATE(real128{"foobar"}, std::invalid_argument, [](const std::invalid_argument &ex) {
+        return std::string(ex.what())
+               == "The string 'foobar' does not represent a valid quadruple-precision floating-point value";
+    });
+    REQUIRE_THROWS_PREDICATE(real128{"12 "}, std::invalid_argument, [](const std::invalid_argument &ex) {
+        return std::string(ex.what())
+               == "The string '12 ' does not represent a valid quadruple-precision floating-point value";
+    });
+    REQUIRE(::isnanq(real128{"nan"}.m_value));
+    REQUIRE(::isnanq(real128{"-nan"}.m_value));
+    REQUIRE(::isinfq(real128{"inf"}.m_value));
+    REQUIRE(::isinfq(real128{"-inf"}.m_value));
+    // Assignment operators.
+    real128 ra{1}, rb{2};
+    ra = rb;
+    REQUIRE((ra.m_value == 2));
+    ra = real128{123};
+    REQUIRE((ra.m_value == 123));
+    ra = ::__float128(-345);
+    REQUIRE((ra.m_value == -345));
+    ra = 456.;
+    REQUIRE((ra.m_value == 456));
+    ra = -23ll;
+    REQUIRE((ra.m_value == -23));
+    REQUIRE((!std::is_assignable<real128 &, std::vector<int>>::value));
+    ra = int_t{-128};
+    REQUIRE((ra.m_value == -128));
+    ra = rat_t{-6, -3};
+    REQUIRE((ra.m_value == 2));
+    ra = "-1.23E5";
+    REQUIRE((ra.m_value == -123000));
+    ra = std::string("1234");
+    REQUIRE((ra.m_value == 1234));
+#if __cplusplus >= 201703L
+    ra = std::string_view{tmp_char + 6, 5};
+    REQUIRE((ra.m_value == -1234));
+#endif
 }

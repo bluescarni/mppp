@@ -257,6 +257,9 @@ public:
     /**
      * \rststar
      * This constructor will initialise \p this from the null-terminated string ``s``.
+     * The accepted string formats are detailed in the quadmath library's documentation
+     * (see the link below). Leading whitespaces are accepted (and ignored), but trailing whitespaces
+     * will raise an error.
      *
      * .. seealso::
      *    https://gcc.gnu.org/onlinedocs/libquadmath/strtoflt128.html
