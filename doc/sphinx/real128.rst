@@ -33,6 +33,14 @@ Types
 Functions
 ---------
 
+.. _real128_comparison:
+
+Comparison
+~~~~~~~~~~
+
+.. doxygengroup:: real128_comparison
+   :content-only:
+
 .. _real128_io:
 
 Input/Output

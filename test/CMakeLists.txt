@@ -69,4 +69,5 @@ ADD_MPPP_TESTCASE(utils)
 
 if(MPPP_WITH_QUADMATH)
     ADD_MPPP_TESTCASE(real128_basic)
+    ADD_MPPP_TESTCASE(real128_signbit)
 endif()

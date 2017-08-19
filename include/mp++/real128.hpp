@@ -647,6 +647,18 @@ public:
         }
         return retval;
     }
+    /// Sign bit.
+    /**
+     * This method will return the value of the sign bit of \p this. That is, if \p this
+     * is not a NaN the method will return \p true if \p this is negative, \p false otherwise.
+     * If \p this is NaN, the sign bit of the NaN value will be returned.
+     *
+     * @return \p true if the sign bit of \p this is set, \p false otherwise.
+     */
+    bool signbit() const
+    {
+        return ::signbitq(m_value);
+    }
     /// The internal value.
     /**
      * \rststar
@@ -679,6 +691,23 @@ inline std::ostream &operator<<(std::ostream &os, const real128 &r)
 {
     float128_stream(os, r.m_value);
     return os;
+}
+
+/** @} */
+
+/** @defgroup real128_comparison real128_comparison
+ *  @{
+ */
+
+/// Sign bit of a \link mppp::real128 real128 \endlink.
+/**
+ * @param r the \link mppp::real128 real128 \endlink whose sign bit will be returned.
+ *
+ * @return the output of mppp::real128::signbit() called on \p r.
+ */
+inline bool signbit(const real128 &r)
+{
+    return r.signbit();
 }
 
 /** @} */
