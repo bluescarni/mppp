@@ -15,7 +15,7 @@
 
 using namespace mppp;
 
-TEST_CASE("real128 signbit")
+TEST_CASE("real128 naninffinite")
 {
     real128 r;
     REQUIRE(r.finite());

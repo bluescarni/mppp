@@ -707,6 +707,16 @@ public:
     {
         return ::finiteq(m_value);
     }
+    /// In-place absolute value.
+    /**
+     * This method will set \p this to its absolute value.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &abs()
+    {
+        return *this = ::fabsq(m_value);
+    }
     /// The internal value.
     /**
      * \rststar
@@ -716,6 +726,24 @@ public:
      */
     ::__float128 m_value;
 };
+
+/** @defgroup real128_arithmetic real128_arithmetic
+ *  @{
+ */
+
+/// Unary absolute value.
+/**
+ * @param x the \link mppp::real128 real128 \endlink argument.
+ *
+ * @return the absolute value of \p x.
+ */
+inline real128 abs(real128 x)
+{
+    x.abs();
+    return x;
+}
+
+/** @} */
 
 /** @defgroup real128_io real128_io
  *  @{

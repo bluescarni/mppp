@@ -33,6 +33,14 @@ Types
 Functions
 ---------
 
+.. _real128_arithmetic:
+
+Arithmetic
+~~~~~~~~~~
+
+.. doxygengroup:: real128_arithmetic
+   :content-only:
+
 .. _real128_comparison:
 
 Comparison
