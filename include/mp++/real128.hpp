@@ -16,6 +16,7 @@
 #include <cassert>
 #include <iostream>
 #include <limits>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #if __cplusplus >= 201703L
@@ -647,6 +648,29 @@ public:
         }
         return retval;
     }
+    /// Convert to string.
+    /**
+     * \rststar
+     * This method will convert ``this`` to a decimal string representation in scientific format.
+     * The number of significant digits in the output (36) guarantees that a :cpp:class:`~mppp::real128`
+     * constructed from the returned string will have a value identical to the value of ``this``.
+     *
+     * The implementation uses the ``quadmath_snprintf()`` function from the quadmath library.
+     *
+     * .. seealso::
+     *    https://gcc.gnu.org/onlinedocs/libquadmath/quadmath_005fsnprintf.html
+     * \endrststar
+     *
+     * @return a decimal string representation of ``this``.
+     *
+     * @throws std::runtime_error if the internal call to the ``quadmath_snprintf()`` function fails.
+     */
+    std::string to_string() const
+    {
+        std::ostringstream oss;
+        float128_stream(oss, m_value);
+        return oss.str();
+    }
     /// Sign bit.
     /**
      * This method will return the value of the sign bit of \p this. That is, if \p this
@@ -700,8 +724,14 @@ public:
 /// Output stream operator.
 /**
  * \rststar
- * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real128` ``r``. Internally it uses
- * the :cpp:func:`mppp::real128::to_string()` method.
+ * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real128` ``r``. The current implementation
+ * ignores any formatting flag specified in ``os``, and the print format will be the one
+ * described in :cpp:func:`mppp::real128::to_string()`.
+ *
+ * .. warning::
+ *    In future versions of mp++, the behaviour of this operator will likely change. Please use the
+ *    ``quadmath_snprintf()`` function from the quadmath library if you need precise and forward-compatible
+ *    control on the printing format.
  * \endrststar
  *
  * @param os the target stream.
@@ -715,6 +745,28 @@ inline std::ostream &operator<<(std::ostream &os, const real128 &r)
 {
     float128_stream(os, r.m_value);
     return os;
+}
+
+/// Input stream operator.
+/**
+ * \rststar
+ * This operator is equivalent to extracting a line from the stream, using it to construct a temporary
+ * :cpp:class:`~mppp::real128` and then assigning the temporary to ``r``.
+ * \endrststar
+ *
+ * @param is the input stream.
+ * @param r the \link mppp::real128 real128 \endlink to which the contents of the stream will be assigned.
+ *
+ * @return a reference to \p is.
+ *
+ * @throws unspecified any exception thrown by the constructor from string of \link mppp::real128 real128 \endlink.
+ */
+inline std::istream &operator>>(std::istream &is, real128 &r)
+{
+    MPPP_MAYBE_TLS std::string tmp_str;
+    std::getline(is, tmp_str);
+    r = real128{tmp_str};
+    return is;
 }
 
 /** @} */
