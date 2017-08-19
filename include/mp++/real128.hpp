@@ -659,6 +659,30 @@ public:
     {
         return ::signbitq(m_value);
     }
+    /// Detect NaN.
+    /**
+     * @return \p true if \p this is NaN, \p false otherwise.
+     */
+    bool isnan() const
+    {
+        return ::isnanq(m_value);
+    }
+    /// Detect infinity.
+    /**
+     * @return \p true if \p this is infinite, \p false otherwise.
+     */
+    bool isinf() const
+    {
+        return ::isinfq(m_value);
+    }
+    /// Detect finite value.
+    /**
+     * @return \p true if \p this is finite, \p false otherwise.
+     */
+    bool finite() const
+    {
+        return ::finiteq(m_value);
+    }
     /// The internal value.
     /**
      * \rststar
@@ -701,13 +725,46 @@ inline std::ostream &operator<<(std::ostream &os, const real128 &r)
 
 /// Sign bit of a \link mppp::real128 real128 \endlink.
 /**
- * @param r the \link mppp::real128 real128 \endlink whose sign bit will be returned.
+ * @param r the \link mppp::real128 real128 \endlink argument.
  *
  * @return the output of mppp::real128::signbit() called on \p r.
  */
 inline bool signbit(const real128 &r)
 {
     return r.signbit();
+}
+
+/// Detect if a \link mppp::real128 real128 \endlink is NaN.
+/**
+ * @param r the \link mppp::real128 real128 \endlink argument.
+ *
+ * @return the output of mppp::real128::isnan() called on \p r.
+ */
+inline bool isnan(const real128 &r)
+{
+    return r.isnan();
+}
+
+/// Detect if a \link mppp::real128 real128 \endlink is infinite.
+/**
+ * @param r the \link mppp::real128 real128 \endlink argument.
+ *
+ * @return the output of mppp::real128::isinf() called on \p r.
+ */
+inline bool isinf(const real128 &r)
+{
+    return r.isinf();
+}
+
+/// Detect if a \link mppp::real128 real128 \endlink is finite.
+/**
+ * @param r the \link mppp::real128 real128 \endlink argument.
+ *
+ * @return the output of mppp::real128::finite() called on \p r.
+ */
+inline bool finite(const real128 &r)
+{
+    return r.finite();
 }
 
 /** @} */
