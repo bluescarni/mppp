@@ -36,6 +36,9 @@ static int ntries = 1000;
 
 static std::mt19937 rng;
 
+static constexpr auto delta64 = std::numeric_limits<std::uint_least64_t>::digits - 64;
+static constexpr auto delta49 = std::numeric_limits<std::uint_least64_t>::digits - 49;
+
 TEST_CASE("real128 constructors")
 {
     real128 r;
@@ -83,8 +86,6 @@ TEST_CASE("real128 constructors")
     n.neg();
     REQUIRE((real128{n}.m_value == ::scalbnq(::__float128(2), 2 * GMP_NUMB_BITS - 1)));
     // Random testing.
-    constexpr auto delta64 = std::numeric_limits<std::uint_least64_t>::digits - 64;
-    constexpr auto delta49 = std::numeric_limits<std::uint_least64_t>::digits - 49;
     std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (std::uint_least64_t(-1) << delta64) >> delta64);
     std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (std::uint_least64_t(-1) << delta49) >> delta49);
     std::uniform_int_distribution<int> sdist(0, 1);
@@ -206,4 +207,95 @@ TEST_CASE("real128 constructors")
     ra = std::string_view{tmp_char + 6, 5};
     REQUIRE((ra.m_value == -1234));
 #endif
+}
+
+TEST_CASE("real128 conversions")
+{
+    // Conversion to C++ basic types.
+    real128 r{-123};
+    REQUIRE(static_cast<int>(r) == -123);
+    REQUIRE(static_cast<signed char>(r) == -123);
+    REQUIRE(static_cast<float>(r) == -123.f);
+    REQUIRE(static_cast<double>(r) == -123.);
+    REQUIRE((static_cast<::__float128>(r) == r.m_value));
+    // Conversion to integer.
+    REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real128{"nan"}), std::domain_error, [](const std::domain_error &ex) {
+        return std::string(ex.what()) == "Cannot convert a non-finite real128 to an integer";
+    });
+    REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real128{"-inf"}), std::domain_error, [](const std::domain_error &ex) {
+        return std::string(ex.what()) == "Cannot convert a non-finite real128 to an integer";
+    });
+    REQUIRE(static_cast<int_t>(real128{"-0.123"}) == 0);
+    REQUIRE(static_cast<int_t>(real128{"-3456.123"}) == -3456);
+    REQUIRE(static_cast<int_t>(real128{"3456.99999"}) == 3456);
+    REQUIRE(static_cast<int_t>(real128{"1.295035023887605022184887791645529310e-4965"}) == 0);
+    // Random testing for abs(value) < 1.
+    std::uniform_real_distribution<double> dist(0., 1.);
+    std::uniform_int_distribution<int> sdist(0, 1);
+    for (int i = 0; i < ntries; ++i) {
+        REQUIRE(static_cast<int_t>(real128{dist(rng) * (sdist(rng) ? 1. : -1.)}) == 0);
+    }
+    // Subnormal numbers.
+    const real128 small_factor{"3e-4932"};
+    for (int i = 0; i < ntries; ++i) {
+        auto value = dist(rng) * (sdist(rng) ? 1. : -1.);
+        real128 tmp{value};
+        tmp.m_value *= small_factor.m_value;
+        REQUIRE(static_cast<int_t>(tmp) == 0);
+    }
+    // Test with integral values.
+    std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (std::uint_least64_t(-1) << delta64) >> delta64);
+    std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (std::uint_least64_t(-1) << delta49) >> delta49);
+    std::uniform_int_distribution<int> extra_bits(0, 8);
+    for (int i = 0; i < ntries; ++i) {
+        const auto hi = dist49(rng);
+        const auto lo = dist64(rng);
+        const auto sign = sdist(rng) ? 1 : -1;
+        const auto ebits = extra_bits(rng);
+        auto tmp_int = ((int_t{hi} << 64) * sign + lo) << ebits;
+        auto r = ::scalbnq(::scalbnq(::__float128(hi) * sign, 64) + lo, ebits);
+        REQUIRE(static_cast<int_t>(real128{r}) == tmp_int);
+        tmp_int = (int_t{hi} << (64 - ebits)) * sign + (lo >> ebits);
+        r = ::scalbnq(::__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
+        REQUIRE(static_cast<int_t>(real128{r}) == tmp_int);
+    }
+    // Test with small non-integral values.
+    dist = std::uniform_real_distribution<double>(100., 1000.);
+    for (int i = 0; i < ntries; ++i) {
+        auto tmp_d = dist(rng) * (sdist(rng) ? 1. : -1.);
+        ::__float128 tmp_r = ::nextafterq(tmp_d, 10000.);
+        REQUIRE(static_cast<int_t>(real128{tmp_r}) == int_t{tmp_d});
+    }
+    // Test with larger values.
+    dist = std::uniform_real_distribution<double>(3.6893488147419103e+19, 3.6893488147419103e+19 * 10.);
+    for (int i = 0; i < ntries; ++i) {
+        auto tmp_d = dist(rng) * (sdist(rng) ? 1. : -1.);
+        REQUIRE(static_cast<int_t>(real128{tmp_d}) == int_t{tmp_d});
+    }
+    // Conversion to rational.
+    REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real128{"nan"}), std::domain_error, [](const std::domain_error &ex) {
+        return std::string(ex.what()) == "Cannot convert a non-finite real128 to a rational";
+    });
+    REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real128{"-inf"}), std::domain_error, [](const std::domain_error &ex) {
+        return std::string(ex.what()) == "Cannot convert a non-finite real128 to a rational";
+    });
+    REQUIRE((static_cast<rat_t>(real128{"-1.5"}) == rat_t{3, -2}));
+    REQUIRE((static_cast<rat_t>(real128{"-1.5"}).get_num().is_static()));
+    REQUIRE((static_cast<rat_t>(real128{"-1.5"}).get_den().is_static()));
+    REQUIRE((static_cast<rat_t>(real128{"0.5"}) == rat_t{1, 2}));
+    REQUIRE((static_cast<rat_t>(real128{".5"}).get_num().is_static()));
+    REQUIRE((static_cast<rat_t>(real128{".5"}).get_den().is_static()));
+    REQUIRE((static_cast<rat_t>(real128{123}) == rat_t{123 * 2, 2}));
+    REQUIRE((static_cast<rat_t>(real128{123}).get_num().is_static()));
+    REQUIRE((static_cast<rat_t>(real128{123}).get_den().is_static()));
+    REQUIRE((static_cast<rat_t>(real128{-123}) == rat_t{123 * -2, 2}));
+    REQUIRE((static_cast<rat_t>(real128{"7.845458984375"}) == rat_t{32135, 1 << 12}));
+    REQUIRE((static_cast<rat_t>(real128{"-7.845458984375"}) == rat_t{-32135, 1 << 12}));
+    REQUIRE((static_cast<rat_t>(real128{"0.03064632415771484375"}) == rat_t{32135, 1l << 20}));
+    REQUIRE((static_cast<rat_t>(real128{"-0.03064632415771484375"}) == rat_t{-32135, 1l << 20}));
+    // Subnormals.
+    REQUIRE((static_cast<rat_t>(real128{"3.40917866435610111081769936359662259e-4957"})
+             == rat_t{32135, int_t{1} << 16480ul}));
+    REQUIRE((static_cast<rat_t>(real128{"-3.40917866435610111081769936359662259e-4957"})
+             == rat_t{-32135, int_t{1} << 16480ul}));
 }

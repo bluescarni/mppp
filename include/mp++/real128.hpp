@@ -578,8 +578,7 @@ public:
             } else {
                 // We need to right shift more than 64 bits, so none of the bits in the low word survive.
                 // NOTE: here the right shift will be in the [0,48] range, so we can do it directly
-                // on a C++ builtin type (i_eee.mant_high gives an ull, which is guaranteed to be
-                // at least 64 bit).
+                // on a C++ builtin type (i_eee.mant_high gives a 64bit int).
                 retval += ief.i_eee.mant_high >> static_cast<unsigned>(-(exponent + 64));
             }
         }
