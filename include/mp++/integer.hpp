@@ -4779,10 +4779,10 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
  * :cpp:class:`~mppp::integer` and then assigning the temporary to ``n``.
  * \endrststar
  *
- * @param is input stream.
- * @param n integer to which the contents of the stream will be assigned.
+ * @param is the input stream.
+ * @param n the integer to which the contents of the stream will be assigned.
  *
- * @return reference to \p is.
+ * @return a reference to \p is.
  *
  * @throws unspecified any exception thrown by the constructor from string of integer.
  */
