@@ -170,7 +170,6 @@ public:
         const auto rem_bits = n_bits % unsigned(GMP_NUMB_BITS);
         std::size_t ls = n_bits / unsigned(GMP_NUMB_BITS) + static_cast<bool>(rem_bits);
         assert(ls && n_bits && ls == n.size());
-
         // Init value with the most significant limb, and move to the next limb.
         m_value = ptr[--ls] & GMP_NUMB_MASK;
         // Number of bits read so far from n: it is the size in bits of the top limb.
