@@ -49,6 +49,14 @@ Comparison
 .. doxygengroup:: real128_comparison
    :content-only:
 
+.. _real128_roots:
+
+Roots
+~~~~~
+
+.. doxygengroup:: real128_roots
+   :content-only:
+
 .. _real128_io:
 
 Input/Output

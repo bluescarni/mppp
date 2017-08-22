@@ -716,6 +716,16 @@ public:
     {
         return *this = ::fabsq(m_value);
     }
+    /// In-place square root.
+    /**
+     * This method will set \p this to its square root.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &sqrt()
+    {
+        return *this = ::sqrtq(m_value);
+    }
     /// The internal value.
     /**
      * \rststar
@@ -751,7 +761,7 @@ inline real128 abs(real128 x)
 /// Output stream operator.
 /**
  * \rststar
- * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real128` ``r``. The current implementation
+ * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real128` ``x``. The current implementation
  * ignores any formatting flag specified in ``os``, and the print format will be the one
  * described in :cpp:func:`mppp::real128::to_string()`.
  *
@@ -762,15 +772,15 @@ inline real128 abs(real128 x)
  * \endrststar
  *
  * @param os the target stream.
- * @param r the input \link mppp::real128 real128 \endlink.
+ * @param x the input \link mppp::real128 real128 \endlink.
  *
  * @return a reference to \p os.
  *
  * @throws unspecified any exception thrown by real128::to_string().
  */
-inline std::ostream &operator<<(std::ostream &os, const real128 &r)
+inline std::ostream &operator<<(std::ostream &os, const real128 &x)
 {
-    float128_stream(os, r.m_value);
+    float128_stream(os, x.m_value);
     return os;
 }
 
@@ -778,21 +788,21 @@ inline std::ostream &operator<<(std::ostream &os, const real128 &r)
 /**
  * \rststar
  * This operator is equivalent to extracting a line from the stream, using it to construct a temporary
- * :cpp:class:`~mppp::real128` and then assigning the temporary to ``r``.
+ * :cpp:class:`~mppp::real128` and then assigning the temporary to ``x``.
  * \endrststar
  *
  * @param is the input stream.
- * @param r the \link mppp::real128 real128 \endlink to which the contents of the stream will be assigned.
+ * @param x the \link mppp::real128 real128 \endlink to which the contents of the stream will be assigned.
  *
  * @return a reference to \p is.
  *
  * @throws unspecified any exception thrown by the constructor from string of \link mppp::real128 real128 \endlink.
  */
-inline std::istream &operator>>(std::istream &is, real128 &r)
+inline std::istream &operator>>(std::istream &is, real128 &x)
 {
     MPPP_MAYBE_TLS std::string tmp_str;
     std::getline(is, tmp_str);
-    r = real128{tmp_str};
+    x = real128{tmp_str};
     return is;
 }
 
@@ -804,46 +814,64 @@ inline std::istream &operator>>(std::istream &is, real128 &r)
 
 /// Sign bit of a \link mppp::real128 real128 \endlink.
 /**
- * @param r the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128 \endlink argument.
  *
- * @return the output of mppp::real128::signbit() called on \p r.
+ * @return the output of mppp::real128::signbit() called on \p x.
  */
-inline bool signbit(const real128 &r)
+inline bool signbit(const real128 &x)
 {
-    return r.signbit();
+    return x.signbit();
 }
 
 /// Detect if a \link mppp::real128 real128 \endlink is NaN.
 /**
- * @param r the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128 \endlink argument.
  *
- * @return the output of mppp::real128::isnan() called on \p r.
+ * @return the output of mppp::real128::isnan() called on \p x.
  */
-inline bool isnan(const real128 &r)
+inline bool isnan(const real128 &x)
 {
-    return r.isnan();
+    return x.isnan();
 }
 
 /// Detect if a \link mppp::real128 real128 \endlink is infinite.
 /**
- * @param r the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128 \endlink argument.
  *
- * @return the output of mppp::real128::isinf() called on \p r.
+ * @return the output of mppp::real128::isinf() called on \p x.
  */
-inline bool isinf(const real128 &r)
+inline bool isinf(const real128 &x)
 {
-    return r.isinf();
+    return x.isinf();
 }
 
 /// Detect if a \link mppp::real128 real128 \endlink is finite.
 /**
- * @param r the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128 \endlink argument.
  *
- * @return the output of mppp::real128::finite() called on \p r.
+ * @return the output of mppp::real128::finite() called on \p x.
  */
-inline bool finite(const real128 &r)
+inline bool finite(const real128 &x)
 {
-    return r.finite();
+    return x.finite();
+}
+
+/** @} */
+
+/** @defgroup real128_roots real128_roots
+ *  @{
+ */
+
+/// Unary square root.
+/**
+ * @param x the \link mppp::real128 real128 \endlink argument.
+ *
+ * @return the square root of \p x.
+ */
+inline real128 sqrt(real128 x)
+{
+    x.sqrt();
+    return x;
 }
 
 /** @} */
