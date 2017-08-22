@@ -85,7 +85,7 @@ constexpr make_unsigned<T> nint_abs(T n)
 // NOTE: we should assert about negative n, but this is guaranteed to work properly only
 // from C++17:
 // https://stackoverflow.com/questions/26072709/alternative-to-asserts-for-constexpr-functions
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
     assert(n < T(0));
 #endif
     static_assert(std::is_integral<T>::value && std::is_signed<T>::value,
@@ -116,7 +116,7 @@ constexpr T c_min(T a, T b)
 // A small helper to convert the input unsigned n to -n, represented as the signed T.
 template <typename T, typename U>
 // NOTE: C++17 because we are using assert().
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
 constexpr
 #else
 inline
@@ -167,7 +167,7 @@ inline
 
 // Like above, but throw on failure.
 template <typename T, typename U>
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
 constexpr
 #else
 inline

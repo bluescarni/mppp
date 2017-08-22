@@ -72,11 +72,28 @@
 
 #endif
 
-// constexpr setup.
-#if __cplusplus >= 201402L
-#define MPPP_CONSTEXPR_14 constexpr
+// C++ standard setup.
+// NOTE: this is necessary because at this time MSVC does not set correctly the
+// __cplusplus macro.
+#if defined(_MSC_VER)
+
+#define MPPP_CPLUSPLUS _MSVC_LANG
+
 #else
+
+#define MPPP_CPLUSPLUS __cplusplus
+
+#endif
+
+// constexpr setup.
+#if MPPP_CPLUSPLUS >= 201402L
+
+#define MPPP_CONSTEXPR_14 constexpr
+
+#else
+
 #define MPPP_CONSTEXPR_14
+
 #endif
 
 #endif

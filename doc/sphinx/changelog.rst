@@ -18,6 +18,8 @@ New
 Changes
 ~~~~~~~
 
+- Update the internal copy of Catch to the latest version, 1.9.7 (`#36 <https://github.com/bluescarni/mppp/pull/36>`__).
+
 - Bump up the minimum required CMake version to 3.3 (`#31 <https://github.com/bluescarni/mppp/pull/31>`__).
 
 - Performance improvements and simplifications in the :cpp:class:`~mppp::rational` constructors and assignment operators
@@ -25,6 +27,8 @@ Changes
 
 Fix
 ~~~
+
+- Fix C++ version detection on MSVC (`#36 <https://github.com/bluescarni/mppp/pull/36>`__).
 
 - Fix missing tests for :cpp:class:`~mppp::rational` hashing (`#29 <https://github.com/bluescarni/mppp/pull/29>`__).
 

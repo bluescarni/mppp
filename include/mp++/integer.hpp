@@ -9,6 +9,8 @@
 #ifndef MPPP_INTEGER_HPP
 #define MPPP_INTEGER_HPP
 
+#include <mp++/config.hpp>
+
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -23,7 +25,7 @@
 #include <new>
 #include <stdexcept>
 #include <string>
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
 #include <type_traits>
@@ -32,7 +34,6 @@
 #include <vector>
 
 #include <mp++/concepts.hpp>
-#include <mp++/config.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #if defined(MPPP_WITH_MPFR)
@@ -1090,7 +1091,7 @@ public:
     explicit integer(const char *begin, const char *end, int base = 10) : m_int(begin, end, base)
     {
     }
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
     /// Constructor from string view.
     /**
      * This constructor will initialise \p this from the content of the input string view,
@@ -1262,7 +1263,7 @@ public:
     {
         return operator=(s.c_str());
     }
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
     /// Assignment from string view.
     /**
      * \rststar
@@ -1952,7 +1953,7 @@ private:
     integer_union<SSize> m_int;
 };
 
-#if __cplusplus < 201703L
+#if MPPP_CPLUSPLUS < 201703L
 
 // NOTE: from C++17 static constexpr members are implicitly inline, and it's not necessary
 // any more (actually, it's deprecated) to re-declare them outside the class.
