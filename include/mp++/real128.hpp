@@ -19,7 +19,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
 #include <vector>
@@ -302,7 +302,7 @@ public:
         buffer.emplace_back('\0');
         m_value = str_to_float128(buffer.data());
     }
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
     /// Constructor from string view.
     /**
      * This constructor will initialise \p this from the content of the input string view,
@@ -461,7 +461,7 @@ public:
     {
         return operator=(s.c_str());
     }
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
     /// Assignment from string view.
     /**
      * \rststar
