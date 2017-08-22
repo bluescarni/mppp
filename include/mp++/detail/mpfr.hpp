@@ -16,6 +16,7 @@
 #include <mpfr.h>
 #include <type_traits>
 
+#include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
 
 #if MPFR_VERSION_MAJOR < 3
@@ -91,7 +92,7 @@ struct mpfr_cleanup {
     }
 };
 
-#if __cplusplus < 201703L
+#if MPPP_CPLUSPLUS < 201703L
 
 // Inline variable emulation machinery for pre-C++17.
 template <typename = void>

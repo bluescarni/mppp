@@ -6,6 +6,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/mp++.hpp>
+
 #include <atomic>
 #include <cmath>
 #include <cstddef>
@@ -16,14 +18,12 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
 #include <thread>
 #include <tuple>
 #include <type_traits>
-
-#include <mp++/mp++.hpp>
 
 #include "test_utils.hpp"
 
@@ -282,7 +282,7 @@ struct string_ctor_tester {
         const char *cs = "-1234\0";
         REQUIRE((integer{cs, cs + 5} == -1234));
         REQUIRE((integer{cs, cs + 4} == -123));
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
         std::string_view sv = "-1234";
         REQUIRE((integer{sv} == -1234));
         REQUIRE((integer{std::string_view{sv.data(), 4u}} == -123));
@@ -501,7 +501,7 @@ struct string_ass_tester {
         REQUIRE_THROWS_PREDICATE(n = "", std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
         });
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
         n = std::string_view(" -123 ");
         REQUIRE(n == -123);
         n = std::string_view("4563 ");
