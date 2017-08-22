@@ -20,6 +20,9 @@ TEST_CASE("real128 sqrt")
     real128 r;
     r.sqrt();
     REQUIRE((r.m_value == 0));
+    r = -0.;
+    r.sqrt();
+    REQUIRE((r.m_value == 0));
     r = 4;
     r.sqrt();
     REQUIRE((r.m_value == 2));
@@ -33,4 +36,38 @@ TEST_CASE("real128 sqrt")
     REQUIRE(isnan(r));
     r.sqrt().sqrt();
     REQUIRE(isnan(r));
+}
+
+TEST_CASE("real128 cbrt")
+{
+    real128 r;
+    r.cbrt();
+    REQUIRE((r.m_value == 0));
+    r = 8;
+    r.cbrt();
+    REQUIRE((r.m_value == 2));
+    r = -8;
+    r.cbrt();
+    REQUIRE((r.m_value == -2));
+    r = 2;
+    r.cbrt();
+    REQUIRE((::fabsq(real128{"1.25992104989487316476721060727822835057025146470150798008197"}.m_value - r.m_value)
+             < 1E-32));
+    r = -2;
+    r.cbrt();
+    REQUIRE((::fabsq(real128{"-1.25992104989487316476721060727822835057025146470150798008197"}.m_value - r.m_value)
+             < 1E-32));
+    r.cbrt().cbrt();
+}
+
+TEST_CASE("real128 hypot")
+{
+    REQUIRE((hypot(real128{}, real128{}).m_value == 0));
+    REQUIRE((hypot(real128{4}, real128{3}).m_value == 5));
+    REQUIRE((hypot(real128{4}, real128{-3}).m_value == 5));
+    REQUIRE((hypot(real128{-4}, real128{-3}).m_value == 5));
+    REQUIRE((hypot(real128{-4}, real128{3}).m_value == 5));
+    REQUIRE((::fabsq(hypot(real128{"1.2"}, real128{"2.3"}).m_value
+                     - real128("2.5942243542145694689507875815343180229805121340196627480426331876639493063").m_value)
+             < 1E-32));
 }

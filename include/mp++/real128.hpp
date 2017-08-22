@@ -718,13 +718,24 @@ public:
     }
     /// In-place square root.
     /**
-     * This method will set \p this to its square root.
+     * This method will set \p this to its nonnegative square root.
+     * If \p this is less than negative zero, the result will be NaN.
      *
      * @return a reference to \p this.
      */
     real128 &sqrt()
     {
         return *this = ::sqrtq(m_value);
+    }
+    /// In-place cube root.
+    /**
+     * This method will set \p this to its real cube root.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &cbrt()
+    {
+        return *this = ::cbrtq(m_value);
     }
     /// The internal value.
     /**
@@ -864,14 +875,40 @@ inline bool finite(const real128 &x)
 
 /// Unary square root.
 /**
+ * If \p x is less than negative zero, the result will be NaN.
+ *
  * @param x the \link mppp::real128 real128 \endlink argument.
  *
- * @return the square root of \p x.
+ * @return the nonnegative square root of \p x.
  */
 inline real128 sqrt(real128 x)
 {
     x.sqrt();
     return x;
+}
+
+/// Unary cube root.
+/**
+ * @param x the \link mppp::real128 real128 \endlink argument.
+ *
+ * @return the real cube root of \p x.
+ */
+inline real128 cbrt(real128 x)
+{
+    x.cbrt();
+    return x;
+}
+
+/// Euclidean distance.
+/**
+ * @param x the first \link mppp::real128 real128 \endlink argument.
+ * @param y the second \link mppp::real128 real128 \endlink argument.
+ *
+ * @return the euclidean distance \f$ \sqrt{x^2+y^2} \f$.
+ */
+inline real128 hypot(const real128 &x, const real128 &y)
+{
+    return real128{::hypotq(x.m_value, y.m_value)};
 }
 
 /** @} */
