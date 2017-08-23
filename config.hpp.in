@@ -71,4 +71,17 @@
 
 #endif
 
+// C++ standard setup.
+// NOTE: this is necessary because at this time MSVC does not set correctly the
+// __cplusplus macro.
+#if defined(_MSC_VER)
+
+#define MPPP_CPLUSPLUS _MSVC_LANG
+
+#else
+
+#define MPPP_CPLUSPLUS __cplusplus
+
+#endif
+
 #endif

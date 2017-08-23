@@ -9,6 +9,8 @@
 #ifndef MPPP_RATIONAL_HPP
 #define MPPP_RATIONAL_HPP
 
+#include <mp++/config.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -18,7 +20,7 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
 #include <type_traits>
@@ -26,7 +28,6 @@
 #include <vector>
 
 #include <mp++/concepts.hpp>
-#include <mp++/config.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #if defined(MPPP_WITH_MPFR)
@@ -451,7 +452,7 @@ public:
         buffer.emplace_back('\0');
         dispatch_c_string_ctor(buffer.data(), base);
     }
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
     /// Constructor from string view.
     /**
      * This constructor will initialise \p this from the content of the input string view,
@@ -672,7 +673,7 @@ public:
     {
         return operator=(s.c_str());
     }
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
     /// Assignment from string view.
     /**
      * \rststar
@@ -1025,7 +1026,7 @@ private:
     int_t m_den;
 };
 
-#if __cplusplus < 201703L
+#if MPPP_CPLUSPLUS < 201703L
 
 // NOTE: see the explanation in integer.hpp regarding static constexpr variables in C++17.
 

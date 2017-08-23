@@ -18,7 +18,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
 #include <thread>
@@ -361,7 +361,7 @@ struct string_ctor_tester {
         const char *cs = "-1234/345\0";
         REQUIRE((rational{cs, cs + 9} == rational{-1234, 345}));
         REQUIRE((rational{cs, cs + 8} == rational{-617, 17}));
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
         std::string_view sv = "-1234/345";
         REQUIRE((rational{sv} == rational{-1234, 345}));
         REQUIRE((rational{std::string_view{sv.data(), 8u}} == rational{-617, 17}));
@@ -734,7 +734,7 @@ struct string_ass_tester {
             return std::string(ia.what())
                    == "A zero denominator was detected in the constructor of a rational from string";
         });
-#if __cplusplus >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L
         q = std::string_view{"1"};
         REQUIRE(q == 1);
         q = std::string_view{"-23"};
