@@ -13,6 +13,20 @@
 
 using namespace mppp;
 
+TEST_CASE("real128 fma")
+{
+    real128 x, y, z;
+    REQUIRE((fma(x, y, z).m_value == 0));
+    x = -2;
+    y = 3;
+    z = -7;
+    REQUIRE((fma(x, y, z).m_value == -13));
+    x = "1.18973149535723176508575932662800702e+4932";
+    y = 2;
+    z = "-1.18973149535723176508575932662800702e+4932";
+    REQUIRE((fma(x, y, z).m_value == x.m_value));
+}
+
 TEST_CASE("real128 abs")
 {
     real128 r;

@@ -751,6 +751,24 @@ public:
  *  @{
  */
 
+/// Fused multiply-add.
+/**
+ * \rststar
+ * This function will return :math:`\left(x \times y\right) + z` as if calculated to infinite precision and
+ * rounded once.
+ * \endrststar
+ *
+ * @param x the first factor.
+ * @param y the second factor.
+ * @param z the addend.
+ *
+ * @return \f$ \left(x \times y\right) + z \f$.
+ */
+inline real128 fma(const real128 &x, const real128 &y, const real128 &z)
+{
+    return real128{::fmaq(x.m_value, y.m_value, z.m_value)};
+}
+
 /// Unary absolute value.
 /**
  * @param x the \link mppp::real128 real128 \endlink argument.
