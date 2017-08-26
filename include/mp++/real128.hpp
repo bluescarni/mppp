@@ -22,17 +22,53 @@
 #if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
+#include <type_traits>
 #include <vector>
 
 #include <mp++/concepts.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/quadmath.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
 namespace mppp
 {
+
+// Fwd declaration.
+class real128;
+
+inline namespace detail
+{
+
+template <typename T, typename U>
+using are_real128_cpp_op_types
+    = std::integral_constant<bool, disjunction<conjunction<std::is_same<T, real128>, std::is_same<U, real128>>,
+                                               conjunction<std::is_same<T, real128>, is_cpp_interoperable<U>>,
+                                               conjunction<std::is_same<U, real128>, is_cpp_interoperable<T>>>::value>;
+
+template <typename T, typename U>
+using are_real128_mppp_op_types
+    = std::integral_constant<bool, disjunction<conjunction<std::is_same<T, real128>, is_integer<U>>,
+                                               conjunction<std::is_same<U, real128>, is_integer<T>>,
+                                               conjunction<std::is_same<T, real128>, is_rational<U>>,
+                                               conjunction<std::is_same<U, real128>, is_rational<T>>>::value>;
+}
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool Real128CppOpTypes = are_real128_cpp_op_types<T, U>::value;
+#else
+using real128_cpp_op_types_enabler = enable_if_t<are_real128_cpp_op_types<T, U>::value, int>;
+#endif
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool Real128MpppOpTypes = are_real128_mppp_op_types<T, U>::value;
+#else
+using real128_mppp_op_types_enabler = enable_if_t<are_real128_mppp_op_types<T, U>::value, int>;
+#endif
 
 /// Quadruple-precision floating-point class.
 /**
@@ -941,9 +977,82 @@ inline real128 hypot(const real128 &x, const real128 &y)
  *
  * @return a copy of \p x.
  */
-constexpr inline real128 operator+(real128 x)
+constexpr real128 operator+(real128 x)
 {
     return x;
+}
+
+inline namespace detail
+{
+
+constexpr real128 dispatch_add(const real128 &x, const real128 &y)
+{
+    return real128{x.m_value + y.m_value};
+}
+
+template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+constexpr real128 dispatch_add(const real128 &x, const T &y)
+{
+    return real128{x.m_value + y};
+}
+
+template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+constexpr real128 dispatch_add(const T &x, const real128 &y)
+{
+    return real128{x + y.m_value};
+}
+}
+
+/// Binary addition involving \link mppp::real128 real128 \endlink and C++ types.
+/**
+ * @param x the first addend.
+ * @param y the second addend.
+ *
+ * @return \f$ x + y \f$.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+constexpr real128 operator+(const T &x, const Real128CppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
+constexpr real128 operator+(const T &x, const U &y)
+#endif
+{
+    return dispatch_add(x, y);
+}
+
+inline namespace detail
+{
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline real128 dispatch_add(const real128 &x, const T &y)
+{
+    return x + real128{y};
+}
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline real128 dispatch_add(const T &x, const real128 &y)
+{
+    return real128{x} + y;
+}
+}
+
+/// Binary addition involving \link mppp::real128 real128 \endlink and mp++ types.
+/**
+ * @param x the first addend.
+ * @param y the second addend.
+ *
+ * @return \f$ x + y \f$.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline real128 operator+(const T &x, const Real128MpppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
+inline real128 operator+(const T &x, const U &y)
+#endif
+{
+    return dispatch_add(x, y);
 }
 
 /** @} */

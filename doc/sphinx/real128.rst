@@ -28,6 +28,26 @@ Types
 
       https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
 
+Concepts
+--------
+
+.. cpp:concept:: template <typename T, typename U> mppp::Real128CppOpTypes
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic binary :ref:`operators <real128_operators>`
+   involving :cpp:class:`~mppp::real128` and C++ types. Specifically, the concept will be ``true`` if either:
+
+   * ``T`` and ``U`` are both :cpp:class:`~mppp::real128`, or
+   * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::CppInteroperable` type.
+
+.. cpp:concept:: template <typename T, typename U> mppp::Real128MpppOpTypes
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic binary :ref:`operators <real128_operators>`
+   involving :cpp:class:`~mppp::real128` and mp++ types. Specifically, the concept will be ``true`` if
+   one type is :cpp:class:`~mppp::real128` and the other is either :cpp:class:`~mppp::integer` or
+   :cpp:class:`~mppp::rational`.
+
 .. _real128_functions:
 
 Functions

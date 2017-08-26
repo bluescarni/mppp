@@ -43,9 +43,16 @@ TEST_CASE("real128 constructors")
 {
     real128 r;
     REQUIRE((r.m_value == 0));
+    constexpr real128 rc;
+    REQUIRE((rc.m_value == 0));
     r.m_value = 12;
     real128 r2{r};
     REQUIRE((r2.m_value == 12));
+    // Do some constexpr checks as well.
+    constexpr real128 rc2{12}, rc3{rc2}, rc4{real128{5}}, rc5{::__float128(45)};
+    REQUIRE((rc3.m_value == 12));
+    REQUIRE((rc4.m_value == 5));
+    REQUIRE((rc5.m_value == 45));
     real128 r3{std::move(r)};
     REQUIRE((r3.m_value == 12));
     REQUIRE((r.m_value == 12));
@@ -224,6 +231,11 @@ TEST_CASE("real128 conversions")
     REQUIRE(static_cast<float>(r) == -123.f);
     REQUIRE(static_cast<double>(r) == -123.);
     REQUIRE((static_cast<::__float128>(r) == r.m_value));
+    // Constexpr checking.
+    constexpr int nc = static_cast<int>(real128{12});
+    REQUIRE(nc == 12);
+    constexpr ::__float128 fc = static_cast<::__float128>(real128{-120});
+    REQUIRE((fc == -120));
     // Conversion to integer.
     REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real128{"nan"}), std::domain_error, [](const std::domain_error &ex) {
         return std::string(ex.what()) == "Cannot convert a non-finite real128 to an integer";
