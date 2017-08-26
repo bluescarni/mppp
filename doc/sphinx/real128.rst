@@ -64,3 +64,11 @@ Input/Output
 
 .. doxygengroup:: real128_io
    :content-only:
+
+.. _real128_operators:
+
+Operators
+~~~~~~~~~
+
+.. doxygengroup:: real128_operators
+   :content-only:

@@ -85,6 +85,12 @@ TEST_CASE("real128 constructors")
     n.promote();
     n.neg();
     REQUIRE((real128{n}.m_value == ::scalbnq(::__float128(2), 2 * GMP_NUMB_BITS - 1)));
+    n = 1;
+    n <<= 16500ul;
+    REQUIRE((real128{n}.m_value == real128{"inf"}.m_value));
+    n = -1;
+    n <<= 16500ul;
+    REQUIRE((real128{n}.m_value == real128{"-inf"}.m_value));
     // Random testing.
     std::uniform_int_distribution<std::uint_least64_t> dist64(0u, (std::uint_least64_t(-1) << delta64) >> delta64);
     std::uniform_int_distribution<std::uint_least64_t> dist49(0u, (std::uint_least64_t(-1) << delta49) >> delta49);

@@ -771,7 +771,7 @@ inline real128 fma(const real128 &x, const real128 &y, const real128 &z)
 
 /// Unary absolute value.
 /**
- * @param x the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128 \endlink whose absolute value will be computed.
  *
  * @return the absolute value of \p x.
  */
@@ -795,9 +795,9 @@ inline real128 abs(real128 x)
  * described in :cpp:func:`mppp::real128::to_string()`.
  *
  * .. warning::
- *    In future versions of mp++, the behaviour of this operator will likely change. Please use the
- *    ``quadmath_snprintf()`` function from the quadmath library if you need precise and forward-compatible
- *    control on the printing format.
+ *    In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
+ *    flags. For the time being, users are encouraged to use the ``quadmath_snprintf()`` function from the quadmath
+ *    library if precise and forward-compatible control on the printing format is needed.
  * \endrststar
  *
  * @param os the target stream.
@@ -843,9 +843,9 @@ inline std::istream &operator>>(std::istream &is, real128 &x)
 
 /// Sign bit of a \link mppp::real128 real128 \endlink.
 /**
- * @param x the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128 \endlink whose sign bit will be returned.
  *
- * @return the output of mppp::real128::signbit() called on \p x.
+ * @return the sign bit of \p x (as returned by mppp::real128::signbit()).
  */
 inline bool signbit(const real128 &x)
 {
@@ -856,7 +856,7 @@ inline bool signbit(const real128 &x)
 /**
  * @param x the \link mppp::real128 real128 \endlink argument.
  *
- * @return the output of mppp::real128::isnan() called on \p x.
+ * @return \p true if \p x is NaN, \p false otherwise.
  */
 inline bool isnan(const real128 &x)
 {
@@ -867,7 +867,7 @@ inline bool isnan(const real128 &x)
 /**
  * @param x the \link mppp::real128 real128 \endlink argument.
  *
- * @return the output of mppp::real128::isinf() called on \p x.
+ * @return \p true if \p x is infinite, \p false otherwise.
  */
 inline bool isinf(const real128 &x)
 {
@@ -878,7 +878,7 @@ inline bool isinf(const real128 &x)
 /**
  * @param x the \link mppp::real128 real128 \endlink argument.
  *
- * @return the output of mppp::real128::finite() called on \p x.
+ * @return \p true if \p x is finite, \p false otherwise.
  */
 inline bool finite(const real128 &x)
 {
@@ -895,7 +895,7 @@ inline bool finite(const real128 &x)
 /**
  * If \p x is less than negative zero, the result will be NaN.
  *
- * @param x the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128 \endlink whose square root will be returned.
  *
  * @return the nonnegative square root of \p x.
  */
@@ -907,7 +907,7 @@ inline real128 sqrt(real128 x)
 
 /// Unary cube root.
 /**
- * @param x the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128 \endlink whose cube root will be returned.
  *
  * @return the real cube root of \p x.
  */
@@ -927,6 +927,23 @@ inline real128 cbrt(real128 x)
 inline real128 hypot(const real128 &x, const real128 &y)
 {
     return real128{::hypotq(x.m_value, y.m_value)};
+}
+
+/** @} */
+
+/** @defgroup real128_operators real128_operators
+ *  @{
+ */
+
+/// Identity operator.
+/**
+ * @param x the \link mppp::real128 real128 \endlink that will be copied.
+ *
+ * @return a copy of \p x.
+ */
+constexpr inline real128 operator+(real128 x)
+{
+    return x;
 }
 
 /** @} */
