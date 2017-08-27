@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Implement the ``sub_ui()`` primitive for :cpp:class:`~mppp::integer` (`#37 <https://github.com/bluescarni/mppp/pull/37>`__).
+
 - Add assignment operator from ``std::string_view`` for :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
   (`#32 <https://github.com/bluescarni/mppp/pull/32>`__).
 
@@ -15,6 +17,8 @@ New
 
 Changes
 ~~~~~~~
+
+- Use various C++17 standard library bits if available (`#37 <https://github.com/bluescarni/mppp/pull/37>`__).
 
 - Update the internal copy of Catch to the latest version, 1.9.7 (`#36 <https://github.com/bluescarni/mppp/pull/36>`__).
 
