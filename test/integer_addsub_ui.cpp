@@ -212,3 +212,185 @@ TEST_CASE("add_ui")
 {
     tuple_for_each(sizes{}, add_ui_tester{});
 }
+
+struct sub_ui_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        // Start with all zeroes.
+        mpz_raii m1, m2;
+        integer n1, n2;
+        sub_ui(n1, n2, 0);
+        ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        // Ones and zeroes.
+        sub_ui(n1, n2, 1);
+        ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        n2 = integer{1};
+        ::mpz_set_si(&m2.m_mpz, 1);
+        sub_ui(n1, n2, 0);
+        ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        n2 = integer{-1};
+        ::mpz_set_si(&m2.m_mpz, -1);
+        sub_ui(n1, n2, 0);
+        ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        sub_ui(n1, n2, 1);
+        ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        sub_ui(n1, n2, 123);
+        ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+        REQUIRE((lex_cast(n1) == lex_cast(m1)));
+        REQUIRE(n1.is_static());
+        mpz_raii tmp;
+        std::uniform_int_distribution<int> sdist(0, 1);
+        std::uniform_int_distribution<unsigned long> uldist(0ull, std::numeric_limits<unsigned long>::max());
+        // Run a variety of tests with operands with x number of limbs.
+        auto random_xy = [&](unsigned x) {
+            for (int i = 0; i < ntries; ++i) {
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset rop every once in a while.
+                    n1 = integer{};
+                }
+                random_integer(tmp, x, rng);
+                ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
+                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.neg();
+                }
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
+                sub_ui(n1, n2, 0);
+                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                const auto rul = uldist(rng);
+                sub_ui(n1, integer{}, rul);
+                mpz_raii empty;
+                ::mpz_sub_ui(&m1.m_mpz, &empty.m_mpz, rul);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                sub_ui(n1, n2, rul);
+                ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, rul);
+                REQUIRE((lex_cast(n1) == lex_cast(m1)));
+                // Overlap.
+                sub_ui(n2, n2, rul);
+                ::mpz_sub_ui(&m2.m_mpz, &m2.m_mpz, rul);
+                REQUIRE((lex_cast(n2) == lex_cast(m2)));
+                REQUIRE((lex_cast(n2) == lex_cast(n1)));
+            }
+        };
+
+        random_xy(0);
+        random_xy(1);
+        random_xy(2);
+        random_xy(3);
+        random_xy(4);
+
+        if (S::value == 1) {
+            // Tests specific for 1-limb optimisation.
+            n2 = integer{GMP_NUMB_MAX};
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            sub_ui(n1, n2, 0);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            sub_ui(n1, n2, 1);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            sub_ui(n1, n2, 123);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            sub_ui(n2, n2, 1);
+            ::mpz_sub_ui(&m2.m_mpz, &m2.m_mpz, 1);
+            REQUIRE((lex_cast(n2) == lex_cast(m2)));
+            n1 = integer{};
+        }
+
+        if (S::value == 2) {
+            // Tests specific for 2-limb optimisation.
+            n2 = integer{GMP_NUMB_MAX};
+            mul_2exp(n2, n2, GMP_NUMB_BITS);
+            add(n2, n2, integer{GMP_NUMB_MAX});
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            sub_ui(n1, n2, 0);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            sub_ui(n1, n2, 1);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            sub_ui(n1, n2, 123);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            sub_ui(n2, n2, 1);
+            ::mpz_sub_ui(&m2.m_mpz, &m2.m_mpz, 1);
+            REQUIRE((lex_cast(n2) == lex_cast(m2)));
+            n1 = integer{};
+        }
+
+        if (S::value > 2) {
+            // Tests specific for mpn implementation.
+            n2 = integer{GMP_NUMB_MAX};
+            for (auto i = 1u; i < S::value; ++i) {
+                mul_2exp(n2, n2, GMP_NUMB_BITS);
+                add(n2, n2, integer{GMP_NUMB_MAX});
+            }
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            sub_ui(n1, n2, 0);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            sub_ui(n1, n2, 1);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 1);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            n2 = integer{};
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            sub_ui(n1, n2, (unsigned long)(-1));
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, (unsigned long)(-1));
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n2 = integer{GMP_NUMB_MAX};
+            mul_2exp(n2, n2, GMP_NUMB_BITS);
+            add(n2, n2, integer{GMP_NUMB_MAX});
+            n2.neg();
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            sub_ui(n1, n2, 123);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            n2 = integer{GMP_NUMB_MAX};
+            n2.neg();
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            sub_ui(n1, n2, 123);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+            n2 = integer{1};
+            n2.neg();
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            sub_ui(n1, n2, 123);
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
+            REQUIRE((lex_cast(n1) == lex_cast(m1)));
+            n1 = integer{};
+        }
+    }
+};
+
+TEST_CASE("sub_ui")
+{
+    tuple_for_each(sizes{}, sub_ui_tester{});
+}

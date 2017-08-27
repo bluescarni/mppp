@@ -29,7 +29,7 @@ function(ADD_MPPP_TESTCASE arg1)
 endfunction()
 
 ADD_MPPP_TESTCASE(integer_abs)
-ADD_MPPP_TESTCASE(integer_add_ui)
+ADD_MPPP_TESTCASE(integer_addsub_ui)
 ADD_MPPP_TESTCASE(integer_arith)
 ADD_MPPP_TESTCASE(integer_arith_ops)
 if(NOT MINGW)

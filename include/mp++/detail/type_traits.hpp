@@ -20,6 +20,13 @@ inline namespace detail
 // A bunch of useful utilities from C++14/C++17.
 
 // http://en.cppreference.com/w/cpp/types/void_t
+#if MPPP_CPLUSPLUS >= 201703L
+
+template <typename... Ts>
+using void_t = std::void_t<Ts...>;
+
+#else
+
 template <typename... Ts>
 struct make_void {
     typedef void type;
@@ -27,6 +34,8 @@ struct make_void {
 
 template <typename... Ts>
 using void_t = typename make_void<Ts...>::type;
+
+#endif
 
 // http://en.cppreference.com/w/cpp/experimental/is_detected
 template <class Default, class AlwaysVoid, template <class...> class Op, class... Args>
@@ -56,6 +65,21 @@ template <template <class...> class Op, class... Args>
 using detected_t = typename detector<nonesuch, void, Op, Args...>::type;
 
 // http://en.cppreference.com/w/cpp/types/conjunction
+// http://en.cppreference.com/w/cpp/types/disjunction
+// http://en.cppreference.com/w/cpp/types/negation
+#if MPPP_CPLUSPLUS >= 201703L
+
+template <typename... Ts>
+using conjunction = std::conjunction<Ts...>;
+
+template <typename... Ts>
+using disjunction = std::disjunction<Ts...>;
+
+template <typename T>
+using negation = std::negation<T>;
+
+#else
+
 template <class...>
 struct conjunction : std::true_type {
 };
@@ -68,7 +92,6 @@ template <class B1, class... Bn>
 struct conjunction<B1, Bn...> : std::conditional<B1::value != false, conjunction<Bn...>, B1>::type {
 };
 
-// http://en.cppreference.com/w/cpp/types/disjunction
 template <class...>
 struct disjunction : std::false_type {
 };
@@ -81,10 +104,11 @@ template <class B1, class... Bn>
 struct disjunction<B1, Bn...> : std::conditional<B1::value != false, B1, disjunction<Bn...>>::type {
 };
 
-// http://en.cppreference.com/w/cpp/types/negation
 template <class B>
 struct negation : std::integral_constant<bool, !B::value> {
 };
+
+#endif
 
 // Some handy aliases.
 template <typename T>
