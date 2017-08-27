@@ -5019,10 +5019,10 @@ inline T &operator+=(T &rop, const U &op)
  *
  * @param n the integer that will be increased.
  *
- * @return reference to \p n after the increment.
+ * @return a reference to \p n after the increment.
  */
 template <std::size_t SSize>
-integer<SSize> &operator++(integer<SSize> &n)
+inline integer<SSize> &operator++(integer<SSize> &n)
 {
     add_ui(n, n, 1u);
     return n;
@@ -5037,7 +5037,7 @@ integer<SSize> &operator++(integer<SSize> &n)
  * @return a copy of \p n before the increment.
  */
 template <std::size_t SSize>
-integer<SSize> operator++(integer<SSize> &n, int)
+inline integer<SSize> operator++(integer<SSize> &n, int)
 {
     auto retval(n);
     ++n;
@@ -5176,10 +5176,10 @@ inline T &operator-=(T &rop, const U &op)
  *
  * @param n the integer that will be decreased.
  *
- * @return reference to \p n after the decrement.
+ * @return a reference to \p n after the decrement.
  */
 template <std::size_t SSize>
-integer<SSize> &operator--(integer<SSize> &n)
+inline integer<SSize> &operator--(integer<SSize> &n)
 {
     sub_ui(n, n, 1u);
     return n;
@@ -5194,7 +5194,7 @@ integer<SSize> &operator--(integer<SSize> &n)
  * @return a copy of \p n before the decrement.
  */
 template <std::size_t SSize>
-integer<SSize> operator--(integer<SSize> &n, int)
+inline integer<SSize> operator--(integer<SSize> &n, int)
 {
     auto retval(n);
     --n;
