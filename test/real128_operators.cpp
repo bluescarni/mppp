@@ -16,6 +16,18 @@ using namespace mppp;
 using int_t = integer<1>;
 using rat_t = rational<1>;
 
+#if MPPP_CPLUSPLUS >= 201402L
+
+static constexpr real128 test_constexpr_incr()
+{
+    real128 retval;
+    ++retval;
+    retval++;
+    return retval;
+}
+
+#endif
+
 TEST_CASE("real128 plus")
 {
     real128 x;
@@ -41,4 +53,18 @@ TEST_CASE("real128 plus")
     REQUIRE(((int_t{3} + x).m_value == -2));
     REQUIRE(((x + rat_t{3, 2}).m_value == real128{"-3.5"}.m_value));
     REQUIRE(((rat_t{3, 2} + x).m_value == real128{"-3.5"}.m_value));
+    x = 5;
+    REQUIRE(((++x).m_value == 6));
+    REQUIRE(((x++).m_value == 6));
+    REQUIRE(((x).m_value == 7));
+#if MPPP_CPLUSPLUS >= 201402L
+    constexpr auto z4 = test_constexpr_incr();
+    REQUIRE((z4.m_value == 2));
+#endif
+    REQUIRE(((-real128{}).m_value == 0));
+    REQUIRE((-real128{}).signbit());
+    REQUIRE(((-real128{123}).m_value == -123));
+    REQUIRE(((-real128{-123}).m_value == 123));
+    constexpr auto z5 = -real128{-45};
+    REQUIRE((z5.m_value == 45));
 }
