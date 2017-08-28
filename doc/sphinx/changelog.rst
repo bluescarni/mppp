@@ -28,6 +28,8 @@ Changes
 Fix
 ~~~
 
+- Fix a few missing ``inline`` specifiers (`#38 <https://github.com/bluescarni/mppp/pull/38>`__).
+
 - Fix C++ version detection on MSVC (`#36 <https://github.com/bluescarni/mppp/pull/36>`__).
 
 - Fix missing tests for :cpp:class:`~mppp::rational` hashing (`#29 <https://github.com/bluescarni/mppp/pull/29>`__).
