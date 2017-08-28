@@ -1059,11 +1059,17 @@ inline real128 operator+(const T &x, const U &y)
 /**
  * Increment \p x by one.
  *
+ * \rststar
+ * .. note::
+ *
+ *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
+ * \endrststar
+ *
  * @param x the \link mppp::real128 real128 \endlink that will be increased.
  *
  * @return a reference to \p x after the increment.
  */
-constexpr real128 &operator++(real128 &x)
+MPPP_CONSTEXPR_14 real128 &operator++(real128 &x)
 {
     ++x.m_value;
     return x;
@@ -1073,11 +1079,17 @@ constexpr real128 &operator++(real128 &x)
 /**
  * Increment \p x by one and return a copy of \p x as it was before the increment.
  *
+ * \rststar
+ * .. note::
+ *
+ *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
+ * \endrststar
+ *
  * @param x the \link mppp::real128 real128 \endlink that will be increased.
  *
  * @return a copy of \p x before the increment.
  */
-constexpr real128 operator++(real128 &x, int)
+MPPP_CONSTEXPR_14 real128 operator++(real128 &x, int)
 {
     auto retval(x);
     ++x;
