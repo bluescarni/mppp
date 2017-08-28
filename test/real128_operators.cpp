@@ -16,7 +16,14 @@ using namespace mppp;
 using int_t = integer<1>;
 using rat_t = rational<1>;
 
-#if MPPP_CPLUSPLUS >= 201402L
+// Some tests involving constexpr result in an ICE on GCC < 6.
+#if (defined(_MSC_VER) || defined(__clang__) || __GNUC__ >= 6) && MPPP_CPLUSPLUS >= 201402L
+
+#define MPPP_ENABLE_CONSTEXPR_TESTS
+
+#endif
+
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
 
 static constexpr real128 test_constexpr_incr()
 {
@@ -57,7 +64,7 @@ TEST_CASE("real128 plus")
     REQUIRE(((++x).m_value == 6));
     REQUIRE(((x++).m_value == 6));
     REQUIRE(((x).m_value == 7));
-#if MPPP_CPLUSPLUS >= 201402L
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     constexpr auto z4 = test_constexpr_incr();
     REQUIRE((z4.m_value == 2));
 #endif
