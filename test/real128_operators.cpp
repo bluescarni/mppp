@@ -33,6 +33,14 @@ static constexpr real128 test_constexpr_incr()
     return retval;
 }
 
+static constexpr real128 test_constexpr_decr()
+{
+    real128 retval;
+    --retval;
+    retval--;
+    return retval;
+}
+
 #endif
 
 TEST_CASE("real128 plus")
@@ -74,4 +82,11 @@ TEST_CASE("real128 plus")
     REQUIRE(((-real128{-123}).m_value == 123));
     constexpr auto z5 = -real128{-45};
     REQUIRE((z5.m_value == 45));
+    REQUIRE(((--x).m_value == 6));
+    REQUIRE(((x--).m_value == 6));
+    REQUIRE(((x).m_value == 5));
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+    constexpr auto z6 = test_constexpr_decr();
+    REQUIRE((z6.m_value == -2));
+#endif
 }

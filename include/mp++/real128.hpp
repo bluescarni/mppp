@@ -1057,7 +1057,7 @@ inline real128 operator+(const T &x, const U &y)
 
 /// Prefix increment.
 /**
- * Increment \p x by one.
+ * This operator will increment \p x by one.
  *
  * \rststar
  * .. note::
@@ -1077,7 +1077,7 @@ MPPP_CONSTEXPR_14 real128 &operator++(real128 &x)
 
 /// Suffix increment.
 /**
- * Increment \p x by one and return a copy of \p x as it was before the increment.
+ * This operator will increment \p x by one and return a copy of \p x as it was before the increment.
  *
  * \rststar
  * .. note::
@@ -1105,6 +1105,47 @@ MPPP_CONSTEXPR_14 real128 operator++(real128 &x, int)
 constexpr real128 operator-(const real128 &x)
 {
     return real128{-x.m_value};
+}
+
+/// Prefix decrement.
+/**
+ * This operator will decrement \p x by one.
+ *
+ * \rststar
+ * .. note::
+ *
+ *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
+ * \endrststar
+ *
+ * @param x the \link mppp::real128 real128 \endlink that will be decreased.
+ *
+ * @return a reference to \p x after the decrement.
+ */
+MPPP_CONSTEXPR_14 real128 &operator--(real128 &x)
+{
+    --x.m_value;
+    return x;
+}
+
+/// Suffix decrement.
+/**
+ * This operator will decrement \p x by one and return a copy of \p x as it was before the decrement.
+ *
+ * \rststar
+ * .. note::
+ *
+ *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
+ * \endrststar
+ *
+ * @param x the \link mppp::real128 real128 \endlink that will be decreased.
+ *
+ * @return a copy of \p x before the decrement.
+ */
+MPPP_CONSTEXPR_14 real128 operator--(real128 &x, int)
+{
+    auto retval(x);
+    --x;
+    return retval;
 }
 
 /** @} */
