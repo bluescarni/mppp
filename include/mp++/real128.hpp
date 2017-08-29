@@ -1005,8 +1005,8 @@ constexpr real128 dispatch_add(const T &x, const real128 &y)
 
 /// Binary addition involving \link mppp::real128 real128 \endlink and C++ types.
 /**
- * @param x the first addend.
- * @param y the second addend.
+ * @param x the first operand.
+ * @param y the second operand.
  *
  * @return \f$ x + y \f$.
  */
@@ -1039,10 +1039,13 @@ inline real128 dispatch_add(const T &x, const real128 &y)
 
 /// Binary addition involving \link mppp::real128 real128 \endlink and mp++ types.
 /**
- * @param x the first addend.
- * @param y the second addend.
+ * @param x the first operand.
+ * @param y the second operand.
  *
  * @return \f$ x + y \f$.
+ *
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * from the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
@@ -1107,6 +1110,82 @@ constexpr real128 operator-(const real128 &x)
     return real128{-x.m_value};
 }
 
+inline namespace detail
+{
+
+constexpr real128 dispatch_sub(const real128 &x, const real128 &y)
+{
+    return real128{x.m_value - y.m_value};
+}
+
+template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+constexpr real128 dispatch_sub(const real128 &x, const T &y)
+{
+    return real128{x.m_value - y};
+}
+
+template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+constexpr real128 dispatch_sub(const T &x, const real128 &y)
+{
+    return real128{x - y.m_value};
+}
+}
+
+/// Binary subtraction involving \link mppp::real128 real128 \endlink and C++ types.
+/**
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \f$ x - y \f$.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+constexpr real128 operator-(const T &x, const Real128CppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
+constexpr real128 operator-(const T &x, const U &y)
+#endif
+{
+    return dispatch_sub(x, y);
+}
+
+inline namespace detail
+{
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline real128 dispatch_sub(const real128 &x, const T &y)
+{
+    return x - real128{y};
+}
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline real128 dispatch_sub(const T &x, const real128 &y)
+{
+    return real128{x} - y;
+}
+}
+
+/// Binary subtraction involving \link mppp::real128 real128 \endlink and mp++ types.
+/**
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \f$ x + y \f$.
+ *
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * from the mp++ type.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline real128 operator-(const T &x, const Real128MpppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
+inline real128 operator-(const T &x, const U &y)
+#endif
+{
+    return dispatch_sub(x, y);
+}
+
 /// Prefix decrement.
 /**
  * This operator will decrement \p x by one.
@@ -1146,6 +1225,82 @@ MPPP_CONSTEXPR_14 real128 operator--(real128 &x, int)
     auto retval(x);
     --x;
     return retval;
+}
+
+inline namespace detail
+{
+
+constexpr real128 dispatch_mul(const real128 &x, const real128 &y)
+{
+    return real128{x.m_value * y.m_value};
+}
+
+template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+constexpr real128 dispatch_mul(const real128 &x, const T &y)
+{
+    return real128{x.m_value * y};
+}
+
+template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+constexpr real128 dispatch_mul(const T &x, const real128 &y)
+{
+    return real128{x * y.m_value};
+}
+}
+
+/// Binary multiplication involving \link mppp::real128 real128 \endlink and C++ types.
+/**
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \f$ x \times y \f$.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+constexpr real128 operator*(const T &x, const Real128CppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
+constexpr real128 operator*(const T &x, const U &y)
+#endif
+{
+    return dispatch_mul(x, y);
+}
+
+inline namespace detail
+{
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline real128 dispatch_mul(const real128 &x, const T &y)
+{
+    return x * real128{y};
+}
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline real128 dispatch_mul(const T &x, const real128 &y)
+{
+    return real128{x} * y;
+}
+}
+
+/// Binary multiplication involving \link mppp::real128 real128 \endlink and mp++ types.
+/**
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \f$ x \times y \f$.
+ *
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * from the mp++ type.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline real128 operator*(const T &x, const Real128MpppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
+inline real128 operator*(const T &x, const U &y)
+#endif
+{
+    return dispatch_mul(x, y);
 }
 
 /** @} */

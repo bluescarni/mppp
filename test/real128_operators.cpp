@@ -81,6 +81,18 @@ TEST_CASE("real128 plus")
     REQUIRE(((-real128{123}).m_value == -123));
     REQUIRE(((-real128{-123}).m_value == 123));
     constexpr auto z5 = -real128{-45};
+    REQUIRE(((x - 3).m_value == 4));
+    REQUIRE(((x - 2.).m_value == 5));
+    REQUIRE(((3 - x).m_value == -4));
+    REQUIRE(((2. - x).m_value == -5));
+    constexpr auto z5a = real128{56} - 3;
+    REQUIRE((z5a.m_value == 53));
+    constexpr auto z5b = 3.f - real128{56};
+    REQUIRE((z5b.m_value == -53));
+    REQUIRE(((x - int_t{3}).m_value == 4));
+    REQUIRE(((int_t{3} - x).m_value == -4));
+    REQUIRE(((x - rat_t{3, 2}).m_value == real128{"5.5"}.m_value));
+    REQUIRE(((rat_t{3, 2} - x).m_value == real128{"-5.5"}.m_value));
     REQUIRE((z5.m_value == 45));
     REQUIRE(((--x).m_value == 6));
     REQUIRE(((x--).m_value == 6));
@@ -89,4 +101,16 @@ TEST_CASE("real128 plus")
     constexpr auto z6 = test_constexpr_decr();
     REQUIRE((z6.m_value == -2));
 #endif
+    REQUIRE(((x * 3).m_value == 15));
+    REQUIRE(((x * 2.).m_value == 10));
+    REQUIRE(((-3 * x).m_value == -15));
+    REQUIRE(((2. * x).m_value == 10));
+    constexpr auto z7 = real128{56} * 3;
+    REQUIRE((z7.m_value == 168));
+    constexpr auto z8 = 3.f * -real128{56};
+    REQUIRE((z8.m_value == -168));
+    REQUIRE(((x * int_t{3}).m_value == 15));
+    REQUIRE(((int_t{3} * -x).m_value == -15));
+    REQUIRE(((x * rat_t{3, 2}).m_value == real128{"7.5"}.m_value));
+    REQUIRE(((rat_t{3, 2} * x).m_value == real128{"7.5"}.m_value));
 }
