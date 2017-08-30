@@ -113,4 +113,17 @@ TEST_CASE("real128 plus")
     REQUIRE(((int_t{3} * -x).m_value == -15));
     REQUIRE(((x * rat_t{3, 2}).m_value == real128{"7.5"}.m_value));
     REQUIRE(((rat_t{3, 2} * x).m_value == real128{"7.5"}.m_value));
+    x = 12;
+    REQUIRE(((x / 3).m_value == 4));
+    REQUIRE(((x / 2.).m_value == 6));
+    REQUIRE(((-6 / x).m_value == real128{"-.5"}.m_value));
+    REQUIRE(((3. / x).m_value == real128{".25"}.m_value));
+    constexpr auto z9 = real128{56} / 2;
+    REQUIRE((z9.m_value == 28));
+    constexpr auto z10 = 3.f / -real128{12};
+    REQUIRE((z10.m_value == -real128{".25"}.m_value));
+    REQUIRE(((x / int_t{3}).m_value == 4));
+    REQUIRE(((int_t{3} / -x).m_value == -real128{".25"}.m_value));
+    REQUIRE(((x / rat_t{3, 2}).m_value == 8));
+    REQUIRE(((rat_t{3, 2} / x).m_value == real128{".125"}.m_value));
 }
