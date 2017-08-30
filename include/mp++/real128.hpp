@@ -1304,6 +1304,46 @@ inline real128 operator*(const T &x, const U &y)
 }
 
 /** @} */
+
+inline namespace detail
+{
+
+// Some constants useful in the implementation of real128 constants below.
+template <typename = void>
+struct real128_constants {
+    // 2**-112.
+    static constexpr double two_112
+        = 0.0000000000000000000000000000000001925929944387235853055977942584927318538101648215388195239938795566558837890625;
+    // 2**-48.
+    static constexpr double two_48 = 0.000000000000003552713678800500929355621337890625;
+};
+
+#if MPPP_CPLUSPLUS < 201703L
+
+template <typename T>
+constexpr double real128_constants<T>::two_112;
+
+template <typename T>
+constexpr double real128_constants<T>::two_48;
+
+#endif
+}
+
+/** @defgroup real128_constants real128_constants
+ *  @{
+ */
+
+/// Pi.
+/**
+ * @return the quadruple-precision value of \f$ \pi \f$.
+ */
+constexpr real128 real128_pi()
+{
+    using c = real128_constants<>;
+    return 2 * (9541308523256152504ull * real128{c::two_112} + 160664882791121ull * real128{c::two_48} + 1);
+}
+
+/** @} */
 }
 
 #else
