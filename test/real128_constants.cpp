@@ -17,4 +17,6 @@ TEST_CASE("real128 constants")
 {
     constexpr auto pi = real128_pi();
     REQUIRE((pi.m_value == real128{"3.14159265358979323846264338327950280"}.m_value));
+    constexpr auto e = real128_e();
+    REQUIRE((e.m_value == real128{"2.71828182845904523536028747135266231e+00"}.m_value));
 }

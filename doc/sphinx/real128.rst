@@ -98,17 +98,5 @@ Operators
 Constants
 ~~~~~~~~~
 
-.. note::
-
-   The implementation of these constants currently assumes that the radix of the C++ ``double`` type is 2,
-   and that ``double`` can represent exactly negative powers of two up to at least :math:`2^{-112}`.
-   This is the case on essentially all modern architectures, but as an alternative to these functions
-   it is possible to use the macros defined by the quadmath library (which, however, might require some
-   special compiler switches to be usable).
-
-.. seealso::
-
-   https://gcc.gnu.org/onlinedocs/libquadmath/Typedef-and-constants.html#Typedef-and-constants
-
 .. doxygengroup:: real128_constants
    :content-only:

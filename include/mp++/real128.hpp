@@ -1388,19 +1388,18 @@ inline namespace detail
 template <typename = void>
 struct real128_constants {
     // 2**-112.
-    static constexpr double two_112
-        = 0.0000000000000000000000000000000001925929944387235853055977942584927318538101648215388195239938795566558837890625;
+    static constexpr real128 two_112 = real128{1} / (1ull << 32) / (1ull << 32) / (1ull << 48);
     // 2**-48.
-    static constexpr double two_48 = 0.000000000000003552713678800500929355621337890625;
+    static constexpr real128 two_48 = real128{1} / (1ull << 48);
 };
 
 #if MPPP_CPLUSPLUS < 201703L
 
 template <typename T>
-constexpr double real128_constants<T>::two_112;
+constexpr real128 real128_constants<T>::two_112;
 
 template <typename T>
-constexpr double real128_constants<T>::two_48;
+constexpr real128 real128_constants<T>::two_48;
 
 #endif
 }
@@ -1409,14 +1408,24 @@ constexpr double real128_constants<T>::two_48;
  *  @{
  */
 
-/// Pi.
+/// The \f$ \pi \f$ constant.
 /**
  * @return the quadruple-precision value of \f$ \pi \f$.
  */
 constexpr real128 real128_pi()
 {
     using c = real128_constants<>;
-    return 2 * (9541308523256152504ull * real128{c::two_112} + 160664882791121ull * real128{c::two_48} + 1);
+    return 2 * (9541308523256152504ull * c::two_112 + 160664882791121ull * c::two_48 + 1);
+}
+
+/// The \f$ \mathrm{e} \f$ constant (Euler's number).
+/**
+ * @return the quadruple-precision value of \f$ \mathrm{e} \f$.
+ */
+constexpr real128 real128_e()
+{
+    using c = real128_constants<>;
+    return 2 * (10751604932185443962ull * c::two_112 + 101089180468598ull * c::two_48 + 1);
 }
 
 /** @} */
