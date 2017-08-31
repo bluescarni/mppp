@@ -48,6 +48,13 @@ Concepts
    one type is :cpp:class:`~mppp::real128` and the other is either :cpp:class:`~mppp::integer` or
    :cpp:class:`~mppp::rational`.
 
+.. cpp:concept:: template <typename T, typename U> mppp::Real128OpTypes
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic binary :ref:`operators <real128_operators>` and :ref:`functions <real128_functions>`
+   involving :cpp:class:`~mppp::real128`. Specifically, the concept will be ``true`` if
+   ``T`` and ``U`` satisfy :cpp:concept:`~mppp::Real128CppOpTypes` or :cpp:concept:`~mppp::Real128MpppOpTypes`.
+
 .. _real128_functions:
 
 Functions
@@ -75,6 +82,14 @@ Roots
 ~~~~~
 
 .. doxygengroup:: real128_roots
+   :content-only:
+
+.. _real128_exponentiation:
+
+Exponentiation
+~~~~~~~~~~~~~~
+
+.. doxygengroup:: real128_exponentiation
    :content-only:
 
 .. _real128_io:

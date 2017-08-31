@@ -1012,6 +1012,20 @@ inline real128 dispatch_pow(const T &x, const real128 &y)
 }
 }
 
+/// Exponentiation.
+/**
+ * \rststar
+ * This function will raise the base ``x`` to the exponent ``y``. Internally,
+ * the implementation uses the ``powq()`` function from the quadmath library,
+ * after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+ * (if necessary).
+ * \endrststar
+ *
+ * @param x the base.
+ * @param y the exponent.
+ *
+ * @return \f$ x^y \f$.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
 inline real128 pow(const T &x, const Real128OpTypes<T> &y)
