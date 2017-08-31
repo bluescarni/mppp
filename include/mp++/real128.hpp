@@ -1428,6 +1428,21 @@ constexpr real128 real128_e()
     return 2 * (10751604932185443962ull * c::two_112 + 101089180468598ull * c::two_48 + 1);
 }
 
+#if MPPP_CPLUSPLUS >= 201703L
+
+// NOTE: namespace scope constexpr variables are *not* implicitly inline, so we need
+// inline here:
+// http://en.cppreference.com/w/cpp/language/inline
+// Note that constexpr static member variables are implicitly inline instead.
+
+/// Quadruple-precision \f$ \pi \f$ constant.
+inline constexpr real128 pi128 = real128_pi();
+
+/// Quadruple-precision \f$ \mathrm{e} \f$ constant (Euler's number).
+inline constexpr real128 e128 = real128_e();
+
+#endif
+
 /** @} */
 }
 
