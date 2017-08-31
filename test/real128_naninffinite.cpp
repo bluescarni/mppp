@@ -24,6 +24,10 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(!isinf(r));
     REQUIRE(!r.isnan());
     REQUIRE(!isnan(r));
+    constexpr bool c0 = real128{}.isnan();
+    REQUIRE(!c0);
+    constexpr bool c1 = isnan(real128{});
+    REQUIRE(!c1);
     r = -1;
     REQUIRE(r.finite());
     REQUIRE(finite(r));
@@ -31,6 +35,10 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(!isinf(r));
     REQUIRE(!r.isnan());
     REQUIRE(!isnan(r));
+    constexpr bool d0 = real128{1}.isnan();
+    REQUIRE(!c0);
+    constexpr bool d1 = isnan(real128{1});
+    REQUIRE(!c1);
     r = 123;
     REQUIRE(r.finite());
     REQUIRE(finite(r));

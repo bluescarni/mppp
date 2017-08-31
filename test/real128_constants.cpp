@@ -21,9 +21,21 @@ TEST_CASE("real128 constants")
     REQUIRE((e.m_value == real128{"2.71828182845904523536028747135266231e+00"}.m_value));
     constexpr auto sqrt2 = real128_sqrt2();
     REQUIRE((sqrt2.m_value == real128{"1.41421356237309504880168872420969798"}.m_value));
+    constexpr auto inf = real128_inf();
+    REQUIRE((inf.m_value == real128{"inf"}.m_value));
+    constexpr auto minf = -real128_inf();
+    REQUIRE((minf.m_value == real128{"-inf"}.m_value));
+    constexpr auto nan = real128_nan();
+    REQUIRE(nan.isnan());
+    REQUIRE(!nan.signbit());
+    constexpr auto mnan = -real128_nan();
+    REQUIRE(mnan.isnan());
+    REQUIRE(mnan.signbit());
 #if MPPP_CPLUSPLUS >= 201703L
     REQUIRE((pi128.m_value == real128_pi().m_value));
     REQUIRE((e128.m_value == real128_e().m_value));
     REQUIRE((sqrt2128.m_value == real128_sqrt2().m_value));
+    REQUIRE((inf128.m_value == real128_inf().m_value));
+    REQUIRE(nan128.isnan());
 #endif
 }

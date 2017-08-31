@@ -722,17 +722,17 @@ public:
      *
      * @return \p true if the sign bit of \p this is set, \p false otherwise.
      */
-    bool signbit() const
+    constexpr bool signbit() const
     {
-        return ::signbitq(m_value);
+        return __builtin_signbit(m_value);
     }
     /// Detect NaN.
     /**
      * @return \p true if \p this is NaN, \p false otherwise.
      */
-    bool isnan() const
+    constexpr bool isnan() const
     {
-        return ::isnanq(m_value);
+        return __builtin_isnan(m_value);
     }
     /// Detect infinity.
     /**
@@ -891,7 +891,7 @@ inline std::istream &operator>>(std::istream &is, real128 &x)
  *
  * @return the sign bit of \p x (as returned by mppp::real128::signbit()).
  */
-inline bool signbit(const real128 &x)
+constexpr bool signbit(const real128 &x)
 {
     return x.signbit();
 }
@@ -902,7 +902,7 @@ inline bool signbit(const real128 &x)
  *
  * @return \p true if \p x is NaN, \p false otherwise.
  */
-inline bool isnan(const real128 &x)
+constexpr bool isnan(const real128 &x)
 {
     return x.isnan();
 }
@@ -1480,6 +1480,31 @@ constexpr real128 real128_constants<T>::two_48;
  *  @{
  */
 
+/// The positive \f$ \infty \f$ constant.
+/**
+ * @return \f$ +\infty \f$.
+ */
+constexpr real128 real128_inf()
+{
+    // NOTE: here we cannot use 1/0 as that is apparently forbidden in a constant expression:
+    // https://stackoverflow.com/questions/33916113/dividing-by-zero-in-a-constant-expression
+    // The infinity value is technically not guaranteed to be there in all implementations.
+    static_assert(std::numeric_limits<double>::has_infinity, "The 'double' type does not support infinity.");
+    return real128{std::numeric_limits<double>::infinity()};
+}
+
+/// NaN constant.
+/**
+ * @return a NaN with sign bit unset.
+ */
+constexpr real128 real128_nan()
+{
+    // NOTE: make sure we return a NaN without sign bit set. On at least some implementations,
+    // inf / inf returns -nan.
+    return (real128_inf() / real128_inf()).signbit() ? -(real128_inf() / real128_inf())
+                                                     : (real128_inf() / real128_inf());
+}
+
 /// The \f$ \pi \f$ constant.
 /**
  * @return the quadruple-precision value of \f$ \pi \f$.
@@ -1516,6 +1541,12 @@ constexpr real128 real128_sqrt2()
 // inline here:
 // http://en.cppreference.com/w/cpp/language/inline
 // Note that constexpr static member variables are implicitly inline instead.
+
+/// Quadruple-precision \f$ +\infty \f$ constant.
+inline constexpr real128 inf128 = real128_inf();
+
+/// Quadruple-precision NaN constant.
+inline constexpr real128 nan128 = real128_nan();
 
 /// Quadruple-precision \f$ \pi \f$ constant.
 inline constexpr real128 pi128 = real128_pi();
