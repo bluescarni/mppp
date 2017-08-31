@@ -70,6 +70,14 @@ concept bool Real128MpppOpTypes = are_real128_mppp_op_types<T, U>::value;
 using real128_mppp_op_types_enabler = enable_if_t<are_real128_mppp_op_types<T, U>::value, int>;
 #endif
 
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool Real128OpTypes = Real128CppOpTypes<T, U> || Real128MpppOpTypes<T, U>;
+#else
+using real128_op_types_enabler
+    = enable_if_t<disjunction<are_real128_cpp_op_types<T, U>, are_real128_mppp_op_types<T, U>>::value, int>;
+#endif
+
 /// Quadruple-precision floating-point class.
 /**
  * \rststar
@@ -967,6 +975,56 @@ inline real128 hypot(const real128 &x, const real128 &y)
 
 /** @} */
 
+/** @defgroup real128_exponentiation real128_exponentiation
+ *  @{
+ */
+
+inline namespace detail
+{
+
+inline real128 dispatch_pow(const real128 &x, const real128 &y)
+{
+    return real128{::powq(x.m_value, y.m_value)};
+}
+
+template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+inline real128 dispatch_pow(const real128 &x, const T &y)
+{
+    return real128{::powq(x.m_value, y)};
+}
+
+template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+inline real128 dispatch_pow(const T &x, const real128 &y)
+{
+    return real128{::powq(x, y.m_value)};
+}
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline real128 dispatch_pow(const real128 &x, const T &y)
+{
+    return dispatch_pow(x, real128{y});
+}
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline real128 dispatch_pow(const T &x, const real128 &y)
+{
+    return dispatch_pow(real128{x}, y);
+}
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline real128 pow(const T &x, const Real128OpTypes<T> &y)
+#else
+template <typename T, typename U, real128_op_types_enabler<T, U> = 0>
+inline real128 pow(const T &x, const U &y)
+#endif
+{
+    return dispatch_pow(x, y);
+}
+
+/** @} */
+
 /** @defgroup real128_operators real128_operators
  *  @{
  */
@@ -1428,6 +1486,16 @@ constexpr real128 real128_e()
     return 2 * (10751604932185443962ull * c::two_112 + 101089180468598ull * c::two_48 + 1);
 }
 
+/// The \f$ \sqrt{2} \f$ constant.
+/**
+ * @return the quadruple-precision value of \f$ \sqrt{2} \f$.
+ */
+constexpr real128 real128_sqrt2()
+{
+    using c = real128_constants<>;
+    return 14486024992869247637ull * c::two_112 + 116590752822204ull * c::two_48 + 1;
+}
+
 #if MPPP_CPLUSPLUS >= 201703L
 
 // NOTE: namespace scope constexpr variables are *not* implicitly inline, so we need
@@ -1440,6 +1508,9 @@ inline constexpr real128 pi128 = real128_pi();
 
 /// Quadruple-precision \f$ \mathrm{e} \f$ constant (Euler's number).
 inline constexpr real128 e128 = real128_e();
+
+/// Quadruple-precision \f$ \sqrt{2} \f$ constant.
+inline constexpr real128 sqrt2128 = real128_sqrt2();
 
 #endif
 
