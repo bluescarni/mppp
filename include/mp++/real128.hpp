@@ -1486,11 +1486,7 @@ constexpr real128 real128_constants<T>::two_48;
  */
 constexpr real128 real128_inf()
 {
-    // NOTE: here we cannot use 1/0 as that is apparently forbidden in a constant expression:
-    // https://stackoverflow.com/questions/33916113/dividing-by-zero-in-a-constant-expression
-    // The infinity value is technically not guaranteed to be there in all implementations.
-    static_assert(std::numeric_limits<double>::has_infinity, "The 'double' type does not support infinity.");
-    return real128{std::numeric_limits<double>::infinity()};
+    return real128{__builtin_huge_valq()};
 }
 
 /// NaN constant.
