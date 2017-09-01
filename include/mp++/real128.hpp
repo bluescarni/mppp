@@ -723,10 +723,29 @@ public:
      *
      * @return \p true if the sign bit of \p this is set, \p false otherwise.
      */
-    constexpr bool signbit() const
+    bool signbit() const
     {
-        // TODO double check this.
-        return __builtin_signbit(static_cast<double>(m_value));
+        return ::signbitq(m_value);
+    }
+    /// Categorise the floating point value.
+    /**
+     * This method will categorise the floating-point value of \p this into the 5 categories,
+     * represented as ``int`` values, defined by the standard:
+     * - ``FP_NAN`` for NaN,
+     * - ``FP_INFINITE`` for infinite,
+     * - ``FP_NORMAL`` for normal values,
+     * - ``FP_SUBNORMAL`` for subnormal values,
+     * - ``FP_ZERO`` for zero.
+     *
+     * @return the category to which the value of \p this belongs.
+     */
+    constexpr int fpclassify() const
+    {
+        // NOTE: according to the docs the builtin accepts generic floating-point types:
+        // https://gcc.gnu.org/onlinedocs/gcc-7.2.0/gcc/Other-Builtins.html
+        // It is used internally in the quadmath library as well:
+        // https://github.com/gcc-mirror/gcc/blob/master/libquadmath/quadmath-imp.h
+        return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value);
     }
     /// Detect NaN.
     /**
@@ -734,7 +753,7 @@ public:
      */
     constexpr bool isnan() const
     {
-        return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value) == FP_NAN;
+        return fpclassify() == FP_NAN;
     }
     /// Detect infinity.
     /**
@@ -742,7 +761,7 @@ public:
      */
     constexpr bool isinf() const
     {
-        return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value) == FP_INFINITE;
+        return fpclassify() == FP_INFINITE;
     }
     /// Detect finite value.
     /**
@@ -750,9 +769,7 @@ public:
      */
     constexpr bool finite() const
     {
-        return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value) == FP_NORMAL
-               || __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value) == FP_SUBNORMAL
-               || __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value) == FP_ZERO;
+        return fpclassify() == FP_NORMAL || fpclassify() == FP_SUBNORMAL || fpclassify() == FP_ZERO;
     }
     /// In-place absolute value.
     /**
@@ -895,9 +912,20 @@ inline std::istream &operator>>(std::istream &is, real128 &x)
  *
  * @return the sign bit of \p x (as returned by mppp::real128::signbit()).
  */
-constexpr bool signbit(const real128 &x)
+inline bool signbit(const real128 &x)
 {
     return x.signbit();
+}
+
+/// Categorise a \link mppp::real128 real128 \endlink.
+/**
+ * @param x the \link mppp::real128 real128 \endlink whose floating-point category will be returned.
+ *
+ * @return the output of mppp::real128::fpclassify() called on \p x.
+ */
+constexpr int fpclassify(const real128 &x)
+{
+    return x.fpclassify();
 }
 
 /// Detect if a \link mppp::real128 real128 \endlink is NaN.
@@ -1486,20 +1514,43 @@ constexpr real128 real128_constants<T>::two_48;
 
 /// The positive \f$ \infty \f$ constant.
 /**
+ * \rststar
+ * .. note::
+ *    The implementation of this function on GCC < 7 requires the ``double`` type
+ *    to be able to represent infinities.
+ * \endrststar
+ *
  * @return \f$ +\infty \f$.
  */
 constexpr real128 real128_inf()
 {
+#if __GNUC__ < 7
+    // NOTE: it seems like there's no way to arithmetically construct infinity in constexpr.
+    // I tried 1/0 and repeated multiplications by a large int, but it always ends up in
+    // a 'not a constant expression' error message.
     return real128{std::numeric_limits<double>::infinity()};
+#else
+    // This builtin is constexpr only in GCC 7 and later.
+    // https://gcc.gnu.org/onlinedocs/gcc/x86-Built-in-Functions.html
+    // Note that this and the nan builtins are arch-specific, but it seems they
+    // might be available everywhere __float128 is available.
+    return real128{__builtin_infq()};
+#endif
 }
 
 /// NaN constant.
 /**
- * @return a NaN value with unspecified sign bit.
+ * @return a quiet NaN value with unspecified sign bit.
  */
 constexpr real128 real128_nan()
 {
+#if __GNUC__ < 7
+    // NOTE: funnily enough, this works alright in constexpr.
     return real128_inf() / real128_inf();
+#else
+    // This builtin is constexpr only in GCC 7 and later.
+    return real128{__builtin_nanq("")};
+#endif
 }
 
 /// The \f$ \pi \f$ constant.
@@ -1535,17 +1586,24 @@ constexpr real128 real128_sqrt2()
 #if MPPP_CPLUSPLUS >= 201703L
 
 // NOTE: namespace scope constexpr variables are *not* implicitly inline, so we need
-// inline here:
+// inline explicitly here:
 // http://en.cppreference.com/w/cpp/language/inline
 // Note that constexpr static member variables are implicitly inline instead.
 
 /// Quadruple-precision \f$ +\infty \f$ constant.
 inline constexpr real128 inf128 = real128_inf();
 
-/// Quadruple-precision NaN constant.
+/// Quadruple-precision quiet NaN constant.
 inline constexpr real128 nan128 = real128_nan();
 
 /// Quadruple-precision \f$ \pi \f$ constant.
+/**
+ * \rststar
+ * .. note::
+ *    The implementation of this constant on GCC < 7 requires the ``double`` type
+ *    to be able to represent infinities.
+ * \endrststar
+ */
 inline constexpr real128 pi128 = real128_pi();
 
 /// Quadruple-precision \f$ \mathrm{e} \f$ constant (Euler's number).
