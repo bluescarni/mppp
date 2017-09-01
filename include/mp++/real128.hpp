@@ -724,7 +724,8 @@ public:
      */
     constexpr bool signbit() const
     {
-        return __builtin_signbit(m_value);
+        // TODO double check this.
+        return __builtin_signbit(static_cast<double>(m_value));
     }
     /// Detect NaN.
     /**
@@ -732,7 +733,7 @@ public:
      */
     constexpr bool isnan() const
     {
-        return __builtin_isnan(m_value);
+        return __builtin_fpclassify(0, 1, 2, 3, 4, m_value) == 0;
     }
     /// Detect infinity.
     /**
