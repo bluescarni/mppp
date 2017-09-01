@@ -14,6 +14,7 @@
 #if defined(MPPP_WITH_QUADMATH)
 
 #include <cassert>
+#include <cmath>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -733,23 +734,25 @@ public:
      */
     constexpr bool isnan() const
     {
-        return __builtin_fpclassify(0, 1, 2, 3, 4, m_value) == 0;
+        return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value) == FP_NAN;
     }
     /// Detect infinity.
     /**
      * @return \p true if \p this is infinite, \p false otherwise.
      */
-    bool isinf() const
+    constexpr bool isinf() const
     {
-        return ::isinfq(m_value);
+        return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value) == FP_INFINITE;
     }
     /// Detect finite value.
     /**
      * @return \p true if \p this is finite, \p false otherwise.
      */
-    bool finite() const
+    constexpr bool finite() const
     {
-        return ::finiteq(m_value);
+        return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value) == FP_NORMAL
+               || __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value) == FP_SUBNORMAL
+               || __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value) == FP_ZERO;
     }
     /// In-place absolute value.
     /**
@@ -914,7 +917,7 @@ constexpr bool isnan(const real128 &x)
  *
  * @return \p true if \p x is infinite, \p false otherwise.
  */
-inline bool isinf(const real128 &x)
+constexpr bool isinf(const real128 &x)
 {
     return x.isinf();
 }
@@ -925,7 +928,7 @@ inline bool isinf(const real128 &x)
  *
  * @return \p true if \p x is finite, \p false otherwise.
  */
-inline bool finite(const real128 &x)
+constexpr bool finite(const real128 &x)
 {
     return x.finite();
 }
