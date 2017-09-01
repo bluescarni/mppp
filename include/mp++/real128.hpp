@@ -1487,7 +1487,7 @@ constexpr real128 real128_constants<T>::two_48;
  */
 constexpr real128 real128_inf()
 {
-    return real128{__builtin_infq()};
+    return real128{std::numeric_limits<double>::infinity()};
 }
 
 /// NaN constant.
