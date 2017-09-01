@@ -995,6 +995,9 @@ inline real128 cbrt(real128 x)
 
 /// Euclidean distance.
 /**
+ * The calculation is performed without undue overflow or underflow during the intermediate
+ * steps of the calculation.
+ *
  * @param x the first \link mppp::real128 real128 \endlink argument.
  * @param y the second \link mppp::real128 real128 \endlink argument.
  *
@@ -1591,12 +1594,6 @@ constexpr real128 real128_sqrt2()
 // Note that constexpr static member variables are implicitly inline instead.
 
 /// Quadruple-precision \f$ +\infty \f$ constant.
-inline constexpr real128 inf128 = real128_inf();
-
-/// Quadruple-precision quiet NaN constant.
-inline constexpr real128 nan128 = real128_nan();
-
-/// Quadruple-precision \f$ \pi \f$ constant.
 /**
  * \rststar
  * .. note::
@@ -1604,6 +1601,12 @@ inline constexpr real128 nan128 = real128_nan();
  *    to be able to represent infinities.
  * \endrststar
  */
+inline constexpr real128 inf128 = real128_inf();
+
+/// Quadruple-precision quiet NaN constant.
+inline constexpr real128 nan128 = real128_nan();
+
+/// Quadruple-precision \f$ \pi \f$ constant.
 inline constexpr real128 pi128 = real128_pi();
 
 /// Quadruple-precision \f$ \mathrm{e} \f$ constant (Euler's number).
