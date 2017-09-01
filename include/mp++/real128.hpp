@@ -1487,19 +1487,16 @@ constexpr real128 real128_constants<T>::two_48;
  */
 constexpr real128 real128_inf()
 {
-    return real128{__builtin_huge_valq()};
+    return real128{__builtin_infq()};
 }
 
 /// NaN constant.
 /**
- * @return a NaN with sign bit unset.
+ * @return a NaN value with unspecified sign bit.
  */
 constexpr real128 real128_nan()
 {
-    // NOTE: make sure we return a NaN without sign bit set. On at least some implementations,
-    // inf / inf returns -nan.
-    return (real128_inf() / real128_inf()).signbit() ? -(real128_inf() / real128_inf())
-                                                     : (real128_inf() / real128_inf());
+    return real128_inf() / real128_inf();
 }
 
 /// The \f$ \pi \f$ constant.
