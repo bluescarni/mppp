@@ -27,5 +27,5 @@ Common concepts
    * ``long long`` and ``unsigned long long``,
    * ``float`` and ``double``.
 
-   ``long double`` is also supported, but only if mp++ was installed with the ``MPPP_WITH_MPFR`` option enabled
+   ``long double`` is also supported, but only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled
    (see the :ref:`installation instructions <installation>`).

@@ -1,5 +1,5 @@
-Quadruple-precision floating-point
-==================================
+Quadruple-precision floats
+==========================
 
 .. note::
 
