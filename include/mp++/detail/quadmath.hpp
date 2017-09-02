@@ -55,11 +55,11 @@ __attribute__((gcc_struct))
 
 // The union.
 union ieee_float128 {
-    ::__float128 value;
+    __float128 value;
     ieee_t i_eee;
 };
 
-inline void float128_stream(std::ostream &os, const ::__float128 &x)
+inline void float128_stream(std::ostream &os, const __float128 &x)
 {
     char buf[100];
     // NOTE: 36 decimal digits ensures that reading back the string always produces the same value.
@@ -81,7 +81,7 @@ inline void float128_stream(std::ostream &os, const ::__float128 &x)
     os << &buf[0];
 }
 
-inline ::__float128 str_to_float128(const char *s)
+inline __float128 str_to_float128(const char *s)
 {
     char *endptr;
     auto retval = ::strtoflt128(s, &endptr);

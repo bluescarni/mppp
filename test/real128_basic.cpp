@@ -49,14 +49,14 @@ TEST_CASE("real128 constructors")
     real128 r2{r};
     REQUIRE((r2.m_value == 12));
     // Do some constexpr checks as well.
-    constexpr real128 rc2{12}, rc3{rc2}, rc4{real128{5}}, rc5{::__float128(45)};
+    constexpr real128 rc2{12}, rc3{rc2}, rc4{real128{5}}, rc5{__float128(45)};
     REQUIRE((rc3.m_value == 12));
     REQUIRE((rc4.m_value == 5));
     REQUIRE((rc5.m_value == 45));
     real128 r3{std::move(r)};
     REQUIRE((r3.m_value == 12));
     REQUIRE((r.m_value == 12));
-    real128 r4{::__float128(-56)};
+    real128 r4{__float128(-56)};
     REQUIRE((r4.m_value == -56));
     real128 r5{-123};
     REQUIRE((r5.m_value == -123));
@@ -81,17 +81,17 @@ TEST_CASE("real128 constructors")
     // Use a couple of limbs, nbits does not divide GMP_NUMB_BITS exactly.
     n = -1;
     n <<= GMP_NUMB_BITS + 1;
-    REQUIRE((real128{n}.m_value == ::scalbnq(::__float128(-1), GMP_NUMB_BITS + 1)));
+    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(-1), GMP_NUMB_BITS + 1)));
     n.promote();
     n.neg();
-    REQUIRE((real128{n}.m_value == ::scalbnq(::__float128(1), GMP_NUMB_BITS + 1)));
+    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(1), GMP_NUMB_BITS + 1)));
     // Use two limbs, nbits dividing exactly.
     n = -2;
     n <<= 2 * GMP_NUMB_BITS - 1;
-    REQUIRE((real128{n}.m_value == ::scalbnq(::__float128(-2), 2 * GMP_NUMB_BITS - 1)));
+    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(-2), 2 * GMP_NUMB_BITS - 1)));
     n.promote();
     n.neg();
-    REQUIRE((real128{n}.m_value == ::scalbnq(::__float128(2), 2 * GMP_NUMB_BITS - 1)));
+    REQUIRE((real128{n}.m_value == ::scalbnq(__float128(2), 2 * GMP_NUMB_BITS - 1)));
     n = 1;
     n <<= 16500ul;
     REQUIRE((real128{n}.m_value == real128{"inf"}.m_value));
@@ -109,11 +109,11 @@ TEST_CASE("real128 constructors")
         const auto sign = sdist(rng) ? 1 : -1;
         const auto ebits = extra_bits(rng);
         auto tmp_r = real128{((int_t{hi} << 64) * sign + lo) << ebits};
-        auto cmp_r = ::scalbnq(::scalbnq(::__float128(hi) * sign, 64) + lo, ebits);
+        auto cmp_r = ::scalbnq(::scalbnq(__float128(hi) * sign, 64) + lo, ebits);
         REQUIRE((tmp_r.m_value == cmp_r));
         REQUIRE(static_cast<int_t>(tmp_r) == ((int_t{hi} << 64) * sign + lo) << ebits);
         tmp_r = real128{(int_t{hi} << (64 - ebits)) * sign + (lo >> ebits)};
-        cmp_r = ::scalbnq(::__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
+        cmp_r = ::scalbnq(__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
         REQUIRE((tmp_r.m_value == cmp_r));
         REQUIRE(static_cast<int_t>(tmp_r) == (int_t{hi} << (64 - ebits)) * sign + (lo >> ebits));
     }
@@ -201,7 +201,7 @@ TEST_CASE("real128 constructors")
     REQUIRE((ra.m_value == 2));
     ra = real128{123};
     REQUIRE((ra.m_value == 123));
-    ra = ::__float128(-345);
+    ra = __float128(-345);
     REQUIRE((ra.m_value == -345));
     ra = 456.;
     REQUIRE((ra.m_value == 456));
@@ -225,16 +225,16 @@ TEST_CASE("real128 constructors")
 TEST_CASE("real128 conversions")
 {
     // Conversion to C++ basic types.
-    real128 r{-123};
-    REQUIRE(static_cast<int>(r) == -123);
-    REQUIRE(static_cast<signed char>(r) == -123);
-    REQUIRE(static_cast<float>(r) == -123.f);
-    REQUIRE(static_cast<double>(r) == -123.);
-    REQUIRE((static_cast<::__float128>(r) == r.m_value));
+    real128 re{-123};
+    REQUIRE(static_cast<int>(re) == -123);
+    REQUIRE(static_cast<signed char>(re) == -123);
+    REQUIRE(static_cast<float>(re) == -123.f);
+    REQUIRE(static_cast<double>(re) == -123.);
+    REQUIRE((static_cast<__float128>(re) == re.m_value));
     // Constexpr checking.
     constexpr int nc = static_cast<int>(real128{12});
     REQUIRE(nc == 12);
-    constexpr ::__float128 fc = static_cast<::__float128>(real128{-120});
+    constexpr __float128 fc = static_cast<__float128>(real128{-120});
     REQUIRE((fc == -120));
     // Conversion to integer.
     REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real128{"nan"}), std::domain_error, [](const std::domain_error &ex) {
@@ -271,17 +271,17 @@ TEST_CASE("real128 conversions")
         const auto sign = sdist(rng) ? 1 : -1;
         const auto ebits = extra_bits(rng);
         auto tmp_int = ((int_t{hi} << 64) * sign + lo) << ebits;
-        auto r = ::scalbnq(::scalbnq(::__float128(hi) * sign, 64) + lo, ebits);
+        auto r = ::scalbnq(::scalbnq(__float128(hi) * sign, 64) + lo, ebits);
         REQUIRE(static_cast<int_t>(real128{r}) == tmp_int);
         tmp_int = (int_t{hi} << (64 - ebits)) * sign + (lo >> ebits);
-        r = ::scalbnq(::__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
+        r = ::scalbnq(__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
         REQUIRE(static_cast<int_t>(real128{r}) == tmp_int);
     }
     // Test with small non-integral values.
     dist = std::uniform_real_distribution<double>(100., 1000.);
     for (int i = 0; i < ntries; ++i) {
         auto tmp_d = dist(rng) * (sdist(rng) ? 1. : -1.);
-        ::__float128 tmp_r = ::nextafterq(tmp_d, 10000.);
+        __float128 tmp_r = ::nextafterq(tmp_d, 10000.);
         REQUIRE(static_cast<int_t>(real128{tmp_r}) == int_t{tmp_d});
     }
     // Test with larger values.

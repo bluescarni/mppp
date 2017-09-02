@@ -118,7 +118,7 @@ using real128_op_types_enabler
  *
  * .. code-block:: c++
  *
- *    ::__float128 a = .5;
+ *    __float128 a = .5;
  *    auto b = ::sinq(a);
  *
  * that computes the sine of 0.5 in quadruple precision, storing the result in ``b``, becomes
@@ -171,7 +171,7 @@ public:
      * @param x the quadruple-precision floating-point variable that will be
      * used to initialise the internal value.
      */
-    constexpr explicit real128(::__float128 x) : m_value(x)
+    constexpr explicit real128(__float128 x) : m_value(x)
     {
     }
 /// Constructor from C++ interoperable types.
@@ -397,7 +397,7 @@ public:
      *
      * @return a reference to \p this.
      */
-    MPPP_CONSTEXPR_14 real128 &operator=(const ::__float128 &x)
+    MPPP_CONSTEXPR_14 real128 &operator=(const __float128 &x)
     {
         m_value = x;
         return *this;
@@ -810,7 +810,7 @@ public:
      * inside :cpp:class:`~mppp::real128`.
      * \endrststar
      */
-    ::__float128 m_value;
+    __float128 m_value;
 };
 
 /** @defgroup real128_arithmetic real128_arithmetic
