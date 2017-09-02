@@ -20,7 +20,8 @@ New
 Changes
 ~~~~~~~
 
-- Use various C++17 standard library bits if available (`#37 <https://github.com/bluescarni/mppp/pull/37>`__).
+- Use various C++17 standard library bits if available, and improve general C++17 compatibility
+  (`#31 <https://github.com/bluescarni/mppp/pull/31>`__, `#37 <https://github.com/bluescarni/mppp/pull/37>`__).
 
 - Update the internal copy of Catch to the latest version, 1.9.7 (`#36 <https://github.com/bluescarni/mppp/pull/36>`__).
 
