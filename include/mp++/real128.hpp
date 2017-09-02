@@ -1088,7 +1088,7 @@ inline bool operator==(const T &x, const U &y)
 /**
  * \rststar
  * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
- * and then uses the inequality operator of :cpp:class:`~mppp::real128`.
+ * and then uses the equality operator of :cpp:class:`~mppp::real128`.
  *
  * .. note::
  *    This operator does not handle NaN in a special way (that is, NaN compares
@@ -1112,7 +1112,7 @@ template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &x, const U &y)
 #endif
 {
-    return x != y;
+    return !(x == y);
 }
 
 /// Equality predicate with special NaN handling.
