@@ -116,7 +116,12 @@ Constants
 A few quadruple-precision mathematical constants are provided. The constants are available as inline variables
 (e.g., :cpp:var:`mppp::pi128`, requires C++17 or later) and as constexpr functions (e.g., :cpp:func:`mppp::real128_pi()`,
 always available). Inline variables and constexpr functions provide exactly the same functionality,
-inline variables are more convenient if C++17 is an option.
+but inline variables are more convenient if C++17 is an option.
+
+.. note::
+   Some of these constants are also available as
+   `macros <https://gcc.gnu.org/onlinedocs/libquadmath/Typedef-and-constants.html#Typedef-and-constants>`__
+   from the quadmath library.
 
 .. doxygengroup:: real128_constants
    :content-only:

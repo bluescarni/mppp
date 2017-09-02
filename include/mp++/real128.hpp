@@ -90,6 +90,7 @@ using real128_op_types_enabler
  * * interoperability with other mp++ classes,
  * * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
  *   default-initialised to zero rather than to indefinite values, conversions must be explicit, etc.),
+ * * enhanced compile-time (``constexpr``) capabilities,
  * * a generic C++ API.
  *
  * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
