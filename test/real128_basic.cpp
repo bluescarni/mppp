@@ -66,7 +66,9 @@ TEST_CASE("real128 constructors")
     REQUIRE((r7.m_value == -0.5));
     real128 r8{1.5f};
     REQUIRE((r8.m_value == 1.5f));
-#if defined(MPPP_WITH_MPFR)
+// NOTE: it seems like current clang does not support interaction
+// between long double and __float128. Skip this test for now.
+#if !defined(__clang__) && defined(MPPP_WITH_MPFR)
     real128 r8a{1.5l};
     REQUIRE((r8a.m_value == 1.5l));
 #endif
