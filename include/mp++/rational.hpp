@@ -2759,9 +2759,11 @@ namespace std
 
 template <size_t SSize>
 struct hash<mppp::rational<SSize>> {
+#if MPPP_CPLUSPLUS < 201703L
     using argument_type = mppp::rational<SSize>;
     using result_type = size_t;
-    result_type operator()(const argument_type &q) const
+#endif
+    size_t operator()(const mppp::rational<SSize> &q) const
     {
         return mppp::hash(q);
     }
