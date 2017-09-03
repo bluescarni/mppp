@@ -85,7 +85,7 @@ using real128_op_types_enabler
  * This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
  * (which features up to 36 decimal digits of precision).
  * The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available in GCC
- * on most contemporary platforms, on top of which it provides the following additions:
+ * and recent Clang versions on most contemporary platforms, on top of which it provides the following additions:
  *
  * * interoperability with other mp++ classes,
  * * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
@@ -1819,7 +1819,7 @@ constexpr real128 real128_constants<T>::two_48;
 /**
  * \rststar
  * .. note::
- *    The implementation of this function on GCC < 7 requires the ``double`` type
+ *    The implementation of this function on GCC < 7 and Clang requires the ``double`` type
  *    to be able to represent infinities.
  * \endrststar
  *
@@ -1843,13 +1843,20 @@ constexpr real128 real128_inf()
 
 /// NaN constant.
 /**
+ * \rststar
+ * .. note::
+ *    The implementation of this function on GCC < 7 and Clang requires the ``double`` type
+ *    to be able to represent quiet NaNs.
+ * \endrststar
+ *
  * @return a quiet NaN value with unspecified sign bit.
  */
 constexpr real128 real128_nan()
 {
 #if __GNUC__ < 7
-    // NOTE: funnily enough, this works alright in constexpr.
-    return real128_inf() / real128_inf();
+    // Same as above - GCC would accept arithmetic generation of NaN,
+    // but Clang does not.
+    return real128{std::numeric_limits<double>::quiet_NaN()};
 #else
     // This builtin is constexpr only in GCC 7 and later.
     return real128{__builtin_nanq("")};
@@ -1897,13 +1904,20 @@ constexpr real128 real128_sqrt2()
 /**
  * \rststar
  * .. note::
- *    The implementation of this constant on GCC < 7 requires the ``double`` type
+ *    The implementation of this constant on GCC < 7 and Clang requires the ``double`` type
  *    to be able to represent infinities.
  * \endrststar
  */
 inline constexpr real128 inf128 = real128_inf();
 
 /// Quadruple-precision quiet NaN constant.
+/**
+ * \rststar
+ * .. note::
+ *    The implementation of this constant on GCC < 7 and Clang requires the ``double`` type
+ *    to be able to represent quiet NaNs.
+ * \endrststar
+ */
 inline constexpr real128 nan128 = real128_nan();
 
 /// Quadruple-precision \f$ \pi \f$ constant.
