@@ -38,7 +38,7 @@ TEST_CASE("real128 signbit")
     r = "nan";
     REQUIRE(!r.signbit());
     REQUIRE(!signbit(r));
-    r = ::copysignq(r.m_value, ::__float128(-1));
+    r = ::copysignq(r.m_value, __float128(-1));
     REQUIRE(r.signbit());
     REQUIRE(signbit(r));
 }
