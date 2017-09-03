@@ -31,6 +31,15 @@ Types
 Concepts
 --------
 
+.. cpp:concept:: template <typename T> mppp::Real128CppInteroperable
+
+   This concept is satisfied by fundamental C++ types that can interoperate with :cpp:class:`~mppp::real128`.
+   Specifically:
+
+   * on GCC, this concept is satisfied by the types satisfying :cpp:concept:`mppp::CppInteroperable`;
+   * on Clang, this concept is satisfied by the types satisfying :cpp:concept:`mppp::CppInteroperable`,
+     minus ``long double`` (whether mp++ was configured with the ``MPPP_WITH_MPFR`` option or not).
+
 .. cpp:concept:: template <typename T, typename U> mppp::Real128CppOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
@@ -38,7 +47,7 @@ Concepts
    involving :cpp:class:`~mppp::real128` and C++ types. Specifically, the concept will be ``true`` if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::real128`, or
-   * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::CppInteroperable` type.
+   * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::Real128CppInteroperable` type.
 
 .. cpp:concept:: template <typename T, typename U> mppp::Real128MpppOpTypes
 

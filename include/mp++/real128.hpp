@@ -43,11 +43,55 @@ class real128;
 inline namespace detail
 {
 
+// Story time!
+//
+// Since 3.9, clang supports the __float128 type. However, interactions between long double and __float128 are disabled.
+// The rationale is given here:
+//
+// https://reviews.llvm.org/D15120
+//
+// Basically, it boils down to the fact that on at least one platform (PPC) the long double type (which is implemented
+// as a double-double) can represent exactly some values that __float128 cannot (double-double is a strange beast).
+// On the other hand, __float128 can also
+// represent values that double-double cannot, so it is not clear which floating-point type should have the higher
+// rank. Note that C and C++ mandate, for the standard FP types, that higher rank FPs can represent all values
+// that lower rank FPs can. So, the decision was made to just disable the interaction. This is in line with the
+// following TS for che C language ("Floating-point extensions for C"):
+//
+// http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1945.pdf (page 20)
+//
+// (this is not necessarily a very good way of doing things though, as it seems to create portability concerns)
+//
+// This is part of a larger problem having to do with the fact that, while the properties of __float128 are exactly
+// specified (i.e., quad-precision IEEE), the properties of the standard floating-point types are *not*. So, a
+// *truly* generic real128 class would need, for instance:
+//
+// - to check which C++ types can interact with __float128 and enable only those,
+// - possibly return types other than real128 in binary operations (maybe long double is strictly bigger than quad
+//   precision?),
+// - etc. etc.
+//
+// For the moment, though, it seems like on all platforms __float128 is at least the same rank as double. For long
+// double, clang and GCC diverge, and we follow whatever the compiler is doing. So we just hard-code the behaviour
+// here, we can always write a more sophisticated solution later if the need arises.
+#if defined(MPPP_WITH_MPFR) && defined(__clang__)
+
+template <typename T>
+using is_real128_cpp_interoperable
+    = std::integral_constant<bool, conjunction<is_cpp_interoperable<T>, negation<std::is_same<T, long double>>>::value>;
+
+#else
+
+template <typename T>
+using is_real128_cpp_interoperable = is_cpp_interoperable<T>;
+
+#endif
+
 template <typename T, typename U>
-using are_real128_cpp_op_types
-    = std::integral_constant<bool, disjunction<conjunction<std::is_same<T, real128>, std::is_same<U, real128>>,
-                                               conjunction<std::is_same<T, real128>, is_cpp_interoperable<U>>,
-                                               conjunction<std::is_same<U, real128>, is_cpp_interoperable<T>>>::value>;
+using are_real128_cpp_op_types = std::
+    integral_constant<bool, disjunction<conjunction<std::is_same<T, real128>, std::is_same<U, real128>>,
+                                        conjunction<std::is_same<T, real128>, is_real128_cpp_interoperable<U>>,
+                                        conjunction<std::is_same<U, real128>, is_real128_cpp_interoperable<T>>>::value>;
 
 template <typename T, typename U>
 using are_real128_mppp_op_types
@@ -56,6 +100,13 @@ using are_real128_mppp_op_types
                                                conjunction<std::is_same<T, real128>, is_rational<U>>,
                                                conjunction<std::is_same<U, real128>, is_rational<T>>>::value>;
 }
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool Real128CppInteroperable = is_real128_cpp_interoperable<T>::value;
+#else
+using real128_cpp_interoperable_enabler = enable_if_t<is_real128_cpp_interoperable<T>::value, int>;
+#endif
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -94,7 +145,7 @@ using real128_op_types_enabler
  * * a generic C++ API.
  *
  * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
- * floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list),
+ * floating-point primitive types (see the :cpp:concept:`~mppp::Real128CppInteroperable` concept for the full list),
  * :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`,
  * and it provides overloaded :ref:`operators <real128_operators>`. Differently from the builtin types,
  * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
@@ -174,16 +225,16 @@ public:
     constexpr explicit real128(__float128 x) : m_value(x)
     {
     }
-/// Constructor from C++ interoperable types.
+/// Constructor from interoperable C++ types.
 /**
  * This constructor will initialise the internal value with \p x.
  *
  * @param x the value that will be used for initialisation.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    constexpr explicit real128(CppInteroperable x)
+    constexpr explicit real128(Real128CppInteroperable x)
 #else
-    template <typename T, cpp_interoperable_enabler<T> = 0>
+    template <typename T, real128_cpp_interoperable_enabler<T> = 0>
     constexpr explicit real128(T x)
 #endif
         : m_value(x)
@@ -402,7 +453,7 @@ public:
         m_value = x;
         return *this;
     }
-/// Assignment from C++ interoperable types.
+/// Assignment from interoperable C++ types.
 /**
  * \rststar
  * .. note::
@@ -415,9 +466,9 @@ public:
  * @return a reference to \p this.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    MPPP_CONSTEXPR_14 real128 &operator=(const CppInteroperable &x)
+    MPPP_CONSTEXPR_14 real128 &operator=(const Real128CppInteroperable &x)
 #else
-    template <typename T, cpp_interoperable_enabler<T> = 0>
+    template <typename T, real128_cpp_interoperable_enabler<T> = 0>
     MPPP_CONSTEXPR_14 real128 &operator=(const T &x)
 #endif
     {
@@ -540,7 +591,7 @@ public:
 /// Conversion to interoperable C++ types.
 /**
  * \rststar
- * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppInteroperable` type. The conversion uses
+ * This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128CppInteroperable` type. The conversion uses
  * a direct ``static_cast()`` of the internal :cpp:member:`~mppp::real128::m_value` member to the target type,
  * and thus no checks are performed to ensure that the value of ``this`` can be represented by the target type.
  * Conversion to integral types will produce the truncated counterpart of ``this``.
@@ -549,9 +600,9 @@ public:
  * @return \p this converted to \p T.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <CppInteroperable T>
+    template <Real128CppInteroperable T>
 #else
-    template <typename T, cpp_interoperable_enabler<T> = 0>
+    template <typename T, real128_cpp_interoperable_enabler<T> = 0>
 #endif
     constexpr explicit operator T() const
     {
@@ -970,13 +1021,13 @@ constexpr bool dispatch_eq(const real128 &x, const real128 &y)
     return x.m_value == y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_eq(const real128 &x, const T &y)
 {
     return x.m_value == y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_eq(const T &x, const real128 &y)
 {
     return x == y.m_value;
@@ -1145,13 +1196,13 @@ constexpr bool dispatch_lt(const real128 &x, const real128 &y)
     return x.m_value < y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_lt(const real128 &x, const T &y)
 {
     return x.m_value < y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_lt(const T &x, const real128 &y)
 {
     return x < y.m_value;
@@ -1322,13 +1373,13 @@ inline real128 dispatch_pow(const real128 &x, const real128 &y)
     return real128{::powq(x.m_value, y.m_value)};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_pow(const real128 &x, const T &y)
 {
     return real128{::powq(x.m_value, y)};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_pow(const T &x, const real128 &y)
 {
     return real128{::powq(x, y.m_value)};
@@ -1397,13 +1448,13 @@ constexpr real128 dispatch_add(const real128 &x, const real128 &y)
     return real128{x.m_value + y.m_value};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_add(const real128 &x, const T &y)
 {
     return real128{x.m_value + y};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_add(const T &x, const real128 &y)
 {
     return real128{x + y.m_value};
@@ -1525,13 +1576,13 @@ constexpr real128 dispatch_sub(const real128 &x, const real128 &y)
     return real128{x.m_value - y.m_value};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_sub(const real128 &x, const T &y)
 {
     return real128{x.m_value - y};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_sub(const T &x, const real128 &y)
 {
     return real128{x - y.m_value};
@@ -1642,13 +1693,13 @@ constexpr real128 dispatch_mul(const real128 &x, const real128 &y)
     return real128{x.m_value * y.m_value};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_mul(const real128 &x, const T &y)
 {
     return real128{x.m_value * y};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_mul(const T &x, const real128 &y)
 {
     return real128{x * y.m_value};
@@ -1718,13 +1769,13 @@ constexpr real128 dispatch_div(const real128 &x, const real128 &y)
     return real128{x.m_value / y.m_value};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_div(const real128 &x, const T &y)
 {
     return real128{x.m_value / y};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_div(const T &x, const real128 &y)
 {
     return real128{x / y.m_value};
