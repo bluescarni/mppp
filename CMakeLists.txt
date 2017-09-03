@@ -65,6 +65,12 @@ endif()
 
 # Optional dependency on quadmath.
 if(MPPP_WITH_QUADMATH)
+    include(CheckTypeSize)
+    check_type_size(__float128 _MPPP_FLOAT128_EXISTS BUILTIN_TYPES_ONLY LANGUAGE CXX)
+    if(NOT _MPPP_FLOAT128_EXISTS)
+        message(FATAL_ERROR "The 'MPPP_WITH_QUADMATH' option was enabled but the '__float128' type does not exist.")
+    endif()
+    unset(_MPPP_FLOAT128_EXISTS)
     find_package(Quadmath REQUIRED)
     target_link_libraries(mp++ INTERFACE Quadmath::quadmath)
     set(MPPP_ENABLE_QUADMATH "#define MPPP_WITH_QUADMATH")
