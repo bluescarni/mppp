@@ -1975,24 +1975,16 @@ inline bool operator<=(const T &x, const U &y)
 inline namespace detail
 {
 
-// Some constants useful in the implementation of real128 constants below.
-template <typename = void>
-struct real128_constants {
-    // 2**-112.
-    static constexpr real128 two_112 = real128{1} / (1ull << 32) / (1ull << 32) / (1ull << 48);
-    // 2**-48.
-    static constexpr real128 two_48 = real128{1} / (1ull << 48);
-};
+// Functions useful for the implementation of real128 constants below.
+constexpr real128 two_112()
+{
+    return real128{1} / (1ull << 32) / (1ull << 32) / (1ull << 48);
+}
 
-#if MPPP_CPLUSPLUS < 201703L
-
-template <typename T>
-constexpr real128 real128_constants<T>::two_112;
-
-template <typename T>
-constexpr real128 real128_constants<T>::two_48;
-
-#endif
+constexpr real128 two_48()
+{
+    return real128{1} / (1ull << 48);
+}
 }
 
 /** @defgroup real128_constants real128_constants
@@ -2053,8 +2045,7 @@ constexpr real128 real128_nan()
  */
 constexpr real128 real128_pi()
 {
-    using c = real128_constants<>;
-    return 2 * (9541308523256152504ull * c::two_112 + 160664882791121ull * c::two_48 + 1);
+    return 2 * (9541308523256152504ull * two_112() + 160664882791121ull * two_48() + 1);
 }
 
 /// The \f$ \mathrm{e} \f$ constant (Euler's number).
@@ -2063,8 +2054,7 @@ constexpr real128 real128_pi()
  */
 constexpr real128 real128_e()
 {
-    using c = real128_constants<>;
-    return 2 * (10751604932185443962ull * c::two_112 + 101089180468598ull * c::two_48 + 1);
+    return 2 * (10751604932185443962ull * two_112() + 101089180468598ull * two_48() + 1);
 }
 
 /// The \f$ \sqrt{2} \f$ constant.
@@ -2073,8 +2063,7 @@ constexpr real128 real128_e()
  */
 constexpr real128 real128_sqrt2()
 {
-    using c = real128_constants<>;
-    return 14486024992869247637ull * c::two_112 + 116590752822204ull * c::two_48 + 1;
+    return 14486024992869247637ull * two_112() + 116590752822204ull * two_48() + 1;
 }
 
 #if MPPP_CPLUSPLUS >= 201703L
