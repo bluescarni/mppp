@@ -1033,159 +1033,6 @@ constexpr bool finite(const real128 &x)
     return x.finite();
 }
 
-inline namespace detail
-{
-
-constexpr bool dispatch_eq(const real128 &x, const real128 &y)
-{
-    return x.m_value == y.m_value;
-}
-
-template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-constexpr bool dispatch_eq(const real128 &x, const T &y)
-{
-    return x.m_value == y;
-}
-
-template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-constexpr bool dispatch_eq(const T &x, const real128 &y)
-{
-    return x == y.m_value;
-}
-}
-
-/// Equality operator involving \link mppp::real128 real128 \endlink and C++ types.
-/**
- * \rststar
- * The implementation uses the comparison operator of the :cpp:type:`__float128` type.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
- *    for an equality predicate that handles NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x = y \f$, \p false otherwise.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-constexpr bool operator==(const T &x, const Real128CppOpTypes<T> &y)
-#else
-template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
-constexpr bool operator==(const T &x, const U &y)
-#endif
-{
-    return dispatch_eq(x, y);
-}
-
-/// Inequality operator involving \link mppp::real128 real128 \endlink and C++ types.
-/**
- * \rststar
- * The implementation uses the comparison operator of the :cpp:type:`__float128` type.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
- *    for an equality predicate that handles NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x = y \f$, \p false otherwise.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-constexpr bool operator!=(const T &x, const Real128CppOpTypes<T> &y)
-#else
-template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
-constexpr bool operator!=(const T &x, const U &y)
-#endif
-{
-    return !(x == y);
-}
-
-inline namespace detail
-{
-
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
-inline bool dispatch_eq(const real128 &x, const T &y)
-{
-    return x == real128{y};
-}
-
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
-inline bool dispatch_eq(const T &x, const real128 &y)
-{
-    return real128{x} == y;
-}
-}
-
-/// Equality operator involving \link mppp::real128 real128 \endlink and mp++ types.
-/**
- * \rststar
- * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
- * and then uses the equality operator of :cpp:class:`~mppp::real128`.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
- *    for an equality predicate that handles NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x = y \f$, \p false otherwise.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
- * from the mp++ type.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline bool operator==(const T &x, const Real128MpppOpTypes<T> &y)
-#else
-template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
-inline bool operator==(const T &x, const U &y)
-#endif
-{
-    return dispatch_eq(x, y);
-}
-
-/// Inequality operator involving \link mppp::real128 real128 \endlink and mp++ types.
-/**
- * \rststar
- * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
- * and then uses the equality operator of :cpp:class:`~mppp::real128`.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
- *    for an equality predicate that handles NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x = y \f$, \p false otherwise.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
- * from the mp++ type.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline bool operator!=(const T &x, const Real128MpppOpTypes<T> &y)
-#else
-template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
-inline bool operator!=(const T &x, const U &y)
-#endif
-{
-    return !(x == y);
-}
-
 /// Equality predicate with special NaN handling.
 /**
  * \rststar
@@ -1203,107 +1050,7 @@ inline bool operator!=(const T &x, const U &y)
  * @return \p true if \f$ x = y \f$ (including the case in which both operands are NaN),
  * \p false otherwise.
  */
-constexpr bool real128_equal_to(const real128 &x, const real128 &y)
-{
-    return (!x.isnan() && !y.isnan()) ? (x == y) : (x.isnan() && y.isnan());
-}
-
-inline namespace detail
-{
-
-constexpr bool dispatch_lt(const real128 &x, const real128 &y)
-{
-    return x.m_value < y.m_value;
-}
-
-template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-constexpr bool dispatch_lt(const real128 &x, const T &y)
-{
-    return x.m_value < y;
-}
-
-template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-constexpr bool dispatch_lt(const T &x, const real128 &y)
-{
-    return x < y.m_value;
-}
-}
-
-/// Less-than operator involving \link mppp::real128 real128 \endlink and C++ types.
-/**
- * \rststar
- * The implementation uses the less-than operator of the :cpp:type:`__float128` type.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    less than any value, and no value is less than NaN).
- *    See :cpp:func:`mppp::real128_lt()` for a less-than predicate that handles
- *    NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x < y \f$, \p false otherwise.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-constexpr bool operator<(const T &x, const Real128CppOpTypes<T> &y)
-#else
-template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
-constexpr bool operator<(const T &x, const U &y)
-#endif
-{
-    return dispatch_lt(x, y);
-}
-
-inline namespace detail
-{
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
-inline bool dispatch_lt(const real128 &x, const T &y)
-{
-    return x < real128{y};
-}
-
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
-inline bool dispatch_lt(const T &x, const real128 &y)
-{
-    return real128{x} < y;
-}
-}
-
-/// Less-than operator involving \link mppp::real128 real128 \endlink and mp++ types.
-/**
- * \rststar
- * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
- * and then uses the less-than operator of :cpp:class:`~mppp::real128`.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    less than any value, and no value is less than NaN).
- *    See :cpp:func:`mppp::real128_lt()` for a less-than predicate that handles
- *    NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x < y \f$, \p false otherwise.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
- * from the mp++ type.
- */
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline bool operator<(const T &x, const Real128MpppOpTypes<T> &y)
-#else
-template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
-inline bool operator<(const T &x, const U &y)
-#endif
-{
-    return dispatch_lt(x, y);
-}
+constexpr bool real128_equal_to(const real128 &x, const real128 &y);
 
 /// Less-than predicate with special NaN handling.
 /**
@@ -1323,14 +1070,7 @@ inline bool operator<(const T &x, const U &y)
  * @return \p true if \f$ x < y \f$ (with NaN values considered greather than non-NaN values),
  * \p false otherwise.
  */
-constexpr bool real128_lt(const real128 &x, const real128 &y)
-{
-    // NOTE: in case at least one op is NaN, we have the following possibilities:
-    // - NaN vs NaN -> false,
-    // - NaN vs not-NaN -> false,
-    // - not-NaN vs NaN -> true.
-    return (!x.isnan() && !y.isnan()) ? (x < y) : !x.isnan();
-}
+constexpr bool real128_lt(const real128 &x, const real128 &y);
 
 /** @} */
 
@@ -1887,6 +1627,349 @@ inline real128 operator/(const T &x, const U &y)
     return dispatch_div(x, y);
 }
 
+inline namespace detail
+{
+
+constexpr bool dispatch_eq(const real128 &x, const real128 &y)
+{
+    return x.m_value == y.m_value;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+constexpr bool dispatch_eq(const real128 &x, const T &y)
+{
+    return x.m_value == y;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+constexpr bool dispatch_eq(const T &x, const real128 &y)
+{
+    return x == y.m_value;
+}
+}
+
+/// Equality operator involving \link mppp::real128 real128 \endlink and C++ types.
+/**
+ * \rststar
+ * The implementation uses the comparison operator of the :cpp:type:`__float128` type.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN compares
+ *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
+ *    for an equality predicate that handles NaN specially.
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x = y \f$, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+constexpr bool operator==(const T &x, const Real128CppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
+constexpr bool operator==(const T &x, const U &y)
+#endif
+{
+    return dispatch_eq(x, y);
+}
+
+/// Inequality operator involving \link mppp::real128 real128 \endlink and C++ types.
+/**
+ * \rststar
+ * The implementation uses the comparison operator of the :cpp:type:`__float128` type.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN compares
+ *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
+ *    for an equality predicate that handles NaN specially.
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x = y \f$, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+constexpr bool operator!=(const T &x, const Real128CppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
+constexpr bool operator!=(const T &x, const U &y)
+#endif
+{
+    return !(x == y);
+}
+
+inline namespace detail
+{
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline bool dispatch_eq(const real128 &x, const T &y)
+{
+    return x == real128{y};
+}
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline bool dispatch_eq(const T &x, const real128 &y)
+{
+    return real128{x} == y;
+}
+}
+
+/// Equality operator involving \link mppp::real128 real128 \endlink and mp++ types.
+/**
+ * \rststar
+ * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
+ * and then uses the equality operator of :cpp:class:`~mppp::real128`.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN compares
+ *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
+ *    for an equality predicate that handles NaN specially.
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x = y \f$, \p false otherwise.
+ *
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * from the mp++ type.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator==(const T &x, const Real128MpppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
+inline bool operator==(const T &x, const U &y)
+#endif
+{
+    return dispatch_eq(x, y);
+}
+
+/// Inequality operator involving \link mppp::real128 real128 \endlink and mp++ types.
+/**
+ * \rststar
+ * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
+ * and then uses the equality operator of :cpp:class:`~mppp::real128`.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN compares
+ *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
+ *    for an equality predicate that handles NaN specially.
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x = y \f$, \p false otherwise.
+ *
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * from the mp++ type.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator!=(const T &x, const Real128MpppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
+inline bool operator!=(const T &x, const U &y)
+#endif
+{
+    return !(x == y);
+}
+
+inline namespace detail
+{
+
+constexpr bool dispatch_lt(const real128 &x, const real128 &y)
+{
+    return x.m_value < y.m_value;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+constexpr bool dispatch_lt(const real128 &x, const T &y)
+{
+    return x.m_value < y;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+constexpr bool dispatch_lt(const T &x, const real128 &y)
+{
+    return x < y.m_value;
+}
+}
+
+/// Less-than operator involving \link mppp::real128 real128 \endlink and C++ types.
+/**
+ * \rststar
+ * The implementation uses the less-than operator of the :cpp:type:`__float128` type.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN is never
+ *    less than any value, and no value is less than NaN).
+ *    See :cpp:func:`mppp::real128_lt()` for a less-than predicate that handles
+ *    NaN specially.
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x < y \f$, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+constexpr bool operator<(const T &x, const Real128CppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
+constexpr bool operator<(const T &x, const U &y)
+#endif
+{
+    return dispatch_lt(x, y);
+}
+
+inline namespace detail
+{
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline bool dispatch_lt(const real128 &x, const T &y)
+{
+    return x < real128{y};
+}
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline bool dispatch_lt(const T &x, const real128 &y)
+{
+    return real128{x} < y;
+}
+}
+
+/// Less-than operator involving \link mppp::real128 real128 \endlink and mp++ types.
+/**
+ * \rststar
+ * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
+ * and then uses the less-than operator of :cpp:class:`~mppp::real128`.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN is never
+ *    less than any value, and no value is less than NaN).
+ *    See :cpp:func:`mppp::real128_lt()` for a less-than predicate that handles
+ *    NaN specially.
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x < y \f$, \p false otherwise.
+ *
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * from the mp++ type.
+ */
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator<(const T &x, const Real128MpppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
+inline bool operator<(const T &x, const U &y)
+#endif
+{
+    return dispatch_lt(x, y);
+}
+
+inline namespace detail
+{
+
+constexpr bool dispatch_lte(const real128 &x, const real128 &y)
+{
+    return x.m_value <= y.m_value;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+constexpr bool dispatch_lte(const real128 &x, const T &y)
+{
+    return x.m_value <= y;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+constexpr bool dispatch_lte(const T &x, const real128 &y)
+{
+    return x <= y.m_value;
+}
+}
+
+/// Less-than or equal operator involving \link mppp::real128 real128 \endlink and C++ types.
+/**
+ * \rststar
+ * The implementation uses the less-than or equal operator of the :cpp:type:`__float128` type.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN is never
+ *    less than or equal to any value, and no value is less than or equal to NaN).
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x \leq y \f$, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+constexpr bool operator<=(const T &x, const Real128CppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
+constexpr bool operator<=(const T &x, const U &y)
+#endif
+{
+    return dispatch_lte(x, y);
+}
+
+inline namespace detail
+{
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline bool dispatch_lte(const real128 &x, const T &y)
+{
+    return x <= real128{y};
+}
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline bool dispatch_lte(const T &x, const real128 &y)
+{
+    return real128{x} <= y;
+}
+}
+
+/// Less-than or equal operator involving \link mppp::real128 real128 \endlink and mp++ types.
+/**
+ * \rststar
+ * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
+ * and then uses the less-than or equal operator of :cpp:class:`~mppp::real128`.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN is never
+ *    less than or equal to any value, and no value is less than or equal to NaN).
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x \leq y \f$, \p false otherwise.
+ *
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * from the mp++ type.
+ */
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator<=(const T &x, const Real128MpppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
+inline bool operator<=(const T &x, const U &y)
+#endif
+{
+    return dispatch_lte(x, y);
+}
+
 /** @} */
 
 inline namespace detail
@@ -2033,6 +2116,21 @@ inline constexpr real128 sqrt2128 = real128_sqrt2();
 #endif
 
 /** @} */
+
+// NOTE: put these definitions here, as we need the comparison operators to be available.
+constexpr bool real128_equal_to(const real128 &x, const real128 &y)
+{
+    return (!x.isnan() && !y.isnan()) ? (x == y) : (x.isnan() && y.isnan());
+}
+
+constexpr bool real128_lt(const real128 &x, const real128 &y)
+{
+    // NOTE: in case at least one op is NaN, we have the following possibilities:
+    // - NaN vs NaN -> false,
+    // - NaN vs not-NaN -> false,
+    // - not-NaN vs NaN -> true.
+    return (!x.isnan() && !y.isnan()) ? (x < y) : !x.isnan();
+}
 }
 
 #else
