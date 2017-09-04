@@ -101,6 +101,14 @@ Exponentiation
 .. doxygengroup:: real128_exponentiation
    :content-only:
 
+.. _real128_trig:
+
+Trigonometry
+~~~~~~~~~~~~
+
+.. doxygengroup:: real128_trig
+   :content-only:
+
 .. _real128_io:
 
 Input/Output

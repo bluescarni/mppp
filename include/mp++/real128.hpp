@@ -854,6 +854,26 @@ public:
     {
         return *this = ::cbrtq(m_value);
     }
+    /// In-place sine.
+    /**
+     * This method will set \p this to its sine.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &sin()
+    {
+        return *this = ::sinq(m_value);
+    }
+    /// In-place cosine.
+    /**
+     * This method will set \p this to its cosine.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &cos()
+    {
+        return *this = ::cosq(m_value);
+    }
     /// The internal value.
     /**
      * \rststar
@@ -1421,6 +1441,36 @@ inline real128 pow(const T &x, const U &y)
 #endif
 {
     return dispatch_pow(x, y);
+}
+
+/** @} */
+
+/** @defgroup real128_trig real128_trig
+ *  @{
+ */
+
+/// Unary sine.
+/**
+ * @param x the \link mppp::real128 real128 \endlink whose sine will be computed.
+ *
+ * @return the sine of \p x.
+ */
+inline real128 sin(real128 x)
+{
+    x.sin();
+    return x;
+}
+
+/// Unary cosine.
+/**
+ * @param x the \link mppp::real128 real128 \endlink whose cosine will be computed.
+ *
+ * @return the cosine of \p x.
+ */
+inline real128 cos(real128 x)
+{
+    x.cos();
+    return x;
 }
 
 /** @} */
