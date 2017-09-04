@@ -15,7 +15,7 @@ rationals and quadruple-precision floats. Based on well-known libraries such as 
 
 mp++ adopts various techniques to improve performance on small multiprecision integers and rationals.
 In particular, a small buffer optimisation and custom implementations of basic mathematical primitives are
-instrumental in achieving a performance increase, with respect to GMP and other libraries, which can be rather
+instrumental in achieving a performance increase, with respect to GMP and other libraries, which can be
 substantial (see the :ref:`benchmarks <benchmarks>` section). The price to pay is a
 small overhead when operating on large integers.
 
