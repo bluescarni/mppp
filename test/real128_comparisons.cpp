@@ -91,18 +91,18 @@ using lt_t = decltype(std::declval<const T &>() == std::declval<const U &>());
 template <typename T, typename U>
 using is_lt_comparable = std::integral_constant<bool, std::is_same<detected_t<lt_t, T, U>, bool>::value>;
 
-TEST_CASE("real128 less_than")
+TEST_CASE("real128 lt")
 {
     REQUIRE((std::is_same<decltype(real128{} < real128{}), bool>::value));
     REQUIRE((is_lt_comparable<real128, real128>::value));
     REQUIRE((!is_lt_comparable<real128, std::string>::value));
     REQUIRE((!is_lt_comparable<std::string, real128>::value));
     constexpr bool c0 = real128{} < real128{};
-    constexpr bool c0b = real128_less_than(real128{}, real128{});
+    constexpr bool c0b = real128_lt(real128{}, real128{});
     REQUIRE(!c0);
     REQUIRE(!c0b);
     constexpr bool c1 = real128{-1} < real128{1};
-    constexpr bool c1b = real128_less_than(real128{-1}, real128{1});
+    constexpr bool c1b = real128_lt(real128{-1}, real128{1});
     REQUIRE(c1);
     REQUIRE(c1b);
     constexpr bool c2 = real128{1} < -1;
@@ -128,17 +128,17 @@ TEST_CASE("real128 less_than")
     REQUIRE(!(-real128_nan() < -real128_nan()));
     REQUIRE(!(real128_nan() < real128_nan()));
     REQUIRE(!(-real128_nan() < -real128_nan()));
-    REQUIRE(!real128_less_than(real128_inf(), real128_inf()));
-    REQUIRE(real128_less_than(-real128_inf(), real128_inf()));
-    REQUIRE(!real128_less_than(real128_nan(), real128_nan()));
-    REQUIRE(!real128_less_than(real128_nan(), -real128_nan()));
-    REQUIRE(!real128_less_than(-real128_nan(), real128_nan()));
-    REQUIRE(real128_less_than(-real128_inf(), real128_nan()));
-    REQUIRE(real128_less_than(real128{-1}, real128_nan()));
-    REQUIRE(real128_less_than(real128{100}, real128_nan()));
-    REQUIRE(real128_less_than(real128_inf(), real128_nan()));
-    REQUIRE(!real128_less_than(real128_nan(), -real128_inf()));
-    REQUIRE(!real128_less_than(real128_nan(), real128{-1}));
-    REQUIRE(!real128_less_than(real128_nan(), real128{100}));
-    REQUIRE(!real128_less_than(real128_nan(), real128_inf()));
+    REQUIRE(!real128_lt(real128_inf(), real128_inf()));
+    REQUIRE(real128_lt(-real128_inf(), real128_inf()));
+    REQUIRE(!real128_lt(real128_nan(), real128_nan()));
+    REQUIRE(!real128_lt(real128_nan(), -real128_nan()));
+    REQUIRE(!real128_lt(-real128_nan(), real128_nan()));
+    REQUIRE(real128_lt(-real128_inf(), real128_nan()));
+    REQUIRE(real128_lt(real128{-1}, real128_nan()));
+    REQUIRE(real128_lt(real128{100}, real128_nan()));
+    REQUIRE(real128_lt(real128_inf(), real128_nan()));
+    REQUIRE(!real128_lt(real128_nan(), -real128_inf()));
+    REQUIRE(!real128_lt(real128_nan(), real128{-1}));
+    REQUIRE(!real128_lt(real128_nan(), real128{100}));
+    REQUIRE(!real128_lt(real128_nan(), real128_inf()));
 }

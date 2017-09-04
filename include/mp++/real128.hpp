@@ -1217,7 +1217,7 @@ constexpr bool dispatch_lt(const T &x, const real128 &y)
  * .. note::
  *    This operator does not handle NaN in a special way (that is, NaN is never
  *    less than any value, and no value is less than NaN).
- *    See :cpp:func:`mppp::real128_less_than()` for a less-than predicate that handles
+ *    See :cpp:func:`mppp::real128_lt()` for a less-than predicate that handles
  *    NaN specially.
  * \endrststar
  *
@@ -1261,7 +1261,7 @@ inline bool dispatch_lt(const T &x, const real128 &y)
  * .. note::
  *    This operator does not handle NaN in a special way (that is, NaN is never
  *    less than any value, and no value is less than NaN).
- *    See :cpp:func:`mppp::real128_less_than()` for a less-than predicate that handles
+ *    See :cpp:func:`mppp::real128_lt()` for a less-than predicate that handles
  *    NaN specially.
  * \endrststar
  *
@@ -1303,7 +1303,7 @@ inline bool operator<(const T &x, const U &y)
  * @return \p true if \f$ x < y \f$ (with NaN values considered greather than non-NaN values),
  * \p false otherwise.
  */
-constexpr bool real128_less_than(const real128 &x, const real128 &y)
+constexpr bool real128_lt(const real128 &x, const real128 &y)
 {
     // NOTE: in case at least one op is NaN, we have the following possibilities:
     // - NaN vs NaN -> false,
