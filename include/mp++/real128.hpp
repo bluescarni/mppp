@@ -865,7 +865,8 @@ public:
     {
         const auto fpc = fpclassify();
         if (fpc == FP_NORMAL || fpc == FP_SUBNORMAL || fpc == FP_INFINITE) {
-            // Negate if the number is normal, subnormal or infinite.
+            // If the number is normal, subnormal or infinite compute its
+            // absolute value.
             if (m_value < 0) {
                 m_value = -m_value;
             }
