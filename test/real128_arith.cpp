@@ -27,12 +27,40 @@ TEST_CASE("real128 fma")
     REQUIRE((fma(x, y, z).m_value == x.m_value));
 }
 
+// Some tests involving constexpr result in an ICE on GCC < 6.
+#if (defined(_MSC_VER) || defined(__clang__) || __GNUC__ >= 6) && MPPP_CPLUSPLUS >= 201402L
+
+#define MPPP_ENABLE_CONSTEXPR_TESTS
+
+#endif
+
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+
+static constexpr real128 test_constexpr_abs()
+{
+    real128 retval{-5};
+    retval.abs();
+    return retval;
+}
+
+#endif
+
 TEST_CASE("real128 abs")
 {
     real128 r;
-    REQUIRE((r.abs().m_value == 0));
+    REQUIRE(!r.signbit());
     REQUIRE((abs(r).m_value == 0));
+    REQUIRE(!(abs(r).signbit()));
+    REQUIRE((r.abs().m_value == 0));
     REQUIRE((r.m_value == 0));
+    REQUIRE(!r.signbit());
+    r = -0.;
+    REQUIRE(r.signbit());
+    REQUIRE((abs(r).m_value == 0));
+    REQUIRE(!(abs(r).signbit()));
+    REQUIRE((r.abs().m_value == 0));
+    REQUIRE((r.m_value == 0));
+    REQUIRE(!r.signbit());
     r = -5;
     REQUIRE((abs(r).m_value == 5));
     REQUIRE((r.abs().m_value == 5));
@@ -57,4 +85,18 @@ TEST_CASE("real128 abs")
     REQUIRE((abs(r).m_value == real128{"inf"}.m_value));
     REQUIRE((r.abs().m_value == real128{"inf"}.m_value));
     REQUIRE((r.m_value == real128{"inf"}.m_value));
+    r = "nan";
+    REQUIRE(abs(r).isnan());
+    REQUIRE(r.abs().isnan());
+    r = "-nan";
+    REQUIRE(abs(r).isnan());
+    REQUIRE(r.abs().isnan());
+    constexpr auto c0 = abs(real128{-5});
+    REQUIRE(c0 == 5);
+    constexpr auto c1 = abs(real128{42});
+    REQUIRE(c1 == 42);
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+    constexpr auto c3 = test_constexpr_abs();
+    REQUIRE(c3 == 5);
+#endif
 }

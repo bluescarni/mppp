@@ -853,11 +853,29 @@ public:
     /**
      * This method will set \p this to its absolute value.
      *
+     * \rststar
+     * .. note::
+     *
+     *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
+     * \endrststar
+     *
      * @return a reference to \p this.
      */
-    real128 &abs()
+    MPPP_CONSTEXPR_14 real128 &abs()
     {
-        return *this = ::fabsq(m_value);
+        const auto fpc = fpclassify();
+        if (fpc == FP_NORMAL || fpc == FP_SUBNORMAL || fpc == FP_INFINITE) {
+            // Negate if the number is normal, subnormal or infinite.
+            if (m_value < 0) {
+                m_value = -m_value;
+            }
+        } else if (fpc == FP_ZERO) {
+            // If the value is zero, it could be negative zero. Make sure we
+            // set it to positive zero.
+            m_value = 0;
+        }
+        // NOTE: for NaN, don't do anything and leave the NaN.
+        return *this;
     }
     /// In-place square root.
     /**
@@ -938,10 +956,13 @@ inline real128 fma(const real128 &x, const real128 &y, const real128 &z)
  *
  * @return the absolute value of \p x.
  */
-inline real128 abs(real128 x)
+constexpr real128 abs(const real128 &x)
 {
-    x.abs();
-    return x;
+    return x.fpclassify() == FP_NAN
+               ? x
+               : ((x.fpclassify() == FP_NORMAL || x.fpclassify() == FP_SUBNORMAL || x.fpclassify() == FP_INFINITE)
+                      ? (x.m_value < 0 ? real128{-x.m_value} : x)
+                      : real128{0});
 }
 
 /** @} */
