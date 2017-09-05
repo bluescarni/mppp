@@ -2087,6 +2087,99 @@ inline bool operator>(const T &x, const U &y)
     return dispatch_gt(x, y);
 }
 
+inline namespace detail
+{
+
+constexpr bool dispatch_gte(const real128 &x, const real128 &y)
+{
+    return x.m_value >= y.m_value;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+constexpr bool dispatch_gte(const real128 &x, const T &y)
+{
+    return x.m_value >= y;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+constexpr bool dispatch_gte(const T &x, const real128 &y)
+{
+    return x >= y.m_value;
+}
+}
+
+/// Greater-than or equal operator involving \link mppp::real128 real128 \endlink and C++ types.
+/**
+ * \rststar
+ * The implementation uses the greater-than or equal operator of the :cpp:type:`__float128` type.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN is never
+ *    greater than or equal to any value, and no value is greater than or equal to NaN).
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x \geq y \f$, \p false otherwise.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+constexpr bool operator>=(const T &x, const Real128CppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
+constexpr bool operator>=(const T &x, const U &y)
+#endif
+{
+    return dispatch_gte(x, y);
+}
+
+inline namespace detail
+{
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline bool dispatch_gte(const real128 &x, const T &y)
+{
+    return x >= real128{y};
+}
+
+template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+inline bool dispatch_gte(const T &x, const real128 &y)
+{
+    return real128{x} >= y;
+}
+}
+
+/// Greater-than or equal operator involving \link mppp::real128 real128 \endlink and mp++ types.
+/**
+ * \rststar
+ * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
+ * and then uses the greater-than or equal operator of :cpp:class:`~mppp::real128`.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN is never
+ *    greater than or equal to any value, and no value is greater than or equal to NaN).
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x \geq y \f$, \p false otherwise.
+ *
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * from the mp++ type.
+ */
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator>=(const T &x, const Real128MpppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
+inline bool operator>=(const T &x, const U &y)
+#endif
+{
+    return dispatch_gte(x, y);
+}
+
 /** @} */
 
 inline namespace detail

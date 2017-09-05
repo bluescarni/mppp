@@ -243,3 +243,42 @@ TEST_CASE("real128 gt")
     REQUIRE(real128_gt(real128_nan(), real128{100}));
     REQUIRE(real128_gt(real128_nan(), real128_inf()));
 }
+
+template <typename T, typename U>
+using gte_t = decltype(std::declval<const T &>() >= std::declval<const U &>());
+
+template <typename T, typename U>
+using is_gte_comparable = std::integral_constant<bool, std::is_same<detected_t<gte_t, T, U>, bool>::value>;
+
+TEST_CASE("real128 gte")
+{
+    REQUIRE((std::is_same<decltype(real128{} >= real128{}), bool>::value));
+    REQUIRE((is_gte_comparable<real128, real128>::value));
+    REQUIRE((!is_gte_comparable<real128, std::string>::value));
+    REQUIRE((!is_gte_comparable<std::string, real128>::value));
+    constexpr bool c0 = real128{} >= real128{};
+    REQUIRE(c0);
+    constexpr bool c1 = real128{-1} >= real128{1};
+    REQUIRE(!c1);
+    constexpr bool c2 = real128{1} >= -1;
+    REQUIRE(c2);
+    constexpr bool c3 = 1.23 >= real128{-1};
+    REQUIRE(c3);
+    REQUIRE(real128{10} >= int_t{10});
+    REQUIRE(int_t{10} >= real128{10});
+    REQUIRE(real128{10} >= int_t{-10});
+    REQUIRE(!(int_t{-10} >= real128{10}));
+    REQUIRE((real128{2} >= rat_t{3, 2}));
+    REQUIRE(!(rat_t{3, 2} >= real128{"2"}));
+    REQUIRE((real128{"1.5"} >= rat_t{3, 5}));
+    REQUIRE(!(rat_t{-3, 2} >= real128{"1.5"}));
+    REQUIRE(real128_inf() >= real128_inf());
+    REQUIRE(!(-real128_inf() >= real128_inf()));
+    REQUIRE(real128_inf() >= -real128_inf());
+    REQUIRE(!(real128_nan() >= real128_nan()));
+    REQUIRE(!(-real128_nan() >= -real128_nan()));
+    REQUIRE(!(real128_nan() >= real128_nan()));
+    REQUIRE(!(-real128_nan() >= -real128_nan()));
+    REQUIRE(!(3 >= real128_nan()));
+    REQUIRE(!(real128_nan() >= 3));
+}
