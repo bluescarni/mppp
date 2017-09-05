@@ -2291,7 +2291,7 @@ constexpr real128 real128_sqrt2()
  *    to be able to represent infinities.
  * \endrststar
  */
-inline constexpr real128 inf128 = real128_inf();
+inline constexpr real128 inf_128 = real128_inf();
 
 /// Quadruple-precision quiet NaN constant.
 /**
@@ -2301,16 +2301,16 @@ inline constexpr real128 inf128 = real128_inf();
  *    to be able to represent quiet NaNs.
  * \endrststar
  */
-inline constexpr real128 nan128 = real128_nan();
+inline constexpr real128 nan_128 = real128_nan();
 
 /// Quadruple-precision \f$ \pi \f$ constant.
-inline constexpr real128 pi128 = real128_pi();
+inline constexpr real128 pi_128 = real128_pi();
 
 /// Quadruple-precision \f$ \mathrm{e} \f$ constant (Euler's number).
-inline constexpr real128 e128 = real128_e();
+inline constexpr real128 e_128 = real128_e();
 
 /// Quadruple-precision \f$ \sqrt{2} \f$ constant.
-inline constexpr real128 sqrt2128 = real128_sqrt2();
+inline constexpr real128 sqrt2_128 = real128_sqrt2();
 
 #endif
 

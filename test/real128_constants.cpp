@@ -30,10 +30,10 @@ TEST_CASE("real128 constants")
     constexpr auto mnan = -real128_nan();
     REQUIRE(mnan.isnan());
 #if MPPP_CPLUSPLUS >= 201703L
-    REQUIRE((pi128.m_value == real128_pi().m_value));
-    REQUIRE((e128.m_value == real128_e().m_value));
-    REQUIRE((sqrt2128.m_value == real128_sqrt2().m_value));
-    REQUIRE((inf128.m_value == real128_inf().m_value));
-    REQUIRE(nan128.isnan());
+    REQUIRE((pi_128.m_value == real128_pi().m_value));
+    REQUIRE((e_128.m_value == real128_e().m_value));
+    REQUIRE((sqrt2_128.m_value == real128_sqrt2().m_value));
+    REQUIRE((inf_128.m_value == real128_inf().m_value));
+    REQUIRE(nan_128.isnan());
 #endif
 }
