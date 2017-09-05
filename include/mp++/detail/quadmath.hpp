@@ -35,15 +35,15 @@ inline namespace detail
 // The ieee fields.
 struct ieee_t {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    unsigned negative : 1;
-    unsigned exponent : 15;
+    std::uint_least8_t negative : 1;
+    std::uint_least16_t exponent : 15;
     std::uint_least64_t mant_high : 48;
     std::uint_least64_t mant_low : 64;
 #else
     std::uint_least64_t mant_low : 64;
     std::uint_least64_t mant_high : 48;
-    unsigned exponent : 15;
-    unsigned negative : 1;
+    std::uint_least16_t exponent : 15;
+    std::uint_least8_t negative : 1;
 #endif
 }
 #ifdef __MINGW32__

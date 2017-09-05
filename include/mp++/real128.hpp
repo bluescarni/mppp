@@ -15,6 +15,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <cstdint>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -23,6 +24,7 @@
 #if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
+#include <tuple>
 #include <type_traits>
 #include <vector>
 
@@ -766,6 +768,30 @@ public:
         std::ostringstream oss;
         float128_stream(oss, m_value);
         return oss.str();
+    }
+    /// Get the IEEE representation of the value.
+    /**
+     * This method will return a tuple containing the IEEE quadruple-precision floating-point representation
+     * of the value. The returned tuple elements are, in order:
+     * - the sign of the value (1 for a negative sign bit, 0 for a positive sign bit),
+     * - the exponent (a 15-bit unsigned value),
+     * - the high part of the significand (a 48-bit unsigned value),
+     * - the low part of the significand (a 64-bit unsigned value).
+     *
+     * \rststar
+     * .. seealso::
+     *    https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
+     * \endrststar
+     *
+     * @return a tuple containing the IEEE quadruple-precision floating-point representation of the value stored
+     * in \p this.
+     */
+    std::tuple<std::uint_least8_t, std::uint_least16_t, std::uint_least64_t, std::uint_least64_t> get_ieee() const
+    {
+        ieee_float128 ie;
+        ie.value = m_value;
+        return std::make_tuple(std::uint_least8_t(ie.i_eee.negative), std::uint_least16_t(ie.i_eee.exponent),
+                               std::uint_least64_t(ie.i_eee.mant_high), std::uint_least64_t(ie.i_eee.mant_low));
     }
     /// Sign bit.
     /**
