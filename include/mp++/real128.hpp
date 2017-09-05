@@ -1098,7 +1098,7 @@ constexpr bool finite(const real128 &x)
  * @return \p true if \f$ x = y \f$ (including the case in which both operands are NaN),
  * \p false otherwise.
  */
-constexpr bool real128_equal_to(const real128 &x, const real128 &y);
+constexpr bool real128_equal_to(const real128 &, const real128 &);
 
 /// Less-than predicate with special NaN handling.
 /**
@@ -2251,12 +2251,6 @@ constexpr real128 two_48()
 
 /// The positive \f$ \infty \f$ constant.
 /**
- * \rststar
- * .. note::
- *    The implementation of this function on GCC < 7 and Clang requires the ``double`` type
- *    to be able to represent infinities.
- * \endrststar
- *
  * @return \f$ +\infty \f$.
  */
 constexpr real128 real128_inf()
@@ -2277,12 +2271,6 @@ constexpr real128 real128_inf()
 
 /// NaN constant.
 /**
- * \rststar
- * .. note::
- *    The implementation of this function on GCC < 7 and Clang requires the ``double`` type
- *    to be able to represent quiet NaNs.
- * \endrststar
- *
  * @return a quiet NaN value with unspecified sign bit.
  */
 constexpr real128 real128_nan()
@@ -2332,23 +2320,9 @@ constexpr real128 real128_sqrt2()
 // Note that constexpr static member variables are implicitly inline instead.
 
 /// Quadruple-precision \f$ +\infty \f$ constant.
-/**
- * \rststar
- * .. note::
- *    The implementation of this constant on GCC < 7 and Clang requires the ``double`` type
- *    to be able to represent infinities.
- * \endrststar
- */
 inline constexpr real128 inf_128 = real128_inf();
 
 /// Quadruple-precision quiet NaN constant.
-/**
- * \rststar
- * .. note::
- *    The implementation of this constant on GCC < 7 and Clang requires the ``double`` type
- *    to be able to represent quiet NaNs.
- * \endrststar
- */
 inline constexpr real128 nan_128 = real128_nan();
 
 /// Quadruple-precision \f$ \pi \f$ constant.
