@@ -6,14 +6,21 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <algorithm>
+#include <initializer_list>
+#include <random>
+#include <set>
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <mp++/mp++.hpp>
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+
+static std::mt19937 rng;
 
 using namespace mppp;
 
@@ -281,4 +288,36 @@ TEST_CASE("real128 gte")
     REQUIRE(!(-real128_nan() >= -real128_nan()));
     REQUIRE(!(3 >= real128_nan()));
     REQUIRE(!(real128_nan() >= 3));
+}
+
+TEST_CASE("real128 sort")
+{
+    std::vector<real128> v0{real128{1}, real128{2}, real128{3}, real128{4}, real128{5}};
+    std::shuffle(v0.begin(), v0.end(), rng);
+    std::sort(v0.begin(), v0.end());
+    REQUIRE((v0 == std::vector<real128>{real128{1}, real128{2}, real128{3}, real128{4}, real128{5}}));
+    v0 = std::vector<real128>{real128{1}, real128{2}, real128{3}, real128_nan(), -real128_nan()};
+    std::shuffle(v0.begin(), v0.end(), rng);
+    std::sort(v0.begin(), v0.end(), mppp::real128_lt);
+    REQUIRE(
+        (std::vector<real128>(v0.begin(), v0.begin() + 3) == std::vector<real128>{real128{1}, real128{2}, real128{3}}));
+    REQUIRE(v0[3].isnan());
+    REQUIRE(v0[4].isnan());
+    std::shuffle(v0.begin(), v0.end(), rng);
+    std::sort(v0.begin(), v0.end(), mppp::real128_gt);
+    REQUIRE((std::vector<real128>(v0.begin() + 2, v0.begin() + 5)
+             == std::vector<real128>{real128{3}, real128{2}, real128{1}}));
+    REQUIRE(v0[0].isnan());
+    REQUIRE(v0[1].isnan());
+    std::set<real128, bool (*)(const real128 &, const real128 &)> s0(mppp::real128_lt);
+    REQUIRE(s0.emplace(10).second);
+    REQUIRE(!s0.emplace(10).second);
+    REQUIRE(s0.emplace(1).second);
+    REQUIRE(s0.emplace(real128_nan()).second);
+    REQUIRE(!s0.emplace(-real128_nan()).second);
+    REQUIRE(s0.emplace(2).second);
+    REQUIRE(s0.emplace(3).second);
+    v0 = std::vector<real128>{real128{1}, real128{2}, real128{3}, real128{10}, real128_nan()};
+    REQUIRE(std::equal(v0.begin(), v0.begin() + 4, s0.begin()));
+    REQUIRE(s0.rbegin()->isnan());
 }
