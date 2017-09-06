@@ -178,10 +178,40 @@ using real128_op_types_enabler
  *
  * .. code-block:: c++
  *
- *    mppp::real128 a{.5};
+ *    real128 a{.5};
  *    auto b = sin(a);
  *
  * where the ``sin()`` function is resolved via argument-dependent lookup.
+ *
+ * Two ways of calling unary functions are usually provided:
+ *
+ * * a unary free function returning the result of the operation,
+ * * a nullary member function that modifies the calling object in-place.
+ *
+ * For instance, here are two possible ways of computing the absolute value:
+ *
+ * .. code-block:: c++
+ *
+ *    real128 r1, r2{-5};
+ *    r1 = abs(r2); // Unary abs(): returns the absolute value of r2, which is
+ *                  // then assigned to r1.
+ *    r2.abs();     // Member function abs(): replaces the value of r2 with its
+ *                  // absolute value.
+ *
+ * Note that at this time only a small subset of the quadmath API has been wrapped by :cpp:class:`~mppp::real128`.
+ *
+ * Various :ref:`overloaded operators <real128_operators>` are provided.
+ * The common arithmetic operators (``+``, ``-``, ``*`` and ``/``) always return :cpp:class:`~mppp::real128`
+ * as a result, promoting at most one operand to :cpp:class:`~mppp::real128` before actually performing
+ * the computation. Similarly, the relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote at
+ * most one argument to :cpp:class:`~mppp::real128` before performing the comparison. Alternative comparison functions
+ * treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
+ * are needed).
+ *
+ * The :cpp:class:`~mppp::real128` class is a `literal type <http://en.cppreference.com/w/cpp/concept/LiteralType>`__,
+ * and, whenever possible, operations involving :cpp:class:`~mppp::real128` are marked as ``constexpr``. Some functions
+ * which are not ``constexpr`` in the quadmath library have been reimplemented as ``constexpr`` functions via compiler
+ * builtins.
  *
  * .. seealso::
  *    https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
