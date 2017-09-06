@@ -949,6 +949,46 @@ public:
     {
         return *this = ::cosq(m_value);
     }
+    /// In-place natural exponential function.
+    /**
+     * This method will set \p this to \f$ \mathrm{e} \f$ raised to the power of \p this.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &exp()
+    {
+        return *this = ::expq(m_value);
+    }
+    /// In-place natural logarithm.
+    /**
+     * This method will set \p this to its natural logarithm.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &log()
+    {
+        return *this = ::logq(m_value);
+    }
+    /// In-place base-10 logarithm.
+    /**
+     * This method will set \p this to its base-10 logarithm.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &log10()
+    {
+        return *this = ::log10q(m_value);
+    }
+    /// In-place base-2 logarithm.
+    /**
+     * This method will set \p this to its base-2 logarithm.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &log2()
+    {
+        return *this = ::log2q(m_value);
+    }
     /// The internal value.
     /**
      * \rststar
@@ -1186,8 +1226,7 @@ constexpr bool real128_gt(const real128 &, const real128 &);
  */
 inline real128 sqrt(real128 x)
 {
-    x.sqrt();
-    return x;
+    return x.sqrt();
 }
 
 /// Unary cube root.
@@ -1198,8 +1237,7 @@ inline real128 sqrt(real128 x)
  */
 inline real128 cbrt(real128 x)
 {
-    x.cbrt();
-    return x;
+    return x.cbrt();
 }
 
 /// Euclidean distance.
@@ -1283,6 +1321,56 @@ inline real128 pow(const T &x, const U &y)
 
 /** @} */
 
+/** @defgroup real128_logexp real128_logexp
+ *  @{
+ */
+
+/// Unary natural exponential function.
+/**
+ * @param x the \link mppp::real128 real128 \endlink whose natural exponential function be computed.
+ *
+ * @return \f$ \mathrm{e} \f$ raised to the power of \p x.
+ */
+inline real128 exp(real128 x)
+{
+    return x.exp();
+}
+
+/// Unary natural logarithm.
+/**
+ * @param x the \link mppp::real128 real128 \endlink whose natural logarithm will be computed.
+ *
+ * @return the natural logarithm of \p x.
+ */
+inline real128 log(real128 x)
+{
+    return x.log();
+}
+
+/// Unary base-10 logarithm.
+/**
+ * @param x the \link mppp::real128 real128 \endlink whose base-10 logarithm will be computed.
+ *
+ * @return the base-10 logarithm of \p x.
+ */
+inline real128 log10(real128 x)
+{
+    return x.log10();
+}
+
+/// Unary base-2 logarithm.
+/**
+ * @param x the \link mppp::real128 real128 \endlink whose base-2 logarithm will be computed.
+ *
+ * @return the base-2 logarithm of \p x.
+ */
+inline real128 log2(real128 x)
+{
+    return x.log2();
+}
+
+/** @} */
+
 /** @defgroup real128_trig real128_trig
  *  @{
  */
@@ -1295,8 +1383,7 @@ inline real128 pow(const T &x, const U &y)
  */
 inline real128 sin(real128 x)
 {
-    x.sin();
-    return x;
+    return x.sin();
 }
 
 /// Unary cosine.
@@ -1307,8 +1394,7 @@ inline real128 sin(real128 x)
  */
 inline real128 cos(real128 x)
 {
-    x.cos();
-    return x;
+    return x.cos();
 }
 
 /** @} */

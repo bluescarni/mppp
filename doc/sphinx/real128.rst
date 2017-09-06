@@ -109,6 +109,14 @@ Trigonometry
 .. doxygengroup:: real128_trig
    :content-only:
 
+.. _real128_logexp:
+
+Logarithms and exponentials
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. doxygengroup:: real128_logexp
+   :content-only:
+
 .. _real128_io:
 
 Input/Output
