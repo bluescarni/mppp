@@ -49,8 +49,8 @@ path, etc.). The available configuration options are:
 * ``MPPP_BUILD_TESTS``: build the test suite (off by default),
 * ``MPPP_BUILD_BENCHMARKS``: build the benchmarking suite (off by default).
 
-Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only using GCC (all supported versions) and Clang
-(since version 3.9).
+Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only using GCC (all the supported versions) and Clang
+(since version 3.9). When using Clang, it is still necessary to link to the quadmath library from GCC.
 
 Since mp++ is a header-only library, there's no compilation step (unless the tests or the benchmarks are being built),
 and the installation of mp++ via ``make install`` or similar will just configure and copy the headers to your ``CMAKE_INSTALL_PREFIX``,
