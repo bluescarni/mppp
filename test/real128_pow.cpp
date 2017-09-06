@@ -7,6 +7,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <quadmath.h>
+#include <type_traits>
 
 #include <mp++/mp++.hpp>
 
@@ -20,6 +21,11 @@ using rat_t = rational<1>;
 
 TEST_CASE("real128 pow")
 {
+    REQUIRE((std::is_same<real128, decltype(pow(real128{}, real128{}))>::value));
+    REQUIRE((std::is_same<real128, decltype(pow(real128{}, 0))>::value));
+    REQUIRE((std::is_same<real128, decltype(pow(0., real128{}))>::value));
+    REQUIRE((std::is_same<real128, decltype(pow(int_t{}, real128{}))>::value));
+    REQUIRE((std::is_same<real128, decltype(pow(real128{}, rat_t{}))>::value));
     REQUIRE((pow(real128{}, real128{}).m_value == 1.));
     REQUIRE((pow(real128{2}, real128{3}).m_value == 8.));
     REQUIRE((pow(real128{2}, real128{-3}).m_value == real128{".125"}.m_value));

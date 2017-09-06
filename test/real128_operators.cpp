@@ -7,6 +7,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <mp++/mp++.hpp>
+#include <type_traits>
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -46,6 +47,28 @@ static constexpr real128 test_constexpr_decr()
 TEST_CASE("real128 plus")
 {
     real128 x;
+    REQUIRE((std::is_same<decltype(+x), real128>::value));
+    REQUIRE((std::is_same<decltype(real128{56} + real128{3}), real128>::value));
+    REQUIRE((std::is_same<decltype(x + 3), real128>::value));
+    REQUIRE((std::is_same<decltype(3. + x), real128>::value));
+    REQUIRE((std::is_same<decltype(x + int_t{3}), real128>::value));
+    REQUIRE((std::is_same<decltype(int_t{3} + x), real128>::value));
+    REQUIRE((std::is_same<decltype(-x), real128>::value));
+    REQUIRE((std::is_same<decltype(real128{56} - real128{3}), real128>::value));
+    REQUIRE((std::is_same<decltype(x - 3), real128>::value));
+    REQUIRE((std::is_same<decltype(3. - x), real128>::value));
+    REQUIRE((std::is_same<decltype(x - int_t{3}), real128>::value));
+    REQUIRE((std::is_same<decltype(int_t{3} - x), real128>::value));
+    REQUIRE((std::is_same<decltype(real128{56} * real128{3}), real128>::value));
+    REQUIRE((std::is_same<decltype(x * 3), real128>::value));
+    REQUIRE((std::is_same<decltype(3. * x), real128>::value));
+    REQUIRE((std::is_same<decltype(x * int_t{3}), real128>::value));
+    REQUIRE((std::is_same<decltype(int_t{3} * x), real128>::value));
+    REQUIRE((std::is_same<decltype(real128{56} / real128{3}), real128>::value));
+    REQUIRE((std::is_same<decltype(x / 3), real128>::value));
+    REQUIRE((std::is_same<decltype(3. / x), real128>::value));
+    REQUIRE((std::is_same<decltype(x / int_t{3}), real128>::value));
+    REQUIRE((std::is_same<decltype(int_t{3} / x), real128>::value));
     REQUIRE(((+x).m_value == 0));
     x = -145;
     REQUIRE(((+x).m_value == -145));
