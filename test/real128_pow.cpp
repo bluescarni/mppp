@@ -1,0 +1,52 @@
+// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+//
+// This file is part of the mp++ library.
+//
+// This Source Code Form is subject to the terms of the Mozilla
+// Public License v. 2.0. If a copy of the MPL was not distributed
+// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#include <quadmath.h>
+#include <type_traits>
+
+#include <mp++/mp++.hpp>
+
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+
+using namespace mppp;
+
+using int_t = integer<1>;
+using rat_t = rational<1>;
+
+TEST_CASE("real128 pow")
+{
+    REQUIRE((std::is_same<real128, decltype(pow(real128{}, real128{}))>::value));
+    REQUIRE((std::is_same<real128, decltype(pow(real128{}, 0))>::value));
+    REQUIRE((std::is_same<real128, decltype(pow(0., real128{}))>::value));
+    REQUIRE((std::is_same<real128, decltype(pow(int_t{}, real128{}))>::value));
+    REQUIRE((std::is_same<real128, decltype(pow(real128{}, rat_t{}))>::value));
+    REQUIRE((pow(real128{}, real128{}).m_value == 1.));
+    REQUIRE((pow(real128{2}, real128{3}).m_value == 8.));
+    REQUIRE((pow(real128{2}, real128{-3}).m_value == real128{".125"}.m_value));
+    REQUIRE((pow(real128{}, 0).m_value == 1.));
+    REQUIRE((pow(0.f, real128{}).m_value == 1.));
+    REQUIRE((pow(real128{2}, 3ll).m_value == 8.));
+    REQUIRE((pow(2u, real128{3}).m_value == 8.));
+    REQUIRE((pow(real128{2}, (signed char)-3).m_value == real128{".125"}.m_value));
+    REQUIRE((pow(2., real128{-3}).m_value == real128{".125"}.m_value));
+    REQUIRE((pow(real128{}, int_t{}).m_value == 1.));
+    REQUIRE((pow(int_t{}, real128{}).m_value == 1.));
+    REQUIRE((pow(real128{2}, int_t{3}).m_value == 8.));
+    REQUIRE((pow(int_t{2}, real128{3}).m_value == 8.));
+    REQUIRE((pow(real128{2}, int_t{-3}).m_value == real128{".125"}.m_value));
+    REQUIRE((pow(int_t{2}, real128{-3}).m_value == real128{".125"}.m_value));
+    REQUIRE((pow(real128{}, rat_t{}).m_value == 1.));
+    REQUIRE((pow(rat_t{}, real128{}).m_value == 1.));
+    REQUIRE((pow(real128{2}, rat_t{3}).m_value == 8.));
+    REQUIRE((pow(rat_t{2}, real128{3}).m_value == 8.));
+    REQUIRE((pow(real128{2}, rat_t{-3}).m_value == real128{".125"}.m_value));
+    REQUIRE((pow(rat_t{2}, real128{-3}).m_value == real128{".125"}.m_value));
+    REQUIRE((abs(pow(real128{2}, rat_t{1, 2}) - real128_sqrt2()).m_value < 1E-30));
+    REQUIRE((pow(rat_t{1, 2}, real128{2}).m_value == real128{".25"}.m_value));
+}

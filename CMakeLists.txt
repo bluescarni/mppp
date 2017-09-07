@@ -2,7 +2,7 @@ cmake_policy(SET CMP0048 NEW)
 
 project(mp++ VERSION 0.5 LANGUAGES CXX C)
 
-cmake_minimum_required(VERSION 3.2.0)
+cmake_minimum_required(VERSION 3.3.0)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
@@ -43,6 +43,7 @@ mark_as_advanced(MPPP_BENCHMARK_BOOST)
 option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
 mark_as_advanced(MPPP_BENCHMARK_FLINT)
 option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
+option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 
 if(YACMA_COMPILER_IS_GNUCXX)
     # This is just a hackish way of detecting concepts, need to revisit once
@@ -54,13 +55,28 @@ find_package(GMP REQUIRED)
 
 # Setup of the mp++ interface library.
 add_library(mp++ INTERFACE)
+
+# Optional dependency on MPFR.
 if(MPPP_WITH_MPFR)
     find_package(MPFR REQUIRED)
     target_link_libraries(mp++ INTERFACE MPFR::MPFR)
     set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
 
-# mp++ depends on GMP.
+# Optional dependency on quadmath.
+if(MPPP_WITH_QUADMATH)
+    include(CheckTypeSize)
+    check_type_size(__float128 _MPPP_FLOAT128_EXISTS BUILTIN_TYPES_ONLY LANGUAGE CXX)
+    if(NOT _MPPP_FLOAT128_EXISTS)
+        message(FATAL_ERROR "The 'MPPP_WITH_QUADMATH' option was enabled but the '__float128' type does not exist.")
+    endif()
+    unset(_MPPP_FLOAT128_EXISTS)
+    find_package(Quadmath REQUIRED)
+    target_link_libraries(mp++ INTERFACE Quadmath::quadmath)
+    set(MPPP_ENABLE_QUADMATH "#define MPPP_WITH_QUADMATH")
+endif()
+
+# Mandatory dependency on GMP.
 # NOTE: depend on GMP *after* optionally depending on MPFR, as the order
 # of the libraries matters on some platforms.
 target_link_libraries(mp++ INTERFACE GMP::GMP)
@@ -84,10 +100,13 @@ set(_MPPP_CONFIG_OPTIONAL_DEPS)
 if(MPPP_WITH_MPFR)
     set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(MPFR REQUIRED)\n")
 endif()
+if(MPPP_WITH_QUADMATH)
+    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(Quadmath REQUIRED)\n")
+endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" DESTINATION "lib/cmake/mp++")
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMPFR.cmake"
-	DESTINATION "lib/cmake/mp++")
+	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindQuadmath.cmake" DESTINATION "lib/cmake/mp++")
 install(EXPORT mp++_export NAMESPACE Mp++:: DESTINATION lib/cmake/mp++)
 # Take care of versioning.
 include(CMakePackageConfigHelpers)

@@ -6,20 +6,23 @@
 Welcome to mp++'s documentation!
 ================================
 
-mp++ is a small C++11 header-only library for multiprecision arithmetic, currently supporting integers
-and rationals. Based on the well-known `GMP <http://www.gmplib.org>`__ library, mp++ places a strong emphasis on
-optimising operations on small values. When dealing with small operands, mp++ will:
+mp++ is a C++11 header-only library for multiprecision arithmetic, currently supporting integers,
+rationals and quadruple-precision floats. Based on well-known libraries such as `GMP <http://www.gmplib.org>`__,
+`MPFR <http://www.mpfr.org>`__, and others, mp++ has two main objectives:
 
-* avoid heap memory allocations as much as possible, and
-* use optimised implementations of basic operations (instead of calling GMP functions).
+* to maximise performance for small integers and rationals,
+* to provide a modern, consistent and unified C++ interface to several lower-level multiprecision libraries.
 
-The combination of these two techniques results in a performance increase, on small operands,
-with respect to GMP (see the :ref:`benchmark <benchmarks>` section). The price to pay is a
-small overhead when operating on large operands.
+mp++ adopts various techniques to improve performance on small multiprecision integers and rationals.
+In particular, a small buffer optimisation and custom implementations of basic mathematical primitives are
+instrumental in achieving a performance increase, with respect to GMP and other libraries, which can be
+substantial (see the :ref:`benchmarks <benchmarks>` section). The price to pay is a
+small overhead when operating on large integers.
 
-mp++ was created to cater to the requirements of computer algebra systems, which typically need to be able
+mp++ is a spinoff of the `Piranha <https://github.com/bluescarni/piranha>`__ library. It was created to cater to
+the requirements of computer algebra systems, which typically need to be able
 to manipulate arbitrarily-large numbers but which, in practice, often end up storing many small values
-(e.g., as coefficients in a polynomial).
+(e.g., as coefficients in a polynomial or entries in a matrix).
 
 mp++ is released under the `MPL2 <https://www.mozilla.org/en-US/MPL/2.0/FAQ/>`__ license.
 

@@ -13,7 +13,7 @@ if [[ "${MPPP_BUILD}" != DebugGCC48DebugGMP && "${MPPP_BUILD}" != Coverage32GCC6
 fi
 
 if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes ../;
     make -j2 VERBOSE=1 install;
     ctest -V;
 
@@ -25,7 +25,7 @@ if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
     make;
     ./main;
 elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
@@ -36,7 +36,7 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 ./configure --disable-shared --enable-assert --enable-alloca=debug --disable-assembly CFLAGS="-g -fsanitize=address";
     make -j2;
     cd ..;
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a ../;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_WITH_QUADMATH=yes -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a ../;
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMPUnstable" ]]; then
@@ -51,12 +51,12 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMPUnstable" ]]; then
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "CoverageGCC5" ]]; then
-    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_CXX_STANDARD=14 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
+    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_CXX_STANDARD=14 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-5;
 elif [[ "${MPPP_BUILD}" == "CoverageGCC7" ]]; then
-    CXX=g++-7 CC=gcc-7 cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_FLAGS="--coverage -fconcepts" ../;
+    CXX=g++-7 CC=gcc-7 cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage -fconcepts" ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-7;

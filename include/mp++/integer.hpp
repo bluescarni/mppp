@@ -4828,10 +4828,10 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
  * :cpp:class:`~mppp::integer` and then assigning the temporary to ``n``.
  * \endrststar
  *
- * @param is input stream.
- * @param n integer to which the contents of the stream will be assigned.
+ * @param is the input stream.
+ * @param n the integer to which the contents of the stream will be assigned.
  *
- * @return reference to \p is.
+ * @return a reference to \p is.
  *
  * @throws unspecified any exception thrown by the constructor from string of integer.
  */
@@ -5015,7 +5015,7 @@ inline T &operator+=(T &rop, const U &op)
 
 /// Prefix increment.
 /**
- * Increment \p n by one.
+ * This operator will increment \p n by one.
  *
  * @param n the integer that will be increased.
  *
@@ -5030,7 +5030,7 @@ inline integer<SSize> &operator++(integer<SSize> &n)
 
 /// Suffix increment.
 /**
- * Increment \p n by one and return a copy of \p n as it was before the increment.
+ * This operator will increment \p n by one and return a copy of \p n as it was before the increment.
  *
  * @param n the integer that will be increased.
  *
@@ -5172,7 +5172,7 @@ inline T &operator-=(T &rop, const U &op)
 
 /// Prefix decrement.
 /**
- * Decrement \p n by one.
+ * This operator will decrement \p n by one.
  *
  * @param n the integer that will be decreased.
  *
@@ -5187,7 +5187,7 @@ inline integer<SSize> &operator--(integer<SSize> &n)
 
 /// Suffix decrement.
 /**
- * Decrement \p n by one and return a copy of \p n as it was before the decrement.
+ * This operator will decrement \p n by one and return a copy of \p n as it was before the decrement.
  *
  * @param n the integer that will be decreased.
  *
@@ -5877,17 +5877,20 @@ namespace std
 /// Specialisation of \p std::hash for mppp::integer.
 template <size_t SSize>
 struct hash<mppp::integer<SSize>> {
+// NOTE: these typedefs have been deprecated in C++17.
+#if MPPP_CPLUSPLUS < 201703L
     /// The argument type.
     typedef mppp::integer<SSize> argument_type;
     /// The result type.
     typedef size_t result_type;
+#endif
     /// Call operator.
     /**
      * @param n the integer whose hash will be returned.
      *
      * @return a hash value for \p n.
      */
-    result_type operator()(const argument_type &n) const
+    size_t operator()(const mppp::integer<SSize> &n) const
     {
         return mppp::hash(n);
     }

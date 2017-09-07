@@ -17,7 +17,7 @@ if [[ "${MPPP_BUILD}" != DebugGCC48DebugGMP* && "${MPPP_BUILD}" != Coverage32GCC
     bash miniconda.sh -b -p $HOME/miniconda
     conda config --add channels conda-forge --force
 
-    conda_pkgs="cmake>=3.2 gmp mpfr"
+    conda_pkgs="cmake>=3.3 gmp mpfr"
 
     if [[ "${MPPP_BUILD}" == Documentation ]]; then
         conda_pkgs="$conda_pkgs graphviz doxygen"
