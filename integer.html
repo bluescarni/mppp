@@ -83,6 +83,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
@@ -1927,11 +1928,11 @@ the <a class="reference internal" href="#_CPPv2NK4mppp7integer9to_stringEi" titl
 <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and then assigning the temporary to <code class="docutils literal"><span class="pre">n</span></code>.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
-<dd>reference to <code class="docutils literal"><span class="pre">is</span></code>.</dd>
+<dd>a reference to <code class="docutils literal"><span class="pre">is</span></code>.</dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">is</span></code>: input stream. </li>
-<li><code class="docutils literal"><span class="pre">n</span></code>: integer to which the contents of the stream will be assigned.</li>
+<li><code class="docutils literal"><span class="pre">is</span></code>: the input stream. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: the integer to which the contents of the stream will be assigned.</li>
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt>
@@ -2050,7 +2051,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt id="_CPPv2N4mpppppER7integerI5SSizeE">
 <span id="mppp::inc-operator__integer:SSize:R"></span><span class="target" id="group__integer__operators_1gab97918e8381f023a82fe1c8c4cdadd40"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">operator++</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppppER7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Prefix increment. </p>
-<p>Increment <code class="docutils literal"><span class="pre">n</span></code> by one.</p>
+<p>This operator will increment <code class="docutils literal"><span class="pre">n</span></code> by one.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">n</span></code> after the increment. </dd>
@@ -2069,7 +2070,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt id="_CPPv2N4mpppppER7integerI5SSizeEi">
 <span id="mppp::inc-operator__integer:SSize:R.i"></span><span class="target" id="group__integer__operators_1gaddaaf33873f284d64bbecd300069efb9"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator++</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppppER7integerI5SSizeEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Suffix increment. </p>
-<p>Increment <code class="docutils literal"><span class="pre">n</span></code> by one and return a copy of <code class="docutils literal"><span class="pre">n</span></code> as it was before the increment.</p>
+<p>This operator will increment <code class="docutils literal"><span class="pre">n</span></code> by one and return a copy of <code class="docutils literal"><span class="pre">n</span></code> as it was before the increment.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a copy of <code class="docutils literal"><span class="pre">n</span></code> before the increment. </dd>
@@ -2157,7 +2158,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt id="_CPPv2N4mpppmmER7integerI5SSizeE">
 <span id="mppp::dec-operator__integer:SSize:R"></span><span class="target" id="group__integer__operators_1gab59e6cefd0be6010fdb816039d426419"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">operator--</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmmER7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Prefix decrement. </p>
-<p>Decrement <code class="docutils literal"><span class="pre">n</span></code> by one.</p>
+<p>This operator will decrement <code class="docutils literal"><span class="pre">n</span></code> by one.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">n</span></code> after the decrement. </dd>
@@ -2176,7 +2177,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dt id="_CPPv2N4mpppmmER7integerI5SSizeEi">
 <span id="mppp::dec-operator__integer:SSize:R.i"></span><span class="target" id="group__integer__operators_1ga9f9f65c990e2fafa085c8cf68324e65a"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator--</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmmER7integerI5SSizeEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Suffix decrement. </p>
-<p>Decrement <code class="docutils literal"><span class="pre">n</span></code> by one and return a copy of <code class="docutils literal"><span class="pre">n</span></code> as it was before the decrement.</p>
+<p>This operator will decrement <code class="docutils literal"><span class="pre">n</span></code> by one and return a copy of <code class="docutils literal"><span class="pre">n</span></code> as it was before the decrement.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a copy of <code class="docutils literal"><span class="pre">n</span></code> before the decrement. </dd>

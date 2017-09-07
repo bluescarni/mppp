@@ -7,7 +7,11 @@ Changelog
 New
 ~~~
 
+- Implement the :cpp:class:`~mppp::real128` class (`#31 <https://github.com/bluescarni/mppp/pull/31>`__).
+
 - Implement the ``sub_ui()`` primitive for :cpp:class:`~mppp::integer` (`#37 <https://github.com/bluescarni/mppp/pull/37>`__).
+
+- Add a CI build testing against the latest unstable GMP branch (`#34 <https://github.com/bluescarni/mppp/pull/34>`__).
 
 - Add assignment operators from ``std::string_view`` for :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
   (`#32 <https://github.com/bluescarni/mppp/pull/32>`__).
@@ -18,9 +22,12 @@ New
 Changes
 ~~~~~~~
 
-- Use various C++17 standard library bits if available (`#37 <https://github.com/bluescarni/mppp/pull/37>`__).
+- Use various C++17 standard library bits if available, and improve general C++17 compatibility
+  (`#31 <https://github.com/bluescarni/mppp/pull/31>`__, `#37 <https://github.com/bluescarni/mppp/pull/37>`__).
 
 - Update the internal copy of Catch to the latest version, 1.9.7 (`#36 <https://github.com/bluescarni/mppp/pull/36>`__).
+
+- Bump up the minimum required CMake version to 3.3 (`#31 <https://github.com/bluescarni/mppp/pull/31>`__).
 
 - Performance improvements and simplifications in the :cpp:class:`~mppp::rational` constructors and assignment operators
   (`#28 <https://github.com/bluescarni/mppp/pull/28>`__, `#32 <https://github.com/bluescarni/mppp/pull/32>`__).
