@@ -15,6 +15,8 @@ using namespace mppp;
 
 TEST_CASE("real128 constants")
 {
+    constexpr auto sig_digits = real128_sig_digits();
+    REQUIRE(sig_digits == 113u);
     constexpr auto pi = real128_pi();
     REQUIRE((pi.m_value == real128{"3.14159265358979323846264338327950280"}.m_value));
     constexpr auto e = real128_e();
@@ -30,6 +32,7 @@ TEST_CASE("real128 constants")
     constexpr auto mnan = -real128_nan();
     REQUIRE(mnan.isnan());
 #if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE(sig_digits_128 == 113u);
     REQUIRE((pi_128.m_value == real128_pi().m_value));
     REQUIRE((e_128.m_value == real128_e().m_value));
     REQUIRE((sqrt2_128.m_value == real128_sqrt2().m_value));

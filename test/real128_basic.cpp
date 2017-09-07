@@ -41,6 +41,7 @@ static constexpr auto delta49 = std::numeric_limits<std::uint_least64_t>::digits
 
 TEST_CASE("real128 constructors")
 {
+    REQUIRE(real128::sig_digits == 113);
     real128 r;
     REQUIRE((r.m_value == 0));
     constexpr real128 rc;

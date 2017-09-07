@@ -2365,6 +2365,15 @@ constexpr real128 two_48()
  *  @{
  */
 
+/// The number of binary digits in the significand of a \link mppp::real128 real128 \endlink.
+/**
+ * @return the integral constant 113.
+ */
+constexpr unsigned real128_sig_digits()
+{
+    return 113u;
+}
+
 /// The positive \f$ \infty \f$ constant.
 /**
  * @return \f$ +\infty \f$.
@@ -2434,6 +2443,9 @@ constexpr real128 real128_sqrt2()
 // inline explicitly here:
 // http://en.cppreference.com/w/cpp/language/inline
 // Note that constexpr static member variables are implicitly inline instead.
+
+/// The number of binary digits in the significand of a \link mppp::real128 real128 \endlink (113).
+inline constexpr unsigned sig_digits_128 = real128_sig_digits();
 
 /// Quadruple-precision \f$ +\infty \f$ constant.
 inline constexpr real128 inf_128 = real128_inf();

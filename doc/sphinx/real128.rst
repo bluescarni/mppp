@@ -138,8 +138,8 @@ Operators
 Constants
 ~~~~~~~~~
 
-A few quadruple-precision mathematical constants are provided. The constants are available as inline variables
-(e.g., :cpp:var:`mppp::pi128`, requires C++17 or later) and as constexpr functions (e.g., :cpp:func:`mppp::real128_pi()`,
+A few mathematical constants are provided. The constants are available as inline variables
+(e.g., :cpp:var:`mppp::pi_128`, requires C++17 or later) and as constexpr functions (e.g., :cpp:func:`mppp::real128_pi()`,
 always available). Inline variables and constexpr functions provide exactly the same functionality,
 but inline variables are more convenient if C++17 is an option.
 
