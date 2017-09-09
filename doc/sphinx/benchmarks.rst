@@ -17,10 +17,10 @@ In addition to mp++, the following libraries are used in the benchmarks:
 * the `FLINT <http://flintlib.org/>`__ library. This library provides a data type called ``fmpz_t`` which, similarly to
   mp++, provides a small-value optimisation on top of GMP.
 
-The benchmark results were last updated on **20170728**, using the following package versions:
+The benchmark results were last updated on **20170909**, using the following package versions:
 
-* GCC 7.1,
-* mp++ 0.4,
+* GCC 7.2,
+* mp++ 0.5,
 * GMP 6.1.2,
 * MPFR 3.1.5,
 * Boost 1.63.0,
@@ -53,7 +53,7 @@ is run in a variety of different setups.
 In this setup, the integer vectors are initialised with small *non-negative* values, and the final dot product
 is less than :math:`2^{64}`. mp++ integers with 1 limb of static size are employed.
 
-.. figure:: _static/integer1_dot_product_unsigned.svg
+.. figure:: _static/integer1_dot_product_unsigned.png
    :width: 100%
    :align: center
 
@@ -70,7 +70,7 @@ in the arithmetic portion of the benchmark. mp++ is also faster than ``cpp_int``
 This setup is almost identical to the :ref:`previous one <integer1_dot_product_unsigned>`, but this time the vectors
 are initialised with both positive *and* negative values.
 
-.. figure:: _static/integer1_dot_product_signed.svg
+.. figure:: _static/integer1_dot_product_signed.png
    :width: 100%
    :align: center
 
@@ -91,7 +91,7 @@ This setup is the 2-limb version of the :ref:`1-limb unsigned benchmark <integer
 the vectors are initialised with larger non-negative values, the final result is less than :math:`2^{128}`, and
 mp++ integers with 2 limbs of static size are now employed.
 
-.. figure:: _static/integer2_dot_product_unsigned.svg
+.. figure:: _static/integer2_dot_product_unsigned.png
    :width: 100%
    :align: center
 
@@ -102,7 +102,7 @@ The benchmark shows that mp++'s specialised arithmetic functions pay off in term
 
 This setup is the signed version of the :ref:`previous benchmark <integer2_dot_product_unsigned>`.
 
-.. figure:: _static/integer2_dot_product_signed.svg
+.. figure:: _static/integer2_dot_product_signed.png
    :width: 100%
    :align: center
 
@@ -130,7 +130,7 @@ into a vector rather than accumulating them directly into a scalar).
 In this setup, the integer vectors are initialised with small *non-negative* values, and the final result
 is less than :math:`2^{64}`. mp++ integers with 1 limb of static size are employed.
 
-.. figure:: _static/integer1_vec_mul_unsigned.svg
+.. figure:: _static/integer1_vec_mul_unsigned.png
    :width: 100%
    :align: center
 
@@ -143,7 +143,7 @@ memory footprint (32 bytes vs mp++'s 16 and FLINT's 8).
 
 In this setup, the vectors are initialised with both positive *and* negative values.
 
-.. figure:: _static/integer1_vec_mul_signed.svg
+.. figure:: _static/integer1_vec_mul_signed.png
    :width: 100%
    :align: center
 
@@ -159,7 +159,7 @@ This setup is the 2-limb version of the :ref:`1-limb unsigned benchmark <integer
 the vectors are initialised with larger non-negative values, the final result is less than :math:`2^{128}`, and
 mp++ integers with 2 limbs of static size are now employed.
 
-.. figure:: _static/integer2_vec_mul_unsigned.svg
+.. figure:: _static/integer2_vec_mul_unsigned.png
    :width: 100%
    :align: center
 
@@ -170,7 +170,7 @@ The benchmark shows again that mp++'s specialised arithmetic functions deliver s
 
 This setup is the signed version of the :ref:`previous benchmark <integer2_vec_mul_unsigned>`.
 
-.. figure:: _static/integer2_vec_mul_signed.svg
+.. figure:: _static/integer2_vec_mul_signed.png
    :width: 100%
    :align: center
 
@@ -184,7 +184,7 @@ This benchmark consists of the sorting (via ``std::sort()``) of a randomly-gener
 
 In this setup, the integer vector is initialised with small *non-negative* values. mp++ integers with 1 limb of static size are employed.
 
-.. figure:: _static/integer1_sort_unsigned.svg
+.. figure:: _static/integer1_sort_unsigned.png
    :width: 100%
    :align: center
 
@@ -197,7 +197,7 @@ and FLINT.
 
 In this setup, the vector is initialised with both positive *and* negative values.
 
-.. figure:: _static/integer1_sort_signed.svg
+.. figure:: _static/integer1_sort_signed.png
    :width: 100%
    :align: center
 
@@ -207,7 +207,7 @@ In this setup, the vector is initialised with both positive *and* negative value
 In this setup, the integer vector is initialised with *non-negative* values in the :math:`\left[2^{64},2^{128}\right)` range.
 mp++ integers with 2 limbs of static size are employed.
 
-.. figure:: _static/integer2_sort_unsigned.svg
+.. figure:: _static/integer2_sort_unsigned.png
    :width: 100%
    :align: center
 
@@ -217,6 +217,6 @@ mp++ integers with 2 limbs of static size are employed.
 In this setup, the vector is initialised with both positive *and* negative values in the :math:`\left(-2^{128},2^{128}\right)` range.
 mp++ integers with 2 limbs of static size are employed.
 
-.. figure:: _static/integer2_sort_signed.svg
+.. figure:: _static/integer2_sort_signed.png
    :width: 100%
    :align: center

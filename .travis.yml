@@ -110,6 +110,7 @@ matrix:
           packages:
           - gcc-5
           - g++-5
+          - texlive
     - env: MPPP_BUILD="OSXDebug"
       os: osx
       osx_image: xcode6.4
