@@ -102,14 +102,13 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     fi
     cd ../sphinx;
     pip install --user sphinx breathe requests[security]
-    export SPHINX_OUTPUT=`make html 2>&1 >/dev/null`
+    export SPHINX_OUTPUT=`make html 2>&1 >/dev/null && make latexpdf 2>&1 >/dev/null`
     if [[ "${SPHINX_OUTPUT}" != "" ]]; then
         echo "Sphinx encountered some problem:";
         echo "${SPHINX_OUTPUT}";
         exit 1;
     fi
     echo "Sphinx ran successfully";
-    make latexpdf
     if [[ "${TRAVIS_PULL_REQUEST}" != "false" ]]; then
         echo "Testing a pull request, the generated documentation will not be uploaded.";
         exit 0;
