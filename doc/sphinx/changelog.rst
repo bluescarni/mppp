@@ -22,6 +22,8 @@ New
 Changes
 ~~~~~~~
 
+- Various updates to the benchmarks (`#39 <https://github.com/bluescarni/mppp/pull/39>`__).
+
 - Use various C++17 standard library bits if available, and improve general C++17 compatibility
   (`#31 <https://github.com/bluescarni/mppp/pull/31>`__, `#37 <https://github.com/bluescarni/mppp/pull/37>`__).
 
@@ -34,6 +36,8 @@ Changes
 
 Fix
 ~~~
+
+- Fix the PDF build of the documentation (`#39 <https://github.com/bluescarni/mppp/pull/39>`__).
 
 - Fix a few missing ``inline`` specifiers (`#38 <https://github.com/bluescarni/mppp/pull/38>`__).
 

@@ -109,6 +109,9 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
         exit 1;
     fi
     echo "Sphinx ran successfully";
+    # Run the latex build as well. We don't check for stderr output here,
+    # as the command turns out to be quite chatty.
+    make latexpdf;
     if [[ "${TRAVIS_PULL_REQUEST}" != "false" ]]; then
         echo "Testing a pull request, the generated documentation will not be uploaded.";
         exit 0;

@@ -10,7 +10,6 @@ branches:
 
 env:
   global:
-    # - secure: "XVtnE3+rh2VtRdv9/vzpo69pGGgR8xHks6MKdAeCmdxBfMZpOXkfmZ5S9QGsVSvlbZjSkfc9QbFxGj3VVaYPciULTW4zyXZj09LzkWOTDVPu5VBT6oz6/iWH5vOoFVvMAUWb3uhRDL8q1FuIcbzQ5HhszWs2Yvjidf1+GpahAIlnHvkqM6dKJLBsHgNq9CWcf/D2GkGFBdS6LoT6p2WDOzl0aCy2dI89c9TRzXA978hhq5avtGmO9sZpqCVaI/IikZPEILML1uxmTamUKKsUFK/x3WU3eo/hYAtlqE4f0Uv8/Y6Als+mNAXeS2ok/GKAHbcW1S7LqT+GbgB2mJr6CTpiMKFZf1XCJGC4Ml8V2Kh4aZQjncwxzvPf0DDrGM6jLQP0Ya/5EVCtbr/IFZwbcApoVngGkUB/viopK7QoEultODDW3bp7UZo4/Rh6+P1WAvnK7d2qQXInQRRllQM3f5wWsEA40H2HoTnm9iPTDQUVFwlWnNSxQvRnhXk9RCDQDBDAWz1Sg5Uv5YeCYgvQAuDtHisBX2FLHK7Y2EgsX/hap8/+rOlluGamUgeVqiuP3Hox8ypTmqHE0f46azgjKwV6HbQTQHnthpfiTWOW0mRqE5zxNeYFfqfsF9T5pvGL3Fnoo68aaEz/7nqq2PdgaL0NtGZofGxifSqQ+zas8wQ="
     - secure: "NSDQD+A45WunP4RejhxNWbD+9xhYv4wGu5Qvx3PPLLjBRp1C0sv6bMYcN7f/YRwaqFrZSnYeoURAM3SAYH6oWw5AmVCh76psgx34QPkG+o2whnSmYgzm9Pyj853xF3nwfkMfKgs29Djle/h4tzRo8ppzm6KGNCXddq1KfUfBOtnvcszuUq5tC+9GFgTSIcgqjqS1Q4TXPH7xR83wSjhG78YBloyYZLxwQc72GX5fBdEzP2NWjB9MA+ftAKrFi14Ph+Zg1Hgl22XEnyFF/fj+aFdZx3w0Bcvy3DQ8caCIV17iLeVEQy1YNNaBKjLiyVd35sgu4Yw3RS5rIewfR1wqu8jKC4ZWgT++CzVXovyeE8rrmPNGMbEQUf+19/1wlOBjO1ALtUsa/VjOVc/UlvKG8Kf0+mK20xX4gCYh0YDnq20os/4MQGETwWVEhki3qwO0l35/DPbcAtxaFvm1mcXtEKf/vMU6esIzaDqJm2kX6FxhIt2Q7t1nWWfyqcPQQrwN90HhuEY7nzc6oaNfLrwzNy7jYWC0YrK21QiQPnxJta7OicGgQKmoWKMC+T0VjwA0dWsjWTgU8DA4rqGJTSq30PVHk6YnFURi8LyK7Z/w1BxtKSrrcI9LOReyXLWV3kNtzywPfqW+DMSsrKOdG6j7R9271ZNEuPN+HEnCtM4UOrM="
 
 matrix:
@@ -110,6 +109,9 @@ matrix:
           packages:
           - gcc-5
           - g++-5
+          - texlive
+          - texlive-latex-extra
+          - latexmk
     - env: MPPP_BUILD="OSXDebug"
       os: osx
       osx_image: xcode6.4

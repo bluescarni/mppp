@@ -163,11 +163,15 @@ int main()
          "    df = get_data()\n"
          "    g = sns.factorplot(x='Library', y = 'Runtime (ms)', hue='Task', data=df, kind='bar', palette='muted', "
          "legend = False, size = 5.5, aspect = 1.5)\n"
+         "    for p in g.ax.patches:\n"
+         "        height = p.get_height()\n"
+         "        g.ax.text(p.get_x()+p.get_width()/2., height + 8, '{}'.format(int(height)), "
+         "ha=\"center\", fontsize=9)\n"
          "    legend(loc='upper right')\n"
          "    g.fig.suptitle('"
          + name + "')\n"
                   "    g.savefig('"
-         + name + ".svg', bbox_inches='tight')\n";
+         + name + ".png', bbox_inches='tight', dpi=150)\n";
     std::ofstream of(name + ".py", std::ios_base::trunc);
     of << s;
 }
