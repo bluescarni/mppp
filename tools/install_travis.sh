@@ -102,7 +102,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     fi
     cd ../sphinx;
     pip install --user sphinx breathe requests[security]
-    export SPHINX_OUTPUT=`make html 2>&1 >/dev/null`
+    export SPHINX_OUTPUT=`make html 2>&1 >/dev/null`;
     if [[ "${SPHINX_OUTPUT}" != "" ]]; then
         echo "Sphinx encountered some problem:";
         echo "${SPHINX_OUTPUT}";
@@ -111,7 +111,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     echo "Sphinx ran successfully";
     # Run the latex build as well. We don't check for stderr output here,
     # as the command turns out to be quite chatty.
-    make latexpdf
+    make latexpdf;
     if [[ "${TRAVIS_PULL_REQUEST}" != "false" ]]; then
         echo "Testing a pull request, the generated documentation will not be uploaded.";
         exit 0;
