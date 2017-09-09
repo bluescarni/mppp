@@ -132,6 +132,12 @@ using real128_op_types_enabler
     = enable_if_t<disjunction<are_real128_cpp_op_types<T, U>, are_real128_mppp_op_types<T, U>>::value, int>;
 #endif
 
+// For the future:
+// - include some clang build in the CI (probably it will be a bit painful to locate the quadmath library though)
+// - in theory we could investigate a clang windows build as well, taking the libquadmath binary from mingw?
+// - finish wrapping up the quadmath API
+// - consider constexpr implementation of some basic functions (sqrt, log, etc.)
+
 /// Quadruple-precision floating-point class.
 /**
  * \rststar
