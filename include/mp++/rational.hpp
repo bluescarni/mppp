@@ -205,6 +205,8 @@ class rational
     friend int cmp(const rational<S> &, const rational<S> &);
     template <std::size_t S>
     friend int cmp(const rational<S> &, const integer<S> &);
+    // Make friends with real, for the mpq_view machinery.
+    friend class real;
 #endif
 
 public:

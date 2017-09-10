@@ -82,3 +82,7 @@ if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_signbit)
   ADD_MPPP_TESTCASE(real128_trig)
 endif()
+
+if(MPPP_WITH_MPFR)
+  ADD_MPPP_TESTCASE(real_basic)
+endif()
