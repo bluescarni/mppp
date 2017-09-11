@@ -101,6 +101,9 @@ using are_real128_mppp_op_types
                                                conjunction<std::is_same<U, real128>, is_integer<T>>,
                                                conjunction<std::is_same<T, real128>, is_rational<U>>,
                                                conjunction<std::is_same<U, real128>, is_rational<T>>>::value>;
+
+template <typename T>
+using is_real128_mppp_interoperable = std::integral_constant<bool, disjunction<is_integer<T>, is_rational<T>>::value>;
 }
 
 template <typename T>
@@ -1287,13 +1290,13 @@ inline real128 dispatch_pow(const T &x, const real128 &y)
     return real128{::powq(x, y.m_value)};
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_pow(const real128 &x, const T &y)
 {
     return dispatch_pow(x, real128{y});
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_pow(const T &x, const real128 &y)
 {
     return dispatch_pow(real128{x}, y);
@@ -1462,13 +1465,13 @@ constexpr real128 operator+(const T &x, const U &y)
 inline namespace detail
 {
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_add(const real128 &x, const T &y)
 {
     return x + real128{y};
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_add(const T &x, const real128 &y)
 {
     return real128{x} + y;
@@ -1601,13 +1604,13 @@ constexpr real128 operator-(const T &x, const U &y)
 inline namespace detail
 {
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_sub(const real128 &x, const T &y)
 {
     return x - real128{y};
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_sub(const T &x, const real128 &y)
 {
     return real128{x} - y;
@@ -1718,13 +1721,13 @@ constexpr real128 operator*(const T &x, const U &y)
 inline namespace detail
 {
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_mul(const real128 &x, const T &y)
 {
     return x * real128{y};
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_mul(const T &x, const real128 &y)
 {
     return real128{x} * y;
@@ -1794,13 +1797,13 @@ constexpr real128 operator/(const T &x, const U &y)
 inline namespace detail
 {
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_div(const real128 &x, const T &y)
 {
     return x / real128{y};
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_div(const T &x, const real128 &y)
 {
     return real128{x} / y;
@@ -1906,13 +1909,13 @@ constexpr bool operator!=(const T &x, const U &y)
 inline namespace detail
 {
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline bool dispatch_eq(const real128 &x, const T &y)
 {
     return x == real128{y};
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline bool dispatch_eq(const T &x, const real128 &y)
 {
     return real128{x} == y;
@@ -2032,13 +2035,13 @@ constexpr bool operator<(const T &x, const U &y)
 
 inline namespace detail
 {
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline bool dispatch_lt(const real128 &x, const T &y)
 {
     return x < real128{y};
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline bool dispatch_lt(const T &x, const real128 &y)
 {
     return real128{x} < y;
@@ -2127,13 +2130,13 @@ constexpr bool operator<=(const T &x, const U &y)
 
 inline namespace detail
 {
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline bool dispatch_lte(const real128 &x, const T &y)
 {
     return x <= real128{y};
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline bool dispatch_lte(const T &x, const real128 &y)
 {
     return real128{x} <= y;
@@ -2222,13 +2225,13 @@ constexpr bool operator>(const T &x, const U &y)
 
 inline namespace detail
 {
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline bool dispatch_gt(const real128 &x, const T &y)
 {
     return x > real128{y};
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline bool dispatch_gt(const T &x, const real128 &y)
 {
     return real128{x} > y;
@@ -2317,13 +2320,13 @@ constexpr bool operator>=(const T &x, const U &y)
 
 inline namespace detail
 {
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline bool dispatch_gte(const real128 &x, const T &y)
 {
     return x >= real128{y};
 }
 
-template <typename T, enable_if_t<disjunction<is_integer<T>, is_rational<T>>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
 inline bool dispatch_gte(const T &x, const real128 &y)
 {
     return real128{x} >= y;
