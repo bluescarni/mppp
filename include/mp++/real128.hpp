@@ -1502,19 +1502,19 @@ inline real128 operator+(const T &x, const U &y)
 inline namespace detail
 {
 
-constexpr void dispatch_in_place_add(real128 &x, const real128 &y)
+inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(real128 &x, const real128 &y)
 {
     x.m_value += y.m_value;
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-constexpr void dispatch_in_place_add(real128 &x, const T &y)
+inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(real128 &x, const T &y)
 {
     x.m_value += y;
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
-constexpr void dispatch_in_place_add(T &x, const real128 &y)
+inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(T &x, const real128 &y)
 {
     x = static_cast<T>(x + y.m_value);
 }
