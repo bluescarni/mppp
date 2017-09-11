@@ -42,6 +42,17 @@ static constexpr real128 test_constexpr_decr()
     return retval;
 }
 
+static constexpr real128 test_constexpr_ipa()
+{
+    real128 retval{1};
+    retval += real128{-2};
+    retval += 1.;
+    retval += -1;
+    int n = 3;
+    n += real128{-2};
+    return retval + n;
+}
+
 #endif
 
 TEST_CASE("real128 plus")
@@ -149,4 +160,33 @@ TEST_CASE("real128 plus")
     REQUIRE(((int_t{3} / -x).m_value == -real128{".25"}.m_value));
     REQUIRE(((x / rat_t{3, 2}).m_value == 8));
     REQUIRE(((rat_t{3, 2} / x).m_value == real128{".125"}.m_value));
+    // In-place.
+    x = -1;
+    x += real128{-2};
+    REQUIRE(x == -3);
+    x += 2;
+    REQUIRE(x == -1);
+    x += -1.;
+    REQUIRE(x == -2);
+    int n = 5;
+    n += real128{-3};
+    REQUIRE(n == 2);
+    double d = -6;
+    d += real128{1};
+    REQUIRE(d == -5.);
+    x = 10;
+    x += int_t{1};
+    REQUIRE(x == 11);
+    int_t nm{-12};
+    nm += real128{2};
+    REQUIRE(nm == -10);
+    x += rat_t{3};
+    REQUIRE(x == 14);
+    rat_t q{5, 2};
+    q += real128{-1.5};
+    REQUIRE(q == 1);
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+    constexpr real128 z11 = test_constexpr_ipa();
+    REQUIRE(z11 == 0);
+#endif
 }
