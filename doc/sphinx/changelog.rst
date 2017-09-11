@@ -37,6 +37,9 @@ Changes
 Fix
 ~~~
 
+- Fix too lax constraints in the implementation of in-place operators for :cpp:class:`~mppp::integer` and
+  :cpp:class:`~mppp::rational` (`#41 <https://github.com/bluescarni/mppp/pull/41>`__).
+
 - Fix the PDF build of the documentation (`#39 <https://github.com/bluescarni/mppp/pull/39>`__).
 
 - Fix a few missing ``inline`` specifiers (`#38 <https://github.com/bluescarni/mppp/pull/38>`__).
