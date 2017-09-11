@@ -1502,6 +1502,8 @@ inline real128 operator+(const T &x, const U &y)
 inline namespace detail
 {
 
+// NOTE: we need the MPPP_CONSTEXPR_14 construct in the implementation detail as well,
+// as returning void in a constexpr function is not allowed in C++11.
 inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(real128 &x, const real128 &y)
 {
     x.m_value += y.m_value;
