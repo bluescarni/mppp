@@ -122,4 +122,11 @@ TEST_CASE("real128 naninffinite")
     REQUIRE(!f6);
     // Subnormals.
     REQUIRE(fpclassify(real128{"1E-4940"}) == FP_SUBNORMAL);
+    REQUIRE(fpclassify(real128{"-1E-4940"}) == FP_SUBNORMAL);
+    // Large but not infinite.
+    REQUIRE(fpclassify(real128{"1E4930"}) == FP_NORMAL);
+    REQUIRE(fpclassify(-real128{"1E4930"}) == FP_NORMAL);
+    // Small but not subnormal.
+    REQUIRE(fpclassify(real128{"1E-4931"}) == FP_NORMAL);
+    REQUIRE(fpclassify(-real128{"1E-4931"}) == FP_NORMAL);
 }

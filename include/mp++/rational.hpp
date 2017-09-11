@@ -1691,7 +1691,7 @@ inline void dispatch_in_place_add(rational<SSize> &retval, const T &x)
     retval = static_cast<T>(retval) + x;
 }
 
-template <typename T, std::size_t SSize>
+template <typename T, std::size_t SSize, enable_if_t<is_rational_interoperable<T, SSize>::value, int> = 0>
 inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
 {
     rop = static_cast<T>(rop + op);
@@ -1848,7 +1848,7 @@ inline void dispatch_in_place_sub(rational<SSize> &retval, const T &x)
     retval = static_cast<T>(retval) - x;
 }
 
-template <typename T, std::size_t SSize>
+template <typename T, std::size_t SSize, enable_if_t<is_rational_interoperable<T, SSize>::value, int> = 0>
 inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
 {
     rop = static_cast<T>(rop - op);
@@ -2010,7 +2010,7 @@ inline void dispatch_in_place_mul(rational<SSize> &retval, const T &x)
     retval = static_cast<T>(retval) * x;
 }
 
-template <typename T, std::size_t SSize>
+template <typename T, std::size_t SSize, enable_if_t<is_rational_interoperable<T, SSize>::value, int> = 0>
 inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
 {
     rop = static_cast<T>(rop * op);
@@ -2019,8 +2019,8 @@ inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
 
 /// In-place multiplication operator.
 /**
- * @param rop the multiplicator.
- * @param op the multiplicand.
+ * @param rop the multiplicand.
+ * @param op the multiplicator.
  *
  * @return a reference to \p rop.
  *
@@ -2217,7 +2217,7 @@ inline void dispatch_in_place_div(rational<SSize> &retval, const T &x)
     retval = static_cast<T>(retval) / x;
 }
 
-template <typename T, std::size_t SSize>
+template <typename T, std::size_t SSize, enable_if_t<is_rational_interoperable<T, SSize>::value, int> = 0>
 inline void dispatch_in_place_div(T &rop, const rational<SSize> &op)
 {
     rop = static_cast<T>(rop / op);
