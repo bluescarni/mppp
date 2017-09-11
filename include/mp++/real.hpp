@@ -206,6 +206,12 @@ private:
         dispatch_fp_construction(::mpfr_set_ld, x, p);
     }
     // Construction from integral types.
+    // Special casing for bool.
+    void dispatch_construction(const bool &b, ::mpfr_prec_t p)
+    {
+        dispatch_integral_init<bool>(p);
+        ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
+    }
     template <typename T>
     void dispatch_integral_init(::mpfr_prec_t p)
     {
