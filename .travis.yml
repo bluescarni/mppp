@@ -89,9 +89,11 @@ matrix:
         apt:
           sources:
           - llvm-toolchain-trusty-3.9
+          - ubuntu-toolchain-r-test
           packages:
           - clang-3.9
-          - g++-4.8
+          - gcc-7
+          - g++-7
     - env: MPPP_BUILD="ReleaseClang38"
       compiler: clang
       os: linux
