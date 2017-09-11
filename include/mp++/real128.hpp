@@ -2139,7 +2139,6 @@ inline bool dispatch_lt(const T &x, const real128 &y)
  * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
  * from the mp++ type.
  */
-
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
 inline bool operator<(const T &x, const Real128MpppOpTypes<T> &y)
@@ -2232,7 +2231,6 @@ inline bool dispatch_lte(const T &x, const real128 &y)
  * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
  * from the mp++ type.
  */
-
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
 inline bool operator<=(const T &x, const Real128MpppOpTypes<T> &y)
@@ -2329,7 +2327,6 @@ inline bool dispatch_gt(const T &x, const real128 &y)
  * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
  * from the mp++ type.
  */
-
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
 inline bool operator>(const T &x, const Real128MpppOpTypes<T> &y)
@@ -2422,7 +2419,6 @@ inline bool dispatch_gte(const T &x, const real128 &y)
  * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
  * from the mp++ type.
  */
-
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
 inline bool operator>=(const T &x, const Real128MpppOpTypes<T> &y)
