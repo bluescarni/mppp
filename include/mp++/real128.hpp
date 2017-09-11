@@ -2098,8 +2098,8 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_div(T &x, const real128 &y)
  *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
  * \endrststar
  *
- * @param rop the dividend.
- * @param op the divisor.
+ * @param x the dividend.
+ * @param y the divisor.
  *
  * @return a reference to \p x, after it has been divided by \p y.
  */
@@ -2133,8 +2133,8 @@ inline void dispatch_in_place_div(T &x, const real128 &y)
 
 /// In-place division involving \link mppp::real128 real128 \endlink and mp++ types.
 /**
- * @param rop the dividend.
- * @param op the divisor.
+ * @param x the dividend.
+ * @param y the divisor.
  *
  * @return a reference to \p x, after it has been divided by \p y.
  *
