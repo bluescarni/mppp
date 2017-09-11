@@ -1496,6 +1496,17 @@ inline real128 operator+(const T &x, const U &y)
     return dispatch_add(x, y);
 }
 
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+constexpr T &operator+=(const T &x, const Real128CppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
+constexpr T &operator+=(const T &x, const U &y)
+#endif
+{
+    return dispatch_add(x, y);
+}
+
 /// Prefix increment.
 /**
  * This operator will increment \p x by one.
@@ -1510,7 +1521,7 @@ inline real128 operator+(const T &x, const U &y)
  *
  * @return a reference to \p x after the increment.
  */
-MPPP_CONSTEXPR_14 real128 &operator++(real128 &x)
+inline MPPP_CONSTEXPR_14 real128 &operator++(real128 &x)
 {
     ++x.m_value;
     return x;
@@ -1530,7 +1541,7 @@ MPPP_CONSTEXPR_14 real128 &operator++(real128 &x)
  *
  * @return a copy of \p x before the increment.
  */
-MPPP_CONSTEXPR_14 real128 operator++(real128 &x, int)
+inline MPPP_CONSTEXPR_14 real128 operator++(real128 &x, int)
 {
     auto retval(x);
     ++x;
@@ -1638,7 +1649,7 @@ inline real128 operator-(const T &x, const U &y)
  *
  * @return a reference to \p x after the decrement.
  */
-MPPP_CONSTEXPR_14 real128 &operator--(real128 &x)
+inline MPPP_CONSTEXPR_14 real128 &operator--(real128 &x)
 {
     --x.m_value;
     return x;
@@ -1658,7 +1669,7 @@ MPPP_CONSTEXPR_14 real128 &operator--(real128 &x)
  *
  * @return a copy of \p x before the decrement.
  */
-MPPP_CONSTEXPR_14 real128 operator--(real128 &x, int)
+inline MPPP_CONSTEXPR_14 real128 operator--(real128 &x, int)
 {
     auto retval(x);
     --x;
