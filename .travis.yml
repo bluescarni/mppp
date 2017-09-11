@@ -91,6 +91,7 @@ matrix:
           - llvm-toolchain-trusty-3.9
           packages:
           - clang-3.9
+          - g++-4.8
     - env: MPPP_BUILD="ReleaseClang38"
       compiler: clang
       os: linux

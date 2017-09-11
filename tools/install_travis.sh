@@ -72,7 +72,7 @@ elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-6;
 elif [[ "${MPPP_BUILD}" == "DebugClang39" ]]; then
-    CXX=clang++-3.9 CC=clang-3.9 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes ../;
+    CXX=clang++-3.9 CC=clang-3.9 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DQuadmath_INCLUDE_DIR=/usr/lib/gcc/x86_64-linux-gnu/4.8/include -DQuadmath_LIBRARY=/usr/lib/gcc/x86_64-linux-gnu/4.8/libquadmath.so ../;
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "ReleaseClang38" ]]; then
