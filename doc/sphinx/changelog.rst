@@ -42,7 +42,7 @@ Fix
 
 - Fix the PDF build of the documentation (`#39 <https://github.com/bluescarni/mppp/pull/39>`__).
 
-- Fix a few missing ``inline`` specifiers (`#38 <https://github.com/bluescarni/mppp/pull/38>`__).
+- Fix a few missing ``inline`` specifiers (`#38 <https://github.com/bluescarni/mppp/pull/38>`__, `#41 <https://github.com/bluescarni/mppp/pull/41>`__).
 
 - Fix C++ version detection on MSVC (`#36 <https://github.com/bluescarni/mppp/pull/36>`__).
 
