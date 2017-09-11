@@ -76,17 +76,13 @@ inline namespace detail
 // For the moment, though, it seems like on all platforms __float128 is at least the same rank as double. For long
 // double, clang and GCC diverge, and we follow whatever the compiler is doing. So we just hard-code the behaviour
 // here, we can always write a more sophisticated solution later if the need arises.
+
+template <typename T>
+using is_real128_cpp_interoperable =
 #if defined(MPPP_WITH_MPFR) && defined(__clang__)
-
-template <typename T>
-using is_real128_cpp_interoperable
-    = std::integral_constant<bool, conjunction<is_cpp_interoperable<T>, negation<std::is_same<T, long double>>>::value>;
-
+    std::integral_constant<bool, conjunction<is_cpp_interoperable<T>, negation<std::is_same<T, long double>>>::value>;
 #else
-
-template <typename T>
-using is_real128_cpp_interoperable = is_cpp_interoperable<T>;
-
+    is_cpp_interoperable<T>;
 #endif
 
 template <typename T, typename U>
@@ -95,15 +91,14 @@ using are_real128_cpp_op_types = std::
                                         conjunction<std::is_same<T, real128>, is_real128_cpp_interoperable<U>>,
                                         conjunction<std::is_same<U, real128>, is_real128_cpp_interoperable<T>>>::value>;
 
-template <typename T, typename U>
-using are_real128_mppp_op_types
-    = std::integral_constant<bool, disjunction<conjunction<std::is_same<T, real128>, is_integer<U>>,
-                                               conjunction<std::is_same<U, real128>, is_integer<T>>,
-                                               conjunction<std::is_same<T, real128>, is_rational<U>>,
-                                               conjunction<std::is_same<U, real128>, is_rational<T>>>::value>;
-
 template <typename T>
 using is_real128_mppp_interoperable = std::integral_constant<bool, disjunction<is_integer<T>, is_rational<T>>::value>;
+
+template <typename T, typename U>
+using are_real128_mppp_op_types
+    = std::integral_constant<bool, disjunction<conjunction<std::is_same<T, real128>, is_real128_mppp_interoperable<U>>,
+                                               conjunction<std::is_same<U, real128>,
+                                                           is_real128_mppp_interoperable<T>>>::value>;
 }
 
 template <typename T>
