@@ -23,6 +23,10 @@ TEST_CASE("real basic")
     std::cout << real{true} << '\n';
     std::cout << real{integer<1>{1}} << '\n';
     std::cout << real{rational<1>{1, 3}} << '\n';
-    std::cout << real{-real128{"1.3E20"}} << '\n';
-    std::cout << -real128{"1.3E20"} << '\n';
+#if defined(MPPP_WITH_QUADMATH)
+    std::cout << real{-real128{"1.3E200"}} << '\n';
+    std::cout << -real128{"1.3E200"} << '\n';
+    std::cout << real{-real128{"1.3E-200"}} << '\n';
+    std::cout << -real128{"1.3E-200"} << '\n';
+#endif
 }

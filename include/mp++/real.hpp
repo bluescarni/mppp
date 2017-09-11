@@ -338,13 +338,8 @@ private:
             ::mpfr_set_ui_2exp(&m_mpfr, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
             // Set the rest of the significand.
             ::mpfr_add_z(&m_mpfr, &m_mpfr, sig.get_mpz_view(), MPFR_RNDN);
-            // Adjust the exponent.
-            const long expo = static_cast<long>(std::get<1>(t)) - 16383 - 112;
-            if (expo >= 0) {
-                ::mpfr_mul_2ui(&m_mpfr, &m_mpfr, static_cast<unsigned long>(expo), MPFR_RNDN);
-            } else {
-                ::mpfr_div_2ui(&m_mpfr, &m_mpfr, static_cast<unsigned long>(-expo), MPFR_RNDN);
-            }
+            // Multiply by 2 raised to the adjusted exponent.
+            ::mpfr_mul_2si(&m_mpfr, &m_mpfr, static_cast<long>(std::get<1>(t)) - (16383l + 112), MPFR_RNDN);
         }
         if (std::get<0>(t)) {
             // Negate if the sign bit is set.
