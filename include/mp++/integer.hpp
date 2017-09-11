@@ -5293,8 +5293,8 @@ inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
 
 /// In-place multiplication operator.
 /**
- * @param rop the multiplicator.
- * @param op the multiplicand.
+ * @param rop the multiplicand.
+ * @param op the multiplicator.
  *
  * @return a reference to \p rop.
  *

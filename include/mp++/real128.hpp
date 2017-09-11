@@ -1938,8 +1938,8 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_mul(T &x, const real128 &y)
  *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
  * \endrststar
  *
- * @param x the multiplicator.
- * @param y the multiplicand.
+ * @param x the multiplicand.
+ * @param y the multiplicator.
  *
  * @return a reference to \p x, after it has been multiplied by \p y.
  */
@@ -1973,8 +1973,8 @@ inline void dispatch_in_place_mul(T &x, const real128 &y)
 
 /// In-place multiplication involving \link mppp::real128 real128 \endlink and mp++ types.
 /**
- * @param x the multiplicator.
- * @param y the multiplicand.
+ * @param x the multiplicand.
+ * @param y the multiplicator.
  *
  * @return a reference to \p x, after it has been multiplied by \p y.
  *

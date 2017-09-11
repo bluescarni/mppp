@@ -2019,8 +2019,8 @@ inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
 
 /// In-place multiplication operator.
 /**
- * @param rop the multiplicator.
- * @param op the multiplicand.
+ * @param rop the multiplicand.
+ * @param op the multiplicator.
  *
  * @return a reference to \p rop.
  *
