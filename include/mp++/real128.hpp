@@ -1708,6 +1708,90 @@ inline real128 operator-(const T &x, const U &y)
     return dispatch_sub(x, y);
 }
 
+inline namespace detail
+{
+
+inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(real128 &x, const real128 &y)
+{
+    x.m_value -= y.m_value;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(real128 &x, const T &y)
+{
+    x.m_value -= y;
+}
+
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
+inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(T &x, const real128 &y)
+{
+    x = static_cast<T>(x - y.m_value);
+}
+}
+
+/// In-place subtraction involving \link mppp::real128 real128 \endlink and C++ types.
+/**
+ * \rststar
+ * .. note::
+ *
+ *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
+ * \endrststar
+ *
+ * @param x the minuend.
+ * @param y the subtrahend.
+ *
+ * @return a reference to \p x, after it has been decremented by \p y.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const Real128CppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
+inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const U &y)
+#endif
+{
+    dispatch_in_place_sub(x, y);
+    return x;
+}
+
+inline namespace detail
+{
+
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
+inline void dispatch_in_place_sub(real128 &x, const T &y)
+{
+    x = x - y;
+}
+
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
+inline void dispatch_in_place_sub(T &x, const real128 &y)
+{
+    x = static_cast<T>(x - y);
+}
+}
+
+/// In-place subtraction involving \link mppp::real128 real128 \endlink and mp++ types.
+/**
+ * @param x the minuend.
+ * @param y the subtrahend.
+ *
+ * @return a reference to \p x, after it has been decremented by \p y.
+ *
+ * @throws unspecified any exception thrown by the corresponding binary operator, or by the conversion
+ * of \link mppp::real128 real128 \endlink to the mp++ type.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator-=(T &x, const Real128MpppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
+inline T &operator-=(T &x, const U &y)
+#endif
+{
+    dispatch_in_place_sub(x, y);
+    return x;
+}
+
 /// Prefix decrement.
 /**
  * This operator will decrement \p x by one.

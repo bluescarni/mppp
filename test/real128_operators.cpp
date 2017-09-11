@@ -53,6 +53,17 @@ static constexpr real128 test_constexpr_ipa()
     return retval + n;
 }
 
+static constexpr real128 test_constexpr_ips()
+{
+    real128 retval{1};
+    retval -= real128{-2};
+    retval -= 1.;
+    retval -= -1;
+    int n = 3;
+    n -= real128{-2};
+    return retval + n;
+}
+
 #endif
 
 TEST_CASE("real128 plus")
@@ -188,5 +199,33 @@ TEST_CASE("real128 plus")
 #if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     constexpr real128 z11 = test_constexpr_ipa();
     REQUIRE(z11 == 0);
+#endif
+    x = -1;
+    x -= real128{-2};
+    REQUIRE(x == 1);
+    x -= 2;
+    REQUIRE(x == -1);
+    x -= -1.;
+    REQUIRE(x == 0);
+    n = 5;
+    n -= real128{-3};
+    REQUIRE(n == 8);
+    d = -6;
+    d -= real128{1};
+    REQUIRE(d == -7.);
+    x = 10;
+    x -= int_t{1};
+    REQUIRE(x == 9);
+    nm = -12;
+    nm -= real128{2};
+    REQUIRE(nm == -14);
+    x -= rat_t{3};
+    REQUIRE(x == 6);
+    q = rat_t{5, 2};
+    q -= real128{-1.5};
+    REQUIRE(q == 4);
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+    constexpr real128 z12 = test_constexpr_ips();
+    REQUIRE(z12 == 8);
 #endif
 }
