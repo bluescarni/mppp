@@ -4945,7 +4945,7 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
     retval = static_cast<T>(retval) + x;
 }
 
-template <typename T, std::size_t SSize>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop + op);
@@ -5104,7 +5104,7 @@ inline void dispatch_in_place_sub(integer<SSize> &retval, const T &x)
     retval = static_cast<T>(retval) - x;
 }
 
-template <typename T, std::size_t SSize>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_sub(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop - op);
@@ -5261,7 +5261,7 @@ inline void dispatch_in_place_mul(integer<SSize> &retval, const T &x)
     retval = static_cast<T>(retval) * x;
 }
 
-template <typename T, std::size_t SSize>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop * op);
@@ -5293,8 +5293,8 @@ inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
 
 /// In-place multiplication operator.
 /**
- * @param rop the multiplicator.
- * @param op the multiplicand.
+ * @param rop the multiplicand.
+ * @param op the multiplicator.
  *
  * @return a reference to \p rop.
  *
@@ -5374,7 +5374,7 @@ inline void dispatch_in_place_div(integer<SSize> &retval, const T &x)
     retval = static_cast<T>(retval) / x;
 }
 
-template <typename T, std::size_t SSize>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_div(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop / op);
@@ -5420,7 +5420,7 @@ inline void dispatch_in_place_mod(integer<SSize> &retval, const T &n)
     tdiv_qr(q, retval, retval, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize>
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
 inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop % op);

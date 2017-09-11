@@ -82,15 +82,18 @@ matrix:
           - g++-6
           - g++-6-multilib
           - cmake3
-    - env: MPPP_BUILD="DebugClang38"
+    - env: MPPP_BUILD="DebugClang39"
       compiler: clang
       os: linux
       addons:
         apt:
           sources:
-          - llvm-toolchain-trusty-3.8
+          - llvm-toolchain-trusty-3.9
+          - ubuntu-toolchain-r-test
           packages:
-          - clang-3.8
+          - clang-3.9
+          - gcc-7
+          - g++-7
     - env: MPPP_BUILD="ReleaseClang38"
       compiler: clang
       os: linux

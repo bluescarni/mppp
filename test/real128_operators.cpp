@@ -42,6 +42,50 @@ static constexpr real128 test_constexpr_decr()
     return retval;
 }
 
+static constexpr real128 test_constexpr_ipa()
+{
+    real128 retval{1};
+    retval += real128{-2};
+    retval += 1.;
+    retval += -1;
+    int n = 3;
+    n += real128{-2};
+    return retval + n;
+}
+
+static constexpr real128 test_constexpr_ips()
+{
+    real128 retval{1};
+    retval -= real128{-2};
+    retval -= 1.;
+    retval -= -1;
+    int n = 3;
+    n -= real128{-2};
+    return retval + n;
+}
+
+static constexpr real128 test_constexpr_ipm()
+{
+    real128 retval{1};
+    retval *= real128{-2};
+    retval *= 2.;
+    retval *= -1;
+    int n = 3;
+    n *= real128{-2};
+    return retval * n;
+}
+
+static constexpr real128 test_constexpr_ipd()
+{
+    real128 retval{12};
+    retval /= real128{-2};
+    retval /= 3.;
+    retval /= -2;
+    int n = 6;
+    n /= real128{-2};
+    return n / retval;
+}
+
 #endif
 
 TEST_CASE("real128 plus")
@@ -149,4 +193,117 @@ TEST_CASE("real128 plus")
     REQUIRE(((int_t{3} / -x).m_value == -real128{".25"}.m_value));
     REQUIRE(((x / rat_t{3, 2}).m_value == 8));
     REQUIRE(((rat_t{3, 2} / x).m_value == real128{".125"}.m_value));
+    // In-place.
+    x = -1;
+    x += real128{-2};
+    REQUIRE(x == -3);
+    x += 2;
+    REQUIRE(x == -1);
+    x += -1.;
+    REQUIRE(x == -2);
+    int n = 5;
+    n += real128{-3};
+    REQUIRE(n == 2);
+    double d = -6;
+    d += real128{1};
+    REQUIRE(d == -5.);
+    x = 10;
+    x += int_t{1};
+    REQUIRE(x == 11);
+    int_t nm{-12};
+    nm += real128{2};
+    REQUIRE(nm == -10);
+    x += rat_t{3};
+    REQUIRE(x == 14);
+    rat_t q{5, 2};
+    q += real128{-1.5};
+    REQUIRE(q == 1);
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+    constexpr real128 z11 = test_constexpr_ipa();
+    REQUIRE(z11 == 0);
+#endif
+    x = -1;
+    x -= real128{-2};
+    REQUIRE(x == 1);
+    x -= 2;
+    REQUIRE(x == -1);
+    x -= -1.;
+    REQUIRE(x == 0);
+    n = 5;
+    n -= real128{-3};
+    REQUIRE(n == 8);
+    d = -6;
+    d -= real128{1};
+    REQUIRE(d == -7.);
+    x = 10;
+    x -= int_t{1};
+    REQUIRE(x == 9);
+    nm = -12;
+    nm -= real128{2};
+    REQUIRE(nm == -14);
+    x -= rat_t{3};
+    REQUIRE(x == 6);
+    q = rat_t{5, 2};
+    q -= real128{-1.5};
+    REQUIRE(q == 4);
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+    constexpr real128 z12 = test_constexpr_ips();
+    REQUIRE(z12 == 8);
+#endif
+    x = -1;
+    x *= real128{-2};
+    REQUIRE(x == 2);
+    x *= 2;
+    REQUIRE(x == 4);
+    x *= -1.;
+    REQUIRE(x == -4);
+    n = 5;
+    n *= real128{-3};
+    REQUIRE(n == -15);
+    d = -6;
+    d *= real128{2};
+    REQUIRE(d == -12.);
+    x = 10;
+    x *= int_t{2};
+    REQUIRE(x == 20);
+    nm = -12;
+    nm *= real128{2};
+    REQUIRE(nm == -24);
+    x *= rat_t{3};
+    REQUIRE(x == 60);
+    q = rat_t{5, 2};
+    q *= real128{-2};
+    REQUIRE(q == -5);
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+    constexpr real128 z13 = test_constexpr_ipm();
+    REQUIRE(z13 == -24);
+#endif
+    x = 12;
+    x /= real128{-2};
+    REQUIRE(x == -6);
+    x /= -3;
+    REQUIRE(x == 2);
+    x /= -1.;
+    REQUIRE(x == -2);
+    n = 36;
+    n /= real128{-3};
+    REQUIRE(n == -12);
+    d = -6;
+    d /= real128{2};
+    REQUIRE(d == -3);
+    x = 10;
+    x /= int_t{2};
+    REQUIRE(x == 5);
+    nm = -12;
+    nm /= real128{2};
+    REQUIRE(nm == -6);
+    x /= rat_t{5};
+    REQUIRE(x == 1);
+    q = rat_t{5, 2};
+    q /= real128{-2};
+    REQUIRE((q == rat_t{5, -4}));
+#if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
+    constexpr real128 z14 = test_constexpr_ipd();
+    REQUIRE(z14 == -3);
+#endif
 }
