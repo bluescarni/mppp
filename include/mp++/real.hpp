@@ -129,31 +129,32 @@ struct real_constants {
     using static_real
         = std::pair<mpfr_struct_t,
                     typename std::aligned_storage<mpfr_custom_get_size(Prec), alignof(::mp_limb_t)>::type>;
+    // Shortcut for the size of the real_2_112 constant.
+    static const ::mpfr_prec_t size_2_112 = c_max(::mpfr_prec_t(1), mpfr_prec_min());
     // Create a static real with value 2**112. This represents the "hidden bit"
     // of the significand of a quadruple-precision FP. We just need
     // 1 bit of precision for this, but make sure we don't go below
     // the minimum allowed precision.
-    static static_real<c_max(::mpfr_prec_t(1), mpfr_prec_min())> get_2_112()
+    static static_real<size_2_112> get_2_112()
     {
         // NOTE: pair's def ctor value-inits the members: everything in retval is zeroed out.
-        static_real<c_max(::mpfr_prec_t(1), mpfr_prec_min())> retval;
+        static_real<size_2_112> retval;
         // Init the limbs first, as indicated by the mpfr docs.
-        mpfr_custom_init(static_cast<void *>(&retval.second), c_max(::mpfr_prec_t(1), mpfr_prec_min()));
+        mpfr_custom_init(static_cast<void *>(&retval.second), size_2_112);
         // Do the custom init with a zero value, exponent 0 (unused), precision matching the previous call,
         // and the limbs storage pointer.
-        mpfr_custom_init_set(&retval.first, MPFR_ZERO_KIND, 0, c_max(::mpfr_prec_t(1), mpfr_prec_min()),
-                             static_cast<void *>(&retval.second));
+        mpfr_custom_init_set(&retval.first, MPFR_ZERO_KIND, 0, size_2_112, static_cast<void *>(&retval.second));
         // Set the actual value.
         ::mpfr_set_ui_2exp(&retval.first, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
         return retval;
     }
     // Actually instantiate the constant.
-    static const static_real<c_max(::mpfr_prec_t(1), mpfr_prec_min())> real_2_112;
+    static const static_real<size_2_112> real_2_112;
 };
 
 template <typename T>
-const typename real_constants<T>::template static_real<c_max(::mpfr_prec_t(1), mpfr_prec_min())>
-    real_constants<T>::real_2_112 = real_constants<T>::get_2_112();
+const typename real_constants<T>::template static_real<real_constants<T>::size_2_112> real_constants<T>::real_2_112
+    = real_constants<T>::get_2_112();
 }
 
 template <typename T>
@@ -286,23 +287,20 @@ private:
             // Infer the precision from the bit size of num/den.
             const auto n_size = q.get_num().size();
             const auto d_size = q.get_den().size();
-            // NOTE: we will check for overflow immediately below, this won't be UB as
-            // unsigned arithmetic wraps around.
-            const auto tot_size = n_size + d_size;
             // Overflow checks.
             if (mppp_unlikely(
                     // Overflow in total size.
                     (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
                     // Check that tot_size * GMP_NUMB_BITS <= max_prec.
-                    || (tot_size > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(mpfr_prec_max())
-                                       / unsigned(GMP_NUMB_BITS)))) {
+                    || ((n_size + d_size) > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(mpfr_prec_max())
+                                                / unsigned(GMP_NUMB_BITS)))) {
                 throw std::invalid_argument(
                     "The deduced precision for a real constructed from a rational is too large");
             }
             // Compute the precision. We already know it's a non-negative value not greater
             // than the max allowed precision. We just need to make sure it's not smaller than the
             // min allowed precision.
-            prec = c_max(static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(tot_size) * int(GMP_NUMB_BITS)),
+            prec = c_max(static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * int(GMP_NUMB_BITS)),
                          mpfr_prec_min());
         }
         ::mpfr_init2(&m_mpfr, prec);
@@ -312,7 +310,7 @@ private:
     void dispatch_construction(const real128 &x, ::mpfr_prec_t p)
     {
         // The significand precision in bits is 113 for real128. Let's double-check it.
-        assert(real128_sig_digits() == 113u);
+        static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
         const ::mpfr_prec_t prec = p ? check_init_prec(p) : 113;
         // Get the IEEE repr. of x.
         const auto t = x.get_ieee();
