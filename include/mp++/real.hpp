@@ -41,28 +41,6 @@ namespace mppp
 inline namespace detail
 {
 
-constexpr ::mpfr_prec_t mpfr_prec_min()
-{
-    return MPFR_PREC_MIN;
-}
-
-// For the max precision, we remove 7 bits from the MPFR_PREC_MAX value (as the MPFR docs warn
-// to never set the precision "close" to the max value).
-constexpr ::mpfr_prec_t mpfr_prec_max()
-{
-    return MPFR_PREC_MAX / 128;
-}
-
-// Paranoia check.
-static_assert(mpfr_prec_min() <= mpfr_prec_max(),
-              "The minimum precision for real is larger than the maximum precision.");
-
-// Check if a precision value is in the allowed range.
-constexpr bool mpfr_prec_check(::mpfr_prec_t p)
-{
-    return p >= mpfr_prec_min() && p <= mpfr_prec_max();
-}
-
 // Clamp the MPFR precision between the min and max allowed values. This is used in the generic constructor.
 constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
 {

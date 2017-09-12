@@ -34,12 +34,41 @@ inline namespace detail
 // mpfr_t is an array of some struct.
 using mpfr_struct_t = std::remove_extent<::mpfr_t>::type;
 
+// min/max prec constants.
+constexpr ::mpfr_prec_t mpfr_prec_min()
+{
+    return MPFR_PREC_MIN;
+}
+
+// For the max precision, we remove 7 bits from the MPFR_PREC_MAX value (as the MPFR docs warn
+// to never set the precision "close" to the max value).
+constexpr ::mpfr_prec_t mpfr_prec_max()
+{
+    return MPFR_PREC_MAX / 128;
+}
+
+// Paranoia check.
+static_assert(mpfr_prec_min() <= mpfr_prec_max(), "The minimum MPFR precision is larger than the maximum precision.");
+
+// Check if a precision value is in the allowed range.
+constexpr bool mpfr_prec_check(::mpfr_prec_t p)
+{
+    return p >= mpfr_prec_min() && p <= mpfr_prec_max();
+}
+
 // Simple RAII holder for MPFR floats.
 struct mpfr_raii {
-    mpfr_raii(::mpfr_prec_t prec)
+    // A constructor from a precision value, will set the value to NaN.
+    // No check is performed on the precision.
+    explicit mpfr_raii(::mpfr_prec_t prec)
     {
         ::mpfr_init2(&m_mpfr, prec);
     }
+    // Disable all the other ctors/assignment ops.
+    mpfr_raii(const mpfr_raii &) = delete;
+    mpfr_raii(mpfr_raii &&) = delete;
+    mpfr_raii &operator=(const mpfr_raii &) = delete;
+    mpfr_raii &operator=(mpfr_raii &&) = delete;
     ~mpfr_raii()
     {
         ::mpfr_clear(&m_mpfr);
@@ -56,6 +85,8 @@ static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limi
               "Overflow error.");
 static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limits<::mp_bitcnt_t>::max(),
               "Overflow error.");
+static_assert(mpfr_prec_check(static_cast<::mpfr_prec_t>(std::numeric_limits<long double>::digits10 * 4)),
+              "The precision required to represent long double is outside the MPFR min/max precision bounds.");
 
 // Machinery to call automatically mpfr_free_cache() at program shutdown,
 // if this header is included.
