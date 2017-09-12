@@ -101,6 +101,33 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
                   && std::numeric_limits<mpz_size_t>::max() <= std::numeric_limits<::mp_size_t>::max(),
               "Invalid mpz_t struct layout and/or GMP types.");
 
+#if MPPP_CPLUSPLUS >= 201703L
+
+// If we have C++17, we can use structured bindings to test the layout of mpz_struct_t
+// and its members' types.
+constexpr void test_mpz_struct_t()
+{
+    // NOTE: if mpz_struct_t has more or fewer members, this will result
+    // in a compile-time error.
+    auto[alloc, size, ptr] = mpz_struct_t{};
+    static_assert(std::is_same<decltype(alloc), mpz_alloc_t>::value);
+    static_assert(std::is_same<decltype(size), mpz_size_t>::value);
+    static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
+    (void)alloc;
+    (void)size;
+    (void)ptr;
+}
+
+#endif
+
+// The reason we are asserting this is the following: in a few places we are using the wrap-around property
+// of unsigned arithmetics, but if mp_limb_t is a narrow unsigned type (e.g., unsigned short or unsigned char)
+// then there could be a promotion to other types triggered by the standard integral promotions,
+// and the wrap around behaviour would not be there any more. This is just a theoretical concern at the moment.
+static_assert(disjunction<std::is_same<::mp_limb_t, unsigned long>, std::is_same<::mp_limb_t, unsigned long long>,
+                          std::is_same<::mp_limb_t, unsigned>>::value,
+              "Invalid type for mp_limb_t.");
+
 // Small helper to get the size in limbs from an mpz_t. Will return zero if n is zero.
 std::size_t inline get_mpz_size(const ::mpz_t n)
 {
@@ -177,7 +204,7 @@ inline void copy_limbs_no(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp
     }
 }
 
-// Add a and b, store the result in res, and return 1 if there's unsigned overflow, 0 othersize.
+// Add a and b, store the result in res, and return 1 if there's unsigned overflow, 0 otherwise.
 // NOTE: recent GCC versions have builtins for this, but they don't seem to make much of a difference:
 // https://gcc.gnu.org/onlinedocs/gcc/Integer-Overflow-Builtins.html
 inline ::mp_limb_t limb_add_overflow(::mp_limb_t a, ::mp_limb_t b, ::mp_limb_t *res)
@@ -211,13 +238,9 @@ inline int builtin_clz_impl(unsigned long long n)
     return __builtin_clzll(n);
 }
 
-// NOTE: theoretically, if mp_limb_t is not one of the three supported types here, then
-// we will have a compile-time error as the overload is removed via SFINAE. In practice,
-// mp_limb_t is ul or ull on all current platforms, but let's keep this caveat in mind.
-template <typename T,
-          enable_if_t<disjunction<std::is_same<T, unsigned>, std::is_same<T, unsigned long>,
-                                  std::is_same<T, unsigned long long>>::value,
-                      int> = 0>
+// NOTE: we checked earlier that mp_limb_t is one of the 3 types supported by the
+// clz builtin. No need to constrain the template.
+template <typename T>
 inline unsigned builtin_clz(T n)
 {
     assert(n != 0u);
@@ -249,7 +272,7 @@ struct static_int {
     // NOTE: it might be possible here to avoid the zero init of the limbs, at least in case
     // of static sizes > opt_size, but it's not clear to me if it is worth it to go down this path.
     // Let's just mention it for now. Note that the matter of zeroing the unused limbs is not
-    // always dealt consistenly throughout the code: here and elsewhere (e.g., set_zero(), and see
+    // always dealt with consistenly throughout the code: here and elsewhere (e.g., set_zero(), and see
     // also some equivalent bits in rational) we zero regardless, but in zero_unused_limbs() we check
     // about opt_size. Let's leave this discussion for when we optimize the mpn_ implementations
     // (if ever).
@@ -735,7 +758,8 @@ union integer_union {
         const auto signed_size = g_dy()._mp_size;
         // Destroy the dynamic storage.
         destroy_dynamic();
-        // Init the static storage with the saved data..
+        // Init the static storage with the saved data. The unused limbs will be zeroed
+        // by the invoked static_int ctor.
         ::new (static_cast<void *>(&m_st)) s_storage{signed_size, tmp.data(), dyn_size};
         return true;
     }
