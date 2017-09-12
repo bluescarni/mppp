@@ -28,5 +28,7 @@ TEST_CASE("real basic")
     std::cout << -real128{"1.3E200"} << '\n';
     std::cout << real{-real128{"1.3E-200"}} << '\n';
     std::cout << -real128{"1.3E-200"} << '\n';
+    std::cout << real128{"1E-4940"} << '\n';
+    std::cout << real{real128{"1E-4940"}} << '\n';
 #endif
 }

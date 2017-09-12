@@ -16,12 +16,14 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 
 #include <mp++/concepts.hpp>
 #include <mp++/detail/fwd_decl.hpp>
@@ -118,6 +120,40 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os)
         os << z_exp;
     }
 }
+
+template <typename = void>
+struct real_constants {
+    // A bare real with static memory allocation, represented as
+    // an mpfr_struct_t paired to storage for the limbs.
+    template <::mpfr_prec_t Prec>
+    using static_real
+        = std::pair<mpfr_struct_t,
+                    typename std::aligned_storage<mpfr_custom_get_size(Prec), alignof(::mp_limb_t)>::type>;
+    // Create a static real with value 2**112. This represents the "hidden bit"
+    // of the significand of a quadruple-precision FP. We just need
+    // 1 bit of precision for this, but make sure we don't go below
+    // the minimum allowed precision.
+    static static_real<c_max(::mpfr_prec_t(1), mpfr_prec_min())> get_2_112()
+    {
+        // NOTE: pair's def ctor value-inits the members: everything in retval is zeroed out.
+        static_real<c_max(::mpfr_prec_t(1), mpfr_prec_min())> retval;
+        // Init the limbs first, as indicated by the mpfr docs.
+        mpfr_custom_init(static_cast<void *>(&retval.second), c_max(::mpfr_prec_t(1), mpfr_prec_min()));
+        // Do the custom init with a zero value, exponent 0 (unused), precision matching the previous call,
+        // and the limbs storage pointer.
+        mpfr_custom_init_set(&retval.first, MPFR_ZERO_KIND, 0, c_max(::mpfr_prec_t(1), mpfr_prec_min()),
+                             static_cast<void *>(&retval.second));
+        // Set the actual value.
+        ::mpfr_set_ui_2exp(&retval.first, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
+        return retval;
+    }
+    // Actually instantiate the constant.
+    static const static_real<c_max(::mpfr_prec_t(1), mpfr_prec_min())> real_2_112;
+};
+
+template <typename T>
+const typename real_constants<T>::template static_real<c_max(::mpfr_prec_t(1), mpfr_prec_min())>
+    real_constants<T>::real_2_112 = real_constants<T>::get_2_112();
 }
 
 template <typename T>
@@ -154,20 +190,17 @@ private:
         return p;
     }
     // Construction from FPs.
+    // Alias for the MPFR init functions from FP types.
     template <typename T>
-    using fp_a_ptr = int (*)(mpfr_t, T, ::mpfr_rnd_t);
+    using fp_a_ptr = int (*)(::mpfr_t, T, ::mpfr_rnd_t);
     template <typename T>
     void dispatch_fp_construction(fp_a_ptr<T> ptr, const T &x, ::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_prec_t prec;
-        if (p) {
-            prec = check_init_prec(p);
-        } else {
-            prec = clamp_mpfr_prec(std::numeric_limits<T>::radix == 2
-                                       ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
-                                       : dig2mpfr_prec<T>());
-        }
+        const ::mpfr_prec_t prec
+            = p ? check_init_prec(p) : clamp_mpfr_prec(std::numeric_limits<T>::radix == 2
+                                                           ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
+                                                           : dig2mpfr_prec<T>());
         ::mpfr_init2(&m_mpfr, prec);
         ptr(&m_mpfr, x, MPFR_RNDN);
     }
@@ -184,23 +217,20 @@ private:
         dispatch_fp_construction(::mpfr_set_ld, x, p);
     }
     // Construction from integral types.
-    // Special casing for bool.
-    void dispatch_construction(const bool &b, ::mpfr_prec_t p)
-    {
-        dispatch_integral_init<bool>(p);
-        ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
-    }
     template <typename T>
     void dispatch_integral_init(::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_prec_t prec;
-        if (p) {
-            prec = check_init_prec(p);
-        } else {
-            prec = clamp_mpfr_prec(static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits));
-        }
+        const ::mpfr_prec_t prec
+            = p ? check_init_prec(p) : clamp_mpfr_prec(static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits));
         ::mpfr_init2(&m_mpfr, prec);
+    }
+    // Special casing for bool, otherwise MSVC warns if we fold this into the
+    // constructor from unsigned.
+    void dispatch_construction(const bool &b, ::mpfr_prec_t p)
+    {
+        dispatch_integral_init<bool>(p);
+        ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
@@ -281,35 +311,47 @@ private:
 #if defined(MPPP_WITH_QUADMATH)
     void dispatch_construction(const real128 &x, ::mpfr_prec_t p)
     {
-        ::mpfr_prec_t prec;
-        if (p) {
-            prec = check_init_prec(p);
-        } else {
-            // The significand precision in bits is 113 for real128.
-            assert(real128_sig_digits() == 113u);
-            prec = 113;
-        }
+        // The significand precision in bits is 113 for real128. Let's double-check it.
+        assert(real128_sig_digits() == 113u);
+        const ::mpfr_prec_t prec = p ? check_init_prec(p) : 113;
         // Get the IEEE repr. of x.
         const auto t = x.get_ieee();
-        // Assemble the significand.
-        integer<2> sig{std::get<2>(t)};
-        sig <<= 64u;
-        sig += std::get<3>(t);
+        // A utility function to write the significand of x
+        // as a big integer inside m_mpfr.
+        auto write_significand = [this, &t]() {
+            // The 4 32-bits part of the significand, from most to least
+            // significant digits.
+            const auto p1 = std::get<2>(t) >> 32;
+            const auto p2 = std::get<2>(t) % (1ull << 32);
+            const auto p3 = std::get<3>(t) >> 32;
+            const auto p4 = std::get<3>(t) % (1ull << 32);
+            // Build the significand, from most to least significant.
+            // NOTE: unsigned long is guaranteed to be at least 32 bit.
+            ::mpfr_set_ui(&this->m_mpfr, static_cast<unsigned long>(p1), MPFR_RNDN);
+            ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
+            ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p2), MPFR_RNDN);
+            ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
+            ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p3), MPFR_RNDN);
+            ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
+            ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p4), MPFR_RNDN);
+        };
+        // Check if the significand is zero.
+        const bool sig_zero = !std::get<2>(t) && !std::get<3>(t);
         // Init the value.
         ::mpfr_init2(&m_mpfr, prec);
         if (std::get<1>(t) == 0u) {
             // Zero or subnormal numbers.
-            if (sig.is_zero()) {
+            if (sig_zero) {
                 // Zero.
                 ::mpfr_set_zero(&m_mpfr, 1);
             } else {
                 // Subnormal.
-                ::mpfr_set_z(&m_mpfr, sig.get_mpz_view(), MPFR_RNDN);
+                write_significand();
                 ::mpfr_div_2ui(&m_mpfr, &m_mpfr, 16382ul + 112ul, MPFR_RNDN);
             }
         } else if (std::get<1>(t) == 32767u) {
             // NaN or inf.
-            if (sig.is_zero()) {
+            if (sig_zero) {
                 // inf.
                 ::mpfr_set_inf(&m_mpfr, 1);
             } else {
@@ -317,11 +359,10 @@ private:
                 ::mpfr_set_nan(&m_mpfr);
             }
         } else {
-            // Normal numbers.
-            // Set the implicit bit.
-            ::mpfr_set_ui_2exp(&m_mpfr, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
-            // Set the rest of the significand.
-            ::mpfr_add_z(&m_mpfr, &m_mpfr, sig.get_mpz_view(), MPFR_RNDN);
+            // Write the significand into this.
+            write_significand();
+            // Add the hidden bit on top.
+            ::mpfr_add(&m_mpfr, &m_mpfr, &real_constants<>::real_2_112.first, MPFR_RNDN);
             // Multiply by 2 raised to the adjusted exponent.
             ::mpfr_mul_2si(&m_mpfr, &m_mpfr, static_cast<long>(std::get<1>(t)) - (16383l + 112), MPFR_RNDN);
         }
