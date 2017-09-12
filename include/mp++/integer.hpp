@@ -101,6 +101,33 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
                   && std::numeric_limits<mpz_size_t>::max() <= std::numeric_limits<::mp_size_t>::max(),
               "Invalid mpz_t struct layout and/or GMP types.");
 
+#if MPPP_CPLUSPLUS >= 201703L
+
+// If we have C++17, we can use structured bindings to test the layout of mpz_struct_t
+// and its members' types.
+constexpr void test_mpz_struct_t()
+{
+    // NOTE: if mpz_struct_t has more or fewer members, this will result
+    // in a compile-time error.
+    auto[alloc, size, ptr] = mpz_struct_t{};
+    static_assert(std::is_same<decltype(alloc), mpz_alloc_t>::value);
+    static_assert(std::is_same<decltype(size), mpz_size_t>::value);
+    static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
+    (void)alloc;
+    (void)size;
+    (void)ptr;
+}
+
+#endif
+
+// The reason we are asserting this is the following: in a few places we are using the wrap-around property
+// of unsigned arithmetics, but if mp_limb_t is a narrow unsigned type (e.g., unsigned short or unsigned char)
+// then there could be a promotion to other types triggered by the standard integral promotions,
+// and the wrap around behaviour would not be there any more. This is just a theoretical concern at the moment.
+static_assert(disjunction<std::is_same<::mp_limb_t, unsigned long>, std::is_same<::mp_limb_t, unsigned long long>,
+                          std::is_same<::mp_limb_t, unsigned>>::value,
+              "Invalid type for mp_limb_t.");
+
 // Small helper to get the size in limbs from an mpz_t. Will return zero if n is zero.
 std::size_t inline get_mpz_size(const ::mpz_t n)
 {
@@ -177,7 +204,7 @@ inline void copy_limbs_no(const ::mp_limb_t *begin, const ::mp_limb_t *end, ::mp
     }
 }
 
-// Add a and b, store the result in res, and return 1 if there's unsigned overflow, 0 othersize.
+// Add a and b, store the result in res, and return 1 if there's unsigned overflow, 0 otherwise.
 // NOTE: recent GCC versions have builtins for this, but they don't seem to make much of a difference:
 // https://gcc.gnu.org/onlinedocs/gcc/Integer-Overflow-Builtins.html
 inline ::mp_limb_t limb_add_overflow(::mp_limb_t a, ::mp_limb_t b, ::mp_limb_t *res)
