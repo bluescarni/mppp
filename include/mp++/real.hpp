@@ -71,10 +71,7 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os)
         return;
     }
     if (mpfr_inf_p(r)) {
-        if (mpfr_sgn(r) < 0) {
-            os << "-";
-        }
-        os << "inf";
+        os << (mpfr_sgn(r) < 0 ? "-inf" : "inf");
         return;
     }
 
@@ -107,12 +104,12 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os)
     // Adjust the exponent. Do it in multiprec in order to avoid potential overflow.
     integer<1> z_exp{exp};
     --z_exp;
-    const auto z_sgn = z_exp.sgn();
-    if (z_sgn && !mpfr_zero_p(r)) {
+    const auto exp_sgn = z_exp.sgn();
+    if (exp_sgn && !mpfr_zero_p(r)) {
         // Add the exponent at the end of the string, if both the value and the exponent
         // are nonzero.
         os << 'e';
-        if (z_sgn == 1) {
+        if (exp_sgn == 1) {
             // Add extra '+' if the exponent is positive, for consistency with
             // real128's string format (and possibly other formats too?).
             os << '+';
