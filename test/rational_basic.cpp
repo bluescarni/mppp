@@ -90,7 +90,12 @@ struct int_ctor_tester {
             REQUIRE(lex_cast(min) == lex_cast(rational{min}));
             REQUIRE(lex_cast(max) == lex_cast(rational{max}));
             std::atomic<bool> fail(false);
-            auto f = [&fail](unsigned n) {
+            auto f = [&fail
+#if defined(_MSC_VER)
+                      ,
+                      min, max
+#endif
+            ](unsigned n) {
                 auto dist = get_int_dist(min, max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
