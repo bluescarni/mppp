@@ -18,12 +18,14 @@ using namespace mppp;
 TEST_CASE("real128 sqrt")
 {
     real128 r;
+    REQUIRE(sqrt(r) == 0);
     r.sqrt();
     REQUIRE((r.m_value == 0));
     r = -0.;
     r.sqrt();
     REQUIRE((r.m_value == 0));
     r = 4;
+    REQUIRE(sqrt(r) == 2);
     r.sqrt();
     REQUIRE((r.m_value == 2));
     r = 2;
@@ -44,9 +46,11 @@ TEST_CASE("real128 cbrt")
     r.cbrt();
     REQUIRE((r.m_value == 0));
     r = 8;
+    REQUIRE(cbrt(r) == 2);
     r.cbrt();
     REQUIRE((r.m_value == 2));
     r = -8;
+    REQUIRE(cbrt(r) == -2);
     r.cbrt();
     REQUIRE((r.m_value == -2));
     r = 2;

@@ -88,7 +88,13 @@ struct int_ctor_tester {
             REQUIRE(lex_cast(min) == lex_cast(integer{min}));
             REQUIRE(lex_cast(max) == lex_cast(integer{max}));
             std::atomic<bool> fail(false);
-            auto f = [&fail](unsigned n) {
+            auto f = [&fail
+// NOTE: MSVC requires capturing of these constexpr variables.
+#if defined(_MSC_VER)
+                      ,
+                      min, max
+#endif
+            ](unsigned n) {
                 auto dist = get_int_dist(min, max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
@@ -738,7 +744,12 @@ struct int_convert_tester {
                                          [](const std::overflow_error &) { return true; });
             }
             std::atomic<bool> fail(false);
-            auto f = [&fail](unsigned n) {
+            auto f = [&fail
+#if defined(_MSC_VER)
+                      ,
+                      min, max
+#endif
+            ](unsigned n) {
                 auto dist = get_int_dist(min, max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
