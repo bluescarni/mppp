@@ -86,19 +86,18 @@ using is_real128_cpp_interoperable =
 #endif
 
 template <typename T, typename U>
-using are_real128_cpp_op_types = std::
-    integral_constant<bool, disjunction<conjunction<std::is_same<T, real128>, std::is_same<U, real128>>,
-                                        conjunction<std::is_same<T, real128>, is_real128_cpp_interoperable<U>>,
-                                        conjunction<std::is_same<U, real128>, is_real128_cpp_interoperable<T>>>::value>;
+using are_real128_cpp_op_types = std::integral_constant<
+    bool, disjunction<conjunction<std::is_same<T, real128>, std::is_same<U, real128>>,
+                      conjunction<std::is_same<T, real128>, is_real128_cpp_interoperable<U>>,
+                      conjunction<std::is_same<U, real128>, is_real128_cpp_interoperable<T>>>::value>;
 
 template <typename T>
 using is_real128_mppp_interoperable = std::integral_constant<bool, disjunction<is_integer<T>, is_rational<T>>::value>;
 
 template <typename T, typename U>
-using are_real128_mppp_op_types
-    = std::integral_constant<bool, disjunction<conjunction<std::is_same<T, real128>, is_real128_mppp_interoperable<U>>,
-                                               conjunction<std::is_same<U, real128>,
-                                                           is_real128_mppp_interoperable<T>>>::value>;
+using are_real128_mppp_op_types = std::integral_constant<
+    bool, disjunction<conjunction<std::is_same<T, real128>, is_real128_mppp_interoperable<U>>,
+                      conjunction<std::is_same<U, real128>, is_real128_mppp_interoperable<T>>>::value>;
 }
 
 template <typename T>
@@ -234,23 +233,17 @@ public:
     /**
      * The default constructor will set \p this to zero.
      */
-    constexpr real128() : m_value(0)
-    {
-    }
+    constexpr real128() : m_value(0) {}
     /// Copy constructor.
     /**
      * @param other the real128 that will be copied.
      */
-    constexpr real128(const real128 &other) : m_value(other)
-    {
-    }
+    constexpr real128(const real128 &other) : m_value(other) {}
     /// Move constructor.
     /**
      * @param other the real128 that will be moved.
      */
-    constexpr real128(real128 &&other) : real128(other)
-    {
-    }
+    constexpr real128(real128 &&other) : real128(other) {}
     /// Constructor from a quadruple-precision floating-point value.
     /**
      * This constructor will initialise the internal value with \p x.
@@ -258,9 +251,7 @@ public:
      * @param x the quadruple-precision floating-point variable that will be
      * used to initialise the internal value.
      */
-    constexpr explicit real128(__float128 x) : m_value(x)
-    {
-    }
+    constexpr explicit real128(__float128 x) : m_value(x) {}
 /// Constructor from interoperable C++ types.
 /**
  * This constructor will initialise the internal value with \p x.
@@ -403,18 +394,14 @@ public:
      * @throws std::invalid_argument if \p s does not represent a valid quadruple-precision
      * floating-point value.
      */
-    explicit real128(const char *s) : m_value(str_to_float128(s))
-    {
-    }
+    explicit real128(const char *s) : m_value(str_to_float128(s)) {}
     /// Constructor from C++ string (equivalent to the constructor from C string).
     /**
      * @param s the input string.
      *
      * @throws unspecified any exception thrown by the constructor from C string.
      */
-    explicit real128(const std::string &s) : real128(s.c_str())
-    {
-    }
+    explicit real128(const std::string &s) : real128(s.c_str()) {}
     /// Constructor from range of characters.
     /**
      * This constructor will initialise \p this from the content of the input half-open range, which is interpreted
@@ -453,9 +440,7 @@ public:
      *
      * @throws unspecified any exception thrown by the constructor from a range of characters.
      */
-    explicit real128(const std::string_view &s) : real128(s.data(), s.data() + s.size())
-    {
-    }
+    explicit real128(const std::string_view &s) : real128(s.data(), s.data() + s.size()) {}
 #endif
     /// Defaulted copy assignment operator.
     /**
@@ -752,7 +737,7 @@ public:
             retval._get_num() += integer<SSize>{ief.i_eee.mant_high} << 64u;
             retval._get_num() += ief.i_eee.mant_low;
             if (exponent >= 0) {
-                // The result is an integer: no need to canonicalise or to try
+                // The result is a large integer: no need to canonicalise or to try
                 // to demote. Den is already set to 1.
                 retval._get_num() <<= static_cast<unsigned long>(exponent);
             } else {

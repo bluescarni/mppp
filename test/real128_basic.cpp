@@ -304,6 +304,9 @@ TEST_CASE("real128 conversions")
     REQUIRE((static_cast<rat_t>(real128{".5"}).get_num().is_static()));
     REQUIRE((static_cast<rat_t>(real128{".5"}).get_den().is_static()));
     REQUIRE((static_cast<rat_t>(real128{123}) == rat_t{123 * 2, 2}));
+    // Large integer.
+    REQUIRE((static_cast<rat_t>(real128{123} * (int_t{1} << 200)) == rat_t{123 * (int_t{1} << 200), 1}));
+    REQUIRE((static_cast<rat_t>(-real128{123} * (int_t{1} << 200)) == rat_t{246 * (int_t{1} << 200), -2}));
     REQUIRE((static_cast<rat_t>(real128{123}).get_num().is_static()));
     REQUIRE((static_cast<rat_t>(real128{123}).get_den().is_static()));
     REQUIRE((static_cast<rat_t>(real128{-123}) == rat_t{123 * -2, 2}));

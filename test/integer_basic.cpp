@@ -55,21 +55,19 @@ struct no_const {
 // NOTE: char types are not supported in uniform_int_distribution by the standard.
 // Use a small wrapper to get an int distribution instead, with the min max limits
 // from the char type. We will be casting back when using the distribution.
-template <typename T,
-          typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                    || std::is_same<unsigned char, T>::value),
-                                  int>::type
-          = 0>
+template <typename T, typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                                || std::is_same<unsigned char, T>::value),
+                                              int>::type
+                      = 0>
 static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
 {
     return std::uniform_int_distribution<T>(min, max);
 }
 
-template <typename T,
-          typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                      || std::is_same<unsigned char, T>::value,
-                                  int>::type
-          = 0>
+template <typename T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                                  || std::is_same<unsigned char, T>::value,
+                                              int>::type
+                      = 0>
 static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
 get_int_dist(T min, T max)
 {
@@ -90,7 +88,13 @@ struct int_ctor_tester {
             REQUIRE(lex_cast(min) == lex_cast(integer{min}));
             REQUIRE(lex_cast(max) == lex_cast(integer{max}));
             std::atomic<bool> fail(false);
-            auto f = [&fail, min, max](unsigned n) {
+            auto f = [&fail
+// NOTE: MSVC requires capturing of these constexpr variables.
+#if defined(_MSC_VER)
+                      ,
+                      min, max
+#endif
+            ](unsigned n) {
                 auto dist = get_int_dist(min, max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
@@ -599,17 +603,20 @@ struct to_string_tester {
         REQUIRE(integer{123}.to_string(3) == "11120");
         REQUIRE(integer{-123}.to_string(3) == "-11120");
         REQUIRE_THROWS_PREDICATE((integer{}.to_string(1)), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "Invalid base for string conversion: the base must be between "
-                                             "2 and 62, but a value of 1 was provided instead";
+            return std::string(ia.what())
+                   == "Invalid base for string conversion: the base must be between "
+                      "2 and 62, but a value of 1 was provided instead";
         });
-        REQUIRE_THROWS_PREDICATE(
-            (integer{}.to_string(-12)), std::invalid_argument, [](const std::invalid_argument &ia) {
-                return std::string(ia.what()) == "Invalid base for string conversion: the base must be between "
-                                                 "2 and 62, but a value of -12 was provided instead";
-            });
+        REQUIRE_THROWS_PREDICATE((integer{}.to_string(-12)), std::invalid_argument,
+                                 [](const std::invalid_argument &ia) {
+                                     return std::string(ia.what())
+                                            == "Invalid base for string conversion: the base must be between "
+                                               "2 and 62, but a value of -12 was provided instead";
+                                 });
         REQUIRE_THROWS_PREDICATE((integer{}.to_string(63)), std::invalid_argument, [](const std::invalid_argument &ia) {
-            return std::string(ia.what()) == "Invalid base for string conversion: the base must be between "
-                                             "2 and 62, but a value of 63 was provided instead";
+            return std::string(ia.what())
+                   == "Invalid base for string conversion: the base must be between "
+                      "2 and 62, but a value of 63 was provided instead";
         });
     }
 };
@@ -737,7 +744,12 @@ struct int_convert_tester {
                                          [](const std::overflow_error &) { return true; });
             }
             std::atomic<bool> fail(false);
-            auto f = [&fail, min, max](unsigned n) {
+            auto f = [&fail
+#if defined(_MSC_VER)
+                      ,
+                      min, max
+#endif
+            ](unsigned n) {
                 auto dist = get_int_dist(min, max);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {

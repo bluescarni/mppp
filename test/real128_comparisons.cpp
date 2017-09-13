@@ -65,6 +65,8 @@ TEST_CASE("real128 equality")
     constexpr bool c2a = real128{-1} != -1;
     REQUIRE(c2);
     REQUIRE(!c2a);
+    REQUIRE(!(1.23 == real128{-1}));
+    REQUIRE(1.23 != real128{-1});
     constexpr bool c3 = 1.23 == real128{-1};
     constexpr bool c3a = 1.23 != real128{-1};
     REQUIRE(!c3);
