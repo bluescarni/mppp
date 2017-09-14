@@ -91,7 +91,7 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os)
         // http://stackoverflow.com/questions/13827180/char-ascii-relation
         // """
         // The mapping of integer values for characters does have one guarantee given
-        // by the Standard: the values of the decimal digits are continguous.
+        // by the Standard: the values of the decimal digits are contiguous.
         // (i.e., '1' - '0' == 1, ... '9' - '0' == 9)
         // """
         if (!dot_added && *cptr >= '0' && *cptr <= '9') {
