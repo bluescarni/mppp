@@ -172,10 +172,6 @@ using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, 
 
 class real
 {
-public:
-    real() : real(0.) {}
-
-private:
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
     {
@@ -186,8 +182,42 @@ private:
         }
         return p;
     }
+
+public:
+    real()
+    {
+        // NOTE: implement this explicitly rather than forwarding to the constructor from
+        // double, as probably performance-wise mpfr_set_zero() is better than mpfr_set_d().
+        ::mpfr_init2(&m_mpfr, clamp_mpfr_prec(std::numeric_limits<double>::radix == 2
+                                                  ? static_cast<::mpfr_prec_t>(std::numeric_limits<double>::digits)
+                                                  : dig2mpfr_prec<double>()));
+        ::mpfr_set_zero(&m_mpfr, 1);
+    }
+    real(const real &other)
+    {
+        // Init with the same precision as other, and then set.
+        ::mpfr_init2(&m_mpfr, other.get_prec());
+        ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
+    }
+    explicit real(const real &other, ::mpfr_prec_t p)
+    {
+        // Init with custom precision, and then set.
+        ::mpfr_init2(&m_mpfr, check_init_prec(p));
+        ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
+    }
+    real(real &&other) noexcept
+    {
+        m_mpfr._mpfr_prec = other.m_mpfr._mpfr_prec;
+        m_mpfr._mpfr_sign = other.m_mpfr._mpfr_sign;
+        m_mpfr._mpfr_exp = other.m_mpfr._mpfr_exp;
+        m_mpfr._mpfr_d = other.m_mpfr._mpfr_d;
+        // Mark the other as moved-from.
+        other.m_mpfr._mpfr_d = nullptr;
+    }
+
+private:
     // Construction from FPs.
-    // Alias for the MPFR init functions from FP types.
+    // Alias for the MPFR assignment functions from FP types.
     template <typename T>
     using fp_a_ptr = int (*)(::mpfr_t, T, ::mpfr_rnd_t);
     template <typename T>
@@ -378,10 +408,32 @@ public:
     ~real()
     {
         if (m_mpfr._mpfr_d) {
+            // The object is not moved-from, destroy it.
             ::mpfr_clear(&m_mpfr);
         }
     }
+    real &operator=(const real &other)
+    {
+        if (mppp_likely(this != &other)) {
+            if (m_mpfr._mpfr_d) {
+                // this has not been moved-from.
+                // Copy the precision. This will also reset the internal value.
+                // No need for prec checking as we assume other has a valid prec.
+                set_prec_impl<false>(other.get_prec());
+            } else {
+                // this has been moved-from: init before setting.
+                ::mpfr_init2(&m_mpfr, other.get_prec());
+            }
+            // Perform the actual copy from other.
+            ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
+        }
+        return *this;
+    }
     const mpfr_struct_t *get_mpfr_t() const
+    {
+        return &m_mpfr;
+    }
+    mpfr_struct_t *_get_mpfr_t()
     {
         return &m_mpfr;
     }
@@ -401,33 +453,33 @@ private:
         }
         return p;
     }
+    // mpfr_set_prec() wrapper, with or without prec checking.
+    template <bool Check>
+    void set_prec_impl(::mpfr_prec_t p)
+    {
+        ::mpfr_set_prec(&m_mpfr, Check ? check_set_prec(p) : p);
+    }
 
 public:
     real &set_prec(::mpfr_prec_t p)
     {
-        ::mpfr_set_prec(&m_mpfr, check_set_prec(p));
+        set_prec_impl<true>(p);
         return *this;
     }
-    real &set_prec_p(::mpfr_prec_t p)
+    real &prec_round(::mpfr_prec_t p)
     {
-        if (p != get_prec()) {
-            check_set_prec(p);
-            // Setup tmp storage with the target precision,
-            // and copy this into it.
-            MPPP_MAYBE_TLS mpfr_raii mpfr_r(mpfr_prec_min());
-            ::mpfr_set_prec(&mpfr_r.m_mpfr, p);
-            ::mpfr_set(&mpfr_r.m_mpfr, &m_mpfr, MPFR_RNDN);
-
-            // Set the precision of this to p, and copy back the previous value.
-            ::mpfr_set_prec(&m_mpfr, p);
-            ::mpfr_set(&m_mpfr, &mpfr_r.m_mpfr, MPFR_RNDN);
-        }
+        ::mpfr_prec_round(&m_mpfr, check_set_prec(p), MPFR_RNDN);
         return *this;
     }
 
 private:
     mpfr_struct_t m_mpfr;
 };
+
+inline void add(real &rop, const real &op1, const real &op2)
+{
+    ::mpfr_add(rop._get_mpfr_t(), op1.get_mpfr_t(), op2.get_mpfr_t(), MPFR_RNDN);
+}
 
 inline std::ostream &operator<<(std::ostream &os, const real &r)
 {

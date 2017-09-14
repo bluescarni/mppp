@@ -18,8 +18,8 @@ TEST_CASE("real basic")
     std::cout << real{1ll} << '\n';
     std::cout << real{1.l} << '\n';
     real r{12356732};
-    std::cout << r.set_prec_p(120) << '\n';
-    std::cout << r.set_prec_p(12) << '\n';
+    std::cout << r.prec_round(120) << '\n';
+    std::cout << r.prec_round(12) << '\n';
     std::cout << real{true} << '\n';
     std::cout << real{integer<1>{1}} << '\n';
     std::cout << real{rational<1>{1, 3}} << '\n';
