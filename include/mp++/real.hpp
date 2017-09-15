@@ -19,10 +19,12 @@
 #include <cstdint>
 #include <iostream>
 #include <limits>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <typeinfo>
 #include <utility>
 
 #include <mp++/concepts.hpp>
@@ -534,6 +536,8 @@ public:
     }
 
 private:
+    // Generic conversion.
+    // integer.
     template <typename T, enable_if_t<is_integer<T>::value, int> = 0>
     T dispatch_conversion() const
     {
@@ -541,8 +545,124 @@ private:
             throw std::domain_error("Cannot convert a non-finite real to integer");
         }
         MPPP_MAYBE_TLS mpz_raii mpz;
+        // Truncate the value when converting to integer.
         ::mpfr_get_z(&mpz.m_mpz, &m_mpfr, MPFR_RNDZ);
         return T{&mpz.m_mpz};
+    }
+    // rational.
+    template <typename T, enable_if_t<is_rational<T>::value, int> = 0>
+    T dispatch_conversion() const
+    {
+        if (mppp_unlikely(!number_p())) {
+            throw std::domain_error("Cannot convert a non-finite real to rational");
+        }
+        // Go through an mpf conversion, as mpfr_get_q() does not exist.
+        MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(32));
+        MPPP_MAYBE_TLS mpq_raii mpq;
+        // Set the temp mpf to the same precision as this.
+        ::mpf_set_prec(&mpf.m_mpf, safe_cast<::mp_bitcnt_t>(get_prec()));
+        // Copy this into the mpf.
+        ::mpfr_get_f(&mpf.m_mpf, &m_mpfr, MPFR_RNDN);
+        // Read the mpq from the mpf.
+        ::mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
+        // Construct the return, no canonicalisation will be performed here.
+        return T{&mpq.m_mpq};
+    }
+    // C++ floating-point.
+    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    T dispatch_conversion() const
+    {
+        if (std::is_same<T, float>::value) {
+            return static_cast<T>(::mpfr_get_flt(&m_mpfr, MPFR_RNDN));
+        }
+        if (std::is_same<T, double>::value) {
+            return static_cast<T>(::mpfr_get_d(&m_mpfr, MPFR_RNDN));
+        }
+        assert((std::is_same<T, long double>::value));
+        return static_cast<T>(::mpfr_get_ld(&m_mpfr, MPFR_RNDN));
+    }
+    // Small helper to raise an exception when converting to C++ integrals.
+    template <typename T>
+    [[noreturn]] void raise_overflow_error() const
+    {
+        throw std::overflow_error("Conversion of the real " + to_string() + " to the type " + typeid(T).name()
+                                  + " results in overflow");
+    }
+    // Unsigned integrals, excluding bool.
+    template <typename T,
+              enable_if_t<conjunction<negation<std::is_same<bool, T>>, std::is_integral<T>, std::is_unsigned<T>>::value,
+                          int> = 0>
+    T dispatch_conversion() const
+    {
+        if (mppp_unlikely(!number_p())) {
+            throw std::domain_error("Cannot convert a non-finite real to a C++ unsigned integral type");
+        }
+        // NOTE: this will handle correctly the case in which this is negative but greater than -1.
+        const unsigned long candidate = ::mpfr_get_ui(&m_mpfr, MPFR_RNDZ);
+        if (::mpfr_erangeflag_p()) {
+            // If the range error flag is set, it means the conversion failed because this is outside
+            // the range of unsigned long. Let's clear the error flag first.
+            ::mpfr_clear_erangeflag();
+            // If the value is positive, and the target type has a range greater than unsigned long,
+            // we will attempt the conversion again via integer.
+            if (std::numeric_limits<T>::max() > std::numeric_limits<unsigned long>::max() && sgn() > 0) {
+                try {
+                    return static_cast<T>(static_cast<integer<1>>(*this));
+                } catch (const std::overflow_error &) {
+                }
+            }
+            // We end up here because either:
+            // - this is negative and not greater than -1,
+            // - the range of the target type is not greater than unsigned long's,
+            // - the range of the target type is greater than unsigned long's but the conversion
+            //   via integer failed anyway.
+            raise_overflow_error<T>();
+        }
+        if (candidate <= std::numeric_limits<T>::max()) {
+            return static_cast<T>(candidate);
+        }
+        raise_overflow_error<T>();
+    }
+    // bool.
+    template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
+    T dispatch_conversion() const
+    {
+        if (mppp_unlikely(nan_p())) {
+            throw std::domain_error("Cannot convert NaN to bool");
+        }
+        return !zero_p();
+    }
+    // Signed integrals.
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    T dispatch_conversion() const
+    {
+        if (mppp_unlikely(!number_p())) {
+            throw std::domain_error("Cannot convert a non-finite real to a C++ signed integral type");
+        }
+        const long candidate = ::mpfr_get_si(&m_mpfr, MPFR_RNDZ);
+        if (::mpfr_erangeflag_p()) {
+            // If the range error flag is set, it means the conversion failed because this is outside
+            // the range of long. Let's clear the error flag first.
+            ::mpfr_clear_erangeflag();
+            // If the target type has a range greater than long,
+            // we will attempt the conversion again via integer.
+            if (std::numeric_limits<T>::min() < std::numeric_limits<long>::min()
+                && std::numeric_limits<T>::max() > std::numeric_limits<long>::max()) {
+                try {
+                    return static_cast<T>(static_cast<integer<1>>(*this));
+                } catch (const std::overflow_error &) {
+                }
+            }
+            // We end up here because either:
+            // - the range of the target type is not greater than long's,
+            // - the range of the target type is greater than long's but the conversion
+            //   via integer failed anyway.
+            raise_overflow_error<T>();
+        }
+        if (candidate >= std::numeric_limits<T>::min() && candidate <= std::numeric_limits<T>::max()) {
+            return static_cast<T>(candidate);
+        }
+        raise_overflow_error<T>();
     }
 
 public:
@@ -554,6 +674,12 @@ public:
     explicit operator T() const
     {
         return dispatch_conversion<T>();
+    }
+    std::string to_string() const
+    {
+        std::ostringstream oss;
+        mpfr_to_stream(&m_mpfr, oss);
+        return oss.str();
     }
 
 private:

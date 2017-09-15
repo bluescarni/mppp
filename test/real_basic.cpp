@@ -24,6 +24,16 @@ TEST_CASE("real basic")
     std::cout << real{integer<1>{1}} << '\n';
     std::cout << static_cast<integer<1>>(real{integer<1>{1}}) << '\n';
     std::cout << real{rational<1>{1, 3}} << '\n';
+    std::cout << static_cast<rational<1>>(real{rational<1>{1, 3}}) << '\n';
+    std::cout << static_cast<float>(real{rational<1>{1, 3}}) << '\n';
+    std::cout << static_cast<double>(real{rational<1>{1, 3}}) << '\n';
+    std::cout << static_cast<long double>(real{rational<1>{1, 3}}) << '\n';
+    std::cout << static_cast<unsigned>(real{128}) << '\n';
+    std::cout << static_cast<bool>(real{128}) << '\n';
+    std::cout << static_cast<bool>(real{-128}) << '\n';
+    std::cout << static_cast<bool>(real{0}) << '\n';
+    std::cout << static_cast<int>(real{42}) << '\n';
+    std::cout << static_cast<long long>(real{-42}) << '\n';
 #if defined(MPPP_WITH_QUADMATH)
     std::cout << real{-real128{"1.3E200"}} << '\n';
     std::cout << -real128{"1.3E200"} << '\n';
