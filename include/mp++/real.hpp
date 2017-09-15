@@ -186,11 +186,8 @@ class real
 public:
     real()
     {
-        // NOTE: implement this explicitly rather than forwarding to the constructor from
-        // double, as probably performance-wise mpfr_set_zero() is better than mpfr_set_d().
-        ::mpfr_init2(&m_mpfr, clamp_mpfr_prec(std::numeric_limits<double>::radix == 2
-                                                  ? static_cast<::mpfr_prec_t>(std::numeric_limits<double>::digits)
-                                                  : dig2mpfr_prec<double>()));
+        // Init with minimum precision.
+        ::mpfr_init2(&m_mpfr, mpfr_prec_min());
         ::mpfr_set_zero(&m_mpfr, 1);
     }
     real(const real &other)
