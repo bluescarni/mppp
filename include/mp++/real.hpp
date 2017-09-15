@@ -252,11 +252,10 @@ private:
     void dispatch_fp_construction(fp_a_ptr<T> ptr, const T &x, ::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr,
-                     p ? check_init_prec(p)
-                       : clamp_mpfr_prec(std::numeric_limits<T>::radix == 2
-                                             ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
-                                             : dig2mpfr_prec<T>()));
+        ::mpfr_init2(&m_mpfr, p ? check_init_prec(p)
+                                : clamp_mpfr_prec(std::numeric_limits<T>::radix == 2
+                                                      ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
+                                                      : dig2mpfr_prec<T>()));
         ptr(&m_mpfr, x, MPFR_RNDN);
     }
     void dispatch_construction(const float &x, ::mpfr_prec_t p)
@@ -276,9 +275,8 @@ private:
     void dispatch_integral_init(::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr,
-                     p ? check_init_prec(p)
-                       : clamp_mpfr_prec(static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)));
+        ::mpfr_init2(&m_mpfr, p ? check_init_prec(p)
+                                : clamp_mpfr_prec(static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)));
     }
     // Special casing for bool, otherwise MSVC warns if we fold this into the
     // constructor from unsigned.
@@ -482,25 +480,25 @@ public:
     }
     bool nan_p() const
     {
-        return mpfr_nan_p(&m_mpfr);
+        return mpfr_nan_p(&m_mpfr) != 0;
     }
     bool inf_p() const
     {
-        return mpfr_inf_p(&m_mpfr);
+        return mpfr_inf_p(&m_mpfr) != 0;
     }
     bool number_p() const
     {
-        return mpfr_number_p(&m_mpfr);
+        return mpfr_number_p(&m_mpfr) != 0;
     }
     bool zero_p() const
     {
-        return mpfr_zero_p(&m_mpfr);
+        return mpfr_zero_p(&m_mpfr) != 0;
     }
     bool regular_p() const
     {
-        return mpfr_regular_p(&m_mpfr);
+        return mpfr_regular_p(&m_mpfr) != 0;
     }
-    bool sgn() const
+    int sgn() const
     {
         return mpfr_sgn(&m_mpfr);
     }
