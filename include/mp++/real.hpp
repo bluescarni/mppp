@@ -43,6 +43,37 @@ namespace mppp
 inline namespace detail
 {
 
+// Some misc tests to check that the mpfr struct conforms to our expectations.
+struct expected_mpfr_struct_t {
+    ::mpfr_prec_t _mpfr_prec;
+    ::mpfr_sign_t _mpfr_sign;
+    ::mpfr_exp_t _mpfr_exp;
+    ::mp_limb_t *_mpfr_d;
+};
+
+static_assert(sizeof(expected_mpfr_struct_t) == sizeof(mpfr_struct_t) && offsetof(mpfr_struct_t, _mpfr_prec) == 0u
+                  && offsetof(mpfr_struct_t, _mpfr_sign) == offsetof(expected_mpfr_struct_t, _mpfr_sign)
+                  && offsetof(mpfr_struct_t, _mpfr_exp) == offsetof(expected_mpfr_struct_t, _mpfr_exp)
+                  && offsetof(mpfr_struct_t, _mpfr_d) == offsetof(expected_mpfr_struct_t, _mpfr_d)
+                  && std::is_same<::mp_limb_t *, decltype(std::declval<mpfr_struct_t>()._mpfr_d)>::value,
+              "Invalid mpfr_t struct layout and/or MPFR types.");
+
+#if MPPP_CPLUSPLUS >= 201703L
+
+// If we have C++17, we can use structured bindings to test the layout of mpfr_struct_t
+// and its members' types.
+constexpr void test_mpfr_struct_t()
+{
+    auto[prec, sign, exp, ptr] = mpfr_struct_t{};
+    static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
+    (void)prec;
+    (void)sign;
+    (void)exp;
+    (void)ptr;
+}
+
+#endif
+
 // Clamp the MPFR precision between the min and max allowed values. This is used in the generic constructor.
 constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
 {
@@ -221,10 +252,11 @@ private:
     void dispatch_fp_construction(fp_a_ptr<T> ptr, const T &x, ::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr, p ? check_init_prec(p)
-                                : clamp_mpfr_prec(std::numeric_limits<T>::radix == 2
-                                                      ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
-                                                      : dig2mpfr_prec<T>()));
+        ::mpfr_init2(&m_mpfr,
+                     p ? check_init_prec(p)
+                       : clamp_mpfr_prec(std::numeric_limits<T>::radix == 2
+                                             ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
+                                             : dig2mpfr_prec<T>()));
         ptr(&m_mpfr, x, MPFR_RNDN);
     }
     void dispatch_construction(const float &x, ::mpfr_prec_t p)
@@ -244,8 +276,9 @@ private:
     void dispatch_integral_init(::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr, p ? check_init_prec(p)
-                                : clamp_mpfr_prec(static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)));
+        ::mpfr_init2(&m_mpfr,
+                     p ? check_init_prec(p)
+                       : clamp_mpfr_prec(static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)));
     }
     // Special casing for bool, otherwise MSVC warns if we fold this into the
     // constructor from unsigned.
@@ -426,6 +459,15 @@ public:
         }
         return *this;
     }
+    real &operator=(real &&other) noexcept
+    {
+        return swap(other);
+    }
+    real &swap(real &other)
+    {
+        ::mpfr_swap(&m_mpfr, &other.m_mpfr);
+        return *this;
+    }
     const mpfr_struct_t *get_mpfr_t() const
     {
         return &m_mpfr;
@@ -437,6 +479,30 @@ public:
     ::mpfr_prec_t get_prec() const
     {
         return mpfr_get_prec(&m_mpfr);
+    }
+    bool nan_p() const
+    {
+        return mpfr_nan_p(&m_mpfr);
+    }
+    bool inf_p() const
+    {
+        return mpfr_inf_p(&m_mpfr);
+    }
+    bool number_p() const
+    {
+        return mpfr_number_p(&m_mpfr);
+    }
+    bool zero_p() const
+    {
+        return mpfr_zero_p(&m_mpfr);
+    }
+    bool regular_p() const
+    {
+        return mpfr_regular_p(&m_mpfr);
+    }
+    bool sgn() const
+    {
+        return mpfr_sgn(&m_mpfr);
     }
 
 private:
@@ -467,6 +533,29 @@ public:
     {
         ::mpfr_prec_round(&m_mpfr, check_set_prec(p), MPFR_RNDN);
         return *this;
+    }
+
+private:
+    template <typename T, enable_if_t<is_integer<T>::value, int> = 0>
+    T dispatch_conversion() const
+    {
+        if (mppp_unlikely(!number_p())) {
+            throw std::domain_error("Cannot convert a non-finite real to integer");
+        }
+        MPPP_MAYBE_TLS mpz_raii mpz;
+        ::mpfr_get_z(&mpz.m_mpz, &m_mpfr, MPFR_RNDZ);
+        return T{&mpz.m_mpz};
+    }
+
+public:
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <RealInteroperable T>
+#else
+    template <typename T, real_interoperable_enabler<T> = 0>
+#endif
+    explicit operator T() const
+    {
+        return dispatch_conversion<T>();
     }
 
 private:
