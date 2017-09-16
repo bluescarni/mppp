@@ -504,6 +504,10 @@ public:
     {
         return mpfr_sgn(&m_mpfr);
     }
+    bool signbit() const
+    {
+        return mpfr_signbit(&m_mpfr) != 0;
+    }
 
 private:
     // Utility function to check precision in set_prec().
@@ -597,6 +601,8 @@ private:
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a C++ unsigned integral type");
         }
+        // Clear the range error flag before attempting the conversion.
+        ::mpfr_clear_erangeflag();
         // NOTE: this will handle correctly the case in which this is negative but greater than -1.
         const unsigned long candidate = ::mpfr_get_ui(&m_mpfr, MPFR_RNDZ);
         if (::mpfr_erangeflag_p()) {
@@ -639,6 +645,7 @@ private:
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to a C++ signed integral type");
         }
+        ::mpfr_clear_erangeflag();
         const long candidate = ::mpfr_get_si(&m_mpfr, MPFR_RNDZ);
         if (::mpfr_erangeflag_p()) {
             // If the range error flag is set, it means the conversion failed because this is outside
