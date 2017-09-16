@@ -301,8 +301,6 @@ public:
         assert(read_bits);
         // Keep on reading as long as we have limbs and as long as we haven't read enough bits
         // to fill up the significand of m_value.
-        // NOTE: a paranoia check about possible overflow in read_bits += rbits.
-        static_assert(sig_digits <= std::numeric_limits<unsigned>::max() - unsigned(GMP_NUMB_BITS), "Overflow error.");
         while (ls && read_bits < sig_digits) {
             // Number of bits to be read from the current limb: GMP_NUMB_BITS or less.
             const unsigned rbits = c_min(unsigned(GMP_NUMB_BITS), sig_digits - read_bits);
@@ -313,6 +311,8 @@ public:
             // in case rbits is not exactly GMP_NUMB_BITS.
             m_value += (ptr[--ls] & GMP_NUMB_MASK) >> (unsigned(GMP_NUMB_BITS) - rbits);
             // Update the number of read bits.
+            // NOTE: read_bits can never be increased past sig_digits, due to the definition of rbits.
+            // Hence, this addition can never overflow (as sig_digits is unsigned itself).
             read_bits += rbits;
         }
         if (read_bits < n_bits) {
