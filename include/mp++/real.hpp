@@ -711,7 +711,7 @@ private:
             // Shift up by rbits.
             // NOTE: cast to int is safe, as rbits is no larger than mp_bits_per_limb which is
             // representable by int.
-            retval.m_value = ::scalbnq(retval.m_value, static_cast<int>(rbits));
+            retval = scalbn(retval, static_cast<int>(rbits));
             // Add the next limb, removing lower bits if they are not to be read.
             retval += (m_mpfr._mpfr_d[--nlimbs] & GMP_NUMB_MASK) >> (static_cast<unsigned>(::mp_bits_per_limb) - rbits);
             // Update the number of read bits.
@@ -721,7 +721,7 @@ private:
         }
         // NOTE: from earlier we know the exponent is well within the range of long, and read_bits
         // cannot be larger than mp_bits_per_limb or 113.
-        retval.m_value = ::scalblnq(retval.m_value, static_cast<long>(m_mpfr._mpfr_exp) - static_cast<long>(read_bits));
+        retval = scalbln(retval, static_cast<long>(m_mpfr._mpfr_exp) - static_cast<long>(read_bits));
         return sgn() > 0 ? retval : -retval;
     }
 #endif
