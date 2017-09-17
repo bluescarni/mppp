@@ -130,10 +130,12 @@ using real128_op_types_enabler
 #endif
 
 // For the future:
-// - include some clang build in the CI (probably it will be a bit painful to locate the quadmath library though)
 // - in theory we could investigate a clang windows build as well, taking the libquadmath binary from mingw?
 // - finish wrapping up the quadmath API
 // - consider constexpr implementation of some basic functions (sqrt, log, etc.)
+// - the constructor from integer *may* be implemented in a faster way by reading directly the hi/lo parts
+//   and writing them to the ieee union (instead right now we are using __float128 arithmetics and quadmath
+//   functions). Make sure to benchmark first though...
 
 /// Quadruple-precision floating-point class.
 /**
