@@ -6,7 +6,10 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/mp++.hpp>
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
+#include <mp++/real128.hpp>
+
 #include <type_traits>
 
 #define CATCH_CONFIG_MAIN

@@ -13,7 +13,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include <mp++/mp++.hpp>
+#include <mp++/rational.hpp>
 
 #include "test_utils.hpp"
 
@@ -487,8 +487,9 @@ struct mul_tester {
                 n2_copy._get_num() = n3_copy.get_den() + 1;
                 n2_copy._get_den() = n3_copy.get_den();
                 mul(n1, n2_copy, n3_copy);
-                REQUIRE((lex_cast(n1) == lex_cast(rational{n3_copy.get_num() * (n3_copy.get_den() + 1),
-                                                           n3_copy.get_den() * n3_copy.get_den()})));
+                REQUIRE((lex_cast(n1)
+                         == lex_cast(rational{n3_copy.get_num() * (n3_copy.get_den() + 1),
+                                              n3_copy.get_den() * n3_copy.get_den()})));
             }
         };
 
