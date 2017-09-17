@@ -47,8 +47,12 @@ constexpr ::mpfr_prec_t mpfr_prec_max()
     return MPFR_PREC_MAX / 128;
 }
 
-// Paranoia check.
+// Paranoia checks.
 static_assert(mpfr_prec_min() <= mpfr_prec_max(), "The minimum MPFR precision is larger than the maximum precision.");
+
+// Zero precision is used to indicate automatically-deduced precision in the real constructors.
+// Thus, the minimum precision must be nonzero.
+static_assert(mpfr_prec_min() > 0, "The minimum MPFR precision must be positive.");
 
 // Check if a precision value is in the allowed range.
 constexpr bool mpfr_prec_check(::mpfr_prec_t p)

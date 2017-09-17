@@ -217,6 +217,10 @@ class real
     }
 
 public:
+    /// Default constructor.
+    /**
+     * The value will be initialised to positive zero with the minimum allowed precision.
+     */
     real()
     {
         // Init with minimum precision.
