@@ -9,7 +9,9 @@
 #include <quadmath.h>
 #include <type_traits>
 
-#include <mp++/mp++.hpp>
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
+#include <mp++/real128.hpp>
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"

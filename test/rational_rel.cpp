@@ -12,7 +12,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include <mp++/mp++.hpp>
+#include <mp++/rational.hpp>
 
 #include "test_utils.hpp"
 

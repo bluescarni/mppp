@@ -6,7 +6,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/mp++.hpp>
+#include <mp++/real128.hpp>
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -99,4 +99,45 @@ TEST_CASE("real128 abs")
     constexpr auto c3 = test_constexpr_abs();
     REQUIRE(c3 == 5);
 #endif
+}
+
+TEST_CASE("real128 scalb")
+{
+    real128 r;
+    REQUIRE(scalbn(r, 0) == 0);
+    REQUIRE(scalbn(r, 10) == 0);
+    REQUIRE(scalbn(r, -10) == 0);
+    REQUIRE(!scalbn(r, -10).signbit());
+    REQUIRE(scalbln(r, 0) == 0);
+    REQUIRE(scalbln(r, 10) == 0);
+    REQUIRE(scalbln(r, -10) == 0);
+    REQUIRE(!scalbln(r, -10).signbit());
+    r = -r;
+    REQUIRE(scalbn(r, 0) == 0);
+    REQUIRE(scalbn(r, 10) == 0);
+    REQUIRE(scalbn(r, -10) == 0);
+    REQUIRE(scalbn(r, -10).signbit());
+    REQUIRE(scalbln(r, 0) == 0);
+    REQUIRE(scalbln(r, 10) == 0);
+    REQUIRE(scalbln(r, -10) == 0);
+    REQUIRE(scalbln(r, -10).signbit());
+    r = 10;
+    REQUIRE(scalbn(r, 0) == 10);
+    REQUIRE(scalbn(r, 2) == 40);
+    REQUIRE(scalbln(r, 4) == 160);
+    REQUIRE(scalbn(r, -2) == real128{10} / 4);
+    REQUIRE(scalbn(r, -4) == real128{10} / 16);
+    // Some non-finite tests.
+    REQUIRE(scalbn(real128_inf(), 0) == real128_inf());
+    REQUIRE(scalbn(real128_inf(), -3) == real128_inf());
+    REQUIRE(scalbln(real128_inf(), 3) == real128_inf());
+    REQUIRE(scalbn(-real128_inf(), 0) == -real128_inf());
+    REQUIRE(scalbn(-real128_inf(), -3) == -real128_inf());
+    REQUIRE(scalbln(-real128_inf(), 3) == -real128_inf());
+    REQUIRE(scalbn(real128_nan(), 0).isnan());
+    REQUIRE(scalbn(real128_nan(), 1).isnan());
+    REQUIRE(scalbn(real128_nan(), -1).isnan());
+    REQUIRE(scalbn(-real128_nan(), 0).isnan());
+    REQUIRE(scalbn(-real128_nan(), 1).isnan());
+    REQUIRE(scalbn(-real128_nan(), -1).isnan());
 }

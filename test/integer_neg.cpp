@@ -12,7 +12,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include <mp++/mp++.hpp>
+#include <mp++/integer.hpp>
 
 #include "test_utils.hpp"
 

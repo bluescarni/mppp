@@ -79,7 +79,7 @@ using mpf_struct_t = std::remove_extent<::mpf_t>::type;
 
 // Simple RAII holder for GMP floats.
 struct mpf_raii {
-    mpf_raii(::mp_bitcnt_t prec)
+    explicit mpf_raii(::mp_bitcnt_t prec)
     {
         ::mpf_init2(&m_mpf, prec);
     }

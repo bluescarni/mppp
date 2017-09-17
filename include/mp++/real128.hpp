@@ -301,8 +301,6 @@ public:
         assert(read_bits);
         // Keep on reading as long as we have limbs and as long as we haven't read enough bits
         // to fill up the significand of m_value.
-        // NOTE: a paranoia check about possible overflow in read_bits += rbits.
-        static_assert(sig_digits <= std::numeric_limits<unsigned>::max() - unsigned(GMP_NUMB_BITS), "Overflow error.");
         while (ls && read_bits < sig_digits) {
             // Number of bits to be read from the current limb: GMP_NUMB_BITS or less.
             const unsigned rbits = c_min(unsigned(GMP_NUMB_BITS), sig_digits - read_bits);
@@ -313,6 +311,8 @@ public:
             // in case rbits is not exactly GMP_NUMB_BITS.
             m_value += (ptr[--ls] & GMP_NUMB_MASK) >> (unsigned(GMP_NUMB_BITS) - rbits);
             // Update the number of read bits.
+            // NOTE: read_bits can never be increased past sig_digits, due to the definition of rbits.
+            // Hence, this addition can never overflow (as sig_digits is unsigned itself).
             read_bits += rbits;
         }
         if (read_bits < n_bits) {
@@ -1023,6 +1023,30 @@ constexpr real128 abs(const real128 &x)
                : ((x.fpclassify() == FP_NORMAL || x.fpclassify() == FP_SUBNORMAL || x.fpclassify() == FP_INFINITE)
                       ? (x.m_value < 0 ? real128{-x.m_value} : x)
                       : real128{0});
+}
+
+/// Multiply by power of 2 (\p int overload).
+/**
+ * @param x the input \link mppp::real128 real128 \endlink.
+ * @param n the power of 2 by which \p x will be multiplied.
+ *
+ * @return \p x multiplied by \f$ 2^n \f$.
+ */
+inline real128 scalbn(const real128 &x, int n)
+{
+    return real128{::scalbnq(x.m_value, n)};
+}
+
+/// Multiply by power of 2 (\p long overload).
+/**
+ * @param x the input \link mppp::real128 real128 \endlink.
+ * @param n the power of 2 by which \p x will be multiplied.
+ *
+ * @return \p x multiplied by \f$ 2^n \f$.
+ */
+inline real128 scalbln(const real128 &x, long n)
+{
+    return real128{::scalblnq(x.m_value, n)};
 }
 
 /** @} */

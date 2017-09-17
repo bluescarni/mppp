@@ -14,7 +14,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include <mp++/mp++.hpp>
+#include <mp++/integer.hpp>
 
 #include "test_utils.hpp"
 
@@ -70,8 +70,9 @@ struct fac_tester {
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         // Error testing.
         REQUIRE_THROWS_PREDICATE(fac_ui(n1, 1000001ul), std::invalid_argument, [](const std::invalid_argument &ex) {
-            return std::string(ex.what()) == "The value 1000001 is too large to be used as input for the factorial "
-                                             "function (the maximum allowed value is 1000000)";
+            return std::string(ex.what())
+                   == "The value 1000001 is too large to be used as input for the factorial "
+                      "function (the maximum allowed value is 1000000)";
         });
         mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
