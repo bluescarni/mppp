@@ -671,6 +671,60 @@ private:
         }
         raise_overflow_error<T>();
     }
+#if defined(MPPP_WITH_QUADMATH)
+    template <typename T, enable_if_t<std::is_same<real128, T>::value, int> = 0>
+    T dispatch_conversion() const
+    {
+        // Handle the special cases first.
+        if (nan_p()) {
+            return real128_nan();
+        }
+        // NOTE: the number 2**18 = 262144 is chosen so that it's amply outside the exponent
+        // range of real128 (a 15 bit value with some offset) but well within the
+        // range of long (around +-2**31 guaranteed by the standard).
+        if (inf_p() || m_mpfr._mpfr_exp > (1l << 18)) {
+            return sgn() > 0 ? real128_inf() : -real128_inf();
+        }
+        if (zero_p() || m_mpfr._mpfr_exp < -(1l << 18)) {
+            // Preserve signedness of zero.
+            return signbit() ? real128{} : -real128{};
+        }
+        // NOTE: this is similar to the code in real128.hpp for the constructor from integer,
+        // with some modification due to the different padding in MPFR vs GMP (see below).
+        const auto prec = get_prec();
+        // Number of limbs in this.
+        auto nlimbs = prec / ::mp_bits_per_limb + static_cast<bool>(prec % ::mp_bits_per_limb);
+        assert(nlimbs != 0);
+        // NOTE: in MPFR the most significant (nonzero) bit of the significand
+        // is always at the high end of the most significand limb. In other words,
+        // MPFR pads the multiprecision significand on the right, the opposite
+        // of GMP integers (which have padding in the top limb).
+        // NOTE: contrary to real128, the MPFR format does not have a hidden bit on top.
+        //
+        // Init retval with the highest limb.
+        real128 retval{m_mpfr._mpfr_d[--nlimbs] & GMP_NUMB_MASK};
+        // Init the number of read bits.
+        unsigned read_bits = static_cast<unsigned>(::mp_bits_per_limb);
+        while (nlimbs && read_bits < real128_sig_digits()) {
+            // Number of bits to be read from the current limb. Either mp_bits_per_limb or less.
+            const unsigned rbits = c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits() - read_bits);
+            // Shift up by rbits.
+            // NOTE: cast to int is safe, as rbits is no larger than mp_bits_per_limb which is
+            // representable by int.
+            retval.m_value = ::scalbnq(retval.m_value, static_cast<int>(rbits));
+            // Add the next limb, removing lower bits if they are not to be read.
+            retval += (m_mpfr._mpfr_d[--nlimbs] & GMP_NUMB_MASK) >> (static_cast<unsigned>(::mp_bits_per_limb) - rbits);
+            // Update the number of read bits.
+            // NOTE: due to the definition of rbits, read_bits can never reach past real128_sig_digits().
+            // Hence, this addition can never overflow (as sig_digits is unsigned itself).
+            read_bits += rbits;
+        }
+        // NOTE: from earlier we know the exponent is well within the range of long, and read_bits
+        // cannot be larger than mp_bits_per_limb or 113.
+        retval.m_value = ::scalblnq(retval.m_value, static_cast<long>(m_mpfr._mpfr_exp) - static_cast<long>(read_bits));
+        return sgn() > 0 ? retval : -retval;
+    }
+#endif
 
 public:
 #if defined(MPPP_HAVE_CONCEPTS)
