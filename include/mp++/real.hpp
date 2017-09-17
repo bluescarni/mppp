@@ -13,10 +13,12 @@
 
 #if defined(MPPP_WITH_MPFR)
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <initializer_list>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -751,9 +753,58 @@ private:
     mpfr_struct_t m_mpfr;
 };
 
+inline namespace detail
+{
+
+// Apply the MPFR n-ary function F with return value rop and mpfr_t arguments
+// args. Before calling the function, we will check if the precisions of rop
+// and the operands are all the same. If that's not the case, we will set
+// rop to the greatest precision among args.
+template <typename F, typename... Args>
+inline void mpfr_nary_op(const F &f, real &rop, const Args &... args)
+{
+    const auto arg_precs = {args.get_prec()...};
+    const auto rp = rop.get_prec();
+    if (mppp_unlikely(std::any_of(arg_precs.begin(), arg_precs.end(), [rp](::mpfr_prec_t p) { return p != rp; }))) {
+        rop.set_prec((std::max)(arg_precs));
+    }
+    f(rop._get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+}
+}
+
 inline void add(real &rop, const real &op1, const real &op2)
 {
-    ::mpfr_add(rop._get_mpfr_t(), op1.get_mpfr_t(), op2.get_mpfr_t(), MPFR_RNDN);
+    mpfr_nary_op(::mpfr_add, rop, op1, op2);
+}
+
+inline void sub(real &rop, const real &op1, const real &op2)
+{
+    mpfr_nary_op(::mpfr_sub, rop, op1, op2);
+}
+
+inline void fma(real &rop, const real &op1, const real &op2, const real &op3)
+{
+    mpfr_nary_op(::mpfr_fma, rop, op1, op2, op3);
+}
+
+inline void fms(real &rop, const real &op1, const real &op2, const real &op3)
+{
+    mpfr_nary_op(::mpfr_fms, rop, op1, op2, op3);
+}
+
+inline void sqrt(real &rop, const real &op)
+{
+    mpfr_nary_op(::mpfr_sqrt, rop, op);
+}
+
+inline void sin(real &rop, const real &op)
+{
+    mpfr_nary_op(::mpfr_sin, rop, op);
+}
+
+inline void cos(real &rop, const real &op)
+{
+    mpfr_nary_op(::mpfr_cos, rop, op);
 }
 
 inline std::ostream &operator<<(std::ostream &os, const real &r)
