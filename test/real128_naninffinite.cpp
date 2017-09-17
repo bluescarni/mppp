@@ -9,7 +9,7 @@
 #include <cmath>
 #include <quadmath.h>
 
-#include <mp++/mp++.hpp>
+#include <mp++/real128.hpp>
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"

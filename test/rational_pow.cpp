@@ -16,7 +16,8 @@
 #include <type_traits>
 #include <utility>
 
-#include <mp++/mp++.hpp>
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
 
 #include "test_utils.hpp"
 

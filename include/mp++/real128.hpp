@@ -1025,6 +1025,30 @@ constexpr real128 abs(const real128 &x)
                       : real128{0});
 }
 
+/// Multiply by power of 2 (\p int overload).
+/**
+ * @param x the input \link mppp::real128 real128 \endlink.
+ * @param n the power of 2 by which \p x will be multiplied.
+ *
+ * @return \p x multiplied by \f$ 2^n \f$.
+ */
+inline real128 scalbn(const real128 &x, int n)
+{
+    return real128{::scalbnq(x.m_value, n)};
+}
+
+/// Multiply by power of 2 (\p long overload).
+/**
+ * @param x the input \link mppp::real128 real128 \endlink.
+ * @param n the power of 2 by which \p x will be multiplied.
+ *
+ * @return \p x multiplied by \f$ 2^n \f$.
+ */
+inline real128 scalbln(const real128 &x, long n)
+{
+    return real128{::scalblnq(x.m_value, n)};
+}
+
 /** @} */
 
 /** @defgroup real128_io real128_io

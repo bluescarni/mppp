@@ -13,7 +13,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include <mp++/mp++.hpp>
+#include <mp++/integer.hpp>
 
 #include "test_utils.hpp"
 
@@ -52,12 +52,14 @@ struct probab_prime_p_tester {
         REQUIRE((probab_prime_p(integer{128}) == 0));
         // Test errors.
         REQUIRE_THROWS_PREDICATE(probab_prime_p(n1, 0), std::invalid_argument, [](const std::invalid_argument &ex) {
-            return std::string(ex.what()) == "The number of primality tests must be at least 1, but a value of "
-                                             "0 was provided instead";
+            return std::string(ex.what())
+                   == "The number of primality tests must be at least 1, but a value of "
+                      "0 was provided instead";
         });
         REQUIRE_THROWS_PREDICATE(n1.probab_prime_p(-1), std::invalid_argument, [](const std::invalid_argument &ex) {
-            return std::string(ex.what()) == "The number of primality tests must be at least 1, but a value of "
-                                             "-1 was provided instead";
+            return std::string(ex.what())
+                   == "The number of primality tests must be at least 1, but a value of "
+                      "-1 was provided instead";
         });
         n1 = integer(-123);
         REQUIRE_THROWS_PREDICATE(probab_prime_p(n1), std::invalid_argument, [](const std::invalid_argument &ex) {
