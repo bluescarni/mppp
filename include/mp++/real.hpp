@@ -508,6 +508,9 @@ public:
     }
     int sgn() const
     {
+        if (mppp_unlikely(nan_p())) {
+            return 0;
+        }
         return mpfr_sgn(&m_mpfr);
     }
     bool signbit() const
