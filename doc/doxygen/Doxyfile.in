@@ -2092,7 +2092,6 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = MPPP_DOXYGEN_INVOKED \
                          MPPP_WITH_MPFR \
                          MPPP_WITH_QUADMATH \
-                         MPPP_HAVE_THREAD_LOCAL \
                          MPPP_HAVE_CONCEPTS \
                          MPPP_CONSTEXPR_14=constexpr \
                          MPPP_CPLUSPLUS=201703L
