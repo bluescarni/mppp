@@ -128,7 +128,7 @@ Input/Output
 .. _real128_operators:
 
 Operators
-~~~~~~~~~
+---------
 
 .. doxygengroup:: real128_operators
    :content-only:
@@ -136,7 +136,7 @@ Operators
 .. _real128_constants:
 
 Constants
-~~~~~~~~~
+---------
 
 A few mathematical constants are provided. The constants are available as inline variables
 (e.g., :cpp:var:`mppp::pi_128`, requires C++17 or later) and as constexpr functions (e.g., :cpp:func:`mppp::real128_pi()`,
