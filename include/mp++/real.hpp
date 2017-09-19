@@ -199,6 +199,9 @@ const typename real_constants<T>::template static_real<real_constants<T>::size_2
 // static initialisation:
 //
 // http://en.cppreference.com/w/cpp/language/initialization
+//
+// This ensures that static reals, which are subject to dynamic initialization, are initialised
+// when this variable has already been constructed, and thus access to it will be safe.
 template <typename T>
 std::atomic<::mpfr_prec_t> real_constants<T>::default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
 }
@@ -225,12 +228,17 @@ inline ::mpfr_prec_t get_default_prec()
 
 inline void set_default_prec(::mpfr_prec_t p)
 {
-    if (mppp_unlikely(!mpfr_prec_check(p))) {
+    if (mppp_unlikely(p && !mpfr_prec_check(p))) {
         throw std::invalid_argument("Cannot set the default precision to " + std::to_string(p)
-                                    + ": the maximum allowed precision is " + std::to_string(mpfr_prec_max())
-                                    + ", the minimum allowed precision is " + std::to_string(mpfr_prec_min()));
+                                    + ": the value must be either zero or between " + std::to_string(mpfr_prec_min())
+                                    + " and " + std::to_string(mpfr_prec_max()));
     }
     real_constants<>::default_prec.store(p);
+}
+
+inline void reset_default_prec()
+{
+    real_constants<>::default_prec.store(0);
 }
 
 /// Multiprecision floating-point class.
@@ -238,7 +246,7 @@ inline void set_default_prec(::mpfr_prec_t p)
  * \rststar
  * This class represents arbitrary-precision real values encoded in a binary floating-point format.
  * It acts as a wrapper around the MPFR ``mpfr_t`` type, which in turn consists of a multiprecision significand
- * whose size can be set at runtime paired to a fixed-size exponent. In other words, :cpp:class:`~mppp::real`
+ * (whose size can be set at runtime) paired to a fixed-size exponent. In other words, :cpp:class:`~mppp::real`
  * values can have an arbitrary number of digits of precision (limited only by the available memory),
  * but the exponent range is limited.
  *
@@ -281,7 +289,11 @@ class real
 public:
     /// Default constructor.
     /**
-     * The value will be initialised to positive zero with the minimum allowed precision.
+     * \rststar
+     * The value will be initialised to positive zero. The precision of ``this`` will be
+     * either the default precision, if set, or the value returned by :cpp:func:`~mppp::mpfr_prec_min()`
+     * otherwise.
+     * \endrststar
      */
     real()
     {
@@ -315,23 +327,20 @@ public:
 private:
     // A helper to determine the precision to use in the generic constructors. The precision
     // can be manually provided, taken from the default global value, or deduced according
-    // to the properties of the type. A Checker will check the provided precision (if nonzero),
-    // a deducer will implement the logic to determine the deduced precision for the type.
-    template <typename Deducer, typename Checker>
-    static ::mpfr_prec_t compute_precision(::mpfr_prec_t provided, const Checker &c, const Deducer &d)
+    // to the properties of the type. A deducer will implement the logic to determine the deduced
+    // precision for the type.
+    template <typename Deducer>
+    static ::mpfr_prec_t compute_init_precision(::mpfr_prec_t provided, const Deducer &d)
     {
         if (provided) {
             // Provided precision trumps everything. Check it and return it.
-            return c(provided);
+            return check_init_prec(provided);
         }
         // Check if we have a default precision.
+        // NOTE: this is guaranteed to be a valid precision value.
         const auto dp = get_default_prec();
-        if (dp) {
-            // NOTE: this is guaranteed to be a valid precision value.
-            return dp;
-        }
-        // Return the deduced precision, after clamping if necessary.
-        return clamp_mpfr_prec(d());
+        // Return default precision if nonzero, otherwise return the clamped deduced precision.
+        return dp ? dp : clamp_mpfr_prec(d());
     }
     // Construction from FPs.
     // Alias for the MPFR assignment functions from FP types.
@@ -341,7 +350,7 @@ private:
     void dispatch_fp_construction(fp_a_ptr<T> ptr, const T &x, ::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr, compute_precision(p, check_init_prec, []() {
+        ::mpfr_init2(&m_mpfr, compute_init_precision(p, []() {
             return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
                                                       : dig2mpfr_prec<T>();
         }));
@@ -364,9 +373,8 @@ private:
     void dispatch_integral_init(::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr, compute_precision(p, check_init_prec, []() {
-            return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits);
-        }));
+        ::mpfr_init2(&m_mpfr, compute_init_precision(
+                                  p, []() { return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits); }));
     }
     // Special casing for bool, otherwise MSVC warns if we fold this into the
     // constructor from unsigned.
@@ -398,10 +406,7 @@ private:
     template <std::size_t SSize>
     void dispatch_construction(const integer<SSize> &n, ::mpfr_prec_t p)
     {
-        ::mpfr_prec_t prec;
-        if (p) {
-            prec = check_init_prec(p);
-        } else {
+        ::mpfr_init2(&m_mpfr, compute_init_precision(p, [&n]() -> ::mpfr_prec_t {
             // Infer the precision from the bit size of n.
             const auto ls = n.size();
             // Check that ls * GMP_NUMB_BITS <= max_prec.
@@ -410,22 +415,14 @@ private:
                 throw std::invalid_argument(
                     "The deduced precision for a real constructed from an integer is too large");
             }
-            // Compute the precision. We already know it's a non-negative value not greater
-            // than the max allowed precision. We just need to make sure it's not smaller than the
-            // min allowed precision.
-            prec = c_max(static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * int(GMP_NUMB_BITS)),
-                         mpfr_prec_min());
-        }
-        ::mpfr_init2(&m_mpfr, prec);
+            return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * int(GMP_NUMB_BITS));
+        }));
         ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
     }
     template <std::size_t SSize>
     void dispatch_construction(const rational<SSize> &q, ::mpfr_prec_t p)
     {
-        ::mpfr_prec_t prec;
-        if (p) {
-            prec = check_init_prec(p);
-        } else {
+        ::mpfr_init2(&m_mpfr, compute_init_precision(p, [&q]() -> ::mpfr_prec_t {
             // Infer the precision from the bit size of num/den.
             const auto n_size = q.get_num().size();
             const auto d_size = q.get_den().size();
@@ -439,13 +436,8 @@ private:
                 throw std::invalid_argument(
                     "The deduced precision for a real constructed from a rational is too large");
             }
-            // Compute the precision. We already know it's a non-negative value not greater
-            // than the max allowed precision. We just need to make sure it's not smaller than the
-            // min allowed precision.
-            prec = c_max(static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * int(GMP_NUMB_BITS)),
-                         mpfr_prec_min());
-        }
-        ::mpfr_init2(&m_mpfr, prec);
+            return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * int(GMP_NUMB_BITS));
+        }));
         ::mpfr_set_q(&m_mpfr, q.get_mpq_view(), MPFR_RNDN);
     }
 #if defined(MPPP_WITH_QUADMATH)
@@ -477,7 +469,7 @@ private:
         // Init the value.
         // The significand precision in bits is 113 for real128. Let's double-check it.
         static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
-        ::mpfr_init2(&m_mpfr, p ? check_init_prec(p) : clamp_mpfr_prec(113));
+        ::mpfr_init2(&m_mpfr, compute_init_precision(p, []() { return ::mpfr_prec_t(113); }));
         if (std::get<1>(t) == 0u) {
             // Zero or subnormal numbers.
             if (sig_zero) {
@@ -774,11 +766,14 @@ private:
         // NOTE: the number 2**18 = 262144 is chosen so that it's amply outside the exponent
         // range of real128 (a 15 bit value with some offset) but well within the
         // range of long (around +-2**31 guaranteed by the standard).
+        //
+        // NOTE: the reason why we do these checks with large positive and negative exponents
+        // is that they ensure we can safely convert _mpfr_exp to long later.
         if (inf_p() || m_mpfr._mpfr_exp > (1l << 18)) {
             return sgn() > 0 ? real128_inf() : -real128_inf();
         }
         if (zero_p() || m_mpfr._mpfr_exp < -(1l << 18)) {
-            // Preserve signedness of zero.
+            // Preserve the signedness of zero.
             return signbit() ? real128{} : -real128{};
         }
         // NOTE: this is similar to the code in real128.hpp for the constructor from integer,
@@ -790,7 +785,8 @@ private:
         // NOTE: in MPFR the most significant (nonzero) bit of the significand
         // is always at the high end of the most significand limb. In other words,
         // MPFR pads the multiprecision significand on the right, the opposite
-        // of GMP integers (which have padding in the top limb).
+        // of GMP integers (which have padding on the left, i.e., in the top limb).
+        //
         // NOTE: contrary to real128, the MPFR format does not have a hidden bit on top.
         //
         // Init retval with the highest limb.
@@ -848,9 +844,7 @@ inline namespace detail
 // of rop and of the arguments. It will return a pair in which the first element is a boolean
 // flag signalling if rop and args all have the same precision, and the second element
 // contains the maximum precision among the args.
-inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &, const real &)
-{
-}
+inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &, const real &) {}
 
 template <typename... Args>
 inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &p, const real &rop, const real &arg0,

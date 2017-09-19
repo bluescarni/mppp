@@ -22,6 +22,7 @@ using namespace mppp;
 
 TEST_CASE("real basic")
 {
+    std::cout << std::setprecision(20);
     std::cout << real{1ll} << '\n';
     std::cout << real{1.l} << '\n';
     real r{12356732};
