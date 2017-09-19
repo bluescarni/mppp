@@ -13,12 +13,10 @@
 
 #if defined(MPPP_WITH_MPFR)
 
-#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <initializer_list>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -260,10 +258,11 @@ private:
     void dispatch_fp_construction(fp_a_ptr<T> ptr, const T &x, ::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr, p ? check_init_prec(p)
-                                : clamp_mpfr_prec(std::numeric_limits<T>::radix == 2
-                                                      ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
-                                                      : dig2mpfr_prec<T>()));
+        ::mpfr_init2(&m_mpfr,
+                     p ? check_init_prec(p)
+                       : clamp_mpfr_prec(std::numeric_limits<T>::radix == 2
+                                             ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
+                                             : dig2mpfr_prec<T>()));
         ptr(&m_mpfr, x, MPFR_RNDN);
     }
     void dispatch_construction(const float &x, ::mpfr_prec_t p)
@@ -283,8 +282,9 @@ private:
     void dispatch_integral_init(::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr, p ? check_init_prec(p)
-                                : clamp_mpfr_prec(static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)));
+        ::mpfr_init2(&m_mpfr,
+                     p ? check_init_prec(p)
+                       : clamp_mpfr_prec(static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)));
     }
     // Special casing for bool, otherwise MSVC warns if we fold this into the
     // constructor from unsigned.
@@ -765,18 +765,17 @@ inline namespace detail
 // of rop and of the arguments. It will return a pair in which the first element is a boolean
 // flag signalling if rop and args all have the same precision, and the second element
 // contains the maximum precision among the args.
-template <typename... Args>
-inline std::pair<bool, ::mpfr_prec_t> mpfr_examine_precs(const real &rop, const real &arg)
+inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &, const real &)
 {
-    return std::make_pair(rop.get_prec() == arg.get_prec(), arg.get_prec());
 }
 
 template <typename... Args>
-inline std::pair<bool, ::mpfr_prec_t> mpfr_examine_precs(const real &rop, const real &arg, const Args &... args)
+inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &p, const real &rop, const real &arg0,
+                               const Args &... args)
 {
-    const auto ret = mpfr_examine_precs(rop, args...);
-    return std::make_pair(rop.get_prec() == arg.get_prec() && ret.first,
-                          static_cast<::mpfr_prec_t>(arg.get_prec() >= ret.second ? arg.get_prec() : ret.second));
+    p.first = p.first && (rop.get_prec() == arg0.get_prec());
+    p.second = (arg0.get_prec() > p.second) ? arg0.get_prec() : p.second;
+    mpfr_examine_precs(p, rop, args...);
 }
 
 #endif
@@ -787,20 +786,19 @@ inline std::pair<bool, ::mpfr_prec_t> mpfr_examine_precs(const real &rop, const 
 template <typename... Args>
 inline void mpfr_setup_rop_prec(real &rop, const real &arg0, const Args &... args)
 {
-    auto retval =
+    auto p = std::make_pair(rop.get_prec() == arg0.get_prec(), arg0.get_prec());
 #if MPPP_CPLUSPLUS >= 201703L
-        std::make_pair(rop.get_prec() == arg0.get_prec(), arg0.get_prec());
-    (..., ((retval.second = (args.get_prec() >= retval.second) ? args.get_prec() : retval.second),
-           retval.first = retval.first && (rop.get_prec() == args.get_prec())));
+    (..., (p.first = (p.first && (rop.get_prec() == args.get_prec())),
+           (p.second = (args.get_prec() > p.second) ? args.get_prec() : p.second)));
 #else
-        mpfr_examine_precs(rop, arg0, args...);
+    mpfr_examine_precs(p, rop, args...);
 #endif
-    if (mppp_unlikely(!retval.first)) {
-        rop.set_prec(retval.second);
+    if (mppp_unlikely(!p.first)) {
+        rop.set_prec(p.second);
     }
 }
 
-// Apply the MPFR n-ary function F with return value rop and real arguments arg0,args.
+// Apply the MPFR n-ary function F with return value rop and real arguments (arg0, args...).
 // The precision of rop will be set using the logic described in the previous function.
 template <typename F, typename... Args>
 inline void mpfr_nary_op(const F &f, real &rop, const real &arg0, const Args &... args)
