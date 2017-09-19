@@ -13,6 +13,7 @@
 
 #if defined(MPPP_WITH_MPFR)
 
+#include <atomic>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -181,11 +182,25 @@ struct real_constants {
     }
     // Actually instantiate the constant.
     static const static_real<size_2_112> real_2_112;
+    // Default precision value.
+    static std::atomic<::mpfr_prec_t> default_prec;
 };
 
 template <typename T>
 const typename real_constants<T>::template static_real<real_constants<T>::size_2_112> real_constants<T>::real_2_112
     = real_constants<T>::get_2_112();
+
+// NOTE: the use of ATOMIC_VAR_INIT ensures that the initialisation of default_prec
+// is constant initialisation:
+//
+// http://en.cppreference.com/w/cpp/atomic/ATOMIC_VAR_INIT
+//
+// This essentially means that this initialisation happens before other types of
+// static initialisation:
+//
+// http://en.cppreference.com/w/cpp/language/initialization
+template <typename T>
+std::atomic<::mpfr_prec_t> real_constants<T>::default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
 }
 
 template <typename T>
@@ -203,6 +218,53 @@ concept bool RealInteroperable = is_real_interoperable<T>::value;
 using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, int>;
 #endif
 
+inline ::mpfr_prec_t get_default_prec()
+{
+    return real_constants<>::default_prec.load();
+}
+
+inline void set_default_prec(::mpfr_prec_t p)
+{
+    if (mppp_unlikely(!mpfr_prec_check(p))) {
+        throw std::invalid_argument("Cannot set the default precision to " + std::to_string(p)
+                                    + ": the maximum allowed precision is " + std::to_string(mpfr_prec_max())
+                                    + ", the minimum allowed precision is " + std::to_string(mpfr_prec_min()));
+    }
+    real_constants<>::default_prec.store(p);
+}
+
+/// Multiprecision floating-point class.
+/**
+ * \rststar
+ * This class represents arbitrary-precision real values encoded in a binary floating-point format.
+ * It acts as a wrapper around the MPFR ``mpfr_t`` type, which in turn consists of a multiprecision significand
+ * whose size can be set at runtime paired to a fixed-size exponent. In other words, :cpp:class:`~mppp::real`
+ * values can have an arbitrary number of digits of precision (limited only by the available memory),
+ * but the exponent range is limited.
+ *
+ * :cpp:class:`~mppp::real` aims to behave like a C++ floating-point type whose precision is a runtime property
+ * of the class instances rather than a compile-time property of the type. Because of this, the way precision
+ * is handled in :cpp:class:`~mppp::real` differs from the way it is managed in MPFR. The most important difference
+ * is that in operations involving :cpp:class:`~mppp::real` the precision of the result is determined
+ * by the precision of the operands, whereas in MPFR the precision of the operation is determined by the precision
+ * of the return value (which is always passed as the first function parameter in the MPFR API). In other words,
+ * :cpp:class:`~mppp::real` mirrors the behaviour of C++ code such as
+ *
+ * .. code-block:: c++
+ *
+ *    auto x = double(5) + float(6);
+ *
+ * where the type of ``x`` is ``double`` because ``double`` has a precision always higher than (or at least equal to)
+ * the precision of ``float``. In the equivalent code with :cpp:class:`~mppp::real`
+ *
+ * .. code-block:: c++
+ *
+ *    auto x = real{5,200} + real{6,150};
+ *
+ * the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
+ * 150 bits. Thus, the precision of the result will be 200 bits.
+ * \endrststar
+ */
 class real
 {
     // Utility function to check the precision upon init.
@@ -223,8 +285,9 @@ public:
      */
     real()
     {
-        // Init with minimum precision.
-        ::mpfr_init2(&m_mpfr, mpfr_prec_min());
+        // Init with minimum or default precision.
+        const auto dp = get_default_prec();
+        ::mpfr_init2(&m_mpfr, dp ? dp : mpfr_prec_min());
         ::mpfr_set_zero(&m_mpfr, 1);
     }
     real(const real &other)
@@ -250,6 +313,26 @@ public:
     }
 
 private:
+    // A helper to determine the precision to use in the generic constructors. The precision
+    // can be manually provided, taken from the default global value, or deduced according
+    // to the properties of the type. A Checker will check the provided precision (if nonzero),
+    // a deducer will implement the logic to determine the deduced precision for the type.
+    template <typename Deducer, typename Checker>
+    static ::mpfr_prec_t compute_precision(::mpfr_prec_t provided, const Checker &c, const Deducer &d)
+    {
+        if (provided) {
+            // Provided precision trumps everything. Check it and return it.
+            return c(provided);
+        }
+        // Check if we have a default precision.
+        const auto dp = get_default_prec();
+        if (dp) {
+            // NOTE: this is guaranteed to be a valid precision value.
+            return dp;
+        }
+        // Return the deduced precision, after clamping if necessary.
+        return clamp_mpfr_prec(d());
+    }
     // Construction from FPs.
     // Alias for the MPFR assignment functions from FP types.
     template <typename T>
@@ -258,11 +341,10 @@ private:
     void dispatch_fp_construction(fp_a_ptr<T> ptr, const T &x, ::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr,
-                     p ? check_init_prec(p)
-                       : clamp_mpfr_prec(std::numeric_limits<T>::radix == 2
-                                             ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
-                                             : dig2mpfr_prec<T>()));
+        ::mpfr_init2(&m_mpfr, compute_precision(p, check_init_prec, []() {
+            return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
+                                                      : dig2mpfr_prec<T>();
+        }));
         ptr(&m_mpfr, x, MPFR_RNDN);
     }
     void dispatch_construction(const float &x, ::mpfr_prec_t p)
@@ -282,9 +364,9 @@ private:
     void dispatch_integral_init(::mpfr_prec_t p)
     {
         static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr,
-                     p ? check_init_prec(p)
-                       : clamp_mpfr_prec(static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)));
+        ::mpfr_init2(&m_mpfr, compute_precision(p, check_init_prec, []() {
+            return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits);
+        }));
     }
     // Special casing for bool, otherwise MSVC warns if we fold this into the
     // constructor from unsigned.
@@ -444,6 +526,7 @@ public:
     ~real()
     {
         if (m_mpfr._mpfr_d) {
+            assert(mpfr_prec_check(get_prec()));
             // The object is not moved-from, destroy it.
             ::mpfr_clear(&m_mpfr);
         }
