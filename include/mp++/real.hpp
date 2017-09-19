@@ -508,6 +508,9 @@ public:
     }
     int sgn() const
     {
+        if (mppp_unlikely(nan_p())) {
+            return 0;
+        }
         return mpfr_sgn(&m_mpfr);
     }
     bool signbit() const
@@ -756,19 +759,54 @@ private:
 inline namespace detail
 {
 
-// Apply the MPFR n-ary function F with return value rop and mpfr_t arguments
-// args. Before calling the function, we will check if the precisions of rop
-// and the operands are all the same. If that's not the case, we will set
-// rop to the greatest precision among args.
-template <typename F, typename... Args>
-inline void mpfr_nary_op(const F &f, real &rop, const Args &... args)
+#if MPPP_CPLUSPLUS < 201703L
+
+// A recursive function to examine, in an MPFR n-ary function call, the precisions
+// of rop and of the arguments. It will return a pair in which the first element is a boolean
+// flag signalling if rop and args all have the same precision, and the second element
+// contains the maximum precision among the args.
+template <typename... Args>
+inline std::pair<bool, ::mpfr_prec_t> mpfr_examine_precs(const real &rop, const real &arg)
 {
-    const auto arg_precs = {args.get_prec()...};
-    const auto rp = rop.get_prec();
-    if (mppp_unlikely(std::any_of(arg_precs.begin(), arg_precs.end(), [rp](::mpfr_prec_t p) { return p != rp; }))) {
-        rop.set_prec((std::max)(arg_precs));
+    return std::make_pair(rop.get_prec() == arg.get_prec(), arg.get_prec());
+}
+
+template <typename... Args>
+inline std::pair<bool, ::mpfr_prec_t> mpfr_examine_precs(const real &rop, const real &arg, const Args &... args)
+{
+    const auto ret = mpfr_examine_precs(rop, args...);
+    return std::make_pair(rop.get_prec() == arg.get_prec() && ret.first,
+                          static_cast<::mpfr_prec_t>(arg.get_prec() >= ret.second ? arg.get_prec() : ret.second));
+}
+
+#endif
+
+// Setup the precision of the return value in an MPFR n-ary function call using the recursive
+// function defined above (or an equivalent C++17 fold): if rop and args all have the same precision, don't do anything,
+// otherwise set rop to the max precision among args.
+template <typename... Args>
+inline void mpfr_setup_rop_prec(real &rop, const real &arg0, const Args &... args)
+{
+    auto retval =
+#if MPPP_CPLUSPLUS >= 201703L
+        std::make_pair(rop.get_prec() == arg0.get_prec(), arg0.get_prec());
+    (..., ((retval.second = (args.get_prec() >= retval.second) ? args.get_prec() : retval.second),
+           retval.first = retval.first && (rop.get_prec() == args.get_prec())));
+#else
+        mpfr_examine_precs(rop, arg0, args...);
+#endif
+    if (mppp_unlikely(!retval.first)) {
+        rop.set_prec(retval.second);
     }
-    f(rop._get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+}
+
+// Apply the MPFR n-ary function F with return value rop and real arguments arg0,args.
+// The precision of rop will be set using the logic described in the previous function.
+template <typename F, typename... Args>
+inline void mpfr_nary_op(const F &f, real &rop, const real &arg0, const Args &... args)
+{
+    mpfr_setup_rop_prec(rop, arg0, args...);
+    f(rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
 }
 }
 
