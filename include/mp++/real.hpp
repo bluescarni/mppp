@@ -204,6 +204,10 @@ struct real_constants {
 // when this variable has already been constructed, and thus access to it will be safe.
 template <typename T>
 std::atomic<::mpfr_prec_t> real_constants<T>::default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
+
+// Fwd declare for friendship.
+template <typename... Args>
+void mpfr_setup_rop_prec(real &, const real &, const Args &...);
 }
 
 template <typename T>
@@ -325,6 +329,9 @@ inline void reset_default_prec()
  */
 class real
 {
+    // Make friends, for accessing the non-checking set_prec().
+    template <typename... Args>
+    friend void detail::mpfr_setup_rop_prec(real &, const real &, const Args &...);
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
     {
@@ -366,10 +373,8 @@ public:
     }
     real(real &&other) noexcept
     {
-        m_mpfr._mpfr_prec = other.m_mpfr._mpfr_prec;
-        m_mpfr._mpfr_sign = other.m_mpfr._mpfr_sign;
-        m_mpfr._mpfr_exp = other.m_mpfr._mpfr_exp;
-        m_mpfr._mpfr_d = other.m_mpfr._mpfr_d;
+        // Shallow copy other.
+        m_mpfr = other.m_mpfr;
         // Mark the other as moved-from.
         other.m_mpfr._mpfr_d = nullptr;
     }
@@ -440,7 +445,9 @@ private:
         if (n <= std::numeric_limits<unsigned long>::max()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
-            ::mpfr_set_z(&m_mpfr, integer<1>(n).get_mpz_view(), MPFR_RNDN);
+            // NOTE: here and elsewhere let's use a 2-limb integer, in the hope
+            // of avoiding dynamic memory allocation.
+            ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
@@ -450,7 +457,7 @@ private:
         if (n <= std::numeric_limits<long>::max() && n >= std::numeric_limits<long>::min()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
-            ::mpfr_set_z(&m_mpfr, integer<1>(n).get_mpz_view(), MPFR_RNDN);
+            ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
     template <std::size_t SSize>
@@ -459,11 +466,11 @@ private:
         ::mpfr_init2(&m_mpfr, compute_init_precision(p, [&n]() -> ::mpfr_prec_t {
             // Infer the precision from the bit size of n.
             const auto ls = n.size();
-            // Check that ls * GMP_NUMB_BITS <= max_prec.
-            if (mppp_unlikely(ls > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(real_prec_max())
-                                       / unsigned(GMP_NUMB_BITS))) {
-                throw std::invalid_argument(
-                    "The deduced precision for a real constructed from an integer is too large");
+            // Check that ls * GMP_NUMB_BITS is representable by mpfr_prec_t.
+            if (mppp_unlikely(
+                    ls > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(std::numeric_limits<::mpfr_prec_t>::max())
+                             / unsigned(GMP_NUMB_BITS))) {
+                throw std::overflow_error("The deduced precision for a real constructed from an integer is too large");
             }
             return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * int(GMP_NUMB_BITS));
         }));
@@ -480,11 +487,11 @@ private:
             if (mppp_unlikely(
                     // Overflow in total size.
                     (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
-                    // Check that tot_size * GMP_NUMB_BITS <= max_prec.
-                    || ((n_size + d_size) > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(real_prec_max())
+                    // Check that tot_size * GMP_NUMB_BITS is representable by mpfr_prec_t.
+                    || ((n_size + d_size) > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(
+                                                std::numeric_limits<::mpfr_prec_t>::max())
                                                 / unsigned(GMP_NUMB_BITS)))) {
-                throw std::invalid_argument(
-                    "The deduced precision for a real constructed from a rational is too large");
+                throw std::overflow_error("The deduced precision for a real constructed from a rational is too large");
             }
             return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * int(GMP_NUMB_BITS));
         }));
@@ -597,10 +604,7 @@ public:
     }
     real &swap(real &other)
     {
-        std::swap(m_mpfr._mpfr_prec, other.m_mpfr._mpfr_prec);
-        std::swap(m_mpfr._mpfr_sign, other.m_mpfr._mpfr_sign);
-        std::swap(m_mpfr._mpfr_exp, other.m_mpfr._mpfr_exp);
-        std::swap(m_mpfr._mpfr_d, other.m_mpfr._mpfr_d);
+        std::swap(m_mpfr, other.m_mpfr);
         return *this;
     }
     const mpfr_struct_t *get_mpfr_t() const
@@ -714,30 +718,16 @@ private:
         }
         // Clear the range error flag before attempting the conversion.
         ::mpfr_clear_erangeflag();
-        // The strategy here is to first try with mpfr_get_z_2exp(). This call can fail
-        // if the exponent of this is very close to the upper/lower limits of the exponent type.
-        // If the call fails (signalled by a range flag being set), we will use another
-        // strategy.
+        // NOTE: this call can fail if the exponent of this is very close to the upper/lower limits of the exponent
+        // type. If the call fails (signalled by a range flag being set), we will raise an error.
         MPPP_MAYBE_TLS mpz_raii mpz;
         const ::mpfr_exp_t exp2 = ::mpfr_get_z_2exp(&mpz.m_mpz, &m_mpfr);
         if (mppp_unlikely(::mpfr_erangeflag_p())) {
-            // The conversion to n * 2**exp failed. We will go through a conversion
-            // to mpf as an alternative.
             // Let's first reset the error flag.
             ::mpfr_clear_erangeflag();
-            // NOTE: the precision value here is not important.
-            MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(32));
-            MPPP_MAYBE_TLS mpq_raii mpq;
-            // Set the temp mpf to the same precision as this.
-            ::mpf_set_prec(&mpf.m_mpf, safe_cast<::mp_bitcnt_t>(get_prec()));
-            // Copy this into the mpf.
-            ::mpfr_get_f(&mpf.m_mpf, &m_mpfr, MPFR_RNDN);
-            // Read the mpq from the mpf.
-            ::mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
-            // Construct the return, no canonicalisation will be performed here.
-            return T{&mpq.m_mpq};
+            throw std::overflow_error("The exponent of a real is too large for conversion to rational");
         }
-        // The conversion fo n * 2**exp succeeded. We will build a rational
+        // The conversion to n * 2**exp succeeded. We will build a rational
         // from n and exp.
         using int_t = typename T::int_t;
         int_t num{&mpz.m_mpz};
@@ -792,7 +782,7 @@ private:
             // we will attempt the conversion again via integer.
             if (std::numeric_limits<T>::max() > std::numeric_limits<unsigned long>::max() && sgn() > 0) {
                 try {
-                    return static_cast<T>(static_cast<integer<1>>(*this));
+                    return static_cast<T>(static_cast<integer<2>>(*this));
                 } catch (const std::overflow_error &) {
                 }
             }
@@ -803,7 +793,7 @@ private:
             //   via integer failed anyway.
             raise_overflow_error<T>();
         }
-        if (candidate <= std::numeric_limits<T>::max()) {
+        if (mppp_likely(candidate <= std::numeric_limits<T>::max())) {
             return static_cast<T>(candidate);
         }
         raise_overflow_error<T>();
@@ -812,9 +802,8 @@ private:
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
     T dispatch_conversion() const
     {
-        if (mppp_unlikely(nan_p())) {
-            throw std::domain_error("Cannot convert NaN to bool");
-        }
+        // NOTE: in C/C++ the conversion of NaN to bool gives true:
+        // https://stackoverflow.com/questions/9158567/nan-to-bool-conversion-true-or-false
         return !zero_p();
     }
     // Signed integrals.
@@ -835,7 +824,7 @@ private:
             if (std::numeric_limits<T>::min() < std::numeric_limits<long>::min()
                 && std::numeric_limits<T>::max() > std::numeric_limits<long>::max()) {
                 try {
-                    return static_cast<T>(static_cast<integer<1>>(*this));
+                    return static_cast<T>(static_cast<integer<2>>(*this));
                 } catch (const std::overflow_error &) {
                 }
             }
@@ -845,7 +834,7 @@ private:
             //   via integer failed anyway.
             raise_overflow_error<T>();
         }
-        if (candidate >= std::numeric_limits<T>::min() && candidate <= std::numeric_limits<T>::max()) {
+        if (mppp_likely(candidate >= std::numeric_limits<T>::min() && candidate <= std::numeric_limits<T>::max())) {
             return static_cast<T>(candidate);
         }
         raise_overflow_error<T>();
@@ -984,7 +973,8 @@ inline void mpfr_setup_rop_prec(real &rop, const real &arg0, const Args &... arg
     mpfr_examine_precs(p, rop, args...);
 #endif
     if (mppp_unlikely(!p.first)) {
-        rop.set_prec(p.second);
+        // NOTE: no need for prec checking, we assume all precision in the operands are valid.
+        rop.set_prec_impl<false>(p.second);
     }
 }
 
