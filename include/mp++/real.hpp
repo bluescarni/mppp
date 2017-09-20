@@ -335,7 +335,7 @@ class real
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
     {
-        if (mppp_unlikely(!mpfr_prec_check(p))) {
+        if (mppp_unlikely(!real_prec_check(p))) {
             throw std::invalid_argument("Cannot init a real with a precision of " + std::to_string(p)
                                         + ": the maximum allowed precision is " + std::to_string(real_prec_max())
                                         + ", the minimum allowed precision is " + std::to_string(real_prec_min()));
