@@ -28,30 +28,52 @@
 namespace mppp
 {
 
+/** @defgroup real_prec real_prec
+ *  @{
+ */
+
+/// Minimum precision for a \link mppp::real real \endlink.
+/**
+ * \rststar
+ * This compile-time constant represents the minimum valid precision
+ * for a :cpp:class:`~mppp::real`.
+ * \endrststar
+ *
+ * @return the minimum valid precision for a \link mppp::real real \endlink.
+ */
+constexpr ::mpfr_prec_t mpfr_prec_min()
+{
+    return MPFR_PREC_MIN;
+}
+
+/// Maximum precision for a \link mppp::real real \endlink.
+/**
+ * \rststar
+ * This compile-time constant represents the maximum valid precision
+ * for a :cpp:class:`~mppp::real`.
+ * \endrststar
+ *
+ * @return the maximum valid precision for a \link mppp::real real \endlink.
+ */
+constexpr ::mpfr_prec_t mpfr_prec_max()
+{
+    // For the max precision, we remove 7 bits from the MPFR_PREC_MAX value (as the MPFR docs warn
+    // to never set the precision "close" to the max value).
+    return MPFR_PREC_MAX >> 7;
+}
+
+/** @} */
+
 inline namespace detail
 {
 
 // mpfr_t is an array of some struct.
 using mpfr_struct_t = std::remove_extent<::mpfr_t>::type;
 
-// min/max prec constants.
-constexpr ::mpfr_prec_t mpfr_prec_min()
-{
-    return MPFR_PREC_MIN;
-}
-
-// For the max precision, we remove 7 bits from the MPFR_PREC_MAX value (as the MPFR docs warn
-// to never set the precision "close" to the max value).
-constexpr ::mpfr_prec_t mpfr_prec_max()
-{
-    return MPFR_PREC_MAX / 128;
-}
-
 // Paranoia checks.
 static_assert(mpfr_prec_min() <= mpfr_prec_max(), "The minimum MPFR precision is larger than the maximum precision.");
 
-// Zero precision is used to indicate automatically-deduced precision in the real constructors.
-// Thus, the minimum precision must be nonzero.
+// Zero precision has a special meaning, depending on the context. Thus, the minimum precision must be nonzero.
 static_assert(mpfr_prec_min() > 0, "The minimum MPFR precision must be positive.");
 
 // Check if a precision value is in the allowed range.

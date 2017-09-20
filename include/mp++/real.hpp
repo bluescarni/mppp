@@ -221,11 +221,42 @@ concept bool RealInteroperable = is_real_interoperable<T>::value;
 using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, int>;
 #endif
 
-inline ::mpfr_prec_t get_default_prec()
+/// Get the default precision.
+/**
+ * \ingroup real_prec
+ * \rststar
+ * This function returns the value of the precision used when an explicit precision value
+ * is **not** specified during the constrcution of
+ * :cpp:class:`~mppp::real` objects. On program startup, the value returned by this function
+ * is zero, meaning that the precision of a :cpp:class:`~mppp::real` object will be chosen
+ * according to heuristics depending to the invoked constructor (see the documentation of
+ * :cpp:class:`~mppp::real`'s constructors for details).
+ *
+ * The default precision is stored in a global variable, and its value can be changed via
+ * :cpp:func:`~mppp::set_default_prec()`. It is safe to read and modify concurrently
+ * from multiple threads the default precision.
+ * \endrststar
+ *
+ * @return the value of the default precision.
+ */
+inline mpfr_prec_t get_default_prec()
 {
     return real_constants<>::default_prec.load();
 }
 
+/// Set the default precision.
+/**
+ * \ingroup real_prec
+ * \rststar
+ * See :cpp:func:`~mppp::get_default_prec()` for an explanation of how the default precision value
+ * is used.
+ * \endrststar
+ *
+ * @param p the desired value for the default precision.
+ *
+ * @throws std::invalid_argument if \p p is nonzero and not in the range established by
+ * \link mppp::mpfr_prec_min() mpfr_prec_min() \endlink and \link mppp::mpfr_prec_max() mpfr_prec_max() \endlink.
+ */
 inline void set_default_prec(::mpfr_prec_t p)
 {
     if (mppp_unlikely(p && !mpfr_prec_check(p))) {
@@ -236,6 +267,15 @@ inline void set_default_prec(::mpfr_prec_t p)
     real_constants<>::default_prec.store(p);
 }
 
+/// Reset the default precision.
+/**
+ * \ingroup real_prec
+ * \rststar
+ * This function will reset the default precision value to zero (i.e., the same value assigned
+ * on program startup). See :cpp:func:`~mppp::get_default_prec()` for an explanation of how the default precision value
+ * is used.
+ * \endrststar
+ */
 inline void reset_default_prec()
 {
     real_constants<>::default_prec.store(0);
@@ -616,6 +656,20 @@ private:
     }
 
 public:
+    /// Destructively set precision.
+    /**
+     * \rststar
+     * This function will set the precision of ``this`` to exactly ``p`` bits. The value
+     * of ``this`` will be set to NaN.
+     * \endrststar
+     *
+     * @param p the desired precision.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::invalid_argument if the value of \p p is not in the range established by
+     * \link mppp::mpfr_prec_min() mpfr_prec_min() \endlink and \link mppp::mpfr_prec_max() mpfr_prec_max() \endlink.
+     */
     real &set_prec(::mpfr_prec_t p)
     {
         set_prec_impl<true>(p);
@@ -865,6 +919,24 @@ public:
 private:
     mpfr_struct_t m_mpfr;
 };
+
+/// Destructively set the precision of a \link mppp::real real \endlink.
+/**
+ * \ingroup real_prec
+ * \rststar
+ * This function will set the precision of ``r`` to exactly ``p`` bits. The value
+ * of ``r`` will be set to NaN.
+ * \endrststar
+ *
+ * @param r the \link mppp::real real \endlink whose precision will be set.
+ * @param p the desired precision.
+ *
+ * @throws unspecified any exception thrown by mppp::real::set_prec().
+ */
+inline void set_prec(real &r, ::mpfr_prec_t p)
+{
+    r.set_prec(p);
+}
 
 inline namespace detail
 {

@@ -19,14 +19,14 @@ The ``real`` class
 Types
 -----
 
-.. cpp:type:: __float128
+.. cpp:type:: mpfr_prec_t
 
-   A quadruple-precision floating-point type available in the GCC compiler on most contemporary platforms.
-   This is the type wrapped by the :cpp:class:`~mppp::real128` class.
+   An integral type defined by the MPFR library, used to represent the precision of ``mpfr_t``
+   and (by extension) :cpp:class:`mppp::real` objects.
 
    .. seealso::
 
-      https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+      http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
 
 Concepts
 --------
@@ -68,6 +68,14 @@ Concepts
 
 Functions
 ---------
+
+.. _real_prec:
+
+Precision handling
+~~~~~~~~~~~~~~~~~~
+
+.. doxygengroup:: real_prec
+   :content-only:
 
 .. _real128_arithmetic:
 
