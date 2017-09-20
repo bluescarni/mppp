@@ -81,7 +81,7 @@ constexpr void test_mpfr_struct_t()
 // Clamp the precision between the min and max allowed values. This is used in the generic constructor.
 constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
 {
-    return mpfr_prec_check(p) ? p : (p < real_prec_min() ? real_prec_min() : real_prec_max());
+    return real_prec_check(p) ? p : (p < real_prec_min() ? real_prec_min() : real_prec_max());
 }
 
 // Utility function to determine the number of base-2 digits of the significand
@@ -263,7 +263,7 @@ inline mpfr_prec_t get_default_prec()
  */
 inline void set_default_prec(::mpfr_prec_t p)
 {
-    if (mppp_unlikely(p && !mpfr_prec_check(p))) {
+    if (mppp_unlikely(p && !real_prec_check(p))) {
         throw std::invalid_argument("Cannot set the default precision to " + std::to_string(p)
                                     + ": the value must be either zero or between " + std::to_string(real_prec_min())
                                     + " and " + std::to_string(real_prec_max()));
@@ -577,7 +577,7 @@ public:
     {
         if (m_mpfr._mpfr_d) {
             // The object is not moved-from, destroy it.
-            assert(mpfr_prec_check(get_prec()));
+            assert(real_prec_check(get_prec()));
             ::mpfr_clear(&m_mpfr);
         }
     }
@@ -655,7 +655,7 @@ private:
     // Utility function to check precision in set_prec().
     static ::mpfr_prec_t check_set_prec(::mpfr_prec_t p)
     {
-        if (mppp_unlikely(!mpfr_prec_check(p))) {
+        if (mppp_unlikely(!real_prec_check(p))) {
             throw std::invalid_argument("Cannot set the precision of a real to the value " + std::to_string(p)
                                         + ": the maximum allowed precision is " + std::to_string(real_prec_max())
                                         + ", the minimum allowed precision is " + std::to_string(real_prec_min()));

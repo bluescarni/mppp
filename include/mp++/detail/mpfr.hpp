@@ -77,7 +77,7 @@ static_assert(real_prec_min() <= real_prec_max(), "The minimum real precision is
 static_assert(real_prec_min() > 0, "The minimum real precision must be positive.");
 
 // Check if a precision value is in the allowed range.
-constexpr bool mpfr_prec_check(::mpfr_prec_t p)
+constexpr bool real_prec_check(::mpfr_prec_t p)
 {
     return p >= real_prec_min() && p <= real_prec_max();
 }
@@ -111,7 +111,7 @@ static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limi
               "Overflow error.");
 static_assert(std::numeric_limits<long double>::digits10 * 4 < std::numeric_limits<::mp_bitcnt_t>::max(),
               "Overflow error.");
-static_assert(mpfr_prec_check(static_cast<::mpfr_prec_t>(std::numeric_limits<long double>::digits10 * 4)),
+static_assert(real_prec_check(static_cast<::mpfr_prec_t>(std::numeric_limits<long double>::digits10 * 4)),
               "The precision required to represent long double is outside the MPFR min/max precision bounds.");
 
 // Machinery to call automatically mpfr_free_cache() at program shutdown,
