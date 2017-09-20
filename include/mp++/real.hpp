@@ -648,17 +648,44 @@ private:
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to rational");
         }
-        // Go through an mpf conversion, as mpfr_get_q() does not exist.
-        MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(32));
-        MPPP_MAYBE_TLS mpq_raii mpq;
-        // Set the temp mpf to the same precision as this.
-        ::mpf_set_prec(&mpf.m_mpf, safe_cast<::mp_bitcnt_t>(get_prec()));
-        // Copy this into the mpf.
-        ::mpfr_get_f(&mpf.m_mpf, &m_mpfr, MPFR_RNDN);
-        // Read the mpq from the mpf.
-        ::mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
-        // Construct the return, no canonicalisation will be performed here.
-        return T{&mpq.m_mpq};
+        // Clear the range error flag before attempting the conversion.
+        ::mpfr_clear_erangeflag();
+        // The strategy here is to first try with mpfr_get_z_2exp(). This call can fail
+        // if the exponent of this is very close to the upper/lower limits of the exponent type.
+        // If the call fails (signalled by a range flag being set), we will use another
+        // strategy.
+        MPPP_MAYBE_TLS mpz_raii mpz;
+        const ::mpfr_exp_t exp2 = ::mpfr_get_z_2exp(&mpz.m_mpz, &m_mpfr);
+        if (mppp_unlikely(::mpfr_erangeflag_p())) {
+            // The conversion to n * 2**exp failed. We will go through a conversion
+            // to mpf as an alternative.
+            // Let's first reset the error flag.
+            ::mpfr_clear_erangeflag();
+            // NOTE: the precision value here is not important.
+            MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(32));
+            MPPP_MAYBE_TLS mpq_raii mpq;
+            // Set the temp mpf to the same precision as this.
+            ::mpf_set_prec(&mpf.m_mpf, safe_cast<::mp_bitcnt_t>(get_prec()));
+            // Copy this into the mpf.
+            ::mpfr_get_f(&mpf.m_mpf, &m_mpfr, MPFR_RNDN);
+            // Read the mpq from the mpf.
+            ::mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
+            // Construct the return, no canonicalisation will be performed here.
+            return T{&mpq.m_mpq};
+        }
+        // The conversion fo n * 2**exp succeeded. We will build a rational
+        // from n and exp.
+        using int_t = typename T::int_t;
+        int_t num{&mpz.m_mpz};
+        if (exp2 >= ::mpfr_exp_t(0)) {
+            // The output value will be an integer.
+            num <<= exp2;
+            return T{std::move(num)};
+        }
+        // The output value will be a rational. Canonicalisation will be needed.
+        int_t den{1};
+        den <<= nint_abs(exp2);
+        return T{std::move(num), std::move(den)};
     }
     // C++ floating-point.
     template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
