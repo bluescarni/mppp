@@ -13,6 +13,7 @@
 
 #if defined(MPPP_WITH_MPFR)
 
+#include <array>
 #include <atomic>
 #include <cassert>
 #include <cmath>
@@ -157,38 +158,37 @@ struct real_constants {
     // A bare real with static memory allocation, represented as
     // an mpfr_struct_t paired to storage for the limbs.
     template <::mpfr_prec_t Prec>
-    using static_real
-        = std::pair<mpfr_struct_t,
-                    typename std::aligned_storage<mpfr_custom_get_size(Prec), alignof(::mp_limb_t)>::type>;
+    using static_real = std::pair<mpfr_struct_t,
+                                  // Use std::array as storage for the limbs.
+                                  std::array<::mp_limb_t, mpfr_custom_get_size(Prec) / sizeof(::mp_limb_t)
+                                                              + mpfr_custom_get_size(Prec) % sizeof(::mp_limb_t)>>;
     // Shortcut for the size of the real_2_112 constant. We just need
-    // 1 bit of precision for this, but make sure we don't go below
-    // the minimum allowed precision.
-    static const ::mpfr_prec_t size_2_112 = c_max(::mpfr_prec_t(1), mpfr_prec_min());
+    // 1 bit of precision for this, but make sure we don't go outside
+    // the allowed precision range.
+    static const ::mpfr_prec_t size_2_112 = clamp_mpfr_prec(1);
     // Create a static real with value 2**112. This represents the "hidden bit"
     // of the significand of a quadruple-precision FP.
+    // NOTE: this could be instantiated as a global static instead of being re-computed every time.
+    // However, since this is not constexpr, there's a high risk of static order initialization screwups
+    // (e.g., if initing a static real from a real128), so for the time being let's keep things basic.
+    // We can determine in the future if we can make this constexpr somehow and have a 2**112 instance
+    // inited during constant initialization.
     static static_real<size_2_112> get_2_112()
     {
         // NOTE: pair's def ctor value-inits the members: everything in retval is zeroed out.
         static_real<size_2_112> retval;
         // Init the limbs first, as indicated by the mpfr docs.
-        static_assert(size_2_112 <= mpfr_prec_max(), "Invalid precision.");
-        mpfr_custom_init(&retval.second, size_2_112);
+        mpfr_custom_init(retval.second.data(), size_2_112);
         // Do the custom init with a zero value, exponent 0 (unused), precision matching the previous call,
         // and the limbs storage pointer.
-        mpfr_custom_init_set(&retval.first, MPFR_ZERO_KIND, 0, size_2_112, &retval.second);
+        mpfr_custom_init_set(&retval.first, MPFR_ZERO_KIND, 0, size_2_112, retval.second.data());
         // Set the actual value.
         ::mpfr_set_ui_2exp(&retval.first, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
         return retval;
     }
-    // Actually instantiate the constant.
-    static const static_real<size_2_112> real_2_112;
     // Default precision value.
     static std::atomic<::mpfr_prec_t> default_prec;
 };
-
-template <typename T>
-const typename real_constants<T>::template static_real<real_constants<T>::size_2_112> real_constants<T>::real_2_112
-    = real_constants<T>::get_2_112();
 
 // NOTE: the use of ATOMIC_VAR_INIT ensures that the initialisation of default_prec
 // is constant initialisation:
@@ -493,7 +493,8 @@ private:
             // Write the significand into this.
             write_significand();
             // Add the hidden bit on top.
-            ::mpfr_add(&m_mpfr, &m_mpfr, &real_constants<>::real_2_112.first, MPFR_RNDN);
+            const auto r_2_112 = real_constants<>::get_2_112();
+            ::mpfr_add(&m_mpfr, &m_mpfr, &r_2_112.first, MPFR_RNDN);
             // Multiply by 2 raised to the adjusted exponent.
             ::mpfr_mul_2si(&m_mpfr, &m_mpfr, static_cast<long>(std::get<1>(t)) - (16383l + 112), MPFR_RNDN);
         }
@@ -518,8 +519,8 @@ public:
     ~real()
     {
         if (m_mpfr._mpfr_d) {
-            assert(mpfr_prec_check(get_prec()));
             // The object is not moved-from, destroy it.
+            assert(mpfr_prec_check(get_prec()));
             ::mpfr_clear(&m_mpfr);
         }
     }
@@ -546,7 +547,10 @@ public:
     }
     real &swap(real &other)
     {
-        ::mpfr_swap(&m_mpfr, &other.m_mpfr);
+        std::swap(m_mpfr._mpfr_prec, other.m_mpfr._mpfr_prec);
+        std::swap(m_mpfr._mpfr_sign, other.m_mpfr._mpfr_sign);
+        std::swap(m_mpfr._mpfr_exp, other.m_mpfr._mpfr_exp);
+        std::swap(m_mpfr._mpfr_d, other.m_mpfr._mpfr_d);
         return *this;
     }
     const mpfr_struct_t *get_mpfr_t() const
