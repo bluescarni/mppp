@@ -241,7 +241,7 @@ using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, 
  * from multiple threads the default precision.
  * \endrststar
  *
- * @return the value of the default precision.
+ * @return the value of the default precision for \link mppp::real real \endlink objects.
  */
 inline mpfr_prec_t real_get_default_prec()
 {
@@ -256,7 +256,7 @@ inline mpfr_prec_t real_get_default_prec()
  * is used.
  * \endrststar
  *
- * @param p the desired value for the default precision.
+ * @param p the desired value for the default precision for \link mppp::real real \endlink objects.
  *
  * @throws std::invalid_argument if \p p is nonzero and not in the range established by
  * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
@@ -329,9 +329,11 @@ inline void real_reset_default_prec()
  */
 class real
 {
+#if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends, for accessing the non-checking set_prec().
     template <typename... Args>
     friend void detail::mpfr_setup_rop_prec(real &, const real &, const Args &...);
+#endif
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
     {
