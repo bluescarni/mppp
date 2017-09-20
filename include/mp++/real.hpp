@@ -225,7 +225,7 @@ concept bool RealInteroperable = is_real_interoperable<T>::value;
 using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, int>;
 #endif
 
-/// Get the default precision.
+/// Get the default precision for \link mppp::real real \endlink objects.
 /**
  * \ingroup real_prec
  * \rststar
@@ -237,22 +237,22 @@ using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, 
  * :cpp:class:`~mppp::real`'s constructors for details).
  *
  * The default precision is stored in a global variable, and its value can be changed via
- * :cpp:func:`~mppp::set_default_prec()`. It is safe to read and modify concurrently
+ * :cpp:func:`~mppp::real_set_default_prec()`. It is safe to read and modify concurrently
  * from multiple threads the default precision.
  * \endrststar
  *
  * @return the value of the default precision.
  */
-inline mpfr_prec_t get_default_prec()
+inline mpfr_prec_t real_get_default_prec()
 {
     return real_constants<>::default_prec.load();
 }
 
-/// Set the default precision.
+/// Set the default precision for \link mppp::real real \endlink objects.
 /**
  * \ingroup real_prec
  * \rststar
- * See :cpp:func:`~mppp::get_default_prec()` for an explanation of how the default precision value
+ * See :cpp:func:`~mppp::real_get_default_prec()` for an explanation of how the default precision value
  * is used.
  * \endrststar
  *
@@ -261,7 +261,7 @@ inline mpfr_prec_t get_default_prec()
  * @throws std::invalid_argument if \p p is nonzero and not in the range established by
  * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
  */
-inline void set_default_prec(::mpfr_prec_t p)
+inline void real_set_default_prec(::mpfr_prec_t p)
 {
     if (mppp_unlikely(p && !real_prec_check(p))) {
         throw std::invalid_argument("Cannot set the default precision to " + std::to_string(p)
@@ -271,16 +271,16 @@ inline void set_default_prec(::mpfr_prec_t p)
     real_constants<>::default_prec.store(p);
 }
 
-/// Reset the default precision.
+/// Reset the default precision for \link mppp::real real \endlink objects.
 /**
  * \ingroup real_prec
  * \rststar
  * This function will reset the default precision value to zero (i.e., the same value assigned
- * on program startup). See :cpp:func:`~mppp::get_default_prec()` for an explanation of how the default precision value
- * is used.
+ * on program startup). See :cpp:func:`~mppp::real_get_default_prec()` for an explanation of how the default precision
+ * value is used.
  * \endrststar
  */
-inline void reset_default_prec()
+inline void real_reset_default_prec()
 {
     real_constants<>::default_prec.store(0);
 }
@@ -323,7 +323,7 @@ inline void reset_default_prec()
  * aimed at ensuring that the constructed :cpp:class:`~mppp::real` represents exactly the value used for initialisation.
  * For instance, by default, the construction of a :cpp:class:`~mppp::real` from a 32 bit integer will yield a
  * :cpp:class:`~mppp::real` with a precision of 32 bits. This behaviour can be altered either by specifying explicitly
- * the desired precision value, or by setting a global default precision via :cpp:func:`~mppp::set_default_prec()`.
+ * the desired precision value, or by setting a global default precision via :cpp:func:`~mppp::real_set_default_prec()`.
  * See the documentation of the constructors for more specific information.
  * \endrststar
  */
@@ -355,7 +355,7 @@ public:
     real()
     {
         // Init with minimum or default precision.
-        const auto dp = get_default_prec();
+        const auto dp = real_get_default_prec();
         ::mpfr_init2(&m_mpfr, dp ? dp : real_prec_min());
         ::mpfr_set_zero(&m_mpfr, 1);
     }
@@ -393,7 +393,7 @@ private:
         }
         // Check if we have a default precision.
         // NOTE: this is guaranteed to be a valid precision value.
-        const auto dp = get_default_prec();
+        const auto dp = real_get_default_prec();
         // Return default precision if nonzero, otherwise return the clamped deduced precision.
         return dp ? dp : clamp_mpfr_prec(d());
     }
