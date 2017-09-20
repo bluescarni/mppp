@@ -41,7 +41,7 @@ namespace mppp
  *
  * @return the minimum valid precision for a \link mppp::real real \endlink.
  */
-constexpr ::mpfr_prec_t mpfr_prec_min()
+constexpr ::mpfr_prec_t real_prec_min()
 {
     return MPFR_PREC_MIN;
 }
@@ -55,7 +55,7 @@ constexpr ::mpfr_prec_t mpfr_prec_min()
  *
  * @return the maximum valid precision for a \link mppp::real real \endlink.
  */
-constexpr ::mpfr_prec_t mpfr_prec_max()
+constexpr ::mpfr_prec_t real_prec_max()
 {
     // For the max precision, we remove 7 bits from the MPFR_PREC_MAX value (as the MPFR docs warn
     // to never set the precision "close" to the max value).
@@ -71,15 +71,15 @@ inline namespace detail
 using mpfr_struct_t = std::remove_extent<::mpfr_t>::type;
 
 // Paranoia checks.
-static_assert(mpfr_prec_min() <= mpfr_prec_max(), "The minimum MPFR precision is larger than the maximum precision.");
+static_assert(real_prec_min() <= real_prec_max(), "The minimum real precision is larger than the maximum precision.");
 
 // Zero precision has a special meaning, depending on the context. Thus, the minimum precision must be nonzero.
-static_assert(mpfr_prec_min() > 0, "The minimum MPFR precision must be positive.");
+static_assert(real_prec_min() > 0, "The minimum real precision must be positive.");
 
 // Check if a precision value is in the allowed range.
 constexpr bool mpfr_prec_check(::mpfr_prec_t p)
 {
-    return p >= mpfr_prec_min() && p <= mpfr_prec_max();
+    return p >= real_prec_min() && p <= real_prec_max();
 }
 
 // Simple RAII holder for MPFR floats.

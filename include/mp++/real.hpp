@@ -78,10 +78,10 @@ constexpr void test_mpfr_struct_t()
 
 #endif
 
-// Clamp the MPFR precision between the min and max allowed values. This is used in the generic constructor.
+// Clamp the precision between the min and max allowed values. This is used in the generic constructor.
 constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
 {
-    return mpfr_prec_check(p) ? p : (p < mpfr_prec_min() ? mpfr_prec_min() : mpfr_prec_max());
+    return mpfr_prec_check(p) ? p : (p < real_prec_min() ? real_prec_min() : real_prec_max());
 }
 
 // Utility function to determine the number of base-2 digits of the significand
@@ -255,14 +255,14 @@ inline mpfr_prec_t get_default_prec()
  * @param p the desired value for the default precision.
  *
  * @throws std::invalid_argument if \p p is nonzero and not in the range established by
- * \link mppp::mpfr_prec_min() mpfr_prec_min() \endlink and \link mppp::mpfr_prec_max() mpfr_prec_max() \endlink.
+ * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
  */
 inline void set_default_prec(::mpfr_prec_t p)
 {
     if (mppp_unlikely(p && !mpfr_prec_check(p))) {
         throw std::invalid_argument("Cannot set the default precision to " + std::to_string(p)
-                                    + ": the value must be either zero or between " + std::to_string(mpfr_prec_min())
-                                    + " and " + std::to_string(mpfr_prec_max()));
+                                    + ": the value must be either zero or between " + std::to_string(real_prec_min())
+                                    + " and " + std::to_string(real_prec_max()));
     }
     real_constants<>::default_prec.store(p);
 }
@@ -310,7 +310,17 @@ inline void reset_default_prec()
  *    auto x = real{5,200} + real{6,150};
  *
  * the first operand has a value of 5 and precision of 200 bits, while the second operand has a value of 6 and precision
- * 150 bits. Thus, the precision of the result will be 200 bits.
+ * 150 bits. Thus, the precision of the result (and the precision at which the addition is computed) will be
+ * :math:`\mathrm{max}\left(200,150\right)=200` bits.
+ *
+ * The precision of a :cpp:class:`~mppp::real` can be set at construction, or it can be changed later via functions and
+ * methods such as :cpp:func:`mppp::real::set_prec()`, :cpp:func:`mppp::real::prec_round()`, etc. By default,
+ * the precision of a :cpp:class:`~mppp::real` is automatically deduced upon construction following a set of heuristics
+ * aimed at ensuring that the constructed :cpp:class:`~mppp::real` represents exactly the value used for initialisation.
+ * For instance, by default, the construction of a :cpp:class:`~mppp::real` from a 32 bit integer will yield a
+ * :cpp:class:`~mppp::real` with a precision of 32 bits. This behaviour can be altered either by specifying explicitly
+ * the desired precision value, or by setting a global default precision via :cpp:func:`~mppp::set_default_prec()`.
+ * See the documentation of the constructors for more specific information.
  * \endrststar
  */
 class real
@@ -320,8 +330,8 @@ class real
     {
         if (mppp_unlikely(!mpfr_prec_check(p))) {
             throw std::invalid_argument("Cannot init a real with a precision of " + std::to_string(p)
-                                        + ": the maximum allowed precision is " + std::to_string(mpfr_prec_max())
-                                        + ", the minimum allowed precision is " + std::to_string(mpfr_prec_min()));
+                                        + ": the maximum allowed precision is " + std::to_string(real_prec_max())
+                                        + ", the minimum allowed precision is " + std::to_string(real_prec_min()));
         }
         return p;
     }
@@ -331,7 +341,7 @@ public:
     /**
      * \rststar
      * The value will be initialised to positive zero. The precision of ``this`` will be
-     * either the default precision, if set, or the value returned by :cpp:func:`~mppp::mpfr_prec_min()`
+     * either the default precision, if set, or the value returned by :cpp:func:`~mppp::real_prec_min()`
      * otherwise.
      * \endrststar
      */
@@ -339,7 +349,7 @@ public:
     {
         // Init with minimum or default precision.
         const auto dp = get_default_prec();
-        ::mpfr_init2(&m_mpfr, dp ? dp : mpfr_prec_min());
+        ::mpfr_init2(&m_mpfr, dp ? dp : real_prec_min());
         ::mpfr_set_zero(&m_mpfr, 1);
     }
     real(const real &other)
@@ -450,7 +460,7 @@ private:
             // Infer the precision from the bit size of n.
             const auto ls = n.size();
             // Check that ls * GMP_NUMB_BITS <= max_prec.
-            if (mppp_unlikely(ls > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(mpfr_prec_max())
+            if (mppp_unlikely(ls > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(real_prec_max())
                                        / unsigned(GMP_NUMB_BITS))) {
                 throw std::invalid_argument(
                     "The deduced precision for a real constructed from an integer is too large");
@@ -471,7 +481,7 @@ private:
                     // Overflow in total size.
                     (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
                     // Check that tot_size * GMP_NUMB_BITS <= max_prec.
-                    || ((n_size + d_size) > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(mpfr_prec_max())
+                    || ((n_size + d_size) > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(real_prec_max())
                                                 / unsigned(GMP_NUMB_BITS)))) {
                 throw std::invalid_argument(
                     "The deduced precision for a real constructed from a rational is too large");
@@ -643,8 +653,8 @@ private:
     {
         if (mppp_unlikely(!mpfr_prec_check(p))) {
             throw std::invalid_argument("Cannot set the precision of a real to the value " + std::to_string(p)
-                                        + ": the maximum allowed precision is " + std::to_string(mpfr_prec_max())
-                                        + ", the minimum allowed precision is " + std::to_string(mpfr_prec_min()));
+                                        + ": the maximum allowed precision is " + std::to_string(real_prec_max())
+                                        + ", the minimum allowed precision is " + std::to_string(real_prec_min()));
         }
         return p;
     }
@@ -668,7 +678,7 @@ public:
      * @return a reference to \p this.
      *
      * @throws std::invalid_argument if the value of \p p is not in the range established by
-     * \link mppp::mpfr_prec_min() mpfr_prec_min() \endlink and \link mppp::mpfr_prec_max() mpfr_prec_max() \endlink.
+     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
      */
     real &set_prec(::mpfr_prec_t p)
     {
