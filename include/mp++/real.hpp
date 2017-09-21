@@ -285,6 +285,11 @@ inline void real_reset_default_prec()
     real_constants<>::default_prec.store(0);
 }
 
+struct real_prec {
+    explicit real_prec(::mpfr_prec_t p) : value{p} {}
+    const ::mpfr_prec_t value;
+};
+
 /// Multiprecision floating-point class.
 /**
  * \rststar
@@ -360,6 +365,10 @@ public:
         const auto dp = real_get_default_prec();
         ::mpfr_init2(&m_mpfr, dp ? dp : real_prec_min());
         ::mpfr_set_zero(&m_mpfr, 1);
+    }
+    explicit real(real_prec p)
+    {
+        ::mpfr_init2(&m_mpfr, check_init_prec(p.value));
     }
     real(const real &other)
     {
