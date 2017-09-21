@@ -120,6 +120,12 @@ using enable_if_t = typename std::enable_if<B, T>::type;
 
 template <typename T>
 using make_unsigned = typename std::make_unsigned<T>::type;
+
+// Detect non-const non-volatile rvalue references.
+template <typename T>
+using is_ncvrvr
+    = conjunction<std::is_rvalue_reference<T>, negation<std::is_const<typename std::remove_reference<T>::type>>,
+                  negation<std::is_volatile<typename std::remove_reference<T>::type>>>;
 }
 }
 
