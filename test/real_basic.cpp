@@ -42,6 +42,10 @@ TEST_CASE("real basic")
     std::cout << static_cast<bool>(real{0}) << '\n';
     std::cout << static_cast<int>(real{42}) << '\n';
     std::cout << static_cast<long long>(real{-42}) << '\n';
+    std::cout << sqrt(r) << '\n';
+    real flup{9876};
+    std::cout << sqrt(std::move(flup)) << '\n';
+    std::cout << fma(real{1}, real{2}, real{3}) << '\n';
 #if defined(MPPP_WITH_QUADMATH)
     std::cout << static_cast<real128>(real{-42}) << '\n';
     std::cout << static_cast<real128>(real{-1}) << '\n';

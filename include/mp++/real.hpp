@@ -206,8 +206,8 @@ template <typename T>
 std::atomic<::mpfr_prec_t> real_constants<T>::default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
 
 // Fwd declare for friendship.
-template <typename... Args>
-void mpfr_setup_rop_prec(real &, const real &, const Args &...);
+template <typename F, typename... Args>
+void mpfr_nary_op(const F &, real &, const real &, const Args &...);
 }
 
 template <typename T>
@@ -223,6 +223,14 @@ template <typename T>
 concept bool RealInteroperable = is_real_interoperable<T>::value;
 #else
 using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, int>;
+#endif
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+concept bool CvrReal = std::is_same<uncvref_t<T>, real>::value;
+#else
+template <typename... Args>
+using cvr_real_enabler = enable_if_t<conjunction<std::is_same<uncvref_t<Args>, real>...>::value, int>;
 #endif
 
 /// Get the default precision for \link mppp::real real \endlink objects.
@@ -336,8 +344,8 @@ class real
 {
 #if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends, for accessing the non-checking set_prec().
-    template <typename... Args>
-    friend void detail::mpfr_setup_rop_prec(real &, const real &, const Args &...);
+    template <typename F, typename... Args>
+    friend void detail::mpfr_nary_op(const F &, real &, const real &, const Args &...);
 #endif
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
@@ -951,10 +959,8 @@ inline void set_prec(real &r, ::mpfr_prec_t p)
 inline namespace detail
 {
 
-#if MPPP_CPLUSPLUS < 201703L
-
 // A recursive function to examine, in an MPFR n-ary function call, the precisions
-// of rop and of the arguments. It will return a pair in which the first element is a boolean
+// of rop and of the arguments. It will write into a pair in which the first element is a boolean
 // flag signalling if rop and args all have the same precision, and the second element
 // contains the maximum precision among the args.
 inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &, const real &) {}
@@ -963,39 +969,73 @@ template <typename... Args>
 inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &p, const real &rop, const real &arg0,
                                const Args &... args)
 {
-    p.first = p.first && (rop.get_prec() == arg0.get_prec());
-    p.second = (arg0.get_prec() > p.second) ? arg0.get_prec() : p.second;
+    const auto prec0 = arg0.get_prec();
+    p.first = p.first && (rop.get_prec() == prec0);
+    p.second = (prec0 > p.second) ? prec0 : p.second;
     mpfr_examine_precs(p, rop, args...);
-}
-
-#endif
-
-// Setup the precision of the return value in an MPFR n-ary function call using the recursive
-// function defined above (or an equivalent C++17 fold): if rop and args all have the same precision, don't do anything,
-// otherwise set rop to the max precision among args.
-template <typename... Args>
-inline void mpfr_setup_rop_prec(real &rop, const real &arg0, const Args &... args)
-{
-    auto p = std::make_pair(rop.get_prec() == arg0.get_prec(), arg0.get_prec());
-#if MPPP_CPLUSPLUS >= 201703L
-    (..., (p.first = (p.first && (rop.get_prec() == args.get_prec())),
-           (p.second = (args.get_prec() > p.second) ? args.get_prec() : p.second)));
-#else
-    mpfr_examine_precs(p, rop, args...);
-#endif
-    if (mppp_unlikely(!p.first)) {
-        // NOTE: no need for prec checking, we assume all precision in the operands are valid.
-        rop.set_prec_impl<false>(p.second);
-    }
 }
 
 // Apply the MPFR n-ary function F with return value rop and real arguments (arg0, args...).
-// The precision of rop will be set using the logic described in the previous function.
+// The precision of rop will be set to the maximum of the precision among the arguments.
 template <typename F, typename... Args>
 inline void mpfr_nary_op(const F &f, real &rop, const real &arg0, const Args &... args)
 {
-    mpfr_setup_rop_prec(rop, arg0, args...);
+    auto p = std::make_pair(rop.get_prec() == arg0.get_prec(), arg0.get_prec());
+    mpfr_examine_precs(p, rop, args...);
+    if (mppp_unlikely(!p.first)) {
+        // NOTE: no need for prec checking, we assume all precisions in the operands are valid.
+        rop.set_prec_impl<false>(p.second);
+    }
+    // Invoke the MPFR function.
     f(rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+}
+
+// A recursive function to determine from which arguments, in an MPFR function call,
+// we can steal resources, and the max precision among the arguments.
+inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &) {}
+
+template <typename Arg0, typename... Args>
+inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
+{
+    const auto prec0 = arg0.get_prec();
+    if (is_ncvrvr<Arg0 &&>::value && (!p.first || prec0 > p.first->get_prec())) {
+        // The current argument arg0 is a non-const rvalue reference, and either it's
+        // the first argument we encounter we can steal from, or it has a precision
+        // larger than the current candidate for stealing resources from. This means that
+        // arg0 is the new candidate.
+        p.first = &arg0;
+    }
+    // Update the max precision among the arguments, if necessary.
+    p.second = (prec0 > p.second) ? prec0 : p.second;
+    mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
+}
+
+// Invoke an MPFR function with arguments (arg0, args...), and store the result
+// in a value to be created by this function. If possible, this function will try
+// to re-use the storage provided by the input arguments, if one or more of these
+// arguments are rvalue references and their precision is large enough. As usual,
+// the precision of the return value will be the max precision among the operands.
+template <typename F, typename Arg0, typename... Args>
+inline real mpfr_nary_op_return(const F &f, Arg0 &&arg0, Args &&... args)
+{
+    // This pair contains:
+    // - a pointer to the largest-precision real from which we can steal resources (may be nullptr),
+    // - the largest precision among all arguments.
+    // It's inited with arg0's precision, and a pointer to arg0, if arg0 is a nonconst rvalue ref.
+    auto p = std::make_pair(is_ncvrvr<Arg0 &&>::value ? &arg0 : static_cast<real *>(nullptr), arg0.get_prec());
+    // Examine the remaining arguments.
+    mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
+    if (p.first && p.first->get_prec() == p.second) {
+        // There's at least one arg we can steal from, and its precision is large enough
+        // to contain the result. Use it.
+        f(p.first->_get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+        return std::move(*p.first);
+    }
+    // Either we cannot steal from any arg, or the candidate(s) have not enough precision.
+    // Init a new value and use it instead.
+    real retval{real_prec{p.second}};
+    f(retval._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+    return retval;
 }
 }
 
@@ -1014,9 +1054,29 @@ inline void fma(real &rop, const real &op1, const real &op2, const real &op3)
     mpfr_nary_op(::mpfr_fma, rop, op1, op2, op3);
 }
 
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U, CvrReal V>
+#else
+template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
+#endif
+inline real fma(T &&a, U &&b, V &&c)
+{
+    return mpfr_nary_op_return(::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
+}
+
 inline void fms(real &rop, const real &op1, const real &op2, const real &op3)
 {
     mpfr_nary_op(::mpfr_fms, rop, op1, op2, op3);
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U, CvrReal V>
+#else
+template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
+#endif
+inline real fms(T &&a, U &&b, V &&c)
+{
+    return mpfr_nary_op_return(::mpfr_fms, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
 inline void sqrt(real &rop, const real &op)
@@ -1024,9 +1084,29 @@ inline void sqrt(real &rop, const real &op)
     mpfr_nary_op(::mpfr_sqrt, rop, op);
 }
 
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real sqrt(T &&r)
+{
+    return mpfr_nary_op_return(::mpfr_sqrt, std::forward<T>(r));
+}
+
 inline void sin(real &rop, const real &op)
 {
     mpfr_nary_op(::mpfr_sin, rop, op);
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real sin(T &&r)
+{
+    return mpfr_nary_op_return(::mpfr_sin, std::forward<T>(r));
 }
 
 inline void cos(real &rop, const real &op)
