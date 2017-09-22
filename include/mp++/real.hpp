@@ -208,6 +208,12 @@ std::atomic<::mpfr_prec_t> real_constants<T>::default_prec = ATOMIC_VAR_INIT(::m
 // Fwd declare for friendship.
 template <typename F, typename... Args>
 void mpfr_nary_op(const F &, real &, const real &, const Args &...);
+
+template <typename F, typename Arg0, typename... Args>
+real mpfr_nary_op_return(const F &, Arg0 &&, Args &&...);
+
+template <typename F>
+real real_constant(const F &, ::mpfr_prec_t);
 }
 
 template <typename T>
@@ -354,9 +360,13 @@ struct real_prec {
 class real
 {
 #if !defined(MPPP_DOXYGEN_INVOKED)
-    // Make friends, for accessing the non-checking set_prec().
+    // Make friends, for accessing the non-checking prec setting funcs.
     template <typename F, typename... Args>
     friend void detail::mpfr_nary_op(const F &, real &, const real &, const Args &...);
+    template <typename F, typename Arg0, typename... Args>
+    friend real detail::mpfr_nary_op_return(const F &, Arg0 &&, Args &&...);
+    template <typename F>
+    friend real detail::real_constant(const F &, ::mpfr_prec_t);
 #endif
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
@@ -410,6 +420,17 @@ public:
     {
         ::mpfr_init2(&m_mpfr, check_init_prec(p.value));
     }
+
+private:
+    // A private version of the above without prec checking.
+    explicit real(real_prec p, bool ignore_prec)
+    {
+        assert(ignore_prec);
+        (void)ignore_prec;
+        ::mpfr_init2(&m_mpfr, p.value);
+    }
+
+public:
     /// Copy constructor.
     /**
      * The copy constructor performs an exact deep copy of the input object.
@@ -546,9 +567,9 @@ private:
             // Infer the precision from the bit size of n.
             const auto ls = n.size();
             // Check that ls * GMP_NUMB_BITS is representable by mpfr_prec_t.
-            if (mppp_unlikely(
-                    ls > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(std::numeric_limits<::mpfr_prec_t>::max())
-                             / unsigned(GMP_NUMB_BITS))) {
+            if (mppp_unlikely(ls
+                              > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
+                                    / unsigned(GMP_NUMB_BITS))) {
                 throw std::overflow_error("The deduced precision for a real constructed from an integer is too large");
             }
             return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * int(GMP_NUMB_BITS));
@@ -567,9 +588,9 @@ private:
                     // Overflow in total size.
                     (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
                     // Check that tot_size * GMP_NUMB_BITS is representable by mpfr_prec_t.
-                    || ((n_size + d_size) > static_cast<std::make_unsigned<::mpfr_prec_t>::type>(
-                                                std::numeric_limits<::mpfr_prec_t>::max())
-                                                / unsigned(GMP_NUMB_BITS)))) {
+                    || ((n_size + d_size)
+                        > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
+                              / unsigned(GMP_NUMB_BITS)))) {
                 throw std::overflow_error("The deduced precision for a real constructed from a rational is too large");
             }
             return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * int(GMP_NUMB_BITS));
@@ -1093,7 +1114,7 @@ inline real mpfr_nary_op_return(const F &f, Arg0 &&arg0, Args &&... args)
     }
     // Either we cannot steal from any arg, or the candidate(s) have not enough precision.
     // Init a new value and use it instead.
-    real retval{real_prec{p.second}};
+    real retval{real_prec{p.second}, true};
     f(retval._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
     return retval;
 }
@@ -1197,7 +1218,7 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
         }
         prec = dp;
     }
-    real retval{real_prec{prec}};
+    real retval{real_prec{prec}, true};
     f(retval);
     return retval;
 }
