@@ -28,6 +28,9 @@ Types
 
       http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
 
+.. doxygenstruct:: mppp::real_prec
+   :members:
+
 Concepts
 --------
 
@@ -43,9 +46,6 @@ Precision handling
 
 .. doxygengroup:: real_prec
    :content-only:
-
-.. doxygenstruct:: mppp::real_prec
-   :members:
 
 .. _real_arithmetic:
 

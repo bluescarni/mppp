@@ -402,7 +402,7 @@ public:
      * the :cpp:member:`mppp::real_prec::value` member of the input argument ``p``, and a value
      * of NaN.
      *
-     * E.g., the following code
+     * E.g., the following code,
      *
      * .. code-block:: c++
      *
