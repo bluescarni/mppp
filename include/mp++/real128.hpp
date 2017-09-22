@@ -1703,7 +1703,7 @@ inline real128 dispatch_sub(const T &x, const real128 &y)
  * @param x the first operand.
  * @param y the second operand.
  *
- * @return \f$ x + y \f$.
+ * @return \f$ x - y \f$.
  *
  * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
  * from the mp++ type.
