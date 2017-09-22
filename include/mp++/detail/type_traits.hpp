@@ -114,18 +114,18 @@ struct negation : std::integral_constant<bool, !B::value> {
 template <typename T>
 using uncvref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
+// Detect non-const non-volatile rvalue references.
+template <typename T>
+using is_ncvrvr
+    = conjunction<std::is_rvalue_reference<T>, negation<std::is_const<typename std::remove_reference<T>::type>>,
+                  negation<std::is_volatile<typename std::remove_reference<T>::type>>>;
+
 // Small helpers, like C++14.
 template <bool B, typename T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
 
 template <typename T>
 using make_unsigned_t = typename std::make_unsigned<T>::type;
-
-// Detect non-const non-volatile rvalue references.
-template <typename T>
-using is_ncvrvr
-    = conjunction<std::is_rvalue_reference<T>, negation<std::is_const<typename std::remove_reference<T>::type>>,
-                  negation<std::is_volatile<typename std::remove_reference<T>::type>>>;
 }
 }
 
