@@ -149,7 +149,7 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
     }
     // NOTE: nbits == 0 is allowed.
     ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
-    assert(make_unsigned<mpz_size_t>(rop._mp_alloc) >= nlimbs);
+    assert(make_unsigned_t<mpz_size_t>(rop._mp_alloc) >= nlimbs);
 }
 
 // Combined init+set.
@@ -527,10 +527,10 @@ union integer_union {
     {
         if (n >= T(0)) {
             // Positive value, just cast to unsigned.
-            dispatch_generic_ctor(static_cast<make_unsigned<T>>(n));
+            dispatch_generic_ctor(static_cast<make_unsigned_t<T>>(n));
         } else {
             // Negative value, use its abs.
-            dispatch_generic_ctor<make_unsigned<T>, true>(nint_abs(n));
+            dispatch_generic_ctor<make_unsigned_t<T>, true>(nint_abs(n));
         }
     }
     // Construction from float/double.
@@ -1529,7 +1529,7 @@ private:
     // chokes on constexpr functions in a SFINAE context.
     template <typename T>
     struct sconv_is_small {
-        static const bool value = c_max(static_cast<make_unsigned<T>>(std::numeric_limits<T>::max()),
+        static const bool value = c_max(static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max()),
                                         nint_abs(std::numeric_limits<T>::min()))
                                   <= GMP_NUMB_MAX;
     };
@@ -1540,7 +1540,7 @@ private:
         static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
         assert(size());
         // Cache for convenience.
-        constexpr auto Tmax = static_cast<make_unsigned<T>>(std::numeric_limits<T>::max());
+        constexpr auto Tmax = static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max());
         if (m_int.m_st._mp_size != 1 && m_int.m_st._mp_size != -1) {
             // this consists of more than 1 limb, the conversion is not possible.
             return std::make_pair(false, T(0));
@@ -1565,11 +1565,11 @@ private:
     std::pair<bool, T> convert_to_signed() const
     {
         // Cache for convenience.
-        constexpr auto Tmax = static_cast<make_unsigned<T>>(std::numeric_limits<T>::max());
+        constexpr auto Tmax = static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max());
         // Branch out depending on the sign of this.
         if (m_int.m_st._mp_size > 0) {
             // Attempt conversion to the unsigned counterpart.
-            const auto candidate = convert_to_unsigned<make_unsigned<T>, true>();
+            const auto candidate = convert_to_unsigned<make_unsigned_t<T>, true>();
             if (candidate.first && candidate.second <= Tmax) {
                 // The conversion to unsigned was successful, and the result fits in
                 // the positive range of T. Return the result.
@@ -1579,7 +1579,7 @@ private:
             return std::make_pair(false, T(0));
         } else {
             // Attempt conversion to the unsigned counterpart.
-            const auto candidate = convert_to_unsigned<make_unsigned<T>, false>();
+            const auto candidate = convert_to_unsigned<make_unsigned_t<T>, false>();
             if (candidate.first) {
                 // The converstion to unsigned was successful, try to negate now.
                 return unsigned_to_nsigned<T>(candidate.second);
@@ -4440,8 +4440,8 @@ inline unsigned long integer_exp_to_ulong(const T &exp)
 #if !defined(__INTEL_COMPILER)
     assert(exp >= T(0));
 #endif
-    // NOTE: make_unsigned<T> is T if T is already unsigned.
-    if (mppp_unlikely(static_cast<make_unsigned<T>>(exp) > std::numeric_limits<unsigned long>::max())) {
+    // NOTE: make_unsigned_t<T> is T if T is already unsigned.
+    if (mppp_unlikely(static_cast<make_unsigned_t<T>>(exp) > std::numeric_limits<unsigned long>::max())) {
         throw std::overflow_error("Cannot convert the integral value " + std::to_string(exp)
                                   + " to unsigned long: the value is too large.");
     }
@@ -5568,7 +5568,7 @@ inline ::mp_bitcnt_t integer_cast_to_bitcnt(T n)
     if (mppp_unlikely(n < T(0))) {
         throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": negative values are not supported");
     }
-    if (mppp_unlikely(static_cast<make_unsigned<T>>(n) > std::numeric_limits<::mp_bitcnt_t>::max())) {
+    if (mppp_unlikely(static_cast<make_unsigned_t<T>>(n) > std::numeric_limits<::mp_bitcnt_t>::max())) {
         throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
     }
     return static_cast<::mp_bitcnt_t>(n);

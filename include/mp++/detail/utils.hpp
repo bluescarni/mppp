@@ -80,7 +80,7 @@ inline std::string to_string(const T &x)
 // we could init the integer with the wrong value, and we should be able to detect this in the unit tests.
 // Let's keep this in mind in the remote case this ever becomes a problem.
 template <typename T>
-constexpr make_unsigned<T> nint_abs(T n)
+constexpr make_unsigned_t<T> nint_abs(T n)
 {
 // NOTE: we should assert about negative n, but this is guaranteed to work properly only
 // from C++17:
@@ -90,7 +90,7 @@ constexpr make_unsigned<T> nint_abs(T n)
 #endif
     static_assert(std::is_integral<T>::value && std::is_signed<T>::value,
                   "The sint_abs() function can be used only with signed integral types.");
-    using uT = make_unsigned<T>;
+    using uT = make_unsigned_t<T>;
     // NOTE: the potential cast to "unsigned", rather than uT, is for when uT is a short integral type.
     // In such a case, the unary minus will trigger integral promotion to int/unsigned
     // int, and I am *not* 100% sure in this case the technique still works. Written like this, the cast
@@ -127,7 +127,7 @@ inline
     static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
     static_assert(std::is_integral<U>::value && std::is_unsigned<U>::value, "Invalid type.");
     // Cache a couple of quantities.
-    constexpr auto Tmax = static_cast<make_unsigned<T>>(std::numeric_limits<T>::max());
+    constexpr auto Tmax = static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max());
     constexpr auto Tmin_abs = nint_abs(std::numeric_limits<T>::min());
     if (mppp_likely(n <= c_min(Tmax, Tmin_abs))) {
         // Optimise the case in which n fits both Tmax and Tmin_abs. This means
@@ -153,8 +153,8 @@ inline
     // we cannot directly convert n to T. The idea then is to init retval to -Tmax
     // and then to subtract from it Tmax as many times as needed.
     auto retval = static_cast<T>(-static_cast<T>(Tmax));
-    const auto q = static_cast<make_unsigned<T>>(n / Tmax), r = static_cast<make_unsigned<T>>(n % Tmax);
-    for (make_unsigned<T> i = 0; i < q - 1u; ++i) {
+    const auto q = static_cast<make_unsigned_t<T>>(n / Tmax), r = static_cast<make_unsigned_t<T>>(n % Tmax);
+    for (make_unsigned_t<T> i = 0; i < q - 1u; ++i) {
         // LCOV_EXCL_START
         // NOTE: this is never hit on current archs, as Tmax differs from Tmin_abs
         // by just 1: we will use only the remainder r.
@@ -216,7 +216,7 @@ template <
                 int> = 0>
 constexpr T safe_cast(const U &n)
 {
-    return (n >= U(0) && static_cast<make_unsigned<U>>(n) <= std::numeric_limits<T>::max())
+    return (n >= U(0) && static_cast<make_unsigned_t<U>>(n) <= std::numeric_limits<T>::max())
                ? static_cast<T>(n)
                : throw std::overflow_error("Error in the safe conversion from a signed integral type to an unsigned "
                                            "integral type: the input value "
@@ -230,7 +230,7 @@ template <
                 int> = 0>
 constexpr T safe_cast(const U &n)
 {
-    return n <= static_cast<make_unsigned<T>>(std::numeric_limits<T>::max())
+    return n <= static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max())
                ? static_cast<T>(n)
                : throw std::overflow_error("Error in the safe conversion from an unsigned integral type to a signed "
                                            "integral type: the input value "

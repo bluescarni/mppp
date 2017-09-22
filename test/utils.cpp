@@ -145,7 +145,7 @@ struct sint_uint_safe_cast_tester {
         template <typename U>
         void operator()(const U &) const
         {
-            using uS = make_unsigned<S>;
+            using uS = make_unsigned_t<S>;
             REQUIRE((std::is_same<U, decltype(safe_cast<U>(S(0)))>::value));
             REQUIRE(safe_cast<U>(S(0)) == U(0));
             REQUIRE_THROWS_PREDICATE(safe_cast<U>(S(-1)), std::overflow_error, [](const std::overflow_error &oe) {
@@ -198,7 +198,7 @@ struct uint_sint_safe_cast_tester {
         template <typename S>
         void operator()(const S &) const
         {
-            using uS = make_unsigned<S>;
+            using uS = make_unsigned_t<S>;
             REQUIRE((std::is_same<S, decltype(safe_cast<S>(U(0)))>::value));
             REQUIRE(safe_cast<S>(U(0)) == S(0));
             REQUIRE(safe_cast<S>(U(10)) == S(10));
