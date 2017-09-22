@@ -34,6 +34,16 @@ Types
 Concepts
 --------
 
+.. cpp:concept:: template <typename T> mppp::RealInteroperable
+
+   This concept is satisfied if the type ``T`` can interoperate with :cpp:class:`~mppp::real`.
+   Specifically, this concept will be ``true`` if:
+
+   * ``T`` is :cpp:concept:`CppInteroperable`, or
+   * ``T`` is an :cpp:class:`~mppp::integer`, or
+   * ``T`` is a :cpp:class:`~mppp::rational`, or
+   * ``T`` is a :cpp:class:`~mppp::real128`.
+
 .. _real_functions:
 
 Functions
