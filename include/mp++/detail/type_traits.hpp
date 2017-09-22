@@ -119,7 +119,7 @@ template <bool B, typename T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
 
 template <typename T>
-using make_unsigned = typename std::make_unsigned<T>::type;
+using make_unsigned_t = typename std::make_unsigned<T>::type;
 
 // Detect non-const non-volatile rvalue references.
 template <typename T>
