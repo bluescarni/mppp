@@ -237,12 +237,11 @@ using cvr_real_enabler = enable_if_t<conjunction<std::is_same<uncvref_t<Args>, r
 /**
  * \ingroup real_prec
  * \rststar
- * This function returns the value of the precision used when an explicit precision value
- * is **not** specified during the constrcution of
- * :cpp:class:`~mppp::real` objects. On program startup, the value returned by this function
+ * This function returns the value of the precision used during the construction of
+ * :cpp:class:`~mppp::real` objects when an explicit precision value
+ * is **not** specified . On program startup, the value returned by this function
  * is zero, meaning that the precision of a :cpp:class:`~mppp::real` object will be chosen
- * according to heuristics depending to the invoked constructor (see the documentation of
- * :cpp:class:`~mppp::real`'s constructors for details).
+ * automatically according to heuristics depending on the specific situation, if possible.
  *
  * The default precision is stored in a global variable, and its value can be changed via
  * :cpp:func:`~mppp::real_set_default_prec()`. It is safe to read and modify concurrently
@@ -293,8 +292,21 @@ inline void real_reset_default_prec()
     real_constants<>::default_prec.store(0);
 }
 
+/// Auxiliary class for initialising a \link mppp::real real \endlink from a precision value.
+/**
+ * \rststar
+ * This class is used as the only construction argument for a specific :cpp:class:`~mppp::real`
+ * constructor. It will initialise the calling :cpp:class:`~mppp::real` with a precision
+ * equal to the value stored in this object, and a value of NaN.
+ * \endrststar
+ */
 struct real_prec {
+    /// Constructor.
+    /**
+     * @param p the desired precision value.
+     */
     explicit real_prec(::mpfr_prec_t p) : value{p} {}
+    /// The precision value specified on construction.
     const ::mpfr_prec_t value;
 };
 
@@ -337,7 +349,6 @@ struct real_prec {
  * For instance, by default, the construction of a :cpp:class:`~mppp::real` from a 32 bit integer will yield a
  * :cpp:class:`~mppp::real` with a precision of 32 bits. This behaviour can be altered either by specifying explicitly
  * the desired precision value, or by setting a global default precision via :cpp:func:`~mppp::real_set_default_prec()`.
- * See the documentation of the constructors for more specific information.
  * \endrststar
  */
 class real
@@ -374,22 +385,71 @@ public:
         ::mpfr_init2(&m_mpfr, dp ? dp : real_prec_min());
         ::mpfr_set_zero(&m_mpfr, 1);
     }
+    /// Constructor from precision.
+    /**
+     * \rststar
+     * This constructor will initialise a :cpp:class:`~mppp::real` with a precision equal to
+     * the :cpp:member:`mppp::real_prec::value` member of the input argument ``p``, and a value
+     * of NaN.
+     *
+     * E.g., the following code
+     *
+     * .. code-block:: c++
+     *
+     *    real x{real_prec{42}};
+     *
+     * will initialise ``x`` with 42 bits of precision and a value of NaN.
+     * \endrststar
+     *
+     * @param p the \link mppp::real_prec real_prec \endlink that wraps the desired precision value.
+     *
+     * @throws std::invalid_argument if the precision value is outside the range established by
+     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
+     */
     explicit real(real_prec p)
     {
         ::mpfr_init2(&m_mpfr, check_init_prec(p.value));
     }
+    /// Copy constructor.
+    /**
+     * The copy constructor performs an exact deep copy of the input object.
+     *
+     * @param other the \link mppp::real real \endlink that will be copied.
+     */
     real(const real &other)
     {
         // Init with the same precision as other, and then set.
         ::mpfr_init2(&m_mpfr, other.get_prec());
         ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
     }
+    /// Copy constructor with custom precision.
+    /**
+     * This constructor will set \p this to a copy of \p other with precision \p p. If \p p
+     * is smaller than the precision of \p other, a rounding operation will be performed,
+     * otherwise the value will be copied exactly.
+     *
+     * @param other the \link mppp::real real \endlink that will be copied.
+     * @param p the desired precision.
+     *
+     * @throws std::invalid_argument if \p p is outside the range established by
+     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
+     */
     explicit real(const real &other, ::mpfr_prec_t p)
     {
         // Init with custom precision, and then set.
         ::mpfr_init2(&m_mpfr, check_init_prec(p));
         ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
     }
+    /// Move constructor.
+    /**
+     * \rststar
+     * .. warning::
+     *    Unless otherwise noted, the only valid operations on the moved-from ``other`` object are
+     *    destruction and copy/move assignment. After re-assignment, ``other`` can be used normally again.
+     * \endrststar
+     *
+     * @param other the \link mppp::real real \endlink that will be moved.
+     */
     real(real &&other) noexcept
     {
         // Shallow copy other.
@@ -1118,6 +1178,34 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
 {
     mpfr_to_stream(r.get_mpfr_t(), os);
     return os;
+}
+
+inline namespace detail
+{
+
+template <typename F>
+inline real real_constant(const F &f, ::mpfr_prec_t p)
+{
+    ::mpfr_prec_t prec;
+    if (p) {
+        prec = p;
+    } else {
+        const auto dp = real_get_default_prec();
+        if (!dp) {
+            // TODO.
+            throw;
+        }
+        prec = dp;
+    }
+    real retval{real_prec{prec}};
+    f(retval);
+    return retval;
+}
+}
+
+inline real real_nan(::mpfr_prec_t p = 0)
+{
+    return real_constant([](real &) {}, p);
 }
 }
 

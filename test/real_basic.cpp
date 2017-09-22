@@ -20,6 +20,20 @@
 
 using namespace mppp;
 
+#if defined(_MSC_VER)
+
+template <typename... Args>
+auto fma_wrap(Args &&... args) -> decltype(mppp::fma(std::forward<Args>(args)...))
+{
+    return mppp::fma(std::forward<Args>(args)...);
+}
+
+#else
+
+#define fma_wrap fma
+
+#endif
+
 TEST_CASE("real basic")
 {
     std::cout << std::setprecision(20);
@@ -45,7 +59,7 @@ TEST_CASE("real basic")
     std::cout << sqrt(r) << '\n';
     real flup{9876};
     std::cout << sqrt(std::move(flup)) << '\n';
-    std::cout << fma(real{1}, real{2}, real{3}) << '\n';
+    std::cout << fma_wrap(real{1}, real{2}, real{3}) << '\n';
 #if defined(MPPP_WITH_QUADMATH)
     std::cout << static_cast<real128>(real{-42}) << '\n';
     std::cout << static_cast<real128>(real{-1}) << '\n';
