@@ -20,6 +20,15 @@
 
 using namespace mppp;
 
+// NOTE: the MSVC standard library defines a function template fma()
+// in the root namespace. This ends up leading to ambiguities
+// with mp++'s fma.
+#if defined(_MSC_VER)
+
+using mppp::fma;
+
+#endif
+
 TEST_CASE("real basic")
 {
     std::cout << std::setprecision(20);
