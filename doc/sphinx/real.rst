@@ -22,11 +22,13 @@ Types
 .. cpp:type:: mpfr_prec_t
 
    An integral type defined by the MPFR library, used to represent the precision of ``mpfr_t``
-   and (by extension) :cpp:class:`mppp::real` objects.
+   and (by extension) :cpp:class:`~mppp::real` objects.
 
    .. seealso::
 
       http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
+
+.. doxygentypedef:: mppp::mpfr_struct_t
 
 .. doxygenstruct:: mppp::real_prec
    :members:
@@ -43,6 +45,11 @@ Concepts
    * ``T`` is an :cpp:class:`~mppp::integer`, or
    * ``T`` is a :cpp:class:`~mppp::rational`, or
    * ``T`` is a :cpp:class:`~mppp::real128`.
+
+.. cpp:concept:: template <typename T> mppp::CvrReal
+
+   This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
+   is the same as :cpp:class:`mppp::real`.
 
 .. _real_functions:
 

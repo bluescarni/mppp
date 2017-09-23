@@ -64,11 +64,15 @@ constexpr ::mpfr_prec_t real_prec_max()
 
 /** @} */
 
+/// The MPFR structure underlying <tt>mpfr_t</tt>.
+/**
+ * The MPFR \p mpfr_t type is an array of size 1 of an unspecified structure,
+ * which is here aliased as <tt>mpfr_struct_t</tt>.
+ */
+typedef std::remove_extent<::mpfr_t>::type mpfr_struct_t;
+
 inline namespace detail
 {
-
-// mpfr_t is an array of some struct.
-using mpfr_struct_t = std::remove_extent<::mpfr_t>::type;
 
 // Paranoia checks.
 static_assert(real_prec_min() <= real_prec_max(), "The minimum real precision is larger than the maximum precision.");

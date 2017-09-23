@@ -322,7 +322,7 @@ struct real_prec {
  * This class represents arbitrary-precision real values encoded in a binary floating-point format.
  * It acts as a wrapper around the MPFR ``mpfr_t`` type, which in turn consists of a multiprecision significand
  * (whose size can be set at runtime) paired to a fixed-size exponent. In other words, :cpp:class:`~mppp::real`
- * values can have an arbitrary number of digits of precision (limited only by the available memory),
+ * values can have an arbitrary number of binary digits of precision (limited only by the available memory),
  * but the exponent range is limited.
  *
  * :cpp:class:`~mppp::real` aims to behave like a C++ floating-point type whose precision is a runtime property
@@ -710,6 +710,7 @@ public:
     {
         dispatch_construction(x, p);
     }
+    /// Destructor.
     ~real()
     {
         if (m_mpfr._mpfr_d) {
@@ -718,6 +719,14 @@ public:
             ::mpfr_clear(&m_mpfr);
         }
     }
+    /// Copy assignment operator.
+    /**
+     * The operator will deep-copy \p other into \p this.
+     *
+     * @param other the \link mppp::real real \endlink that will be copied into \p this.
+     *
+     * @return a reference to \p this.
+     */
     real &operator=(const real &other)
     {
         if (mppp_likely(this != &other)) {
@@ -735,57 +744,139 @@ public:
         }
         return *this;
     }
+    /// Move assignment operator.
+    /**
+     * @param other the \link mppp::real real \endlink that will be moved into \p this.
+     *
+     * @return a reference to \p this.
+     */
     real &operator=(real &&other) noexcept
     {
-        return swap(other);
-    }
-    real &swap(real &other)
-    {
+        // NOTE: for generic code, std::swap() is not a particularly good way of implementing
+        // the move assignment:
+        //
+        // https://stackoverflow.com/questions/6687388/why-do-some-people-use-swap-for-move-assignments
+        //
+        // Here however it is fine, as we know there are no side effects we need to maintain.
+        //
+        // NOTE: we use a raw std::swap() here (instead of mpfr_swap()) because we don't know in principle
+        // if mpfr_swap() relies on the operands not to be in a moved-from state (although it's unlikely).
         std::swap(m_mpfr, other.m_mpfr);
         return *this;
     }
+    /// Swap \link mppp::real real \endlink objects.
+    /**
+     * This function will efficiently swap the content of \p a and \p b.
+     *
+     * @param a the first operand.
+     * @param b the second operand.
+     */
+    friend void swap(real &a, real &b) noexcept
+    {
+        ::mpfr_swap(&a.m_mpfr, &b.m_mpfr);
+    }
+    /// Const reference to the internal <tt>mpfr_t</tt>.
+    /**
+     * This method will return a const pointer to the internal MPFR structure used
+     * to represent the value of \p this. The returned object can be used as a
+     * <tt>const mpfr_t</tt> function parameter in the MPFR API.
+     *
+     * @return a const reference to the internal MPFR structure.
+     */
     const mpfr_struct_t *get_mpfr_t() const
     {
         return &m_mpfr;
     }
+    /// Mutable reference to the internal <tt>mpfr_t</tt>.
+    /**
+     * This method will return a mutable pointer to the internal MPFR structure used
+     * to represent the value of \p this. The returned object can be used as an
+     * <tt>mpfr_t</tt> function parameter in the MPFR API.
+     *
+     * \rststar
+     * .. warning::
+     *    When using this mutable getter, it is the user's responsibility to ensure
+     *    that the internal MPFR structure is kept in a state which respects the invariants
+     *    of the :cpp:class:`~mppp::real` class.
+     * \endrststar
+     *
+     * @return a mutable reference to the internal MPFR structure.
+     */
     mpfr_struct_t *_get_mpfr_t()
     {
         return &m_mpfr;
     }
-    ::mpfr_prec_t get_prec() const
-    {
-        return mpfr_get_prec(&m_mpfr);
-    }
+    /// Detect NaN.
+    /**
+     * @return \p true if \p this is NaN, \p false otherwise.
+     */
     bool nan_p() const
     {
         return mpfr_nan_p(&m_mpfr) != 0;
     }
+    /// Detect infinity.
+    /**
+     * @return \p true if \p this is an infinity, \p false otherwise.
+     */
     bool inf_p() const
     {
         return mpfr_inf_p(&m_mpfr) != 0;
     }
+    /// Detect finite number.
+    /**
+     * @return \p true if \p this is a finite number (i.e., not NaN or infinity), \p false otherwise.
+     */
     bool number_p() const
     {
         return mpfr_number_p(&m_mpfr) != 0;
     }
+    /// Detect zero.
+    /**
+     * @return \p true if \p this is zero, \p false otherwise.
+     */
     bool zero_p() const
     {
         return mpfr_zero_p(&m_mpfr) != 0;
     }
+    /// Detect regular number.
+    /**
+     * @return \p true if \p this is a regular number (i.e., not NaN, infinity or zero), \p false otherwise.
+     */
     bool regular_p() const
     {
         return mpfr_regular_p(&m_mpfr) != 0;
     }
+    /// Detect sign.
+    /**
+     * @return a positive value if \p this is positive, zero if \p this is zero, a negative value if \p this
+     * is negative.
+     *
+     * @throws std::domain_error if \p this is NaN.
+     */
     int sgn() const
     {
         if (mppp_unlikely(nan_p())) {
-            return 0;
+            // NOTE: mpfr_sgn() in this case would set an error flag, and we generally
+            // handle error flags as exceptions.
+            throw std::domain_error("Cannot determine the sign of a real NaN");
         }
         return mpfr_sgn(&m_mpfr);
     }
+    /// Get the sign bit.
+    /**
+     * @return the sign bit of \p this.
+     */
     bool signbit() const
     {
         return mpfr_signbit(&m_mpfr) != 0;
+    }
+    /// Get the precision of \p this.
+    /**
+     * @return the current precision (i.e., the number of binary digits in the significand) of \p this.
+     */
+    ::mpfr_prec_t get_prec() const
+    {
+        return mpfr_get_prec(&m_mpfr);
     }
 
 private:
@@ -807,10 +898,10 @@ private:
     }
 
 public:
-    /// Destructively set precision.
+    /// Destructively set the precision.
     /**
      * \rststar
-     * This function will set the precision of ``this`` to exactly ``p`` bits. The value
+     * This method will set the precision of ``this`` to exactly ``p`` bits. The value
      * of ``this`` will be set to NaN.
      * \endrststar
      *
@@ -826,6 +917,21 @@ public:
         set_prec_impl<true>(p);
         return *this;
     }
+    /// Set the precision maintaining the current value.
+    /**
+     * \rststar
+     * This method will set the precision of ``this`` to exactly ``p`` bits. If ``p``
+     * is smaller than the current precision of ``this``, a rounding operation will be performed,
+     * otherwise the value will be preserved exactly.
+     * \endrststar
+     *
+     * @param p the desired precision.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::invalid_argument if the value of \p p is not in the range established by
+     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
+     */
     real &prec_round(::mpfr_prec_t p)
     {
         ::mpfr_prec_round(&m_mpfr, check_set_prec(p), MPFR_RNDN);
@@ -1036,6 +1142,31 @@ private:
 #endif
 
 public:
+    /// Generic conversion operator.
+    /**
+     * \rststar
+     * This operator will convert ``this`` to a :cpp:concept:`~mppp::RealInteroperable` type. The conversion
+     * proceeds as follows:
+     *
+     * - if ``T`` is ``bool``, then the conversion returns ``false`` if ``this`` is zero, ``true`` otherwise
+     *   (including if ``this`` is NaN);
+     * - if ``T`` is a C++ integral type other than ``bool``, the conversion will yield the truncated counterpart
+     *   of ``this`` (i.e., the conversion rounds to zero). The conversion may fail due to overflow or domain errors
+     *   (e.g., when trying to convert non-finite values);
+     * - if ``T`` if a C++ floating-point type, the conversion calls directly the low-level MPFR functions (e.g.,
+     *   ``mpfr_get_d()``), and might yield infinities for finite input values;
+     * - if ``T`` is :cpp:class:`~mppp::integer`, the conversion rounds to zero and might fail due to domain errors,
+     *   but it will never overflow;
+     * - if ``T`` is :cpp:class:`~mppp::rational`, the conversion, if successful, is exact;
+     * - if ``T`` is :cpp:class:`~mppp::real128`, the conversion might yield infinities for finite input values.
+     *
+     * \endrststar
+     *
+     * @return \p this converted to \p T.
+     *
+     * @throws std::domain_error if \p this is not finite and the target type cannot represent non-finite numbers.
+     * @throws std::overflow_error if the conversion results in overflow.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RealInteroperable T>
 #else
@@ -1045,6 +1176,15 @@ public:
     {
         return dispatch_conversion<T>();
     }
+    /// Convert to string.
+    /**
+     * \rststar
+     * This method will convert ``this`` to a string representation in base 10. The returned string is guaranteed to
+     * produce exactly the original value when used as a construction argument for :cpp:class:`~mppp::real`.
+     * \endrststar
+     *
+     * @return \p this converted to a string.
+     */
     std::string to_string() const
     {
         std::ostringstream oss;
@@ -1072,6 +1212,25 @@ private:
 inline void set_prec(real &r, ::mpfr_prec_t p)
 {
     r.set_prec(p);
+}
+
+/// Set the precision of a \link mppp::real real \endlink maintaining the current value.
+/**
+ * \ingroup real_prec
+ * \rststar
+ * This function will set the precision of ``r`` to exactly ``p`` bits. If ``p``
+ * is smaller than the current precision of ``r``, a rounding operation will be performed,
+ * otherwise the value will be preserved exactly.
+ * \endrststar
+ *
+ * @param r the \link mppp::real real \endlink whose precision will be set.
+ * @param p the desired precision.
+ *
+ * @throws unspecified any exception thrown by mppp::real::prec_round().
+ */
+inline void prec_round(real &r, ::mpfr_prec_t p)
+{
+    r.prec_round(p);
 }
 
 inline namespace detail
@@ -1157,6 +1316,10 @@ inline real mpfr_nary_op_return(const F &f, Arg0 &&arg0, Args &&... args)
 }
 }
 
+/** @defgroup real_arithmetic real_arithmetic
+ *  @{
+ */
+
 inline void add(real &rop, const real &op1, const real &op2)
 {
     mpfr_nary_op(::mpfr_add, rop, op1, op2);
@@ -1196,6 +1359,8 @@ inline real fms(T &&a, U &&b, V &&c)
 {
     return mpfr_nary_op_return(::mpfr_fms, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
+
+/** @} */
 
 inline void sqrt(real &rop, const real &op)
 {
