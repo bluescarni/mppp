@@ -1365,6 +1365,92 @@ inline real fms(T &&a, U &&b, V &&c)
 
 /** @} */
 
+/** @defgroup real_comparison real_comparison
+ *  @{
+ */
+
+/// Detect if a \link mppp::real real \endlink is NaN.
+/**
+ * @param r the \link mppp::real real \endlink that will be examined.
+ *
+ * @return \p true if \p r is NaN, \p false otherwise.
+ */
+inline bool nan_p(const real &r)
+{
+    return r.nan_p();
+}
+
+/// Detect if a \link mppp::real real \endlink is infinity.
+/**
+ * @param r the \link mppp::real real \endlink that will be examined.
+ *
+ * @return \p true if \p r is an infinity, \p false otherwise.
+ */
+inline bool inf_p(const real &r)
+{
+    return r.inf_p();
+}
+
+/// Detect if \link mppp::real real \endlink is a finite number.
+/**
+ * @param r the \link mppp::real real \endlink that will be examined.
+ *
+ * @return \p true if \p r is a finite number (i.e., not NaN or infinity), \p false otherwise.
+ */
+inline bool number_p(const real &r)
+{
+    return r.number_p();
+}
+
+/// Detect if a \link mppp::real real \endlink is zero.
+/**
+ * @param r the \link mppp::real real \endlink that will be examined.
+ *
+ * @return \p true if \p r is zero, \p false otherwise.
+ */
+inline bool zero_p(const real &r)
+{
+    return r.zero_p();
+}
+
+/// Detect if a \link mppp::real real \endlink is a regular number.
+/**
+ * @param r the \link mppp::real real \endlink that will be examined.
+ *
+ * @return \p true if \p r is a regular number (i.e., not NaN, infinity or zero), \p false otherwise.
+ */
+inline bool regular_p(const real &r)
+{
+    return r.regular_p();
+}
+
+/// Detect the sign of a \link mppp::real real \endlink.
+/**
+ * @param r the \link mppp::real real \endlink that will be examined.
+ *
+ * @return a positive value if \p r is positive, zero if \p r is zero, a negative value if \p thris
+ * is negative.
+ *
+ * @throws std::domain_error if \p r is NaN.
+ */
+inline int sgn(const real &r)
+{
+    return r.sgn();
+}
+
+/// Get the sign bit of a \link mppp::real real \endlink.
+/**
+ * @param r the \link mppp::real real \endlink that will be examined.
+ *
+ * @return the sign bit of \p r.
+ */
+inline bool signbit(const real &r)
+{
+    return r.signbit();
+}
+
+/** @} */
+
 inline void sqrt(real &rop, const real &op)
 {
     mpfr_nary_op(::mpfr_sqrt, rop, op);
