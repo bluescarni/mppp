@@ -1119,7 +1119,10 @@ private:
         // Init retval with the highest limb.
         real128 retval{m_mpfr._mpfr_d[--nlimbs] & GMP_NUMB_MASK};
         // Init the number of read bits.
-        unsigned read_bits = static_cast<unsigned>(::mp_bits_per_limb);
+        // NOTE: we have read a full limb in the line above, so mp_bits_per_limb bits. If mp_bits_per_limb > 113,
+        // then the constructor of real128 truncated the input limb value to 113 bits of precision, so effectively
+        // we have read 113 bits only in such a case.
+        unsigned read_bits = c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits());
         while (nlimbs && read_bits < real128_sig_digits()) {
             // Number of bits to be read from the current limb. Either mp_bits_per_limb or less.
             const unsigned rbits = c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits() - read_bits);
@@ -1135,7 +1138,7 @@ private:
             read_bits += rbits;
         }
         // NOTE: from earlier we know the exponent is well within the range of long, and read_bits
-        // cannot be larger than mp_bits_per_limb or 113.
+        // cannot be larger than 113.
         retval = scalbln(retval, static_cast<long>(m_mpfr._mpfr_exp) - static_cast<long>(read_bits));
         return sgn() > 0 ? retval : -retval;
     }
