@@ -1451,6 +1451,10 @@ inline bool signbit(const real &r)
 
 /** @} */
 
+/** @defgroup real_roots real_roots
+ *  @{
+ */
+
 inline void sqrt(real &rop, const real &op)
 {
     mpfr_nary_op(::mpfr_sqrt, rop, op);
@@ -1465,6 +1469,18 @@ inline real sqrt(T &&r)
 {
     return mpfr_nary_op_return(::mpfr_sqrt, std::forward<T>(r));
 }
+
+/** @} */
+
+/** @defgroup real_exponentiation real_exponentiation
+ *  @{
+ */
+
+/** @} */
+
+/** @defgroup real_trig real_trig
+ *  @{
+ */
 
 inline void sin(real &rop, const real &op)
 {
@@ -1486,11 +1502,35 @@ inline void cos(real &rop, const real &op)
     mpfr_nary_op(::mpfr_cos, rop, op);
 }
 
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real cos(T &&r)
+{
+    return mpfr_nary_op_return(::mpfr_cos, std::forward<T>(r));
+}
+
+/** @} */
+
+/** @defgroup real_logexp real_logexp
+ *  @{
+ */
+
+/** @} */
+
+/** @defgroup real_io real_io
+ *  @{
+ */
+
 inline std::ostream &operator<<(std::ostream &os, const real &r)
 {
     mpfr_to_stream(r.get_mpfr_t(), os);
     return os;
 }
+
+/** @} */
 
 inline namespace detail
 {
@@ -1515,10 +1555,22 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
 }
 }
 
+/** @defgroup real_constants real_constants
+ *  @{
+ */
+
 inline real real_nan(::mpfr_prec_t p = 0)
 {
     return real_constant([](real &) {}, p);
 }
+
+/** @} */
+
+/** @defgroup real_operators real_operators
+ *  @{
+ */
+
+/** @} */
 }
 
 #else
