@@ -1540,6 +1540,7 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
 {
     ::mpfr_prec_t prec;
     if (p) {
+        // TODO need prec checking here.
         prec = p;
     } else {
         const auto dp = real_get_default_prec();
