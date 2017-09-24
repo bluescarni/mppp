@@ -572,7 +572,7 @@ private:
                                     / unsigned(GMP_NUMB_BITS))) {
                 throw std::overflow_error("The deduced precision for a real constructed from an integer is too large");
             }
-            return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * int(GMP_NUMB_BITS));
+            return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS);
         }));
         ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
     }
@@ -593,7 +593,7 @@ private:
                               / unsigned(GMP_NUMB_BITS)))) {
                 throw std::overflow_error("The deduced precision for a real constructed from a rational is too large");
             }
-            return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * int(GMP_NUMB_BITS));
+            return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS);
         }));
         ::mpfr_set_q(&m_mpfr, q.get_mpq_view(), MPFR_RNDN);
     }
