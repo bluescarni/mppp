@@ -3226,7 +3226,7 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
     // At the very minimum, the new asize will be the old asize plus ls.
     // Check if we can represent it first.
     // NOTE: use >= because we may need to increase by 1 new_asize at the end, as a size hint.
-    if (mppp_unlikely(ls >= std::numeric_limits<std::size_t>::max() - static_cast<unsigned>(asize))) {
+    if (mppp_unlikely(ls >= std::numeric_limits<std::size_t>::max() - static_cast<std::size_t>(asize))) {
         // NOTE: don't think this can be hit on any setup currently.
         throw std::overflow_error("A left bitshift value of " + std::to_string(s) + " is too large"); // LCOV_EXCL_LINE
     }
@@ -3246,7 +3246,7 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
             // NOTE: we have to use move_backward here because the ranges may be overlapping but not
             // starting at the same pointer (in which case we could've used copy_limbs()). Here we know ls is not
             // zero: we don't have a remainder, and s == 0 was already handled above. Hence, new_asize > asize.
-            assert(new_asize > static_cast<unsigned>(asize));
+            assert(new_asize > static_cast<std::size_t>(asize));
             std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
         }
         // Zero the lower limbs vacated by the shift. We need to do this as we don't know
@@ -3268,7 +3268,7 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
             copy_limbs_no(tmp.data(), tmp.data() + asize, rop.m_limbs.data() + ls);
         } else {
             // If we shifted by a multiple of the limb size, then we can write directly to rop.
-            assert(new_asize > static_cast<unsigned>(asize));
+            assert(new_asize > static_cast<std::size_t>(asize));
             std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
         }
         // Zero the lower limbs vacated by the shift.
@@ -3334,7 +3334,7 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
         // NOTE: paranoia static assert to make sure there's no chance of overflowing.
         static_assert(GMP_NUMB_BITS > 1, "Invalid number of bits.");
         // NOTE: asize is 2 at most, no need to check for overflow.
-        return s / unsigned(GMP_NUMB_BITS) + 1u + static_cast<unsigned>(asize);
+        return s / unsigned(GMP_NUMB_BITS) + 1u + static_cast<std::size_t>(asize);
     }
     if (s == unsigned(GMP_NUMB_BITS)) {
         // This case can be dealt with moving lo into hi, but only if asize is 1.
@@ -3352,7 +3352,7 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
     ::mp_limb_t lo = n.m_limbs[0u], hi = n.m_limbs[1u];
     if (s > unsigned(GMP_NUMB_BITS)) {
         if (mppp_unlikely(asize == 2)) {
-            return s / unsigned(GMP_NUMB_BITS) + 1u + static_cast<unsigned>(asize);
+            return s / unsigned(GMP_NUMB_BITS) + 1u + static_cast<std::size_t>(asize);
         }
         // Move lo to hi and set lo to zero.
         hi = n.m_limbs[0u];
@@ -3945,7 +3945,7 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
     // ls: number of entire limbs shifted.
     // rs: effective shift that will be passed to the mpn function.
     const auto ls = s / unsigned(GMP_NUMB_BITS), rs = s % unsigned(GMP_NUMB_BITS);
-    if (ls >= static_cast<unsigned>(asize)) {
+    if (ls >= static_cast<std::size_t>(asize)) {
         // If we shift by a number of entire limbs equal to or larger than the asize,
         // the result will be zero.
         rop._mp_size = 0;
