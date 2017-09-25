@@ -788,7 +788,7 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
 // - pow() can probably benefit for some specialised static implementation, especially in conjunction with
 //   mpn_sqr().
 // - gcd() can be improved (see notes).
-// - functions still to be de-branched: div, divexact, right shift, etc. + all the mpn implementations, if worth it.
+// - functions still to be de-branched: div, divexact, ... + all the mpn implementations, if worth it.
 //   Probably better to wait for benchmarks before moving.
 // - performance improvements for the assignment operators to integrals, at least (maybe floats as well?): avoid
 //   cting temporary.
@@ -3923,8 +3923,7 @@ inline namespace detail
 
 // Selection of the algorithm for static tdiv_q_2exp.
 template <typename SInt>
-using integer_static_tdiv_q_2exp_algo
-    = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
+using integer_static_tdiv_q_2exp_algo = std::integral_constant<int, (SInt::s_size > 2) ? 0 : SInt::s_size>;
 
 // mpn implementation.
 template <std::size_t SSize>
@@ -3938,7 +3937,7 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
         return;
     }
     // Finish setting up asize and sign.
-    int sign = asize != 0;
+    int sign = 1;
     if (asize < 0) {
         asize = -asize;
         sign = -1;
@@ -3946,7 +3945,7 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
     // ls: number of entire limbs shifted.
     // rs: effective shift that will be passed to the mpn function.
     const auto ls = s / unsigned(GMP_NUMB_BITS), rs = s % unsigned(GMP_NUMB_BITS);
-    if (ls >= std::size_t(asize)) {
+    if (ls >= static_cast<unsigned>(asize)) {
         // If we shift by a number of entire limbs equal to or larger than the asize,
         // the result will be zero.
         rop._mp_size = 0;
@@ -3967,10 +3966,7 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
         std::move(n.m_limbs.begin() + ls, n.m_limbs.begin() + asize, rop.m_limbs.begin());
     }
     // Set the size. We need to check if the top limb is zero.
-    rop._mp_size = new_asize - ((rop.m_limbs[std::size_t(new_asize - 1)] & GMP_NUMB_MASK) == 0u);
-    if (sign == -1) {
-        rop._mp_size = -rop._mp_size;
-    }
+    rop._mp_size = sign * (new_asize - ((rop.m_limbs[static_cast<std::size_t>(new_asize - 1)] & GMP_NUMB_MASK) == 0u));
 }
 
 // 1-limb optimisation.
@@ -3992,7 +3988,7 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
     // Compute the result.
     const auto res = l >> s;
     // Size is the original one or zero.
-    rop._mp_size = res ? n._mp_size : 0;
+    rop._mp_size = static_cast<int>(res != 0u) * n._mp_size;
     rop.m_limbs[0] = res;
 }
 
@@ -4006,7 +4002,7 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
         rop = n;
         return;
     }
-    int sign = asize != 0;
+    int sign = 1;
     if (asize < 0) {
         asize = -asize;
         sign = -1;
@@ -4026,7 +4022,7 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
         // The size could be zero or +-1, depending
         // on the new content of m_limbs[0] and the previous
         // sign of _mp_size.
-        rop._mp_size = lo ? sign : 0;
+        rop._mp_size = static_cast<int>(lo != 0u) * sign;
         rop.m_limbs[0u] = lo;
         rop.m_limbs[1u] = 0u;
         return;
@@ -4040,10 +4036,7 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
     rop.m_limbs[1u] = (n.m_limbs[1u] & GMP_NUMB_MASK) >> s;
     // The effective shift was less than 1 entire limb. The new asize must be the old one,
     // or one less than that.
-    rop._mp_size = asize - ((rop.m_limbs[std::size_t(asize - 1)] & GMP_NUMB_MASK) == 0u);
-    if (sign == -1) {
-        rop._mp_size = -rop._mp_size;
-    }
+    rop._mp_size = sign * (asize - ((rop.m_limbs[std::size_t(asize - 1)] & GMP_NUMB_MASK) == 0u));
 }
 
 template <std::size_t SSize>
@@ -5533,37 +5526,12 @@ inline T &operator%=(T &rop, const U &op)
 
 #if !defined(MPPP_DOXYGEN_INVOKED)
 
-inline namespace detail
-{
-
-template <typename T, enable_if_t<std::is_unsigned<T>::value, int> = 0>
-inline ::mp_bitcnt_t integer_cast_to_bitcnt(T n)
-{
-    if (mppp_unlikely(n > std::numeric_limits<::mp_bitcnt_t>::max())) {
-        throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
-    }
-    return static_cast<::mp_bitcnt_t>(n);
-}
-
-template <typename T, enable_if_t<std::is_signed<T>::value, int> = 0>
-inline ::mp_bitcnt_t integer_cast_to_bitcnt(T n)
-{
-    if (mppp_unlikely(n < T(0))) {
-        throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": negative values are not supported");
-    }
-    if (mppp_unlikely(static_cast<make_unsigned_t<T>>(n) > std::numeric_limits<::mp_bitcnt_t>::max())) {
-        throw std::domain_error("Cannot bit shift by " + std::to_string(n) + ": the value is too large");
-    }
-    return static_cast<::mp_bitcnt_t>(n);
-}
-
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
 concept bool IntegerShiftType = CppInteroperable<T> &&std::is_integral<T>::value;
 #else
 using integer_shift_type_enabler = enable_if_t<conjunction<is_cpp_interoperable<T>, std::is_integral<T>>::value, int>;
 #endif
-}
 
 #endif
 
@@ -5574,7 +5542,7 @@ using integer_shift_type_enabler = enable_if_t<conjunction<is_cpp_interoperable<
  *
  * @return \p n times <tt>2**s</tt>.
  *
- * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
@@ -5585,7 +5553,7 @@ inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 #endif
 {
     integer<SSize> retval;
-    mul_2exp(retval, n, integer_cast_to_bitcnt(s));
+    mul_2exp(retval, n, safe_cast<::mp_bitcnt_t>(s));
     return retval;
 }
 
@@ -5596,7 +5564,7 @@ inline integer<SSize> operator<<(const integer<SSize> &n, T s)
  *
  * @return a reference to \p rop.
  *
- * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
@@ -5606,7 +5574,7 @@ template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
 inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 #endif
 {
-    mul_2exp(rop, rop, integer_cast_to_bitcnt(s));
+    mul_2exp(rop, rop, safe_cast<::mp_bitcnt_t>(s));
     return rop;
 }
 
@@ -5617,7 +5585,7 @@ inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
  *
  * @return \p n divided <tt>2**s</tt>.
  *
- * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
@@ -5628,7 +5596,7 @@ inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 #endif
 {
     integer<SSize> retval;
-    tdiv_q_2exp(retval, n, integer_cast_to_bitcnt(s));
+    tdiv_q_2exp(retval, n, safe_cast<::mp_bitcnt_t>(s));
     return retval;
 }
 
@@ -5639,7 +5607,7 @@ inline integer<SSize> operator>>(const integer<SSize> &n, T s)
  *
  * @return a reference to \p rop.
  *
- * @throws std::domain_error if \p s is negative or larger than an implementation-defined value.
+ * @throws std::overflow_error if \p s is negative or larger than an implementation-defined value.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
@@ -5649,7 +5617,7 @@ template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
 inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
 #endif
 {
-    tdiv_q_2exp(rop, rop, integer_cast_to_bitcnt(s));
+    tdiv_q_2exp(rop, rop, safe_cast<::mp_bitcnt_t>(s));
     return rop;
 }
 
