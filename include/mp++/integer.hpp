@@ -3201,13 +3201,14 @@ inline namespace detail
 
 // Selection of the algorithm for static mul_2exp.
 template <typename SInt>
-using integer_static_mul_2exp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
+using integer_static_mul_2exp_algo = std::integral_constant<int, (SInt::s_size > 2) ? 0 : SInt::s_size>;
 
 // mpn implementation.
 template <std::size_t SSize>
 inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s,
                                         const std::integral_constant<int, 0> &)
 {
+    using mpz_usize_t = make_unsigned_t<mpz_size_t>;
     mpz_size_t asize = n._mp_size;
     if (s == 0u || asize == 0) {
         // If shift is zero, or the operand is zero, write n into rop and return success.
@@ -3215,7 +3216,7 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
         return 0u;
     }
     // Finish setting up asize and sign.
-    int sign = asize != 0;
+    int sign = 1;
     if (asize < 0) {
         asize = -asize;
         sign = -1;
@@ -3223,10 +3224,14 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
     // ls: number of entire limbs shifted.
     // rs: effective shift that will be passed to the mpn function.
     const auto ls = s / unsigned(GMP_NUMB_BITS), rs = s % unsigned(GMP_NUMB_BITS);
-    // At the very minimum, the new asize will be the old asize
-    // plus ls.
-    const mpz_size_t new_asize = asize + static_cast<mpz_size_t>(ls);
-    if (std::size_t(new_asize) < SSize) {
+    // At the very minimum, the new asize will be the old asize plus ls.
+    // Check if we can represent it first.
+    // NOTE: use >= because we may need to increase by 1 new_asize at the end, as a size hint.
+    if (mppp_unlikely(ls >= std::numeric_limits<std::size_t>::max() - static_cast<mpz_usize_t>(asize))) {
+        throw std::overflow_error("A left bitshift value of " + std::to_string(s) + " is too large");
+    }
+    const std::size_t new_asize = static_cast<std::size_t>(asize) + ls;
+    if (new_asize < SSize) {
         // In this case the operation will always succeed, and we can write directly into rop.
         ::mp_limb_t ret = 0u;
         if (rs) {
@@ -3235,25 +3240,23 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
             ret = ::mpn_lshift(rop.m_limbs.data() + ls, n.m_limbs.data(), static_cast<::mp_size_t>(asize),
                                unsigned(rs));
             // Write bits spilling out.
-            rop.m_limbs[std::size_t(new_asize)] = ret;
+            rop.m_limbs[new_asize] = ret;
         } else {
             // Otherwise, just copy over (the mpn function requires the shift to be at least 1).
-            // NOTE: we have to use move_backward here because the ranges are overlapping and they do not
-            // start at the same pointer (in which case we could've used copy_limbs()). Here we know ls is not
+            // NOTE: we have to use move_backward here because the ranges may be overlapping but not
+            // starting at the same pointer (in which case we could've used copy_limbs()). Here we know ls is not
             // zero: we don't have a remainder, and s == 0 was already handled above. Hence, new_asize > asize.
-            assert(new_asize > asize);
+            assert(new_asize > static_cast<mpz_usize_t>(asize));
             std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
         }
-        // Zero the lower limbs vacated by the shift.
+        // Zero the lower limbs vacated by the shift. We need to do this as we don't know
+        // the state of rop.
         std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
         // Set the size.
-        rop._mp_size = new_asize + (ret != 0u);
-        if (sign == -1) {
-            rop._mp_size = -rop._mp_size;
-        }
+        rop._mp_size = sign * (static_cast<mpz_size_t>(new_asize) + (ret != 0u));
         return 0u;
     }
-    if (std::size_t(new_asize) == SSize) {
+    if (new_asize == SSize) {
         if (rs) {
             // In this case the operation may fail, so we need to write to temporary storage.
             std::array<::mp_limb_t, SSize> tmp;
@@ -3265,21 +3268,18 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
             copy_limbs_no(tmp.data(), tmp.data() + asize, rop.m_limbs.data() + ls);
         } else {
             // If we shifted by a multiple of the limb size, then we can write directly to rop.
-            assert(new_asize > asize);
+            assert(new_asize > static_cast<mpz_usize_t>(asize));
             std::move_backward(n.m_limbs.begin(), n.m_limbs.begin() + asize, rop.m_limbs.begin() + new_asize);
         }
         // Zero the lower limbs vacated by the shift.
         std::fill(rop.m_limbs.data(), rop.m_limbs.data() + ls, ::mp_limb_t(0));
         // Set the size.
-        rop._mp_size = new_asize;
-        if (sign == -1) {
-            rop._mp_size = -rop._mp_size;
-        }
+        rop._mp_size = sign * static_cast<mpz_size_t>(new_asize);
         return 0u;
     }
-    // Shift is too much, the size will overflow the static limit.
-    // Return a hint for the size of the result.
-    return std::size_t(new_asize) + 1u;
+    // Shift is too much, the size will overflow the static limit. Return a hint for the size of the result.
+    // We checked above we can compute this safely.
+    return new_asize + 1u;
 }
 
 // 1-limb optimisation.
