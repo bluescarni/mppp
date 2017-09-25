@@ -22,6 +22,10 @@ New
 Changes
 ~~~~~~~
 
+- **BREAKING**: various improvements/changes to the bit shifting functions for :cpp:class:`~mppp::integer`,
+  and the exception raised by the bit shifting operators is not any more
+  ``std::domain_error``, it is now ``std::overflow_error`` (`#48 <https://github.com/bluescarni/mppp/pull/48>`__).
+
 - Various updates to the benchmarks (`#39 <https://github.com/bluescarni/mppp/pull/39>`__).
 
 - Use various C++17 standard library bits if available, and improve general C++17 compatibility

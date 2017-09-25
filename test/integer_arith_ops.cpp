@@ -665,73 +665,21 @@ struct shift_tester {
         REQUIRE((lex_cast(ret >>= short(1)) == "-4"));
         REQUIRE((lex_cast(ret >> 128) == "0"));
         // Error handling.
-        REQUIRE_THROWS_PREDICATE(ret << -1, std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot bit shift by -1: negative values are not supported";
-        });
-        REQUIRE_THROWS_PREDICATE(ret <<= -2, std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot bit shift by -2: negative values are not supported";
-        });
-        REQUIRE_THROWS_PREDICATE(ret >> -1, std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot bit shift by -1: negative values are not supported";
-        });
-        REQUIRE_THROWS_PREDICATE(ret >>= -2, std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot bit shift by -2: negative values are not supported";
-        });
+        REQUIRE_THROWS_AS(ret << -1, std::overflow_error);
+        REQUIRE_THROWS_AS(ret <<= -2, std::overflow_error);
+        REQUIRE_THROWS_AS(ret >> -1, std::overflow_error);
+        REQUIRE_THROWS_AS(ret >>= -2, std::overflow_error);
         if (std::numeric_limits<unsigned long long>::max() > std::numeric_limits<::mp_bitcnt_t>::max()) {
-            REQUIRE_THROWS_PREDICATE(ret << std::numeric_limits<unsigned long long>::max(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot bit shift by "
-                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + ": the value is too large";
-                                     });
-            REQUIRE_THROWS_PREDICATE(ret <<= std::numeric_limits<unsigned long long>::max(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot bit shift by "
-                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + ": the value is too large";
-                                     });
-            REQUIRE_THROWS_PREDICATE(ret >> std::numeric_limits<unsigned long long>::max(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot bit shift by "
-                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + ": the value is too large";
-                                     });
-            REQUIRE_THROWS_PREDICATE(ret >>= std::numeric_limits<unsigned long long>::max(), std::domain_error,
-                                     [](const std::domain_error &ex) {
-                                         return std::string(ex.what())
-                                                == "Cannot bit shift by "
-                                                       + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + ": the value is too large";
-                                     });
+            REQUIRE_THROWS_AS(ret << std::numeric_limits<unsigned long long>::max(), std::overflow_error);
+            REQUIRE_THROWS_AS(ret <<= std::numeric_limits<unsigned long long>::max(), std::overflow_error);
+            REQUIRE_THROWS_AS(ret >> std::numeric_limits<unsigned long long>::max(), std::overflow_error);
+            REQUIRE_THROWS_AS(ret >>= std::numeric_limits<unsigned long long>::max(), std::overflow_error);
         }
         if ((unsigned long long)std::numeric_limits<long long>::max() > std::numeric_limits<::mp_bitcnt_t>::max()) {
-            REQUIRE_THROWS_PREDICATE(
-                ret << std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
-                    return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
-                                  + ": the value is too large";
-                });
-            REQUIRE_THROWS_PREDICATE(
-                ret <<= std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
-                    return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
-                                  + ": the value is too large";
-                });
-            REQUIRE_THROWS_PREDICATE(
-                ret >> std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
-                    return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
-                                  + ": the value is too large";
-                });
-            REQUIRE_THROWS_PREDICATE(
-                ret >>= std::numeric_limits<long long>::max(), std::domain_error, [](const std::domain_error &ex) {
-                    return std::string(ex.what())
-                           == "Cannot bit shift by " + std::to_string(std::numeric_limits<long long>::max())
-                                  + ": the value is too large";
-                });
+            REQUIRE_THROWS_AS(ret << std::numeric_limits<long long>::max(), std::overflow_error);
+            REQUIRE_THROWS_AS(ret <<= std::numeric_limits<long long>::max(), std::overflow_error);
+            REQUIRE_THROWS_AS(ret >> std::numeric_limits<long long>::max(), std::overflow_error);
+            REQUIRE_THROWS_AS(ret >>= std::numeric_limits<long long>::max(), std::overflow_error);
         }
         // Type traits.
         REQUIRE((!is_lshiftable<integer, double>::value));
