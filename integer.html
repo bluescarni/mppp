@@ -1260,7 +1260,12 @@ convenience/generic overloads is provided as well.</p>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">rop</span></code>: the return value. </li>
 <li><code class="docutils literal"><span class="pre">n</span></code>: the multiplicand. </li>
-<li><code class="docutils literal"><span class="pre">s</span></code>: the bit shift value. </li>
+<li><code class="docutils literal"><span class="pre">s</span></code>: the bit shift value.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal"><span class="pre">s</span></code> is larger than an implementation-defined limit. </li>
 </ul>
 </dd>
 </dl>
@@ -2366,7 +2371,7 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">s</span></code> is negative or larger than an implementation-defined value. </li>
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal"><span class="pre">s</span></code> is negative or larger than an implementation-defined value. </li>
 </ul>
 </dd>
 </dl>
@@ -2390,7 +2395,7 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">s</span></code> is negative or larger than an implementation-defined value. </li>
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal"><span class="pre">s</span></code> is negative or larger than an implementation-defined value. </li>
 </ul>
 </dd>
 </dl>
@@ -2414,7 +2419,7 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">s</span></code> is negative or larger than an implementation-defined value. </li>
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal"><span class="pre">s</span></code> is negative or larger than an implementation-defined value. </li>
 </ul>
 </dd>
 </dl>
@@ -2438,7 +2443,7 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">s</span></code> is negative or larger than an implementation-defined value. </li>
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal"><span class="pre">s</span></code> is negative or larger than an implementation-defined value. </li>
 </ul>
 </dd>
 </dl>

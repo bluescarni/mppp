@@ -132,6 +132,9 @@
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><strong>BREAKING</strong>: various improvements/changes to the bit shifting functions for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>,
+and the exception raised by the bit shifting operators is not any more
+<code class="docutils literal"><span class="pre">std::domain_error</span></code>, it is now <code class="docutils literal"><span class="pre">std::overflow_error</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/48">#48</a>).</li>
 <li>Various updates to the benchmarks (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/39">#39</a>).</li>
 <li>Use various C++17 standard library bits if available, and improve general C++17 compatibility
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/37">#37</a>).</li>
