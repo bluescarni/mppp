@@ -4825,23 +4825,22 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
 /// Input stream operator.
 /**
  * \rststar
- * This operator is equivalent to extracting a line from the stream, using it to construct a temporary
- * :cpp:class:`~mppp::integer` and then assigning the temporary to ``n``.
+ * This operator is equivalent to extracting a line from the stream and assigning it to ``n``.
  * \endrststar
  *
  * @param is the input stream.
- * @param n the integer to which the contents of the stream will be assigned.
+ * @param n the integer to which the string extracted from the stream will be assigned.
  *
  * @return a reference to \p is.
  *
- * @throws unspecified any exception thrown by the constructor from string of integer.
+ * @throws unspecified any exception thrown by \link mppp::integer integer \endlink's assignment operator from string.
  */
 template <std::size_t SSize>
 inline std::istream &operator>>(std::istream &is, integer<SSize> &n)
 {
     MPPP_MAYBE_TLS std::string tmp_str;
     std::getline(is, tmp_str);
-    n = integer<SSize>{tmp_str};
+    n = tmp_str;
     return is;
 }
 
