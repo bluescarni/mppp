@@ -1443,20 +1443,19 @@ library if precise and forward-compatible control on the printing format is need
 <dt id="_CPPv2N4mppprsERNSt7istreamER7real128">
 <span id="mppp::rshift-operator__isR.real128R"></span><span class="target" id="group__real128__io_1ga13d0b74a5d7c3c8441939f0813c27b2d"></span>std::istream &amp;<code class="descclassname">mppp::</code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span>std::istream &amp;<em>is</em>, <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprsERNSt7istreamER7real128" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Input stream operator. </p>
-<p>This operator is equivalent to extracting a line from the stream, using it to construct a temporary
-<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> and then assigning the temporary to <code class="docutils literal"><span class="pre">x</span></code>.</p>
+<p>This operator is equivalent to extracting a line from the stream and assigning it to <code class="docutils literal"><span class="pre">x</span></code>.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">is</span></code>.</dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">is</span></code>: the input stream. </li>
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> to which the contents of the stream will be assigned.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> to which the string extracted from the stream will be assigned.</li>
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a>. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a>‘s assignment operator from string. </li>
 </ul>
 </dd>
 </dl>
@@ -2439,7 +2438,7 @@ from the quadmath library.</p>
       &copy;2016-2017, Francesco Biscani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |

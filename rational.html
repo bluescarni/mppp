@@ -1359,20 +1359,19 @@ The printing format is described in <a class="reference internal" href="#_CPPv2N
 <dt id="_CPPv2N4mppprsERNSt7istreamER8rationalI5SSizeE">
 <span id="mppp::rshift-operator__isR.rational:SSize:R"></span><span class="target" id="group__rational__io_1gae10c345ac27825e91c56afdf16298cb9"></span>std::istream &amp;<code class="descclassname">mppp::</code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span>std::istream &amp;<em>is</em>, <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprsERNSt7istreamER8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Input stream operator. </p>
-<p>This operator is equivalent to extracting a line from the stream, using it to construct a temporary
-<a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> and then assigning the temporary to <code class="docutils literal"><span class="pre">q</span></code>.</p>
+<p>This operator is equivalent to extracting a line from the stream and assigning it to <code class="docutils literal"><span class="pre">q</span></code>.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">is</span></code>.</dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">is</span></code>: input stream. </li>
-<li><code class="docutils literal"><span class="pre">q</span></code>: rational to which the contents of the stream will be assigned.</li>
+<li><code class="docutils literal"><span class="pre">is</span></code>: the input stream. </li>
+<li><code class="docutils literal"><span class="pre">q</span></code>: the rational to which the string extracted from the stream will be assigned.</li>
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string of rational. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational </span></a>‘s assignment operator from string. </li>
 </ul>
 </dd>
 </dl>
@@ -1801,7 +1800,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
       &copy;2016-2017, Francesco Biscani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
