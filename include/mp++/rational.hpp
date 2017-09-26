@@ -228,9 +228,7 @@ public:
     /**
      * The default constructor will initialize ``this`` to 0 (represented as 0/1).
      */
-    rational() : m_den(1u)
-    {
-    }
+    rational() : m_den(1u) {}
     /// Defaulted copy constructor.
     rational(const rational &) = default;
     /// Move constructor.
@@ -429,9 +427,7 @@ public:
      *
      * @throws unspecified any exception thrown by the constructor from C string.
      */
-    explicit rational(const std::string &s, int base = 10) : rational(s.c_str(), base)
-    {
-    }
+    explicit rational(const std::string &s, int base = 10) : rational(s.c_str(), base) {}
     /// Constructor from range of characters.
     /**
      * This constructor will initialise \p this from the content of the input half-open range,
@@ -473,9 +469,7 @@ public:
      *
      * @throws unspecified any exception thrown by the constructor from C string.
      */
-    explicit rational(const std::string_view &s, int base = 10) : rational(s.data(), s.data() + s.size(), base)
-    {
-    }
+    explicit rational(const std::string_view &s, int base = 10) : rational(s.data(), s.data() + s.size(), base) {}
 #endif
     /// Constructor from \p mpz_t.
     /**
@@ -491,9 +485,7 @@ public:
      *
      * @param n the input GMP integer.
      */
-    explicit rational(const ::mpz_t n) : m_num(n), m_den(1u)
-    {
-    }
+    explicit rational(const ::mpz_t n) : m_num(n), m_den(1u) {}
     /// Constructor from \p mpq_t.
     /**
      * This constructor will initialise the numerator and denominator of \p this with those of the GMP rational \p q.
@@ -508,9 +500,7 @@ public:
      *
      * @param q the input GMP rational.
      */
-    explicit rational(const ::mpq_t q) : m_num(mpq_numref(q)), m_den(mpq_denref(q))
-    {
-    }
+    explicit rational(const ::mpq_t q) : m_num(mpq_numref(q)), m_den(mpq_denref(q)) {}
     /// Defaulted copy-assignment operator.
     /**
      * @return a reference to ``this``.
@@ -746,9 +736,7 @@ private:
     // if the view's mpz_struct were the same object as n's mpz_t, as the GMP code would update
     // the new pointer after the realloc for both structs).
     struct mpq_view {
-        explicit mpq_view(const rational &q) : m_mpq{*q.m_num.get_mpz_view().get(), *q.m_den.get_mpz_view().get()}
-        {
-        }
+        explicit mpq_view(const rational &q) : m_mpq{*q.m_num.get_mpz_view().get(), *q.m_den.get_mpz_view().get()} {}
         operator mpq_struct_t const *() const
         {
             return get();
@@ -1544,23 +1532,22 @@ inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
 /// Input stream operator.
 /**
  * \rststar
- * This operator is equivalent to extracting a line from the stream, using it to construct a temporary
- * :cpp:class:`~mppp::rational` and then assigning the temporary to ``q``.
+ * This operator is equivalent to extracting a line from the stream and assigning it to ``q``.
  * \endrststar
  *
- * @param is input stream.
- * @param q rational to which the contents of the stream will be assigned.
+ * @param is the input stream.
+ * @param q the rational to which the string extracted from the stream will be assigned.
  *
  * @return a reference to \p is.
  *
- * @throws unspecified any exception thrown by the constructor from string of rational.
+ * @throws unspecified any exception thrown by \link mppp::rational rational \endlink's assignment operator from string.
  */
 template <std::size_t SSize>
 inline std::istream &operator>>(std::istream &is, rational<SSize> &q)
 {
     MPPP_MAYBE_TLS std::string tmp_str;
     std::getline(is, tmp_str);
-    q = rational<SSize>{tmp_str};
+    q = tmp_str;
     return is;
 }
 
@@ -2651,10 +2638,10 @@ inline rational<SSize> pow_impl(const rational<SSize> &base, const T &exp)
 }
 
 // Integral base, rational exponent.
-template <std::size_t SSize, typename T,
-          enable_if_t<conjunction<negation<std::is_floating_point<T>>,
-                                  negation<std::is_same<T, rational<SSize>>>>::value,
-                      int> = 0>
+template <
+    std::size_t SSize, typename T,
+    enable_if_t<conjunction<negation<std::is_floating_point<T>>, negation<std::is_same<T, rational<SSize>>>>::value,
+                int> = 0>
 inline rational<SSize> pow_impl(const T &base, const rational<SSize> &exp)
 {
     return pow_impl(rational<SSize>{base}, exp);

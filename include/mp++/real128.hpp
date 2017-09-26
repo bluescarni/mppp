@@ -1086,22 +1086,21 @@ inline std::ostream &operator<<(std::ostream &os, const real128 &x)
 /// Input stream operator.
 /**
  * \rststar
- * This operator is equivalent to extracting a line from the stream, using it to construct a temporary
- * :cpp:class:`~mppp::real128` and then assigning the temporary to ``x``.
+ * This operator is equivalent to extracting a line from the stream and assigning it to ``x``.
  * \endrststar
  *
  * @param is the input stream.
- * @param x the \link mppp::real128 real128 \endlink to which the contents of the stream will be assigned.
+ * @param x the \link mppp::real128 real128 \endlink to which the string extracted from the stream will be assigned.
  *
  * @return a reference to \p is.
  *
- * @throws unspecified any exception thrown by the constructor from string of \link mppp::real128 real128 \endlink.
+ * @throws unspecified any exception thrown by \link mppp::real128 real128 \endlink's assignment operator from string.
  */
 inline std::istream &operator>>(std::istream &is, real128 &x)
 {
     MPPP_MAYBE_TLS std::string tmp_str;
     std::getline(is, tmp_str);
-    x = real128{tmp_str};
+    x = tmp_str;
     return is;
 }
 
