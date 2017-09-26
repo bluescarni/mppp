@@ -549,7 +549,7 @@ union integer_union {
                                     + std::to_string(x));
         }
         // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
-        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
+        constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
@@ -1590,7 +1590,7 @@ private:
     template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
     static std::pair<bool, T> mpz_float_conversion(const mpz_struct_t &m)
     {
-        constexpr int d2 = std::numeric_limits<long double>::digits10 * 4;
+        constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         ::mpfr_set_z(&mpfr.m_mpfr, &m, MPFR_RNDN);
         return std::make_pair(true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN));
