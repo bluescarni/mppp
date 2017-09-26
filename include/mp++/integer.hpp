@@ -1100,7 +1100,8 @@ public:
      * @param end the end of the input range.
      * @param base the base used in the string representation.
      *
-     * @throws unspecified any exception thrown by the constructor from C string.
+     * @throws unspecified any exception thrown by the constructor from C string, or by memory
+     * allocation errors in standard containers.
      */
     explicit integer(const char *begin, const char *end, int base = 10) : m_int(begin, end, base) {}
 #if MPPP_CPLUSPLUS >= 201703L
