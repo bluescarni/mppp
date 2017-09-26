@@ -9,16 +9,22 @@
 #include <mp++/config.hpp>
 
 #include <initializer_list>
+#include <iomanip>
 #include <limits>
+#include <random>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
+#include <tuple>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real.hpp>
@@ -32,6 +38,11 @@
 #include "catch.hpp"
 
 using namespace mppp;
+using namespace mppp_test;
+
+static std::mt19937 rng;
+
+static const int ntrials = 1000;
 
 // #if defined(_MSC_VER)
 
@@ -46,6 +57,43 @@ using namespace mppp;
 // #define fma_wrap fma
 
 // #endif
+
+using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
+                             unsigned long, long long, unsigned long long>;
+
+using fp_types = std::tuple<float, double, long double>;
+
+// NOTE: char types are not supported in uniform_int_distribution by the standard.
+// Use a small wrapper to get an int distribution instead, with the min max limits
+// from the char type. We will be casting back when using the distribution.
+template <typename T, typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                                || std::is_same<unsigned char, T>::value),
+                                              int>::type
+                      = 0>
+static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
+{
+    return std::uniform_int_distribution<T>(min, max);
+}
+
+template <typename T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                                  || std::is_same<unsigned char, T>::value,
+                                              int>::type
+                      = 0>
+static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
+get_int_dist(T min, T max)
+{
+    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>(min,
+                                                                                                                   max);
+}
+
+// Base-10 string representation at full precision for a float.
+template <typename T>
+static inline std::string f2str(const T &x)
+{
+    std::ostringstream oss;
+    oss << std::setprecision(std::numeric_limits<T>::max_digits10) << x;
+    return oss.str();
+}
 
 TEST_CASE("real default prec")
 {
@@ -82,8 +130,83 @@ TEST_CASE("real default prec")
     REQUIRE(real_get_default_prec() == 0);
 }
 
+struct int_ctor_tester {
+    template <typename T>
+    void operator()(const T &) const
+    {
+        real_reset_default_prec();
+        REQUIRE(real{T(0)}.zero_p());
+        REQUIRE(real{T(0)}.get_prec() == std::numeric_limits<T>::digits);
+        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
+        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
+        real_set_default_prec(101);
+        REQUIRE(real{T(0)}.zero_p());
+        REQUIRE(real{T(0)}.get_prec() == 101);
+        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
+        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
+        real_reset_default_prec();
+        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        for (int i = 0; i < ntrials; ++i) {
+            auto n = int_dist(rng);
+            REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(),
+                                   real{std::to_string(n), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(real{n, std::numeric_limits<T>::digits + 100}.get_mpfr_t(),
+                                   real{std::to_string(n), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+            real_set_default_prec(100);
+            REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(), real{std::to_string(n), 10}.get_mpfr_t()));
+            real_reset_default_prec();
+        }
+    }
+};
+
+struct fp_ctor_tester {
+    template <typename T>
+    void operator()(const T &) const
+    {
+        real_reset_default_prec();
+        REQUIRE(real{T(0)}.zero_p());
+        if (std::numeric_limits<T>::radix == 2) {
+            REQUIRE(real{T(0)}.get_prec() == std::numeric_limits<T>::digits);
+        }
+        if (std::numeric_limits<T>::is_iec559) {
+            REQUIRE(real{std::numeric_limits<T>::infinity()}.inf_p());
+            REQUIRE(real{std::numeric_limits<T>::infinity()}.sgn() > 0);
+            REQUIRE(real{-std::numeric_limits<T>::infinity()}.inf_p());
+            REQUIRE(real{-std::numeric_limits<T>::infinity()}.sgn() < 0);
+            REQUIRE(real{std::numeric_limits<T>::quiet_NaN()}.nan_p());
+        }
+        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
+        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
+        real_set_default_prec(101);
+        REQUIRE(real{T(0)}.zero_p());
+        REQUIRE(real{T(0)}.get_prec() == 101);
+        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
+        REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
+        real_reset_default_prec();
+        if (std::numeric_limits<T>::radix != 2) {
+            return;
+        }
+        std::uniform_real_distribution<T> dist(-T(100), T(100));
+        for (int i = 0; i < ntrials; ++i) {
+            auto x = dist(rng);
+            REQUIRE(
+                ::mpfr_equal_p(real{x}.get_mpfr_t(), real{f2str(x), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(real{x, std::numeric_limits<T>::digits + 100}.get_mpfr_t(),
+                                   real{f2str(x), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+            real_set_default_prec(c_max(100, std::numeric_limits<T>::digits));
+            REQUIRE(
+                ::mpfr_equal_p(real{x}.get_mpfr_t(), real{f2str(x), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+            real_reset_default_prec();
+        }
+    }
+};
+
+struct foobar {
+};
+
 TEST_CASE("real constructors")
 {
+    REQUIRE((!std::is_constructible<real, foobar>::value));
     // Default constructor.
     real r1;
     REQUIRE(r1.get_prec() == real_prec_min());
@@ -304,6 +427,17 @@ TEST_CASE("real constructors")
             return ex.what() == std::string("The string ',-1234' does not represent a valid real in base 10");
         });
 #endif
+    tuple_for_each(int_types{}, int_ctor_tester{});
+    tuple_for_each(fp_types{}, fp_ctor_tester{});
+    // Special handling of bool.
+    REQUIRE(real{false}.zero_p());
+    REQUIRE(real{false}.get_prec() == c_max(::mpfr_prec_t(std::numeric_limits<bool>::digits), real_prec_min()));
+    REQUIRE(::mpfr_cmp_ui(real{true}.get_mpfr_t(), 1ul) == 0);
+    REQUIRE(real{true}.get_prec() == c_max(::mpfr_prec_t(std::numeric_limits<bool>::digits), real_prec_min()));
+    REQUIRE((real{false, 128}.zero_p()));
+    REQUIRE((real{false, 128}.get_prec() == 128));
+    REQUIRE(::mpfr_cmp_ui((real{true, 128}).get_mpfr_t(), 1ul) == 0);
+    REQUIRE((real{true, 128}.get_prec() == 128));
 }
 
 #if 0
