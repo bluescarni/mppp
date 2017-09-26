@@ -24,10 +24,14 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#if MPPP_CPLUSPLUS >= 201703L
+#include <string_view>
+#endif
 #include <tuple>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
+#include <vector>
 
 #include <mp++/concepts.hpp>
 #include <mp++/detail/fwd_decl.hpp>
@@ -710,6 +714,118 @@ public:
     {
         dispatch_construction(x, p);
     }
+
+private:
+    void construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
+    {
+        if (mppp_unlikely(base && (base < 2 || base > 62))) {
+            throw std::invalid_argument("Cannot construct a real from a string in base " + std::to_string(base)
+                                        + ": the base must either be zero or in the [2,62] range");
+        }
+        const ::mpfr_prec_t prec = p ? check_init_prec(p) : real_get_default_prec();
+        if (mppp_unlikely(!prec)) {
+            throw std::invalid_argument("Cannot construct a real from a string if the precision is not explicitly "
+                                        "specified and no default precision has been set");
+        }
+        ::mpfr_init2(&m_mpfr, prec);
+        const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
+        if (mppp_unlikely(ret == -1)) {
+            ::mpfr_clear(&m_mpfr);
+            throw std::invalid_argument(std::string{"The string '"} + s + "' does not represent a valid real in base "
+                                        + std::to_string(base));
+        }
+    }
+
+public:
+    /// Constructor from C string.
+    /**
+     * \rststar
+     * This constructor will set ``this`` to the value represented by the string ``s``, which is interpreted
+     * as a floating-point number in base ``base``. ``base`` must be either zero (in which case the base will be
+     * automatically deduced) or a number in the [2,62] range. The valid string formats are detailed in the
+     * documentation of the MPFR function ``mpfr_set_str()``. Note that leading whitespaces are ignored, but trailing
+     * whitespaces will raise an error.
+     *
+     * The precision of ``this`` will be ``p`` if ``p`` is nonzero, the default precision otherwise. If ``p`` is zero
+     * and no default precision has been set, an error will be raised.
+     *
+     * .. seealso::
+     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     * \endrststar
+     *
+     * @param s the input C string.
+     * @param base the base used in the string representation.
+     * @param p the desired precision.
+     *
+     * @throws std::invalid_argument in the following cases:
+     * - \p base is not zero and not in the [2,62] range,
+     * - \p p is either outside the valid bounds for a precision value, or it is zero and no
+     *   default precision value has been set,
+     * - \p s cannot be interpreted as a floating-point number.
+     */
+    explicit real(const char *s, int base = 10, ::mpfr_prec_t p = 0)
+    {
+        construct_from_c_string(s, base, p);
+    }
+    /// Constructor from C++ string.
+    /**
+     * This constructor is equivalent to the constructor from C string.
+     *
+     * @param s the input C++ string.
+     * @param base the base used in the string representation.
+     * @param p the desired precision.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string.
+     */
+    explicit real(const std::string &s, int base = 10, ::mpfr_prec_t p = 0) : real(s.c_str(), base, p) {}
+    /// Constructor from range of characters.
+    /**
+     * This constructor will initialise \p this from the content of the input half-open range,
+     * which is interpreted as the string representation of a floating-point value in base \p base.
+     *
+     * Internally, the constructor will copy the content of the range to a local buffer, add a
+     * string terminator, and invoke the constructor from C string.
+     *
+     * @param begin the begin of the input range.
+     * @param end the end of the input range.
+     * @param base the base used in the string representation.
+     * @param p the desired precision.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string, or by memory
+     * allocation errors in standard containers.
+     */
+    explicit real(const char *begin, const char *end, int base = 10, ::mpfr_prec_t p = 0)
+    {
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        buffer.assign(begin, end);
+        buffer.emplace_back('\0');
+        construct_from_c_string(buffer.data(), base, p);
+    }
+#if MPPP_CPLUSPLUS >= 201703L
+    /// Constructor from string view.
+    /**
+     * This constructor will initialise \p this from the content of the input string view,
+     * which is interpreted as the string representation of a floating-point value in base \p base.
+     *
+     * Internally, the constructor will invoke the constructor from a range of characters.
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This constructor is available only if at least C++17 is being used.
+     * \endrststar
+     *
+     * @param s the \p std::string_view that will be used for construction.
+     * @param base the base used in the string representation.
+     * @param p the desired precision.
+     *
+     * @throws unspecified any exception thrown by the constructor from a range of characters.
+     */
+    explicit real(const std::string_view &s, int base = 10, ::mpfr_prec_t p = 0)
+        : real(s.data(), s.data() + s.size(), base, p)
+    {
+    }
+#endif
     /// Destructor.
     ~real()
     {
@@ -797,7 +913,10 @@ public:
      * .. warning::
      *    When using this mutable getter, it is the user's responsibility to ensure
      *    that the internal MPFR structure is kept in a state which respects the invariants
-     *    of the :cpp:class:`~mppp::real` class.
+     *    of the :cpp:class:`~mppp::real` class. Specifically, the precision value
+     *    must be in the bounds established by :cpp:func:`~mppp::real_prec_min()` and
+     *    :cpp:func:`~mppp::real_prec_max()`, and upon destruction a :cpp:class:`~mppp::real`
+     *    object must contain a valid ``mpfr_t`` object.
      * \endrststar
      *
      * @return a mutable reference to the internal MPFR structure.

@@ -170,6 +170,89 @@ TEST_CASE("real constructors")
     REQUIRE(::mpfr_equal_p(r9.get_mpfr_t(), real{42, 50}.get_mpfr_t()));
     REQUIRE(r9.get_prec() == 50);
     REQUIRE(r8.get_mpfr_t()->_mpfr_d == nullptr);
+    // String constructors.
+    REQUIRE(real_get_default_prec() == 0);
+    REQUIRE((::mpfr_equal_p(real{"123", 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{std::string{"123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    // Leading whitespaces are ok.
+    REQUIRE((::mpfr_equal_p(real{"   123", 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{std::string{"   123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    REQUIRE((real{"123", 10, 100}.get_prec() == 100));
+    REQUIRE((real{std::string{"123"}, 10, 100}.get_prec() == 100));
+    REQUIRE((::mpfr_equal_p(real{"-1.23E2", 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{std::string{"-1.23E2"}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+    if (std::numeric_limits<double>::radix == 2) {
+        REQUIRE((::mpfr_equal_p(real{"5E-1", 10, 100}.get_mpfr_t(), real{.5}.get_mpfr_t())));
+        REQUIRE((::mpfr_equal_p(real{"-25e-2", 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
+        REQUIRE((::mpfr_equal_p(real{std::string{"-25e-2"}, 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
+    }
+    REQUIRE((::mpfr_equal_p(real{"-11120", 3, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{"-11120", 3, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{"1111011", 2, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    real_set_default_prec(150);
+    REQUIRE((::mpfr_equal_p(real{"123"}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    REQUIRE((real{"123"}.get_prec() == 150));
+    REQUIRE((::mpfr_equal_p(real{"-11120", 3}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{std::string{"-11120"}, 3}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+    REQUIRE((real{"-11120", 3}.get_prec() == 150));
+    REQUIRE((::mpfr_equal_p(real{"123", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{"0b1111011", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{"-0B1111011", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{"0x7B", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{std::string{"0x7B"}, int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{"-0X7B", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+    REQUIRE_THROWS_PREDICATE((real{"12", -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string("Cannot construct a real from a string in base -1: the base must either be zero or in "
+                              "the [2,62] range");
+    });
+    REQUIRE_THROWS_PREDICATE((real{"12", 80}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string("Cannot construct a real from a string in base 80: the base must either be zero or in "
+                              "the [2,62] range");
+    });
+    REQUIRE_THROWS_PREDICATE((real{std::string{"12"}, -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string("Cannot construct a real from a string in base -1: the base must either be zero or in "
+                              "the [2,62] range");
+    });
+    REQUIRE_THROWS_PREDICATE((real{std::string{"12"}, 80}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string("Cannot construct a real from a string in base 80: the base must either be zero or in "
+                              "the [2,62] range");
+    });
+    real_reset_default_prec();
+    REQUIRE_THROWS_PREDICATE((real{"12", 10}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string("Cannot construct a real from a string if the precision is not explicitly "
+                              "specified and no default precision has been set");
+    });
+    REQUIRE_THROWS_PREDICATE((real{"123", 10, -100}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of -100: the maximum allowed precision is "
+                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + std::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE((real{"hell-o", 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what() == std::string("The string 'hell-o' does not represent a valid real in base 10");
+    });
+    REQUIRE_THROWS_PREDICATE(
+        (real{std::string{"123"}, 10, -100}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == "Cannot init a real with a precision of -100: the maximum allowed precision is "
+                          + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                          + std::to_string(real_prec_min());
+        });
+    REQUIRE_THROWS_PREDICATE(
+        (real{std::string{"hell-o"}, 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what() == std::string("The string 'hell-o' does not represent a valid real in base 10");
+        });
+    REQUIRE_THROWS_PREDICATE((real{"123 ", 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what() == std::string("The string '123 ' does not represent a valid real in base 10");
+    });
+    REQUIRE_THROWS_PREDICATE((real{" 123 ", 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what() == std::string("The string ' 123 ' does not represent a valid real in base 10");
+    });
 }
 
 #if 0
