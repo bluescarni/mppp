@@ -6,12 +6,17 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
+#include <initializer_list>
 #include <limits>
 #include <stdexcept>
 #include <string>
+#if MPPP_CPLUSPLUS >= 201703L
+#include <string_view>
+#endif
 #include <utility>
-
-#include <mp++/config.hpp>
+#include <vector>
 
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/integer.hpp>
@@ -174,17 +179,32 @@ TEST_CASE("real constructors")
     REQUIRE(real_get_default_prec() == 0);
     REQUIRE((::mpfr_equal_p(real{"123", 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE((::mpfr_equal_p(real{std::string_view{"123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
+#endif
     // Leading whitespaces are ok.
     REQUIRE((::mpfr_equal_p(real{"   123", 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"   123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE((::mpfr_equal_p(real{std::string_view{"   123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
+#endif
     REQUIRE((real{"123", 10, 100}.get_prec() == 100));
     REQUIRE((real{std::string{"123"}, 10, 100}.get_prec() == 100));
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE((real{std::string_view{"123"}, 10, 100}.get_prec() == 100));
+#endif
     REQUIRE((::mpfr_equal_p(real{"-1.23E2", 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"-1.23E2"}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE((::mpfr_equal_p(real{std::string_view{"-1.23E2"}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+#endif
     if (std::numeric_limits<double>::radix == 2) {
         REQUIRE((::mpfr_equal_p(real{"5E-1", 10, 100}.get_mpfr_t(), real{.5}.get_mpfr_t())));
         REQUIRE((::mpfr_equal_p(real{"-25e-2", 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
         REQUIRE((::mpfr_equal_p(real{std::string{"-25e-2"}, 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
+#if MPPP_CPLUSPLUS >= 201703L
+        REQUIRE((::mpfr_equal_p(real{std::string_view{"-25e-2"}, 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
+#endif
     }
     REQUIRE((::mpfr_equal_p(real{"-11120", 3, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{"-11120", 3, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
@@ -194,12 +214,19 @@ TEST_CASE("real constructors")
     REQUIRE((real{"123"}.get_prec() == 150));
     REQUIRE((::mpfr_equal_p(real{"-11120", 3}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"-11120"}, 3}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE((::mpfr_equal_p(real{std::string_view{"-11120"}, 3}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+#endif
     REQUIRE((real{"-11120", 3}.get_prec() == 150));
     REQUIRE((::mpfr_equal_p(real{"123", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{"0b1111011", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{"-0B1111011", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{"0x7B", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"0x7B"}, int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE((
+        ::mpfr_equal_p(real{std::string_view{"0x7B"}, int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
+#endif
     REQUIRE((::mpfr_equal_p(real{"-0X7B", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE_THROWS_PREDICATE((real{"12", -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
@@ -216,6 +243,15 @@ TEST_CASE("real constructors")
                == std::string("Cannot construct a real from a string in base -1: the base must either be zero or in "
                               "the [2,62] range");
     });
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE_THROWS_PREDICATE(
+        (real{std::string_view{"12"}, -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string(
+                          "Cannot construct a real from a string in base -1: the base must either be zero or in "
+                          "the [2,62] range");
+        });
+#endif
     REQUIRE_THROWS_PREDICATE((real{std::string{"12"}, 80}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == std::string("Cannot construct a real from a string in base 80: the base must either be zero or in "
@@ -253,6 +289,21 @@ TEST_CASE("real constructors")
     REQUIRE_THROWS_PREDICATE((real{" 123 ", 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what() == std::string("The string ' 123 ' does not represent a valid real in base 10");
     });
+    const std::vector<char> vc = {',', '-', '1', '2', '3', '4'};
+    REQUIRE((::mpfr_equal_p(real{vc.data() + 2, vc.data() + 6, 10, 100}.get_mpfr_t(), real{1234}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{vc.data() + 1, vc.data() + 5, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+    REQUIRE_THROWS_PREDICATE(
+        (real{vc.data(), vc.data() + 6, 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what() == std::string("The string ',-1234' does not represent a valid real in base 10");
+        });
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE((::mpfr_equal_p(real{std::string_view{vc.data() + 2, 4}, 10, 100}.get_mpfr_t(), real{1234}.get_mpfr_t())));
+    REQUIRE((::mpfr_equal_p(real{std::string_view{vc.data() + 1, 4}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
+    REQUIRE_THROWS_PREDICATE(
+        (real{std::string_view{vc.data(), 6}, 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what() == std::string("The string ',-1234' does not represent a valid real in base 10");
+        });
+#endif
 }
 
 #if 0
