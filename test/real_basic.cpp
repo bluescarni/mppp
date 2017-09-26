@@ -434,10 +434,10 @@ TEST_CASE("real constructors")
     REQUIRE(real{false}.get_prec() == c_max(::mpfr_prec_t(std::numeric_limits<bool>::digits), real_prec_min()));
     REQUIRE(::mpfr_cmp_ui(real{true}.get_mpfr_t(), 1ul) == 0);
     REQUIRE(real{true}.get_prec() == c_max(::mpfr_prec_t(std::numeric_limits<bool>::digits), real_prec_min()));
-    REQUIRE((real{false, 128}.zero_p()));
-    REQUIRE((real{false, 128}.get_prec() == 128));
-    REQUIRE(::mpfr_cmp_ui((real{true, 128}).get_mpfr_t(), 1ul) == 0);
-    REQUIRE((real{true, 128}.get_prec() == 128));
+    REQUIRE((real{false, ::mpfr_prec_t(128)}.zero_p()));
+    REQUIRE((real{false, ::mpfr_prec_t(128)}.get_prec() == 128));
+    REQUIRE(::mpfr_cmp_ui((real{true, ::mpfr_prec_t(128)}).get_mpfr_t(), 1ul) == 0);
+    REQUIRE((real{true, ::mpfr_prec_t(128)}.get_prec() == 128));
 }
 
 #if 0
