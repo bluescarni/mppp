@@ -542,6 +542,42 @@ TEST_CASE("real constructors")
 #endif
 }
 
+TEST_CASE("real assignment")
+{
+    real r0{123}, r1;
+    r1 = r0;
+    REQUIRE(r0.get_prec() == r1.get_prec());
+    REQUIRE(::mpfr_equal_p(r0.get_mpfr_t(), r1.get_mpfr_t()));
+    auto old_r1(r1);
+    // Self assignment.
+    r1 = r1;
+    REQUIRE(old_r1.get_prec() == r1.get_prec());
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), old_r1.get_mpfr_t()));
+    // Move assignment.
+    real r2{456, 10};
+    r2 = std::move(r1);
+    REQUIRE(r1.get_prec() == 10);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{456, 10}.get_mpfr_t()));
+    REQUIRE(r2.get_prec() == r0.get_prec());
+    REQUIRE(::mpfr_equal_p(r2.get_mpfr_t(), old_r1.get_mpfr_t()));
+    // Revive moved-from object with copy or move assignment.
+    real r3{std::move(r1)};
+    r1 = r2;
+    REQUIRE(r1.get_prec() == r0.get_prec());
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), old_r1.get_mpfr_t()));
+    real r4{std::move(r1)};
+    r1 = real{321, 84};
+    REQUIRE(r1.get_prec() == 84);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{321, 84}.get_mpfr_t()));
+    // Swapping.
+    real r5{123, 45}, r6{67, 89};
+    swap(r5, r6);
+    REQUIRE(r5.get_prec() == 89);
+    REQUIRE(r6.get_prec() == 45);
+    REQUIRE(::mpfr_equal_p(r5.get_mpfr_t(), real{67, 89}.get_mpfr_t()));
+    REQUIRE(::mpfr_equal_p(r6.get_mpfr_t(), real{123, 45}.get_mpfr_t()));
+}
+
 #if 0
 TEST_CASE("real basic")
 {
