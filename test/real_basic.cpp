@@ -542,8 +542,82 @@ TEST_CASE("real constructors")
 #endif
 }
 
+struct int_ass_tester {
+    template <typename T>
+    void operator()(const T &) const
+    {
+        real_reset_default_prec();
+        real r{12};
+        r.set_prec(123);
+        r = T(0);
+        REQUIRE(r.get_prec() == std::numeric_limits<T>::digits);
+        REQUIRE(r.zero_p());
+        r.set_prec(123);
+        r = T(42);
+        REQUIRE(r.get_prec() == std::numeric_limits<T>::digits);
+        REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{"42", 10, 100}.get_mpfr_t()));
+        real_set_default_prec(200);
+        r.set_prec(123);
+        r = T(43);
+        REQUIRE(r.get_prec() == 200);
+        REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{"43", 10, 100}.get_mpfr_t()));
+        real_reset_default_prec();
+        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        for (int i = 0; i < ntrials; ++i) {
+            auto n = int_dist(rng);
+            r = n;
+            REQUIRE(::mpfr_equal_p(r.get_mpfr_t(),
+                                   real{std::to_string(n), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+        }
+    }
+};
+
+struct fp_ass_tester {
+    template <typename T>
+    void operator()(const T &) const
+    {
+        real_reset_default_prec();
+        real r{12};
+        r.set_prec(123);
+        r = T(0);
+        REQUIRE(r.zero_p());
+        if (std::numeric_limits<T>::radix == 2) {
+            REQUIRE(r.get_prec() == std::numeric_limits<T>::digits);
+        }
+        if (std::numeric_limits<T>::is_iec559) {
+            REQUIRE(!r.signbit());
+            r = -T(0);
+            REQUIRE(r.zero_p());
+            REQUIRE(r.signbit());
+            r = std::numeric_limits<T>::infinity();
+            REQUIRE(r.inf_p());
+            REQUIRE(r.sgn() > 0);
+            r = -std::numeric_limits<T>::infinity();
+            REQUIRE(r.inf_p());
+            REQUIRE(r.sgn() < 0);
+            r = std::numeric_limits<T>::quiet_NaN();
+            REQUIRE(r.nan_p());
+        }
+        real_set_default_prec(101);
+        r = T(0);
+        REQUIRE(r.zero_p());
+        REQUIRE(r.get_prec() == 101);
+        real_reset_default_prec();
+        if (std::numeric_limits<T>::radix != 2) {
+            return;
+        }
+        std::uniform_real_distribution<T> dist(-T(100), T(100));
+        for (int i = 0; i < ntrials; ++i) {
+            auto x = dist(rng);
+            r = x;
+            REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{f2str(x), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+        }
+    }
+};
+
 TEST_CASE("real assignment")
 {
+    REQUIRE((!std::is_assignable<real &, const foobar &>::value));
     real r0{123}, r1;
     r1 = r0;
     REQUIRE(r0.get_prec() == r1.get_prec());
@@ -576,6 +650,142 @@ TEST_CASE("real assignment")
     REQUIRE(r6.get_prec() == 45);
     REQUIRE(::mpfr_equal_p(r5.get_mpfr_t(), real{67, 89}.get_mpfr_t()));
     REQUIRE(::mpfr_equal_p(r6.get_mpfr_t(), real{123, 45}.get_mpfr_t()));
+    // Generic assignment.
+    tuple_for_each(int_types{}, int_ass_tester{});
+    tuple_for_each(fp_types{}, fp_ass_tester{});
+    // Special handling of bool.
+    real r7;
+    r7 = false;
+    REQUIRE(r7.zero_p());
+    REQUIRE(r7.get_prec() == c_max(::mpfr_prec_t(std::numeric_limits<bool>::digits), real_prec_min()));
+    r7 = true;
+    REQUIRE(::mpfr_cmp_ui(r7.get_mpfr_t(), 1ul) == 0);
+    REQUIRE(r7.get_prec() == c_max(::mpfr_prec_t(std::numeric_limits<bool>::digits), real_prec_min()));
+    real_set_default_prec(101);
+    r7 = false;
+    REQUIRE(r7.zero_p());
+    REQUIRE(r7.get_prec() == 101);
+    r7 = true;
+    REQUIRE(::mpfr_cmp_ui(r7.get_mpfr_t(), 1ul) == 0);
+    REQUIRE(r7.get_prec() == 101);
+    real_reset_default_prec();
+    // Assignment from integer.
+    real r8;
+    r8 = int_t{};
+    REQUIRE(r8.zero_p());
+    REQUIRE(r8.get_prec() == real_prec_min());
+    r8 = int_t{1};
+    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
+    r8 = int_t{42};
+    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 42ul) == 0);
+    REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
+    r8 = -int_t{1};
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -1l) == 0);
+    REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
+    r8 = -int_t{42};
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
+    REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
+    r8 = int_t{42} << GMP_NUMB_BITS;
+    REQUIRE(r8.get_prec() == 2 * GMP_NUMB_BITS);
+    real tmp{42};
+    ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
+    REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r8.get_mpfr_t())));
+    tmp = real{-42};
+    r8 = int_t{-42} << GMP_NUMB_BITS;
+    ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
+    REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r8.get_mpfr_t())));
+    real_set_default_prec(100);
+    r8 = int_t{};
+    REQUIRE(r8.zero_p());
+    REQUIRE(r8.get_prec() == 100);
+    r8 = int_t{1};
+    REQUIRE(r8.get_prec() == 100);
+    real_reset_default_prec();
+    // Assignment from rational.
+    r8 = rat_t{};
+    REQUIRE(r8.zero_p());
+    REQUIRE(r8.get_prec() == GMP_NUMB_BITS);
+    r8 = rat_t{1};
+    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 2);
+    r8 = rat_t{42};
+    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 42ul) == 0);
+    REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 2);
+    r8 = -rat_t{1};
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -1l) == 0);
+    REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 2);
+    r8 = rat_t{-42};
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
+    REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 2);
+    r8 = rat_t{5, 2};
+    REQUIRE((::mpfr_equal_p((r8).get_mpfr_t(), (real{"2.5", 10, 64}).get_mpfr_t())));
+    REQUIRE((r8.get_prec()) == GMP_NUMB_BITS * 2);
+    r8 = rat_t{5, -2};
+    REQUIRE((::mpfr_equal_p((r8).get_mpfr_t(), (real{"-25e-1", 10, 64}).get_mpfr_t())));
+    REQUIRE((r8).get_prec() == GMP_NUMB_BITS * 2);
+    tmp = real{42, GMP_NUMB_BITS * 3};
+    r8 = rat_t{int_t{42} << GMP_NUMB_BITS, 5};
+    ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
+    ::mpfr_div_ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), 5ul, MPFR_RNDN);
+    REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r8.get_mpfr_t())));
+    REQUIRE(r8.get_prec() == GMP_NUMB_BITS * 3);
+    real_set_default_prec(100);
+    r8 = rat_t{};
+    REQUIRE(r8.zero_p());
+    REQUIRE(r8.get_prec() == 100);
+    r8 = rat_t{1};
+    REQUIRE(r8.get_prec() == 100);
+    real_reset_default_prec();
+#if defined(MPPP_WITH_QUADMATH)
+    r8 = real128{};
+    REQUIRE(r8.zero_p());
+    REQUIRE(!r8.signbit());
+    r8 = -real128{};
+    REQUIRE(r8.zero_p());
+    REQUIRE(r8.signbit());
+    REQUIRE(r8.get_prec() == 113);
+    r8 = real128{-1};
+    REQUIRE(r8.get_prec() == 113);
+    r8 = real128{1};
+    REQUIRE(r8.get_prec() == 113);
+    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 1ul) == 0);
+    r8 = real128{-1};
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -1l) == 0);
+    r8 = real128{1123};
+    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 1123ul) == 0);
+    r8 = real128{-1123};
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -1123l) == 0);
+    r8 = real128_inf();
+    REQUIRE(r8.inf_p());
+    REQUIRE(r8.sgn() > 0);
+    r8 = -real128_inf();
+    REQUIRE(r8.inf_p());
+    REQUIRE(r8.sgn() < 0);
+    r8 = real128_nan();
+    REQUIRE(r8.nan_p());
+    r8 = real128{"3.40917866435610111081769936359662259e-2"};
+    REQUIRE(::mpfr_equal_p(r8.get_mpfr_t(), real{"3.40917866435610111081769936359662259e-2", 10, 113}.get_mpfr_t()));
+    r8 = -real128{"3.40917866435610111081769936359662259e-2"};
+    REQUIRE(::mpfr_equal_p(r8.get_mpfr_t(), real{"-3.40917866435610111081769936359662259e-2", 10, 113}.get_mpfr_t()));
+    // Subnormal values.
+    r8 = real128{"3.40917866435610111081769936359662259e-4957"};
+    REQUIRE(::mpfr_equal_p(r8.get_mpfr_t(), real{"3.40917866435610111081769936359662259e-4957", 10, 113}.get_mpfr_t()));
+    r8 = -real128{"3.40917866435610111081769936359662259e-4957"};
+    REQUIRE(
+        ::mpfr_equal_p(r8.get_mpfr_t(), real{"-3.40917866435610111081769936359662259e-4957", 10, 113}.get_mpfr_t()));
+    // Change default precision.
+    real_set_default_prec(100);
+    r8 = real128{"3.40917866435610111081769936359662259e-2"};
+    REQUIRE((r8).get_prec() == 100);
+    r8 = -real128{"3.40917866435610111081769936359662259e-2"};
+    REQUIRE((r8).get_prec() == 100);
+    r8 = real128{"3.40917866435610111081769936359662259e-2"};
+    REQUIRE(::mpfr_equal_p(r8.get_mpfr_t(), real{"3.40917866435610111081769936359662259e-2", 10, 100}.get_mpfr_t()));
+    r8 = -real128{"3.40917866435610111081769936359662259e-2"};
+    REQUIRE(::mpfr_equal_p(r8.get_mpfr_t(), real{"-3.40917866435610111081769936359662259e-2", 10, 100}.get_mpfr_t()));
+    real_reset_default_prec();
+#endif
 }
 
 #if 0

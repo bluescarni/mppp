@@ -82,7 +82,8 @@ constexpr void test_mpfr_struct_t()
 
 #endif
 
-// Clamp the precision between the min and max allowed values. This is used in the generic constructor.
+// Clamp the precision between the min and max allowed values. This is used in the generic constructor/assignment
+// operator.
 constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
 {
     return real_prec_check(p) ? p : (p < real_prec_min() ? real_prec_min() : real_prec_max());
@@ -491,6 +492,8 @@ private:
     template <typename Deducer>
     static ::mpfr_prec_t compute_init_precision(::mpfr_prec_t provided, const Deducer &d)
     {
+        static_assert(std::is_same<decltype(d()), ::mpfr_prec_t>::value,
+                      "Invalid type returned by the precision deducer.");
         if (provided) {
             // Provided precision trumps everything. Check it and return it.
             return check_init_prec(provided);
@@ -608,6 +611,16 @@ private:
 #if defined(MPPP_WITH_QUADMATH)
     void dispatch_construction(const real128 &x, ::mpfr_prec_t p)
     {
+        // Init the value.
+        // The significand precision in bits is 113 for real128. Let's double-check it.
+        static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
+        ::mpfr_init2(&m_mpfr, compute_init_precision(p, []() { return ::mpfr_prec_t(113); }));
+        assign_real128(x);
+    }
+    // NOTE: split this off from the dispatch_construction() overload, so we can re-use it in the
+    // generic assignment.
+    void assign_real128(const real128 &x)
+    {
         // Get the IEEE repr. of x.
         const auto t = x.get_ieee();
         // A utility function to write the significand of x
@@ -631,10 +644,6 @@ private:
         };
         // Check if the significand is zero.
         const bool sig_zero = !std::get<2>(t) && !std::get<3>(t);
-        // Init the value.
-        // The significand precision in bits is 113 for real128. Let's double-check it.
-        static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, []() { return ::mpfr_prec_t(113); }));
         if (std::get<1>(t) == 0u) {
             // Zero or subnormal numbers.
             if (sig_zero) {
@@ -882,6 +891,172 @@ public:
         // NOTE: we use a raw std::swap() here (instead of mpfr_swap()) because we don't know in principle
         // if mpfr_swap() relies on the operands not to be in a moved-from state (although it's unlikely).
         std::swap(m_mpfr, other.m_mpfr);
+        return *this;
+    }
+
+private:
+    // Compute the precision to use in a generic assignment. Same idea as in the generic constructor.
+    template <typename Deducer>
+    static ::mpfr_prec_t compute_ass_precision(const Deducer &d)
+    {
+        static_assert(std::is_same<decltype(d()), ::mpfr_prec_t>::value,
+                      "Invalid type returned by the precision deducer.");
+        // Check if we have a default precision.
+        // NOTE: this is guaranteed to be a valid precision value.
+        const auto dp = real_get_default_prec();
+        // Return default precision if nonzero, otherwise return the clamped deduced precision.
+        return dp ? dp : clamp_mpfr_prec(d());
+    }
+    // Assignment from FPs.
+    template <typename T>
+    void dispatch_fp_assignment(fp_a_ptr<T> ptr, const T &x)
+    {
+        static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
+        set_prec_impl<false>(compute_ass_precision([]() {
+            return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
+                                                      : dig2mpfr_prec<T>();
+        }));
+        ptr(&m_mpfr, x, MPFR_RNDN);
+    }
+    void dispatch_assignment(const float &x)
+    {
+        dispatch_fp_assignment(::mpfr_set_flt, x);
+    }
+    void dispatch_assignment(const double &x)
+    {
+        dispatch_fp_assignment(::mpfr_set_d, x);
+    }
+    void dispatch_assignment(const long double &x)
+    {
+        dispatch_fp_assignment(::mpfr_set_ld, x);
+    }
+    // Assignment from integral types.
+    template <typename T>
+    void dispatch_integral_ass_prec()
+    {
+        static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
+        set_prec_impl<false>(
+            compute_ass_precision([]() { return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits); }));
+    }
+    // Special casing for bool.
+    void dispatch_assignment(const bool &b)
+    {
+        dispatch_integral_ass_prec<bool>();
+        ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
+    }
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    void dispatch_assignment(const T &n)
+    {
+        dispatch_integral_ass_prec<T>();
+        if (n <= std::numeric_limits<unsigned long>::max()) {
+            ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
+        } else {
+            ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
+        }
+    }
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    void dispatch_assignment(const T &n)
+    {
+        dispatch_integral_ass_prec<T>();
+        if (n <= std::numeric_limits<long>::max() && n >= std::numeric_limits<long>::min()) {
+            ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
+        } else {
+            ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
+        }
+    }
+    template <std::size_t SSize>
+    void dispatch_assignment(const integer<SSize> &n)
+    {
+        set_prec_impl<false>(compute_ass_precision([&n]() -> ::mpfr_prec_t {
+            // Infer the precision from the bit size of n.
+            const auto ls = n.size();
+            // Check that ls * GMP_NUMB_BITS is representable by mpfr_prec_t.
+            if (mppp_unlikely(ls
+                              > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
+                                    / unsigned(GMP_NUMB_BITS))) {
+                // LCOV_EXCL_START
+                throw std::overflow_error("The deduced precision for a real assigned from an integer is too large");
+                // LCOV_EXCL_STOP
+            }
+            return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS);
+        }));
+        ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
+    }
+    template <std::size_t SSize>
+    void dispatch_assignment(const rational<SSize> &q)
+    {
+        set_prec_impl<false>(compute_ass_precision([&q]() -> ::mpfr_prec_t {
+            // Infer the precision from the bit size of num/den.
+            const auto n_size = q.get_num().size();
+            const auto d_size = q.get_den().size();
+            // Overflow checks.
+            if (mppp_unlikely(
+                    // Overflow in total size.
+                    (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
+                    // Check that tot_size * GMP_NUMB_BITS is representable by mpfr_prec_t.
+                    || ((n_size + d_size)
+                        > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
+                              / unsigned(GMP_NUMB_BITS)))) {
+                // LCOV_EXCL_START
+                throw std::overflow_error("The deduced precision for a real assigned from a rational is too large");
+                // LCOV_EXCL_STOP
+            }
+            return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS);
+        }));
+        ::mpfr_set_q(&m_mpfr, q.get_mpq_view(), MPFR_RNDN);
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    void dispatch_assignment(const real128 &x)
+    {
+        // The significand precision in bits is 113 for real128. Let's double-check it.
+        static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
+        set_prec_impl<false>(compute_ass_precision([]() { return ::mpfr_prec_t(113); }));
+        assign_real128(x);
+    }
+#endif
+
+public:
+    /// Generic assignment operator.
+    /**
+     * \rststar
+     * The generic assignment operator will set ``this`` to the value of ``x``.
+     *
+     * The operator will first fetch the default precision ``dp`` via
+     * :cpp:func:`~mppp::real_get_default_prec()`. If ``dp`` is nonzero, then ``dp`` will be used
+     * as a new precision for ``this`` and a rounding operation might occurr during the assignment.
+     *
+     * Otherwise, if ``dp`` is zero, the precision of ``this`` will be set according to the following
+     * heuristics:
+     *
+     * * if ``x`` is a C++ integral type ``I``, then the precision is set to the bit width of ``I``;
+     * * if ``x`` is a C++ floating-point type ``F``, then the precision is set to the number of binary digits
+     *   in the significand of ``F``;
+     * * if ``x`` is :cpp:class:`~mppp::integer`, then the precision is set to the number of bits in use by
+     *   ``x`` (rounded up to the next multiple of the limb type's bit width);
+     * * if ``x`` is :cpp:class:`~mppp::rational`, then the precision is set to the sum of the number of bits
+     *   used by numerator and denominator (as established by the previous heuristic for :cpp:class:`~mppp::integer`);
+     * * if ``x`` is :cpp:class:`~mppp::real128`, then the precision is set to 113.
+     *
+     * These heuristics aim at ensuring that, whatever the type of ``x``, its value is preserved exactly after
+     * the assignment.
+     *
+     * Assignment from ``bool`` will set ``this`` to 1 for ``true``, and ``0`` for ``false``.
+     * \endrststar
+     *
+     * @param x the assignment argument.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::overflow_error if an overflow occurs in the computation of the automatically-deduced precision.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    real &operator=(const RealInteroperable &x)
+#else
+    template <typename T, real_interoperable_enabler<T> = 0>
+    real &operator=(const T &x)
+#endif
+    {
+        dispatch_assignment(x);
         return *this;
     }
     /// Swap \link mppp::real real \endlink objects.
