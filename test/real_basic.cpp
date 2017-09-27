@@ -23,6 +23,7 @@
 #include <utility>
 #include <vector>
 
+#include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
@@ -62,6 +63,9 @@ using int_types = std::tuple<char, signed char, unsigned char, short, unsigned s
                              unsigned long, long long, unsigned long long>;
 
 using fp_types = std::tuple<float, double, long double>;
+
+using int_t = integer<1>;
+using rat_t = rational<1>;
 
 // NOTE: char types are not supported in uniform_int_distribution by the standard.
 // Use a small wrapper to get an int distribution instead, with the min max limits
@@ -136,6 +140,7 @@ struct int_ctor_tester {
     {
         real_reset_default_prec();
         REQUIRE(real{T(0)}.zero_p());
+        REQUIRE(!real{T(0)}.signbit());
         REQUIRE(real{T(0)}.get_prec() == std::numeric_limits<T>::digits);
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
@@ -169,6 +174,9 @@ struct fp_ctor_tester {
             REQUIRE(real{T(0)}.get_prec() == std::numeric_limits<T>::digits);
         }
         if (std::numeric_limits<T>::is_iec559) {
+            REQUIRE(!real{T(0)}.signbit());
+            REQUIRE(real{-T(0)}.zero_p());
+            REQUIRE(real{-T(0)}.signbit());
             REQUIRE(real{std::numeric_limits<T>::infinity()}.inf_p());
             REQUIRE(real{std::numeric_limits<T>::infinity()}.sgn() > 0);
             REQUIRE(real{-std::numeric_limits<T>::infinity()}.inf_p());
@@ -438,6 +446,100 @@ TEST_CASE("real constructors")
     REQUIRE((real{false, ::mpfr_prec_t(128)}.get_prec() == 128));
     REQUIRE(::mpfr_cmp_ui((real{true, ::mpfr_prec_t(128)}).get_mpfr_t(), 1ul) == 0);
     REQUIRE((real{true, ::mpfr_prec_t(128)}.get_prec() == 128));
+    // Construction from integer.
+    REQUIRE(real{int_t{}}.zero_p());
+    REQUIRE(real{int_t{}}.get_prec() == real_prec_min());
+    REQUIRE(::mpfr_cmp_ui((real{int_t{1}}).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(real{int_t{1}}.get_prec() == GMP_NUMB_BITS);
+    REQUIRE(::mpfr_cmp_ui((real{int_t{42}}).get_mpfr_t(), 42ul) == 0);
+    REQUIRE(real{int_t{42}}.get_prec() == GMP_NUMB_BITS);
+    REQUIRE(::mpfr_cmp_si((real{-int_t{1}}).get_mpfr_t(), -1l) == 0);
+    REQUIRE(real{int_t{-1}}.get_prec() == GMP_NUMB_BITS);
+    REQUIRE(::mpfr_cmp_si((real{-int_t{42}}).get_mpfr_t(), -42l) == 0);
+    REQUIRE(real{int_t{-42}}.get_prec() == GMP_NUMB_BITS);
+    real r0{int_t{42} << GMP_NUMB_BITS};
+    REQUIRE(r0.get_prec() == 2 * GMP_NUMB_BITS);
+    real tmp{42};
+    ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
+    REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r0.get_mpfr_t())));
+    tmp = real{-42};
+    r0 = real{int_t{-42} << GMP_NUMB_BITS};
+    ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
+    REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r0.get_mpfr_t())));
+    real_set_default_prec(100);
+    REQUIRE(real{int_t{}}.zero_p());
+    REQUIRE(real{int_t{}}.get_prec() == 100);
+    REQUIRE(real{int_t{1}}.get_prec() == 100);
+    real_reset_default_prec();
+    // Construction from rational.
+    REQUIRE(real{rat_t{}}.zero_p());
+    REQUIRE(real{rat_t{}}.get_prec() == GMP_NUMB_BITS);
+    REQUIRE(::mpfr_cmp_ui((real{rat_t{1}}).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(real{rat_t{1}}.get_prec() == GMP_NUMB_BITS * 2);
+    REQUIRE(::mpfr_cmp_ui((real{rat_t{42}}).get_mpfr_t(), 42ul) == 0);
+    REQUIRE(real{rat_t{42}}.get_prec() == GMP_NUMB_BITS * 2);
+    REQUIRE(::mpfr_cmp_si((real{-rat_t{1}}).get_mpfr_t(), -1l) == 0);
+    REQUIRE(real{rat_t{-1}}.get_prec() == GMP_NUMB_BITS * 2);
+    REQUIRE(::mpfr_cmp_si((real{-rat_t{42}}).get_mpfr_t(), -42l) == 0);
+    REQUIRE(real{rat_t{-42}}.get_prec() == GMP_NUMB_BITS * 2);
+    REQUIRE((::mpfr_equal_p((real{rat_t{5, 2}}).get_mpfr_t(), (real{"2.5", 10, 64}).get_mpfr_t())));
+    REQUIRE((real{rat_t{5, 2}}.get_prec()) == GMP_NUMB_BITS * 2);
+    REQUIRE((::mpfr_equal_p((real{rat_t{5, -2}}).get_mpfr_t(), (real{"-25e-1", 10, 64}).get_mpfr_t())));
+    REQUIRE((real{rat_t{-5, 2}}).get_prec() == GMP_NUMB_BITS * 2);
+    tmp = real{42, GMP_NUMB_BITS * 3};
+    r0 = real{rat_t{int_t{42} << GMP_NUMB_BITS, 5}};
+    ::mpfr_mul_2ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), GMP_NUMB_BITS, MPFR_RNDN);
+    ::mpfr_div_ui(tmp._get_mpfr_t(), tmp.get_mpfr_t(), 5ul, MPFR_RNDN);
+    REQUIRE((::mpfr_equal_p(tmp.get_mpfr_t(), r0.get_mpfr_t())));
+    REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 3);
+    real_set_default_prec(100);
+    REQUIRE(real{rat_t{}}.zero_p());
+    REQUIRE(real{rat_t{}}.get_prec() == 100);
+    REQUIRE(real{rat_t{1}}.get_prec() == 100);
+    real_reset_default_prec();
+#if defined(MPPP_WITH_QUADMATH)
+    REQUIRE(real{real128{}}.zero_p());
+    REQUIRE(real{-real128{}}.zero_p());
+    REQUIRE(!real{real128{}}.signbit());
+    REQUIRE(real{-real128{}}.signbit());
+    REQUIRE(real{real128{}}.get_prec() == 113);
+    REQUIRE(real{real128{-1}}.get_prec() == 113);
+    REQUIRE(real{real128{1}}.get_prec() == 113);
+    REQUIRE(::mpfr_cmp_ui((real{real128{1}}).get_mpfr_t(), 1ul) == 0);
+    REQUIRE(::mpfr_cmp_si((real{real128{-1}}).get_mpfr_t(), -1l) == 0);
+    REQUIRE(::mpfr_cmp_ui((real{real128{1123}}).get_mpfr_t(), 1123ul) == 0);
+    REQUIRE(::mpfr_cmp_si((real{real128{-1123}}).get_mpfr_t(), -1123l) == 0);
+    REQUIRE(real{real128_inf()}.inf_p());
+    REQUIRE(real{real128_inf()}.sgn() > 0);
+    REQUIRE(real{-real128_inf()}.inf_p());
+    REQUIRE(real{-real128_inf()}.sgn() < 0);
+    REQUIRE(real{real128_nan()}.nan_p());
+    REQUIRE(::mpfr_equal_p(real{real128{"3.40917866435610111081769936359662259e-2"}}.get_mpfr_t(),
+                           real{"3.40917866435610111081769936359662259e-2", 10, 113}.get_mpfr_t()));
+    REQUIRE(::mpfr_equal_p(real{-real128{"3.40917866435610111081769936359662259e-2"}}.get_mpfr_t(),
+                           real{"-3.40917866435610111081769936359662259e-2", 10, 113}.get_mpfr_t()));
+    // Subnormal values.
+    REQUIRE(::mpfr_equal_p(real{real128{"3.40917866435610111081769936359662259e-4957"}}.get_mpfr_t(),
+                           real{"3.40917866435610111081769936359662259e-4957", 10, 113}.get_mpfr_t()));
+    REQUIRE(::mpfr_equal_p(real{-real128{"3.40917866435610111081769936359662259e-4957"}}.get_mpfr_t(),
+                           real{"-3.40917866435610111081769936359662259e-4957", 10, 113}.get_mpfr_t()));
+    // Custom precision.
+    REQUIRE((real{real128{"3.40917866435610111081769936359662259e-2"}, 64}).get_prec() == 64);
+    REQUIRE((real{real128{"-3.40917866435610111081769936359662259e-2"}, 64}).get_prec() == 64);
+    REQUIRE(::mpfr_equal_p(real{real128{"3.40917866435610111081769936359662259e-2"}, 64}.get_mpfr_t(),
+                           real{"3.40917866435610111081769936359662259e-2", 10, 64}.get_mpfr_t()));
+    REQUIRE(::mpfr_equal_p(real{-real128{"3.40917866435610111081769936359662259e-2"}, 64}.get_mpfr_t(),
+                           real{"-3.40917866435610111081769936359662259e-2", 10, 64}.get_mpfr_t()));
+    // Change default precision.
+    real_set_default_prec(100);
+    REQUIRE((real{real128{"3.40917866435610111081769936359662259e-2"}}).get_prec() == 100);
+    REQUIRE((real{real128{"-3.40917866435610111081769936359662259e-2"}}).get_prec() == 100);
+    REQUIRE(::mpfr_equal_p(real{real128{"3.40917866435610111081769936359662259e-2"}}.get_mpfr_t(),
+                           real{"3.40917866435610111081769936359662259e-2", 10, 100}.get_mpfr_t()));
+    REQUIRE(::mpfr_equal_p(real{-real128{"3.40917866435610111081769936359662259e-2"}}.get_mpfr_t(),
+                           real{"-3.40917866435610111081769936359662259e-2", 10, 100}.get_mpfr_t()));
+    real_reset_default_prec();
+#endif
 }
 
 #if 0

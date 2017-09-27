@@ -574,7 +574,9 @@ private:
             if (mppp_unlikely(ls
                               > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
                                     / unsigned(GMP_NUMB_BITS))) {
+                // LCOV_EXCL_START
                 throw std::overflow_error("The deduced precision for a real constructed from an integer is too large");
+                // LCOV_EXCL_STOP
             }
             return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS);
         }));
@@ -595,7 +597,9 @@ private:
                     || ((n_size + d_size)
                         > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
                               / unsigned(GMP_NUMB_BITS)))) {
+                // LCOV_EXCL_START
                 throw std::overflow_error("The deduced precision for a real constructed from a rational is too large");
+                // LCOV_EXCL_STOP
             }
             return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS);
         }));
