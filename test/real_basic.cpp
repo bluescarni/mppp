@@ -786,6 +786,41 @@ TEST_CASE("real assignment")
     REQUIRE(::mpfr_equal_p(r8.get_mpfr_t(), real{"-3.40917866435610111081769936359662259e-2", 10, 100}.get_mpfr_t()));
     real_reset_default_prec();
 #endif
+    // The setter function.
+    r8.set_prec(115);
+    r8.set(12u);
+    REQUIRE(r8.get_prec() == 115);
+    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 12ul) == 0);
+    r8.set_prec(116);
+    r8.set(short(-42));
+    REQUIRE(r8.get_prec() == 116);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -42l) == 0);
+    r8.set_prec(26);
+    r8.set(false);
+    REQUIRE(r8.get_prec() == 26);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 0l) == 0);
+    r8.set_prec(126);
+    r8.set(-123.);
+    REQUIRE(r8.get_prec() == 126);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -123l) == 0);
+    r8.set_prec(125);
+    r8.set(123.f);
+    REQUIRE(r8.get_prec() == 125);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 123l) == 0);
+    r8.set_prec(136);
+    r8.set(int_t{-12345l});
+    REQUIRE(r8.get_prec() == 136);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -12345l) == 0);
+    r8.set_prec(135);
+    r8.set(rat_t{-9, 3});
+    REQUIRE(r8.get_prec() == 135);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -3l) == 0);
+#if defined(MPPP_WITH_QUADMATH)
+    r8.set_prec(185);
+    r8.set(real128{-456});
+    REQUIRE(r8.get_prec() == 185);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -456l) == 0);
+#endif
 }
 
 #if 0
