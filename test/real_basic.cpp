@@ -354,6 +354,11 @@ TEST_CASE("real constructors")
     REQUIRE((::mpfr_equal_p(real{"-0B1111011", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{"0x7B", int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"0x7B"}, int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
+    REQUIRE((real{"nan", 10, 42}.nan_p()));
+    REQUIRE((real{"inf", 10, 42}.inf_p()));
+    REQUIRE((-real{"inf", 10, 42}.inf_p()));
+    REQUIRE((real{"inf", 10, 42}.sgn() > 0));
+    REQUIRE((real{"-inf", 10, 42}.sgn() < 0));
 #if MPPP_CPLUSPLUS >= 201703L
     REQUIRE((
         ::mpfr_equal_p(real{std::string_view{"0x7B"}, int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
