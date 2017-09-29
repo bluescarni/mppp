@@ -1076,13 +1076,40 @@ public:
         dispatch_assignment<true>(x);
         return *this;
     }
+    /// Set to another \link mppp::real real \endlink value.
+    /**
+     * \rststar
+     * This method will set ``this`` to the value of ``other``. Contrary to the copy assignment operator,
+     * the precision of the assignment is dictated by the precision of ``this``, rather than
+     * the precision of ``other``. Consequently, the precision of ``this`` will not be altered by the
+     * assignment, and a rounding might occur, depending on the values
+     * and the precisions of the operands.
+     *
+     * This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
+     *
+     * .. seealso ::
+     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     *\endrststar
+     *
+     * @param other the value to which \p this will be set.
+     *
+     * @return a reference to \p this.
+     */
+    real &set(const real &other)
+    {
+        ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
+        return *this;
+    }
         /// Generic setter.
         /**
          * \rststar
          * This method will set ``this`` to the value of ``x``. Contrary to the generic assignment operator,
-         * this method will not change the precision of ``this``, which will be maintained to its original value after
-         * the assignment. In other words, this method is a thin wrapper around various ``mpfr_set_*()`` assignment
-         * functions from the MPFR API.
+         * the precision of the assignment is dictated by the precision of ``this``, rather than
+         * being deduced from the type and value of ``x``. Consequently, the precision of ``this`` will not be altered
+         * by the assignment, and a rounding might occur, depending on the operands.
+         *
+         * This method is a thin wrapper around various ``mpfr_set_*()``
+         * assignment functions from the MPFR API.
          *
          * .. seealso ::
          *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions

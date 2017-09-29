@@ -792,6 +792,10 @@ TEST_CASE("real assignment")
     real_reset_default_prec();
 #endif
     // The setter function.
+    r8.set_prec(212);
+    r8.set(real{1234, 55});
+    REQUIRE(r8.get_prec() == 212);
+    REQUIRE(::mpfr_cmp_ui((r8).get_mpfr_t(), 1234ul) == 0);
     r8.set_prec(115);
     r8.set(12u);
     REQUIRE(r8.get_prec() == 115);
