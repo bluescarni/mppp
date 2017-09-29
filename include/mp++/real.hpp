@@ -360,6 +360,8 @@ struct real_prec {
  * For instance, by default, the construction of a :cpp:class:`~mppp::real` from a 32 bit integer will yield a
  * :cpp:class:`~mppp::real` with a precision of 32 bits. This behaviour can be altered either by specifying explicitly
  * the desired precision value, or by setting a global default precision via :cpp:func:`~mppp::real_set_default_prec()`.
+ *
+ * TODO: mention it's always MPFR_RNDN.
  * \endrststar
  */
 class real
@@ -1076,6 +1078,92 @@ public:
         dispatch_assignment<true>(x);
         return *this;
     }
+
+private:
+    // Implementation of the assignment from string.
+    void string_assignment(const char *s, int base)
+    {
+        if (mppp_unlikely(base && (base < 2 || base > 62))) {
+            throw std::invalid_argument("Cannot assign a real from a string in base " + std::to_string(base)
+                                        + ": the base must either be zero or in the [2,62] range");
+        }
+        const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
+        if (mppp_unlikely(ret == -1)) {
+            ::mpfr_set_nan(&m_mpfr);
+            throw std::invalid_argument(std::string{"The string '"} + s
+                                        + "' cannot be interpreted as a floating-point value in base "
+                                        + std::to_string(base));
+        }
+    }
+
+public:
+    /// Assignment from C string.
+    /**
+     * \rststar
+     * This operator will set ``this`` to the value represented by the string ``s``, which is interpreted
+     * as a floating-point number in base 10. The precision of ``this`` will be set to the value returned
+     * by :cpp:func:`~mppp::real_get_default_prec()`. If no default precision has been set, an error will
+     * be raised. If ``s`` is not a valid representation of a floating-point number in base 10, ``this``
+     * will be set to NaN and an error will be raised.
+     * \endrststar
+     *
+     * @param s the C string that will be assigned to \p this.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::invalid_argument if a default precision has not been set, or if \p s cannot be parsed
+     * as a floating-point value in base 10.
+     */
+    real &operator=(const char *s)
+    {
+        const auto dp = real_get_default_prec();
+        if (mppp_unlikely(!dp)) {
+            throw std::invalid_argument("Cannot assign a string to a real if a default precision is not set");
+        }
+        set_prec_impl<false>(dp);
+        string_assignment(s, 10);
+        return *this;
+    }
+    /// Assignment from C++ string.
+    /**
+     * This operator is equivalent to the assignment operator from C string.
+     *
+     * @param s the C++ string that will be assigned to \p this.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the assignment operator from C string.
+     */
+    real &operator=(const std::string &s)
+    {
+        return operator=(s.c_str());
+    }
+#if MPPP_CPLUSPLUS >= 201703L
+    /// Assignment from string view.
+    /**
+     * This operator is equivalent to the assignment operator from C string.
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This operator is available only if at least C++17 is being used.
+     * \endrststar
+     *
+     * @param s the string view that will be assigned to \p this.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the assignment operator from C string,
+     * or by memory allocation errors in standard containers.
+     */
+    real &operator=(const std::string_view &s)
+    {
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        buffer.assign(s.begin(), s.end());
+        buffer.emplace_back('\0');
+        return operator=(buffer.data());
+    }
+#endif
     /// Set to another \link mppp::real real \endlink value.
     /**
      * \rststar
@@ -1089,7 +1177,7 @@ public:
      *
      * .. seealso ::
      *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     *\endrststar
+     * \endrststar
      *
      * @param other the value to which \p this will be set.
      *
@@ -1113,7 +1201,7 @@ public:
          *
          * .. seealso ::
          *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-         *\endrststar
+         * \endrststar
          *
          * @param x the value to which \p this will be set.
          *
@@ -1129,6 +1217,88 @@ public:
         dispatch_assignment<false>(x);
         return *this;
     }
+    /// Setter to C string.
+    /**
+     * \rststar
+     * This method will set ``this`` to the value represented by the string ``s``, which will be interpreted
+     * as a floating-point number in base ``base``. ``base`` must be either 0 (in which case the base is
+     * automatically deduced), or a value in the [2,62] range. Contrary to the assignment operator from C string, the
+     * global default precision is ignored and the precision of the assignment is dictated by the precision of ``this``.
+     * Consequently, the precision of ``this`` will not be altered by the assignment, and a rounding might occur,
+     * depending on the operands.
+     *
+     * If ``s`` is not a valid representation of a floating-point number in base ``base``, ``this``
+     * will be set to NaN and an error will be raised.
+     *
+     * This method is a thin wrapper around the ``mpfr_set_str()`` assignment function from the MPFR API.
+     *
+     * .. seealso ::
+     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     * \endrststar
+     *
+     * @param s the string to which \p this will be set.
+     * @param base the base used in the string representation.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::invalid_argument if \p s cannot be parsed as a floating-point value in base 10, or if the value of
+     * \p base is invalid.
+     */
+    real &set(const char *s, int base = 10)
+    {
+        string_assignment(s, base);
+        return *this;
+    }
+    /// Set to C++ string.
+    /**
+     * \rststar
+     * This setter is equivalent to the setter from C string.
+     *
+     * .. seealso ::
+     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     * \endrststar
+     *
+     * @param s the string to which \p this will be set.
+     * @param base the base used in the string representation.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the setter from C string.
+     */
+    real &set(const std::string &s, int base = 10)
+    {
+        return set(s.c_str(), base);
+    }
+#if MPPP_CPLUSPLUS >= 201703L
+    /// Set to string view.
+    /**
+     * \rststar
+     * This setter is equivalent to the setter from C string.
+     *
+     * .. note::
+     *
+     *   This operator is available only if at least C++17 is being used.
+     *
+     * .. seealso ::
+     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     * \endrststar
+     *
+     * @param s the string to which \p this will be set.
+     * @param base the base used in the string representation.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the setter from C string, or by memory
+     * allocation errors in standard containers.
+     */
+    real &set(const std::string_view &s, int base = 10)
+    {
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        buffer.assign(s.begin(), s.end());
+        buffer.emplace_back('\0');
+        return set(buffer.data(), base);
+    }
+#endif
     /// Swap \link mppp::real real \endlink objects.
     /**
      * This function will efficiently swap the content of \p a and \p b.

@@ -830,6 +830,180 @@ TEST_CASE("real assignment")
     REQUIRE(r8.get_prec() == 185);
     REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -456l) == 0);
 #endif
+    // Assignment from string.
+    real_reset_default_prec();
+    REQUIRE_THROWS_PREDICATE(r8 = "1223", std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what() == std::string("Cannot assign a string to a real if a default precision is not set");
+    });
+    REQUIRE_THROWS_PREDICATE(r8 = std::string("1223"), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what() == std::string("Cannot assign a string to a real if a default precision is not set");
+    });
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE_THROWS_PREDICATE(r8 = std::string_view("1223"), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what() == std::string("Cannot assign a string to a real if a default precision is not set");
+    });
+#endif
+    real_set_default_prec(100);
+    r8.set_prec(150);
+    r8 = "1223";
+    REQUIRE(r8.get_prec() == 100);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1223l) == 0);
+    r8.set_prec(150);
+    r8 = std::string{"1224"};
+    REQUIRE(r8.get_prec() == 100);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1224l) == 0);
+#if MPPP_CPLUSPLUS >= 201703L
+    r8.set_prec(150);
+    r8 = std::string_view{"1224"};
+    REQUIRE(r8.get_prec() == 100);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1224l) == 0);
+#endif
+    REQUIRE_THROWS_PREDICATE(r8 = "hell-o", std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
+    });
+    REQUIRE(r8.nan_p());
+    r8 = 56;
+    REQUIRE_THROWS_PREDICATE(r8 = std::string{"hell-o"}, std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
+    });
+    REQUIRE(r8.nan_p());
+    r8 = 56;
+#if MPPP_CPLUSPLUS >= 201703L
+    REQUIRE_THROWS_PREDICATE(
+        r8 = std::string_view{"hell-o"}, std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
+        });
+    REQUIRE(r8.nan_p());
+    r8 = 56;
+#endif
+    real_reset_default_prec();
+    // Setter from string.
+    r8.set_prec(123);
+    r8.set("-4.321e3");
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
+    r8.set("4.321e3", 0);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 4321) == 0);
+    r8.set("0b10011010010", 0);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1234) == 0);
+    r8.set("0b10011010011", 2);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    r8.set("0b1.0011010011e10", 2);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE_THROWS_PREDICATE(r8.set("4.321e3", -1), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string{"Cannot assign a real from a string in base -1: the base must either be zero or in the "
+                              "[2,62] range"};
+    });
+    REQUIRE_THROWS_PREDICATE(r8.set("4.321e3", 65), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string{"Cannot assign a real from a string in base 65: the base must either be zero or in the "
+                              "[2,62] range"};
+    });
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE_THROWS_PREDICATE(r8.set("hell-o"), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
+    });
+    REQUIRE(r8.nan_p());
+    r8 = 12;
+    REQUIRE_THROWS_PREDICATE(r8.set("hell-o", 11), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 11"};
+    });
+    REQUIRE_THROWS_PREDICATE(r8.set("baboo", 0), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what() == std::string{"The string 'baboo' cannot be interpreted as a floating-point value in base 0"};
+    });
+    REQUIRE(r8.nan_p());
+    r8.set(std::string{"-4.321e3"});
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
+    r8.set(std::string{"4.321e3"}, 0);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 4321) == 0);
+    r8.set(std::string{"0b10011010010"}, 0);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1234) == 0);
+    r8.set(std::string{"0b10011010011"}, 2);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    r8.set(std::string{"0b1.0011010011e10"}, 2);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(std::string{"4.321e3"}, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{
+                          "Cannot assign a real from a string in base -1: the base must either be zero or in the "
+                          "[2,62] range"};
+        });
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(std::string{"4.321e3"}, 65), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{
+                          "Cannot assign a real from a string in base 65: the base must either be zero or in the "
+                          "[2,62] range"};
+        });
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE_THROWS_PREDICATE(r8.set(std::string{"hell-o"}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
+    });
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(std::string("baboo"), 0), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{"The string 'baboo' cannot be interpreted as a floating-point value in base 0"};
+        });
+    REQUIRE(r8.nan_p());
+    r8 = 12;
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(std::string{"hell-o"}, 11), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 11"};
+        });
+    REQUIRE(r8.nan_p());
+#if MPPP_CPLUSPLUS >= 201703L
+    r8.set(std::string_view{"-4.321e3"});
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
+    r8.set(std::string_view{"4.321e3"}, 0);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 4321) == 0);
+    r8.set(std::string_view{"0b10011010010"}, 0);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1234) == 0);
+    r8.set(std::string_view{"0b10011010011"}, 2);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    r8.set(std::string_view{"0b1.0011010011e10"}, 2);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(std::string_view{"4.321e3"}, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{
+                          "Cannot assign a real from a string in base -1: the base must either be zero or in the "
+                          "[2,62] range"};
+        });
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(std::string_view{"4.321e3"}, 65), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{
+                          "Cannot assign a real from a string in base 65: the base must either be zero or in the "
+                          "[2,62] range"};
+        });
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(std::string_view{"hell-o"}), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 10"};
+        });
+    REQUIRE(r8.nan_p());
+    r8 = 12;
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(std::string_view{"hell-o"}, 11), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 11"};
+        });
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(std::string_view{"baboo"}, 0), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{"The string 'baboo' cannot be interpreted as a floating-point value in base 0"};
+        });
+    REQUIRE(r8.nan_p());
+#endif
 }
 
 #if 0
