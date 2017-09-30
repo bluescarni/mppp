@@ -1654,12 +1654,8 @@ private:
         //
         // NOTE: contrary to real128, the MPFR format does not have a hidden bit on top.
         //
-        // NOTE: normally we use GMP_NUMB_MASK when accessing raw limbs in GMP, but since MPFR pads
-        // differently it's unclear to me if we have to use it at all. There's no use of GMP_NUMB_MASK
-        // in the whole MPFR source, though, so we just pretend it does not exist for the moment.
-        //
         // Init retval with the highest limb.
-        real128 retval{m_mpfr._mpfr_d[--nlimbs]};
+        real128 retval{m_mpfr._mpfr_d[--nlimbs] & GMP_NUMB_MASK};
         // Init the number of read bits.
         // NOTE: we have read a full limb in the line above, so mp_bits_per_limb bits. If mp_bits_per_limb > 113,
         // then the constructor of real128 truncated the input limb value to 113 bits of precision, so effectively
@@ -1673,7 +1669,7 @@ private:
             // representable by int.
             retval = scalbn(retval, static_cast<int>(rbits));
             // Add the next limb, removing lower bits if they are not to be read.
-            retval += m_mpfr._mpfr_d[--nlimbs] >> (static_cast<unsigned>(::mp_bits_per_limb) - rbits);
+            retval += (m_mpfr._mpfr_d[--nlimbs] & GMP_NUMB_MASK) >> (static_cast<unsigned>(::mp_bits_per_limb) - rbits);
             // Update the number of read bits.
             // NOTE: due to the definition of rbits, read_bits can never reach past real128_sig_digits().
             // Hence, this addition can never overflow (as sig_digits is unsigned itself).
