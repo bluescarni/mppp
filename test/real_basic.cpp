@@ -8,6 +8,7 @@
 
 #include <mp++/config.hpp>
 
+#include <cmath>
 #include <initializer_list>
 #include <iomanip>
 #include <limits>
@@ -20,6 +21,7 @@
 #endif
 #include <tuple>
 #include <type_traits>
+#include <typeinfo>
 #include <utility>
 #include <vector>
 
@@ -1003,6 +1005,166 @@ TEST_CASE("real assignment")
                    == std::string{"The string 'baboo' cannot be interpreted as a floating-point value in base 0"};
         });
     REQUIRE(r8.nan_p());
+#endif
+}
+
+struct int_conv_tester {
+    template <typename T>
+    void operator()(const T &) const
+    {
+        real r0{T(0)};
+        REQUIRE(static_cast<T>(r0) == T(0));
+        r0 = real{T(42)};
+        REQUIRE(static_cast<T>(r0) == T(42));
+        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        for (int i = 0; i < ntrials; ++i) {
+            const auto tmp = int_dist(rng);
+            REQUIRE(static_cast<T>(real{tmp}) == tmp);
+        }
+        REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{std::numeric_limits<T>::max()} + 1}), std::overflow_error,
+                                 [](const std::overflow_error &ex) {
+                                     return ex.what()
+                                            == "Conversion of the real "
+                                                   + real{int_t{std::numeric_limits<T>::max()} + 1}.to_string()
+                                                   + " to the type " + typeid(T).name() + " results in overflow";
+                                 });
+        REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{std::numeric_limits<T>::min()} - 1}), std::overflow_error,
+                                 [](const std::overflow_error &ex) {
+                                     return ex.what()
+                                            == "Conversion of the real "
+                                                   + real{int_t{std::numeric_limits<T>::min()} - 1}.to_string()
+                                                   + " to the type " + typeid(T).name() + " results in overflow";
+                                 });
+        REQUIRE_THROWS_PREDICATE(
+            static_cast<T>(real{"inf", 10, 100}), std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == (std::is_unsigned<T>::value
+                               ? std::string{"Cannot convert a non-finite real to a C++ unsigned integral type"}
+                               : std::string{"Cannot convert a non-finite real to a C++ signed integral type"});
+            });
+        REQUIRE_THROWS_PREDICATE(
+            static_cast<T>(real{"-inf", 10, 100}), std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == (std::is_unsigned<T>::value
+                               ? std::string{"Cannot convert a non-finite real to a C++ unsigned integral type"}
+                               : std::string{"Cannot convert a non-finite real to a C++ signed integral type"});
+            });
+        REQUIRE_THROWS_PREDICATE(
+            static_cast<T>(real{"nan", 10, 100}), std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == (std::is_unsigned<T>::value
+                               ? std::string{"Cannot convert a non-finite real to a C++ unsigned integral type"}
+                               : std::string{"Cannot convert a non-finite real to a C++ signed integral type"});
+            });
+    }
+};
+
+struct fp_conv_tester {
+    template <typename T>
+    void operator()(const T &) const
+    {
+        real r0{T(0)};
+        REQUIRE(static_cast<T>(r0) == T(0));
+        r0 = 42;
+        REQUIRE(static_cast<T>(r0) == T(42));
+        std::uniform_real_distribution<T> dist(-T(1000), T(1000));
+        for (int i = 0; i < ntrials; ++i) {
+            const auto tmp = dist(rng);
+            REQUIRE(static_cast<T>(real{tmp}) == tmp);
+        }
+        if (std::numeric_limits<T>::has_infinity && std::numeric_limits<T>::has_quiet_NaN) {
+            REQUIRE(std::isinf(static_cast<T>(real{"inf", 10, 100})));
+            REQUIRE(std::isinf(static_cast<T>(real{"-inf", 10, 100})));
+            REQUIRE(std::isnan(static_cast<T>(real{"nan", 10, 100})));
+        }
+    }
+};
+
+TEST_CASE("real conversion")
+{
+    tuple_for_each(int_types{}, int_conv_tester{});
+    tuple_for_each(fp_types{}, fp_conv_tester{});
+    // Bool conversion.
+    REQUIRE(static_cast<bool>(real{123}));
+    REQUIRE(static_cast<bool>(real{-123}));
+    REQUIRE(static_cast<bool>(real{"inf", 10, 100}));
+    REQUIRE(static_cast<bool>(real{"-inf", 10, 100}));
+    REQUIRE(static_cast<bool>(real{"nan", 10, 100}));
+    REQUIRE(!static_cast<bool>(real{0}));
+    // Integer.
+    REQUIRE(static_cast<int_t>(real{0}) == 0);
+    REQUIRE(static_cast<int_t>(real{123}) == 123);
+    REQUIRE(static_cast<int_t>(real{-123}) == -123);
+    REQUIRE(static_cast<int_t>(real{"123.96", 10, 100}) == 123);
+    REQUIRE(static_cast<int_t>(real{"-123.96", 10, 100}) == -123);
+    REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real{"inf", 10, 100}), std::domain_error,
+                             [](const std::domain_error &ex) {
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to integer"};
+                             });
+    REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real{"-inf", 10, 100}), std::domain_error,
+                             [](const std::domain_error &ex) {
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to integer"};
+                             });
+    REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real{"nan", 10, 100}), std::domain_error,
+                             [](const std::domain_error &ex) {
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to integer"};
+                             });
+    // Rational.
+    REQUIRE(static_cast<rat_t>(real{0}) == 0);
+    REQUIRE(static_cast<rat_t>(real{123}) == 123);
+    REQUIRE(static_cast<rat_t>(real{-123}) == -123);
+    REQUIRE((static_cast<rat_t>(real{"4.1875", 10, 100}) == rat_t{67, 16}));
+    REQUIRE((static_cast<rat_t>(real{"-4.1875", 10, 100}) == -rat_t{67, 16}));
+    REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real{"inf", 10, 100}), std::domain_error,
+                             [](const std::domain_error &ex) {
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to rational"};
+                             });
+    REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real{"-inf", 10, 100}), std::domain_error,
+                             [](const std::domain_error &ex) {
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to rational"};
+                             });
+    REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real{"nan", 10, 100}), std::domain_error,
+                             [](const std::domain_error &ex) {
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to rational"};
+                             });
+#if defined(MPPP_WITH_QUADMATH)
+    // Zeroes and special values.
+    REQUIRE(static_cast<real128>(real{}) == 0);
+    REQUIRE(!static_cast<real128>(real{}).signbit());
+    REQUIRE(static_cast<real128>(real{"-0.", 10, 100}) == 0);
+    REQUIRE(static_cast<real128>(real{"-0.", 10, 100}).signbit());
+    REQUIRE(isnan(static_cast<real128>(real{"nan", 10, 100})));
+    REQUIRE(static_cast<real128>(real{"inf", 10, 100}) == real128_inf());
+    REQUIRE(static_cast<real128>(real{"-inf", 10, 100}) == -real128_inf());
+    // Big and small.
+    real r0{1};
+    ::mpfr_mul_2ui(r0._get_mpfr_t(), r0.get_mpfr_t(), 20000ul, MPFR_RNDN);
+    REQUIRE(static_cast<real128>(r0) == real128_inf());
+    r0 = 1;
+    ::mpfr_mul_2ui(r0._get_mpfr_t(), r0.get_mpfr_t(), 262145ul, MPFR_RNDN);
+    REQUIRE(static_cast<real128>(r0) == real128_inf());
+    r0 = 1;
+    ::mpfr_div_2ui(r0._get_mpfr_t(), r0.get_mpfr_t(), 20000ul, MPFR_RNDN);
+    REQUIRE(static_cast<real128>(r0) == 0);
+    r0 = 1;
+    ::mpfr_div_2ui(r0._get_mpfr_t(), r0.get_mpfr_t(), 262145ul, MPFR_RNDN);
+    REQUIRE(static_cast<real128>(r0) == 0);
+    // Subnormals.
+    REQUIRE(static_cast<real128>(real{real128{"3.40917866435610111081769936359662259e-4957"}})
+            == real128{"3.40917866435610111081769936359662259e-4957"});
+    REQUIRE(static_cast<real128>(real{real128{"-3.40917866435610111081769936359662259e-4957"}})
+            == -real128{"3.40917866435610111081769936359662259e-4957"});
+    // A couple of normal values.
+    REQUIRE(static_cast<real128>(real{real128{"3.40917866435610111081769936359662259e-4"}})
+            == real128{"3.40917866435610111081769936359662259e-4"});
+    REQUIRE(static_cast<real128>(real{-real128{"3.40917866435610111081769936359662259e-4"}})
+            == real128{"-3.40917866435610111081769936359662259e-4"});
+    // A real with less precision than real128.
+    REQUIRE(static_cast<real128>(real{123, 32}) == real128{123});
+    REQUIRE(static_cast<real128>(real{-123, 32}) == -real128{123});
+    // Larger precision.
+    REQUIRE(abs(static_cast<real128>(real{"1.1", 10, 300}) - real128{"1.1"}) < 1E-33);
+    REQUIRE(abs(static_cast<real128>(real{"-1.1", 10, 300}) + real128{"-1.1"}) < 1E-33);
 #endif
 }
 

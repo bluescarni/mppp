@@ -1504,9 +1504,12 @@ private:
         MPPP_MAYBE_TLS mpz_raii mpz;
         const ::mpfr_exp_t exp2 = ::mpfr_get_z_2exp(&mpz.m_mpz, &m_mpfr);
         if (mppp_unlikely(::mpfr_erangeflag_p())) {
+            // NOTE: not sure at the moment how to trigger this, let's leave it for now.
+            // LCOV_EXCL_START
             // Let's first reset the error flag.
             ::mpfr_clear_erangeflag();
             throw std::overflow_error("The exponent of a real is too large for conversion to rational");
+            // LCOV_EXCL_STOP
         }
         // The conversion to n * 2**exp succeeded. We will build a rational
         // from n and exp.
@@ -1639,7 +1642,7 @@ private:
         }
         if (zero_p() || m_mpfr._mpfr_exp < -(1l << 18)) {
             // Preserve the signedness of zero.
-            return signbit() ? real128{} : -real128{};
+            return signbit() ? -real128{} : real128{};
         }
         // NOTE: this is similar to the code in real128.hpp for the constructor from integer,
         // with some modification due to the different padding in MPFR vs GMP (see below).
