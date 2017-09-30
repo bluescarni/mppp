@@ -752,7 +752,7 @@ private:
     }
 
 public:
-    /// Constructor from C string.
+    /// Constructor from C string, base and precision.
     /**
      * \rststar
      * This constructor will set ``this`` to the value represented by the string ``s``, which is interpreted
@@ -778,28 +778,68 @@ public:
      *   default precision value has been set,
      * - \p s cannot be interpreted as a floating-point number.
      */
-    explicit real(const char *s, int base = 10, ::mpfr_prec_t p = 0)
+    explicit real(const char *s, int base, ::mpfr_prec_t p)
     {
         construct_from_c_string(s, base, p);
     }
-    /// Constructor from C++ string.
+    /// Constructor from C string and precision.
     /**
-     * This constructor is equivalent to the constructor from C string.
+     * This constructor is equivalent to the constructor from C string with a ``base`` value hard-coded to 10.
+     *
+     * @param s the input C string.
+     * @param p the desired precision.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string, base and precision.
+     */
+    explicit real(const char *s, ::mpfr_prec_t p) : real(s, 10, p) {}
+    /// Constructor from C string.
+    /**
+     * This constructor is equivalent to the constructor from C string with a ``base`` value hard-coded to 10
+     * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
+     *
+     * @param s the input C string.
+     *
+     * @throws unspecified any exception thrown by the constructor from C string, base and precision.
+     */
+    explicit real(const char *s) : real(s, 10, 0) {}
+    /// Constructor from C++ string, base and precision.
+    /**
+     * This constructor is equivalent to the constructor from C string, base and precision.
      *
      * @param s the input C++ string.
      * @param base the base used in the string representation.
      * @param p the desired precision.
      *
-     * @throws unspecified any exception thrown by the constructor from C string.
+     * @throws unspecified any exception thrown by the constructor from C string, base and precision.
      */
-    explicit real(const std::string &s, int base = 10, ::mpfr_prec_t p = 0) : real(s.c_str(), base, p) {}
-    /// Constructor from range of characters.
+    explicit real(const std::string &s, int base, ::mpfr_prec_t p) : real(s.c_str(), base, p) {}
+    /// Constructor from C++ string and precision.
+    /**
+     * This constructor is equivalent to the constructor from C++ string with a ``base`` value hard-coded to 10.
+     *
+     * @param s the input C++ string.
+     * @param p the desired precision.
+     *
+     * @throws unspecified any exception thrown by the constructor from C++ string, base and precision.
+     */
+    explicit real(const std::string &s, ::mpfr_prec_t p) : real(s, 10, p) {}
+    /// Constructor from C++ string.
+    /**
+     * This constructor is equivalent to the constructor from C++ string with a ``base`` value hard-coded to 10
+     * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
+     *
+     * @param s the input C++ string.
+     *
+     * @throws unspecified any exception thrown by the constructor from C++ string, base and precision.
+     */
+    explicit real(const std::string &s) : real(s, 10, 0) {}
+    /// Constructor from range of characters, base and precision.
     /**
      * This constructor will initialise \p this from the content of the input half-open range,
      * which is interpreted as the string representation of a floating-point value in base \p base.
      *
      * Internally, the constructor will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the constructor from C string.
+     * string terminator, and invoke the constructor from C string, base and precision.
      *
      * @param begin the begin of the input range.
      * @param end the end of the input range.
@@ -809,15 +849,38 @@ public:
      * @throws unspecified any exception thrown by the constructor from C string, or by memory
      * allocation errors in standard containers.
      */
-    explicit real(const char *begin, const char *end, int base = 10, ::mpfr_prec_t p = 0)
+    explicit real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
     {
         MPPP_MAYBE_TLS std::vector<char> buffer;
         buffer.assign(begin, end);
         buffer.emplace_back('\0');
         construct_from_c_string(buffer.data(), base, p);
     }
+    /// Constructor from range of characters and precision.
+    /**
+     * This constructor is equivalent to the constructor from range of characters with a ``base`` value hard-coded
+     * to 10.
+     *
+     * @param begin the begin of the input range.
+     * @param end the end of the input range.
+     * @param p the desired precision.
+     *
+     * @throws unspecified any exception thrown by the constructor from range of characters, base and precision.
+     */
+    explicit real(const char *begin, const char *end, ::mpfr_prec_t p) : real(begin, end, 10, p) {}
+    /// Constructor from range of characters.
+    /**
+     * This constructor is equivalent to the constructor from range of characters with a ``base`` value hard-coded
+     * to 10 and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
+     *
+     * @param begin the begin of the input range.
+     * @param end the end of the input range.
+     *
+     * @throws unspecified any exception thrown by the constructor from range of characters, base and precision.
+     */
+    explicit real(const char *begin, const char *end) : real(begin, end, 10, 0) {}
 #if MPPP_CPLUSPLUS >= 201703L
-    /// Constructor from string view.
+    /// Constructor from string view, base and precision.
     /**
      * This constructor will initialise \p this from the content of the input string view,
      * which is interpreted as the string representation of a floating-point value in base \p base.
@@ -830,18 +893,52 @@ public:
      *   This constructor is available only if at least C++17 is being used.
      * \endrststar
      *
-     * @param s the \p std::string_view that will be used for construction.
+     * @param s the string view that will be used for construction.
      * @param base the base used in the string representation.
      * @param p the desired precision.
      *
      * @throws unspecified any exception thrown by the constructor from a range of characters.
      */
-    explicit real(const std::string_view &s, int base = 10, ::mpfr_prec_t p = 0)
-        : real(s.data(), s.data() + s.size(), base, p)
+    explicit real(const std::string_view &s, int base, ::mpfr_prec_t p) : real(s.data(), s.data() + s.size(), base, p)
     {
     }
+    /// Constructor from string view and precision.
+    /**
+     * This constructor is equivalent to the constructor from string view with a ``base`` value hard-coded to 10.
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This constructor is available only if at least C++17 is being used.
+     * \endrststar
+     *
+     * @param s the input string view.
+     * @param p the desired precision.
+     *
+     * @throws unspecified any exception thrown by the constructor from string view, base and precision.
+     */
+    explicit real(const std::string_view &s, ::mpfr_prec_t p) : real(s, 10, p) {}
+    /// Constructor from string view.
+    /**
+     * This constructor is equivalent to the constructor from string view with a ``base`` value hard-coded to 10
+     * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
+     *
+     * \rststar
+     * .. note::
+     *
+     *   This constructor is available only if at least C++17 is being used.
+     * \endrststar
+     *
+     * @param s the input string view.
+     *
+     * @throws unspecified any exception thrown by the constructor from string view, base and precision.
+     */
+    explicit real(const std::string_view &s) : real(s, 10, 0) {}
 #endif
     /// Destructor.
+    /**
+     * The destructor will free any resource held by the internal ``mpfr_t`` instance.
+     */
     ~real()
     {
         if (m_mpfr._mpfr_d) {
