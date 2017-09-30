@@ -1654,6 +1654,10 @@ private:
         //
         // NOTE: contrary to real128, the MPFR format does not have a hidden bit on top.
         //
+        // NOTE: it's not clear to me here if we should MASK or not. Let's keep it for consistency
+        // with integer etc., but at one point we should probably have some nail-enabled build
+        // to check this.
+        //
         // Init retval with the highest limb.
         real128 retval{m_mpfr._mpfr_d[--nlimbs] & GMP_NUMB_MASK};
         // Init the number of read bits.
