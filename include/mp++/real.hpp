@@ -841,7 +841,7 @@ public:
      * Internally, the constructor will copy the content of the range to a local buffer, add a
      * string terminator, and invoke the constructor from C string, base and precision.
      *
-     * @param begin the begin of the input range.
+     * @param begin the start of the input range.
      * @param end the end of the input range.
      * @param base the base used in the string representation.
      * @param p the desired precision.
@@ -861,7 +861,7 @@ public:
      * This constructor is equivalent to the constructor from range of characters with a ``base`` value hard-coded
      * to 10.
      *
-     * @param begin the begin of the input range.
+     * @param begin the start of the input range.
      * @param end the end of the input range.
      * @param p the desired precision.
      *
@@ -873,7 +873,7 @@ public:
      * This constructor is equivalent to the constructor from range of characters with a ``base`` value hard-coded
      * to 10 and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
      *
-     * @param begin the begin of the input range.
+     * @param begin the start of the input range.
      * @param end the end of the input range.
      *
      * @throws unspecified any exception thrown by the constructor from range of characters, base and precision.
@@ -1349,7 +1349,7 @@ public:
     /// Set to C++ string.
     /**
      * \rststar
-     * This setter is equivalent to the setter from C string.
+     * This setter is equivalent to the setter to C string.
      *
      * .. seealso ::
      *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
@@ -1360,40 +1360,60 @@ public:
      *
      * @return a reference to \p this.
      *
-     * @throws unspecified any exception thrown by the setter from C string.
+     * @throws unspecified any exception thrown by the setter to C string.
      */
     real &set(const std::string &s, int base = 10)
     {
         return set(s.c_str(), base);
     }
+    /// Set to character range.
+    /**
+     * This setter will set \p this to the content of the input half-open range,
+     * which is interpreted as the string representation of a floating-point value in base \p base.
+     *
+     * Internally, the setter will copy the content of the range to a local buffer, add a
+     * string terminator, and invoke the setter to C string.
+     *
+     * @param begin the start of the input range.
+     * @param end the end of the input range.
+     * @param base the base used in the string representation.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the setter to C string, or by memory
+     * allocation errors in standard containers.
+     */
+    real &set(const char *begin, const char *end, int base = 10)
+    {
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        buffer.assign(begin, end);
+        buffer.emplace_back('\0');
+        return set(buffer.data(), base);
+    }
 #if MPPP_CPLUSPLUS >= 201703L
     /// Set to string view.
     /**
      * \rststar
-     * This setter is equivalent to the setter from C string.
+     * This setter is equivalent to the setter to character range.
      *
      * .. note::
      *
-     *   This operator is available only if at least C++17 is being used.
+     *   This setter is available only if at least C++17 is being used.
      *
      * .. seealso ::
      *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
      * \endrststar
      *
-     * @param s the string to which \p this will be set.
+     * @param s the string view to which \p this will be set.
      * @param base the base used in the string representation.
      *
      * @return a reference to \p this.
      *
-     * @throws unspecified any exception thrown by the setter from C string, or by memory
-     * allocation errors in standard containers.
+     * @throws unspecified any exception thrown by the setter to character range.
      */
     real &set(const std::string_view &s, int base = 10)
     {
-        MPPP_MAYBE_TLS std::vector<char> buffer;
-        buffer.assign(s.begin(), s.end());
-        buffer.emplace_back('\0');
-        return set(buffer.data(), base);
+        return set(s.data(), s.data() + s.size(), base);
     }
 #endif
     /// Swap \link mppp::real real \endlink objects.

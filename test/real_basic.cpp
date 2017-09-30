@@ -999,6 +999,47 @@ TEST_CASE("real assignment")
                    == std::string{"The string 'hell-o' cannot be interpreted as a floating-point value in base 11"};
         });
     REQUIRE(r8.nan_p());
+    // Setter to char range.
+    r8.set_prec(123);
+    const std::vector<char> vc = {',', '-', '1', '2', '3', '4'};
+    r8.set(vc.data() + 1, vc.data() + 5);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -123) == 0);
+    REQUIRE(r8.get_prec() == 123);
+    r8.set(vc.data() + 1, vc.data() + 6, 0);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -1234) == 0);
+    REQUIRE(r8.get_prec() == 123);
+    r8.set(vc.data() + 1, vc.data() + 4, 4);
+    REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -6) == 0);
+    REQUIRE(r8.get_prec() == 123);
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(vc.data() + 1, vc.data() + 5, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{
+                          "Cannot assign a real from a string in base -1: the base must either be zero or in the "
+                          "[2,62] range"};
+        });
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(vc.data() + 1, vc.data() + 5, 65), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{
+                          "Cannot assign a real from a string in base 65: the base must either be zero or in the "
+                          "[2,62] range"};
+        });
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(vc.data(), vc.data() + 5), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{"The string ',-123' cannot be interpreted as a floating-point value in base 10"};
+        });
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(vc.data(), vc.data() + 5, 19), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{"The string ',-123' cannot be interpreted as a floating-point value in base 19"};
+        });
+    REQUIRE_THROWS_PREDICATE(
+        r8.set(vc.data(), vc.data() + 4, 0), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == std::string{"The string ',-12' cannot be interpreted as a floating-point value in base 0"};
+        });
 #if MPPP_CPLUSPLUS >= 201703L
     r8.set(std::string_view{"-4.321e3"});
     REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
