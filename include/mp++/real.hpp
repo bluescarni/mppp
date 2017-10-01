@@ -103,8 +103,13 @@ inline ::mpfr_prec_t dig2mpfr_prec()
 }
 
 // Helper function to print an mpfr to stream in base 10.
-inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os)
+inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 {
+    // Check the base.
+    if (mppp_unlikely(base < 2 || base > 62)) {
+        throw std::invalid_argument("Cannot convert a real to a string in base " + std::to_string(base)
+                                    + ": the base must be in the [2,62] range");
+    }
     // Special values first.
     if (mpfr_nan_p(r)) {
         os << "nan";
@@ -118,7 +123,7 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os)
     // Get the string fractional representation via the MPFR function,
     // and wrap it into a smart pointer.
     ::mpfr_exp_t exp(0);
-    smart_mpfr_str str(::mpfr_get_str(nullptr, &exp, 10, 0, r, MPFR_RNDN), ::mpfr_free_str);
+    smart_mpfr_str str(::mpfr_get_str(nullptr, &exp, base, 0, r, MPFR_RNDN), ::mpfr_free_str);
     if (mppp_unlikely(!str)) {
         throw std::runtime_error("Error in the conversion of a real to string: the call to mpfr_get_str() failed");
     }
@@ -212,7 +217,7 @@ std::atomic<::mpfr_prec_t> real_constants<T>::default_prec = ATOMIC_VAR_INIT(::m
 
 // Fwd declare for friendship.
 template <typename F, typename... Args>
-void mpfr_nary_op(const F &, real &, const real &, const Args &...);
+real &mpfr_nary_op(const F &, real &, const real &, const Args &...);
 
 template <typename F, typename Arg0, typename... Args>
 real mpfr_nary_op_return(const F &, Arg0 &&, Args &&...);
@@ -369,7 +374,7 @@ class real
 #if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends, for accessing the non-checking prec setting funcs.
     template <typename F, typename... Args>
-    friend void detail::mpfr_nary_op(const F &, real &, const real &, const Args &...);
+    friend real &detail::mpfr_nary_op(const F &, real &, const real &, const Args &...);
     template <typename F, typename Arg0, typename... Args>
     friend real detail::mpfr_nary_op_return(const F &, Arg0 &&, Args &&...);
     template <typename F>
@@ -1844,16 +1849,22 @@ public:
     /// Convert to string.
     /**
      * \rststar
-     * This method will convert ``this`` to a string representation in base 10. The returned string is guaranteed to
-     * produce exactly the original value when used as a construction argument for :cpp:class:`~mppp::real`.
+     * This method will convert ``this`` to a string representation in base ``base``. The returned string is guaranteed
+     * to produce exactly the original value when used in one of the constructors from string of
+     * :cpp:class:`~mppp::real` (provided that the original precision and base are used in the construction).
      * \endrststar
      *
+     * @param base the base to be used for the string representation.
+     *
      * @return \p this converted to a string.
+     *
+     * @throws std::invalid_argument if \p base is not in the [2,62] range.
+     * @throws std::runtime_error if the call to the ``mpfr_get_str()`` function of the MPFR API fails.
      */
-    std::string to_string() const
+    std::string to_string(int base = 10) const
     {
         std::ostringstream oss;
-        mpfr_to_stream(&m_mpfr, oss);
+        mpfr_to_stream(&m_mpfr, oss, base);
         return oss.str();
     }
 
@@ -1920,7 +1931,7 @@ inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &p, const real &ro
 // Apply the MPFR n-ary function F with return value rop and real arguments (arg0, args...).
 // The precision of rop will be set to the maximum of the precision among the arguments.
 template <typename F, typename... Args>
-inline void mpfr_nary_op(const F &f, real &rop, const real &arg0, const Args &... args)
+inline real &mpfr_nary_op(const F &f, real &rop, const real &arg0, const Args &... args)
 {
     auto p = std::make_pair(rop.get_prec() == arg0.get_prec(), arg0.get_prec());
     mpfr_examine_precs(p, rop, args...);
@@ -1930,6 +1941,7 @@ inline void mpfr_nary_op(const F &f, real &rop, const real &arg0, const Args &..
     }
     // Invoke the MPFR function.
     f(rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+    return rop;
 }
 
 // A recursive function to determine from which arguments, in an MPFR function call,
@@ -1985,21 +1997,54 @@ inline real mpfr_nary_op_return(const F &f, Arg0 &&arg0, Args &&... args)
  *  @{
  */
 
-inline void add(real &rop, const real &op1, const real &op2)
+/// Ternary \link mppp::real real \endlink addition.
+/**
+ * @param rop the return value.
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ *
+ * @return a reference to \p rop.
+ */
+inline real &add(real &rop, const real &op1, const real &op2)
 {
-    mpfr_nary_op(::mpfr_add, rop, op1, op2);
+    return mpfr_nary_op(::mpfr_add, rop, op1, op2);
 }
 
-inline void sub(real &rop, const real &op1, const real &op2)
+/// Ternary \link mppp::real real \endlink subtraction.
+/**
+ * @param rop the return value.
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ *
+ * @return a reference to \p rop.
+ */
+inline real &sub(real &rop, const real &op1, const real &op2)
 {
-    mpfr_nary_op(::mpfr_sub, rop, op1, op2);
+    return mpfr_nary_op(::mpfr_sub, rop, op1, op2);
 }
 
-inline void fma(real &rop, const real &op1, const real &op2, const real &op3)
+/// Quaternary \link mppp::real real \endlink fused multiply–add.
+/**
+ * @param rop the return value.
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ * @param op3 the third operand.
+ *
+ * @return a reference to \p rop.
+ */
+inline real &fma(real &rop, const real &op1, const real &op2, const real &op3)
 {
-    mpfr_nary_op(::mpfr_fma, rop, op1, op2, op3);
+    return mpfr_nary_op(::mpfr_fma, rop, op1, op2, op3);
 }
 
+/// Ternary \link mppp::real real \endlink fused multiply–add.
+/**
+ * @param a the first operand.
+ * @param b the second operand.
+ * @param c the third operand.
+ *
+ * @return \f$ a \times b + c \f$.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U, CvrReal V>
 #else
@@ -2010,11 +2055,28 @@ inline real fma(T &&a, U &&b, V &&c)
     return mpfr_nary_op_return(::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-inline void fms(real &rop, const real &op1, const real &op2, const real &op3)
+/// Quaternary \link mppp::real real \endlink fused multiply–sub.
+/**
+ * @param rop the return value.
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ * @param op3 the third operand.
+ *
+ * @return a reference to \p rop.
+ */
+inline real &fms(real &rop, const real &op1, const real &op2, const real &op3)
 {
-    mpfr_nary_op(::mpfr_fms, rop, op1, op2, op3);
+    return mpfr_nary_op(::mpfr_fms, rop, op1, op2, op3);
 }
 
+/// Ternary \link mppp::real real \endlink fused multiply–sub.
+/**
+ * @param a the first operand.
+ * @param b the second operand.
+ * @param c the third operand.
+ *
+ * @return \f$ a \times b - c \f$.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U, CvrReal V>
 #else
@@ -2117,11 +2179,24 @@ inline bool signbit(const real &r)
  *  @{
  */
 
-inline void sqrt(real &rop, const real &op)
+/// Binary square root.
+/**
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to \p rop.
+ */
+inline real &sqrt(real &rop, const real &op)
 {
-    mpfr_nary_op(::mpfr_sqrt, rop, op);
+    return mpfr_nary_op(::mpfr_sqrt, rop, op);
 }
 
+/// Unary square root.
+/**
+ * @param r the operand.
+ *
+ * @return the square root of \p r.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2144,11 +2219,24 @@ inline real sqrt(T &&r)
  *  @{
  */
 
-inline void sin(real &rop, const real &op)
+/// Binary sine.
+/**
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to \p rop.
+ */
+inline real &sin(real &rop, const real &op)
 {
-    mpfr_nary_op(::mpfr_sin, rop, op);
+    return mpfr_nary_op(::mpfr_sin, rop, op);
 }
 
+/// Unary sine.
+/**
+ * @param r the operand.
+ *
+ * @return the sine of \p r.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2159,11 +2247,24 @@ inline real sin(T &&r)
     return mpfr_nary_op_return(::mpfr_sin, std::forward<T>(r));
 }
 
-inline void cos(real &rop, const real &op)
+/// Binary cosine.
+/**
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to \p rop.
+ */
+inline real &cos(real &rop, const real &op)
 {
-    mpfr_nary_op(::mpfr_cos, rop, op);
+    return mpfr_nary_op(::mpfr_cos, rop, op);
 }
 
+/// Unary cosine.
+/**
+ * @param r the operand.
+ *
+ * @return the cosine of \p r.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2186,10 +2287,51 @@ inline real cos(T &&r)
  *  @{
  */
 
+/// Output stream operator for \link mppp::real real \endlink objects.
+/**
+ * \rststar
+ * This operator will insert into the stream ``os`` a string representation of ``r``
+ * in base 10 (as returned by :cpp:func:`mppp::real::to_string()`).
+ *
+ * .. warning::
+ *    In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
+ *    flags. For the time being, users are encouraged to use the ``mpfr_get_str()`` function from the MPFR
+ *    library if precise and forward-compatible control on the printing format is needed.
+ *
+ * \endrststar
+ *
+ * @param os the target stream.
+ * @param r the \link mppp::real real \endlink that will be directed to \p os.
+ *
+ * @return a reference to \p os.
+ *
+ * @throws unspecified any exception thrown by mppp::real::to_string().
+ */
 inline std::ostream &operator<<(std::ostream &os, const real &r)
 {
-    mpfr_to_stream(r.get_mpfr_t(), os);
+    mpfr_to_stream(r.get_mpfr_t(), os, 10);
     return os;
+}
+
+/// Input stream operator for \link mppp::real real \endlink objects.
+/**
+ * \rststar
+ * This operator is equivalent to extracting a line from the stream and assigning it to ``x``.
+ * \endrststar
+ *
+ * @param is the input stream.
+ * @param x the \link mppp::real real \endlink to which the string extracted from the stream will be assigned.
+ *
+ * @return a reference to \p is.
+ *
+ * @throws unspecified any exception thrown by \link mppp::real real \endlink's assignment operator from string.
+ */
+inline std::istream &operator>>(std::istream &is, real &x)
+{
+    MPPP_MAYBE_TLS std::string tmp_str;
+    std::getline(is, tmp_str);
+    x = tmp_str;
+    return is;
 }
 
 /** @} */
@@ -2222,6 +2364,12 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
  *  @{
  */
 
+/// NaN constant.
+/**
+ * @param p the desired precision.
+ *
+ * @return a \link mppp::real real \endlink NaN.
+ */
 inline real real_nan(::mpfr_prec_t p = 0)
 {
     return real_constant([](real &) {}, p);

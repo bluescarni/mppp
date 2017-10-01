@@ -85,4 +85,5 @@ endif()
 
 if(MPPP_WITH_MPFR)
   ADD_MPPP_TESTCASE(real_basic)
+  ADD_MPPP_TESTCASE(real_io)
 endif()
