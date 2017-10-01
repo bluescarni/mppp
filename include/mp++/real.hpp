@@ -1395,8 +1395,7 @@ public:
      */
     real &set(const real &other)
     {
-        ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
-        return *this;
+        return set(&other.m_mpfr);
     }
         /// Generic setter.
         /**
@@ -1529,6 +1528,33 @@ public:
         return set(s.data(), s.data() + s.size(), base);
     }
 #endif
+    /// Set to an ``mpfr_t``.
+    /**
+     * \rststar
+     * This method will set ``this`` to the value of ``x``. Contrary to the corresponding assignment operator,
+     * the precision of the assignment is dictated by the precision of ``this``, rather than
+     * the precision of ``x``. Consequently, the precision of ``this`` will not be altered by the
+     * assignment, and a rounding might occur, depending on the values
+     * and the precisions of the operands.
+     *
+     * This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
+     *
+     * .. warning::
+     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised.
+     *
+     * .. seealso ::
+     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     * \endrststar
+     *
+     * @param x the ``mpfr_t`` to which \p this will be set.
+     *
+     * @return a reference to \p this.
+     */
+    real &set(const ::mpfr_t x)
+    {
+        ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
+        return *this;
+    }
     /// Swap \link mppp::real real \endlink objects.
     /**
      * This function will efficiently swap the content of \p a and \p b.

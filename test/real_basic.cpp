@@ -1096,19 +1096,32 @@ TEST_CASE("real assignment")
         });
     REQUIRE(r8.nan_p());
 #endif
-    // assignment from mpfr_t.
-    ::mpfr_t m;
-    ::mpfr_init2(m, 123);
-    ::mpfr_set_ui(m, 42ul, MPFR_RNDN);
-    real rtmp;
-    rtmp = m;
-    REQUIRE(rtmp.get_prec() == 123);
-    REQUIRE(::mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
-    ::mpfr_set_si(m, -63l, MPFR_RNDN);
-    real rtmp2{46, 46};
-    rtmp2 = std::move(m);
-    REQUIRE(rtmp2.get_prec() == 123);
-    REQUIRE(::mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
+    {
+        // Assignment from mpfr_t.
+        ::mpfr_t m;
+        ::mpfr_init2(m, 123);
+        ::mpfr_set_ui(m, 42ul, MPFR_RNDN);
+        real rtmp;
+        rtmp = m;
+        REQUIRE(rtmp.get_prec() == 123);
+        REQUIRE(::mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
+        ::mpfr_set_si(m, -63l, MPFR_RNDN);
+        real rtmp2{46, 46};
+        rtmp2 = std::move(m);
+        REQUIRE(rtmp2.get_prec() == 123);
+        REQUIRE(::mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
+    }
+    {
+        // Setter from mpfr_t.
+        ::mpfr_t m;
+        ::mpfr_init2(m, 123);
+        ::mpfr_set_ui(m, 42ul, MPFR_RNDN);
+        real rtmp{12, 12};
+        rtmp.set(m);
+        REQUIRE(rtmp.get_prec() == 12);
+        REQUIRE(::mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
+        ::mpfr_clear(m);
+    }
 }
 
 struct int_conv_tester {
