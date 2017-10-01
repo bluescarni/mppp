@@ -585,6 +585,17 @@ TEST_CASE("real constructors")
                            real{"-3.40917866435610111081769936359662259e-2", 10, 100}.get_mpfr_t()));
     real_reset_default_prec();
 #endif
+    // Constructor from mpfr_t.
+    ::mpfr_t m;
+    ::mpfr_init2(m, 123);
+    ::mpfr_set_ui(m, 42ul, MPFR_RNDN);
+    real rtmp{m};
+    REQUIRE(rtmp.get_prec() == 123);
+    REQUIRE(::mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
+    ::mpfr_set_si(m, -63l, MPFR_RNDN);
+    real rtmp2{std::move(m)};
+    REQUIRE(rtmp2.get_prec() == 123);
+    REQUIRE(::mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
 }
 
 struct int_ass_tester {

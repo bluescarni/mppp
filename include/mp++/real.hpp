@@ -475,12 +475,7 @@ public:
      *
      * @param other the \link mppp::real real \endlink that will be copied.
      */
-    real(const real &other)
-    {
-        // Init with the same precision as other, and then set.
-        ::mpfr_init2(&m_mpfr, other.get_prec());
-        ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
-    }
+    real(const real &other) : real(&other.m_mpfr) {}
     /// Copy constructor with custom precision.
     /**
      * This constructor will set \p this to a copy of \p other with precision \p p. If \p p
@@ -966,6 +961,40 @@ public:
      */
     explicit real(const std::string_view &s) : real(s, 10, 0) {}
 #endif
+    /// Copy constructor from ``mpfr_t``.
+    /**
+     * This constructor will initialise ``this`` with an exact deep copy of ``x``.
+     *
+     * \rststar
+     * .. warning::
+     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised.
+     *    Calling this constructor with an uninitialised ``x`` will result in undefined behaviour.
+     * \endrststar
+     *
+     * @param x the ``mpfr_t`` that will be deep-copied.
+     */
+    explicit real(const ::mpfr_t x)
+    {
+        // Init with the same precision as other, and then set.
+        ::mpfr_init2(&m_mpfr, mpfr_get_prec(x));
+        ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
+    }
+    /// Move constructor from ``mpfr_t``.
+    /**
+     * This constructor will initialise ``this`` with a shallow copy of ``x``.
+     *
+     * \rststar
+     * .. warning::
+     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised.
+     *    Calling this constructor with an uninitialised ``x`` will result in undefined behaviour.
+     *    Additionally, the user must ensure that, after construction, ``mpfr_clear()`` is never
+     *    called on ``x``: the resources previously owned by ``x`` are now owned by ``this``, which
+     *    will take care of releasing them when the destructor is called.
+     * \endrststar
+     *
+     * @param x the ``mpfr_t`` that will be moved.
+     */
+    explicit real(::mpfr_t &&x) : m_mpfr(*x) {}
     /// Destructor.
     /**
      * The destructor will free any resource held by the internal ``mpfr_t`` instance.
