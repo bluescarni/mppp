@@ -593,9 +593,13 @@ TEST_CASE("real constructors")
     REQUIRE(rtmp.get_prec() == 123);
     REQUIRE(::mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
     ::mpfr_set_si(m, -63l, MPFR_RNDN);
+#if defined(_MSC_VER) && !defined(__clang__)
+    ::mpfr_clear(m);
+#else
     real rtmp2{std::move(m)};
     REQUIRE(rtmp2.get_prec() == 123);
     REQUIRE(::mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
+#endif
 }
 
 struct int_ass_tester {
@@ -1106,10 +1110,14 @@ TEST_CASE("real assignment")
         REQUIRE(rtmp.get_prec() == 123);
         REQUIRE(::mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
         ::mpfr_set_si(m, -63l, MPFR_RNDN);
+#if defined(_MSC_VER) && !defined(__clang__)
+        ::mpfr_clear(m);
+#else
         real rtmp2{46, 46};
         rtmp2 = std::move(m);
         REQUIRE(rtmp2.get_prec() == 123);
         REQUIRE(::mpfr_cmp_si(rtmp2.get_mpfr_t(), -63l) == 0);
+#endif
     }
     {
         // Setter from mpfr_t.
