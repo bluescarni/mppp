@@ -1192,6 +1192,7 @@ TEST_CASE("real conversion")
     REQUIRE(static_cast<rat_t>(real{0}) == 0);
     REQUIRE(static_cast<rat_t>(real{123}) == 123);
     REQUIRE(static_cast<rat_t>(real{-123}) == -123);
+    REQUIRE(static_cast<rat_t>(real{int_t{-123} << 110, 32}) == (int_t{-123} << 110));
     REQUIRE((static_cast<rat_t>(real{"4.1875", 10, 100}) == rat_t{67, 16}));
     REQUIRE((static_cast<rat_t>(real{"-4.1875", 10, 100}) == -rat_t{67, 16}));
     REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real{"inf", 10, 100}), std::domain_error,

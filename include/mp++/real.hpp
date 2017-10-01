@@ -133,7 +133,9 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
     ::mpfr_exp_t exp(0);
     smart_mpfr_str str(::mpfr_get_str(nullptr, &exp, base, 0, r, MPFR_RNDN), ::mpfr_free_str);
     if (mppp_unlikely(!str)) {
+        // LCOV_EXCL_START
         throw std::runtime_error("Error in the conversion of a real to string: the call to mpfr_get_str() failed");
+        // LCOV_EXCL_STOP
     }
 
     // Print the string, inserting a decimal point after the first digit.
