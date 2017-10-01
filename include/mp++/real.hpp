@@ -967,8 +967,9 @@ public:
      *
      * \rststar
      * .. warning::
-     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised.
-     *    Calling this constructor with an uninitialised ``x`` will result in undefined behaviour.
+     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
+     *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
+     *    and :cpp:func:`~mppp::real_prec_max()`.
      * \endrststar
      *
      * @param x the ``mpfr_t`` that will be deep-copied.
@@ -985,8 +986,10 @@ public:
      *
      * \rststar
      * .. warning::
-     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised.
-     *    Calling this constructor with an uninitialised ``x`` will result in undefined behaviour.
+     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
+     *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
+     *    and :cpp:func:`~mppp::real_prec_max()`.
+     *
      *    Additionally, the user must ensure that, after construction, ``mpfr_clear()`` is never
      *    called on ``x``: the resources previously owned by ``x`` are now owned by ``this``, which
      *    will take care of releasing them when the destructor is called.
@@ -1321,6 +1324,56 @@ public:
         return operator=(buffer.data());
     }
 #endif
+    /// Copy assignment from ``mpfr_t``.
+    /**
+     * This operator will set ``this`` to a deep copy of ``x``.
+     *
+     * \rststar
+     * .. warning::
+     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
+     *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
+     *    and :cpp:func:`~mppp::real_prec_max()`.
+     * \endrststar
+     *
+     * @param x the ``mpfr_t`` that will be copied.
+     *
+     * @return a reference to \p this.
+     */
+    real &operator=(const ::mpfr_t x)
+    {
+        // Set the precision, assuming the prec of x is valid.
+        set_prec_impl<false>(mpfr_get_prec(x));
+        // Set the value.
+        ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
+        return *this;
+    }
+    /// Move assignment from ``mpfr_t``.
+    /**
+     * This operator will set ``this`` to a shallow copy of ``x``.
+     *
+     * \rststar
+     * .. warning::
+     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
+     *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
+     *    and :cpp:func:`~mppp::real_prec_max()`.
+     *
+     *    Additionally, the user must ensure that, after the assignment, ``mpfr_clear()`` is never
+     *    called on ``x``: the resources previously owned by ``x`` are now owned by ``this``, which
+     *    will take care of releasing them when the destructor is called.
+     * \endrststar
+     *
+     * @param x the ``mpfr_t`` that will be moved.
+     *
+     * @return a reference to \p this.
+     */
+    real &operator=(::mpfr_t &&x)
+    {
+        // Clear this.
+        ::mpfr_clear(&m_mpfr);
+        // Shallow copy x.
+        m_mpfr = *x;
+        return *this;
+    }
     /// Set to another \link mppp::real real \endlink value.
     /**
      * \rststar
