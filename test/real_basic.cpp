@@ -1293,6 +1293,55 @@ TEST_CASE("real conversion")
 #endif
 }
 
+TEST_CASE("real set prec")
+{
+    real r;
+    REQUIRE(r.get_prec() == real_prec_min());
+    REQUIRE(r.zero_p());
+    r.set_prec(156);
+    REQUIRE(r.get_prec() == 156);
+    REQUIRE(r.nan_p());
+    r = real{};
+    set_prec(r, 156);
+    REQUIRE(get_prec(r) == 156);
+    REQUIRE(r.nan_p());
+    r = real{};
+    REQUIRE_THROWS_PREDICATE(r.set_prec(-1), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot set the precision of a real to the value -1: the maximum allowed precision is "
+                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + std::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE(set_prec(r, 0), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot set the precision of a real to the value 0: the maximum allowed precision is "
+                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + std::to_string(real_prec_min());
+    });
+    REQUIRE(r.zero_p());
+    r = 123;
+    r.prec_round(64);
+    REQUIRE(get_prec(r) == 64);
+    REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{123}.get_mpfr_t()));
+    prec_round(r, 74);
+    REQUIRE(get_prec(r) == 74);
+    REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{123}.get_mpfr_t()));
+    REQUIRE_THROWS_PREDICATE(r.prec_round(-1), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot set the precision of a real to the value -1: the maximum allowed precision is "
+                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + std::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE(prec_round(r, 0), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot set the precision of a real to the value 0: the maximum allowed precision is "
+                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + std::to_string(real_prec_min());
+    });
+    REQUIRE(get_prec(r) == 74);
+    REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{123}.get_mpfr_t()));
+}
+
 #if 0
 TEST_CASE("real basic")
 {

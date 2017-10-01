@@ -2043,6 +2043,19 @@ inline void prec_round(real &r, ::mpfr_prec_t p)
     r.prec_round(p);
 }
 
+/// Get the precision of a \link mppp::real real \endlink.
+/**
+ * \ingroup real_prec
+ *
+ * @param r the \link mppp::real real \endlink whose precision will be returned.
+ *
+ * @return the precision of \p r.
+ */
+inline mpfr_prec_t get_prec(const real &r)
+{
+    return r.get_prec();
+}
+
 inline namespace detail
 {
 
