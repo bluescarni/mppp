@@ -352,6 +352,14 @@ struct real_prec {
     const ::mpfr_prec_t value;
 };
 
+// For the future:
+// - construction from/conversion to interoperables can probably be improved performance wise, especially
+//   if we exploit the mpfr_t internals.
+// - probably we should have a build in the CI against the latest MPFR, built with sanitizers on.
+// - maybe for the conversion operators we could consider having get_*() functions as well, at least for the
+//   multiprecision types (the rationale being that it might be convenient to provide an already-setup, e.g., integer
+//   for the conversion rather than creating it in the conversion operator - for the usual reasons).
+
 /// Multiprecision floating-point class.
 /**
  * \rststar
