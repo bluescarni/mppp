@@ -2134,6 +2134,8 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
 }
 
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
 // A small helper to init the pair in the function below. We need this because
 // we cannot take the address of a const real as a real *.
 template <typename Arg, enable_if_t<!is_ncvrvr<Arg &&>::value, int> = 0>
@@ -2149,6 +2151,8 @@ inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(Arg &&arg)
     // arg is a non-const rvalue ref, and a candidate for stealing resources.
     return std::make_pair(&arg, arg.get_prec());
 }
+
+#endif
 
 // Invoke an MPFR function with arguments (arg0, args...), and store the result
 // in a value to be created by this function. If possible, this function will try
