@@ -2081,7 +2081,7 @@ inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &p, const real &ro
 {
     const auto prec0 = arg0.get_prec();
     p.first = p.first && (rop.get_prec() == prec0);
-    p.second = (prec0 > p.second) ? prec0 : p.second;
+    p.second = c_max(prec0, p.second);
     mpfr_examine_precs(p, rop, args...);
 }
 
@@ -2112,9 +2112,7 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
 {
     // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
     // update the prec.
-    const auto prec0 = arg0.get_prec();
-    // Update the max precision among the arguments, if necessary.
-    p.second = (prec0 > p.second) ? prec0 : p.second;
+    p.second = c_max(arg0.get_prec(), p.second);
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
 }
 
@@ -2130,7 +2128,7 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
         p.first = &arg0;
     }
     // Update the max precision among the arguments, if necessary.
-    p.second = (prec0 > p.second) ? prec0 : p.second;
+    p.second = c_max(prec0, p.second);
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
 }
 
