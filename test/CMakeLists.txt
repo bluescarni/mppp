@@ -84,6 +84,7 @@ if(MPPP_WITH_QUADMATH)
 endif()
 
 if(MPPP_WITH_MPFR)
+  ADD_MPPP_TESTCASE(real_arith)
   ADD_MPPP_TESTCASE(real_basic)
   ADD_MPPP_TESTCASE(real_cmp)
   ADD_MPPP_TESTCASE(real_io)

@@ -2071,13 +2071,10 @@ inline namespace detail
 // of rop and of the arguments. It will write into a pair in which the first element is a boolean
 // flag signalling if rop and args all have the same precision, and the second element
 // contains the maximum precision among the args.
-// NOTE: this is the terminator for the recursion, the real argument is a rop, not
-// one of the operands.
-inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &, const real &) {}
+inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &, real &) {}
 
 template <typename... Args>
-inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &p, const real &rop, const real &arg0,
-                               const Args &... args)
+inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &p, real &rop, const real &arg0, const Args &... args)
 {
     const auto prec0 = arg0.get_prec();
     p.first = p.first && (rop.get_prec() == prec0);
