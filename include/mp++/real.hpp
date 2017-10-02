@@ -2071,6 +2071,8 @@ inline namespace detail
 // of rop and of the arguments. It will write into a pair in which the first element is a boolean
 // flag signalling if rop and args all have the same precision, and the second element
 // contains the maximum precision among the args.
+// NOTE: this is the terminator for the recursion, the real argument is a rop, not
+// one of the operands.
 inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &, const real &) {}
 
 template <typename... Args>
@@ -2103,11 +2105,24 @@ inline real &mpfr_nary_op(const F &f, real &rop, const real &arg0, const Args &.
 // we can steal resources, and the max precision among the arguments.
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &) {}
 
-template <typename Arg0, typename... Args>
+// NOTE: we need 2 overloads for this, as we cannot extract a non-const pointer from
+// arg0 if arg0 is a const ref.
+template <typename Arg0, typename... Args, enable_if_t<!is_ncvrvr<Arg0 &&>::value, int> = 0>
+inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
+{
+    // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
+    // update the prec.
+    const auto prec0 = arg0.get_prec();
+    // Update the max precision among the arguments, if necessary.
+    p.second = (prec0 > p.second) ? prec0 : p.second;
+    mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
+}
+
+template <typename Arg0, typename... Args, enable_if_t<is_ncvrvr<Arg0 &&>::value, int> = 0>
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
 {
     const auto prec0 = arg0.get_prec();
-    if (is_ncvrvr<Arg0 &&>::value && (!p.first || prec0 > p.first->get_prec())) {
+    if (!p.first || prec0 > p.first->get_prec()) {
         // The current argument arg0 is a non-const rvalue reference, and either it's
         // the first argument we encounter we can steal from, or it has a precision
         // larger than the current candidate for stealing resources from. This means that
@@ -2117,6 +2132,22 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
     // Update the max precision among the arguments, if necessary.
     p.second = (prec0 > p.second) ? prec0 : p.second;
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
+}
+
+// A small helper to init the pair in the function below. We need this because
+// we cannot take the address of a const real as a real *.
+template <typename Arg, enable_if_t<!is_ncvrvr<Arg &&>::value, int> = 0>
+inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(Arg &&arg)
+{
+    // arg is not a non-const rvalue ref, we cannot steal from it. Init with nullptr.
+    return std::make_pair(static_cast<real *>(nullptr), arg.get_prec());
+}
+
+template <typename Arg, enable_if_t<is_ncvrvr<Arg &&>::value, int> = 0>
+inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(Arg &&arg)
+{
+    // arg is a non-const rvalue ref, and a candidate for stealing resources.
+    return std::make_pair(&arg, arg.get_prec());
 }
 
 // Invoke an MPFR function with arguments (arg0, args...), and store the result
@@ -2131,7 +2162,7 @@ inline real mpfr_nary_op_return(const F &f, Arg0 &&arg0, Args &&... args)
     // - a pointer to the largest-precision real from which we can steal resources (may be nullptr),
     // - the largest precision among all arguments.
     // It's inited with arg0's precision, and a pointer to arg0, if arg0 is a nonconst rvalue ref.
-    auto p = std::make_pair(is_ncvrvr<Arg0 &&>::value ? &arg0 : static_cast<real *>(nullptr), arg0.get_prec());
+    auto p = mpfr_nary_op_return_init_pair(std::forward<Arg0>(arg0));
     // Examine the remaining arguments.
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
     if (p.first && p.first->get_prec() == p.second) {
@@ -2140,7 +2171,7 @@ inline real mpfr_nary_op_return(const F &f, Arg0 &&arg0, Args &&... args)
         f(p.first->_get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
         return std::move(*p.first);
     }
-    // Either we cannot steal from any arg, or the candidate(s) have not enough precision.
+    // Either we cannot steal from any arg, or the candidate(s) do not have enough precision.
     // Init a new value and use it instead.
     real retval{real_prec{p.second}, true};
     f(retval._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
