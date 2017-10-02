@@ -1116,6 +1116,20 @@ TEST_CASE("real assignment")
         REQUIRE(::mpfr_cmp_ui(rtmp.get_mpfr_t(), 42ul) == 0);
         ::mpfr_clear(m);
     }
+    // The setter free function.
+    r8.set_prec(154);
+    set(r8, 12);
+    REQUIRE(::mpfr_cmp_ui(r8.get_mpfr_t(), 12ul) == 0);
+    REQUIRE(r8.get_prec() == 154);
+    r8.set_prec(254);
+    set(r8, "123", 7);
+    REQUIRE(::mpfr_cmp_ui(r8.get_mpfr_t(), 66ul) == 0);
+    REQUIRE(r8.get_prec() == 254);
+    REQUIRE((std::is_same<real &, decltype(set(r8, "123", 7))>::value));
+    r8.set_prec(253);
+    set(r8, rat_t{45, 5});
+    REQUIRE(::mpfr_cmp_ui(r8.get_mpfr_t(), 9ul) == 0);
+    REQUIRE(r8.get_prec() == 253);
 }
 
 struct int_conv_tester {

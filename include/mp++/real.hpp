@@ -2067,6 +2067,61 @@ inline mpfr_prec_t get_prec(const real &r)
 inline namespace detail
 {
 
+template <typename... Args>
+using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &>()...));
+}
+
+/** @defgroup real_assignment real_assignment
+ *  @{
+ */
+
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
+template <typename... Args>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RealSetArgs = is_detected<real_set_t, Args...>::value;
+#else
+using real_set_args_enabler = enable_if_t<is_detected<real_set_t, Args...>::value, int>;
+#endif
+
+#endif
+
+/// Generic setter for \link mppp::real real \endlink.
+/**
+ * \rststar
+ * This function will use the arguments ``args`` to set the value of the :cpp:class:`~mppp::real` ``r``,
+ * using one of the available :cpp:func:`mppp::real::set()` overloads. That is,
+ * the body of this function is equivalent to
+ *
+ * .. code-block:: c++
+ *
+ *    return r.set(args...);
+ *
+ * The input arguments must satisfy the :cpp:concept:`~mppp::RealSetArgs` concept.
+ * \endrststar
+ *
+ * @param r the \link mppp::real real \endlink that will be set.
+ * @param args the arguments that will be passed to mppp::real::set().
+ *
+ * @return a reference to \p r.
+ *
+ * @throws unspecified any exception thrown by the invoked mppp::real::set() overload.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <RealSetArgs... Args>
+#else
+template <typename... Args, real_set_args_enabler<Args...> = 0>
+#endif
+inline real &set(real &r, const Args &... args)
+{
+    return r.set(args...);
+}
+
+/** @} */
+
+inline namespace detail
+{
+
 // A recursive function to examine, in an MPFR n-ary function call, the precisions
 // of rop and of the arguments. It will write into a pair in which the first element is a boolean
 // flag signalling if rop and args all have the same precision, and the second element
@@ -2185,7 +2240,7 @@ inline real mpfr_nary_op_return(const F &f, Arg0 &&arg0, Args &&... args)
 /// Ternary \link mppp::real real \endlink addition.
 /**
  * This function will compute \f$a+b\f$, storing the result in \p rop.
- * The precision of the result is the largest precision among the operands.
+ * The precision of the result will be set to the largest precision among the operands.
  *
  * @param rop the return value.
  * @param a the first operand.
@@ -2201,7 +2256,7 @@ inline real &add(real &rop, const real &a, const real &b)
 /// Ternary \link mppp::real real \endlink subtraction.
 /**
  * This function will compute \f$a-b\f$, storing the result in \p rop.
- * The precision of the result is the largest precision among the operands.
+ * The precision of the result will be set to the largest precision among the operands.
  *
  * @param rop the return value.
  * @param a the first operand.
@@ -2217,7 +2272,7 @@ inline real &sub(real &rop, const real &a, const real &b)
 /// Quaternary \link mppp::real real \endlink fused multiply–add.
 /**
  * This function will compute \f$a \times b + c\f$, storing the result in \p rop.
- * The precision of the result is the largest precision among the operands.
+ * The precision of the result will be set to the largest precision among the operands.
  *
  * @param rop the return value.
  * @param a the first operand.
@@ -2235,7 +2290,7 @@ inline real &fma(real &rop, const real &a, const real &b, const real &c)
 /**
  * \rststar
  * This function will compute and return :math:`a \times b + c`.
- * The precision of the result is the largest precision among the operands,
+ * The precision of the result will be set to the largest precision among the operands,
  * which must all satisfy the :cpp:concept:`~mppp::CvrReal` concept.
  * \endrststar
  *

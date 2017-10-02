@@ -51,6 +51,19 @@ Concepts
    This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
    is the same as :cpp:class:`mppp::real`.
 
+.. cpp:concept:: template <typename... Args> mppp::RealSetArgs
+
+   This concept is satisfied if the types in the parameter pack ``Args``
+   can be used as argument types in one of the :cpp:func:`mppp::real::set()` method overloads.
+   In other words, this concept is satisfied if the expression
+
+   .. code-block:: c++
+
+      r.set(x, y, z, ...);
+
+   is valid (where ``r`` is a non-const :cpp:class:`~mppp::real` and ``x``, ``y``, ``z``, etc. are const
+   references to the types in ``Args``).
+
 .. _real_functions:
 
 Functions
@@ -62,6 +75,14 @@ Precision handling
 ~~~~~~~~~~~~~~~~~~
 
 .. doxygengroup:: real_prec
+   :content-only:
+
+.. _real_assignment:
+
+Assignment
+~~~~~~~~~~
+
+.. doxygengroup:: real_assignment
    :content-only:
 
 .. _real_arithmetic:
