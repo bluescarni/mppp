@@ -17,6 +17,20 @@
 
 using namespace mppp;
 
+#if defined(_MSC_VER)
+
+template <typename... Args>
+auto fma_wrap(Args &&... args) -> decltype(mppp::fma(std::forward<Args>(args)...))
+{
+    return mppp::fma(std::forward<Args>(args)...);
+}
+
+#else
+
+#define fma_wrap fma
+
+#endif
+
 TEST_CASE("real arith nary rop")
 {
     real r1, r2, r3;
@@ -168,21 +182,40 @@ TEST_CASE("real sub")
 TEST_CASE("real fma")
 {
     real r1, r2, r3, r4;
-    fma(r1, r2, r3, r4);
+    fma_wrap(r1, r2, r3, r4);
     REQUIRE(r1.zero_p());
     REQUIRE(r1.get_prec() == r3.get_prec());
-    fma(r1, real{2, 12}, real{3, 7}, real{14, 128});
+    fma_wrap(r1, real{2, 12}, real{3, 7}, real{14, 128});
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{20}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
     r1 = 0;
-    fma(r1, real{3, 7}, real{2, 12}, real{14, 128});
+    fma_wrap(r1, real{3, 7}, real{2, 12}, real{14, 128});
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{20}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
     r1 = 0;
-    fma(r1, real{14, 128}, real{3, 7}, real{2, 12});
+    fma_wrap(r1, real{14, 128}, real{3, 7}, real{2, 12});
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{44}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
-    r1 = fma(real{14, 128}, real{3, 7}, real{2, 12});
+    r1 = fma_wrap(real{14, 128}, real{3, 7}, real{2, 12});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{44}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(static_cast<const real &>(real{14, 128}), real{3, 7}, real{2, 12});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{44}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(real{14, 128}, static_cast<const real &>(real{3, 7}), real{2, 12});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{44}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(real{14, 128}, real{3, 7}, static_cast<const real &>(real{2, 12}));
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{44}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(real{14, 128}, static_cast<const real &>(real{3, 7}), static_cast<const real &>(real{2, 12}));
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{44}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(static_cast<const real &>(real{14, 128}), real{3, 7}, static_cast<const real &>(real{2, 12}));
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{44}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fma_wrap(static_cast<const real &>(real{14, 128}), static_cast<const real &>(real{3, 7}),
+                  static_cast<const real &>(real{2, 12}));
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{44}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
 }

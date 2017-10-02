@@ -47,20 +47,6 @@ static std::mt19937 rng;
 
 static const int ntrials = 1000;
 
-// #if defined(_MSC_VER)
-
-// template <typename... Args>
-// auto fma_wrap(Args &&... args) -> decltype(mppp::fma(std::forward<Args>(args)...))
-// {
-//     return mppp::fma(std::forward<Args>(args)...);
-// }
-
-// #else
-
-// #define fma_wrap fma
-
-// #endif
-
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
                              unsigned long, long long, unsigned long long>;
 
@@ -1341,53 +1327,3 @@ TEST_CASE("real set prec")
     REQUIRE(get_prec(r) == 74);
     REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{123}.get_mpfr_t()));
 }
-
-#if 0
-TEST_CASE("real basic")
-{
-    std::cout << std::setprecision(20);
-    std::cout << real{1ll} << '\n';
-    std::cout << real{1.l} << '\n';
-    real r{12356732};
-    std::cout << r.prec_round(120) << '\n';
-    std::cout << r.prec_round(12) << '\n';
-    std::cout << real{true} << '\n';
-    std::cout << real{integer<1>{1}} << '\n';
-    std::cout << static_cast<integer<1>>(real{integer<1>{1}}) << '\n';
-    std::cout << real{rational<1>{1, 3}} << '\n';
-    std::cout << static_cast<rational<1>>(real{rational<1>{1, 3}}) << '\n';
-    std::cout << static_cast<float>(real{rational<1>{1, 3}}) << '\n';
-    std::cout << static_cast<double>(real{rational<1>{1, 3}}) << '\n';
-    std::cout << static_cast<long double>(real{rational<1>{1, 3}}) << '\n';
-    std::cout << static_cast<unsigned>(real{128}) << '\n';
-    std::cout << static_cast<bool>(real{128}) << '\n';
-    std::cout << static_cast<bool>(real{-128}) << '\n';
-    std::cout << static_cast<bool>(real{0}) << '\n';
-    std::cout << static_cast<int>(real{42}) << '\n';
-    std::cout << static_cast<long long>(real{-42}) << '\n';
-    std::cout << sqrt(r) << '\n';
-    real flup{9876};
-    std::cout << sqrt(std::move(flup)) << '\n';
-    std::cout << fma_wrap(real{1}, real{2}, real{3}) << '\n';
-#if defined(MPPP_WITH_QUADMATH)
-    std::cout << static_cast<real128>(real{-42}) << '\n';
-    std::cout << static_cast<real128>(real{-1}) << '\n';
-    std::cout << static_cast<real128>(real{1}) << '\n';
-    std::cout << static_cast<real128>(real{real128{"3.40917866435610111081769936359662259e-4957"}}) << '\n';
-    std::cout << static_cast<real128>(real{real128{"3.40917866435610111081769936359662259e-4957"}}.prec_round(127))
-              << '\n';
-    std::cout << static_cast<real128>(real{real128{"3.40917866435610111081769936359662259e-4957"}}.prec_round(128))
-              << '\n';
-    std::cout << static_cast<real128>(real{real128{"3.40917866435610111081769936359662259e-4957"}}.prec_round(129))
-              << '\n';
-    std::cout << static_cast<real128>(real{real128{"3.40917866435610111081769936359662259e-4957"}}.prec_round(250))
-              << '\n';
-    std::cout << real{-real128{"1.3E200"}} << '\n';
-    std::cout << -real128{"1.3E200"} << '\n';
-    std::cout << real{-real128{"1.3E-200"}} << '\n';
-    std::cout << -real128{"1.3E-200"} << '\n';
-    std::cout << real128{"1E-4940"} << '\n';
-    std::cout << real{real128{"1E-4940"}} << '\n';
-#endif
-}
-#endif
