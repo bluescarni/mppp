@@ -2184,46 +2184,61 @@ inline real mpfr_nary_op_return(const F &f, Arg0 &&arg0, Args &&... args)
 
 /// Ternary \link mppp::real real \endlink addition.
 /**
+ * This function will compute \f$a+b\f$, storing the result in \p rop.
+ * The precision of the result is the largest precision among the operands.
+ *
  * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
+ * @param a the first operand.
+ * @param b the second operand.
  *
  * @return a reference to \p rop.
  */
-inline real &add(real &rop, const real &op1, const real &op2)
+inline real &add(real &rop, const real &a, const real &b)
 {
-    return mpfr_nary_op(::mpfr_add, rop, op1, op2);
+    return mpfr_nary_op(::mpfr_add, rop, a, b);
 }
 
 /// Ternary \link mppp::real real \endlink subtraction.
 /**
+ * This function will compute \f$a-b\f$, storing the result in \p rop.
+ * The precision of the result is the largest precision among the operands.
+ *
  * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
+ * @param a the first operand.
+ * @param b the second operand.
  *
  * @return a reference to \p rop.
  */
-inline real &sub(real &rop, const real &op1, const real &op2)
+inline real &sub(real &rop, const real &a, const real &b)
 {
-    return mpfr_nary_op(::mpfr_sub, rop, op1, op2);
+    return mpfr_nary_op(::mpfr_sub, rop, a, b);
 }
 
 /// Quaternary \link mppp::real real \endlink fused multiply–add.
 /**
+ * This function will compute \f$a \times b + c\f$, storing the result in \p rop.
+ * The precision of the result is the largest precision among the operands.
+ *
  * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
- * @param op3 the third operand.
+ * @param a the first operand.
+ * @param b the second operand.
+ * @param c the third operand.
  *
  * @return a reference to \p rop.
  */
-inline real &fma(real &rop, const real &op1, const real &op2, const real &op3)
+inline real &fma(real &rop, const real &a, const real &b, const real &c)
 {
-    return mpfr_nary_op(::mpfr_fma, rop, op1, op2, op3);
+    return mpfr_nary_op(::mpfr_fma, rop, a, b, c);
 }
 
 /// Ternary \link mppp::real real \endlink fused multiply–add.
 /**
+ * \rststar
+ * This function will compute and return :math:`a \times b + c`.
+ * The precision of the result is the largest precision among the operands,
+ * which must all satisfy the :cpp:concept:`~mppp::CvrReal` concept.
+ * \endrststar
+ *
  * @param a the first operand.
  * @param b the second operand.
  * @param c the third operand.
