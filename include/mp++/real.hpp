@@ -2396,20 +2396,29 @@ inline real fma(T &&a, U &&b, V &&c)
 
 /// Quaternary \link mppp::real real \endlink fused multiply–sub.
 /**
+ * This function will compute \f$a \times b - c\f$, storing the result in \p rop.
+ * The precision of the result will be set to the largest precision among the operands.
+ *
  * @param rop the return value.
- * @param op1 the first operand.
- * @param op2 the second operand.
- * @param op3 the third operand.
+ * @param a the first operand.
+ * @param b the second operand.
+ * @param c the third operand.
  *
  * @return a reference to \p rop.
  */
-inline real &fms(real &rop, const real &op1, const real &op2, const real &op3)
+inline real &fms(real &rop, const real &a, const real &b, const real &c)
 {
-    return mpfr_nary_op(::mpfr_fms, rop, op1, op2, op3);
+    return mpfr_nary_op(::mpfr_fms, rop, a, b, c);
 }
 
 /// Ternary \link mppp::real real \endlink fused multiply–sub.
 /**
+ * \rststar
+ * This function will compute and return :math:`a \times b - c`.
+ * The precision of the result will be set to the largest precision among the operands,
+ * which must all satisfy the :cpp:concept:`~mppp::CvrReal` concept.
+ * \endrststar
+ *
  * @param a the first operand.
  * @param b the second operand.
  * @param c the third operand.
