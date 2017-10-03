@@ -25,9 +25,16 @@ auto fma_wrap(Args &&... args) -> decltype(mppp::fma(std::forward<Args>(args)...
     return mppp::fma(std::forward<Args>(args)...);
 }
 
+template <typename... Args>
+auto fms_wrap(Args &&... args) -> decltype(mppp::fms(std::forward<Args>(args)...))
+{
+    return mppp::fms(std::forward<Args>(args)...);
+}
+
 #else
 
 #define fma_wrap fma
+#define fms_wrap fms
 
 #endif
 
@@ -217,5 +224,46 @@ TEST_CASE("real fma")
     r1 = fma_wrap(static_cast<const real &>(real{14, 128}), static_cast<const real &>(real{3, 7}),
                   static_cast<const real &>(real{2, 12}));
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{44}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+}
+
+TEST_CASE("real fms")
+{
+    real r1, r2, r3, r4;
+    fms_wrap(r1, r2, r3, r4);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    fms_wrap(r1, real{2, 12}, real{3, 7}, real{14, 128});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{-8}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = 0;
+    fms_wrap(r1, real{3, 7}, real{2, 12}, real{14, 128});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{-8}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = 0;
+    fms_wrap(r1, real{14, 128}, real{3, 7}, real{2, 12});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{40}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fms_wrap(real{14, 128}, real{3, 7}, real{2, 12});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{40}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fms_wrap(static_cast<const real &>(real{14, 128}), real{3, 7}, real{2, 12});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{40}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fms_wrap(real{14, 128}, static_cast<const real &>(real{3, 7}), real{2, 12});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{40}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fms_wrap(real{14, 128}, real{3, 7}, static_cast<const real &>(real{2, 12}));
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{40}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fms_wrap(real{14, 128}, static_cast<const real &>(real{3, 7}), static_cast<const real &>(real{2, 12}));
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{40}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fms_wrap(static_cast<const real &>(real{14, 128}), real{3, 7}, static_cast<const real &>(real{2, 12}));
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{40}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+    r1 = fms_wrap(static_cast<const real &>(real{14, 128}), static_cast<const real &>(real{3, 7}),
+                  static_cast<const real &>(real{2, 12}));
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{40}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
 }
