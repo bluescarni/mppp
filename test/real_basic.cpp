@@ -1156,6 +1156,27 @@ TEST_CASE("real assignment")
     REQUIRE(r8.inf_p());
     REQUIRE(r8.get_prec() == 45);
     REQUIRE(r8.sgn() < 0);
+    r8.set_prec(86);
+    r8.set_zero();
+    REQUIRE(r8.zero_p());
+    REQUIRE(r8.get_prec() == 86);
+    REQUIRE(r8.sgn() == 0);
+    REQUIRE(!r8.signbit());
+    set_zero(r8, 1);
+    REQUIRE(r8.zero_p());
+    REQUIRE(r8.get_prec() == 86);
+    REQUIRE(r8.sgn() == 0);
+    r8.set_prec(45);
+    r8.set_zero(-1);
+    REQUIRE(r8.zero_p());
+    REQUIRE(r8.get_prec() == 45);
+    REQUIRE(r8.sgn() == 0);
+    REQUIRE(r8.signbit());
+    set_zero(r8, -10);
+    REQUIRE(r8.zero_p());
+    REQUIRE(r8.get_prec() == 45);
+    REQUIRE(r8.sgn() == 0);
+    REQUIRE(r8.signbit());
 }
 
 struct int_conv_tester {
