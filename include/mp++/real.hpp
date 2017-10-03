@@ -2353,6 +2353,38 @@ inline real &sub(real &rop, const real &a, const real &b)
     return mpfr_nary_op(::mpfr_sub, rop, a, b);
 }
 
+/// Ternary \link mppp::real real \endlink multiplication.
+/**
+ * This function will compute \f$a \times b\f$, storing the result in \p rop.
+ * The precision of the result will be set to the largest precision among the operands.
+ *
+ * @param rop the return value.
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return a reference to \p rop.
+ */
+inline real &mul(real &rop, const real &a, const real &b)
+{
+    return mpfr_nary_op(::mpfr_mul, rop, a, b);
+}
+
+/// Ternary \link mppp::real real \endlink division.
+/**
+ * This function will compute \f$a / b\f$, storing the result in \p rop.
+ * The precision of the result will be set to the largest precision among the operands.
+ *
+ * @param rop the return value.
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return a reference to \p rop.
+ */
+inline real &div(real &rop, const real &a, const real &b)
+{
+    return mpfr_nary_op(::mpfr_div, rop, a, b);
+}
+
 /// Quaternary \link mppp::real real \endlink fused multiply–add.
 /**
  * This function will compute \f$a \times b + c\f$, storing the result in \p rop.

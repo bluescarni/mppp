@@ -186,6 +186,56 @@ TEST_CASE("real sub")
     REQUIRE(r1.get_prec() == 128);
 }
 
+TEST_CASE("real mul")
+{
+    real r1, r2, r3;
+    mul(r1, r2, r3);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1 = 56;
+    mul(r1, r2, r3);
+    REQUIRE(r1.zero_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r2 = 56;
+    r3 = -45;
+    r1 = -4;
+    mul(r1, r2, r3);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{-2520}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1.prec_round(real_prec_min());
+    mul(r1, r2, r3);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{-2520}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    mul(r1, real{12, 123}, real{34, 128});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{408}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+}
+
+TEST_CASE("real div")
+{
+    real r1, r2, r3;
+    div(r1, r2, r3);
+    REQUIRE(r1.nan_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1 = 56;
+    div(r1, r2, r3);
+    REQUIRE(r1.nan_p());
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r2 = 56;
+    r3 = -7;
+    r1 = -4;
+    div(r1, r2, r3);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{-8}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    r1.prec_round(real_prec_min());
+    div(r1, r2, r3);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{-8}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == r3.get_prec());
+    div(r1, real{12, 123}, real{32, 128});
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{"0.375", 64}.get_mpfr_t()));
+    REQUIRE(r1.get_prec() == 128);
+}
+
 TEST_CASE("real fma")
 {
     real r1, r2, r3, r4;
