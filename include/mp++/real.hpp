@@ -1563,6 +1563,46 @@ public:
         ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
         return *this;
     }
+    /// Set to NaN.
+    /**
+     * This setter will set \p this to NaN with an unspecified sign bit. The precision of \p this
+     * will not be altered.
+     *
+     * @return a reference to \p this.
+     */
+    real &set_nan()
+    {
+        ::mpfr_set_nan(&m_mpfr);
+        return *this;
+    }
+    /// Set to infinity.
+    /**
+     * This setter will set \p this to infinity. The sign bit will be positive if \p sign
+     * is nonnegative, negative otherwise. The precision of \p this will not be altered.
+     *
+     * @param sign the sign of the infinity to which \p this will be set.
+     *
+     * @return a reference to \p this.
+     */
+    real &set_inf(int sign = 0)
+    {
+        ::mpfr_set_inf(&m_mpfr, sign);
+        return *this;
+    }
+    /// Set to zero.
+    /**
+     * This setter will set \p this to zero. The sign bit will be positive if \p sign
+     * is nonnegative, negative otherwise. The precision of \p this will not be altered.
+     *
+     * @param sign the sign of the zero to which \p this will be set.
+     *
+     * @return a reference to \p this.
+     */
+    real &set_zero(int sign = 0)
+    {
+        ::mpfr_set_zero(&m_mpfr, sign);
+        return *this;
+    }
     /// Swap \link mppp::real real \endlink objects.
     /**
      * This function will efficiently swap the content of \p a and \p b.
@@ -2115,6 +2155,50 @@ template <typename... Args, real_set_args_enabler<Args...> = 0>
 inline real &set(real &r, const Args &... args)
 {
     return r.set(args...);
+}
+
+/// Set \link mppp::real real \endlink to NaN.
+/**
+ * This function will set \p r to NaN with an unspecified sign bit. The precision of \p r
+ * will not be altered.
+ *
+ * @param r the \link mppp::real real \endlink argument.
+ *
+ * @return a reference to \p r.
+ */
+inline real &set_nan(real &r)
+{
+    return r.set_nan();
+}
+
+/// Set \link mppp::real real \endlink to infinity.
+/**
+ * This function will set \p r to infinity. The sign bit will be positive if \p sign
+ * is nonnegative, negative otherwise. The precision of \p r will not be altered.
+ *
+ * @param r the \link mppp::real real \endlink argument.
+ * @param sign the sign of the infinity to which \p r will be set.
+ *
+ * @return a reference to \p r.
+ */
+inline real &set_inf(real &r, int sign = 0)
+{
+    return r.set_inf(sign);
+}
+
+/// Set \link mppp::real real \endlink to zero.
+/**
+ * This function will set \p r to zero. The sign bit will be positive if \p sign
+ * is nonnegative, negative otherwise. The precision of \p r will not be altered.
+ *
+ * @param r the \link mppp::real real \endlink argument.
+ * @param sign the sign of the zero to which \p r will be set.
+ *
+ * @return a reference to \p r.
+ */
+inline real &set_zero(real &r, int sign = 0)
+{
+    return r.set_zero(sign);
 }
 
 /** @} */

@@ -1130,6 +1130,32 @@ TEST_CASE("real assignment")
     set(r8, rat_t{45, 5});
     REQUIRE(::mpfr_cmp_ui(r8.get_mpfr_t(), 9ul) == 0);
     REQUIRE(r8.get_prec() == 253);
+    // Special values setters.
+    r8.set_nan();
+    REQUIRE(r8.nan_p());
+    REQUIRE(r8.get_prec() == 253);
+    r8.set_prec(251);
+    r8.set(4);
+    set_nan(r8);
+    REQUIRE(r8.nan_p());
+    REQUIRE(r8.get_prec() == 251);
+    r8.set_inf();
+    REQUIRE(r8.inf_p());
+    REQUIRE(r8.get_prec() == 251);
+    REQUIRE(r8.sgn() > 0);
+    set_inf(r8, 1);
+    REQUIRE(r8.inf_p());
+    REQUIRE(r8.get_prec() == 251);
+    REQUIRE(r8.sgn() > 0);
+    r8.set_prec(45);
+    r8.set_inf(-1);
+    REQUIRE(r8.inf_p());
+    REQUIRE(r8.get_prec() == 45);
+    REQUIRE(r8.sgn() < 0);
+    set_inf(r8, -10);
+    REQUIRE(r8.inf_p());
+    REQUIRE(r8.get_prec() == 45);
+    REQUIRE(r8.sgn() < 0);
 }
 
 struct int_conv_tester {
