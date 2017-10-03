@@ -176,6 +176,8 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
     }
 }
 
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
 // Helpers to deduce the precision when constructing/assigning a real via another type.
 template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
@@ -248,6 +250,8 @@ inline ::mpfr_prec_t real_deduce_precision(const real128 &)
     static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
     return 113;
 }
+#endif
+
 #endif
 
 template <typename = void>
