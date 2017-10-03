@@ -90,19 +90,6 @@ constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
     return real_prec_check(p) ? p : (p < real_prec_min() ? real_prec_min() : real_prec_max());
 }
 
-// Utility function to determine the number of base-2 digits of the significand
-// of a floating-point type which is not in base-2.
-template <typename T>
-inline ::mpfr_prec_t dig2mpfr_prec()
-{
-    static_assert(std::is_floating_point<T>::value, "Invalid type.");
-    // NOTE: just do a raw cast for the time being, it's not like we have ways of testing
-    // this in any case. In the future we could consider switching to a compile-time implementation
-    // of the integral log2, and do everything as compile-time integral computations.
-    return static_cast<::mpfr_prec_t>(
-        std::ceil(std::numeric_limits<T>::digits * std::log2(std::numeric_limits<T>::radix)));
-}
-
 // Helper function to print an mpfr to stream in base 10.
 inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 {
@@ -188,6 +175,80 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
         os << z_exp;
     }
 }
+
+// Helpers to deduce the precision when constructing/assigning a real via another type.
+template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+inline ::mpfr_prec_t real_deduce_precision(const T &)
+{
+    static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
+    return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits);
+}
+
+// Utility function to determine the number of base-2 digits of the significand
+// of a floating-point type which is not in base-2.
+template <typename T>
+inline ::mpfr_prec_t dig2mpfr_prec()
+{
+    static_assert(std::is_floating_point<T>::value, "Invalid type.");
+    // NOTE: just do a raw cast for the time being, it's not like we have ways of testing
+    // this in any case. In the future we could consider switching to a compile-time implementation
+    // of the integral log2, and do everything as compile-time integral computations.
+    return static_cast<::mpfr_prec_t>(
+        std::ceil(std::numeric_limits<T>::digits * std::log2(std::numeric_limits<T>::radix)));
+}
+
+template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+inline ::mpfr_prec_t real_deduce_precision(const T &)
+{
+    static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
+    return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
+                                              : dig2mpfr_prec<T>();
+}
+
+template <std::size_t SSize>
+inline ::mpfr_prec_t real_deduce_precision(const integer<SSize> &n)
+{
+    // Infer the precision from the bit size of n.
+    const auto ls = n.size();
+    // Check that ls * GMP_NUMB_BITS is representable by mpfr_prec_t.
+    if (mppp_unlikely(ls > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
+                               / unsigned(GMP_NUMB_BITS))) {
+        // LCOV_EXCL_START
+        throw std::overflow_error("The deduced precision for a real from an integer is too large");
+        // LCOV_EXCL_STOP
+    }
+    return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS);
+}
+
+template <std::size_t SSize>
+inline ::mpfr_prec_t real_deduce_precision(const rational<SSize> &q)
+{
+    // Infer the precision from the bit size of num/den.
+    const auto n_size = q.get_num().size();
+    const auto d_size = q.get_den().size();
+    // Overflow checks.
+    if (mppp_unlikely(
+            // Overflow in total size.
+            (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
+            // Check that tot_size * GMP_NUMB_BITS is representable by mpfr_prec_t.
+            || ((n_size + d_size)
+                > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
+                      / unsigned(GMP_NUMB_BITS)))) {
+        // LCOV_EXCL_START
+        throw std::overflow_error("The deduced precision for a real from a rational is too large");
+        // LCOV_EXCL_STOP
+    }
+    return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS);
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+inline ::mpfr_prec_t real_deduce_precision(const real128 &)
+{
+    // The significand precision in bits is 113 for real128. Let's double-check it.
+    static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
+    return 113;
+}
+#endif
 
 template <typename = void>
 struct real_constants {
@@ -523,13 +584,10 @@ public:
 private:
     // A helper to determine the precision to use in the generic constructors. The precision
     // can be manually provided, taken from the default global value, or deduced according
-    // to the properties of the type. A deducer will implement the logic to determine the deduced
-    // precision for the type.
-    template <typename Deducer>
-    static ::mpfr_prec_t compute_init_precision(::mpfr_prec_t provided, const Deducer &d)
+    // to the properties of the type/value.
+    template <typename T>
+    static ::mpfr_prec_t compute_init_precision(::mpfr_prec_t provided, const T &x)
     {
-        static_assert(std::is_same<decltype(d()), ::mpfr_prec_t>::value,
-                      "Invalid type returned by the precision deducer.");
         if (provided) {
             // Provided precision trumps everything. Check it and return it.
             return check_init_prec(provided);
@@ -538,7 +596,7 @@ private:
         // NOTE: this is guaranteed to be a valid precision value.
         const auto dp = real_get_default_prec();
         // Return default precision if nonzero, otherwise return the clamped deduced precision.
-        return dp ? dp : clamp_mpfr_prec(d());
+        return dp ? dp : clamp_mpfr_prec(real_deduce_precision(x));
     }
     // Construction from FPs.
     // Alias for the MPFR assignment functions from FP types.
@@ -547,11 +605,7 @@ private:
     template <typename T>
     void dispatch_fp_construction(fp_a_ptr<T> ptr, const T &x, ::mpfr_prec_t p)
     {
-        static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, []() {
-            return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
-                                                      : dig2mpfr_prec<T>();
-        }));
+        ::mpfr_init2(&m_mpfr, compute_init_precision(p, x));
         ptr(&m_mpfr, x, MPFR_RNDN);
     }
     void dispatch_construction(const float &x, ::mpfr_prec_t p)
@@ -568,23 +622,21 @@ private:
     }
     // Construction from integral types.
     template <typename T>
-    void dispatch_integral_init(::mpfr_prec_t p)
+    void dispatch_integral_init(::mpfr_prec_t p, const T &n)
     {
-        static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-        ::mpfr_init2(&m_mpfr, compute_init_precision(
-                                  p, []() { return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits); }));
+        ::mpfr_init2(&m_mpfr, compute_init_precision(p, n));
     }
     // Special casing for bool, otherwise MSVC warns if we fold this into the
     // constructor from unsigned.
     void dispatch_construction(const bool &b, ::mpfr_prec_t p)
     {
-        dispatch_integral_init<bool>(p);
+        dispatch_integral_init(p, b);
         ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
-        dispatch_integral_init<T>(p);
+        dispatch_integral_init(p, n);
         if (n <= std::numeric_limits<unsigned long>::max()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
@@ -596,7 +648,7 @@ private:
     template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
-        dispatch_integral_init<T>(p);
+        dispatch_integral_init(p, n);
         if (n <= std::numeric_limits<long>::max() && n >= std::numeric_limits<long>::min()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
@@ -606,51 +658,20 @@ private:
     template <std::size_t SSize>
     void dispatch_construction(const integer<SSize> &n, ::mpfr_prec_t p)
     {
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, [&n]() -> ::mpfr_prec_t {
-            // Infer the precision from the bit size of n.
-            const auto ls = n.size();
-            // Check that ls * GMP_NUMB_BITS is representable by mpfr_prec_t.
-            if (mppp_unlikely(ls
-                              > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
-                                    / unsigned(GMP_NUMB_BITS))) {
-                // LCOV_EXCL_START
-                throw std::overflow_error("The deduced precision for a real constructed from an integer is too large");
-                // LCOV_EXCL_STOP
-            }
-            return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS);
-        }));
+        ::mpfr_init2(&m_mpfr, compute_init_precision(p, n));
         ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
     }
     template <std::size_t SSize>
     void dispatch_construction(const rational<SSize> &q, ::mpfr_prec_t p)
     {
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, [&q]() -> ::mpfr_prec_t {
-            // Infer the precision from the bit size of num/den.
-            const auto n_size = q.get_num().size();
-            const auto d_size = q.get_den().size();
-            // Overflow checks.
-            if (mppp_unlikely(
-                    // Overflow in total size.
-                    (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
-                    // Check that tot_size * GMP_NUMB_BITS is representable by mpfr_prec_t.
-                    || ((n_size + d_size)
-                        > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
-                              / unsigned(GMP_NUMB_BITS)))) {
-                // LCOV_EXCL_START
-                throw std::overflow_error("The deduced precision for a real constructed from a rational is too large");
-                // LCOV_EXCL_STOP
-            }
-            return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS);
-        }));
+        ::mpfr_init2(&m_mpfr, compute_init_precision(p, q));
         ::mpfr_set_q(&m_mpfr, q.get_mpq_view(), MPFR_RNDN);
     }
 #if defined(MPPP_WITH_QUADMATH)
     void dispatch_construction(const real128 &x, ::mpfr_prec_t p)
     {
         // Init the value.
-        // The significand precision in bits is 113 for real128. Let's double-check it.
-        static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, []() { return ::mpfr_prec_t(113); }));
+        ::mpfr_init2(&m_mpfr, compute_init_precision(p, x));
         assign_real128(x);
     }
     // NOTE: split this off from the dispatch_construction() overload, so we can re-use it in the
@@ -1066,27 +1087,21 @@ public:
 
 private:
     // Compute the precision to use in a generic assignment. Same idea as in the generic constructor.
-    template <typename Deducer>
-    static ::mpfr_prec_t compute_ass_precision(const Deducer &d)
+    template <typename T>
+    static ::mpfr_prec_t compute_ass_precision(const T &x)
     {
-        static_assert(std::is_same<decltype(d()), ::mpfr_prec_t>::value,
-                      "Invalid type returned by the precision deducer.");
         // Check if we have a default precision.
         // NOTE: this is guaranteed to be a valid precision value.
         const auto dp = real_get_default_prec();
         // Return default precision if nonzero, otherwise return the clamped deduced precision.
-        return dp ? dp : clamp_mpfr_prec(d());
+        return dp ? dp : clamp_mpfr_prec(real_deduce_precision(x));
     }
     // Assignment from FPs.
     template <bool SetPrec, typename T>
     void dispatch_fp_assignment(fp_a_ptr<T> ptr, const T &x)
     {
-        static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
         if (SetPrec) {
-            set_prec_impl<false>(compute_ass_precision([]() {
-                return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
-                                                          : dig2mpfr_prec<T>();
-            }));
+            set_prec_impl<false>(compute_ass_precision(x));
         }
         ptr(&m_mpfr, x, MPFR_RNDN);
     }
@@ -1107,26 +1122,24 @@ private:
     }
     // Assignment from integral types.
     template <bool SetPrec, typename T>
-    void dispatch_integral_ass_prec()
+    void dispatch_integral_ass_prec(const T &n)
     {
-        static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
         if (SetPrec) {
-            set_prec_impl<false>(
-                compute_ass_precision([]() { return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits); }));
+            set_prec_impl<false>(compute_ass_precision(n));
         }
     }
     // Special casing for bool.
     template <bool SetPrec>
     void dispatch_assignment(const bool &b)
     {
-        dispatch_integral_ass_prec<SetPrec, bool>();
+        dispatch_integral_ass_prec<SetPrec>(b);
         ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
     template <bool SetPrec, typename T,
               enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_assignment(const T &n)
     {
-        dispatch_integral_ass_prec<SetPrec, T>();
+        dispatch_integral_ass_prec<SetPrec>(n);
         if (n <= std::numeric_limits<unsigned long>::max()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
@@ -1137,7 +1150,7 @@ private:
               enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
     void dispatch_assignment(const T &n)
     {
-        dispatch_integral_ass_prec<SetPrec, T>();
+        dispatch_integral_ass_prec<SetPrec>(n);
         if (n <= std::numeric_limits<long>::max() && n >= std::numeric_limits<long>::min()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
@@ -1148,19 +1161,7 @@ private:
     void dispatch_assignment(const integer<SSize> &n)
     {
         if (SetPrec) {
-            set_prec_impl<false>(compute_ass_precision([&n]() -> ::mpfr_prec_t {
-                // Infer the precision from the bit size of n.
-                const auto ls = n.size();
-                // Check that ls * GMP_NUMB_BITS is representable by mpfr_prec_t.
-                if (mppp_unlikely(
-                        ls > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
-                                 / unsigned(GMP_NUMB_BITS))) {
-                    // LCOV_EXCL_START
-                    throw std::overflow_error("The deduced precision for a real assigned from an integer is too large");
-                    // LCOV_EXCL_STOP
-                }
-                return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS);
-            }));
+            set_prec_impl<false>(compute_ass_precision(n));
         }
         ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
     }
@@ -1168,24 +1169,7 @@ private:
     void dispatch_assignment(const rational<SSize> &q)
     {
         if (SetPrec) {
-            set_prec_impl<false>(compute_ass_precision([&q]() -> ::mpfr_prec_t {
-                // Infer the precision from the bit size of num/den.
-                const auto n_size = q.get_num().size();
-                const auto d_size = q.get_den().size();
-                // Overflow checks.
-                if (mppp_unlikely(
-                        // Overflow in total size.
-                        (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
-                        // Check that tot_size * GMP_NUMB_BITS is representable by mpfr_prec_t.
-                        || ((n_size + d_size)
-                            > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
-                                  / unsigned(GMP_NUMB_BITS)))) {
-                    // LCOV_EXCL_START
-                    throw std::overflow_error("The deduced precision for a real assigned from a rational is too large");
-                    // LCOV_EXCL_STOP
-                }
-                return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS);
-            }));
+            set_prec_impl<false>(compute_ass_precision(q));
         }
         ::mpfr_set_q(&m_mpfr, q.get_mpq_view(), MPFR_RNDN);
     }
@@ -1193,10 +1177,8 @@ private:
     template <bool SetPrec>
     void dispatch_assignment(const real128 &x)
     {
-        // The significand precision in bits is 113 for real128. Let's double-check it.
-        static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
         if (SetPrec) {
-            set_prec_impl<false>(compute_ass_precision([]() { return ::mpfr_prec_t(113); }));
+            set_prec_impl<false>(compute_ass_precision(x));
         }
         assign_real128(x);
     }
