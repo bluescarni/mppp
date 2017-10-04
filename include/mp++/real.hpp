@@ -668,8 +668,9 @@ private:
     template <std::size_t SSize>
     void dispatch_construction(const rational<SSize> &q, ::mpfr_prec_t p)
     {
+        const auto v = get_mpq_view(q);
         ::mpfr_init2(&m_mpfr, compute_init_precision(p, q));
-        ::mpfr_set_q(&m_mpfr, q.get_mpq_view(), MPFR_RNDN);
+        ::mpfr_set_q(&m_mpfr, &v, MPFR_RNDN);
     }
 #if defined(MPPP_WITH_QUADMATH)
     void dispatch_construction(const real128 &x, ::mpfr_prec_t p)
@@ -1175,7 +1176,8 @@ private:
         if (SetPrec) {
             set_prec_impl<false>(compute_ass_precision(q));
         }
-        ::mpfr_set_q(&m_mpfr, q.get_mpq_view(), MPFR_RNDN);
+        const auto v = get_mpq_view(q);
+        ::mpfr_set_q(&m_mpfr, &v, MPFR_RNDN);
     }
 #if defined(MPPP_WITH_QUADMATH)
     template <bool SetPrec>
