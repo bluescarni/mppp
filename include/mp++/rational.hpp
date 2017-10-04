@@ -67,13 +67,6 @@ template <typename T, std::size_t SSize>
 concept bool RationalFPInteroperable = is_rational_fp_interoperable<T, SSize>::value;
 #endif
 
-// Fwd declare these as we need friendship.
-template <std::size_t SSize>
-int cmp(const rational<SSize> &, const rational<SSize> &);
-
-template <std::size_t SSize>
-int cmp(const rational<SSize> &, const integer<SSize> &);
-
 inline namespace detail
 {
 
@@ -95,6 +88,10 @@ struct is_rational : std::false_type {
 template <std::size_t SSize>
 struct is_rational<rational<SSize>> : std::true_type {
 };
+
+// mpq_view getter fwd declaration.
+template <std::size_t SSize>
+mpq_struct_t get_mpq_view(const rational<SSize> &);
 }
 
 /// Multiprecision rational class.
@@ -199,16 +196,6 @@ struct is_rational<rational<SSize>> : std::true_type {
 template <std::size_t SSize>
 class rational
 {
-#if !defined(MPPP_DOXYGEN_INVOKED)
-    // Make friends with the comparison functions.
-    template <std::size_t S>
-    friend int cmp(const rational<S> &, const rational<S> &);
-    template <std::size_t S>
-    friend int cmp(const rational<S> &, const integer<S> &);
-    // Make friends with real, for the mpq_view machinery.
-    friend class real;
-#endif
-
 public:
 /// Underlying integral type.
 /**
@@ -718,39 +705,6 @@ public:
     }
 
 private:
-    // Let's keep the view machinery private for now, as it suffers from the potential aliasing
-    // issues described in the mpz_view documentation. In this case, we have to fill in a shallow mpq_struct
-    // in any case, as the rational class is not backed by a regular mpq_t. We could then have aliasing
-    // between a real mpz_t and, say, the numerator extracted from a view which is internally pointing
-    // to the same mpz_t. Example:
-    //
-    // rational q;
-    // auto &n = q._get_num();
-    // n.promote();
-    // auto q_view = q.get_mpq_view();
-    // mpz_add_ui(n.get_mpz_t(), mpq_numref(q_view.get()), 1);
-    //
-    // In the last line, mpq_numref() is extracting an mpz_struct from the view which internally
-    // points to the same limbs as the mpz_t inside n. The mpz_add_ui code will try to realloc()
-    // the limb pointer inside n, thus invalidating the limb pointer in the view (this would work
-    // if the view's mpz_struct were the same object as n's mpz_t, as the GMP code would update
-    // the new pointer after the realloc for both structs).
-    struct mpq_view {
-        explicit mpq_view(const rational &q) : m_mpq{*q.m_num.get_mpz_view().get(), *q.m_den.get_mpz_view().get()} {}
-        operator mpq_struct_t const *() const
-        {
-            return get();
-        }
-        mpq_struct_t const *get() const
-        {
-            return &m_mpq;
-        }
-        mpq_struct_t m_mpq;
-    };
-    mpq_view get_mpq_view() const
-    {
-        return mpq_view{*this};
-    }
     // Conversion to int_t.
     template <typename T, enable_if_t<std::is_same<int_t, T>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
@@ -774,7 +728,8 @@ private:
     template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
-        return std::make_pair(true, static_cast<T>(::mpq_get_d(get_mpq_view())));
+        const auto v = get_mpq_view(*this);
+        return std::make_pair(true, static_cast<T>(::mpq_get_d(&v)));
     }
 #if defined(MPPP_WITH_MPFR)
     // Conversion to long double.
@@ -784,7 +739,8 @@ private:
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(d2));
-        ::mpf_set_q(&mpf.m_mpf, get_mpq_view());
+        const auto v = get_mpq_view(*this);
+        ::mpf_set_q(&mpf.m_mpf, &v);
         ::mpfr_set_f(&mpfr.m_mpfr, &mpf.m_mpf, MPFR_RNDN);
         return std::make_pair(true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN));
     }
@@ -1026,6 +982,28 @@ constexpr std::size_t rational<SSize>::ssize;
 
 inline namespace detail
 {
+// Let's keep the view machinery private for now, as it suffers from the potential aliasing
+// issues described in the mpz_view documentation. In this case, we have to fill in a shallow mpq_struct
+// in any case, as the rational class is not backed by a regular mpq_t. We could then have aliasing
+// between a real mpz_t and, say, the numerator extracted from a view which is internally pointing
+// to the same mpz_t. Example:
+//
+// rational q;
+// auto &n = q._get_num();
+// n.promote();
+// const auto q_view = get_mpq_view(q);
+// mpz_add_ui(n.get_mpz_t(), mpq_numref(&q_view), 1);
+//
+// In the last line, mpq_numref() is extracting an mpz_struct from the view which internally
+// points to the same limbs as the mpz_t inside n. The mpz_add_ui code will try to realloc()
+// the limb pointer inside n, thus invalidating the limb pointer in the view (this would work
+// if the view's mpz_struct were the same object as n's mpz_t, as the GMP code would update
+// the new pointer after the realloc for both structs).
+template <std::size_t SSize>
+inline mpq_struct_t get_mpq_view(const rational<SSize> &q)
+{
+    return mpq_struct_t{*q.get_num().get_mpz_view().get(), *q.get_den().get_mpz_view().get()};
+}
 
 // Machinery for the determination of the result of a binary operation involving rational.
 // Default is empty for SFINAE.
@@ -2493,7 +2471,9 @@ inline int cmp(const rational<SSize> &op1, const rational<SSize> &op2)
     // - try to see if the limb/bit sizes of nums and dens can tell use immediately which
     //   number is larger,
     // - otherwise, do the two multiplications and compare.
-    return ::mpq_cmp(op1.get_mpq_view(), op2.get_mpq_view());
+    const auto v1 = get_mpq_view(op1);
+    const auto v2 = get_mpq_view(op2);
+    return ::mpq_cmp(&v1, &v2);
 }
 
 /// Comparison function for rational/integer arguments.
@@ -2509,7 +2489,8 @@ inline int cmp(const rational<SSize> &op1, const integer<SSize> &op2)
 {
     // NOTE: mpq_cmp_z() is a macro or a function, depending on the GMP version. Don't
     // call it with "::".
-    return mpq_cmp_z(op1.get_mpq_view(), op2.get_mpz_view());
+    const auto v1 = get_mpq_view(op1);
+    return mpq_cmp_z(&v1, op2.get_mpz_view());
 }
 
 /// Comparison function for integer/rational arguments.
