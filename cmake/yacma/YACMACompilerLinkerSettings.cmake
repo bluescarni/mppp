@@ -111,9 +111,7 @@ if(NOT _YACMACompilerLinkerSettingsRun)
         # This limit is supposed to be at least 1024 in C++11, but for some reason
         # clang sets this to 256, and gcc to 900.
         _YACMA_CHECK_ENABLE_CXX_FLAG(-ftemplate-depth=1024)
-        # NOTE: this can be useful, but at the moment it triggers lots of warnings in type traits.
-        # Keep it in mind for the next time we touch type traits.
-        # _YACMA_CHECK_ENABLE_CXX_FLAG(-Wold-style-cast)
+        _YACMA_CHECK_ENABLE_CXX_FLAG(-Wold-style-cast)
         # NOTE: disable this for now, as it results in a lot of clutter from Boost.
         # _YACMA_CHECK_ENABLE_CXX_FLAG(-Wzero-as-null-pointer-constant)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-pedantic-errors)
@@ -131,6 +129,7 @@ if(NOT _YACMACompilerLinkerSettingsRun)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wshift-negative-value)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wshift-overflow=2)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wduplicated-cond)
+        _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wnull-dereference)
         # From GCC 7.
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wduplicated-branches)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wrestrict)
