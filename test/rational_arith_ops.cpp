@@ -65,7 +65,7 @@ struct add_tester {
         REQUIRE((lex_cast(4ul + rational{3}) == "7"));
         REQUIRE((std::is_same<rational, decltype(3 + rational{3})>::value));
         REQUIRE((std::is_same<rational, decltype(rational{3} + 3)>::value));
-        REQUIRE((lex_cast(rational{-3, 2} + (signed char)4) == "5/2"));
+        REQUIRE((lex_cast(rational{-3, 2} + static_cast<signed char>(4)) == "5/2"));
         REQUIRE((lex_cast(4ll + rational{-3, 2}) == "5/2"));
         REQUIRE((rational{3} + 4.f == 7.f));
         REQUIRE((4.f + rational{3} == 7.f));
@@ -98,7 +98,7 @@ struct add_tester {
         REQUIRE((lex_cast(retval) == "3/2"));
         retval += 1ull;
         REQUIRE((lex_cast(retval) == "5/2"));
-        retval += (short)-1;
+        retval += static_cast<short>(-1);
         REQUIRE((lex_cast(retval) == "3/2"));
         retval += 2.f;
         REQUIRE((std::is_same<rational &, decltype(retval += 1.)>::value));
@@ -207,7 +207,7 @@ struct sub_tester {
         REQUIRE((lex_cast(4ul - rational{3}) == "1"));
         REQUIRE((std::is_same<rational, decltype(3 - rational{3})>::value));
         REQUIRE((std::is_same<rational, decltype(rational{3} - 3)>::value));
-        REQUIRE((lex_cast(rational{-3, 2} - (signed char)4) == "-11/2"));
+        REQUIRE((lex_cast(rational{-3, 2} - static_cast<signed char>(4)) == "-11/2"));
         REQUIRE((lex_cast(4ll - rational{-3, 2}) == "11/2"));
         REQUIRE((rational{3} - 4.f == -1.f));
         REQUIRE((4.f - rational{3} == 1.f));
@@ -240,7 +240,7 @@ struct sub_tester {
         REQUIRE((lex_cast(retval) == "-1/2"));
         retval -= 1ull;
         REQUIRE((lex_cast(retval) == "-3/2"));
-        retval -= (short)-1;
+        retval -= static_cast<short>(-1);
         REQUIRE((lex_cast(retval) == "-1/2"));
         retval -= 2.f;
         REQUIRE((std::is_same<rational &, decltype(retval -= 1.)>::value));
@@ -348,7 +348,7 @@ struct mul_tester {
         REQUIRE((lex_cast(4ul * rational{3}) == "12"));
         REQUIRE((std::is_same<rational, decltype(3 * rational{3})>::value));
         REQUIRE((std::is_same<rational, decltype(rational{3} * 3)>::value));
-        REQUIRE((lex_cast(rational{-3, 2} * (signed char)4) == "-6"));
+        REQUIRE((lex_cast(rational{-3, 2} * static_cast<signed char>(4)) == "-6"));
         REQUIRE((lex_cast(4ll * rational{-3, 2}) == "-6"));
         REQUIRE((rational{3} * 4.f == 12.f));
         REQUIRE((4.f * rational{3} == 12.f));
@@ -385,7 +385,7 @@ struct mul_tester {
         REQUIRE((lex_cast(retval) == "3/2"));
         retval *= 4ull;
         REQUIRE((lex_cast(retval) == "6"));
-        retval *= (short)-1;
+        retval *= static_cast<short>(-1);
         REQUIRE((lex_cast(retval) == "-6"));
         retval *= 2.f;
         REQUIRE((std::is_same<rational &, decltype(retval *= 1.)>::value));
@@ -512,7 +512,7 @@ struct div_tester {
         });
         REQUIRE((std::is_same<rational, decltype(3 / rational{3})>::value));
         REQUIRE((std::is_same<rational, decltype(rational{3} / 3)>::value));
-        REQUIRE((lex_cast(rational{-3, 2} / (signed char)4) == "-3/8"));
+        REQUIRE((lex_cast(rational{-3, 2} / static_cast<signed char>(4)) == "-3/8"));
         REQUIRE((lex_cast(4ll / rational{-3, 2}) == "-8/3"));
         REQUIRE((rational{3} / 4.f == 3.f / 4));
         REQUIRE((4.f / rational{3} == 4.f / 3));
@@ -561,7 +561,7 @@ struct div_tester {
         REQUIRE((lex_cast(retval) == "1/6"));
         retval /= 4ull;
         REQUIRE((lex_cast(retval) == "1/24"));
-        retval /= (short)-1;
+        retval /= static_cast<short>(-1);
         REQUIRE((lex_cast(retval) == "-1/24"));
         retval = 12;
         retval /= 2.f;
@@ -655,7 +655,7 @@ struct rel_tester {
         REQUIRE(integer{4} == n1);
         REQUIRE(4u == n1);
         REQUIRE(n1 != 3);
-        REQUIRE((signed char)-3 != n1);
+        REQUIRE(static_cast<signed char>(-3) != n1);
         REQUIRE(4ull == n1);
         REQUIRE(-2 == n2);
         REQUIRE(n2 == short(-2));
