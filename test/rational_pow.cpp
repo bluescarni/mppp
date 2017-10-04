@@ -171,7 +171,7 @@ struct pow_tester {
         REQUIRE((pow(rational{1}, rational{1, 2}) == rational{1}));
         REQUIRE((pow(rational{1}, integer{-2}) == rational{1}));
         REQUIRE((pow(rational{1}, 2ull) == rational{1}));
-        REQUIRE((pow(rational{1}, (signed char)(-1)) == rational{1}));
+        REQUIRE((pow(rational{1}, static_cast<signed char>(-1)) == rational{1}));
         REQUIRE((pow(1, rational{3, 4}) == rational{1}));
         REQUIRE((pow(1, rational{-3, 4}) == rational{1}));
     }

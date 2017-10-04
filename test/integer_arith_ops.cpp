@@ -64,8 +64,8 @@ struct add_tester {
         REQUIRE((lex_cast(char(4) + n2) == "2"));
         REQUIRE((std::is_same<decltype(n1 + char(4)), integer>::value));
         REQUIRE((std::is_same<decltype(char(4) + n2), integer>::value));
-        REQUIRE((lex_cast(n1 + (unsigned char)(4)) == "5"));
-        REQUIRE((lex_cast((unsigned char)(4) + n2) == "2"));
+        REQUIRE((lex_cast(n1 + static_cast<unsigned char>(4)) == "5"));
+        REQUIRE((lex_cast(static_cast<unsigned char>(4) + n2) == "2"));
         REQUIRE((lex_cast(n1 + short(4)) == "5"));
         REQUIRE((lex_cast(short(4) + n2) == "2"));
         REQUIRE((lex_cast(n1 + 4) == "5"));
@@ -96,11 +96,11 @@ struct add_tester {
         REQUIRE((lex_cast(retval) == "3"));
         retval += short(-1);
         REQUIRE((lex_cast(retval) == "2"));
-        retval += (signed char)(-1);
+        retval += static_cast<signed char>(-1);
         REQUIRE((lex_cast(retval) == "1"));
-        retval += (long long)(-5);
+        retval += -5ll;
         REQUIRE((lex_cast(retval) == "-4"));
-        retval += (unsigned long long)(20);
+        retval += 20ull;
         REQUIRE((lex_cast(retval) == "16"));
         retval += 2.5f;
         REQUIRE((lex_cast(retval) == "18"));
@@ -223,8 +223,8 @@ struct sub_tester {
         REQUIRE((lex_cast(char(4) - n2) == "6"));
         REQUIRE((std::is_same<decltype(n1 - char(4)), integer>::value));
         REQUIRE((std::is_same<decltype(char(4) - n2), integer>::value));
-        REQUIRE((lex_cast(n1 - (unsigned char)(4)) == "-3"));
-        REQUIRE((lex_cast((unsigned char)(4) - n2) == "6"));
+        REQUIRE((lex_cast(n1 - static_cast<unsigned char>(4)) == "-3"));
+        REQUIRE((lex_cast(static_cast<unsigned char>(4) - n2) == "6"));
         REQUIRE((lex_cast(n1 - short(4)) == "-3"));
         REQUIRE((lex_cast(short(4) - n2) == "6"));
         REQUIRE((lex_cast(n1 - 4) == "-3"));
@@ -255,11 +255,11 @@ struct sub_tester {
         REQUIRE((lex_cast(retval) == "-1"));
         retval -= short(-1);
         REQUIRE((lex_cast(retval) == "0"));
-        retval -= (signed char)(-1);
+        retval -= static_cast<signed char>(-1);
         REQUIRE((lex_cast(retval) == "1"));
-        retval -= (long long)(-5);
+        retval -= -5ll;
         REQUIRE((lex_cast(retval) == "6"));
-        retval -= (unsigned long long)(20);
+        retval -= 20ull;
         REQUIRE((lex_cast(retval) == "-14"));
         retval -= 2.5f;
         REQUIRE((lex_cast(retval) == "-16"));
@@ -383,8 +383,8 @@ struct mul_tester {
         REQUIRE((lex_cast(char(4) * n2) == "-8"));
         REQUIRE((std::is_same<decltype(n1 * char(4)), integer>::value));
         REQUIRE((std::is_same<decltype(char(4) * n2), integer>::value));
-        REQUIRE((lex_cast(n1 * (unsigned char)(4)) == "4"));
-        REQUIRE((lex_cast((unsigned char)(4) * n2) == "-8"));
+        REQUIRE((lex_cast(n1 * static_cast<unsigned char>(4)) == "4"));
+        REQUIRE((lex_cast(static_cast<unsigned char>(4) * n2) == "-8"));
         REQUIRE((lex_cast(n1 * short(4)) == "4"));
         REQUIRE((lex_cast(short(4) * n2) == "-8"));
         REQUIRE((lex_cast(n1 * 4) == "4"));
@@ -415,11 +415,11 @@ struct mul_tester {
         REQUIRE((lex_cast(retval) == "1"));
         retval *= short(-1);
         REQUIRE((lex_cast(retval) == "-1"));
-        retval *= (signed char)(-1);
+        retval *= static_cast<signed char>(-1);
         REQUIRE((lex_cast(retval) == "1"));
-        retval *= (long long)(-5);
+        retval *= -5ll;
         REQUIRE((lex_cast(retval) == "-5"));
-        retval *= (unsigned long long)(20);
+        retval *= 20ull;
         REQUIRE((lex_cast(retval) == "-100"));
         retval *= 2.5f;
         REQUIRE((lex_cast(retval) == "-250"));
@@ -502,8 +502,8 @@ struct div_tester {
         REQUIRE((lex_cast(char(4) / n2) == "-2"));
         REQUIRE((std::is_same<decltype(n1 / char(4)), integer>::value));
         REQUIRE((std::is_same<decltype(char(4) / n2), integer>::value));
-        REQUIRE((lex_cast(n1 / (unsigned char)(4)) == "1"));
-        REQUIRE((lex_cast((unsigned char)(4) / n2) == "-2"));
+        REQUIRE((lex_cast(n1 / static_cast<unsigned char>(4)) == "1"));
+        REQUIRE((lex_cast(static_cast<unsigned char>(4) / n2) == "-2"));
         REQUIRE((lex_cast(n1 / short(4)) == "1"));
         REQUIRE((lex_cast(short(4) / n2) == "-2"));
         REQUIRE((lex_cast(n1 / 4) == "1"));
@@ -535,12 +535,12 @@ struct div_tester {
         REQUIRE((lex_cast(retval) == "2"));
         retval /= short(-1);
         REQUIRE((lex_cast(retval) == "-2"));
-        retval /= (signed char)(-1);
+        retval /= static_cast<signed char>(-1);
         REQUIRE((lex_cast(retval) == "2"));
-        retval /= (long long)(-5);
+        retval /= -5ll;
         REQUIRE((lex_cast(retval) == "0"));
         retval = -20;
-        retval /= (unsigned long long)(20);
+        retval /= 20ull;
         REQUIRE((lex_cast(retval) == "-1"));
         retval /= 2.5f;
         REQUIRE((lex_cast(retval) == "0"));
@@ -658,7 +658,7 @@ struct shift_tester {
         REQUIRE((lex_cast(ret << 3ull) == "-8"));
         REQUIRE((lex_cast(ret <<= 3ull) == "-8"));
         REQUIRE((lex_cast(ret <<= char(1)) == "-16"));
-        REQUIRE((lex_cast(ret <<= (signed char)(0)) == "-16"));
+        REQUIRE((lex_cast(ret <<= static_cast<signed char>(0)) == "-16"));
         REQUIRE((lex_cast(ret >> 0) == "-16"));
         REQUIRE((lex_cast(ret >> 1) == "-8"));
         REQUIRE((lex_cast(ret >>= 1ul) == "-8"));
@@ -675,7 +675,8 @@ struct shift_tester {
             REQUIRE_THROWS_AS(ret >> std::numeric_limits<unsigned long long>::max(), std::overflow_error);
             REQUIRE_THROWS_AS(ret >>= std::numeric_limits<unsigned long long>::max(), std::overflow_error);
         }
-        if ((unsigned long long)std::numeric_limits<long long>::max() > std::numeric_limits<::mp_bitcnt_t>::max()) {
+        if (static_cast<unsigned long long>(std::numeric_limits<long long>::max())
+            > std::numeric_limits<::mp_bitcnt_t>::max()) {
             REQUIRE_THROWS_AS(ret << std::numeric_limits<long long>::max(), std::overflow_error);
             REQUIRE_THROWS_AS(ret <<= std::numeric_limits<long long>::max(), std::overflow_error);
             REQUIRE_THROWS_AS(ret >> std::numeric_limits<long long>::max(), std::overflow_error);
@@ -738,8 +739,8 @@ struct mod_tester {
         REQUIRE((lex_cast(char(3) % n2) == "1"));
         REQUIRE((std::is_same<decltype(n1 % char(4)), integer>::value));
         REQUIRE((std::is_same<decltype(char(4) % n2), integer>::value));
-        REQUIRE((lex_cast(-n1 % (unsigned char)(3)) == "-1"));
-        REQUIRE((lex_cast((unsigned char)(3) % n2) == "1"));
+        REQUIRE((lex_cast(-n1 % static_cast<unsigned char>(3)) == "-1"));
+        REQUIRE((lex_cast(static_cast<unsigned char>(3) % n2) == "1"));
         REQUIRE((lex_cast(n1 % short(3)) == "1"));
         REQUIRE((lex_cast(-short(3) % n2) == "-1"));
         REQUIRE((lex_cast(n1 % -3) == "1"));
@@ -759,13 +760,13 @@ struct mod_tester {
         retval = -3;
         retval %= short(2);
         REQUIRE((lex_cast(retval) == "-1"));
-        retval %= (signed char)(-1);
+        retval %= static_cast<signed char>(-1);
         REQUIRE((lex_cast(retval) == "0"));
         retval = 26;
-        retval %= (long long)(-5);
+        retval %= -5ll;
         REQUIRE((lex_cast(retval) == "1"));
         retval = -19;
-        retval %= (unsigned long long)(7);
+        retval %= 7ull;
         REQUIRE((lex_cast(retval) == "-5"));
         // CppInteroperable on the left.
         int n = 3;
@@ -827,7 +828,7 @@ struct rel_tester {
         REQUIRE(n1 == 4);
         REQUIRE(4u == n1);
         REQUIRE(n1 != 3);
-        REQUIRE((signed char)-3 != n1);
+        REQUIRE(static_cast<signed char>(-3) != n1);
         REQUIRE(4ull == n1);
         REQUIRE(-2 == n2);
         REQUIRE(n2 == short(-2));

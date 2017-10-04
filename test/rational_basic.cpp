@@ -858,7 +858,7 @@ struct gen_ass_tester {
         rational q;
         q = 12;
         REQUIRE(lex_cast(q) == "12");
-        q = (signed char)-11;
+        q = static_cast<signed char>(-11);
         REQUIRE(lex_cast(q) == "-11");
         q = integer{"-2323232312312311"};
         REQUIRE(lex_cast(q) == "-2323232312312311");
