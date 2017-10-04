@@ -35,7 +35,7 @@ TEST_CASE("real128 pow")
     REQUIRE((pow(0.f, real128{}).m_value == 1.));
     REQUIRE((pow(real128{2}, 3ll).m_value == 8.));
     REQUIRE((pow(2u, real128{3}).m_value == 8.));
-    REQUIRE((pow(real128{2}, (signed char)-3).m_value == real128{".125"}.m_value));
+    REQUIRE((pow(real128{2}, static_cast<signed char>(-3)).m_value == real128{".125"}.m_value));
     REQUIRE((pow(2., real128{-3}).m_value == real128{".125"}.m_value));
     REQUIRE((pow(real128{}, int_t{}).m_value == 1.));
     REQUIRE((pow(int_t{}, real128{}).m_value == 1.));

@@ -178,8 +178,8 @@ struct add_ui_tester {
             n1 = integer{};
             n2 = integer{};
             ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
-            add_ui(n1, n2, (unsigned long)(-1));
-            ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, (unsigned long)(-1));
+            add_ui(n1, n2, static_cast<unsigned long>(-1));
+            ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, static_cast<unsigned long>(-1));
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             n2 = integer{GMP_NUMB_MAX};
             mul_2exp(n2, n2, GMP_NUMB_BITS);
@@ -360,8 +360,8 @@ struct sub_ui_tester {
             n1 = integer{};
             n2 = integer{};
             ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
-            sub_ui(n1, n2, (unsigned long)(-1));
-            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, (unsigned long)(-1));
+            sub_ui(n1, n2, static_cast<unsigned long>(-1));
+            ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, static_cast<unsigned long>(-1));
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             n2 = integer{GMP_NUMB_MAX};
             mul_2exp(n2, n2, GMP_NUMB_BITS);

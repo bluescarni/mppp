@@ -105,7 +105,7 @@ struct pow_tester {
         REQUIRE(pow(integer{-4}, 2) == 16);
         REQUIRE(pow(-4, integer{2}) == 16);
         REQUIRE(pow(integer{-4}, char(0)) == 1);
-        REQUIRE(pow((signed char)-4, integer{0}) == 1);
+        REQUIRE(pow(static_cast<signed char>(-4), integer{0}) == 1);
         REQUIRE(pow(integer{-4}, 3ull) == -64);
         REQUIRE(pow(integer{-4}, integer{4}) == 256);
         if (std::numeric_limits<unsigned long long>::max() > std::numeric_limits<unsigned long>::max()) {
@@ -150,14 +150,14 @@ struct pow_tester {
         // 1 to negative exp.
         REQUIRE(pow(integer{1}, -1) == 1);
         REQUIRE(pow(1, integer{-1}) == 1);
-        REQUIRE(pow(integer{1}, (signed char)(-2)) == 1);
+        REQUIRE(pow(integer{1}, static_cast<signed char>(-2)) == 1);
         REQUIRE(pow(char(1), integer{-2}) == 1);
         REQUIRE(pow(integer{1}, -3ll) == 1);
         REQUIRE(pow(1ll, integer{-3ll}) == 1);
         REQUIRE(pow(integer{1}, integer{-4ll}) == 1);
         // -1 to negative exp.
         REQUIRE(pow(integer{-1}, -1) == -1);
-        REQUIRE(pow(integer{-1}, (signed char)(-2)) == 1);
+        REQUIRE(pow(integer{-1}, static_cast<signed char>(-2)) == 1);
         REQUIRE(pow(integer{-1}, -3ll) == -1);
         REQUIRE(pow(-1, integer{-1}) == -1);
         REQUIRE(pow(-1, integer{-2}) == 1);
@@ -165,10 +165,10 @@ struct pow_tester {
         REQUIRE(pow(integer{-1}, integer{-4ll}) == 1);
         // n to negative exp.
         REQUIRE(pow(integer{2}, -1) == 0);
-        REQUIRE(pow(integer{-3}, (signed char)(-2)) == 0);
+        REQUIRE(pow(integer{-3}, static_cast<signed char>(-2)) == 0);
         REQUIRE(pow(integer{4}, -3ll) == 0);
         REQUIRE(pow(2, integer{-1}) == 0);
-        REQUIRE(pow((signed char)-3, integer{-2}) == 0);
+        REQUIRE(pow(static_cast<signed char>(-3), integer{-2}) == 0);
         REQUIRE(pow(4, integer{-3ll}) == 0);
         REQUIRE(pow(integer{-5}, integer{-4}) == 0);
         // FP testing.
