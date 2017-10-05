@@ -359,7 +359,7 @@ using cvr_real_enabler = enable_if_t<conjunction<std::is_same<uncvref_t<Args>, r
  */
 inline mpfr_prec_t real_get_default_prec()
 {
-    return real_constants<>::default_prec.load();
+    return real_constants<>::default_prec.load(std::memory_order_relaxed);
 }
 
 /// Set the default precision for \link mppp::real real \endlink objects.
@@ -382,7 +382,7 @@ inline void real_set_default_prec(::mpfr_prec_t p)
                                     + ": the value must be either zero or between " + std::to_string(real_prec_min())
                                     + " and " + std::to_string(real_prec_max()));
     }
-    real_constants<>::default_prec.store(p);
+    real_constants<>::default_prec.store(p, std::memory_order_relaxed);
 }
 
 /// Reset the default precision for \link mppp::real real \endlink objects.
