@@ -399,6 +399,20 @@ inline void real_reset_default_prec()
     real_constants<>::default_prec.store(0);
 }
 
+inline namespace detail
+{
+
+// Get the default precision, if set, otherwise the clamped deduced precision for x.
+template <typename T>
+inline ::mpfr_prec_t real_dd_prec(const T &x)
+{
+    // NOTE: this is guaranteed to be a valid precision value.
+    const auto dp = real_get_default_prec();
+    // Return default precision if nonzero, otherwise return the clamped deduced precision.
+    return dp ? dp : clamp_mpfr_prec(real_deduce_precision(x));
+}
+}
+
 /// Auxiliary class for initialising a \link mppp::real real \endlink from a precision value.
 /**
  * \rststar
@@ -596,11 +610,8 @@ private:
             // Provided precision trumps everything. Check it and return it.
             return check_init_prec(provided);
         }
-        // Check if we have a default precision.
-        // NOTE: this is guaranteed to be a valid precision value.
-        const auto dp = real_get_default_prec();
-        // Return default precision if nonzero, otherwise return the clamped deduced precision.
-        return dp ? dp : clamp_mpfr_prec(real_deduce_precision(x));
+        // Return the default or deduced precision.
+        return real_dd_prec(x);
     }
     // Construction from FPs.
     // Alias for the MPFR assignment functions from FP types.
@@ -1091,22 +1102,12 @@ public:
     }
 
 private:
-    // Compute the precision to use in a generic assignment. Same idea as in the generic constructor.
-    template <typename T>
-    static ::mpfr_prec_t compute_ass_precision(const T &x)
-    {
-        // Check if we have a default precision.
-        // NOTE: this is guaranteed to be a valid precision value.
-        const auto dp = real_get_default_prec();
-        // Return default precision if nonzero, otherwise return the clamped deduced precision.
-        return dp ? dp : clamp_mpfr_prec(real_deduce_precision(x));
-    }
     // Assignment from FPs.
     template <bool SetPrec, typename T>
     void dispatch_fp_assignment(fp_a_ptr<T> ptr, const T &x)
     {
         if (SetPrec) {
-            set_prec_impl<false>(compute_ass_precision(x));
+            set_prec_impl<false>(real_dd_prec(x));
         }
         ptr(&m_mpfr, x, MPFR_RNDN);
     }
@@ -1130,7 +1131,7 @@ private:
     void dispatch_integral_ass_prec(const T &n)
     {
         if (SetPrec) {
-            set_prec_impl<false>(compute_ass_precision(n));
+            set_prec_impl<false>(real_dd_prec(n));
         }
     }
     // Special casing for bool.
@@ -1166,7 +1167,7 @@ private:
     void dispatch_assignment(const integer<SSize> &n)
     {
         if (SetPrec) {
-            set_prec_impl<false>(compute_ass_precision(n));
+            set_prec_impl<false>(real_dd_prec(n));
         }
         ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
     }
@@ -1174,7 +1175,7 @@ private:
     void dispatch_assignment(const rational<SSize> &q)
     {
         if (SetPrec) {
-            set_prec_impl<false>(compute_ass_precision(q));
+            set_prec_impl<false>(real_dd_prec(q));
         }
         const auto v = get_mpq_view(q);
         ::mpfr_set_q(&m_mpfr, &v, MPFR_RNDN);
@@ -1184,7 +1185,7 @@ private:
     void dispatch_assignment(const real128 &x)
     {
         if (SetPrec) {
-            set_prec_impl<false>(compute_ass_precision(x));
+            set_prec_impl<false>(real_dd_prec(x));
         }
         assign_real128(x);
     }
