@@ -64,6 +64,16 @@ Concepts
    is valid (where ``r`` is a non-const :cpp:class:`~mppp::real` and ``x``, ``y``, ``z``, etc. are const
    references to the types in ``Args``).
 
+.. cpp:concept:: template <typename T, typename U> mppp::RealOpTypes
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic binary :ref:`operators <real_operators>` and :ref:`functions <real_functions>`
+   involving :cpp:class:`~mppp::real`. Specifically, the concept will be ``true`` if either:
+
+   * ``T`` and ``U`` both satisfy :cpp:concept:`~mppp::CvrReal`,
+   * one type satisfies :cpp:concept:`~mppp::CvrReal` and the other type, after the removal of reference
+     and cv qualifiers, satisfies :cpp:concept:`~mppp::RealInteroperable`.
+
 .. _real_functions:
 
 Functions

@@ -311,7 +311,7 @@ template <typename F, typename... Args>
 real &mpfr_nary_op(const F &, real &, const real &, const Args &...);
 
 template <typename F, typename Arg0, typename... Args>
-real mpfr_nary_op_return(const F &, Arg0 &&, Args &&...);
+real mpfr_nary_op_return(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
 
 template <typename F>
 real real_constant(const F &, ::mpfr_prec_t);
@@ -489,7 +489,7 @@ class real
     template <typename F, typename... Args>
     friend real &detail::mpfr_nary_op(const F &, real &, const real &, const Args &...);
     template <typename F, typename Arg0, typename... Args>
-    friend real detail::mpfr_nary_op_return(const F &, Arg0 &&, Args &&...);
+    friend real detail::mpfr_nary_op_return(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
     template <typename F>
     friend real detail::real_constant(const F &, ::mpfr_prec_t);
 #endif
@@ -2262,17 +2262,17 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
 // A small helper to init the pair in the function below. We need this because
 // we cannot take the address of a const real as a real *.
 template <typename Arg, enable_if_t<!is_ncvrvr<Arg &&>::value, int> = 0>
-inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(Arg &&arg)
+inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
     // arg is not a non-const rvalue ref, we cannot steal from it. Init with nullptr.
-    return std::make_pair(static_cast<real *>(nullptr), arg.get_prec());
+    return std::make_pair(static_cast<real *>(nullptr), c_max(arg.get_prec(), min_prec));
 }
 
 template <typename Arg, enable_if_t<is_ncvrvr<Arg &&>::value, int> = 0>
-inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(Arg &&arg)
+inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
     // arg is a non-const rvalue ref, and a candidate for stealing resources.
-    return std::make_pair(&arg, arg.get_prec());
+    return std::make_pair(&arg, c_max(arg.get_prec(), min_prec));
 }
 
 #endif
@@ -2281,15 +2281,16 @@ inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(Arg &&arg)
 // in a value to be created by this function. If possible, this function will try
 // to re-use the storage provided by the input arguments, if one or more of these
 // arguments are rvalue references and their precision is large enough. As usual,
-// the precision of the return value will be the max precision among the operands.
+// the precision of the return value will be the max precision among the operands,
+// but not less than min_prec.
 template <typename F, typename Arg0, typename... Args>
-inline real mpfr_nary_op_return(const F &f, Arg0 &&arg0, Args &&... args)
+inline real mpfr_nary_op_return(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&... args)
 {
     // This pair contains:
     // - a pointer to the largest-precision real from which we can steal resources (may be nullptr),
     // - the largest precision among all arguments.
     // It's inited with arg0's precision, and a pointer to arg0, if arg0 is a nonconst rvalue ref.
-    auto p = mpfr_nary_op_return_init_pair(std::forward<Arg0>(arg0));
+    auto p = mpfr_nary_op_return_init_pair(min_prec, std::forward<Arg0>(arg0));
     // Examine the remaining arguments.
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
     if (p.first && p.first->get_prec() == p.second) {
@@ -2412,7 +2413,7 @@ template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 #endif
 inline real fma(T &&a, U &&b, V &&c)
 {
-    return mpfr_nary_op_return(::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
+    return mpfr_nary_op_return(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
 /// Quaternary \link mppp::real real \endlink fused multiply–sub.
@@ -2453,7 +2454,7 @@ template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 #endif
 inline real fms(T &&a, U &&b, V &&c)
 {
-    return mpfr_nary_op_return(::mpfr_fms, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
+    return mpfr_nary_op_return(0, ::mpfr_fms, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
 /** @} */
@@ -2573,7 +2574,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real sqrt(T &&r)
 {
-    return mpfr_nary_op_return(::mpfr_sqrt, std::forward<T>(r));
+    return mpfr_nary_op_return(0, ::mpfr_sqrt, std::forward<T>(r));
 }
 
 /** @} */
@@ -2613,7 +2614,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real sin(T &&r)
 {
-    return mpfr_nary_op_return(::mpfr_sin, std::forward<T>(r));
+    return mpfr_nary_op_return(0, ::mpfr_sin, std::forward<T>(r));
 }
 
 /// Binary cosine.
@@ -2641,7 +2642,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real cos(T &&r)
 {
-    return mpfr_nary_op_return(::mpfr_cos, std::forward<T>(r));
+    return mpfr_nary_op_return(0, ::mpfr_cos, std::forward<T>(r));
 }
 
 /** @} */
@@ -2746,9 +2747,121 @@ inline real real_nan(::mpfr_prec_t p = 0)
 
 /** @} */
 
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RealOpTypes = (CvrReal<T> && CvrReal<U>) || (CvrReal<T> && RealInteroperable<uncvref_t<U>>)
+                           || (CvrReal<U> && RealInteroperable<uncvref_t<T>>);
+#else
+using real_op_types_enabler = enable_if_t<
+    disjunction<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>,
+                conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<uncvref_t<U>>>,
+                conjunction<std::is_same<real, uncvref_t<U>>, is_real_interoperable<uncvref_t<T>>>>::value,
+    int>;
+#endif
+
 /** @defgroup real_operators real_operators
  *  @{
  */
+
+/// Identity operator for \link mppp::real real \endlink.
+/**
+ * \rststar
+ * This operator will return a copy of the input
+ * object ``r``, whose type must satisfy the :cpp:concept:`~mppp::CvrReal` concept.
+ * \endrststar
+ *
+ * @param r the \link mppp::real real \endlink that will be copied.
+ *
+ * @return a copy of \p r.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real operator+(T &&r)
+{
+    return std::forward<T>(r);
+}
+
+inline namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_binary_add(T &&a, U &&b)
+{
+    return mpfr_nary_op_return(0, ::mpfr_add, std::forward<T>(a), std::forward<U>(b));
+}
+
+template <typename T, std::size_t SSize, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline real dispatch_binary_add(T &&a, const integer<SSize> &n)
+{
+    return mpfr_nary_op_return(
+        real_dd_prec(n),
+        [&n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_add_z(rop, op, n.get_mpz_view(), rnd); },
+        std::forward<T>(a));
+}
+
+template <typename T, std::size_t SSize, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline real dispatch_binary_add(const integer<SSize> &n, T &&a)
+{
+    return dispatch_binary_add(std::forward<T>(a), n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline real dispatch_binary_add(T &&a, const rational<SSize> &q)
+{
+    return mpfr_nary_op_return(
+        real_dd_prec(q),
+        [&q](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+            const mpq_struct_t mpq{*q.get_num().get_mpz_view().get(), *q.get_den().get_mpz_view().get()};
+            ::mpfr_add_q(rop, op, &mpq, rnd);
+        },
+        std::forward<T>(a));
+}
+
+template <typename T, std::size_t SSize, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline real dispatch_binary_add(const rational<SSize> &q, T &&a)
+{
+    return dispatch_binary_add(std::forward<T>(a), q);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_integral<U>, std::is_unsigned<U>>::value,
+                      int> = 0>
+inline real dispatch_binary_add(T &&a, const U &n)
+{
+    if (n <= std::numeric_limits<unsigned long>::max()) {
+        return mpfr_nary_op_return(real_dd_prec(n),
+                                   [&n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                                       ::mpfr_add_ui(rop, op, static_cast<unsigned long>(n), rnd);
+                                   },
+                                   std::forward<T>(a));
+    }
+    return dispatch_binary_add(std::forward<T>(a), integer<2>(n));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, std::is_integral<T>, std::is_unsigned<T>>::value,
+                      int> = 0>
+inline real dispatch_binary_add(const T &n, U &&a)
+{
+    return dispatch_binary_add(std::forward<U>(a), n);
+}
+}
+
+/// Binary addition involving \link mppp::real real \endlink.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline real operator+(T &&a, RealOpTypes<T> &&b)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline real operator+(T &&a, U &&b)
+#endif
+{
+    return dispatch_binary_add(std::forward<T>(a), std::forward<decltype(b)>(b));
+}
 
 /** @} */
 }
