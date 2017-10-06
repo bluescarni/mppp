@@ -2826,12 +2826,28 @@ inline real dispatch_binary_add(const rational<SSize> &q, T &&a)
     return dispatch_binary_add(std::forward<T>(a), q);
 }
 
+// A workaround for MSVC when using bool in an arithmetic context.
+template <typename T>
+inline T real_op_bool_cast(const T &n)
+{
+    return n;
+}
+
+#if defined(_MSC_VER) && !defined(__clang__)
+
+inline unsigned real_op_bool_cast(const bool &n)
+{
+    return static_cast<unsigned>(n);
+}
+
+#endif
+
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_integral<U>, std::is_unsigned<U>>::value,
                       int> = 0>
 inline real dispatch_binary_add(T &&a, const U &n)
 {
-    if (n <= std::numeric_limits<unsigned long>::max()) {
+    if (real_op_bool_cast(n) <= std::numeric_limits<unsigned long>::max()) {
         return mpfr_nary_op_return(real_dd_prec(n),
                                    [&n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
                                        ::mpfr_add_ui(rop, op, static_cast<unsigned long>(n), rnd);
