@@ -2842,9 +2842,10 @@ inline unsigned real_op_bool_cast(const bool &n)
 
 #endif
 
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_integral<U>, std::is_unsigned<U>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_supported_integral<U>, std::is_unsigned<U>>::value,
+                int> = 0>
 inline real dispatch_binary_add(T &&a, const U &n)
 {
     if (real_op_bool_cast(n) <= std::numeric_limits<unsigned long>::max()) {
@@ -2857,17 +2858,18 @@ inline real dispatch_binary_add(T &&a, const U &n)
     return dispatch_binary_add(std::forward<T>(a), integer<2>(n));
 }
 
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, std::is_integral<T>, std::is_unsigned<T>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, is_supported_integral<T>, std::is_unsigned<T>>::value,
+                int> = 0>
 inline real dispatch_binary_add(const T &n, U &&a)
 {
     return dispatch_binary_add(std::forward<U>(a), n);
 }
 
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_integral<U>, std::is_signed<U>>::value, int> = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_supported_integral<U>, std::is_signed<U>>::value,
+                      int> = 0>
 inline real dispatch_binary_add(T &&a, const U &n)
 {
     if (n >= std::numeric_limits<long>::min() && n <= std::numeric_limits<long>::max()) {
@@ -2880,9 +2882,9 @@ inline real dispatch_binary_add(T &&a, const U &n)
     return dispatch_binary_add(std::forward<T>(a), integer<2>(n));
 }
 
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, is_supported_integral<T>, std::is_signed<T>>::value,
+                      int> = 0>
 inline real dispatch_binary_add(const T &n, U &&a)
 {
     return dispatch_binary_add(std::forward<U>(a), n);
