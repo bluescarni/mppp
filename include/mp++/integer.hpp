@@ -105,18 +105,19 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
 
 // If we have C++17, we can use structured bindings to test the layout of mpz_struct_t
 // and its members' types.
-constexpr void test_mpz_struct_t()
+constexpr bool test_mpz_struct_t()
 {
     // NOTE: if mpz_struct_t has more or fewer members, this will result
     // in a compile-time error.
     auto[alloc, size, ptr] = mpz_struct_t{};
-    static_assert(std::is_same<decltype(alloc), mpz_alloc_t>::value);
-    static_assert(std::is_same<decltype(size), mpz_size_t>::value);
-    static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
     (void)alloc;
     (void)size;
     (void)ptr;
+    return std::is_same<decltype(alloc), mpz_alloc_t>::value && std::is_same<decltype(size), mpz_size_t>::value
+           && std::is_same<decltype(ptr), ::mp_limb_t *>::value;
 }
+
+static_assert(test_mpz_struct_t(), "The mpz_struct_t does not have the expected layout.");
 
 #endif
 
