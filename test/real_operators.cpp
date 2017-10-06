@@ -32,4 +32,8 @@ TEST_CASE("real plus")
     std::cout << (rat_t{4} + real{123}) << '\n';
     std::cout << (real{123} + 34u) << '\n';
     std::cout << (36u + real{123}) << '\n';
+    std::cout << (real{123} + -34) << '\n';
+    std::cout << (-36 + real{123}) << '\n';
+    std::cout << (real{123} + true) << '\n';
+    std::cout << (false + real{123}) << '\n';
 }

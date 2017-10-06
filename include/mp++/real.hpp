@@ -2812,13 +2812,12 @@ inline real dispatch_binary_add(const integer<SSize> &n, T &&a)
 template <typename T, std::size_t SSize, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
 inline real dispatch_binary_add(T &&a, const rational<SSize> &q)
 {
-    return mpfr_nary_op_return(
-        real_dd_prec(q),
-        [&q](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
-            const mpq_struct_t mpq{*q.get_num().get_mpz_view().get(), *q.get_den().get_mpz_view().get()};
-            ::mpfr_add_q(rop, op, &mpq, rnd);
-        },
-        std::forward<T>(a));
+    return mpfr_nary_op_return(real_dd_prec(q),
+                               [&q](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                                   const auto v = get_mpq_view(q);
+                                   ::mpfr_add_q(rop, op, &v, rnd);
+                               },
+                               std::forward<T>(a));
 }
 
 template <typename T, std::size_t SSize, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
@@ -2845,6 +2844,29 @@ inline real dispatch_binary_add(T &&a, const U &n)
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, std::is_integral<T>, std::is_unsigned<T>>::value,
                       int> = 0>
+inline real dispatch_binary_add(const T &n, U &&a)
+{
+    return dispatch_binary_add(std::forward<U>(a), n);
+}
+
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_integral<U>, std::is_signed<U>>::value, int> = 0>
+inline real dispatch_binary_add(T &&a, const U &n)
+{
+    if (n >= std::numeric_limits<long>::min() && n <= std::numeric_limits<long>::max()) {
+        return mpfr_nary_op_return(real_dd_prec(n),
+                                   [&n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                                       ::mpfr_add_si(rop, op, static_cast<long>(n), rnd);
+                                   },
+                                   std::forward<T>(a));
+    }
+    return dispatch_binary_add(std::forward<T>(a), integer<2>(n));
+}
+
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
 inline real dispatch_binary_add(const T &n, U &&a)
 {
     return dispatch_binary_add(std::forward<U>(a), n);
