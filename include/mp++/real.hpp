@@ -1727,6 +1727,12 @@ private:
     {
         ::mpfr_set_prec(&m_mpfr, Check ? check_set_prec(p) : p);
     }
+    // mpfr_prec_round() wrapper, with or without prec checking.
+    template <bool Check>
+    void prec_round_impl(::mpfr_prec_t p)
+    {
+        ::mpfr_prec_round(&m_mpfr, Check ? check_set_prec(p) : p, MPFR_RNDN);
+    }
 
 public:
     /// Destructively set the precision.
@@ -1765,7 +1771,7 @@ public:
      */
     real &prec_round(::mpfr_prec_t p)
     {
-        ::mpfr_prec_round(&m_mpfr, check_set_prec(p), MPFR_RNDN);
+        prec_round_impl<true>(p);
         return *this;
     }
 
