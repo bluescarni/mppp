@@ -307,8 +307,8 @@ template <typename T>
 std::atomic<::mpfr_prec_t> real_constants<T>::default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
 
 // Fwd declare for friendship.
-template <typename F, typename... Args>
-real &mpfr_nary_op(const F &, real &, const real &, const Args &...);
+template <typename F, typename Arg0, typename... Args>
+real &mpfr_nary_op(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
 
 template <typename F, typename Arg0, typename... Args>
 real mpfr_nary_op_return(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
@@ -486,8 +486,8 @@ class real
 {
 #if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends, for accessing the non-checking prec setting funcs.
-    template <typename F, typename... Args>
-    friend real &detail::mpfr_nary_op(const F &, real &, const real &, const Args &...);
+    template <typename F, typename Arg0, typename... Args>
+    friend real &detail::mpfr_nary_op(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
     template <typename F, typename Arg0, typename... Args>
     friend real detail::mpfr_nary_op_return(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
     template <typename F>
@@ -2201,39 +2201,27 @@ inline real &set_zero(real &r, int sign = 0)
 inline namespace detail
 {
 
-// A recursive function to examine, in an MPFR n-ary function call, the precisions
-// of rop and of the arguments. It will write into a pair in which the first element is a boolean
-// flag signalling if rop and args all have the same precision, and the second element
-// contains the maximum precision among the args.
-inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &, real &) {}
+#if !defined(MPPP_DOXYGEN_INVOKED)
 
-template <typename... Args>
-inline void mpfr_examine_precs(std::pair<bool, ::mpfr_prec_t> &p, real &rop, const real &arg0, const Args &... args)
+// A small helper to init the pairs in the functions below. We need this because
+// we cannot take the address of a const real as a real *.
+template <typename Arg, enable_if_t<!is_ncvrvr<Arg &&>::value, int> = 0>
+inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
-    const auto prec0 = arg0.get_prec();
-    p.first = p.first && (rop.get_prec() == prec0);
-    p.second = c_max(prec0, p.second);
-    mpfr_examine_precs(p, rop, args...);
+    // arg is not a non-const rvalue ref, we cannot steal from it. Init with nullptr.
+    return std::make_pair(static_cast<real *>(nullptr), c_max(arg.get_prec(), min_prec));
 }
 
-// Apply the MPFR n-ary function F with return value rop and real arguments (arg0, args...).
-// The precision of rop will be set to the maximum of the precision among the arguments.
-template <typename F, typename... Args>
-inline real &mpfr_nary_op(const F &f, real &rop, const real &arg0, const Args &... args)
+template <typename Arg, enable_if_t<is_ncvrvr<Arg &&>::value, int> = 0>
+inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
-    auto p = std::make_pair(rop.get_prec() == arg0.get_prec(), arg0.get_prec());
-    mpfr_examine_precs(p, rop, args...);
-    if (mppp_unlikely(!p.first)) {
-        // NOTE: no need for prec checking, we assume all precisions in the operands are valid.
-        rop.set_prec_impl<false>(p.second);
-    }
-    // Invoke the MPFR function.
-    f(rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
-    return rop;
+    // arg is a non-const rvalue ref, and a candidate for stealing resources.
+    return std::make_pair(&arg, c_max(arg.get_prec(), min_prec));
 }
 
-// A recursive function to determine from which arguments, in an MPFR function call,
-// we can steal resources, and the max precision among the arguments.
+// A recursive function to determine, in an MPFR function call,
+// the largest argument we can steal resources from, and the max precision among
+// all the arguments.
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &) {}
 
 // NOTE: we need 2 overloads for this, as we cannot extract a non-const pointer from
@@ -2242,7 +2230,7 @@ template <typename Arg0, typename... Args, enable_if_t<!is_ncvrvr<Arg0 &&>::valu
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
 {
     // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
-    // update the prec.
+    // update the max prec.
     p.second = c_max(arg0.get_prec(), p.second);
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
 }
@@ -2263,25 +2251,59 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
 }
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
-// A small helper to init the pair in the function below. We need this because
-// we cannot take the address of a const real as a real *.
-template <typename Arg, enable_if_t<!is_ncvrvr<Arg &&>::value, int> = 0>
-inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
+// Apply the MPFR n-ary function F with return value rop and real arguments (arg0, args...).
+// The precision of rop will be set to the maximum of the precision among the arguments,
+// but not less than min_prec.
+// Resources may be stolen from one of the arguments, if possible.
+template <typename F, typename Arg0, typename... Args>
+inline real &mpfr_nary_op(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&arg0, Args &&... args)
 {
-    // arg is not a non-const rvalue ref, we cannot steal from it. Init with nullptr.
-    return std::make_pair(static_cast<real *>(nullptr), c_max(arg.get_prec(), min_prec));
+    // This pair contains:
+    // - a pointer to the largest-precision real from which we can steal resources (may be nullptr),
+    // - the largest precision among all arguments.
+    // It's inited with arg0's precision (but no less than min_prec), and a pointer to arg0, if arg0 is a nonconst
+    // rvalue ref (a nullptr otherwise).
+    auto p = mpfr_nary_op_init_pair(min_prec, std::forward<Arg0>(arg0));
+    // Examine the remaining arguments.
+    mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
+    // Cache this for convenience.
+    const auto r_prec = rop.get_prec();
+    if (p.second == r_prec) {
+        // The largest precision among the operands and the precision of the return value
+        // match. No need to steal, just execute the function.
+        f(rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+    } else {
+        if (r_prec > p.second) {
+            // The precision of the return value is larger than the largest precision
+            // among the operands. We can reset its precision destructively
+            // because we know it does not overlap with any operand.
+            rop.set_prec_impl<false>(p.second);
+            f(rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+        } else if (!p.first || p.first->get_prec() != p.second) {
+            // This covers 2 cases:
+            // - the precision of the return value is smaller than the largest precision
+            //   among the operands and we cannot steal from any argument,
+            // - the precision of the return value is smaller than the largest precision
+            //   among the operands, we can steal from an argument but the target argument
+            //   does not have enough precision.
+            // In these cases, we will just set the precision of rop and call the function.
+            // NOTE: we need to set the precision without destroying the rop, as it might
+            // overlap with one of the arguments. Since this will be an increase in precision,
+            // it should not entail a rounding operation.
+            // NOTE: we assume all the precs in the operands are valid, so we will not need
+            // to check them.
+            rop.prec_round_impl<false>(p.second);
+            f(rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+        } else {
+            // The precision of the return value is smaller than the largest precision among the operands,
+            // and we have a candidate for stealing with enough precision: we will use it as return
+            // value and then swap out the result to rop.
+            f(p.first->_get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+            swap(*p.first, rop);
+        }
+    }
+    return rop;
 }
-
-template <typename Arg, enable_if_t<is_ncvrvr<Arg &&>::value, int> = 0>
-inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
-{
-    // arg is a non-const rvalue ref, and a candidate for stealing resources.
-    return std::make_pair(&arg, c_max(arg.get_prec(), min_prec));
-}
-
-#endif
 
 // Invoke an MPFR function with arguments (arg0, args...), and store the result
 // in a value to be created by this function. If possible, this function will try
@@ -2292,12 +2314,7 @@ inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_return_init_pair(::mpfr_pre
 template <typename F, typename Arg0, typename... Args>
 inline real mpfr_nary_op_return(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&... args)
 {
-    // This pair contains:
-    // - a pointer to the largest-precision real from which we can steal resources (may be nullptr),
-    // - the largest precision among all arguments.
-    // It's inited with arg0's precision, and a pointer to arg0, if arg0 is a nonconst rvalue ref.
-    auto p = mpfr_nary_op_return_init_pair(min_prec, std::forward<Arg0>(arg0));
-    // Examine the remaining arguments.
+    auto p = mpfr_nary_op_init_pair(min_prec, std::forward<Arg0>(arg0));
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
     if (p.first && p.first->get_prec() == p.second) {
         // There's at least one arg we can steal from, and its precision is large enough
@@ -2311,6 +2328,8 @@ inline real mpfr_nary_op_return(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0,
     f(retval._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
     return retval;
 }
+
+#endif
 }
 
 /** @defgroup real_arithmetic real_arithmetic
@@ -2328,74 +2347,99 @@ inline real mpfr_nary_op_return(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0,
  *
  * @return a reference to \p rop.
  */
-inline real &add(real &rop, const real &a, const real &b)
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &add(real &rop, T &&a, U &&b)
 {
-    return mpfr_nary_op(::mpfr_add, rop, a, b);
+    return mpfr_nary_op(0, ::mpfr_add, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Ternary \link mppp::real real \endlink subtraction.
-/**
- * This function will compute \f$a-b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
-inline real &sub(real &rop, const real &a, const real &b)
+    /// Ternary \link mppp::real real \endlink subtraction.
+    /**
+     * This function will compute \f$a-b\f$, storing the result in \p rop.
+     * The precision of the result will be set to the largest precision among the operands.
+     *
+     * @param rop the return value.
+     * @param a the first operand.
+     * @param b the second operand.
+     *
+     * @return a reference to \p rop.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &sub(real &rop, T &&a, U &&b)
 {
-    return mpfr_nary_op(::mpfr_sub, rop, a, b);
+    return mpfr_nary_op(0, ::mpfr_sub, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Ternary \link mppp::real real \endlink multiplication.
-/**
- * This function will compute \f$a \times b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
-inline real &mul(real &rop, const real &a, const real &b)
+    /// Ternary \link mppp::real real \endlink multiplication.
+    /**
+     * This function will compute \f$a \times b\f$, storing the result in \p rop.
+     * The precision of the result will be set to the largest precision among the operands.
+     *
+     * @param rop the return value.
+     * @param a the first operand.
+     * @param b the second operand.
+     *
+     * @return a reference to \p rop.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &mul(real &rop, T &&a, U &&b)
 {
-    return mpfr_nary_op(::mpfr_mul, rop, a, b);
+    return mpfr_nary_op(0, ::mpfr_mul, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Ternary \link mppp::real real \endlink division.
-/**
- * This function will compute \f$a / b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
-inline real &div(real &rop, const real &a, const real &b)
+    /// Ternary \link mppp::real real \endlink division.
+    /**
+     * This function will compute \f$a / b\f$, storing the result in \p rop.
+     * The precision of the result will be set to the largest precision among the operands.
+     *
+     * @param rop the return value.
+     * @param a the first operand.
+     * @param b the second operand.
+     *
+     * @return a reference to \p rop.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &div(real &rop, T &&a, U &&b)
 {
-    return mpfr_nary_op(::mpfr_div, rop, a, b);
+    return mpfr_nary_op(0, ::mpfr_div, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Quaternary \link mppp::real real \endlink fused multiply–add.
-/**
- * This function will compute \f$a \times b + c\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- * @param c the third operand.
- *
- * @return a reference to \p rop.
- */
-inline real &fma(real &rop, const real &a, const real &b, const real &c)
+    /// Quaternary \link mppp::real real \endlink fused multiply–add.
+    /**
+     * This function will compute \f$a \times b + c\f$, storing the result in \p rop.
+     * The precision of the result will be set to the largest precision among the operands.
+     *
+     * @param rop the return value.
+     * @param a the first operand.
+     * @param b the second operand.
+     * @param c the third operand.
+     *
+     * @return a reference to \p rop.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U, CvrReal V>
+#else
+template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
+#endif
+inline real &fma(real &rop, T &&a, U &&b, V &&c)
 {
-    return mpfr_nary_op(::mpfr_fma, rop, a, b, c);
+    return mpfr_nary_op(0, ::mpfr_fma, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
 /// Ternary \link mppp::real real \endlink fused multiply–add.
@@ -2422,21 +2466,26 @@ inline real fma(T &&a, U &&b, V &&c)
     return mpfr_nary_op_return(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-/// Quaternary \link mppp::real real \endlink fused multiply–sub.
-/**
- * This function will compute \f$a \times b - c\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- * @param c the third operand.
- *
- * @return a reference to \p rop.
- */
-inline real &fms(real &rop, const real &a, const real &b, const real &c)
+    /// Quaternary \link mppp::real real \endlink fused multiply–sub.
+    /**
+     * This function will compute \f$a \times b - c\f$, storing the result in \p rop.
+     * The precision of the result will be set to the largest precision among the operands.
+     *
+     * @param rop the return value.
+     * @param a the first operand.
+     * @param b the second operand.
+     * @param c the third operand.
+     *
+     * @return a reference to \p rop.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U, CvrReal V>
+#else
+template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
+#endif
+inline real &fms(real &rop, T &&a, U &&b, V &&c)
 {
-    return mpfr_nary_op(::mpfr_fms, rop, a, b, c);
+    return mpfr_nary_op(0, ::mpfr_fms, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
 /// Ternary \link mppp::real real \endlink fused multiply–sub.
@@ -2549,22 +2598,27 @@ inline bool signbit(const real &r)
     return r.signbit();
 }
 
-/** @} */
+    /** @} */
 
-/** @defgroup real_roots real_roots
- *  @{
- */
+    /** @defgroup real_roots real_roots
+     *  @{
+     */
 
-/// Binary square root.
-/**
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
-inline real &sqrt(real &rop, const real &op)
+    /// Binary square root.
+    /**
+     * @param rop the return value.
+     * @param op the operand.
+     *
+     * @return a reference to \p rop.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &sqrt(real &rop, T &&op)
 {
-    return mpfr_nary_op(::mpfr_sqrt, rop, op);
+    return mpfr_nary_op(0, ::mpfr_sqrt, rop, std::forward<T>(op));
 }
 
 /// Unary square root.
@@ -2583,28 +2637,33 @@ inline real sqrt(T &&r)
     return mpfr_nary_op_return(0, ::mpfr_sqrt, std::forward<T>(r));
 }
 
-/** @} */
+    /** @} */
 
-/** @defgroup real_exponentiation real_exponentiation
- *  @{
- */
+    /** @defgroup real_exponentiation real_exponentiation
+     *  @{
+     */
 
-/** @} */
+    /** @} */
 
-/** @defgroup real_trig real_trig
- *  @{
- */
+    /** @defgroup real_trig real_trig
+     *  @{
+     */
 
-/// Binary sine.
-/**
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
-inline real &sin(real &rop, const real &op)
+    /// Binary sine.
+    /**
+     * @param rop the return value.
+     * @param op the operand.
+     *
+     * @return a reference to \p rop.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &sin(real &rop, T &&op)
 {
-    return mpfr_nary_op(::mpfr_sin, rop, op);
+    return mpfr_nary_op(0, ::mpfr_sin, rop, std::forward<T>(op));
 }
 
 /// Unary sine.
@@ -2623,16 +2682,21 @@ inline real sin(T &&r)
     return mpfr_nary_op_return(0, ::mpfr_sin, std::forward<T>(r));
 }
 
-/// Binary cosine.
-/**
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
-inline real &cos(real &rop, const real &op)
+    /// Binary cosine.
+    /**
+     * @param rop the return value.
+     * @param op the operand.
+     *
+     * @return a reference to \p rop.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &cos(real &rop, T &&op)
 {
-    return mpfr_nary_op(::mpfr_cos, rop, op);
+    return mpfr_nary_op(0, ::mpfr_cos, rop, std::forward<T>(op));
 }
 
 /// Unary cosine.
@@ -2754,15 +2818,25 @@ inline real real_nan(::mpfr_prec_t p = 0)
 /** @} */
 
 template <typename T, typename U>
+using are_real_op_types = std::integral_constant<
+    bool, disjunction<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>,
+                      conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<uncvref_t<U>>>,
+                      conjunction<std::is_same<real, uncvref_t<U>>, is_real_interoperable<uncvref_t<T>>>>::value>;
+
+template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 concept bool RealOpTypes = (CvrReal<T> && CvrReal<U>) || (CvrReal<T> && RealInteroperable<uncvref_t<U>>)
                            || (CvrReal<U> && RealInteroperable<uncvref_t<T>>);
 #else
-using real_op_types_enabler = enable_if_t<
-    disjunction<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>,
-                conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<uncvref_t<U>>>,
-                conjunction<std::is_same<real, uncvref_t<U>>, is_real_interoperable<uncvref_t<T>>>>::value,
-    int>;
+using real_op_types_enabler = enable_if_t<are_real_op_types<T, U>::value, int>;
+#endif
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RealCompoundOpTypes = RealOpTypes<T, U> && !std::is_const<unref_t<T>>::value;
+#else
+using real_compound_op_types_enabler
+    = enable_if_t<conjunction<are_real_op_types<T, U>, negation<std::is_const<unref_t<T>>>>::value, int>;
 #endif
 
 /** @defgroup real_operators real_operators
@@ -2895,6 +2969,50 @@ inline real dispatch_binary_add(const T &n, U &&a)
 {
     return dispatch_binary_add(std::forward<U>(a), n);
 }
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_floating_point<U>>::value, int> = 0>
+inline real dispatch_binary_add(T &&a, const U &x)
+{
+    if (std::is_same<U, float>::value || std::is_same<U, double>::value) {
+        return mpfr_nary_op_return(real_dd_prec(x),
+                                   [&x](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                                       ::mpfr_add_d(rop, op, static_cast<double>(x), rnd);
+                                   },
+                                   std::forward<T>(a));
+    }
+    assert((std::is_same<U, long double>::value));
+    // There's no long double add primitive in MPFR. Let's just construct
+    // a temporary real instead.
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_binary_add(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, std::is_floating_point<T>>::value, int> = 0>
+inline real dispatch_binary_add(const T &x, U &&a)
+{
+    return dispatch_binary_add(std::forward<U>(a), x);
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+
+template <typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline real dispatch_binary_add(T &&a, const real128 &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_binary_add(std::forward<T>(a), tmp);
+}
+
+template <typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline real dispatch_binary_add(const real128 &x, T &&a)
+{
+    return dispatch_binary_add(std::forward<T>(a), x);
+}
+
+#endif
 }
 
 /// Binary addition involving \link mppp::real real \endlink.
@@ -2907,6 +3025,50 @@ inline real operator+(T &&a, U &&b)
 #endif
 {
     return dispatch_binary_add(std::forward<T>(a), std::forward<decltype(b)>(b));
+}
+
+inline namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline void dispatch_in_place_add(T &a, U &&b)
+{
+    add(a, a, std::forward<U>(b));
+}
+
+template <std::size_t SSize>
+inline void dispatch_in_place_add(real &a, const integer<SSize> &n)
+{
+    mpfr_nary_op(
+        real_dd_prec(n),
+        [&n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_add_z(rop, op, n.get_mpz_view(), rnd); }, a,
+        a);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline void dispatch_in_place_add(integer<SSize> &n, T &&r)
+{
+    MPPP_MAYBE_TLS real tmp;
+    mpfr_nary_op(
+        real_dd_prec(n),
+        [&n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_add_z(rop, op, n.get_mpz_view(), rnd); }, tmp,
+        std::forward<T>(r));
+    n = static_cast<integer<SSize>>(tmp);
+}
+}
+
+/// In-place addition involving \link mppp::real real \endlink.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator+=(T &a, RealCompoundOpTypes<T> &&b)
+#else
+template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
+inline T &operator+=(T &a, U &&b)
+#endif
+{
+    dispatch_in_place_add(a, std::forward<decltype(b)>(b));
+    return a;
 }
 
 /** @} */

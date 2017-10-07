@@ -36,4 +36,19 @@ TEST_CASE("real plus")
     std::cout << (-36 + real{123}) << '\n';
     std::cout << (real{123} + true) << '\n';
     std::cout << (false + real{123}) << '\n';
+    std::cout << (real{123} + 1.2f) << '\n';
+    std::cout << (1.2f + real{123}) << '\n';
+    std::cout << (real{123} + 1.2) << '\n';
+    std::cout << (1.2 + real{123}) << '\n';
+    std::cout << (real{123} + 1.2l) << '\n';
+    std::cout << (1.2l + real{123}) << '\n';
+#if defined(MPPP_WITH_QUADMATH)
+    std::cout << (real{123} + real128{"1.1"}) << '\n';
+    std::cout << (real128{"1.1"} + real{123}) << '\n';
+#endif
+    std::cout << (r0 += real{45}) << '\n';
+    std::cout << (r0 += int_t{45}) << '\n';
+    int_t n0{56};
+    n0 += real{45};
+    std::cout << n0 << '\n';
 }
