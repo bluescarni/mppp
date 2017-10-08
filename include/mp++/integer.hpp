@@ -180,9 +180,11 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 #if defined(MPPP_HAVE_THREAD_LOCAL)
     auto &mpzc = mpz_caches<>::a_cache;
     if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
+        // LCOV_EXCL_START
         if (mppp_unlikely(nlimbs > static_cast<make_unsigned_t<mpz_size_t>>(std::numeric_limits<mpz_size_t>::max()))) {
-            std::abort(); // LCOV_EXCL_LINE
+            std::abort();
         }
+        // LCOV_EXCL_STOP
         const auto idx = nlimbs - 1u;
         rop._mp_alloc = static_cast<mpz_size_t>(nlimbs);
         rop._mp_size = 0;
@@ -190,16 +192,20 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
         --mpzc.sizes[idx];
     } else {
 #endif
+        // LCOV_EXCL_START
         // A bit of horrid overflow checking.
         if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
             // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
             // to do anything else, as long as GMP does not provide error recovery.
-            std::abort(); // LCOV_EXCL_LINE
+            std::abort();
         }
+        // LCOV_EXCL_STOP
         const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
+        // LCOV_EXCL_START
         if (mppp_unlikely(nbits > std::numeric_limits<::mp_bitcnt_t>::max())) {
-            std::abort(); // LCOV_EXCL_LINE
+            std::abort();
         }
+        // LCOV_EXCL_STOP
         // NOTE: nbits == 0 is allowed.
         ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
         assert(make_unsigned_t<mpz_size_t>(rop._mp_alloc) >= nlimbs);
@@ -220,9 +226,11 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
 {
     assert(base >= 2 && base <= 62);
     const auto size_base = ::mpz_sizeinbase(mpz, base);
+    // LCOV_EXCL_START
     if (mppp_unlikely(size_base > std::numeric_limits<std::size_t>::max() - 2u)) {
-        throw std::overflow_error("Too many digits in the conversion of mpz_t to string."); // LCOV_EXCL_LINE
+        throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
     }
+    // LCOV_EXCL_STOP
     // Total max size is the size in base plus an optional sign and the null terminator.
     const auto total_size = size_base + 2u;
     // NOTE: possible improvement: use a null allocator to avoid initing the chars each time
@@ -3298,10 +3306,12 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
     // At the very minimum, the new asize will be the old asize plus ls.
     // Check if we can represent it first.
     // NOTE: use >= because we may need to increase by 1 new_asize at the end, as a size hint.
+    // LCOV_EXCL_START
     if (mppp_unlikely(ls >= std::numeric_limits<std::size_t>::max() - static_cast<std::size_t>(asize))) {
         // NOTE: don't think this can be hit on any setup currently.
-        throw std::overflow_error("A left bitshift value of " + std::to_string(s) + " is too large"); // LCOV_EXCL_LINE
+        throw std::overflow_error("A left bitshift value of " + std::to_string(s) + " is too large");
     }
+    // LCOV_EXCL_STOP
     const std::size_t new_asize = static_cast<std::size_t>(asize) + ls;
     if (new_asize < SSize) {
         // In this case the operation will always succeed, and we can write directly into rop.
