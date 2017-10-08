@@ -61,6 +61,7 @@
 
 // For the rest, we assume thread_local is available.
 #define MPPP_MAYBE_TLS static thread_local
+#define MPPP_HAVE_THREAD_LOCAL
 
 #endif
 

@@ -135,22 +135,78 @@ inline std::size_t get_mpz_size(const ::mpz_t n)
     return (n->_mp_size >= 0) ? static_cast<std::size_t>(n->_mp_size) : static_cast<std::size_t>(nint_abs(n->_mp_size));
 }
 
+// Structure for caching allocated arrays of limbs.
+struct mpz_alloc_cache {
+    // Arrays up to this size will be cached.
+    static constexpr std::size_t max_size = 10;
+    // Max number of arrays to cache for each size.
+    static constexpr std::size_t max_entries = 100;
+    // The actual cache.
+    std::array<std::array<::mp_limb_t *, max_entries>, max_size> caches;
+    // The number of arrays actually stored in each cache entry.
+    std::array<std::size_t, max_size> sizes;
+    // NOTE: make sure we zero-init the sizes array. For the other array it does
+    // not matter.
+    mpz_alloc_cache() : sizes{} {}
+    ~mpz_alloc_cache()
+    {
+#if !defined(NDEBUG)
+        std::cout << "Cleaning up the mpz alloc cache." << std::endl;
+#endif
+        void (*ffp)(void *, std::size_t);
+        ::mp_get_memory_functions(nullptr, nullptr, &ffp);
+        for (std::size_t i = 0; i < max_size; ++i) {
+            for (std::size_t j = 0; j < sizes[i]; ++j) {
+                ffp(static_cast<void *>(caches[i][j]), i + 1u);
+            }
+        }
+    }
+};
+
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+
+template <typename = void>
+struct mpz_caches {
+    static thread_local mpz_alloc_cache a_cache;
+};
+
+template <typename T>
+thread_local mpz_alloc_cache mpz_caches<T>::a_cache;
+
+#endif
+
 // Helper function to init an mpz to zero with nlimbs preallocated limbs.
 inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 {
-    // A bit of horrid overflow checking.
-    if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
-        // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
-        // to do anything else, as long as GMP does not provide error recovery.
-        std::abort(); // LCOV_EXCL_LINE
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+    auto &mpzc = mpz_caches<>::a_cache;
+    if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
+        if (mppp_unlikely(nlimbs > static_cast<make_unsigned_t<mpz_size_t>>(std::numeric_limits<mpz_size_t>::max()))) {
+            std::abort(); // LCOV_EXCL_LINE
+        }
+        const auto idx = nlimbs - 1u;
+        rop._mp_alloc = static_cast<mpz_size_t>(nlimbs);
+        rop._mp_size = 0;
+        rop._mp_d = mpzc.caches[idx][mpzc.sizes[idx] - 1u];
+        --mpzc.sizes[idx];
+    } else {
+#endif
+        // A bit of horrid overflow checking.
+        if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
+            // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
+            // to do anything else, as long as GMP does not provide error recovery.
+            std::abort(); // LCOV_EXCL_LINE
+        }
+        const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
+        if (mppp_unlikely(nbits > std::numeric_limits<::mp_bitcnt_t>::max())) {
+            std::abort(); // LCOV_EXCL_LINE
+        }
+        // NOTE: nbits == 0 is allowed.
+        ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
+        assert(make_unsigned_t<mpz_size_t>(rop._mp_alloc) >= nlimbs);
+#if defined(MPPP_HAVE_THREAD_LOCAL)
     }
-    const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
-    if (mppp_unlikely(nbits > std::numeric_limits<::mp_bitcnt_t>::max())) {
-        std::abort(); // LCOV_EXCL_LINE
-    }
-    // NOTE: nbits == 0 is allowed.
-    ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
-    assert(make_unsigned_t<mpz_size_t>(rop._mp_alloc) >= nlimbs);
+#endif
 }
 
 // Combined init+set.
@@ -683,7 +739,18 @@ union integer_union {
         assert(!is_static());
         assert(g_dy()._mp_alloc >= 0);
         assert(g_dy()._mp_d != nullptr);
-        ::mpz_clear(&g_dy());
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+        auto &mpzc = mpz_caches<>::a_cache;
+        const auto ualloc = static_cast<make_unsigned_t<mpz_size_t>>(g_dy()._mp_alloc);
+        if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
+            mpzc.caches[ualloc - 1u][mpzc.sizes[ualloc - 1u]] = g_dy()._mp_d;
+            ++mpzc.sizes[ualloc - 1u];
+        } else {
+#endif
+            ::mpz_clear(&g_dy());
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+        }
+#endif
         g_dy().~d_storage();
     }
     // Check storage type.
