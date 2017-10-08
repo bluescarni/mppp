@@ -740,10 +740,8 @@ private:
     {
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
-        MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(d2));
         const auto v = get_mpq_view(*this);
-        ::mpf_set_q(&mpf.m_mpf, &v);
-        ::mpfr_set_f(&mpfr.m_mpfr, &mpf.m_mpf, MPFR_RNDN);
+        ::mpfr_set_q(&mpfr.m_mpfr, &v, MPFR_RNDN);
         return std::make_pair(true, ::mpfr_get_ld(&mpfr.m_mpfr, MPFR_RNDN));
     }
 #endif
