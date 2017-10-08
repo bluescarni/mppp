@@ -132,6 +132,9 @@
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Minor improvements in the static checks for the expected layouts of <code class="docutils literal"><span class="pre">mpz_t</span></code> and <code class="docutils literal"><span class="pre">mpq_t</span></code>
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/53">#53</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/42">#42</a>).</li>
+<li>Enable additional compiler warning flags in debug builds for GCC (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/52">#52</a>).</li>
 <li><strong>BREAKING</strong>: various improvements/changes to the bit shifting functions for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>,
 and the exception raised by the bit shifting operators is not any more
 <code class="docutils literal"><span class="pre">std::domain_error</span></code>, it is now <code class="docutils literal"><span class="pre">std::overflow_error</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/48">#48</a>).</li>
@@ -147,6 +150,9 @@ and the exception raised by the bit shifting operators is not any more
 <div class="section" id="fix">
 <h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Fixes/improvements in the support for <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/50">#50</a>,
+<a class="reference external" href="https://github.com/bluescarni/mppp/pull/54">#54</a>).</li>
+<li>Fix the compilation of the tests on Clang 5 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/43">#43</a>).</li>
 <li>Fix too lax constraints in the implementation of in-place operators for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and
 <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/41">#41</a>).</li>
 <li>Fix the PDF build of the documentation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/39">#39</a>).</li>
