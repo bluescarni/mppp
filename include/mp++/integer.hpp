@@ -750,8 +750,9 @@ union integer_union {
         auto &mpzc = mpz_caches<>::a_cache;
         const auto ualloc = static_cast<make_unsigned_t<mpz_size_t>>(g_dy()._mp_alloc);
         if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
-            mpzc.caches[ualloc - 1u][mpzc.sizes[ualloc - 1u]] = g_dy()._mp_d;
-            ++mpzc.sizes[ualloc - 1u];
+            const auto idx = ualloc - 1u;
+            mpzc.caches[idx][mpzc.sizes[idx]] = g_dy()._mp_d;
+            ++mpzc.sizes[idx];
         } else {
 #endif
             ::mpz_clear(&g_dy());
