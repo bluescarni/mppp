@@ -22,6 +22,11 @@ New
 Changes
 ~~~~~~~
 
+- Minor improvements in the static checks for the expected layouts of ``mpz_t`` and ``mpq_t``
+  (`#53 <https://github.com/bluescarni/mppp/pull/53>`__, `#42 <https://github.com/bluescarni/mppp/pull/42>`__).
+
+- Enable additional compiler warning flags in debug builds for GCC (`#52 <https://github.com/bluescarni/mppp/pull/52>`__).
+
 - **BREAKING**: various improvements/changes to the bit shifting functions for :cpp:class:`~mppp::integer`,
   and the exception raised by the bit shifting operators is not any more
   ``std::domain_error``, it is now ``std::overflow_error`` (`#48 <https://github.com/bluescarni/mppp/pull/48>`__).
@@ -40,6 +45,11 @@ Changes
 
 Fix
 ~~~
+
+- Fixes/improvements in the support for ``long double`` (`#50 <https://github.com/bluescarni/mppp/pull/50>`__,
+  `#54 <https://github.com/bluescarni/mppp/pull/54>`__).
+
+- Fix the compilation of the tests on Clang 5 (`#43 <https://github.com/bluescarni/mppp/pull/43>`__).
 
 - Fix too lax constraints in the implementation of in-place operators for :cpp:class:`~mppp::integer` and
   :cpp:class:`~mppp::rational` (`#41 <https://github.com/bluescarni/mppp/pull/41>`__).
