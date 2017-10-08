@@ -172,11 +172,11 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
     const auto total_size = size_base + 2u;
     // NOTE: possible improvement: use a null allocator to avoid initing the chars each time
     // we resize up.
-    out.resize(static_cast<std::vector<char>::size_type>(total_size));
     // Overflow check.
-    if (mppp_unlikely(out.size() != total_size)) {
+    if (mppp_unlikely(total_size > std::numeric_limits<std::vector<char>::size_type>::max())) {
         throw std::overflow_error("Too many digits in the conversion of mpz_t to string."); // LCOV_EXCL_LINE
     }
+    out.resize(static_cast<std::vector<char>::size_type>(total_size));
     ::mpz_get_str(out.data(), base, mpz);
 }
 
