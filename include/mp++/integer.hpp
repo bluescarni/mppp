@@ -145,9 +145,8 @@ struct mpz_alloc_cache {
     std::array<std::array<::mp_limb_t *, max_entries>, max_size> caches;
     // The number of arrays actually stored in each cache entry.
     std::array<std::size_t, max_size> sizes;
-    // NOTE: make sure we zero-init the sizes array. For the other array it does
-    // not matter.
-    mpz_alloc_cache() : sizes{} {}
+    // NOTE: use round brackets init for the usual GCC 4.8 workaround.
+    constexpr mpz_alloc_cache() : caches(), sizes() {}
     ~mpz_alloc_cache()
     {
 #if !defined(NDEBUG)
