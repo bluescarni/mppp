@@ -865,7 +865,7 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
 // - pow() can probably benefit for some specialised static implementation, especially in conjunction with
 //   mpn_sqr().
 // - gcd() can be improved (see notes).
-// - functions still to be de-branched: div, divexact, ... + all the mpn implementations, if worth it.
+// - functions still to be de-branched: all the mpn implementations, if worth it.
 //   Probably better to wait for benchmarks before moving.
 // - performance improvements for the assignment operators to integrals, at least (maybe floats as well?): avoid
 //   cting temporary.
@@ -3668,19 +3668,13 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
     const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK),
                       r_ = (op1.m_limbs[0] & GMP_NUMB_MASK) % (op2.m_limbs[0] & GMP_NUMB_MASK);
     // Write q.
-    q._mp_size = (q_ != 0u);
-    if (sign1 != sign2) {
-        q._mp_size = -q._mp_size;
-    }
+    q._mp_size = sign1 * sign2 * (q_ != 0u);
     // NOTE: there should be no need here to mask.
     q.m_limbs[0] = q_;
     // Write r.
-    r._mp_size = (r_ != 0u);
     // Following C++11, the sign of r is the sign of op1:
     // http://stackoverflow.com/questions/13100711/operator-modulo-change-in-c-11
-    if (sign1 == -1) {
-        r._mp_size = -r._mp_size;
-    }
+    r._mp_size = sign1 * (r_ != 0u);
     r.m_limbs[0] = r_;
 }
 
@@ -3751,16 +3745,10 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
         // fewer than 2 limbs. This a slightly modified version of the 1-limb division from above,
         // without the need to mask as this function is called only if there are no nail bits.
         const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0], r_ = op1.m_limbs[0] % op2.m_limbs[0];
-        q._mp_size = (q_ != 0u);
-        if (sign1 != sign2) {
-            q._mp_size = -q._mp_size;
-        }
+        q._mp_size = sign1 * sign2 * (q_ != 0u);
         q.m_limbs[0] = q_;
         q.m_limbs[1] = 0u;
-        r._mp_size = (r_ != 0u);
-        if (sign1 == -1) {
-            r._mp_size = -r._mp_size;
-        }
+        r._mp_size = sign1 * (r_ != 0u);
         r.m_limbs[0] = r_;
         r.m_limbs[1] = 0u;
         return;
@@ -3769,16 +3757,10 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
     ::mp_limb_t q1, q2, r1, r2;
     dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2, &r1, &r2);
     // Write out.
-    q._mp_size = q2 ? 2 : (q1 ? 1 : 0);
-    if (sign1 != sign2) {
-        q._mp_size = -q._mp_size;
-    }
+    q._mp_size = sign1 * sign2 * (q2 ? 2 : (q1 ? 1 : 0));
     q.m_limbs[0] = q1;
     q.m_limbs[1] = q2;
-    r._mp_size = r2 ? 2 : (r1 ? 1 : 0);
-    if (sign1 == -1) {
-        r._mp_size = -r._mp_size;
-    }
+    r._mp_size = sign1 * (r2 ? 2 : (r1 ? 1 : 0));
     r.m_limbs[0] = r1;
     r.m_limbs[1] = r2;
 }
@@ -3855,10 +3837,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
 {
     const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK);
     // Write q.
-    q._mp_size = (q_ != 0u);
-    if (sign1 != sign2) {
-        q._mp_size = -q._mp_size;
-    }
+    q._mp_size = sign1 * sign2 * (q_ != 0u);
     q.m_limbs[0] = q_;
 }
 
@@ -3871,10 +3850,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
     if (asize1 < 2 && asize2 < 2) {
         // 1-limb optimisation.
         const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0];
-        q._mp_size = (q_ != 0u);
-        if (sign1 != sign2) {
-            q._mp_size = -q._mp_size;
-        }
+        q._mp_size = sign1 * sign2 * (q_ != 0u);
         q.m_limbs[0] = q_;
         q.m_limbs[1] = 0u;
         return;
@@ -3882,10 +3858,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
     // General case.
     ::mp_limb_t q1, q2;
     dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
-    q._mp_size = q2 ? 2 : (q1 ? 1 : 0);
-    if (sign1 != sign2) {
-        q._mp_size = -q._mp_size;
-    }
+    q._mp_size = sign1 * sign2 * (q2 ? 2 : (q1 ? 1 : 0));
     q.m_limbs[0] = q1;
     q.m_limbs[1] = q2;
 }
