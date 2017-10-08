@@ -130,7 +130,7 @@ static_assert(disjunction<std::is_same<::mp_limb_t, unsigned long>, std::is_same
               "Invalid type for mp_limb_t.");
 
 // Small helper to get the size in limbs from an mpz_t. Will return zero if n is zero.
-std::size_t inline get_mpz_size(const ::mpz_t n)
+inline std::size_t get_mpz_size(const ::mpz_t n)
 {
     return (n->_mp_size >= 0) ? static_cast<std::size_t>(n->_mp_size) : static_cast<std::size_t>(nint_abs(n->_mp_size));
 }
