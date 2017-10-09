@@ -38,7 +38,7 @@ Concepts
 
    * on GCC, this concept is satisfied by the types satisfying :cpp:concept:`mppp::CppInteroperable`;
    * on Clang, this concept is satisfied by the types satisfying :cpp:concept:`mppp::CppInteroperable`,
-     minus ``long double`` (whether mp++ was configured with the ``MPPP_WITH_MPFR`` option or not).
+     minus ``long double``.
 
 .. cpp:concept:: template <typename T, typename U> mppp::Real128CppOpTypes
 
