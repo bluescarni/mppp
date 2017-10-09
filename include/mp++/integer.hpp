@@ -135,22 +135,83 @@ inline std::size_t get_mpz_size(const ::mpz_t n)
     return (n->_mp_size >= 0) ? static_cast<std::size_t>(n->_mp_size) : static_cast<std::size_t>(nint_abs(n->_mp_size));
 }
 
+// Structure for caching allocated arrays of limbs.
+struct mpz_alloc_cache {
+    // Arrays up to this size will be cached.
+    static constexpr std::size_t max_size = 10;
+    // Max number of arrays to cache for each size.
+    static constexpr std::size_t max_entries = 100;
+    // The actual cache.
+    std::array<std::array<::mp_limb_t *, max_entries>, max_size> caches;
+    // The number of arrays actually stored in each cache entry.
+    std::array<std::size_t, max_size> sizes;
+    // NOTE: use round brackets init for the usual GCC 4.8 workaround.
+    constexpr mpz_alloc_cache() : caches(), sizes() {}
+    ~mpz_alloc_cache()
+    {
+#if !defined(NDEBUG)
+        std::cout << "Cleaning up the mpz alloc cache." << std::endl;
+#endif
+        void (*ffp)(void *, std::size_t);
+        ::mp_get_memory_functions(nullptr, nullptr, &ffp);
+        for (std::size_t i = 0; i < max_size; ++i) {
+            for (std::size_t j = 0; j < sizes[i]; ++j) {
+                ffp(static_cast<void *>(caches[i][j]), i + 1u);
+            }
+        }
+    }
+};
+
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+
+template <typename = void>
+struct mpz_caches {
+    static thread_local mpz_alloc_cache a_cache;
+};
+
+template <typename T>
+thread_local mpz_alloc_cache mpz_caches<T>::a_cache;
+
+#endif
+
 // Helper function to init an mpz to zero with nlimbs preallocated limbs.
 inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 {
-    // A bit of horrid overflow checking.
-    if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
-        // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
-        // to do anything else, as long as GMP does not provide error recovery.
-        std::abort(); // LCOV_EXCL_LINE
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+    auto &mpzc = mpz_caches<>::a_cache;
+    if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
+        // LCOV_EXCL_START
+        if (mppp_unlikely(nlimbs > static_cast<make_unsigned_t<mpz_size_t>>(std::numeric_limits<mpz_size_t>::max()))) {
+            std::abort();
+        }
+        // LCOV_EXCL_STOP
+        const auto idx = nlimbs - 1u;
+        rop._mp_alloc = static_cast<mpz_size_t>(nlimbs);
+        rop._mp_size = 0;
+        rop._mp_d = mpzc.caches[idx][mpzc.sizes[idx] - 1u];
+        --mpzc.sizes[idx];
+    } else {
+#endif
+        // LCOV_EXCL_START
+        // A bit of horrid overflow checking.
+        if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
+            // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
+            // to do anything else, as long as GMP does not provide error recovery.
+            std::abort();
+        }
+        // LCOV_EXCL_STOP
+        const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
+        // LCOV_EXCL_START
+        if (mppp_unlikely(nbits > std::numeric_limits<::mp_bitcnt_t>::max())) {
+            std::abort();
+        }
+        // LCOV_EXCL_STOP
+        // NOTE: nbits == 0 is allowed.
+        ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
+        assert(make_unsigned_t<mpz_size_t>(rop._mp_alloc) >= nlimbs);
+#if defined(MPPP_HAVE_THREAD_LOCAL)
     }
-    const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
-    if (mppp_unlikely(nbits > std::numeric_limits<::mp_bitcnt_t>::max())) {
-        std::abort(); // LCOV_EXCL_LINE
-    }
-    // NOTE: nbits == 0 is allowed.
-    ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
-    assert(make_unsigned_t<mpz_size_t>(rop._mp_alloc) >= nlimbs);
+#endif
 }
 
 // Combined init+set.
@@ -165,9 +226,11 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
 {
     assert(base >= 2 && base <= 62);
     const auto size_base = ::mpz_sizeinbase(mpz, base);
+    // LCOV_EXCL_START
     if (mppp_unlikely(size_base > std::numeric_limits<std::size_t>::max() - 2u)) {
-        throw std::overflow_error("Too many digits in the conversion of mpz_t to string."); // LCOV_EXCL_LINE
+        throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
     }
+    // LCOV_EXCL_STOP
     // Total max size is the size in base plus an optional sign and the null terminator.
     const auto total_size = size_base + 2u;
     // NOTE: possible improvement: use a null allocator to avoid initing the chars each time
@@ -683,7 +746,19 @@ union integer_union {
         assert(!is_static());
         assert(g_dy()._mp_alloc >= 0);
         assert(g_dy()._mp_d != nullptr);
-        ::mpz_clear(&g_dy());
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+        auto &mpzc = mpz_caches<>::a_cache;
+        const auto ualloc = static_cast<make_unsigned_t<mpz_size_t>>(g_dy()._mp_alloc);
+        if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
+            const auto idx = ualloc - 1u;
+            mpzc.caches[idx][mpzc.sizes[idx]] = g_dy()._mp_d;
+            ++mpzc.sizes[idx];
+        } else {
+#endif
+            ::mpz_clear(&g_dy());
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+        }
+#endif
         g_dy().~d_storage();
     }
     // Check storage type.
@@ -791,7 +866,7 @@ void sqrt(integer<SSize> &, const integer<SSize> &);
 // - pow() can probably benefit for some specialised static implementation, especially in conjunction with
 //   mpn_sqr().
 // - gcd() can be improved (see notes).
-// - functions still to be de-branched: div, divexact, ... + all the mpn implementations, if worth it.
+// - functions still to be de-branched: all the mpn implementations, if worth it.
 //   Probably better to wait for benchmarks before moving.
 // - performance improvements for the assignment operators to integrals, at least (maybe floats as well?): avoid
 //   cting temporary.
@@ -3232,10 +3307,12 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
     // At the very minimum, the new asize will be the old asize plus ls.
     // Check if we can represent it first.
     // NOTE: use >= because we may need to increase by 1 new_asize at the end, as a size hint.
+    // LCOV_EXCL_START
     if (mppp_unlikely(ls >= std::numeric_limits<std::size_t>::max() - static_cast<std::size_t>(asize))) {
         // NOTE: don't think this can be hit on any setup currently.
-        throw std::overflow_error("A left bitshift value of " + std::to_string(s) + " is too large"); // LCOV_EXCL_LINE
+        throw std::overflow_error("A left bitshift value of " + std::to_string(s) + " is too large");
     }
+    // LCOV_EXCL_STOP
     const std::size_t new_asize = static_cast<std::size_t>(asize) + ls;
     if (new_asize < SSize) {
         // In this case the operation will always succeed, and we can write directly into rop.
@@ -3592,19 +3669,13 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
     const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK),
                       r_ = (op1.m_limbs[0] & GMP_NUMB_MASK) % (op2.m_limbs[0] & GMP_NUMB_MASK);
     // Write q.
-    q._mp_size = (q_ != 0u);
-    if (sign1 != sign2) {
-        q._mp_size = -q._mp_size;
-    }
+    q._mp_size = sign1 * sign2 * (q_ != 0u);
     // NOTE: there should be no need here to mask.
     q.m_limbs[0] = q_;
     // Write r.
-    r._mp_size = (r_ != 0u);
     // Following C++11, the sign of r is the sign of op1:
     // http://stackoverflow.com/questions/13100711/operator-modulo-change-in-c-11
-    if (sign1 == -1) {
-        r._mp_size = -r._mp_size;
-    }
+    r._mp_size = sign1 * (r_ != 0u);
     r.m_limbs[0] = r_;
 }
 
@@ -3675,16 +3746,10 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
         // fewer than 2 limbs. This a slightly modified version of the 1-limb division from above,
         // without the need to mask as this function is called only if there are no nail bits.
         const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0], r_ = op1.m_limbs[0] % op2.m_limbs[0];
-        q._mp_size = (q_ != 0u);
-        if (sign1 != sign2) {
-            q._mp_size = -q._mp_size;
-        }
+        q._mp_size = sign1 * sign2 * (q_ != 0u);
         q.m_limbs[0] = q_;
         q.m_limbs[1] = 0u;
-        r._mp_size = (r_ != 0u);
-        if (sign1 == -1) {
-            r._mp_size = -r._mp_size;
-        }
+        r._mp_size = sign1 * (r_ != 0u);
         r.m_limbs[0] = r_;
         r.m_limbs[1] = 0u;
         return;
@@ -3693,16 +3758,10 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
     ::mp_limb_t q1, q2, r1, r2;
     dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2, &r1, &r2);
     // Write out.
-    q._mp_size = q2 ? 2 : (q1 ? 1 : 0);
-    if (sign1 != sign2) {
-        q._mp_size = -q._mp_size;
-    }
+    q._mp_size = sign1 * sign2 * (q2 ? 2 : (q1 ? 1 : 0));
     q.m_limbs[0] = q1;
     q.m_limbs[1] = q2;
-    r._mp_size = r2 ? 2 : (r1 ? 1 : 0);
-    if (sign1 == -1) {
-        r._mp_size = -r._mp_size;
-    }
+    r._mp_size = sign1 * (r2 ? 2 : (r1 ? 1 : 0));
     r.m_limbs[0] = r1;
     r.m_limbs[1] = r2;
 }
@@ -3779,10 +3838,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
 {
     const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK);
     // Write q.
-    q._mp_size = (q_ != 0u);
-    if (sign1 != sign2) {
-        q._mp_size = -q._mp_size;
-    }
+    q._mp_size = sign1 * sign2 * (q_ != 0u);
     q.m_limbs[0] = q_;
 }
 
@@ -3795,10 +3851,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
     if (asize1 < 2 && asize2 < 2) {
         // 1-limb optimisation.
         const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0];
-        q._mp_size = (q_ != 0u);
-        if (sign1 != sign2) {
-            q._mp_size = -q._mp_size;
-        }
+        q._mp_size = sign1 * sign2 * (q_ != 0u);
         q.m_limbs[0] = q_;
         q.m_limbs[1] = 0u;
         return;
@@ -3806,10 +3859,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
     // General case.
     ::mp_limb_t q1, q2;
     dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
-    q._mp_size = q2 ? 2 : (q1 ? 1 : 0);
-    if (sign1 != sign2) {
-        q._mp_size = -q._mp_size;
-    }
+    q._mp_size = sign1 * sign2 * (q2 ? 2 : (q1 ? 1 : 0));
     q.m_limbs[0] = q1;
     q.m_limbs[1] = q2;
 }

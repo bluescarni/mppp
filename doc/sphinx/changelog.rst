@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Implement a cache for the allocation of limbs arrays in small :cpp:class:`~mppp::integer` objects
+  (`#55 <https://github.com/bluescarni/mppp/pull/55>`__).
+
 - Implement the :cpp:class:`~mppp::real128` class (`#31 <https://github.com/bluescarni/mppp/pull/31>`__).
 
 - Implement the ``sub_ui()`` primitive for :cpp:class:`~mppp::integer` (`#37 <https://github.com/bluescarni/mppp/pull/37>`__).
@@ -21,6 +24,9 @@ New
 
 Changes
 ~~~~~~~
+
+- Performance improvements and code simplifications for :cpp:class:`~mppp::integer` division
+  (`#55 <https://github.com/bluescarni/mppp/pull/55>`__).
 
 - Minor improvements in the static checks for the expected layouts of ``mpz_t`` and ``mpq_t``
   (`#53 <https://github.com/bluescarni/mppp/pull/53>`__, `#42 <https://github.com/bluescarni/mppp/pull/42>`__).
