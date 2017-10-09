@@ -39,7 +39,7 @@ struct add_tester {
         // Start with all zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;
-        add(n1, n2, n3);
+        REQUIRE(&add(n1, n2, n3) == &n1);
         ::mpz_add(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -301,7 +301,7 @@ struct sub_tester {
         // Start with all zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;
-        sub(n1, n2, n3);
+        REQUIRE(&sub(n1, n2, n3) == &n1);
         ::mpz_sub(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -536,7 +536,7 @@ struct mul_tester {
         // Start with zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;
-        mul(n1, n2, n3);
+        REQUIRE(&mul(n1, n2, n3) == &n1);
         ::mpz_mul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -743,7 +743,7 @@ struct addmul_tester {
         // Start with zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;
-        addmul(n1, n2, n3);
+        REQUIRE(&addmul(n1, n2, n3) == &n1);
         ::mpz_addmul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -1027,7 +1027,7 @@ struct submul_tester {
         // Start with zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;
-        submul(n1, n2, n3);
+        REQUIRE(&submul(n1, n2, n3) == &n1);
         ::mpz_submul(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -1465,7 +1465,7 @@ struct lshift_tester {
         // A few zero tests to start.
         mpz_raii m1, m2;
         integer n1, n2;
-        mul_2exp(n1, n2, 0u);
+        REQUIRE(&mul_2exp(n1, n2, 0u) == &n1);
         ::mpz_mul_2exp(&m1.m_mpz, &m2.m_mpz, 0u);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         n2 = integer(4);
@@ -1760,7 +1760,7 @@ struct rshift_tester {
         // A few zero tests to start.
         mpz_raii m1, m2;
         integer n1, n2;
-        tdiv_q_2exp(n1, n2, 0u);
+        REQUIRE(&tdiv_q_2exp(n1, n2, 0u) == &n1);
         ::mpz_tdiv_q_2exp(&m1.m_mpz, &m2.m_mpz, 0u);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         n2 = integer(4);

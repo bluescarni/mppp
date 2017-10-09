@@ -42,7 +42,7 @@ struct pow_tester {
         mpz_raii m1, m2;
         integer n1, n2;
         ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, 0u);
-        pow_ui(n1, n2, 0);
+        REQUIRE(&pow_ui(n1, n2, 0) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(pow_ui(n2, 0)) == lex_cast(m1)));
         REQUIRE(n1.is_static());

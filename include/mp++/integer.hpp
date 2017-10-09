@@ -852,7 +852,7 @@ union integer_union {
 
 // Fwd declaration.
 template <std::size_t SSize>
-void sqrt(integer<SSize> &, const integer<SSize> &);
+integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 
 // NOTE: a few misc things:
 // - re-visit at one point the issue of the estimators when we need to promote from static to dynamic
@@ -2066,11 +2066,13 @@ constexpr std::size_t integer<SSize>::ssize;
  * \endrststar
  *
  * @param n the assignment argument.
+ *
+ * @return a reference to \p n.
  */
 template <std::size_t SSize>
-inline void set_zero(integer<SSize> &n)
+inline integer<SSize> &set_zero(integer<SSize> &n)
 {
-    n.set_zero();
+    return n.set_zero();
 }
 
 /// Set to one.
@@ -2084,11 +2086,13 @@ inline void set_zero(integer<SSize> &n)
  * \endrststar
  *
  * @param n the assignment argument.
+ *
+ * @return a reference to \p n.
  */
 template <std::size_t SSize>
-inline void set_one(integer<SSize> &n)
+inline integer<SSize> &set_one(integer<SSize> &n)
 {
-    n.set_one();
+    return n.set_one();
 }
 
 /// Set to minus one.
@@ -2102,11 +2106,13 @@ inline void set_one(integer<SSize> &n)
  * \endrststar
  *
  * @param n the assignment argument.
+ *
+ * @return a reference to \p n.
  */
 template <std::size_t SSize>
-inline void set_negative_one(integer<SSize> &n)
+inline integer<SSize> &set_negative_one(integer<SSize> &n)
 {
-    n.set_negative_one();
+    return n.set_negative_one();
 }
 
 /** @} */
@@ -2500,22 +2506,25 @@ inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, 
  * @param rop the return value.
  * @param op1 the first argument.
  * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void add(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+inline integer<SSize> &add(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
     const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
     if (mppp_likely(sr && s1 && s2)) {
         // Optimise the case of all statics.
         if (mppp_likely(
                 static_addsub<true>(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st()))) {
-            return;
+            return rop;
         }
     }
     if (sr) {
         rop._get_union().promote(SSize + 1u);
     }
     ::mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    return rop;
 }
 
 inline namespace detail
@@ -2712,9 +2721,11 @@ inline bool static_addsub_ui(static_int<SSize> &rop, const static_int<SSize> &op
  * @param rop the return value.
  * @param op1 the first argument.
  * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void add_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
+inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
 {
     if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
         // For the optimised version below to kick in we need to be sure we can safely convert
@@ -2724,20 +2735,21 @@ inline void add_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long
         // NOTE: does not look like this can be hit on any modern setup.
         // LCOV_EXCL_START
         add(rop, op1, integer<SSize>{op2});
-        return;
+        return rop;
         // LCOV_EXCL_STOP
     }
     const bool sr = rop.is_static(), s1 = op1.is_static();
     if (mppp_likely(sr && s1)) {
         // Optimise the case of all statics.
         if (mppp_likely(static_addsub_ui<true>(rop._get_union().g_st(), op1._get_union().g_st(), op2))) {
-            return;
+            return rop;
         }
     }
     if (sr) {
         rop._get_union().promote(SSize + 1u);
     }
     ::mpz_add_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), op2);
+    return rop;
 }
 
 /// Ternary subtraction with <tt>unsigned long</tt>.
@@ -2747,26 +2759,29 @@ inline void add_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long
  * @param rop the return value.
  * @param op1 the first argument.
  * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void sub_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
+inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
 {
     if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
         // LCOV_EXCL_START
         sub(rop, op1, integer<SSize>{op2});
-        return;
+        return rop;
         // LCOV_EXCL_STOP
     }
     const bool sr = rop.is_static(), s1 = op1.is_static();
     if (mppp_likely(sr && s1)) {
         if (mppp_likely(static_addsub_ui<false>(rop._get_union().g_st(), op1._get_union().g_st(), op2))) {
-            return;
+            return rop;
         }
     }
     if (sr) {
         rop._get_union().promote(SSize + 1u);
     }
     ::mpz_sub_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), op2);
+    return rop;
 }
 
 /// Ternary subtraction.
@@ -2776,22 +2791,25 @@ inline void sub_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long
  * @param rop the return value.
  * @param op1 the first argument.
  * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void sub(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+inline integer<SSize> &sub(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
     const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
     if (mppp_likely(sr && s1 && s2)) {
         // Optimise the case of all statics.
         if (mppp_likely(
                 static_addsub<false>(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st()))) {
-            return;
+            return rop;
         }
     }
     if (sr) {
         rop._get_union().promote(SSize + 1u);
     }
     ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    return rop;
 }
 
 inline namespace detail
@@ -3004,16 +3022,18 @@ inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &o
  * @param rop the return value.
  * @param op1 the first argument.
  * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void mul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+inline integer<SSize> &mul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
     const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
     std::size_t size_hint = 0u;
     if (mppp_likely(sr && s1 && s2)) {
         size_hint = static_mul(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
         if (mppp_likely(size_hint == 0u)) {
-            return;
+            return rop;
         }
     }
     if (sr) {
@@ -3025,6 +3045,7 @@ inline void mul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SS
         rop._get_union().promote(size_hint);
     }
     ::mpz_mul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    return rop;
 }
 
 inline namespace detail
@@ -3234,22 +3255,25 @@ inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSi
  * @param rop the return value.
  * @param op1 the first argument.
  * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void addmul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+inline integer<SSize> &addmul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
     const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
     std::size_t size_hint = 0u;
     if (mppp_likely(sr && s1 && s2)) {
         size_hint = static_addsubmul<true>(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
         if (mppp_likely(size_hint == 0u)) {
-            return;
+            return rop;
         }
     }
     if (sr) {
         rop._get_union().promote(size_hint);
     }
     ::mpz_addmul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    return rop;
 }
 
 /// Ternary multiply–sub.
@@ -3259,22 +3283,25 @@ inline void addmul(integer<SSize> &rop, const integer<SSize> &op1, const integer
  * @param rop the return value.
  * @param op1 the first argument.
  * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void submul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+inline integer<SSize> &submul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
     const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
     std::size_t size_hint = 0u;
     if (mppp_likely(sr && s1 && s2)) {
         size_hint = static_addsubmul<false>(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
         if (mppp_likely(size_hint == 0u)) {
-            return;
+            return rop;
         }
     }
     if (sr) {
         rop._get_union().promote(size_hint);
     }
     ::mpz_submul(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    return rop;
 }
 
 inline namespace detail
@@ -3481,10 +3508,12 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
  * @param n the multiplicand.
  * @param s the bit shift value.
  *
+ * @return a reference to \p rop.
+ *
  * @throws std::overflow_error if \p s is larger than an implementation-defined limit.
  */
 template <std::size_t SSize>
-inline void mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
+inline integer<SSize> &mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
 {
     const bool sr = rop.is_static(), sn = n.is_static();
     std::size_t size_hint = 0u;
@@ -3493,13 +3522,14 @@ inline void mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t
         // in the implementation functions.
         size_hint = static_mul_2exp(rop._get_union().g_st(), n._get_union().g_st(), safe_cast<std::size_t>(s));
         if (mppp_likely(size_hint == 0u)) {
-            return;
+            return rop;
         }
     }
     if (sr) {
         rop._get_union().promote(size_hint);
     }
     ::mpz_mul_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
+    return rop;
 }
 
 /// Binary negation.
@@ -3508,12 +3538,14 @@ inline void mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t
  *
  * @param rop the return value.
  * @param n the integer that will be negated.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void neg(integer<SSize> &rop, const integer<SSize> &n)
+inline integer<SSize> &neg(integer<SSize> &rop, const integer<SSize> &n)
 {
     rop = n;
-    rop.neg();
+    return rop.neg();
 }
 
 /// Unary negation.
@@ -3536,12 +3568,14 @@ inline integer<SSize> neg(const integer<SSize> &n)
  *
  * @param rop the return value.
  * @param n the argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void abs(integer<SSize> &rop, const integer<SSize> &n)
+inline integer<SSize> &abs(integer<SSize> &rop, const integer<SSize> &n)
 {
     rop = n;
-    rop.abs();
+    return rop.abs();
 }
 
 /// Unary absolute value.
@@ -3937,20 +3971,23 @@ inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &
  * @param rop the return value.
  * @param n the dividend.
  * @param d the divisor.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void divexact(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
+inline integer<SSize> &divexact(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
 {
     const bool sr = rop.is_static(), s1 = n.is_static(), s2 = d.is_static();
     if (mppp_likely(sr && s1 && s2)) {
         static_divexact(rop._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
         // Division can never fail.
-        return;
+        return rop;
     }
     if (sr) {
         rop._get_union().promote();
     }
     ::mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    return rop;
 }
 
 /// Exact division (binary version).
@@ -4113,19 +4150,22 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
  * @param rop the return value.
  * @param n the dividend.
  * @param s the bit shift value.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
+inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
 {
     const bool sr = rop.is_static(), sn = n.is_static();
     if (mppp_likely(sr && sn)) {
         static_tdiv_q_2exp(rop._get_union().g_st(), n._get_union().g_st(), s);
-        return;
+        return rop;
     }
     if (sr) {
         rop._get_union().promote();
     }
     ::mpz_tdiv_q_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
+    return rop;
 }
 
 /** @} */
@@ -4365,20 +4405,23 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
  * @param rop the return value.
  * @param op1 the first operand.
  * @param op2 the second operand.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void gcd(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+inline integer<SSize> &gcd(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
     const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
     if (mppp_likely(sr && s1 && s2)) {
         static_gcd(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
         rop._get_union().g_st().zero_unused_limbs();
-        return;
+        return rop;
     }
     if (sr) {
         rop._get_union().promote();
     }
     ::mpz_gcd(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    return rop;
 }
 
 /// GCD (binary version).
@@ -4403,10 +4446,12 @@ inline integer<SSize> gcd(const integer<SSize> &op1, const integer<SSize> &op2)
  * @param rop the return value.
  * @param n the argument for the factorial.
  *
+ * @return a reference to \p rop.
+ *
  * @throws std::invalid_argument if \p n is larger than an implementation-defined limit.
  */
 template <std::size_t SSize>
-inline void fac_ui(integer<SSize> &rop, unsigned long n)
+inline integer<SSize> &fac_ui(integer<SSize> &rop, unsigned long n)
 {
     // NOTE: we put a limit here because the GMP function just crashes and burns
     // if n is too large, and n does not even need to be that large.
@@ -4424,6 +4469,7 @@ inline void fac_ui(integer<SSize> &rop, unsigned long n)
     } else {
         ::mpz_fac_ui(&rop._get_union().g_dy(), n);
     }
+    return rop;
 }
 
 /// Binomial coefficient (ternary version).
@@ -4434,9 +4480,11 @@ inline void fac_ui(integer<SSize> &rop, unsigned long n)
  * @param rop the return value.
  * @param n the top argument.
  * @param k the bottom argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k)
+inline integer<SSize> &bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k)
 {
     if (rop.is_static()) {
         MPPP_MAYBE_TLS mpz_raii tmp;
@@ -4445,6 +4493,7 @@ inline void bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k
     } else {
         ::mpz_bin_ui(&rop._get_union().g_dy(), n.get_mpz_view(), k);
     }
+    return rop;
 }
 
 /// Binomial coefficient (binary version).
@@ -4587,12 +4636,15 @@ inline void nextprime_impl(integer<SSize> &rop, const integer<SSize> &n)
  *
  * @param rop the return value.
  * @param n the integer argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void nextprime(integer<SSize> &rop, const integer<SSize> &n)
+inline integer<SSize> &nextprime(integer<SSize> &rop, const integer<SSize> &n)
 {
     // NOTE: nextprime on negative numbers always returns 2.
     nextprime_impl(rop, n);
+    return rop;
 }
 
 /// Compute next prime number (unary version).
@@ -4641,9 +4693,11 @@ inline int probab_prime_p(const integer<SSize> &n, int reps = 25)
  * @param rop the return value.
  * @param base the base.
  * @param exp the exponent.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned long exp)
+inline integer<SSize> &pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned long exp)
 {
     if (rop.is_static()) {
         MPPP_MAYBE_TLS mpz_raii tmp;
@@ -4652,6 +4706,7 @@ inline void pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned lon
     } else {
         ::mpz_pow_ui(&rop._get_union().g_dy(), base.get_mpz_view(), exp);
     }
+    return rop;
 }
 
 /// Binary integer exponentiation.
@@ -4827,12 +4882,15 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
  * @param rop the return value.
  * @param n the integer whose integer square root will be computed.
  *
+ * @return a reference to \p rop.
+ *
  * @throws std::domain_error if \p n is negative.
  */
 template <std::size_t SSize>
-inline void sqrt(integer<SSize> &rop, const integer<SSize> &n)
+inline integer<SSize> &sqrt(integer<SSize> &rop, const integer<SSize> &n)
 {
     sqrt_impl(rop, n);
+    return rop;
 }
 
 /// Integer square root (unary version).

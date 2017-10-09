@@ -71,7 +71,7 @@ struct set_zero_tester {
                     // Promote sometimes, if possible.
                     n1.promote();
                 }
-                set_zero(n1);
+                REQUIRE(&set_zero(n1) == &n1);
                 REQUIRE(n1.is_zero());
                 REQUIRE(n1.is_static());
             }
@@ -142,11 +142,11 @@ struct set_one_tester {
                     n1.promote();
                 }
                 if (sdist(rng)) {
-                    set_one(n1);
+                    REQUIRE(&set_one(n1) == &n1);
                     REQUIRE(n1.is_one());
                     REQUIRE(n1.is_static());
                 } else {
-                    set_negative_one(n1);
+                    REQUIRE(&set_negative_one(n1) == &n1);
                     REQUIRE(n1.is_negative_one());
                     REQUIRE(n1.is_static());
                 }
