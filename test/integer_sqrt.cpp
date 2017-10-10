@@ -41,7 +41,7 @@ struct sqrt_tester {
         mpz_raii m1, m2;
         integer n1, n2;
         ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
-        sqrt(n1, n2);
+        REQUIRE(&sqrt(n1, n2) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         REQUIRE((lex_cast(sqrt(n2)) == lex_cast(m1)));

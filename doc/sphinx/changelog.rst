@@ -25,6 +25,9 @@ New
 Changes
 ~~~~~~~
 
+- The free functions for :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational` now return a reference
+  to the return value, rather than ``void`` (`#56 <https://github.com/bluescarni/mppp/pull/56>`__).
+
 - Performance improvements and code simplifications for :cpp:class:`~mppp::integer` division
   (`#55 <https://github.com/bluescarni/mppp/pull/55>`__).
 

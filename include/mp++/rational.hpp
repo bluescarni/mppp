@@ -1219,11 +1219,14 @@ using rational_op_types_enabler = enable_if_t<are_rational_op_types<T, U>::value
  * @param rop the return value.
  * @param op1 the first argument.
  * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+inline rational<SSize> &add(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
     addsub_impl<true, false>(rop, op1, op2);
+    return rop;
 }
 
 /// Ternary subtraction.
@@ -1233,11 +1236,14 @@ inline void add(rational<SSize> &rop, const rational<SSize> &op1, const rational
  * @param rop the return value.
  * @param op1 the first argument.
  * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void sub(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+inline rational<SSize> &sub(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
     addsub_impl<false, false>(rop, op1, op2);
+    return rop;
 }
 
 inline namespace detail
@@ -1319,11 +1325,14 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
  * @param rop the return value.
  * @param op1 the first argument.
  * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void mul(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+inline rational<SSize> &mul(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
     mul_impl<false>(rop, op1, op2);
+    return rop;
 }
 
 /// Ternary division.
@@ -1334,10 +1343,12 @@ inline void mul(rational<SSize> &rop, const rational<SSize> &op1, const rational
  * @param op1 the first argument.
  * @param op2 the second argument.
  *
+ * @return a reference to \p rop.
+ *
  * @throws zero_division_error if \p op2 is zero.
  */
 template <std::size_t SSize>
-inline void div(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
+inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, const rational<SSize> &op2)
 {
     if (mppp_unlikely(op2.is_zero())) {
         throw zero_division_error("Zero divisor in rational division");
@@ -1350,7 +1361,7 @@ inline void div(rational<SSize> &rop, const rational<SSize> &op1, const rational
             // x = x/x = 1.
             rop._get_num().set_one();
             rop._get_den().set_one();
-            return;
+            return rop;
         }
         // Set rop to 1/rop by swapping num/den.
         // NOTE: we already checked that op2 is nonzero, so inverting it
@@ -1360,7 +1371,7 @@ inline void div(rational<SSize> &rop, const rational<SSize> &op1, const rational
         fix_den_sign(rop);
         // Multiply by op1.
         mul(rop, rop, op1);
-        return;
+        return rop;
     }
     const bool u1 = op1.get_den().is_one(), u2 = op2.get_den().is_one();
     if ((u1 && u2) || (op1.get_den() == op2.get_den())) {
@@ -1417,6 +1428,7 @@ inline void div(rational<SSize> &rop, const rational<SSize> &op1, const rational
     }
     // Fix wrong sign in the den.
     fix_den_sign(rop);
+    return rop;
 }
 
 /// Binary negation.
@@ -1425,12 +1437,14 @@ inline void div(rational<SSize> &rop, const rational<SSize> &op1, const rational
  *
  * @param rop the return value.
  * @param q the rational that will be negated.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void neg(rational<SSize> &rop, const rational<SSize> &q)
+inline rational<SSize> &neg(rational<SSize> &rop, const rational<SSize> &q)
 {
     rop = q;
-    rop.neg();
+    return rop.neg();
 }
 
 /// Unary negation.
@@ -1453,12 +1467,14 @@ inline rational<SSize> neg(const rational<SSize> &q)
  *
  * @param rop the return value.
  * @param q the argument.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void abs(rational<SSize> &rop, const rational<SSize> &q)
+inline rational<SSize> &abs(rational<SSize> &rop, const rational<SSize> &q)
 {
     rop = q;
-    rop.abs();
+    return rop.abs();
 }
 
 /// Unary absolute value.
@@ -1482,13 +1498,15 @@ inline rational<SSize> abs(const rational<SSize> &q)
  * @param rop the return value.
  * @param q the argument.
  *
+ * @return a reference to \p rop.
+ *
  * @throws unspecified any exception thrown by mppp::rational::inv().
  */
 template <std::size_t SSize>
-inline void inv(rational<SSize> &rop, const rational<SSize> &q)
+inline rational<SSize> &inv(rational<SSize> &rop, const rational<SSize> &q)
 {
     rop = q;
-    rop.inv();
+    return rop.inv();
 }
 
 /// Unary inversion.
@@ -2712,16 +2730,18 @@ inline rational_common_t<T, U> pow(const T &base, const U &exp)
 /// Canonicalise.
 /**
  * \rststar
- * This function will put ``q`` in canonical form. Internally, this function will employ
+ * This function will put ``rop`` in canonical form. Internally, this function will employ
  * :cpp:func:`mppp::rational::canonicalise()`.
  * \endrststar
  *
- * @param q the rational that will be canonicalised.
+ * @param rop the rational that will be canonicalised.
+ *
+ * @return a reference to \p rop.
  */
 template <std::size_t SSize>
-inline void canonicalise(rational<SSize> &q)
+inline rational<SSize> &canonicalise(rational<SSize> &rop)
 {
-    q.canonicalise();
+    return rop.canonicalise();
 }
 
 /// Hash value.

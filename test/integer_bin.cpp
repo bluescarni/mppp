@@ -41,7 +41,7 @@ struct bin_tester {
         mpz_raii m1, m2;
         integer n1, n2;
         ::mpz_bin_ui(&m1.m_mpz, &m2.m_mpz, 0u);
-        bin_ui(n1, n2, 0);
+        REQUIRE(&bin_ui(n1, n2, 0) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(bin_ui(n2, 0)) == lex_cast(m1)));
         REQUIRE(n1.is_static());
