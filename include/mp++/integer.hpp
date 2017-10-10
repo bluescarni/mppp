@@ -1317,7 +1317,7 @@ public:
     {
         return *this = integer{x};
     }
-    /// Assignment from \p mpz_t.
+    /// Copy assignment from \p mpz_t.
     /**
      * This assignment operator will copy into \p this the value of the GMP integer \p n. The storage type of \p this
      * after the assignment will be static if \p n fits in the static storage, otherwise it will be dynamic.
@@ -1369,6 +1369,73 @@ public:
         }
         return *this;
     }
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+    /// Move assignment from \p mpz_t.
+    /**
+     * This assignment operator will move into \p this the GMP integer \p n. The storage type of \p this
+     * after the assignment will be static if \p n fits in the static storage, otherwise it will be dynamic.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
+     *    with an uninitialized ``n`` results in undefined behaviour. Also, no aliasing is allowed: the data in ``n``
+     *    must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of ``this`` then
+     *    it might point to internal data of ``this``, and the behaviour of this operator will thus be undefined).
+     *
+     *    Additionally, the user must ensure that, after the assignment, ``mpz_clear()`` is never
+     *    called on ``n``: the resources previously owned by ``n`` are now owned by ``this``, which
+     *    will take care of releasing them when the destructor is called.
+     *
+     * .. note::
+     *
+     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio
+     *    versions earlier than 14.1 (Visual Studio 2017).
+     * \endrststar
+     *
+     * @param n the input GMP integer.
+     *
+     * @return a reference to \p this.
+     */
+    integer &operator=(::mpz_t &&n)
+    {
+        const auto asize = get_mpz_size(n);
+        const auto s = is_static();
+        if (s && asize <= SSize) {
+            // this is static, n fits into static. Copy over.
+            m_int.g_st()._mp_size = n->_mp_size;
+            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+            if (SSize <= static_int<SSize>::opt_size) {
+                // Zero the non-copied limbs, but only if the static size is not greater than
+                // the size for which special optimisations kick in. See the documentation
+                // of zero_unused_limbs().
+                std::fill(m_int.g_st().m_limbs.begin() + asize, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+            }
+            // Clear out n.
+            mpz_clear_wrap(*n);
+        } else if (!s && asize > SSize) {
+            // Dynamic to dynamic: clear this, shallow copy n.
+            mpz_clear_wrap(m_int.m_dy);
+            m_int.m_dy = *n;
+        } else if (s && asize > SSize) {
+            // this is static, n is too big. Promote and assign.
+            // Destroy static.
+            m_int.g_st().~s_storage();
+            // Init dynamic with a shallow copy.
+            ::new (static_cast<void *>(&m_int.m_dy)) d_storage(*n);
+        } else {
+            // This is dynamic and n fits into static.
+            assert(!s && asize <= SSize);
+            // Destroy the dynamic storage.
+            m_int.destroy_dynamic();
+            // Init a static with the content from n.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage{n->_mp_size, n->_mp_d, asize};
+            // Clear out n.
+            mpz_clear_wrap(*n);
+        }
+        return *this;
+    }
+#endif
     /// Assignment from C string.
     /**
      * \rststar
