@@ -46,7 +46,7 @@ struct fac_tester {
         REQUIRE(n1.is_static());
         // Try one.
         ::mpz_fac_ui(&m1.m_mpz, 1);
-        fac_ui(n1, 1);
+        REQUIRE(&fac_ui(n1, 1) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         // Try two.

@@ -49,7 +49,7 @@ struct inv_tester {
         });
         n2 = "3/-4";
         ::mpq_set_si(&m2.m_mpq, -3, 4);
-        inv(n1, n2);
+        REQUIRE(&inv(n1, n2) == &n1);
         ::mpq_inv(&m1.m_mpq, &m2.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(inv(n2)) == lex_cast(m1)));

@@ -41,7 +41,7 @@ struct divexact_tester {
         ::mpz_set_si(&m3.m_mpz, 1);
         n3 = integer(1);
         ::mpz_divexact(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
-        divexact(n1, n2, n3);
+        REQUIRE(&divexact(n1, n2, n3) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(divexact(n2, n3)) == lex_cast(m1)));
         ::mpz_set_si(&m3.m_mpz, -2);

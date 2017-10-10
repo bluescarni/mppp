@@ -1080,7 +1080,7 @@ struct canonicalise_tester {
         REQUIRE(q.get_den() == 1);
         q._get_num() = 3;
         q._get_den() = -6;
-        canonicalise(q);
+        REQUIRE(&canonicalise(q) == &q);
         REQUIRE(q.get_num() == -1);
         REQUIRE(q.get_den() == 2);
         q._get_num() = 0;

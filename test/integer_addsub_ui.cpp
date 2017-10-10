@@ -39,7 +39,7 @@ struct add_ui_tester {
         // Start with all zeroes.
         mpz_raii m1, m2;
         integer n1, n2;
-        add_ui(n1, n2, 0);
+        REQUIRE(&add_ui(n1, n2, 0) == &n1);
         ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
@@ -221,7 +221,7 @@ struct sub_ui_tester {
         // Start with all zeroes.
         mpz_raii m1, m2;
         integer n1, n2;
-        sub_ui(n1, n2, 0);
+        REQUIRE(&sub_ui(n1, n2, 0) == &n1);
         ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());

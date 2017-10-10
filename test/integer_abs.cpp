@@ -39,7 +39,7 @@ struct abs_tester {
         mpz_raii m1, m2;
         integer n1, n2;
         ::mpz_abs(&m1.m_mpz, &m2.m_mpz);
-        abs(n1, n2);
+        REQUIRE(&abs(n1, n2) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.is_static());
         // Test the other variants.
