@@ -39,7 +39,7 @@ struct neg_tester {
         mpq_raii m1, m2;
         rational n1, n2;
         ::mpq_neg(&m1.m_mpq, &m2.m_mpq);
-        neg(n1, n2);
+        REQUIRE(&neg(n1, n2) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         // Test the other variants.
         n1.neg();

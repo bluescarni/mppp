@@ -39,7 +39,7 @@ struct add_tester {
         // Start with all zeroes.
         mpq_raii m1, m2, m3;
         rational n1, n2, n3;
-        add(n1, n2, n3);
+        REQUIRE(&add(n1, n2, n3) == &n1);
         ::mpq_add(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2 + n3) == lex_cast(m1)));
@@ -211,7 +211,7 @@ struct sub_tester {
         // Start with all zeroes.
         mpq_raii m1, m2, m3;
         rational n1, n2, n3;
-        sub(n1, n2, n3);
+        REQUIRE(&sub(n1, n2, n3) == &n1);
         ::mpq_sub(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2 - n3) == lex_cast(m1)));
@@ -386,7 +386,7 @@ struct mul_tester {
         // Start with all zeroes.
         mpq_raii m1, m2, m3;
         rational n1, n2, n3;
-        mul(n1, n2, n3);
+        REQUIRE(&mul(n1, n2, n3) == &n1);
         ::mpq_mul(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2 * n3) == lex_cast(m1)));
@@ -552,7 +552,7 @@ struct div_tester {
         n2 = 0;
         n3 = -10;
         ::mpq_set_si(&m3.m_mpq, -10, 1);
-        div(n1, n2, n3);
+        REQUIRE(&div(n1, n2, n3) == &n1);
         ::mpq_div(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(n2 / n3) == lex_cast(m1)));

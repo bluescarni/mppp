@@ -39,7 +39,7 @@ struct abs_tester {
         mpq_raii m1, m2;
         rational n1, n2;
         ::mpq_abs(&m1.m_mpq, &m2.m_mpq);
-        abs(n1, n2);
+        REQUIRE(&abs(n1, n2) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE(n1.get_num().is_static());
         REQUIRE(n1.get_den().is_static());
