@@ -214,6 +214,24 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 #endif
 }
 
+// Thin wrapper around mpz_clear(): will add entry to cache if possible instead of clearing.
+inline void mpz_clear_wrap(mpz_struct_t &m)
+{
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+    auto &mpzc = mpz_caches<>::a_cache;
+    const auto ualloc = static_cast<make_unsigned_t<mpz_size_t>>(m._mp_alloc);
+    if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
+        const auto idx = ualloc - 1u;
+        mpzc.caches[idx][mpzc.sizes[idx]] = m._mp_d;
+        ++mpzc.sizes[idx];
+    } else {
+#endif
+        ::mpz_clear(&m);
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+    }
+#endif
+}
+
 // Combined init+set.
 inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
 {
@@ -746,19 +764,7 @@ union integer_union {
         assert(!is_static());
         assert(g_dy()._mp_alloc >= 0);
         assert(g_dy()._mp_d != nullptr);
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-        auto &mpzc = mpz_caches<>::a_cache;
-        const auto ualloc = static_cast<make_unsigned_t<mpz_size_t>>(g_dy()._mp_alloc);
-        if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
-            const auto idx = ualloc - 1u;
-            mpzc.caches[idx][mpzc.sizes[idx]] = g_dy()._mp_d;
-            ++mpzc.sizes[idx];
-        } else {
-#endif
-            ::mpz_clear(&g_dy());
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-        }
-#endif
+        mpz_clear_wrap(g_dy());
         g_dy().~d_storage();
     }
     // Check storage type.
