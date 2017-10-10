@@ -697,6 +697,25 @@ union integer_union {
     {
         dispatch_mpz_ctor(n);
     }
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+    // Move ctor from mpz_t.
+    explicit integer_union(::mpz_t &&n)
+    {
+        const auto asize = get_mpz_size(n);
+        if (asize > SSize) {
+            // Too big, make shallow copy into dynamic. this will now
+            // own the resources of n.
+            ::new (static_cast<void *>(&m_dy)) d_storage(*n);
+        } else {
+            // Fits into small.
+            ::new (static_cast<void *>(&m_st)) s_storage{n->_mp_size, n->_mp_d, asize};
+            // Clear n: its resources have been copied into this, and we must
+            // ensure uniform behaviour with the case in which we shallow-copied it
+            // into dynamic storage.
+            mpz_clear_wrap(*n);
+        }
+    }
+#endif
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
     {
@@ -1210,7 +1229,7 @@ public:
      */
     explicit integer(const std::string_view &s, int base = 10) : integer(s.data(), s.data() + s.size(), base) {}
 #endif
-    /// Constructor from \p mpz_t.
+    /// Copy constructor from \p mpz_t.
     /**
      * This constructor will initialize \p this with the value of the GMP integer \p n. The storage type of \p this
      * will be static if \p n fits in the static storage, otherwise it will be dynamic.
@@ -1225,6 +1244,33 @@ public:
      * @param n the input GMP integer.
      */
     explicit integer(const ::mpz_t n) : m_int(n) {}
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+    /// Move constructor from \p mpz_t.
+    /**
+     * This constructor will initialize \p this with the value of the GMP integer \p n, transferring the state
+     * of \p n into \p this. The storage type of \p this
+     * will be static if \p n fits in the static storage, otherwise it will be dynamic.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
+     *    with an uninitialized ``n`` results in undefined behaviour.
+     *
+     *    Additionally, the user must ensure that, after construction, ``mpz_clear()`` is never
+     *    called on ``n``: the resources previously owned by ``n`` are now owned by ``this``, which
+     *    will take care of releasing them when the destructor is called.
+     *
+     * .. note::
+     *
+     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio
+     *    versions earlier than 14.1 (Visual Studio 2017).
+     * \endrststar
+     *
+     * @param n the input GMP integer.
+     */
+    explicit integer(::mpz_t &&n) : m_int(std::move(n)) {}
+#endif
     /// Copy assignment operator.
     /**
      * This operator will perform a deep copy of \p other, copying its storage type as well.
