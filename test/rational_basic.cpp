@@ -386,7 +386,7 @@ TEST_CASE("string constructor")
     tuple_for_each(sizes{}, string_ctor_tester{});
 }
 
-struct mpq_ctor_tester {
+struct mpq_copy_ctor_tester {
     template <typename S>
     void operator()(const S &) const
     {
@@ -413,10 +413,54 @@ struct mpq_ctor_tester {
     }
 };
 
-TEST_CASE("mpq_t constructor")
+TEST_CASE("mpq_t copy constructor")
 {
-    tuple_for_each(sizes{}, mpq_ctor_tester{});
+    tuple_for_each(sizes{}, mpq_copy_ctor_tester{});
 }
+
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+
+struct mpq_move_ctor_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        ::mpq_t q0;
+        ::mpq_init(q0);
+        REQUIRE(rational{std::move(q0)} == 0);
+        ::mpq_init(q0);
+        ::mpz_set_si(mpq_numref(q0), 1234);
+        REQUIRE(rational{std::move(q0)} == 1234);
+        ::mpq_init(q0);
+        ::mpz_set_si(mpq_numref(q0), -1234);
+        REQUIRE(rational{std::move(q0)} == -1234);
+        ::mpq_init(q0);
+        ::mpz_set_si(mpq_numref(q0), 4);
+        ::mpz_set_si(mpq_denref(q0), -3);
+        REQUIRE(lex_cast(rational{std::move(q0)}) == "4/-3");
+        ::mpq_init(q0);
+        ::mpz_set_str(mpq_numref(q0), "3218372891372987328917389127389217398271983712987398127398172389712937819237",
+                      10);
+        ::mpz_set_si(mpq_denref(q0), -3);
+        REQUIRE(lex_cast(rational{std::move(q0)})
+                == "3218372891372987328917389127389217398271983712987398127398172389712937819237/-3");
+        ::mpq_init(q0);
+        ::mpz_set_str(mpq_numref(q0), "3218372891372987328917389127389217398271983712987398127398172389712937819237",
+                      10);
+        ::mpz_set_str(mpq_denref(q0), "-3218372891372987328917389127389217398271983712987398127398172389712937819237",
+                      10);
+        REQUIRE(lex_cast(rational{std::move(q0)})
+                == "3218372891372987328917389127389217398271983712987398127398172389712937819237/"
+                   "-3218372891372987328917389127389217398271983712987398127398172389712937819237");
+    }
+};
+
+TEST_CASE("mpq_t move constructor")
+{
+    tuple_for_each(sizes{}, mpq_move_ctor_tester{});
+}
+
+#endif
 
 struct mpz_ctor_tester {
     template <typename S>
@@ -763,7 +807,7 @@ TEST_CASE("string ass")
     tuple_for_each(sizes{}, string_ass_tester{});
 }
 
-struct mpq_ass_tester {
+struct mpq_copy_ass_tester {
     template <typename S>
     void operator()(const S &) const
     {
@@ -772,7 +816,8 @@ struct mpq_ass_tester {
         REQUIRE((!std::is_assignable<const rational &, ::mpq_t>::value));
         rational q;
         mpq_raii m;
-        REQUIRE(lex_cast(rational{&m.m_mpq}) == "0");
+        q = &m.m_mpq;
+        REQUIRE(lex_cast(q) == "0");
         ::mpq_set_si(&m.m_mpq, 1234, 1);
         q = &m.m_mpq;
         REQUIRE(lex_cast(q) == "1234");
@@ -788,10 +833,50 @@ struct mpq_ass_tester {
     }
 };
 
-TEST_CASE("mpq_t assignment")
+TEST_CASE("mpq_t copy assignment")
 {
-    tuple_for_each(sizes{}, mpq_ass_tester{});
+    tuple_for_each(sizes{}, mpq_copy_ass_tester{});
 }
+
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+
+struct mpq_move_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        REQUIRE((std::is_assignable<rational &, ::mpq_t &&>::value));
+        REQUIRE((!std::is_assignable<const rational &, ::mpq_t &&>::value));
+        rational q;
+        ::mpq_t q0;
+        ::mpq_init(q0);
+        q = std::move(q0);
+        REQUIRE(lex_cast(q) == "0");
+        ::mpq_init(q0);
+        ::mpq_set_si(q0, 1234, 1);
+        q = std::move(q0);
+        REQUIRE(lex_cast(q) == "1234");
+        ::mpq_init(q0);
+        ::mpq_set_si(q0, -1234, 1);
+        q = std::move(q0);
+        REQUIRE(lex_cast(q) == "-1234");
+        ::mpq_init(q0);
+        ::mpq_set_str(q0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        q = std::move(q0);
+        REQUIRE(lex_cast(q) == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
+        ::mpq_init(q0);
+        ::mpq_set_str(q0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2", 10);
+        q = std::move(q0);
+        REQUIRE(lex_cast(q) == "-3218372891372987328917389127389217398271983712987398127398172389712937819237/2");
+    }
+};
+
+TEST_CASE("mpq_t move assignment")
+{
+    tuple_for_each(sizes{}, mpq_move_ass_tester{});
+}
+
+#endif
 
 struct mpz_ass_tester {
     template <typename S>

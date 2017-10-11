@@ -24,6 +24,7 @@
 #include <thread>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 
 #include "test_utils.hpp"
 
@@ -307,7 +308,7 @@ TEST_CASE("string constructor")
     tuple_for_each(sizes{}, string_ctor_tester{});
 }
 
-struct mpz_ctor_tester {
+struct mpz_copy_ctor_tester {
     template <typename S>
     void operator()(const S &) const
     {
@@ -349,10 +350,67 @@ struct mpz_ctor_tester {
     }
 };
 
-TEST_CASE("mpz_t constructor")
+TEST_CASE("mpz_t copy constructor")
 {
-    tuple_for_each(sizes{}, mpz_ctor_tester{});
+    tuple_for_each(sizes{}, mpz_copy_ctor_tester{});
 }
+
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+
+struct mpz_move_ctor_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        ::mpz_t m0;
+        ::mpz_init(m0);
+        REQUIRE(lex_cast(integer{std::move(m0)}) == "0");
+        ::mpz_init(m0);
+        ::mpz_set_si(m0, 1234);
+        REQUIRE(lex_cast(integer{std::move(m0)}) == "1234");
+        ::mpz_init(m0);
+        ::mpz_set_si(m0, -1234);
+        REQUIRE(lex_cast(integer{std::move(m0)}) == "-1234");
+        ::mpz_init(m0);
+        ::mpz_set_str(m0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        REQUIRE(lex_cast(integer{std::move(m0)})
+                == "3218372891372987328917389127389217398271983712987398127398172389712937819237");
+        ::mpz_init(m0);
+        ::mpz_set_str(m0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        REQUIRE(lex_cast(integer{std::move(m0)})
+                == "-3218372891372987328917389127389217398271983712987398127398172389712937819237");
+        // Random testing.
+        std::atomic<bool> fail(false);
+        auto f = [&fail](unsigned n) {
+            std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
+                                                     std::numeric_limits<long>::max());
+            std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
+            for (auto i = 0; i < ntries; ++i) {
+                ::mpz_t m1;
+                ::mpz_init(m1);
+                auto tmp = dist(eng);
+                ::mpz_set_si(m1, tmp);
+                if (lex_cast(integer{std::move(m1)}) != lex_cast(tmp)) {
+                    fail.store(false);
+                }
+            }
+        };
+        std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+        t0.join();
+        t1.join();
+        t2.join();
+        t3.join();
+        REQUIRE(!fail.load());
+        mt_rng_seed += 4u;
+    }
+};
+
+TEST_CASE("mpz_t move constructor")
+{
+    tuple_for_each(sizes{}, mpz_move_ctor_tester{});
+}
+
+#endif
 
 struct copy_move_tester {
     template <typename S>
@@ -432,14 +490,15 @@ TEST_CASE("copy and move")
     tuple_for_each(sizes{}, copy_move_tester{});
 }
 
-struct mpz_ass_tester {
+struct mpz_copy_ass_tester {
     template <typename S>
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
         integer n;
         mpz_raii m;
-        REQUIRE(lex_cast(integer{&m.m_mpz}) == "0");
+        n = &m.m_mpz;
+        REQUIRE(lex_cast(n) == "0");
         ::mpz_set_si(&m.m_mpz, 1234);
         n = &m.m_mpz;
         REQUIRE(n == 1234);
@@ -483,10 +542,77 @@ struct mpz_ass_tester {
     }
 };
 
-TEST_CASE("mpz_t assignment")
+TEST_CASE("mpz_t copy assignment")
 {
-    tuple_for_each(sizes{}, mpz_ass_tester{});
+    tuple_for_each(sizes{}, mpz_copy_ass_tester{});
 }
+
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+
+struct mpz_move_ass_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        integer n;
+        ::mpz_t m0;
+        ::mpz_init(m0);
+        n = std::move(m0);
+        REQUIRE(lex_cast(n) == "0");
+        ::mpz_init(m0);
+        ::mpz_set_si(m0, 1234);
+        n = std::move(m0);
+        REQUIRE(n == 1234);
+        ::mpz_init(m0);
+        ::mpz_set_si(m0, -1234);
+        n = std::move(m0);
+        REQUIRE(n == -1234);
+        ::mpz_init(m0);
+        ::mpz_set_str(m0, "3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        n = std::move(m0);
+        REQUIRE(n == integer("3218372891372987328917389127389217398271983712987398127398172389712937819237"));
+        ::mpz_init(m0);
+        ::mpz_set_str(m0, "-3218372891372987328917389127389217398271983712987398127398172389712937819237", 10);
+        n = std::move(m0);
+        REQUIRE(n == integer("-3218372891372987328917389127389217398271983712987398127398172389712937819237"));
+        // Random testing.
+        std::atomic<bool> fail(false);
+        auto f = [&fail](unsigned u) {
+            std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
+                                                     std::numeric_limits<long>::max());
+            std::uniform_int_distribution<int> sdist(0, 1);
+            std::mt19937 eng(static_cast<std::mt19937::result_type>(u + mt_rng_seed));
+            for (auto i = 0; i < ntries; ++i) {
+                ::mpz_t m1;
+                ::mpz_init(m1);
+                auto tmp = dist(eng);
+                ::mpz_set_si(m1, tmp);
+                integer z;
+                if (sdist(eng)) {
+                    z.promote();
+                }
+                z = std::move(m1);
+                if (z != tmp) {
+                    fail.store(false);
+                }
+            }
+        };
+        std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+        t0.join();
+        t1.join();
+        t2.join();
+        t3.join();
+        REQUIRE(!fail.load());
+        mt_rng_seed += 4u;
+    }
+};
+
+TEST_CASE("mpz_t move assignment")
+{
+    tuple_for_each(sizes{}, mpz_move_ass_tester{});
+}
+
+#endif
 
 struct string_ass_tester {
     template <typename S>

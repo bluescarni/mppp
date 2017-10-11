@@ -475,7 +475,7 @@ public:
      * @param n the input GMP integer.
      */
     explicit rational(const ::mpz_t n) : m_num(n), m_den(1u) {}
-    /// Constructor from \p mpq_t.
+    /// Copy constructor from \p mpq_t.
     /**
      * This constructor will initialise the numerator and denominator of \p this with those of the GMP rational \p q.
      *
@@ -483,13 +483,43 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``q`` results in undefined behaviour. Also, this constructor will **not**
+     *    with an uninitialized ``q`` results in undefined behaviour.
+     *
+     *    This constructor will **not**
      *    canonicalise ``this``: numerator and denominator are constructed as-is from ``q``.
      * \endrststar
      *
      * @param q the input GMP rational.
      */
     explicit rational(const ::mpq_t q) : m_num(mpq_numref(q)), m_den(mpq_denref(q)) {}
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+    /// Move constructor from \p mpq_t.
+    /**
+     * This constructor will move the numerator and denominator of the GMP rational \p q into \p this.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this constructor
+     *    with an uninitialized ``q`` results in undefined behaviour.
+     *
+     *    This constructor will **not**
+     *    canonicalise ``this``: numerator and denominator are constructed as-is from ``q``.
+     *
+     *    The user must ensure that, after construction, ``mpq_clear()`` is never
+     *    called on ``q``: the resources previously owned by ``q`` are now owned by ``this``, which
+     *    will take care of releasing them when the destructor is called.
+     *
+     * .. note::
+     *
+     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio
+     *    versions earlier than 14.1 (Visual Studio 2017).
+     * \endrststar
+     *
+     * @param q the input GMP rational.
+     */
+    explicit rational(::mpq_t &&q) : m_num(::mpz_t{*mpq_numref(q)}), m_den(::mpz_t{*mpq_denref(q)}) {}
+#endif
     /// Defaulted copy-assignment operator.
     /**
      * @return a reference to ``this``.
@@ -529,7 +559,9 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` results in undefined behaviour. Also, no aliasing is allowed:
+     *    with an uninitialized ``n`` results in undefined behaviour.
+     *
+     *    No aliasing is allowed:
      *    the data in ``n`` must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of
      *    the numerator of ``this`` then it might point to internal data of ``this``, and the behaviour of this operator
      *    will thus be undefined).
@@ -545,7 +577,7 @@ public:
         m_den.set_one();
         return *this;
     }
-    /// Assignment from \p mpq_t.
+    /// Copy assignment from \p mpq_t.
     /**
      * This assignment operator will copy into \p this the value of the GMP rational \p q.
      *
@@ -553,8 +585,12 @@ public:
      * .. warning::
      *
      *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``q`` results in undefined behaviour. Also, this operator will **not** canonicalise
-     *    the assigned value: numerator and denominator are assigned as-is from ``q``. Finally, no aliasing is allowed:
+     *    with an uninitialized ``q`` results in undefined behaviour.
+     *
+     *    This operator will **not** canonicalise
+     *    the assigned value: numerator and denominator are assigned as-is from ``q``.
+     *
+     *    No aliasing is allowed:
      *    the data in ``q`` must be completely distinct from the data in ``this``.
      * \endrststar
      *
@@ -568,6 +604,44 @@ public:
         m_den = mpq_denref(q);
         return *this;
     }
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+    /// Move assignment from \p mpq_t.
+    /**
+     * This assignment operator will move the GMP rational \p q into \p this.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``q`` has been correctly initialized. Calling this operator
+     *    with an uninitialized ``q`` results in undefined behaviour.
+     *
+     *    This operator will **not** canonicalise
+     *    the assigned value: numerator and denominator are assigned as-is from ``q``.
+     *
+     *    No aliasing is allowed:
+     *    the data in ``q`` must be completely distinct from the data in ``this``.
+     *
+     *    The user must ensure that, after the assignment, ``mpq_clear()`` is never
+     *    called on ``q``: the resources previously owned by ``q`` are now owned by ``this``, which
+     *    will take care of releasing them when the destructor is called.
+     *
+     * .. note::
+     *
+     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio
+     *    versions earlier than 14.1 (Visual Studio 2017).
+     * \endrststar
+     *
+     * @param q the input GMP rational.
+     *
+     * @return a reference to \p this.
+     */
+    rational &operator=(::mpq_t &&q)
+    {
+        m_num = ::mpz_t{*mpq_numref(q)};
+        m_den = ::mpz_t{*mpq_denref(q)};
+        return *this;
+    }
+#endif
 /// Assignment from integrals.
 /**
  * \rststar
