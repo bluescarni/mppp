@@ -406,12 +406,41 @@ Via the GMP interfacing facilities, it is thus possible to use directly the GMP 
 <dl class="function">
 <dt id="_CPPv2N4mppp7integer7integerEK5mpz_t">
 <span id="mppp::integer::integer__mpz_tC"></span><span class="target" id="classmppp_1_1integer_1af547129dd3120e67e884e9890bb12f12"></span><code class="descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
+<dd><p>Copy constructor from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
 <p>This constructor will initialize <code class="docutils literal"><span class="pre">this</span></code> with the value of the GMP integer <code class="docutils literal"><span class="pre">n</span></code>. The storage type of <code class="docutils literal"><span class="pre">this</span></code> will be static if <code class="docutils literal"><span class="pre">n</span></code> fits in the static storage, otherwise it will be dynamic.</p>
 <p><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">It is the user’s responsibility to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this constructor
 with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> results in undefined behaviour.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the input GMP integer. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp7integer7integerERR5mpz_t">
+<span id="mppp::integer::integer__mpz_tRR"></span><span class="target" id="classmppp_1_1integer_1ad28fce46c3471f9357b5a2125e6ad892"></span><code class="descname">integer</code><span class="sig-paren">(</span>mpz_t &amp;&amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerERR5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Move constructor from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
+<p>This constructor will initialize <code class="docutils literal"><span class="pre">this</span></code> with the value of the GMP integer <code class="docutils literal"><span class="pre">n</span></code>, transferring the state of <code class="docutils literal"><span class="pre">n</span></code> into <code class="docutils literal"><span class="pre">this</span></code>. The storage type of <code class="docutils literal"><span class="pre">this</span></code> will be static if <code class="docutils literal"><span class="pre">n</span></code> fits in the static storage, otherwise it will be dynamic.</p>
+<p><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>It is the user’s responsibility to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this constructor
+with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> results in undefined behaviour.</p>
+<p class="last">Additionally, the user must ensure that, after construction, <code class="docutils literal"><span class="pre">mpz_clear()</span></code> is never
+called on <code class="docutils literal"><span class="pre">n</span></code>: the resources previously owned by <code class="docutils literal"><span class="pre">n</span></code> are now owned by <code class="docutils literal"><span class="pre">this</span></code>, which
+will take care of releasing them when the destructor is called.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Due to a compiler bug, this constructor is not available on Microsoft Visual Studio
+versions earlier than 14.1 (Visual Studio 2017).</p>
 </div>
 </p>
 <p><dl class="docutils">
@@ -488,7 +517,7 @@ with an uninitialized <code class="docutils literal"><span class="pre">n</span><
 <dl class="function">
 <dt id="_CPPv2N4mppp7integeraSEK5mpz_t">
 <span id="mppp::integer::assign-operator__mpz_tC"></span><span class="target" id="classmppp_1_1integer_1a0a3eb0f86c914225832b41ff3003d33a"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integeraSEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
+<dd><p>Copy assignment from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
 <p>This assignment operator will copy into <code class="docutils literal"><span class="pre">this</span></code> the value of the GMP integer <code class="docutils literal"><span class="pre">n</span></code>. The storage type of <code class="docutils literal"><span class="pre">this</span></code> after the assignment will be static if <code class="docutils literal"><span class="pre">n</span></code> fits in the static storage, otherwise it will be dynamic.</p>
 <p><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
@@ -496,6 +525,39 @@ with an uninitialized <code class="docutils literal"><span class="pre">n</span><
 with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> results in undefined behaviour. Also, no aliasing is allowed: the data in <code class="docutils literal"><span class="pre">n</span></code>
 must be completely distinct from the data in <code class="docutils literal"><span class="pre">this</span></code> (e.g., if <code class="docutils literal"><span class="pre">n</span></code> is an <code class="docutils literal"><span class="pre">mpz_view</span></code> of <code class="docutils literal"><span class="pre">this</span></code> then
 it might point to internal data of <code class="docutils literal"><span class="pre">this</span></code>, and the behaviour of this operator will thus be undefined).</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the input GMP integer.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp7integeraSERR5mpz_t">
+<span id="mppp::integer::assign-operator__mpz_tRR"></span><span class="target" id="classmppp_1_1integer_1a6f5e56a429b12884579f584eaeb47474"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span>mpz_t &amp;&amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integeraSERR5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Move assignment from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
+<p>This assignment operator will move into <code class="docutils literal"><span class="pre">this</span></code> the GMP integer <code class="docutils literal"><span class="pre">n</span></code>. The storage type of <code class="docutils literal"><span class="pre">this</span></code> after the assignment will be static if <code class="docutils literal"><span class="pre">n</span></code> fits in the static storage, otherwise it will be dynamic.</p>
+<p><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>It is the user’s responsibility to ensure that <code class="docutils literal"><span class="pre">n</span></code> has been correctly initialized. Calling this operator
+with an uninitialized <code class="docutils literal"><span class="pre">n</span></code> results in undefined behaviour. Also, no aliasing is allowed: the data in <code class="docutils literal"><span class="pre">n</span></code>
+must be completely distinct from the data in <code class="docutils literal"><span class="pre">this</span></code> (e.g., if <code class="docutils literal"><span class="pre">n</span></code> is an <code class="docutils literal"><span class="pre">mpz_view</span></code> of <code class="docutils literal"><span class="pre">this</span></code> then
+it might point to internal data of <code class="docutils literal"><span class="pre">this</span></code>, and the behaviour of this operator will thus be undefined).</p>
+<p class="last">Additionally, the user must ensure that, after the assignment, <code class="docutils literal"><span class="pre">mpz_clear()</span></code> is never
+called on <code class="docutils literal"><span class="pre">n</span></code>: the resources previously owned by <code class="docutils literal"><span class="pre">n</span></code> are now owned by <code class="docutils literal"><span class="pre">this</span></code>, which
+will take care of releasing them when the destructor is called.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Due to a compiler bug, this operator is not available on Microsoft Visual Studio
+versions earlier than 14.1 (Visual Studio 2017).</p>
 </div>
 </p>
 <p><dl class="docutils">
