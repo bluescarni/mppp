@@ -214,6 +214,24 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 #endif
 }
 
+// Thin wrapper around mpz_clear(): will add entry to cache if possible instead of clearing.
+inline void mpz_clear_wrap(mpz_struct_t &m)
+{
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+    auto &mpzc = mpz_caches<>::a_cache;
+    const auto ualloc = static_cast<make_unsigned_t<mpz_size_t>>(m._mp_alloc);
+    if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
+        const auto idx = ualloc - 1u;
+        mpzc.caches[idx][mpzc.sizes[idx]] = m._mp_d;
+        ++mpzc.sizes[idx];
+    } else {
+#endif
+        ::mpz_clear(&m);
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+    }
+#endif
+}
+
 // Combined init+set.
 inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
 {
@@ -679,6 +697,25 @@ union integer_union {
     {
         dispatch_mpz_ctor(n);
     }
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+    // Move ctor from mpz_t.
+    explicit integer_union(::mpz_t &&n)
+    {
+        const auto asize = get_mpz_size(n);
+        if (asize > SSize) {
+            // Too big, make shallow copy into dynamic. this will now
+            // own the resources of n.
+            ::new (static_cast<void *>(&m_dy)) d_storage(*n);
+        } else {
+            // Fits into small.
+            ::new (static_cast<void *>(&m_st)) s_storage{n->_mp_size, n->_mp_d, asize};
+            // Clear n: its resources have been copied into this, and we must
+            // ensure uniform behaviour with the case in which we shallow-copied it
+            // into dynamic storage.
+            mpz_clear_wrap(*n);
+        }
+    }
+#endif
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
     {
@@ -746,19 +783,7 @@ union integer_union {
         assert(!is_static());
         assert(g_dy()._mp_alloc >= 0);
         assert(g_dy()._mp_d != nullptr);
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-        auto &mpzc = mpz_caches<>::a_cache;
-        const auto ualloc = static_cast<make_unsigned_t<mpz_size_t>>(g_dy()._mp_alloc);
-        if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
-            const auto idx = ualloc - 1u;
-            mpzc.caches[idx][mpzc.sizes[idx]] = g_dy()._mp_d;
-            ++mpzc.sizes[idx];
-        } else {
-#endif
-            ::mpz_clear(&g_dy());
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-        }
-#endif
+        mpz_clear_wrap(g_dy());
         g_dy().~d_storage();
     }
     // Check storage type.
@@ -875,7 +900,6 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 // - for divisions, right shifts, etc. it might make sense to force the demotion of rop in the ternary forms
 //   if num and den are both static, as the result will be static. This should be weighted against potential
 //   ping-pong in the promotion/demotion of rop however, if this is likely to happen. Need to think about it.
-// - move assignment/construction from mpz_t.
 
 /// Multiprecision integer class.
 /**
@@ -1204,7 +1228,7 @@ public:
      */
     explicit integer(const std::string_view &s, int base = 10) : integer(s.data(), s.data() + s.size(), base) {}
 #endif
-    /// Constructor from \p mpz_t.
+    /// Copy constructor from \p mpz_t.
     /**
      * This constructor will initialize \p this with the value of the GMP integer \p n. The storage type of \p this
      * will be static if \p n fits in the static storage, otherwise it will be dynamic.
@@ -1219,6 +1243,33 @@ public:
      * @param n the input GMP integer.
      */
     explicit integer(const ::mpz_t n) : m_int(n) {}
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+    /// Move constructor from \p mpz_t.
+    /**
+     * This constructor will initialize \p this with the value of the GMP integer \p n, transferring the state
+     * of \p n into \p this. The storage type of \p this
+     * will be static if \p n fits in the static storage, otherwise it will be dynamic.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
+     *    with an uninitialized ``n`` results in undefined behaviour.
+     *
+     *    Additionally, the user must ensure that, after construction, ``mpz_clear()`` is never
+     *    called on ``n``: the resources previously owned by ``n`` are now owned by ``this``, which
+     *    will take care of releasing them when the destructor is called.
+     *
+     * .. note::
+     *
+     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio
+     *    versions earlier than 14.1 (Visual Studio 2017).
+     * \endrststar
+     *
+     * @param n the input GMP integer.
+     */
+    explicit integer(::mpz_t &&n) : m_int(std::move(n)) {}
+#endif
     /// Copy assignment operator.
     /**
      * This operator will perform a deep copy of \p other, copying its storage type as well.
@@ -1265,7 +1316,7 @@ public:
     {
         return *this = integer{x};
     }
-    /// Assignment from \p mpz_t.
+    /// Copy assignment from \p mpz_t.
     /**
      * This assignment operator will copy into \p this the value of the GMP integer \p n. The storage type of \p this
      * after the assignment will be static if \p n fits in the static storage, otherwise it will be dynamic.
@@ -1317,6 +1368,73 @@ public:
         }
         return *this;
     }
+#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+    /// Move assignment from \p mpz_t.
+    /**
+     * This assignment operator will move into \p this the GMP integer \p n. The storage type of \p this
+     * after the assignment will be static if \p n fits in the static storage, otherwise it will be dynamic.
+     *
+     * \rststar
+     * .. warning::
+     *
+     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
+     *    with an uninitialized ``n`` results in undefined behaviour. Also, no aliasing is allowed: the data in ``n``
+     *    must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of ``this`` then
+     *    it might point to internal data of ``this``, and the behaviour of this operator will thus be undefined).
+     *
+     *    Additionally, the user must ensure that, after the assignment, ``mpz_clear()`` is never
+     *    called on ``n``: the resources previously owned by ``n`` are now owned by ``this``, which
+     *    will take care of releasing them when the destructor is called.
+     *
+     * .. note::
+     *
+     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio
+     *    versions earlier than 14.1 (Visual Studio 2017).
+     * \endrststar
+     *
+     * @param n the input GMP integer.
+     *
+     * @return a reference to \p this.
+     */
+    integer &operator=(::mpz_t &&n)
+    {
+        const auto asize = get_mpz_size(n);
+        const auto s = is_static();
+        if (s && asize <= SSize) {
+            // this is static, n fits into static. Copy over.
+            m_int.g_st()._mp_size = n->_mp_size;
+            copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
+            if (SSize <= static_int<SSize>::opt_size) {
+                // Zero the non-copied limbs, but only if the static size is not greater than
+                // the size for which special optimisations kick in. See the documentation
+                // of zero_unused_limbs().
+                std::fill(m_int.g_st().m_limbs.begin() + asize, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+            }
+            // Clear out n.
+            mpz_clear_wrap(*n);
+        } else if (!s && asize > SSize) {
+            // Dynamic to dynamic: clear this, shallow copy n.
+            mpz_clear_wrap(m_int.m_dy);
+            m_int.m_dy = *n;
+        } else if (s && asize > SSize) {
+            // this is static, n is too big. Promote and assign.
+            // Destroy static.
+            m_int.g_st().~s_storage();
+            // Init dynamic with a shallow copy.
+            ::new (static_cast<void *>(&m_int.m_dy)) d_storage(*n);
+        } else {
+            // This is dynamic and n fits into static.
+            assert(!s && asize <= SSize);
+            // Destroy the dynamic storage.
+            m_int.destroy_dynamic();
+            // Init a static with the content from n.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage{n->_mp_size, n->_mp_d, asize};
+            // Clear out n.
+            mpz_clear_wrap(*n);
+        }
+        return *this;
+    }
+#endif
     /// Assignment from C string.
     /**
      * \rststar
