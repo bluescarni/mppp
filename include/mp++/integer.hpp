@@ -900,7 +900,6 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 // - for divisions, right shifts, etc. it might make sense to force the demotion of rop in the ternary forms
 //   if num and den are both static, as the result will be static. This should be weighted against potential
 //   ping-pong in the promotion/demotion of rop however, if this is likely to happen. Need to think about it.
-// - move assignment/construction from mpz_t.
 
 /// Multiprecision integer class.
 /**
