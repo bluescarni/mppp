@@ -497,7 +497,8 @@ struct mpz_copy_ass_tester {
         using integer = integer<S::value>;
         integer n;
         mpz_raii m;
-        REQUIRE(lex_cast(integer{&m.m_mpz}) == "0");
+        n = &m.m_mpz;
+        REQUIRE(lex_cast(n) == "0");
         ::mpz_set_si(&m.m_mpz, 1234);
         n = &m.m_mpz;
         REQUIRE(n == 1234);
