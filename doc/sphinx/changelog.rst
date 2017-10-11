@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Implement move constructors and move assignment operators from ``mpz_t`` and ``mpq_t`` for :cpp:class:`~mppp::integer`
+  and :cpp:class:`~mppp::rational` (`#57 <https://github.com/bluescarni/mppp/pull/57>`__).
+
 - Implement a cache for the allocation of limbs arrays in small :cpp:class:`~mppp::integer` objects
   (`#55 <https://github.com/bluescarni/mppp/pull/55>`__).
 
