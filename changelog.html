@@ -136,6 +136,9 @@ and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" ti
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>The <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> functions accepting the return value as a parameter will now
+demote a return value with dynamic storage to static storage if the other arguments all have static storage
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/58">#58</a>).</li>
 <li>The free functions for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> now return a reference
 to the return value, rather than <code class="docutils literal"><span class="pre">void</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/56">#56</a>).</li>
 <li>Performance improvements and code simplifications for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> division
