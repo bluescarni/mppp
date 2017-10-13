@@ -4088,16 +4088,13 @@ inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &
     if (mppp_unlikely(d.sgn() == 0)) {
         throw zero_division_error("Integer division by zero");
     }
-    const bool s1 = n.is_static(), s2 = d.is_static();
-    bool sq = q.is_static(), sr = r.is_static();
+    const bool sq = q.is_static(), sr = r.is_static(), s1 = n.is_static(), s2 = d.is_static();
     if (mppp_likely(s1 && s2)) {
         if (!sq) {
             q.set_zero();
-            sq = true;
         }
         if (!sr) {
             r.set_zero();
-            sr = true;
         }
         static_div(q._get_union().g_st(), r._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
         // Division can never fail.
@@ -4131,12 +4128,10 @@ inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &
 template <std::size_t SSize>
 inline integer<SSize> &divexact(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
 {
-    const bool s1 = n.is_static(), s2 = d.is_static();
-    bool sr = rop.is_static();
+    const bool sr = rop.is_static(), s1 = n.is_static(), s2 = d.is_static();
     if (mppp_likely(s1 && s2)) {
         if (!sr) {
             rop.set_zero();
-            sr = true;
         }
         static_divexact(rop._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
         // Division can never fail.
@@ -4576,7 +4571,10 @@ template <std::size_t SSize>
 inline integer<SSize> &gcd(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
     const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
-    if (mppp_likely(sr && s1 && s2)) {
+    if (mppp_likely(s1 && s2)) {
+        if (!sr) {
+            rop.set_zero();
+        }
         static_gcd(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
         rop._get_union().g_st().zero_unused_limbs();
         return rop;
@@ -4626,14 +4624,11 @@ inline integer<SSize> &fac_ui(integer<SSize> &rop, unsigned long n)
             + " is too large to be used as input for the factorial function (the maximum allowed value is "
             + std::to_string(max_fac) + ")");
     }
-    if (rop.is_static()) {
-        MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpz_fac_ui(&tmp.m_mpz, n);
-        rop = &tmp.m_mpz;
-    } else {
-        ::mpz_fac_ui(&rop._get_union().g_dy(), n);
-    }
-    return rop;
+    // NOTE: let's get through a static temporary and then assign it to the rop,
+    // so that rop will be static/dynamic according to the size of tmp.
+    MPPP_MAYBE_TLS mpz_raii tmp;
+    ::mpz_fac_ui(&tmp.m_mpz, n);
+    return rop = &tmp.m_mpz;
 }
 
 /// Binomial coefficient (ternary version).
@@ -4650,14 +4645,9 @@ inline integer<SSize> &fac_ui(integer<SSize> &rop, unsigned long n)
 template <std::size_t SSize>
 inline integer<SSize> &bin_ui(integer<SSize> &rop, const integer<SSize> &n, unsigned long k)
 {
-    if (rop.is_static()) {
-        MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
-        rop = &tmp.m_mpz;
-    } else {
-        ::mpz_bin_ui(&rop._get_union().g_dy(), n.get_mpz_view(), k);
-    }
-    return rop;
+    MPPP_MAYBE_TLS mpz_raii tmp;
+    ::mpz_bin_ui(&tmp.m_mpz, n.get_mpz_view(), k);
+    return rop = &tmp.m_mpz;
 }
 
 /// Binomial coefficient (binary version).
@@ -4783,13 +4773,9 @@ inline namespace detail
 template <std::size_t SSize>
 inline void nextprime_impl(integer<SSize> &rop, const integer<SSize> &n)
 {
-    if (rop.is_static()) {
-        MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
-        rop = &tmp.m_mpz;
-    } else {
-        ::mpz_nextprime(&rop._get_union().g_dy(), n.get_mpz_view());
-    }
+    MPPP_MAYBE_TLS mpz_raii tmp;
+    ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
+    rop = &tmp.m_mpz;
 }
 }
 
@@ -4863,14 +4849,9 @@ inline int probab_prime_p(const integer<SSize> &n, int reps = 25)
 template <std::size_t SSize>
 inline integer<SSize> &pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned long exp)
 {
-    if (rop.is_static()) {
-        MPPP_MAYBE_TLS mpz_raii tmp;
-        ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
-        rop = &tmp.m_mpz;
-    } else {
-        ::mpz_pow_ui(&rop._get_union().g_dy(), base.get_mpz_view(), exp);
-    }
-    return rop;
+    MPPP_MAYBE_TLS mpz_raii tmp;
+    ::mpz_pow_ui(&tmp.m_mpz, base.get_mpz_view(), exp);
+    return rop = &tmp.m_mpz;
 }
 
 /// Binary integer exponentiation.
@@ -5004,7 +4985,10 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
         throw std::domain_error("Cannot compute the square root of the negative number " + n.to_string());
     }
     const bool sr = rop.is_static(), sn = n.is_static();
-    if (mppp_likely(sr && sn)) {
+    if (mppp_likely(sn)) {
+        if (!sr) {
+            rop.set_zero();
+        }
         static_int<SSize> &rs = rop._get_union().g_st();
         const static_int<SSize> &ns = n._get_union().g_st();
         // NOTE: we know this is not negative, from the check above.
