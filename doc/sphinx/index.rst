@@ -26,6 +26,11 @@ to manipulate arbitrarily-large numbers but which, in practice, often end up sto
 
 mp++ is released under the `MPL2 <https://www.mozilla.org/en-US/MPL/2.0/FAQ/>`__ license.
 
+.. note::
+
+   This documentation refers to the latest development version of mp++, and it may describe features
+   not yet available in mp++'s stable releases.
+
 .. toctree::
 
    installation.rst
