@@ -897,9 +897,6 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 //   cting temporary.
 // - performance improvements for arithmetic with C++ integrals? (e.g., use add_ui() and similar rather than cting
 //   temporary).
-// - for divisions, right shifts, etc. it might make sense to force the demotion of rop in the ternary forms
-//   if num and den are both static, as the result will be static. This should be weighted against potential
-//   ping-pong in the promotion/demotion of rop however, if this is likely to happen. Need to think about it.
 
 /// Multiprecision integer class.
 /**
@@ -2629,9 +2626,17 @@ inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, 
 template <std::size_t SSize>
 inline integer<SSize> &add(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
-    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
-    if (mppp_likely(sr && s1 && s2)) {
-        // Optimise the case of all statics.
+    const bool s1 = op1.is_static(), s2 = op2.is_static();
+    bool sr = rop.is_static();
+    if (mppp_likely(s1 && s2)) {
+        // If both op1 and op2 are static, we will try to do the statid add.
+        // We might need to downgrade rop to static.
+        if (!sr) {
+            // NOTE: here we are sure rop is distinct from op1/op2, as
+            // rop is dynamic and op1/op2 are both static.
+            rop.set_zero();
+            sr = true;
+        }
         if (mppp_likely(
                 static_addsub<true>(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st()))) {
             return rop;
@@ -2844,20 +2849,24 @@ inline bool static_addsub_ui(static_int<SSize> &rop, const static_int<SSize> &op
 template <std::size_t SSize>
 inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
 {
+    // LCOV_EXCL_START
     if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
         // For the optimised version below to kick in we need to be sure we can safely convert
         // unsigned long to an ::mp_limb_t, modulo nail bits. This because in the optimised version
         // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an
         // integer.
-        // NOTE: does not look like this can be hit on any modern setup.
-        // LCOV_EXCL_START
+        // NOTE: it does not look like this can be hit on any modern setup.
         add(rop, op1, integer<SSize>{op2});
         return rop;
-        // LCOV_EXCL_STOP
     }
-    const bool sr = rop.is_static(), s1 = op1.is_static();
-    if (mppp_likely(sr && s1)) {
-        // Optimise the case of all statics.
+    // LCOV_EXCL_STOP
+    const bool s1 = op1.is_static();
+    bool sr = rop.is_static();
+    if (mppp_likely(s1)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
         if (mppp_likely(static_addsub_ui<true>(rop._get_union().g_st(), op1._get_union().g_st(), op2))) {
             return rop;
         }
@@ -2882,14 +2891,19 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, un
 template <std::size_t SSize>
 inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
 {
+    // LCOV_EXCL_START
     if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
-        // LCOV_EXCL_START
         sub(rop, op1, integer<SSize>{op2});
         return rop;
-        // LCOV_EXCL_STOP
     }
-    const bool sr = rop.is_static(), s1 = op1.is_static();
-    if (mppp_likely(sr && s1)) {
+    // LCOV_EXCL_STOP
+    const bool s1 = op1.is_static();
+    bool sr = rop.is_static();
+    if (mppp_likely(s1)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
         if (mppp_likely(static_addsub_ui<false>(rop._get_union().g_st(), op1._get_union().g_st(), op2))) {
             return rop;
         }
@@ -2914,9 +2928,13 @@ inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, un
 template <std::size_t SSize>
 inline integer<SSize> &sub(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
-    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
-    if (mppp_likely(sr && s1 && s2)) {
-        // Optimise the case of all statics.
+    const bool s1 = op1.is_static(), s2 = op2.is_static();
+    bool sr = rop.is_static();
+    if (mppp_likely(s1 && s2)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
         if (mppp_likely(
                 static_addsub<false>(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st()))) {
             return rop;
@@ -3145,9 +3163,14 @@ inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &o
 template <std::size_t SSize>
 inline integer<SSize> &mul(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
-    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+    const bool s1 = op1.is_static(), s2 = op2.is_static();
+    bool sr = rop.is_static();
     std::size_t size_hint = 0u;
-    if (mppp_likely(sr && s1 && s2)) {
+    if (mppp_likely(s1 && s2)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
         size_hint = static_mul(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
         if (mppp_likely(size_hint == 0u)) {
             return rop;
@@ -3632,9 +3655,14 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
 template <std::size_t SSize>
 inline integer<SSize> &mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
 {
-    const bool sr = rop.is_static(), sn = n.is_static();
+    const bool sn = n.is_static();
+    bool sr = rop.is_static();
     std::size_t size_hint = 0u;
-    if (mppp_likely(sr && sn)) {
+    if (mppp_likely(sn)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
         // NOTE: we cast to size_t because it's more convenient for reasoning about number of limbs
         // in the implementation functions.
         size_hint = static_mul_2exp(rop._get_union().g_st(), n._get_union().g_st(), safe_cast<std::size_t>(s));
@@ -4060,8 +4088,17 @@ inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &
     if (mppp_unlikely(d.sgn() == 0)) {
         throw zero_division_error("Integer division by zero");
     }
-    const bool sq = q.is_static(), sr = r.is_static(), s1 = n.is_static(), s2 = d.is_static();
-    if (mppp_likely(sq && sr && s1 && s2)) {
+    const bool s1 = n.is_static(), s2 = d.is_static();
+    bool sq = q.is_static(), sr = r.is_static();
+    if (mppp_likely(s1 && s2)) {
+        if (!sq) {
+            q.set_zero();
+            sq = true;
+        }
+        if (!sr) {
+            r.set_zero();
+            sr = true;
+        }
         static_div(q._get_union().g_st(), r._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
         // Division can never fail.
         return;
@@ -4094,8 +4131,13 @@ inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &
 template <std::size_t SSize>
 inline integer<SSize> &divexact(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
 {
-    const bool sr = rop.is_static(), s1 = n.is_static(), s2 = d.is_static();
-    if (mppp_likely(sr && s1 && s2)) {
+    const bool s1 = n.is_static(), s2 = d.is_static();
+    bool sr = rop.is_static();
+    if (mppp_likely(s1 && s2)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
         static_divexact(rop._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
         // Division can never fail.
         return rop;
@@ -4273,8 +4315,13 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
 template <std::size_t SSize>
 inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
 {
-    const bool sr = rop.is_static(), sn = n.is_static();
-    if (mppp_likely(sr && sn)) {
+    const bool sn = n.is_static();
+    bool sr = rop.is_static();
+    if (mppp_likely(sn)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
         static_tdiv_q_2exp(rop._get_union().g_st(), n._get_union().g_st(), s);
         return rop;
     }
