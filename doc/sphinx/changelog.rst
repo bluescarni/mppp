@@ -28,6 +28,10 @@ New
 Changes
 ~~~~~~~
 
+- The :cpp:class:`~mppp::integer` functions accepting the return value as a parameter will now
+  demote a return value with dynamic storage to static storage if the other arguments all have static storage
+  (`#58 <https://github.com/bluescarni/mppp/pull/58>`__).
+
 - The free functions for :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational` now return a reference
   to the return value, rather than ``void`` (`#56 <https://github.com/bluescarni/mppp/pull/56>`__).
 
