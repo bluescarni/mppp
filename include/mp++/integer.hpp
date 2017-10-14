@@ -1858,6 +1858,35 @@ public:
         }
         return std::move(retval.second);
     }
+        /// Generic conversion method.
+        /**
+         * \rststar
+         * This method, similarly to the conversion operator, will convert ``this`` to a
+         * :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into ``rop``. Differently
+         * from the conversion operator, this method does not raise any exception: if the conversion is successful, the
+         * method will return ``true``, otherwise the method will return ``false``. If the conversion fails,
+         * ``rop`` will not be altered.
+         * \endrststar
+         *
+         * @param rop the variable which will store the result of the conversion.
+         *
+         * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
+         * a C++ integral which cannot represent the value of ``this``.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    bool get(CppInteroperable &rop) const
+#else
+    template <typename T, cpp_interoperable_enabler<T> = 0>
+    bool get(T &rop) const
+#endif
+    {
+        auto retval = dispatch_conversion<T>();
+        if (retval.first) {
+            rop = std::move(retval.second);
+            return true;
+        }
+        return false;
+    }
     /// Promote to dynamic storage.
     /**
      * This method will promote the storage type of \p this from static to dynamic.
@@ -2227,6 +2256,39 @@ template <std::size_t SSize>
 inline integer<SSize> &set_negative_one(integer<SSize> &n)
 {
     return n.set_negative_one();
+}
+
+/** @} */
+
+/** @defgroup integer_conversion integer_conversion
+ *  @{
+ */
+
+/// Generic conversion function for \link mppp::integer integer \endlink.
+/**
+ * \rststar
+ * This function will convert the input :cpp:class:`~mppp::integer` ``n`` to a
+ * :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into ``rop``.
+ * If the conversion is successful, the function
+ * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
+ * not be altered.
+ * \endrststar
+ *
+ * @param rop the variable which will store the result of the conversion.
+ * @param n the input \link mppp::integer integer \endlink.
+ *
+ * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
+ * a C++ integral which cannot represent the value of ``n``.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline bool get(CppInteroperable &rop, const integer<SSize> &n)
+#else
+template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
+inline bool get(T &rop, const integer<SSize> &n)
+#endif
+{
+    return n.get(rop);
 }
 
 /** @} */
