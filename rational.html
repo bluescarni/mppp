@@ -68,6 +68,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#the-rational-class">The <code class="docutils literal"><span class="pre">rational</span></code> class</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#concepts">Concepts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#conversion">Conversion</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#arithmetic">Arithmetic</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#comparison">Comparison</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#exponentiation">Exponentiation</a></li>
@@ -777,6 +778,29 @@ infinities.</p>
 </dd></dl>
 
 <dl class="function">
+<dt>
+<em class="property">template </em>&lt;RationalInteroperable&lt; SSize &gt; <em>T</em>&gt;</dt>
+<dt id="_CPPv2NK4mppp8rational3getER1T">
+<span id="mppp::rational::get__TRC"></span><span class="target" id="classmppp_1_1rational_1a730c27b91be7344fcafe04219e65a1a0"></span>bool <code class="descname">get</code><span class="sig-paren">(</span>T &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational3getER1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Generic conversion method. </p>
+<p>This method, similarly to the conversion operator, will convert <code class="docutils literal"><span class="pre">this</span></code> to a
+<a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalInteroperable</span></code></a> type, storing the result of the conversion into <code class="docutils literal"><span class="pre">rop</span></code>. Differently
+from the conversion operator, this method does not raise any exception: if the conversion is successful, the
+method will return <code class="docutils literal"><span class="pre">true</span></code>, otherwise the method will return <code class="docutils literal"><span class="pre">false</span></code>. If the conversion fails,
+<code class="docutils literal"><span class="pre">rop</span></code> will not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><code class="docutils literal"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal"><span class="pre">rop</span></code> is a C++ integral which cannot represent the truncated value of <code class="docutils literal"><span class="pre">this</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the variable which will store the result of the conversion.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv2NK4mppp8rational7get_numEv">
 <span id="mppp::rational::get_numC"></span><span class="target" id="classmppp_1_1rational_1a3fac026998f425baaba7857b7fa36142"></span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">get_num</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp8rational7get_numEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Const numerator getter. </p>
@@ -1017,6 +1041,33 @@ type.</li>
 <p>Much of the functionality of the <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> class is exposed via plain functions. These functions
 mimic the <a class="reference external" href="https://gmplib.org/manual/Rational-Number-Functions.html">GMP API</a> where appropriate, but a variety of
 convenience/generic overloads is provided as well.</p>
+<div class="section" id="conversion">
+<span id="rational-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp3getER21RationalInteroperableI5SSizeERK8rationalI5SSizeE">
+<span id="mppp::get__RationalInteroperable:SSize:R.rational:SSize:CR"></span><span class="target" id="group__rational__conversion_1ga51ae2eae8afb440e5f9f73380617127b"></span>bool <code class="descclassname">mppp::</code><code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable">RationalInteroperable</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3getER21RationalInteroperableI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Generic conversion function for <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational </span></a>. </p>
+<p>This function will convert the input <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> <code class="docutils literal"><span class="pre">q</span></code> to a
+<a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalInteroperable</span></code></a> type, storing the result of the conversion into <code class="docutils literal"><span class="pre">rop</span></code>.
+If the conversion is successful, the function
+will return <code class="docutils literal"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal"><span class="pre">false</span></code>. If the conversion fails, <code class="docutils literal"><span class="pre">rop</span></code> will
+not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><code class="docutils literal"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal"><span class="pre">rop</span></code> is a C++ integral which cannot represent the truncated value of <code class="docutils literal"><span class="pre">q</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the variable which will store the result of the conversion. </li>
+<li><code class="docutils literal"><span class="pre">q</span></code>: the input <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational </span></a>.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
 <div class="section" id="arithmetic">
 <span id="rational-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
