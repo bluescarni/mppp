@@ -697,7 +697,7 @@ union integer_union {
     {
         dispatch_mpz_ctor(n);
     }
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
     // Move ctor from mpz_t.
     explicit integer_union(::mpz_t &&n)
     {
@@ -1240,7 +1240,7 @@ public:
      * @param n the input GMP integer.
      */
     explicit integer(const ::mpz_t n) : m_int(n) {}
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
     /// Move constructor from \p mpz_t.
     /**
      * This constructor will initialize \p this with the value of the GMP integer \p n, transferring the state
@@ -1259,8 +1259,7 @@ public:
      *
      * .. note::
      *
-     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio
-     *    versions earlier than 14.1 (Visual Studio 2017).
+     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
      * \endrststar
      *
      * @param n the input GMP integer.
@@ -1365,7 +1364,7 @@ public:
         }
         return *this;
     }
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
     /// Move assignment from \p mpz_t.
     /**
      * This assignment operator will move into \p this the GMP integer \p n. The storage type of \p this
@@ -1385,8 +1384,7 @@ public:
      *
      * .. note::
      *
-     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio
-     *    versions earlier than 14.1 (Visual Studio 2017).
+     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
      * \endrststar
      *
      * @param n the input GMP integer.

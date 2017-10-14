@@ -418,7 +418,7 @@ TEST_CASE("mpq_t copy constructor")
     tuple_for_each(sizes{}, mpq_copy_ctor_tester{});
 }
 
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
 
 struct mpq_move_ctor_tester {
     template <typename S>
@@ -838,7 +838,7 @@ TEST_CASE("mpq_t copy assignment")
     tuple_for_each(sizes{}, mpq_copy_ass_tester{});
 }
 
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
 
 struct mpq_move_ass_tester {
     template <typename S>
