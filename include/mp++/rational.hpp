@@ -492,7 +492,7 @@ public:
      * @param q the input GMP rational.
      */
     explicit rational(const ::mpq_t q) : m_num(mpq_numref(q)), m_den(mpq_denref(q)) {}
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
     /// Move constructor from \p mpq_t.
     /**
      * This constructor will move the numerator and denominator of the GMP rational \p q into \p this.
@@ -512,8 +512,7 @@ public:
      *
      * .. note::
      *
-     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio
-     *    versions earlier than 14.1 (Visual Studio 2017).
+     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
      * \endrststar
      *
      * @param q the input GMP rational.
@@ -604,7 +603,7 @@ public:
         m_den = mpq_denref(q);
         return *this;
     }
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
     /// Move assignment from \p mpq_t.
     /**
      * This assignment operator will move the GMP rational \p q into \p this.
@@ -627,8 +626,7 @@ public:
      *
      * .. note::
      *
-     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio
-     *    versions earlier than 14.1 (Visual Studio 2017).
+     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
      * \endrststar
      *
      * @param q the input GMP rational.
