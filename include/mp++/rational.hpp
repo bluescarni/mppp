@@ -889,11 +889,11 @@ public:
      * a C++ integral which cannot represent the truncated value of ``this``.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-    bool get(RationalInteroperable<SSize> &rop) const
+    template <RationalInteroperable<SSize> T>
 #else
     template <typename T, rational_interoperable_enabler<T, SSize> = 0>
-    bool get(T &rop) const
 #endif
+    bool get(T &rop) const
     {
         return dispatch_get(rop);
     }

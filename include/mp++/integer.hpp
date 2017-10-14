@@ -1874,11 +1874,11 @@ public:
          * a C++ integral which cannot represent the value of ``this``.
          */
 #if defined(MPPP_HAVE_CONCEPTS)
-    bool get(CppInteroperable &rop) const
+    template <CppInteroperable T>
 #else
     template <typename T, cpp_interoperable_enabler<T> = 0>
-    bool get(T &rop) const
 #endif
+    bool get(T &rop) const
     {
         auto retval = dispatch_conversion<T>();
         if (retval.first) {
