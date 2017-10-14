@@ -67,6 +67,14 @@ Assignment
 .. doxygengroup:: integer_assignment
    :content-only:
 
+.. _integer_conversion:
+
+Conversion
+~~~~~~~~~~
+
+.. doxygengroup:: integer_conversion
+   :content-only:
+
 .. _integer_arithmetic:
 
 Arithmetic

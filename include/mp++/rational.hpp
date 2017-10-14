@@ -492,7 +492,7 @@ public:
      * @param q the input GMP rational.
      */
     explicit rational(const ::mpq_t q) : m_num(mpq_numref(q)), m_den(mpq_denref(q)) {}
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
     /// Move constructor from \p mpq_t.
     /**
      * This constructor will move the numerator and denominator of the GMP rational \p q into \p this.
@@ -512,8 +512,7 @@ public:
      *
      * .. note::
      *
-     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio
-     *    versions earlier than 14.1 (Visual Studio 2017).
+     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
      * \endrststar
      *
      * @param q the input GMP rational.
@@ -604,7 +603,7 @@ public:
         m_den = mpq_denref(q);
         return *this;
     }
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
     /// Move assignment from \p mpq_t.
     /**
      * This assignment operator will move the GMP rational \p q into \p this.
@@ -627,8 +626,7 @@ public:
      *
      * .. note::
      *
-     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio
-     *    versions earlier than 14.1 (Visual Studio 2017).
+     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
      * \endrststar
      *
      * @param q the input GMP rational.
@@ -850,6 +848,52 @@ public:
                                       + " results in overflow");
         }
         return std::move(retval.second);
+    }
+
+private:
+    // int_t getter.
+    bool dispatch_get(int_t &rop) const
+    {
+        MPPP_MAYBE_TLS int_t r;
+        tdiv_qr(rop, r, m_num, m_den);
+        return true;
+    }
+    // The other getters.
+    template <typename T>
+    bool dispatch_get(T &rop) const
+    {
+        auto retval = dispatch_conversion<T>();
+        if (retval.first) {
+            rop = std::move(retval.second);
+            return true;
+        }
+        return false;
+    }
+
+public:
+    /// Generic conversion method.
+    /**
+     * \rststar
+     * This method, similarly to the conversion operator, will convert ``this`` to a
+     * :cpp:concept:`~mppp::RationalInteroperable` type, storing the result of the conversion into ``rop``. Differently
+     * from the conversion operator, this method does not raise any exception: if the conversion is successful, the
+     * method will return ``true``, otherwise the method will return ``false``. If the conversion fails,
+     * ``rop`` will not be altered.
+     * \endrststar
+     *
+     * @param rop the variable which will store the result of the conversion.
+     *
+     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
+     * a C++ integral which cannot represent the truncated value of ``this``.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <RationalInteroperable<SSize> T>
+#else
+    template <typename T, rational_interoperable_enabler<T, SSize> = 0>
+#endif
+    bool get(T &rop) const
+    {
+        return dispatch_get(rop);
     }
     /// Const numerator getter.
     /**
@@ -1274,6 +1318,39 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
     }
 }
 }
+
+/** @defgroup rational_conversion rational_conversion
+ *  @{
+ */
+
+/// Generic conversion function for \link mppp::rational rational \endlink.
+/**
+ * \rststar
+ * This function will convert the input :cpp:class:`~mppp::rational` ``q`` to a
+ * :cpp:concept:`~mppp::RationalInteroperable` type, storing the result of the conversion into ``rop``.
+ * If the conversion is successful, the function
+ * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
+ * not be altered.
+ * \endrststar
+ *
+ * @param rop the variable which will store the result of the conversion.
+ * @param q the input \link mppp::rational rational \endlink.
+ *
+ * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
+ * a C++ integral which cannot represent the truncated value of ``q``.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline bool get(RationalInteroperable<SSize> &rop, const rational<SSize> &q)
+#else
+template <typename T, std::size_t SSize, rational_interoperable_enabler<T, SSize> = 0>
+inline bool get(T &rop, const rational<SSize> &q)
+#endif
+{
+    return q.get(rop);
+}
+
+/** @} */
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)

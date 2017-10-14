@@ -697,7 +697,7 @@ union integer_union {
     {
         dispatch_mpz_ctor(n);
     }
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
     // Move ctor from mpz_t.
     explicit integer_union(::mpz_t &&n)
     {
@@ -1240,7 +1240,7 @@ public:
      * @param n the input GMP integer.
      */
     explicit integer(const ::mpz_t n) : m_int(n) {}
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
     /// Move constructor from \p mpz_t.
     /**
      * This constructor will initialize \p this with the value of the GMP integer \p n, transferring the state
@@ -1259,8 +1259,7 @@ public:
      *
      * .. note::
      *
-     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio
-     *    versions earlier than 14.1 (Visual Studio 2017).
+     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
      * \endrststar
      *
      * @param n the input GMP integer.
@@ -1365,7 +1364,7 @@ public:
         }
         return *this;
     }
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
     /// Move assignment from \p mpz_t.
     /**
      * This assignment operator will move into \p this the GMP integer \p n. The storage type of \p this
@@ -1385,8 +1384,7 @@ public:
      *
      * .. note::
      *
-     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio
-     *    versions earlier than 14.1 (Visual Studio 2017).
+     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
      * \endrststar
      *
      * @param n the input GMP integer.
@@ -1858,6 +1856,35 @@ public:
         }
         return std::move(retval.second);
     }
+        /// Generic conversion method.
+        /**
+         * \rststar
+         * This method, similarly to the conversion operator, will convert ``this`` to a
+         * :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into ``rop``. Differently
+         * from the conversion operator, this method does not raise any exception: if the conversion is successful, the
+         * method will return ``true``, otherwise the method will return ``false``. If the conversion fails,
+         * ``rop`` will not be altered.
+         * \endrststar
+         *
+         * @param rop the variable which will store the result of the conversion.
+         *
+         * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
+         * a C++ integral which cannot represent the value of ``this``.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <CppInteroperable T>
+#else
+    template <typename T, cpp_interoperable_enabler<T> = 0>
+#endif
+    bool get(T &rop) const
+    {
+        auto retval = dispatch_conversion<T>();
+        if (retval.first) {
+            rop = std::move(retval.second);
+            return true;
+        }
+        return false;
+    }
     /// Promote to dynamic storage.
     /**
      * This method will promote the storage type of \p this from static to dynamic.
@@ -2227,6 +2254,39 @@ template <std::size_t SSize>
 inline integer<SSize> &set_negative_one(integer<SSize> &n)
 {
     return n.set_negative_one();
+}
+
+/** @} */
+
+/** @defgroup integer_conversion integer_conversion
+ *  @{
+ */
+
+/// Generic conversion function for \link mppp::integer integer \endlink.
+/**
+ * \rststar
+ * This function will convert the input :cpp:class:`~mppp::integer` ``n`` to a
+ * :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into ``rop``.
+ * If the conversion is successful, the function
+ * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
+ * not be altered.
+ * \endrststar
+ *
+ * @param rop the variable which will store the result of the conversion.
+ * @param n the input \link mppp::integer integer \endlink.
+ *
+ * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
+ * a C++ integral which cannot represent the value of ``n``.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline bool get(CppInteroperable &rop, const integer<SSize> &n)
+#else
+template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
+inline bool get(T &rop, const integer<SSize> &n)
+#endif
+{
+    return n.get(rop);
 }
 
 /** @} */
@@ -3659,13 +3719,15 @@ inline integer<SSize> &mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::
     bool sr = rop.is_static();
     std::size_t size_hint = 0u;
     if (mppp_likely(sn)) {
+        // NOTE: we cast to size_t because it's more convenient for reasoning about number of limbs
+        // in the implementation functions.
+        // NOTE: do it before touching rop, for exception safety.
+        const auto s_size = safe_cast<std::size_t>(s);
         if (!sr) {
             rop.set_zero();
             sr = true;
         }
-        // NOTE: we cast to size_t because it's more convenient for reasoning about number of limbs
-        // in the implementation functions.
-        size_hint = static_mul_2exp(rop._get_union().g_st(), n._get_union().g_st(), safe_cast<std::size_t>(s));
+        size_hint = static_mul_2exp(rop._get_union().g_st(), n._get_union().g_st(), s_size);
         if (mppp_likely(size_hint == 0u)) {
             return rop;
         }

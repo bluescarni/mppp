@@ -355,7 +355,7 @@ TEST_CASE("mpz_t copy constructor")
     tuple_for_each(sizes{}, mpz_copy_ctor_tester{});
 }
 
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
 
 struct mpz_move_ctor_tester {
     template <typename S>
@@ -547,7 +547,7 @@ TEST_CASE("mpz_t copy assignment")
     tuple_for_each(sizes{}, mpz_copy_ass_tester{});
 }
 
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
 
 struct mpz_move_ass_tester {
     template <typename S>
@@ -820,7 +820,13 @@ template <typename Integer, typename T>
 static inline bool roundtrip_conversion(const T &x)
 {
     Integer tmp{x};
-    return (static_cast<T>(tmp) == x) && (lex_cast(x) == lex_cast(tmp));
+    T rop1, rop2;
+    bool retval = (static_cast<T>(tmp) == x) && (lex_cast(x) == lex_cast(tmp));
+    const bool res1 = tmp.get(rop1);
+    const bool res2 = get(rop2, tmp);
+    retval = retval && res1 && res2;
+    retval = retval && (lex_cast(rop1) == lex_cast(tmp)) && (lex_cast(rop2) == lex_cast(tmp));
+    return retval;
 }
 
 struct no_conv {
@@ -846,28 +852,59 @@ struct int_convert_tester {
             REQUIRE(roundtrip_conversion<integer>(max - Int(3)));
             REQUIRE(roundtrip_conversion<integer>(min + Int(42)));
             REQUIRE(roundtrip_conversion<integer>(max - Int(42)));
+            Int rop(1);
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) - 1), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE(!(integer(min) - 1).get(rop));
+            REQUIRE(!get(rop, integer(min) - 1));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) - 2), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE(!(integer(min) - 2).get(rop));
+            REQUIRE(!get(rop, integer(min) - 2));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) - 3), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE(!(integer(min) - 3).get(rop));
+            REQUIRE(!get(rop, integer(min) - 3));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) - 123), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE(!(integer(min) - 123).get(rop));
+            REQUIRE(!get(rop, integer(min) - 123));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) + 1), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE(!(integer(max) + 1).get(rop));
+            REQUIRE(!get(rop, integer(max) + 1));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) + 2), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE(!(integer(max) + 2).get(rop));
+            REQUIRE(!get(rop, integer(max) + 2));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) + 3), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE(!(integer(max) + 3).get(rop));
+            REQUIRE(!get(rop, integer(max) + 3));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) + 123), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE(!(integer(max) + 123).get(rop));
+            REQUIRE(!get(rop, integer(max) + 123));
+            REQUIRE(rop == Int(1));
             // Try with large integers that should trigger a specific error, at least on some platforms.
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(max) * max * max * max * max), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE(!(integer(max) * max * max * max * max).get(rop));
+            REQUIRE(!get(rop, integer(max) * max * max * max * max));
+            REQUIRE(rop == Int(1));
             if (min != Int(0)) {
                 REQUIRE_THROWS_PREDICATE(static_cast<Int>(integer(min) * min * min * min * min), std::overflow_error,
                                          [](const std::overflow_error &) { return true; });
+                REQUIRE(!(integer(min) * min * min * min * min).get(rop));
+                REQUIRE(!get(rop, integer(min) * min * min * min * min));
+                REQUIRE(rop == Int(1));
             }
             std::atomic<bool> fail(false);
             auto f = [&fail
@@ -921,11 +958,27 @@ struct fp_convert_tester {
         {
             using integer = integer<S::value>;
             REQUIRE((is_convertible<integer, Float>::value));
+            Float rop(1);
             REQUIRE(static_cast<Float>(integer{0}) == Float(0));
+            REQUIRE(integer{0}.get(rop));
+            REQUIRE(get(rop, integer{0}));
+            REQUIRE(rop == Float(0));
             REQUIRE(static_cast<Float>(integer{1}) == Float(1));
+            REQUIRE(integer{1}.get(rop));
+            REQUIRE(get(rop, integer{1}));
+            REQUIRE(rop == Float(1));
             REQUIRE(static_cast<Float>(integer{-1}) == Float(-1));
+            REQUIRE(integer{-1}.get(rop));
+            REQUIRE(get(rop, integer{-1}));
+            REQUIRE(rop == Float(-1));
             REQUIRE(static_cast<Float>(integer{12}) == Float(12));
+            REQUIRE(integer{12}.get(rop));
+            REQUIRE(get(rop, integer{12}));
+            REQUIRE(rop == Float(12));
             REQUIRE(static_cast<Float>(integer{-12}) == Float(-12));
+            REQUIRE(integer{-12}.get(rop));
+            REQUIRE(get(rop, integer{-12}));
+            REQUIRE(rop == Float(-12));
             if (std::numeric_limits<Float>::is_iec559) {
                 // Try with large numbers.
                 REQUIRE(std::abs(static_cast<Float>(integer{"1000000000000000000000000000000"}) - Float(1E30))
@@ -945,8 +998,18 @@ struct fp_convert_tester {
                 std::uniform_real_distribution<Float> dist(Float(-100), Float(100));
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
+                    Float rop1;
                     const auto tmp = dist(eng);
                     if (static_cast<Float>(integer{tmp}) != std::trunc(tmp)) {
+                        fail.store(false);
+                    }
+                    if (!integer{tmp}.get(rop1)) {
+                        fail.store(false);
+                    }
+                    if (!get(rop1, integer{tmp})) {
+                        fail.store(false);
+                    }
+                    if (rop1 != std::trunc(tmp)) {
                         fail.store(false);
                     }
                 }

@@ -107,6 +107,13 @@ concept bool Real128CppInteroperable = is_real128_cpp_interoperable<T>::value;
 using real128_cpp_interoperable_enabler = enable_if_t<is_real128_cpp_interoperable<T>::value, int>;
 #endif
 
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool Real128MpppInteroperable = is_real128_mppp_interoperable<T>::value;
+#else
+using real128_mppp_interoperable_enabler = enable_if_t<is_real128_mppp_interoperable<T>::value, int>;
+#endif
+
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 concept bool Real128CppOpTypes = are_real128_cpp_op_types<T, U>::value;
@@ -269,19 +276,11 @@ public:
         : m_value(x)
     {
     }
-    /// Constructor from \link mppp::integer integer \endlink.
-    /**
-     * This constructor will initialise the internal value with \p n. If the absolute value of \p n is large
-     * enough, \p this may not be exactly equal to \p n after initialisation.
-     *
-     * @param n the \link mppp::integer integer \endlink that will be used for the initialisation of the
-     * internal value.
-     *
-     * @throws std::overflow_error if the absolute value of \p n is larger than an implementation-defined
-     * limit.
-     */
+
+private:
+    // Construction from mp++ types.
     template <std::size_t SSize>
-    explicit real128(const integer<SSize> &n)
+    void dispatch_mppp_construction(const integer<SSize> &n)
     {
         // Special case for zero.
         const auto n_sgn = n.sgn();
@@ -328,18 +327,8 @@ public:
             m_value = -m_value;
         }
     }
-    /// Constructor from \link mppp::rational rational \endlink.
-    /**
-     * This constructor will initialise the internal value with \p q.
-     *
-     * @param q the \link mppp::rational rational \endlink that will be used for the initialisation of the
-     * internal value.
-     *
-     * @throws std::overflow_error if the absolute values of the numerator and/or denominator of \p q are larger than an
-     * implementation-defined limit.
-     */
     template <std::size_t SSize>
-    explicit real128(const rational<SSize> &q)
+    void dispatch_mppp_construction(const rational<SSize> &q)
     {
         const auto n_bits = q.get_num().nbits();
         const auto d_bits = q.get_den().nbits();
@@ -378,6 +367,28 @@ public:
                 m_value = ::scalblnq(m_value, negate_unsigned<long>(d_shift - n_shift));
             }
         }
+    }
+
+public:
+    /// Constructor from mp++ types.
+    /**
+     * \rststar
+     * This constructor will initialise the internal value with with the :cpp:concept:`~mppp::Real128MpppInteroperable`
+     * ``x``. Depending on the value of ``x``, ``this`` may not be exactly equal to ``x`` after initialisation.
+     * \endrststar
+     *
+     * @param x the value that will be used for the initialisation.
+     *
+     * @throws std::overflow_error if an overflow occurs during initialisation.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit real128(const Real128MpppInteroperable &x)
+#else
+    template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+    explicit real128(const T &x)
+#endif
+    {
+        dispatch_mppp_construction(x);
     }
     /// Constructor from C string.
     /**
@@ -498,53 +509,34 @@ public:
         m_value = x;
         return *this;
     }
-    /// Assignment from \link mppp::integer integer \endlink.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = real128{n};
-     *
-     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``n`` and it is then move-assigned to
-     * ``this``.
-     * \endrststar
-     *
-     * @param n the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from \link mppp::integer integer \endlink.
-     */
-    template <std::size_t SSize>
-    real128 &operator=(const integer<SSize> &n)
+        /// Assignment from mp++ types.
+        /**
+         * \rststar
+         * The body of this operator is equivalent to:
+         *
+         * .. code-block:: c++
+         *
+         *    return *this = real128{x};
+         *
+         * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``x`` and it is then move-assigned to
+         * ``this``.
+         * \endrststar
+         *
+         * @param x the assignment argument.
+         *
+         * @return a reference to \p this.
+         *
+         * @throws unspecified any exception thrown by the construction of a \link mppp::real128 real128 \endlink from
+         * ``x``.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    real128 &operator=(const Real128MpppInteroperable &x)
+#else
+    template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+    real128 &operator=(const T &x)
+#endif
     {
-        return *this = real128{n};
-    }
-    /// Assignment from \link mppp::rational rational \endlink.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = real128{q};
-     *
-     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``q`` and it is then move-assigned to
-     * ``this``.
-     * \endrststar
-     *
-     * @param q the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from \link mppp::rational rational \endlink.
-     */
-    template <std::size_t SSize>
-    real128 &operator=(const rational<SSize> &q)
-    {
-        return *this = real128{q};
+        return *this = real128{x};
     }
     /// Assignment from C string.
     /**
@@ -611,7 +603,7 @@ public:
         return *this = real128{s};
     }
 #endif
-/// Conversion to interoperable C++ types.
+/// Conversion operator to interoperable C++ types.
 /**
  * \rststar
  * This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128CppInteroperable` type. The conversion uses
@@ -643,26 +635,17 @@ public:
     {
         return m_value;
     }
-    /// Conversion to \link mppp::integer integer \endlink.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to an :cpp:type:`~mppp::integer`. If ``this`` does not represent
-     * an integral value, the conversion will yield the truncated counterpart of ``this``.
-     * \endrststar
-     *
-     * @return \p this converted to \link mppp::integer integer \endlink.
-     *
-     * @throws std::domain_error if \p this represents a non-finite value.
-     */
+
+private:
     template <std::size_t SSize>
-    explicit operator integer<SSize>() const
+    bool mppp_conversion(integer<SSize> &rop) const
     {
         // Build the union and assign the value.
         ieee_float128 ief;
         ief.value = m_value;
         if (mppp_unlikely(ief.i_eee.exponent == 32767u)) {
             // Inf or nan, not representable by integer.
-            throw std::domain_error("Cannot convert a non-finite real128 to an integer");
+            return false;
         }
         // Determine the real exponent. 16383 is the offset of the representation,
         // 112 is because we need to left shift the significand by 112 positions
@@ -671,101 +654,148 @@ public:
         if (!ief.i_eee.exponent || exponent < -112) {
             // Zero stored exponent means subnormal number, and if the real exponent is too small
             // we end up with a value with abs less than 1. In such cases, just return 0.
-            return integer<SSize>{};
+            rop.set_zero();
+            return true;
         }
         // Value is normalised and not less than 1 in abs. We can proceed.
-        integer<SSize> retval{1u};
+        rop.set_one();
         if (exponent >= 0) {
             // Non-negative exponent means that we will have to take the significand
             // converted to an integer and further left shift it.
-            retval <<= 112u;
-            retval += integer<SSize>{ief.i_eee.mant_high} << 64u;
-            retval += ief.i_eee.mant_low;
-            retval <<= static_cast<unsigned long>(exponent);
+            rop <<= 112u;
+            rop += integer<SSize>{ief.i_eee.mant_high} << 64u;
+            rop += ief.i_eee.mant_low;
+            rop <<= static_cast<unsigned long>(exponent);
         } else {
             // NOTE: the idea here is to avoid shifting up and then shifting back down,
             // as that might trigger a promotion to dynamic storage in retval. Instead,
             // we offset the shifts by the (negative) exponent, which is here guaranteed
             // to be in the [-112,-1] range.
-            retval <<= static_cast<unsigned>(112 + exponent);
+            rop <<= static_cast<unsigned>(112 + exponent);
             if (exponent > -64) {
                 // We need to right shift less than 64 bits. This means that some bits from the low
                 // word of the significand survive.
                 // NOTE: need to do the left shift in multiprecision here, as the final result
                 // might spill over the 64 bit range.
-                retval += integer<SSize>{ief.i_eee.mant_high} << static_cast<unsigned>(exponent + 64);
-                retval += ief.i_eee.mant_low >> static_cast<unsigned>(-exponent);
+                rop += integer<SSize>{ief.i_eee.mant_high} << static_cast<unsigned>(exponent + 64);
+                rop += ief.i_eee.mant_low >> static_cast<unsigned>(-exponent);
             } else {
                 // We need to right shift more than 64 bits, so none of the bits in the low word survive.
                 // NOTE: here the right shift will be in the [0,48] range, so we can do it directly
                 // on a C++ builtin type (i_eee.mant_high gives a 64bit int).
-                retval += ief.i_eee.mant_high >> static_cast<unsigned>(-(exponent + 64));
+                rop += ief.i_eee.mant_high >> static_cast<unsigned>(-(exponent + 64));
             }
         }
         // Adjust the sign.
         if (ief.i_eee.negative) {
-            retval.neg();
+            rop.neg();
         }
-        return retval;
+        return true;
     }
-    /// Conversion to \link mppp::rational rational \endlink.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to a :cpp:type:`~mppp::rational`. The conversion,
-     * if successful, is exact.
-     * \endrststar
-     *
-     * @return \p this converted to \link mppp::rational rational \endlink.
-     *
-     * @throws std::domain_error if \p this represents a non-finite value.
-     */
     template <std::size_t SSize>
-    explicit operator rational<SSize>() const
+    bool mppp_conversion(rational<SSize> &rop) const
     {
         // Build the union and assign the value.
         ieee_float128 ief;
         ief.value = m_value;
         if (mppp_unlikely(ief.i_eee.exponent == 32767u)) {
             // Inf or nan, not representable by rational.
-            throw std::domain_error("Cannot convert a non-finite real128 to a rational");
+            return false;
         }
-        rational<SSize> retval;
+        rop._get_num().set_zero();
+        rop._get_den().set_one();
         if (ief.i_eee.exponent) {
             // Normal number.
             // Determine the real exponent.
             const auto exponent = static_cast<long>(ief.i_eee.exponent) - (16383l + 112);
-            retval._get_num() = 1u;
-            retval._get_num() <<= 112u;
-            retval._get_num() += integer<SSize>{ief.i_eee.mant_high} << 64u;
-            retval._get_num() += ief.i_eee.mant_low;
+            rop._get_num() = 1u;
+            rop._get_num() <<= 112u;
+            rop._get_num() += integer<SSize>{ief.i_eee.mant_high} << 64u;
+            rop._get_num() += ief.i_eee.mant_low;
             if (exponent >= 0) {
                 // The result is a large integer: no need to canonicalise or to try
                 // to demote. Den is already set to 1.
-                retval._get_num() <<= static_cast<unsigned long>(exponent);
+                rop._get_num() <<= static_cast<unsigned long>(exponent);
             } else {
-                retval._get_den() <<= static_cast<unsigned long>(-exponent);
+                rop._get_den() <<= static_cast<unsigned long>(-exponent);
                 // Put in canonical form.
-                canonicalise(retval);
+                canonicalise(rop);
                 // Try demoting, after having possibly removed common factors.
-                retval._get_num().demote();
-                retval._get_den().demote();
+                rop._get_num().demote();
+                rop._get_den().demote();
             }
         } else {
             // Subnormal number.
-            retval._get_num() = ief.i_eee.mant_high;
-            retval._get_num() <<= 64u;
-            retval._get_num() += ief.i_eee.mant_low;
-            retval._get_den() <<= static_cast<unsigned long>(16382l + 112);
-            canonicalise(retval);
+            rop._get_num() = ief.i_eee.mant_high;
+            rop._get_num() <<= 64u;
+            rop._get_num() += ief.i_eee.mant_low;
+            rop._get_den() <<= static_cast<unsigned long>(16382l + 112);
+            canonicalise(rop);
             // Try demoting.
-            retval._get_num().demote();
-            retval._get_den().demote();
+            rop._get_num().demote();
+            rop._get_den().demote();
         }
         // Adjust the sign.
         if (ief.i_eee.negative) {
-            retval.neg();
+            rop.neg();
+        }
+        return true;
+    }
+
+public:
+    /// Conversion operator to mp++ types.
+    /**
+     * \rststar
+     * This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128MpppInteroperable` type.
+     *
+     * For conversions to :cpp:class:`~mppp::integer`, if ``this`` does not represent
+     * an integral value the conversion will yield the truncated counterpart of ``this``.
+     *
+     * For conversions to :cpp:class:`~mppp::rational`, the conversion,
+     * if successful, is exact.
+     * \endrststar
+     *
+     * @return \p this converted to the target type.
+     *
+     * @throws std::domain_error if \p this represents a non-finite value.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <Real128MpppInteroperable T>
+#else
+    template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+#endif
+    explicit operator T() const
+    {
+        T retval;
+        if (mppp_unlikely(!mppp_conversion(retval))) {
+            throw std::domain_error(std::string{"Cannot convert a non-finite real128 to "}
+                                    + (is_integer<T>::value ? "an integer" : "a rational"));
         }
         return retval;
+    }
+        /// Conversion method to mp++ types.
+        /**
+         * \rststar
+         * This method, similarly to the corresponding conversion operator, will convert ``this`` to a
+         * :cpp:concept:`~mppp::Real128MpppInteroperable` type, storing the result of the conversion into ``rop``.
+         * Differently from the conversion operator, this method does not raise any exception: if the conversion is
+         * successful, the method will return ``true``, otherwise the method will return ``false``. If the conversion
+         * fails, ``rop`` will not be altered.
+         * \endrststar
+         *
+         * @param rop the variable which will store the result of the conversion.
+         *
+         * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if
+         * ``this`` does not represent a finite value.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <Real128MpppInteroperable T>
+#else
+    template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+#endif
+    bool get(T &rop) const
+    {
+        return mppp_conversion(rop);
     }
     /// Convert to string.
     /**
@@ -989,6 +1019,38 @@ public:
      */
     __float128 m_value;
 };
+
+/** @defgroup real128_conversion real128_conversion
+ *  @{
+ */
+
+/// Conversion function to mp++ types for \link mppp::real128 real128 \endlink.
+/**
+ * \rststar
+ * This function will convert the input :cpp:class:`~mppp::real128` ``x`` to a
+ * :cpp:concept:`~mppp::Real128MpppInteroperable` type, storing the result of the conversion into ``rop``.
+ * If the conversion is successful, the function
+ * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
+ * not be altered.
+ * \endrststar
+ *
+ * @param rop the variable which will store the result of the conversion.
+ * @param x the input \link mppp::real128 real128 \endlink.
+ *
+ * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``x``
+ * does not represent a finite value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline bool get(Real128MpppInteroperable &rop, const real128 &x)
+#else
+template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+inline bool get(T &rop, const real128 &x)
+#endif
+{
+    return x.get(rop);
+}
+
+/** @} */
 
 /** @defgroup real128_arithmetic real128_arithmetic
  *  @{

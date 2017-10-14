@@ -239,16 +239,35 @@ TEST_CASE("real128 conversions")
     constexpr __float128 fc = static_cast<__float128>(real128{-120});
     REQUIRE((fc == -120));
     // Conversion to integer.
+    int_t nrop{1};
     REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real128{"nan"}), std::domain_error, [](const std::domain_error &ex) {
         return std::string(ex.what()) == "Cannot convert a non-finite real128 to an integer";
     });
+    REQUIRE(!real128{"nan"}.get(nrop));
+    REQUIRE(!get(nrop, real128{"nan"}));
+    REQUIRE(nrop.is_one());
     REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real128{"-inf"}), std::domain_error, [](const std::domain_error &ex) {
         return std::string(ex.what()) == "Cannot convert a non-finite real128 to an integer";
     });
+    REQUIRE(!real128{"-inf"}.get(nrop));
+    REQUIRE(!get(nrop, real128{"-inf"}));
+    REQUIRE(nrop.is_one());
     REQUIRE(static_cast<int_t>(real128{"-0.123"}) == 0);
+    REQUIRE(real128{"-0.123"}.get(nrop));
+    REQUIRE(get(nrop, real128{"-0.123"}));
+    REQUIRE(nrop.is_zero());
     REQUIRE(static_cast<int_t>(real128{"-3456.123"}) == -3456);
+    REQUIRE(real128{"-3456.123"}.get(nrop));
+    REQUIRE(get(nrop, real128{"-3456.123"}));
+    REQUIRE(nrop == -3456);
     REQUIRE(static_cast<int_t>(real128{"3456.99999"}) == 3456);
+    REQUIRE(real128{"3456.99999"}.get(nrop));
+    REQUIRE(get(nrop, real128{"3456.99999"}));
+    REQUIRE(nrop == 3456);
     REQUIRE(static_cast<int_t>(real128{"1.295035023887605022184887791645529310e-4965"}) == 0);
+    REQUIRE(real128{"1.295035023887605022184887791645529310e-4965"}.get(nrop));
+    REQUIRE(get(nrop, real128{"1.295035023887605022184887791645529310e-4965"}));
+    REQUIRE(nrop == 0);
     // Random testing for abs(value) < 1.
     std::uniform_real_distribution<double> dist(0., 1.);
     std::uniform_int_distribution<int> sdist(0, 1);
@@ -278,6 +297,9 @@ TEST_CASE("real128 conversions")
         tmp_int = (int_t{hi} << (64 - ebits)) * sign + (lo >> ebits);
         r = ::scalbnq(__float128(hi) * sign, 64 - ebits) + (lo >> ebits);
         REQUIRE(static_cast<int_t>(real128{r}) == tmp_int);
+        REQUIRE(real128{r}.get(nrop));
+        REQUIRE(get(nrop, real128{r}));
+        REQUIRE(nrop == tmp_int);
     }
     // Test with small non-integral values.
     dist = std::uniform_real_distribution<double>(100., 1000.);
@@ -285,30 +307,70 @@ TEST_CASE("real128 conversions")
         auto tmp_d = dist(rng) * (sdist(rng) ? 1. : -1.);
         __float128 tmp_r = ::nextafterq(tmp_d, 10000.);
         REQUIRE(static_cast<int_t>(real128{tmp_r}) == int_t{tmp_d});
+        REQUIRE(real128{tmp_r}.get(nrop));
+        REQUIRE(get(nrop, real128{tmp_r}));
+        REQUIRE(nrop == int_t{tmp_d});
     }
     // Test with larger values.
     dist = std::uniform_real_distribution<double>(3.6893488147419103e+19, 3.6893488147419103e+19 * 10.);
     for (int i = 0; i < ntries; ++i) {
         auto tmp_d = dist(rng) * (sdist(rng) ? 1. : -1.);
         REQUIRE(static_cast<int_t>(real128{tmp_d}) == int_t{tmp_d});
+        REQUIRE(real128{tmp_d}.get(nrop));
+        REQUIRE(get(nrop, real128{tmp_d}));
+        REQUIRE(nrop == int_t{tmp_d});
     }
+    rat_t rrop{1};
     // Conversion to rational.
     REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real128{"nan"}), std::domain_error, [](const std::domain_error &ex) {
         return std::string(ex.what()) == "Cannot convert a non-finite real128 to a rational";
     });
+    REQUIRE(!real128{"nan"}.get(rrop));
+    REQUIRE(!get(rrop, real128{"nan"}));
+    REQUIRE(rrop.is_one());
     REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real128{"-inf"}), std::domain_error, [](const std::domain_error &ex) {
         return std::string(ex.what()) == "Cannot convert a non-finite real128 to a rational";
     });
+    REQUIRE(!real128{"-inf"}.get(rrop));
+    REQUIRE(!get(rrop, real128{"-inf"}));
+    REQUIRE(rrop.is_one());
+    rrop._get_num().promote();
+    rrop._get_den().promote();
     REQUIRE((static_cast<rat_t>(real128{"-1.5"}) == rat_t{3, -2}));
     REQUIRE((static_cast<rat_t>(real128{"-1.5"}).get_num().is_static()));
     REQUIRE((static_cast<rat_t>(real128{"-1.5"}).get_den().is_static()));
+    REQUIRE(real128{"-1.5"}.get(rrop));
+    REQUIRE(get(rrop, real128{"-1.5"}));
+    REQUIRE((rrop == rat_t{3, -2}));
+    REQUIRE(rrop.get_num().is_static());
+    REQUIRE(rrop.get_den().is_static());
+    rrop._get_num().promote();
+    rrop._get_den().promote();
     REQUIRE((static_cast<rat_t>(real128{"0.5"}) == rat_t{1, 2}));
     REQUIRE((static_cast<rat_t>(real128{".5"}).get_num().is_static()));
     REQUIRE((static_cast<rat_t>(real128{".5"}).get_den().is_static()));
+    REQUIRE(real128{"0.5"}.get(rrop));
+    REQUIRE(get(rrop, real128{"0.5"}));
+    REQUIRE((rrop == rat_t{1, 2}));
+    REQUIRE(rrop.get_num().is_static());
+    REQUIRE(rrop.get_den().is_static());
+    rrop._get_num().promote();
+    rrop._get_den().promote();
     REQUIRE((static_cast<rat_t>(real128{123}) == rat_t{123 * 2, 2}));
+    REQUIRE(real128{123}.get(rrop));
+    REQUIRE(get(rrop, real128{123}));
+    REQUIRE((rrop == rat_t{123}));
+    REQUIRE(rrop.get_num().is_static());
+    REQUIRE(rrop.get_den().is_static());
     // Large integer.
     REQUIRE((static_cast<rat_t>(real128{123} * (int_t{1} << 200)) == rat_t{123 * (int_t{1} << 200), 1}));
+    REQUIRE((real128{123} * (int_t{1} << 200)).get(rrop));
+    REQUIRE(get(rrop, real128{123} * (int_t{1} << 200)));
+    REQUIRE((rrop == rat_t{123 * (int_t{1} << 200), 1}));
     REQUIRE((static_cast<rat_t>(-real128{123} * (int_t{1} << 200)) == rat_t{246 * (int_t{1} << 200), -2}));
+    REQUIRE((real128{-123} * (int_t{1} << 200)).get(rrop));
+    REQUIRE(get(rrop, real128{-123} * (int_t{1} << 200)));
+    REQUIRE((rrop == rat_t{-123 * (int_t{1} << 200), 1}));
     REQUIRE((static_cast<rat_t>(real128{123}).get_num().is_static()));
     REQUIRE((static_cast<rat_t>(real128{123}).get_den().is_static()));
     REQUIRE((static_cast<rat_t>(real128{-123}) == rat_t{123 * -2, 2}));
@@ -319,6 +381,12 @@ TEST_CASE("real128 conversions")
     // Subnormals.
     REQUIRE((static_cast<rat_t>(real128{"3.40917866435610111081769936359662259e-4957"})
              == rat_t{32135, int_t{1} << 16480ul}));
+    REQUIRE(real128{"3.40917866435610111081769936359662259e-4957"}.get(rrop));
+    REQUIRE(get(rrop, real128{"3.40917866435610111081769936359662259e-4957"}));
+    REQUIRE((rrop == rat_t{32135, int_t{1} << 16480ul}));
     REQUIRE((static_cast<rat_t>(real128{"-3.40917866435610111081769936359662259e-4957"})
              == rat_t{-32135, int_t{1} << 16480ul}));
+    REQUIRE(real128{"-3.40917866435610111081769936359662259e-4957"}.get(rrop));
+    REQUIRE(get(rrop, real128{"-3.40917866435610111081769936359662259e-4957"}));
+    REQUIRE((rrop == rat_t{-32135, int_t{1} << 16480ul}));
 }

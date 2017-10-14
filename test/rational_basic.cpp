@@ -418,7 +418,7 @@ TEST_CASE("mpq_t copy constructor")
     tuple_for_each(sizes{}, mpq_copy_ctor_tester{});
 }
 
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
 
 struct mpq_move_ctor_tester {
     template <typename S>
@@ -838,7 +838,7 @@ TEST_CASE("mpq_t copy assignment")
     tuple_for_each(sizes{}, mpq_copy_ass_tester{});
 }
 
-#if !defined(_MSC_VER) || (_MSC_VER > 1900)
+#if !defined(_MSC_VER)
 
 struct mpq_move_ass_tester {
     template <typename S>
@@ -987,7 +987,13 @@ template <typename Integer, typename T>
 static inline bool roundtrip_conversion(const T &x)
 {
     Integer tmp{x};
-    return (static_cast<T>(tmp) == x) && (lex_cast(x) == lex_cast(tmp));
+    T rop1, rop2;
+    bool retval = (static_cast<T>(tmp) == x) && (lex_cast(x) == lex_cast(tmp));
+    const bool res1 = tmp.get(rop1);
+    const bool res2 = get(rop2, tmp);
+    retval = retval && res1 && res2;
+    retval = retval && (lex_cast(rop1) == lex_cast(tmp)) && (lex_cast(rop2) == lex_cast(tmp));
+    return retval;
 }
 
 struct no_conv {
@@ -1014,28 +1020,63 @@ struct int_convert_tester {
             REQUIRE(roundtrip_conversion<rational>(max - Int(3)));
             REQUIRE(roundtrip_conversion<rational>(min + Int(42)));
             REQUIRE(roundtrip_conversion<rational>(max - Int(42)));
+            Int rop(1);
             if (min != Int(0)) {
                 REQUIRE(static_cast<Int>(rational{integer(min) * 3, integer(min) * -2}) == Int(-1));
+                REQUIRE((rational{integer(min) * 3, integer(min) * -2}.get(rop)));
+                REQUIRE((get(rop, rational{integer(min) * 3, integer(min) * -2})));
+                REQUIRE(rop == Int(-1));
             }
             REQUIRE(static_cast<Int>(rational{integer(max) * 5, integer(max) * 2}) == Int(2));
+            REQUIRE((rational{integer(max) * 5, integer(max) * 2}.get(rop)));
+            REQUIRE((get(rop, rational{integer(max) * 5, integer(max) * 2})));
+            REQUIRE(rop == Int(2));
+            rop = Int(1);
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(integer(min) * 2, 2) - 1), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE((!(rational(integer(min) * 2, 2) - 1).get(rop)));
+            REQUIRE((!get(rop, (rational(integer(min) * 2, 2) - 1))));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(min) - 1), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE((!(rational(min) - 1).get(rop)));
+            REQUIRE((!get(rop, (rational(min) - 1))));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(min) - 2), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE((!(rational(min) - 2).get(rop)));
+            REQUIRE((!get(rop, (rational(min) - 2))));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(min) - 3), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE((!(rational(min) - 3).get(rop)));
+            REQUIRE((!get(rop, (rational(min) - 3))));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(min) - 123), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE((!(rational(min) - 123).get(rop)));
+            REQUIRE((!get(rop, (rational(min) - 123))));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(max) + 1), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE((!(rational(max) + 1).get(rop)));
+            REQUIRE((!get(rop, (rational(max) + 1))));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(max) + 2), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE((!(rational(max) + 2).get(rop)));
+            REQUIRE((!get(rop, (rational(max) + 2))));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(max) + 3), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE((!(rational(max) + 3).get(rop)));
+            REQUIRE((!get(rop, (rational(max) + 3))));
+            REQUIRE(rop == Int(1));
             REQUIRE_THROWS_PREDICATE(static_cast<Int>(rational(max) + 123), std::overflow_error,
                                      [](const std::overflow_error &) { return true; });
+            REQUIRE((!(rational(max) + 123).get(rop)));
+            REQUIRE((!get(rop, (rational(max) + 123))));
+            REQUIRE(rop == Int(1));
         }
     };
     template <typename S>
@@ -1052,12 +1093,22 @@ struct int_convert_tester {
         REQUIRE((!is_convertible<rational, wchar_t>::value));
         REQUIRE((!is_convertible<rational, no_conv>::value));
         // Conversion to int_t.
+        integer rop;
         REQUIRE((is_convertible<rational, integer>::value));
         REQUIRE(roundtrip_conversion<rational>(integer{42}));
         REQUIRE(roundtrip_conversion<rational>(integer{-42}));
         REQUIRE(static_cast<integer>(rational{1, 2}) == 0);
+        REQUIRE((rational{1, 2}.get(rop)));
+        REQUIRE((get(rop, rational{1, 2})));
+        REQUIRE(rop == 0);
         REQUIRE(static_cast<integer>(rational{3, 2}) == 1);
+        REQUIRE((rational{3, 2}.get(rop)));
+        REQUIRE((get(rop, rational{3, 2})));
+        REQUIRE(rop == 1);
         REQUIRE(static_cast<integer>(rational{3, -2}) == -1);
+        REQUIRE((rational{3, -2}.get(rop)));
+        REQUIRE((get(rop, rational{3, -2})));
+        REQUIRE(rop == -1);
     }
 };
 
@@ -1073,12 +1124,28 @@ struct fp_convert_tester {
         void operator()(const Float &) const
         {
             using rational = rational<S::value>;
+            Float rop(1);
             REQUIRE((is_convertible<rational, Float>::value));
             REQUIRE(static_cast<Float>(rational{0}) == Float(0));
+            REQUIRE(rational{0}.get(rop));
+            REQUIRE(get(rop, rational{0}));
+            REQUIRE(rop == Float(0));
             REQUIRE(static_cast<Float>(rational{1}) == Float(1));
+            REQUIRE(rational{1}.get(rop));
+            REQUIRE(get(rop, rational{1}));
+            REQUIRE(rop == Float(1));
             REQUIRE(static_cast<Float>(rational{-1}) == Float(-1));
+            REQUIRE(rational{-1}.get(rop));
+            REQUIRE(get(rop, rational{-1}));
+            REQUIRE(rop == Float(-1));
             REQUIRE(static_cast<Float>(rational{12}) == Float(12));
+            REQUIRE(rational{12}.get(rop));
+            REQUIRE(get(rop, rational{12}));
+            REQUIRE(rop == Float(12));
             REQUIRE(static_cast<Float>(rational{-12}) == Float(-12));
+            REQUIRE(rational{-12}.get(rop));
+            REQUIRE(get(rop, rational{-12}));
+            REQUIRE(rop == Float(-12));
             if (std::numeric_limits<Float>::is_iec559) {
                 REQUIRE(static_cast<Float>(rational{1, 2}) == Float(.5));
                 REQUIRE(static_cast<Float>(rational{3, -2}) == Float(-1.5));
@@ -1091,8 +1158,18 @@ struct fp_convert_tester {
                     std::uniform_real_distribution<Float> dist(Float(-1E9), Float(1E9));
                     std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                     for (auto i = 0; i < ntries; ++i) {
+                        Float rop1;
                         const auto tmp = dist(eng);
                         if (!roundtrip_conversion<rational>(tmp)) {
+                            fail.store(false);
+                        }
+                        if (!rational{tmp}.get(rop1)) {
+                            fail.store(false);
+                        }
+                        if (!get(rop1, rational{tmp})) {
+                            fail.store(false);
+                        }
+                        if (rop1 != std::trunc(tmp)) {
                             fail.store(false);
                         }
                     }
@@ -1101,8 +1178,18 @@ struct fp_convert_tester {
                     std::uniform_real_distribution<Float> dist(Float(-1E-9), Float(1E-9));
                     std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                     for (auto i = 0; i < ntries; ++i) {
+                        Float rop1;
                         const auto tmp = dist(eng);
                         if (!roundtrip_conversion<rational>(tmp)) {
+                            fail.store(false);
+                        }
+                        if (!rational{tmp}.get(rop1)) {
+                            fail.store(false);
+                        }
+                        if (!get(rop1, rational{tmp})) {
+                            fail.store(false);
+                        }
+                        if (rop1 != std::trunc(tmp)) {
                             fail.store(false);
                         }
                     }
