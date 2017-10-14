@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Add non-throwing GMP-style conversion functions (`#59 <https://github.com/bluescarni/mppp/pull/59>`__,
+  `#61 <https://github.com/bluescarni/mppp/pull/61>`__).
+
 - Implement move constructors and move assignment operators from ``mpz_t`` and ``mpq_t`` for :cpp:class:`~mppp::integer`
   and :cpp:class:`~mppp::rational` (`#57 <https://github.com/bluescarni/mppp/pull/57>`__).
 
