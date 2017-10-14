@@ -998,18 +998,18 @@ struct fp_convert_tester {
                 std::uniform_real_distribution<Float> dist(Float(-100), Float(100));
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
-                    Float rop;
+                    Float rop1;
                     const auto tmp = dist(eng);
                     if (static_cast<Float>(integer{tmp}) != std::trunc(tmp)) {
                         fail.store(false);
                     }
-                    if (!integer{tmp}.get(rop)) {
+                    if (!integer{tmp}.get(rop1)) {
                         fail.store(false);
                     }
-                    if (!get(rop, integer{tmp})) {
+                    if (!get(rop1, integer{tmp})) {
                         fail.store(false);
                     }
-                    if (rop != std::trunc(tmp)) {
+                    if (rop1 != std::trunc(tmp)) {
                         fail.store(false);
                     }
                 }

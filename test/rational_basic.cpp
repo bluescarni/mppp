@@ -1158,18 +1158,18 @@ struct fp_convert_tester {
                     std::uniform_real_distribution<Float> dist(Float(-1E9), Float(1E9));
                     std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                     for (auto i = 0; i < ntries; ++i) {
-                        Float rop;
+                        Float rop1;
                         const auto tmp = dist(eng);
                         if (!roundtrip_conversion<rational>(tmp)) {
                             fail.store(false);
                         }
-                        if (!rational{tmp}.get(rop)) {
+                        if (!rational{tmp}.get(rop1)) {
                             fail.store(false);
                         }
-                        if (!get(rop, rational{tmp})) {
+                        if (!get(rop1, rational{tmp})) {
                             fail.store(false);
                         }
-                        if (rop != std::trunc(tmp)) {
+                        if (rop1 != std::trunc(tmp)) {
                             fail.store(false);
                         }
                     }
@@ -1178,18 +1178,18 @@ struct fp_convert_tester {
                     std::uniform_real_distribution<Float> dist(Float(-1E-9), Float(1E-9));
                     std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                     for (auto i = 0; i < ntries; ++i) {
-                        Float rop;
+                        Float rop1;
                         const auto tmp = dist(eng);
                         if (!roundtrip_conversion<rational>(tmp)) {
                             fail.store(false);
                         }
-                        if (!rational{tmp}.get(rop)) {
+                        if (!rational{tmp}.get(rop1)) {
                             fail.store(false);
                         }
-                        if (!get(rop, rational{tmp})) {
+                        if (!get(rop1, rational{tmp})) {
                             fail.store(false);
                         }
-                        if (rop != std::trunc(tmp)) {
+                        if (rop1 != std::trunc(tmp)) {
                             fail.store(false);
                         }
                     }
