@@ -635,6 +635,65 @@ public:
     {
         return m_value;
     }
+
+private:
+    template <std::size_t SSize>
+    bool integer_conversion(integer<SSize> &rop) const
+    {
+        // Build the union and assign the value.
+        ieee_float128 ief;
+        ief.value = m_value;
+        if (mppp_unlikely(ief.i_eee.exponent == 32767u)) {
+            // Inf or nan, not representable by integer.
+            return false;
+        }
+        // Determine the real exponent. 16383 is the offset of the representation,
+        // 112 is because we need to left shift the significand by 112 positions
+        // in order to turn it into an integral value.
+        const auto exponent = static_cast<long>(ief.i_eee.exponent) - (16383l + 112);
+        if (!ief.i_eee.exponent || exponent < -112) {
+            // Zero stored exponent means subnormal number, and if the real exponent is too small
+            // we end up with a value with abs less than 1. In such cases, just return 0.
+            rop.set_zero();
+            return true;
+        }
+        // Value is normalised and not less than 1 in abs. We can proceed.
+        rop.set_one();
+        if (exponent >= 0) {
+            // Non-negative exponent means that we will have to take the significand
+            // converted to an integer and further left shift it.
+            rop <<= 112u;
+            rop += integer<SSize>{ief.i_eee.mant_high} << 64u;
+            rop += ief.i_eee.mant_low;
+            rop <<= static_cast<unsigned long>(exponent);
+        } else {
+            // NOTE: the idea here is to avoid shifting up and then shifting back down,
+            // as that might trigger a promotion to dynamic storage in retval. Instead,
+            // we offset the shifts by the (negative) exponent, which is here guaranteed
+            // to be in the [-112,-1] range.
+            rop <<= static_cast<unsigned>(112 + exponent);
+            if (exponent > -64) {
+                // We need to right shift less than 64 bits. This means that some bits from the low
+                // word of the significand survive.
+                // NOTE: need to do the left shift in multiprecision here, as the final result
+                // might spill over the 64 bit range.
+                rop += integer<SSize>{ief.i_eee.mant_high} << static_cast<unsigned>(exponent + 64);
+                rop += ief.i_eee.mant_low >> static_cast<unsigned>(-exponent);
+            } else {
+                // We need to right shift more than 64 bits, so none of the bits in the low word survive.
+                // NOTE: here the right shift will be in the [0,48] range, so we can do it directly
+                // on a C++ builtin type (i_eee.mant_high gives a 64bit int).
+                rop += ief.i_eee.mant_high >> static_cast<unsigned>(-(exponent + 64));
+            }
+        }
+        // Adjust the sign.
+        if (ief.i_eee.negative) {
+            rop.neg();
+        }
+        return true;
+    }
+
+public:
     /// Conversion to \link mppp::integer integer \endlink.
     /**
      * \rststar
@@ -649,57 +708,65 @@ public:
     template <std::size_t SSize>
     explicit operator integer<SSize>() const
     {
+        integer<SSize> retval;
+        if (mppp_unlikely(!integer_conversion(retval))) {
+            throw std::domain_error("Cannot convert a non-finite real128 to an integer");
+        }
+        return retval;
+    }
+
+private:
+    template <std::size_t SSize>
+    bool rational_conversion(rational<SSize> &rop) const
+    {
         // Build the union and assign the value.
         ieee_float128 ief;
         ief.value = m_value;
         if (mppp_unlikely(ief.i_eee.exponent == 32767u)) {
-            // Inf or nan, not representable by integer.
-            throw std::domain_error("Cannot convert a non-finite real128 to an integer");
+            // Inf or nan, not representable by rational.
+            return false;
         }
-        // Determine the real exponent. 16383 is the offset of the representation,
-        // 112 is because we need to left shift the significand by 112 positions
-        // in order to turn it into an integral value.
-        const auto exponent = static_cast<long>(ief.i_eee.exponent) - (16383l + 112);
-        if (!ief.i_eee.exponent || exponent < -112) {
-            // Zero stored exponent means subnormal number, and if the real exponent is too small
-            // we end up with a value with abs less than 1. In such cases, just return 0.
-            return integer<SSize>{};
-        }
-        // Value is normalised and not less than 1 in abs. We can proceed.
-        integer<SSize> retval{1u};
-        if (exponent >= 0) {
-            // Non-negative exponent means that we will have to take the significand
-            // converted to an integer and further left shift it.
-            retval <<= 112u;
-            retval += integer<SSize>{ief.i_eee.mant_high} << 64u;
-            retval += ief.i_eee.mant_low;
-            retval <<= static_cast<unsigned long>(exponent);
-        } else {
-            // NOTE: the idea here is to avoid shifting up and then shifting back down,
-            // as that might trigger a promotion to dynamic storage in retval. Instead,
-            // we offset the shifts by the (negative) exponent, which is here guaranteed
-            // to be in the [-112,-1] range.
-            retval <<= static_cast<unsigned>(112 + exponent);
-            if (exponent > -64) {
-                // We need to right shift less than 64 bits. This means that some bits from the low
-                // word of the significand survive.
-                // NOTE: need to do the left shift in multiprecision here, as the final result
-                // might spill over the 64 bit range.
-                retval += integer<SSize>{ief.i_eee.mant_high} << static_cast<unsigned>(exponent + 64);
-                retval += ief.i_eee.mant_low >> static_cast<unsigned>(-exponent);
+        rop._get_num().set_zero();
+        rop._get_den().set_one();
+        if (ief.i_eee.exponent) {
+            // Normal number.
+            // Determine the real exponent.
+            const auto exponent = static_cast<long>(ief.i_eee.exponent) - (16383l + 112);
+            rop._get_num() = 1u;
+            rop._get_num() <<= 112u;
+            rop._get_num() += integer<SSize>{ief.i_eee.mant_high} << 64u;
+            rop._get_num() += ief.i_eee.mant_low;
+            if (exponent >= 0) {
+                // The result is a large integer: no need to canonicalise or to try
+                // to demote. Den is already set to 1.
+                rop._get_num() <<= static_cast<unsigned long>(exponent);
             } else {
-                // We need to right shift more than 64 bits, so none of the bits in the low word survive.
-                // NOTE: here the right shift will be in the [0,48] range, so we can do it directly
-                // on a C++ builtin type (i_eee.mant_high gives a 64bit int).
-                retval += ief.i_eee.mant_high >> static_cast<unsigned>(-(exponent + 64));
+                rop._get_den() <<= static_cast<unsigned long>(-exponent);
+                // Put in canonical form.
+                canonicalise(rop);
+                // Try demoting, after having possibly removed common factors.
+                rop._get_num().demote();
+                rop._get_den().demote();
             }
+        } else {
+            // Subnormal number.
+            rop._get_num() = ief.i_eee.mant_high;
+            rop._get_num() <<= 64u;
+            rop._get_num() += ief.i_eee.mant_low;
+            rop._get_den() <<= static_cast<unsigned long>(16382l + 112);
+            canonicalise(rop);
+            // Try demoting.
+            rop._get_num().demote();
+            rop._get_den().demote();
         }
         // Adjust the sign.
         if (ief.i_eee.negative) {
-            retval.neg();
+            rop.neg();
         }
-        return retval;
+        return true;
     }
+
+public:
     /// Conversion to \link mppp::rational rational \endlink.
     /**
      * \rststar
@@ -714,50 +781,30 @@ public:
     template <std::size_t SSize>
     explicit operator rational<SSize>() const
     {
-        // Build the union and assign the value.
-        ieee_float128 ief;
-        ief.value = m_value;
-        if (mppp_unlikely(ief.i_eee.exponent == 32767u)) {
-            // Inf or nan, not representable by rational.
+        rational<SSize> retval;
+        if (mppp_unlikely(!rational_conversion(retval))) {
             throw std::domain_error("Cannot convert a non-finite real128 to a rational");
         }
-        rational<SSize> retval;
-        if (ief.i_eee.exponent) {
-            // Normal number.
-            // Determine the real exponent.
-            const auto exponent = static_cast<long>(ief.i_eee.exponent) - (16383l + 112);
-            retval._get_num() = 1u;
-            retval._get_num() <<= 112u;
-            retval._get_num() += integer<SSize>{ief.i_eee.mant_high} << 64u;
-            retval._get_num() += ief.i_eee.mant_low;
-            if (exponent >= 0) {
-                // The result is a large integer: no need to canonicalise or to try
-                // to demote. Den is already set to 1.
-                retval._get_num() <<= static_cast<unsigned long>(exponent);
-            } else {
-                retval._get_den() <<= static_cast<unsigned long>(-exponent);
-                // Put in canonical form.
-                canonicalise(retval);
-                // Try demoting, after having possibly removed common factors.
-                retval._get_num().demote();
-                retval._get_den().demote();
-            }
-        } else {
-            // Subnormal number.
-            retval._get_num() = ief.i_eee.mant_high;
-            retval._get_num() <<= 64u;
-            retval._get_num() += ief.i_eee.mant_low;
-            retval._get_den() <<= static_cast<unsigned long>(16382l + 112);
-            canonicalise(retval);
-            // Try demoting.
-            retval._get_num().demote();
-            retval._get_den().demote();
-        }
-        // Adjust the sign.
-        if (ief.i_eee.negative) {
-            retval.neg();
-        }
         return retval;
+    }
+        /// Conversion to interoperable C++ types.
+        /**
+         * \rststar
+         * This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128CppInteroperable` type. The conversion
+         * uses a direct ``static_cast()`` of the internal :cpp:member:`~mppp::real128::m_value` member to the target
+         * type, and thus no checks are performed to ensure that the value of ``this`` can be represented by the target
+         * type. Conversion to integral types will produce the truncated counterpart of ``this``. \endrststar
+         *
+         * @return \p this converted to \p T.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <Real128CppInteroperable T>
+#else
+    template <typename T, real128_cpp_interoperable_enabler<T> = 0>
+#endif
+    constexpr bool get(T &rop) const
+    {
+        return rop = static_cast<T>(m_value), true;
     }
     /// Convert to string.
     /**
