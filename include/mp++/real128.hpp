@@ -603,7 +603,7 @@ public:
         return *this = real128{s};
     }
 #endif
-/// Conversion to interoperable C++ types.
+/// Conversion operator to interoperable C++ types.
 /**
  * \rststar
  * This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128CppInteroperable` type. The conversion uses
@@ -638,7 +638,7 @@ public:
 
 private:
     template <std::size_t SSize>
-    bool integer_conversion(integer<SSize> &rop) const
+    bool mppp_conversion(integer<SSize> &rop) const
     {
         // Build the union and assign the value.
         ieee_float128 ief;
@@ -692,32 +692,8 @@ private:
         }
         return true;
     }
-
-public:
-    /// Conversion to \link mppp::integer integer \endlink.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to an :cpp:type:`~mppp::integer`. If ``this`` does not represent
-     * an integral value, the conversion will yield the truncated counterpart of ``this``.
-     * \endrststar
-     *
-     * @return \p this converted to \link mppp::integer integer \endlink.
-     *
-     * @throws std::domain_error if \p this represents a non-finite value.
-     */
     template <std::size_t SSize>
-    explicit operator integer<SSize>() const
-    {
-        integer<SSize> retval;
-        if (mppp_unlikely(!integer_conversion(retval))) {
-            throw std::domain_error("Cannot convert a non-finite real128 to an integer");
-        }
-        return retval;
-    }
-
-private:
-    template <std::size_t SSize>
-    bool rational_conversion(rational<SSize> &rop) const
+    bool mppp_conversion(rational<SSize> &rop) const
     {
         // Build the union and assign the value.
         ieee_float128 ief;
@@ -767,44 +743,59 @@ private:
     }
 
 public:
-    /// Conversion to \link mppp::rational rational \endlink.
+    /// Conversion operator to mp++ types.
     /**
      * \rststar
-     * This operator will convert ``this`` to a :cpp:type:`~mppp::rational`. The conversion,
+     * This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128MpppInteroperable` type.
+     *
+     * For conversions to :cpp:class:`~mppp::integer`, if ``this`` does not represent
+     * an integral value the conversion will yield the truncated counterpart of ``this``.
+     *
+     * For conversions to :cpp:class:`~mppp::rational`, the conversion,
      * if successful, is exact.
      * \endrststar
      *
-     * @return \p this converted to \link mppp::rational rational \endlink.
+     * @return \p this converted to the target type.
      *
      * @throws std::domain_error if \p this represents a non-finite value.
      */
-    template <std::size_t SSize>
-    explicit operator rational<SSize>() const
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <Real128MpppInteroperable T>
+#else
+    template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+#endif
+    explicit operator T() const
     {
-        rational<SSize> retval;
-        if (mppp_unlikely(!rational_conversion(retval))) {
-            throw std::domain_error("Cannot convert a non-finite real128 to a rational");
+        T retval;
+        if (mppp_unlikely(!mppp_conversion(retval))) {
+            throw std::domain_error(std::string{"Cannot convert a non-finite real128 to "}
+                                    + (is_integer<T>::value ? "an integer" : "a rational"));
         }
         return retval;
     }
-        /// Conversion to interoperable C++ types.
+        /// Conversion method to mp++ types.
         /**
          * \rststar
-         * This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128CppInteroperable` type. The conversion
-         * uses a direct ``static_cast()`` of the internal :cpp:member:`~mppp::real128::m_value` member to the target
-         * type, and thus no checks are performed to ensure that the value of ``this`` can be represented by the target
-         * type. Conversion to integral types will produce the truncated counterpart of ``this``. \endrststar
+         * This method, similarly to the corresponding conversion operator, will convert ``this`` to a
+         * :cpp:concept:`~mppp::Real128MpppInteroperable` type, storing the result of the conversion into ``rop``.
+         * Differently from the conversion operator, this method does not raise any exception: if the conversion is
+         * successful, the method will return ``true``, otherwise the method will return ``false``. If the conversion
+         * fails, ``rop`` will not be altered.
+         * \endrststar
          *
-         * @return \p this converted to \p T.
+         * @param rop the variable which will store the result of the conversion.
+         *
+         * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if
+         * ``this`` does not represent a finite value.
          */
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <Real128CppInteroperable T>
+    template <Real128MpppInteroperable T>
 #else
-    template <typename T, real128_cpp_interoperable_enabler<T> = 0>
+    template <typename T, real128_mppp_interoperable_enabler<T> = 0>
 #endif
-    constexpr bool get(T &rop) const
+    bool get(T &rop) const
     {
-        return rop = static_cast<T>(m_value), true;
+        return mppp_conversion(rop);
     }
     /// Convert to string.
     /**
@@ -1028,6 +1019,38 @@ public:
      */
     __float128 m_value;
 };
+
+/** @defgroup real128_conversion real128_conversion
+ *  @{
+ */
+
+/// Conversion function to mp++ types for \link mppp::real128 real128 \endlink.
+/**
+ * \rststar
+ * This function will convert the input :cpp:class:`~mppp::real128` ``x`` to a
+ * :cpp:concept:`~mppp::Real128MpppInteroperable` type, storing the result of the conversion into ``rop``.
+ * If the conversion is successful, the function
+ * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
+ * not be altered.
+ * \endrststar
+ *
+ * @param rop the variable which will store the result of the conversion.
+ * @param x the input \link mppp::real128 real128 \endlink.
+ *
+ * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``x``
+ * does not represent a finite value.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline bool get(Real128MpppInteroperable &rop, const real128 &x)
+#else
+template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+inline bool get(T &rop, const real128 &x)
+#endif
+{
+    return x.get(rop);
+}
+
+/** @} */
 
 /** @defgroup real128_arithmetic real128_arithmetic
  *  @{

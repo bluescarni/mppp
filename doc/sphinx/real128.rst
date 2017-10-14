@@ -74,6 +74,14 @@ Concepts
 Functions
 ---------
 
+.. _real128_conversion:
+
+Conversion
+~~~~~~~~~~
+
+.. doxygengroup:: real128_conversion
+   :content-only:
+
 .. _real128_arithmetic:
 
 Arithmetic
