@@ -40,6 +40,12 @@ Concepts
    * on Clang, this concept is satisfied by the types satisfying :cpp:concept:`mppp::CppInteroperable`,
      minus ``long double``.
 
+.. cpp:concept:: template <typename T> mppp::Real128MpppInteroperable
+
+   This concept is satisfied by mp++ types that can interoperate with :cpp:class:`~mppp::real128`.
+   Specifically, the concept is satisfied if ``T`` is either :cpp:class:`~mppp::integer` or
+   :cpp:class:`~mppp::rational`.
+
 .. cpp:concept:: template <typename T, typename U> mppp::Real128CppOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
@@ -54,8 +60,7 @@ Concepts
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic binary :ref:`operators <real128_operators>`
    involving :cpp:class:`~mppp::real128` and mp++ types. Specifically, the concept will be ``true`` if
-   one type is :cpp:class:`~mppp::real128` and the other is either :cpp:class:`~mppp::integer` or
-   :cpp:class:`~mppp::rational`.
+   one type is :cpp:class:`~mppp::real128` and the other type satisfies :cpp:concept:`~mppp::Real128MpppInteroperable`.
 
 .. cpp:concept:: template <typename T, typename U> mppp::Real128OpTypes
 

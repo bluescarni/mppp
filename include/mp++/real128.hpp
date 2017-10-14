@@ -107,6 +107,13 @@ concept bool Real128CppInteroperable = is_real128_cpp_interoperable<T>::value;
 using real128_cpp_interoperable_enabler = enable_if_t<is_real128_cpp_interoperable<T>::value, int>;
 #endif
 
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool Real128MpppInteroperable = is_real128_mppp_interoperable<T>::value;
+#else
+using real128_mppp_interoperable_enabler = enable_if_t<is_real128_mppp_interoperable<T>::value, int>;
+#endif
+
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 concept bool Real128CppOpTypes = are_real128_cpp_op_types<T, U>::value;
@@ -269,19 +276,11 @@ public:
         : m_value(x)
     {
     }
-    /// Constructor from \link mppp::integer integer \endlink.
-    /**
-     * This constructor will initialise the internal value with \p n. If the absolute value of \p n is large
-     * enough, \p this may not be exactly equal to \p n after initialisation.
-     *
-     * @param n the \link mppp::integer integer \endlink that will be used for the initialisation of the
-     * internal value.
-     *
-     * @throws std::overflow_error if the absolute value of \p n is larger than an implementation-defined
-     * limit.
-     */
+
+private:
+    // Construction from mp++ types.
     template <std::size_t SSize>
-    explicit real128(const integer<SSize> &n)
+    void dispatch_mppp_construction(const integer<SSize> &n)
     {
         // Special case for zero.
         const auto n_sgn = n.sgn();
@@ -328,18 +327,8 @@ public:
             m_value = -m_value;
         }
     }
-    /// Constructor from \link mppp::rational rational \endlink.
-    /**
-     * This constructor will initialise the internal value with \p q.
-     *
-     * @param q the \link mppp::rational rational \endlink that will be used for the initialisation of the
-     * internal value.
-     *
-     * @throws std::overflow_error if the absolute values of the numerator and/or denominator of \p q are larger than an
-     * implementation-defined limit.
-     */
     template <std::size_t SSize>
-    explicit real128(const rational<SSize> &q)
+    void dispatch_mppp_construction(const rational<SSize> &q)
     {
         const auto n_bits = q.get_num().nbits();
         const auto d_bits = q.get_den().nbits();
@@ -378,6 +367,28 @@ public:
                 m_value = ::scalblnq(m_value, negate_unsigned<long>(d_shift - n_shift));
             }
         }
+    }
+
+public:
+    /// Constructor from mp++ types.
+    /**
+     * \rststar
+     * This constructor will initialise the internal value with with the :cpp:concept:`~mppp::Real128MpppInteroperable`
+     * ``x``. Depending on the value of ``x``, ``this`` may not be exactly equal to ``x`` after initialisation.
+     * \endrststar
+     *
+     * @param x the value that will be used for the initialisation.
+     *
+     * @throws std::overflow_error if an overflow occurs during initialisation.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit real128(const Real128MpppInteroperable &x)
+#else
+    template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+    explicit real128(const T &x)
+#endif
+    {
+        dispatch_mppp_construction(x);
     }
     /// Constructor from C string.
     /**
@@ -498,53 +509,34 @@ public:
         m_value = x;
         return *this;
     }
-    /// Assignment from \link mppp::integer integer \endlink.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = real128{n};
-     *
-     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``n`` and it is then move-assigned to
-     * ``this``.
-     * \endrststar
-     *
-     * @param n the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from \link mppp::integer integer \endlink.
-     */
-    template <std::size_t SSize>
-    real128 &operator=(const integer<SSize> &n)
+        /// Assignment from mp++ types.
+        /**
+         * \rststar
+         * The body of this operator is equivalent to:
+         *
+         * .. code-block:: c++
+         *
+         *    return *this = real128{x};
+         *
+         * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``x`` and it is then move-assigned to
+         * ``this``.
+         * \endrststar
+         *
+         * @param x the assignment argument.
+         *
+         * @return a reference to \p this.
+         *
+         * @throws unspecified any exception thrown by the construction of a \link mppp::real128 real128 \endlink from
+         * ``x``.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    real128 &operator=(const Real128MpppInteroperable &x)
+#else
+    template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+    real128 &operator=(const T &x)
+#endif
     {
-        return *this = real128{n};
-    }
-    /// Assignment from \link mppp::rational rational \endlink.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = real128{q};
-     *
-     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``q`` and it is then move-assigned to
-     * ``this``.
-     * \endrststar
-     *
-     * @param q the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from \link mppp::rational rational \endlink.
-     */
-    template <std::size_t SSize>
-    real128 &operator=(const rational<SSize> &q)
-    {
-        return *this = real128{q};
+        return *this = real128{x};
     }
     /// Assignment from C string.
     /**
