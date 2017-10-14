@@ -3719,13 +3719,15 @@ inline integer<SSize> &mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::
     bool sr = rop.is_static();
     std::size_t size_hint = 0u;
     if (mppp_likely(sn)) {
+        // NOTE: we cast to size_t because it's more convenient for reasoning about number of limbs
+        // in the implementation functions.
+        // NOTE: do it before touching rop, for exception safety.
+        const auto s_size = safe_cast<std::size_t>(s);
         if (!sr) {
             rop.set_zero();
             sr = true;
         }
-        // NOTE: we cast to size_t because it's more convenient for reasoning about number of limbs
-        // in the implementation functions.
-        size_hint = static_mul_2exp(rop._get_union().g_st(), n._get_union().g_st(), safe_cast<std::size_t>(s));
+        size_hint = static_mul_2exp(rop._get_union().g_st(), n._get_union().g_st(), s_size);
         if (mppp_likely(size_hint == 0u)) {
             return rop;
         }
