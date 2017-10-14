@@ -51,6 +51,14 @@ Much of the functionality of the :cpp:class:`~mppp::rational` class is exposed v
 mimic the `GMP API <https://gmplib.org/manual/Rational-Number-Functions.html>`__ where appropriate, but a variety of
 convenience/generic overloads is provided as well.
 
+.. _rational_conversion:
+
+Conversion
+~~~~~~~~~~
+
+.. doxygengroup:: rational_conversion
+   :content-only:
+
 .. _rational_arithmetic:
 
 Arithmetic
