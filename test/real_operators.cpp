@@ -51,4 +51,14 @@ TEST_CASE("real plus")
     int_t n0{56};
     n0 += real{45};
     std::cout << n0 << '\n';
+    r0 += rat_t{1, 2};
+    std::cout << r0 << '\n';
+    rat_t q0{1, 2};
+    q0 += real{1};
+    std::cout << q0 << '\n';
+    r0 += 1u;
+    std::cout << r0 << '\n';
+    unsigned un = 5;
+    un += real{23};
+    std::cout << un << '\n';
 }

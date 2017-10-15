@@ -3183,7 +3183,61 @@ inline void dispatch_in_place_add(integer<SSize> &n, T &&r)
         real_dd_prec(n),
         [&n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_add_z(rop, op, n.get_mpz_view(), rnd); }, tmp,
         std::forward<T>(r));
-    n = static_cast<integer<SSize>>(tmp);
+    get(n, tmp);
+}
+
+template <std::size_t SSize>
+inline void dispatch_in_place_add(real &a, const rational<SSize> &q)
+{
+    const auto v = get_mpq_view(q);
+    mpfr_nary_op(real_dd_prec(q),
+                 [&v](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_add_q(rop, op, &v, rnd); }, a, a);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
+inline void dispatch_in_place_add(rational<SSize> &q, T &&r)
+{
+    MPPP_MAYBE_TLS real tmp;
+    const auto v = get_mpq_view(q);
+    mpfr_nary_op(real_dd_prec(q),
+                 [&v](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_add_q(rop, op, &v, rnd); }, tmp,
+                 std::forward<T>(r));
+    get(q, tmp);
+}
+
+template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+inline void dispatch_in_place_add(real &a, T n)
+{
+    if (real_op_bool_cast(n) <= std::numeric_limits<unsigned long>::max()) {
+        mpfr_nary_op(real_dd_prec(n),
+                     [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                         ::mpfr_add_ui(rop, op, static_cast<unsigned long>(n), rnd);
+                     },
+                     a, a);
+    } else {
+        dispatch_in_place_add(a, integer<2>{n});
+    }
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>, std::is_same<real, uncvref_t<U>>>::value,
+                      int> = 0>
+inline void dispatch_in_place_add(T &n, U &&r)
+{
+    if (real_op_bool_cast(n) <= std::numeric_limits<unsigned long>::max()) {
+        MPPP_MAYBE_TLS real tmp;
+        mpfr_nary_op(real_dd_prec(n),
+                     [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                         ::mpfr_add_ui(rop, op, static_cast<unsigned long>(n), rnd);
+                     },
+                     tmp, std::forward<U>(r));
+        get(n, tmp);
+    } else {
+        MPPP_MAYBE_TLS integer<2> tmp;
+        tmp = n;
+        dispatch_in_place_add(tmp, std::forward<U>(r));
+        get(n, tmp);
+    }
 }
 }
 
