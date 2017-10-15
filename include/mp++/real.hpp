@@ -435,9 +435,6 @@ struct real_prec {
 // - construction from/conversion to interoperables can probably be improved performance wise, especially
 //   if we exploit the mpfr_t internals.
 // - probably we should have a build in the CI against the latest MPFR, built with sanitizers on.
-// - maybe for the conversion operators we could consider having get_*() functions as well, at least for the
-//   multiprecision types (the rationale being that it might be convenient to provide an already-setup, e.g., integer
-//   for the conversion rather than creating it in the conversion operator - for the usual reasons).
 
 /// Multiprecision floating-point class.
 /**
@@ -1782,7 +1779,7 @@ private:
     T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
-            throw std::domain_error("Cannot convert a non-finite real to integer");
+            throw std::domain_error("Cannot convert a non-finite real to an integer");
         }
         MPPP_MAYBE_TLS mpz_raii mpz;
         // Truncate the value when converting to integer.
@@ -1790,39 +1787,50 @@ private:
         return T{&mpz.m_mpz};
     }
     // rational.
+    template <std::size_t SSize>
+    bool rational_conversion(rational<SSize> &rop) const
+    {
+        // Clear the range error flag before attempting the conversion.
+        ::mpfr_clear_erangeflag();
+        // NOTE: this call can fail if the exponent of this is very close to the upper/lower limits of the exponent
+        // type. If the call fails (signalled by a range flag being set), we will return error.
+        MPPP_MAYBE_TLS mpz_raii mpz;
+        const ::mpfr_exp_t exp2 = ::mpfr_get_z_2exp(&mpz.m_mpz, &m_mpfr);
+        // NOTE: not sure at the moment how to trigger this, let's leave it for now.
+        // LCOV_EXCL_START
+        if (mppp_unlikely(::mpfr_erangeflag_p())) {
+            // Let's first reset the error flag.
+            ::mpfr_clear_erangeflag();
+            return false;
+        }
+        // LCOV_EXCL_STOP
+        // The conversion to n * 2**exp succeeded. We will build a rational
+        // from n and exp.
+        rop._get_num() = &mpz.m_mpz;
+        rop._get_den().set_one();
+        if (exp2 >= ::mpfr_exp_t(0)) {
+            // The output value will be an integer.
+            rop._get_num() <<= static_cast<make_unsigned_t<::mpfr_exp_t>>(exp2);
+        } else {
+            // The output value will be a rational. Canonicalisation will be needed.
+            rop._get_den() <<= nint_abs(exp2);
+            canonicalise(rop);
+        }
+        return true;
+    }
     template <typename T, enable_if_t<is_rational<T>::value, int> = 0>
     T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
-            throw std::domain_error("Cannot convert a non-finite real to rational");
+            throw std::domain_error("Cannot convert a non-finite real to a rational");
         }
-        // Clear the range error flag before attempting the conversion.
-        ::mpfr_clear_erangeflag();
-        // NOTE: this call can fail if the exponent of this is very close to the upper/lower limits of the exponent
-        // type. If the call fails (signalled by a range flag being set), we will raise an error.
-        MPPP_MAYBE_TLS mpz_raii mpz;
-        const ::mpfr_exp_t exp2 = ::mpfr_get_z_2exp(&mpz.m_mpz, &m_mpfr);
-        if (mppp_unlikely(::mpfr_erangeflag_p())) {
-            // NOTE: not sure at the moment how to trigger this, let's leave it for now.
-            // LCOV_EXCL_START
-            // Let's first reset the error flag.
-            ::mpfr_clear_erangeflag();
+        T rop;
+        // LCOV_EXCL_START
+        if (mppp_unlikely(!rational_conversion(rop))) {
             throw std::overflow_error("The exponent of a real is too large for conversion to rational");
-            // LCOV_EXCL_STOP
         }
-        // The conversion to n * 2**exp succeeded. We will build a rational
-        // from n and exp.
-        using int_t = typename T::int_t;
-        int_t num{&mpz.m_mpz};
-        if (exp2 >= ::mpfr_exp_t(0)) {
-            // The output value will be an integer.
-            num <<= exp2;
-            return T{std::move(num)};
-        }
-        // The output value will be a rational. Canonicalisation will be needed.
-        int_t den{1};
-        den <<= nint_abs(exp2);
-        return T{std::move(num), std::move(den)};
+        // LCOV_EXCL_STOP
+        return rop;
     }
     // C++ floating-point.
     template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
@@ -1845,14 +1853,9 @@ private:
                                   + " results in overflow");
     }
     // Unsigned integrals, excluding bool.
-    template <typename T,
-              enable_if_t<conjunction<negation<std::is_same<bool, T>>, std::is_integral<T>, std::is_unsigned<T>>::value,
-                          int> = 0>
-    T dispatch_conversion() const
+    template <typename T>
+    bool uint_conversion(T &rop) const
     {
-        if (mppp_unlikely(!number_p())) {
-            throw std::domain_error("Cannot convert a non-finite real to a C++ unsigned integral type");
-        }
         // Clear the range error flag before attempting the conversion.
         ::mpfr_clear_erangeflag();
         // NOTE: this will handle correctly the case in which this is negative but greater than -1.
@@ -1864,22 +1867,29 @@ private:
             // If the value is positive, and the target type has a range greater than unsigned long,
             // we will attempt the conversion again via integer.
             if (std::numeric_limits<T>::max() > std::numeric_limits<unsigned long>::max() && sgn() > 0) {
-                try {
-                    return static_cast<T>(static_cast<integer<2>>(*this));
-                } catch (const std::overflow_error &) {
-                }
+                return mppp::get(rop, static_cast<integer<2>>(*this));
             }
-            // We end up here because either:
-            // - this is negative and not greater than -1,
-            // - the range of the target type is not greater than unsigned long's,
-            // - the range of the target type is greater than unsigned long's but the conversion
-            //   via integer failed anyway.
+            return false;
+        }
+        if (candidate <= std::numeric_limits<T>::max()) {
+            rop = static_cast<T>(candidate);
+            return true;
+        }
+        return false;
+    }
+    template <typename T,
+              enable_if_t<conjunction<negation<std::is_same<bool, T>>, std::is_integral<T>, std::is_unsigned<T>>::value,
+                          int> = 0>
+    T dispatch_conversion() const
+    {
+        if (mppp_unlikely(!number_p())) {
+            throw std::domain_error("Cannot convert a non-finite real to a C++ unsigned integral type");
+        }
+        T rop;
+        if (mppp_unlikely(!uint_conversion(rop))) {
             raise_overflow_error<T>();
         }
-        if (mppp_likely(candidate <= std::numeric_limits<T>::max())) {
-            return static_cast<T>(candidate);
-        }
-        raise_overflow_error<T>();
+        return rop;
     }
     // bool.
     template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
@@ -1890,12 +1900,9 @@ private:
         return !zero_p();
     }
     // Signed integrals.
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
-    T dispatch_conversion() const
+    template <typename T>
+    bool sint_conversion(T &rop) const
     {
-        if (mppp_unlikely(!number_p())) {
-            throw std::domain_error("Cannot convert a non-finite real to a C++ signed integral type");
-        }
         ::mpfr_clear_erangeflag();
         const long candidate = ::mpfr_get_si(&m_mpfr, MPFR_RNDZ);
         if (::mpfr_erangeflag_p()) {
@@ -1906,21 +1913,27 @@ private:
             // we will attempt the conversion again via integer.
             if (std::numeric_limits<T>::min() < std::numeric_limits<long>::min()
                 && std::numeric_limits<T>::max() > std::numeric_limits<long>::max()) {
-                try {
-                    return static_cast<T>(static_cast<integer<2>>(*this));
-                } catch (const std::overflow_error &) {
-                }
+                return mppp::get(rop, static_cast<integer<2>>(*this));
             }
-            // We end up here because either:
-            // - the range of the target type is not greater than long's,
-            // - the range of the target type is greater than long's but the conversion
-            //   via integer failed anyway.
+            return false;
+        }
+        if (candidate >= std::numeric_limits<T>::min() && candidate <= std::numeric_limits<T>::max()) {
+            rop = static_cast<T>(candidate);
+            return true;
+        }
+        return false;
+    }
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    T dispatch_conversion() const
+    {
+        if (mppp_unlikely(!number_p())) {
+            throw std::domain_error("Cannot convert a non-finite real to a C++ signed integral type");
+        }
+        T rop;
+        if (mppp_unlikely(!sint_conversion(rop))) {
             raise_overflow_error<T>();
         }
-        if (mppp_likely(candidate >= std::numeric_limits<T>::min() && candidate <= std::numeric_limits<T>::max())) {
-            return static_cast<T>(candidate);
-        }
-        raise_overflow_error<T>();
+        return rop;
     }
 #if defined(MPPP_WITH_QUADMATH)
     template <typename T, enable_if_t<std::is_same<real128, T>::value, int> = 0>
@@ -2023,6 +2036,89 @@ public:
     {
         return dispatch_conversion<T>();
     }
+
+private:
+    template <std::size_t SSize>
+    bool dispatch_get(integer<SSize> &rop) const
+    {
+        if (!number_p()) {
+            return false;
+        }
+        MPPP_MAYBE_TLS mpz_raii mpz;
+        // Truncate the value when converting to integer.
+        ::mpfr_get_z(&mpz.m_mpz, &m_mpfr, MPFR_RNDZ);
+        rop = &mpz.m_mpz;
+        return true;
+    }
+    template <std::size_t SSize>
+    bool dispatch_get(rational<SSize> &rop) const
+    {
+        if (!number_p()) {
+            return false;
+        }
+        return rational_conversion(rop);
+    }
+    bool dispatch_get(bool &b) const
+    {
+        b = !zero_p();
+        return true;
+    }
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    bool dispatch_get(T &n) const
+    {
+        if (!number_p()) {
+            return false;
+        }
+        return uint_conversion(n);
+    }
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    bool dispatch_get(T &n) const
+    {
+        if (!number_p()) {
+            return false;
+        }
+        return sint_conversion(n);
+    }
+    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    bool dispatch_get(T &x) const
+    {
+        x = static_cast<T>(*this);
+        return true;
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    bool dispatch_get(real128 &x) const
+    {
+        x = static_cast<real128>(*this);
+        return true;
+    }
+#endif
+
+public:
+    /// Generic conversion method.
+    /**
+     * \rststar
+     * This method, similarly to the conversion operator, will convert ``this`` to a
+     * :cpp:concept:`~mppp::RealInteroperable` type, storing the result of the conversion into ``rop``. Differently
+     * from the conversion operator, this method does not raise any exception: if the conversion is successful, the
+     * method will return ``true``, otherwise the method will return ``false``. If the conversion fails,
+     * ``rop`` will not be altered.
+     * \endrststar
+     *
+     * @param rop the variable which will store the result of the conversion.
+     *
+     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
+     * specified in the documentation of the conversion operator.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <RealInteroperable T>
+#else
+    template <typename T, real_interoperable_enabler<T> = 0>
+#endif
+    bool get(T &rop) const
+    {
+        return dispatch_get(rop);
+    }
+
     /// Convert to string.
     /**
      * \rststar
@@ -2194,6 +2290,38 @@ inline real &set_inf(real &r, int sign = 0)
 inline real &set_zero(real &r, int sign = 0)
 {
     return r.set_zero(sign);
+}
+
+    /** @} */
+
+    /** @defgroup real_conversion real_conversion
+     *  @{
+     */
+
+    /// Generic conversion function for \link mppp::real real \endlink.
+    /**
+     * \rststar
+     * This function will convert the input :cpp:class:`~mppp::real` ``x`` to a
+     * :cpp:concept:`~mppp::RealInteroperable` type, storing the result of the conversion into ``rop``.
+     * If the conversion is successful, the function
+     * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
+     * not be altered.
+     * \endrststar
+     *
+     * @param rop the variable which will store the result of the conversion.
+     * @param x the input \link mppp::real real\endlink.
+     *
+     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
+     * specified in the documentation of the conversion operator for \link mppp::real real\endlink.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline bool get(RealInteroperable &rop, const real &x)
+#else
+template <typename T, real_interoperable_enabler<T> = 0>
+inline bool get(T &rop, const real &x)
+#endif
+{
+    return x.get(rop);
 }
 
 /** @} */

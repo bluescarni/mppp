@@ -95,6 +95,14 @@ Assignment
 .. doxygengroup:: real_assignment
    :content-only:
 
+.. _real_conversion:
+
+Conversion
+~~~~~~~~~~
+
+.. doxygengroup:: real_conversion
+   :content-only:
+
 .. _real_arithmetic:
 
 Arithmetic

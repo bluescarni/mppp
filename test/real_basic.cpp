@@ -1183,15 +1183,26 @@ struct int_conv_tester {
     template <typename T>
     void operator()(const T &) const
     {
+        T rop(0);
         real r0{T(0)};
         REQUIRE(static_cast<T>(r0) == T(0));
+        REQUIRE(r0.get(rop));
+        REQUIRE(get(rop, r0));
+        REQUIRE(rop == T(0));
         r0 = real{T(42)};
         REQUIRE(static_cast<T>(r0) == T(42));
+        REQUIRE(r0.get(rop));
+        REQUIRE(get(rop, r0));
+        REQUIRE(rop == T(42));
         auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
         for (int i = 0; i < ntrials; ++i) {
             const auto tmp = int_dist(rng);
             REQUIRE(static_cast<T>(real{tmp}) == tmp);
+            REQUIRE(real{tmp}.get(rop));
+            REQUIRE(get(rop, real{tmp}));
+            REQUIRE(rop == tmp);
         }
+        rop = T(0);
         REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{std::numeric_limits<T>::max()} + 1}), std::overflow_error,
                                  [](const std::overflow_error &ex) {
                                      return ex.what()
@@ -1199,6 +1210,9 @@ struct int_conv_tester {
                                                    + real{int_t{std::numeric_limits<T>::max()} + 1}.to_string()
                                                    + " to the type " + typeid(T).name() + " results in overflow";
                                  });
+        REQUIRE((!real{int_t{std::numeric_limits<T>::max()} + 1}.get(rop)));
+        REQUIRE(!get(rop, real{int_t{std::numeric_limits<T>::max()} + 1}));
+        REQUIRE(rop == T(0));
         REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{std::numeric_limits<T>::min()} - 1}), std::overflow_error,
                                  [](const std::overflow_error &ex) {
                                      return ex.what()
@@ -1206,6 +1220,9 @@ struct int_conv_tester {
                                                    + real{int_t{std::numeric_limits<T>::min()} - 1}.to_string()
                                                    + " to the type " + typeid(T).name() + " results in overflow";
                                  });
+        REQUIRE((!real{int_t{std::numeric_limits<T>::min()} - 1}.get(rop)));
+        REQUIRE(!get(rop, real{int_t{std::numeric_limits<T>::min()} - 1}));
+        REQUIRE(rop == T(0));
         REQUIRE_THROWS_PREDICATE(
             static_cast<T>(real{"inf", 10, 100}), std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
@@ -1213,6 +1230,9 @@ struct int_conv_tester {
                                ? std::string{"Cannot convert a non-finite real to a C++ unsigned integral type"}
                                : std::string{"Cannot convert a non-finite real to a C++ signed integral type"});
             });
+        REQUIRE((!real{"inf", 10, 100}.get(rop)));
+        REQUIRE(!get(rop, real{"inf", 10, 100}));
+        REQUIRE(rop == T(0));
         REQUIRE_THROWS_PREDICATE(
             static_cast<T>(real{"-inf", 10, 100}), std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
@@ -1220,6 +1240,9 @@ struct int_conv_tester {
                                ? std::string{"Cannot convert a non-finite real to a C++ unsigned integral type"}
                                : std::string{"Cannot convert a non-finite real to a C++ signed integral type"});
             });
+        REQUIRE((!real{"-inf", 10, 100}.get(rop)));
+        REQUIRE(!get(rop, real{"-inf", 10, 100}));
+        REQUIRE(rop == T(0));
         REQUIRE_THROWS_PREDICATE(
             static_cast<T>(real{"nan", 10, 100}), std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
@@ -1227,6 +1250,9 @@ struct int_conv_tester {
                                ? std::string{"Cannot convert a non-finite real to a C++ unsigned integral type"}
                                : std::string{"Cannot convert a non-finite real to a C++ signed integral type"});
             });
+        REQUIRE((!real{"nan", 10, 100}.get(rop)));
+        REQUIRE(!get(rop, real{"nan", 10, 100}));
+        REQUIRE(rop == T(0));
     }
 };
 
@@ -1234,19 +1260,38 @@ struct fp_conv_tester {
     template <typename T>
     void operator()(const T &) const
     {
+        T rop(0);
         real r0{T(0)};
         REQUIRE(static_cast<T>(r0) == T(0));
+        REQUIRE(r0.get(rop));
+        REQUIRE(get(rop, r0));
+        REQUIRE(rop == T(0));
         r0 = 42;
         REQUIRE(static_cast<T>(r0) == T(42));
+        REQUIRE(r0.get(rop));
+        REQUIRE(get(rop, r0));
+        REQUIRE(rop == T(42));
         std::uniform_real_distribution<T> dist(-T(1000), T(1000));
         for (int i = 0; i < ntrials; ++i) {
             const auto tmp = dist(rng);
             REQUIRE(static_cast<T>(real{tmp}) == tmp);
+            REQUIRE(real{tmp}.get(rop));
+            REQUIRE(get(rop, real{tmp}));
+            REQUIRE(rop == tmp);
         }
         if (std::numeric_limits<T>::has_infinity && std::numeric_limits<T>::has_quiet_NaN) {
             REQUIRE(std::isinf(static_cast<T>(real{"inf", 10, 100})));
+            REQUIRE((real{"inf", 10, 100}.get(rop)));
+            REQUIRE(get(rop, real{"inf", 10, 100}));
+            REQUIRE(rop == std::numeric_limits<T>::infinity());
             REQUIRE(std::isinf(static_cast<T>(real{"-inf", 10, 100})));
+            REQUIRE((real{"-inf", 10, 100}.get(rop)));
+            REQUIRE(get(rop, real{"-inf", 10, 100}));
+            REQUIRE(rop == -std::numeric_limits<T>::infinity());
             REQUIRE(std::isnan(static_cast<T>(real{"nan", 10, 100})));
+            REQUIRE((real{"nan", 10, 100}.get(rop)));
+            REQUIRE(get(rop, real{"nan", 10, 100}));
+            REQUIRE(std::isnan(rop));
         }
     }
 };
@@ -1256,87 +1301,216 @@ TEST_CASE("real conversion")
     tuple_for_each(int_types{}, int_conv_tester{});
     tuple_for_each(fp_types{}, fp_conv_tester{});
     // Bool conversion.
+    bool brop;
     REQUIRE(static_cast<bool>(real{123}));
+    REQUIRE(real{123}.get(brop));
+    REQUIRE(get(brop, real{123}));
+    REQUIRE(brop);
     REQUIRE(static_cast<bool>(real{-123}));
+    REQUIRE(real{-123}.get(brop));
+    REQUIRE(get(brop, real{-123}));
+    REQUIRE(brop);
     REQUIRE(static_cast<bool>(real{"inf", 10, 100}));
+    REQUIRE((real{"inf", 10, 100}.get(brop)));
+    REQUIRE(get(brop, real{"inf", 10, 100}));
+    REQUIRE(brop);
     REQUIRE(static_cast<bool>(real{"-inf", 10, 100}));
+    REQUIRE((real{"-inf", 10, 100}.get(brop)));
+    REQUIRE(get(brop, real{"-inf", 10, 100}));
+    REQUIRE(brop);
     REQUIRE(static_cast<bool>(real{"nan", 10, 100}));
+    REQUIRE((real{"nan", 10, 100}.get(brop)));
+    REQUIRE(get(brop, real{"nan", 10, 100}));
+    REQUIRE(brop);
     REQUIRE(!static_cast<bool>(real{0}));
+    REQUIRE((real{0}.get(brop)));
+    REQUIRE(get(brop, real{0}));
+    REQUIRE(!brop);
     // Integer.
+    int_t nrop{1};
     REQUIRE(static_cast<int_t>(real{0}) == 0);
+    REQUIRE((real{0}.get(nrop)));
+    REQUIRE(get(nrop, real{0}));
+    REQUIRE(nrop == 0);
     REQUIRE(static_cast<int_t>(real{123}) == 123);
+    REQUIRE((real{123}.get(nrop)));
+    REQUIRE(get(nrop, real{123}));
+    REQUIRE(nrop == 123);
     REQUIRE(static_cast<int_t>(real{-123}) == -123);
+    REQUIRE((real{-123}.get(nrop)));
+    REQUIRE(get(nrop, real{-123}));
+    REQUIRE(nrop == -123);
     REQUIRE(static_cast<int_t>(real{"123.96", 10, 100}) == 123);
+    REQUIRE((real{"123.96", 10, 100}.get(nrop)));
+    REQUIRE(get(nrop, real{"123.96", 10, 100}));
+    REQUIRE(nrop == 123);
     REQUIRE(static_cast<int_t>(real{"-123.96", 10, 100}) == -123);
+    REQUIRE((real{"-123.96", 10, 100}.get(nrop)));
+    REQUIRE(get(nrop, real{"-123.96", 10, 100}));
+    REQUIRE(nrop == -123);
+    nrop = 0;
     REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real{"inf", 10, 100}), std::domain_error,
                              [](const std::domain_error &ex) {
-                                 return ex.what() == std::string{"Cannot convert a non-finite real to integer"};
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to an integer"};
                              });
+    REQUIRE((!real{"inf", 10, 100}.get(nrop)));
+    REQUIRE(!get(nrop, real{"inf", 10, 100}));
+    REQUIRE(nrop == 0);
     REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real{"-inf", 10, 100}), std::domain_error,
                              [](const std::domain_error &ex) {
-                                 return ex.what() == std::string{"Cannot convert a non-finite real to integer"};
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to an integer"};
                              });
+    REQUIRE((!real{"-inf", 10, 100}.get(nrop)));
+    REQUIRE(!get(nrop, real{"-inf", 10, 100}));
+    REQUIRE(nrop == 0);
     REQUIRE_THROWS_PREDICATE(static_cast<int_t>(real{"nan", 10, 100}), std::domain_error,
                              [](const std::domain_error &ex) {
-                                 return ex.what() == std::string{"Cannot convert a non-finite real to integer"};
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to an integer"};
                              });
+    REQUIRE((!real{"nan", 10, 100}.get(nrop)));
+    REQUIRE(!get(nrop, real{"nan", 10, 100}));
+    REQUIRE(nrop == 0);
     // Rational.
+    rat_t qrop{1};
     REQUIRE(static_cast<rat_t>(real{0}) == 0);
+    REQUIRE((real{0}.get(qrop)));
+    REQUIRE(get(qrop, real{0}));
+    REQUIRE(qrop == 0);
     REQUIRE(static_cast<rat_t>(real{123}) == 123);
+    REQUIRE((real{123}.get(qrop)));
+    REQUIRE(get(qrop, real{123}));
+    REQUIRE(qrop == 123);
     REQUIRE(static_cast<rat_t>(real{-123}) == -123);
+    REQUIRE((real{-123}.get(qrop)));
+    REQUIRE(get(qrop, real{-123}));
+    REQUIRE(qrop == -123);
     REQUIRE(static_cast<rat_t>(real{int_t{-123} << 110, 32}) == (int_t{-123} << 110));
+    REQUIRE((real{int_t{-123} << 110, 32}.get(qrop)));
+    REQUIRE(get(qrop, real{int_t{-123} << 110, 32}));
+    REQUIRE(qrop == (int_t{-123} << 110));
     REQUIRE((static_cast<rat_t>(real{"4.1875", 10, 100}) == rat_t{67, 16}));
+    REQUIRE((real{"4.1875", 10, 100}.get(qrop)));
+    REQUIRE(get(qrop, real{"4.1875", 10, 100}));
+    REQUIRE((qrop == rat_t{67, 16}));
     REQUIRE((static_cast<rat_t>(real{"-4.1875", 10, 100}) == -rat_t{67, 16}));
+    REQUIRE((real{"-4.1875", 10, 100}.get(qrop)));
+    REQUIRE(get(qrop, real{"-4.1875", 10, 100}));
+    REQUIRE(qrop == (-rat_t{67, 16}));
+    qrop = 0;
     REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real{"inf", 10, 100}), std::domain_error,
                              [](const std::domain_error &ex) {
-                                 return ex.what() == std::string{"Cannot convert a non-finite real to rational"};
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to a rational"};
                              });
+    REQUIRE((!real{"inf", 10, 100}.get(qrop)));
+    REQUIRE(!get(qrop, real{"inf", 10, 100}));
+    REQUIRE(qrop == 0);
     REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real{"-inf", 10, 100}), std::domain_error,
                              [](const std::domain_error &ex) {
-                                 return ex.what() == std::string{"Cannot convert a non-finite real to rational"};
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to a rational"};
                              });
+    REQUIRE((!real{"-inf", 10, 100}.get(qrop)));
+    REQUIRE(!get(qrop, real{"-inf", 10, 100}));
+    REQUIRE(qrop == 0);
     REQUIRE_THROWS_PREDICATE(static_cast<rat_t>(real{"nan", 10, 100}), std::domain_error,
                              [](const std::domain_error &ex) {
-                                 return ex.what() == std::string{"Cannot convert a non-finite real to rational"};
+                                 return ex.what() == std::string{"Cannot convert a non-finite real to a rational"};
                              });
+    REQUIRE((!real{"nan", 10, 100}.get(qrop)));
+    REQUIRE(!get(qrop, real{"nan", 10, 100}));
+    REQUIRE(qrop == 0);
 #if defined(MPPP_WITH_QUADMATH)
+    real128 rrop{1};
     // Zeroes and special values.
     REQUIRE(static_cast<real128>(real{}) == 0);
     REQUIRE(!static_cast<real128>(real{}).signbit());
+    REQUIRE((real{0}.get(rrop)));
+    REQUIRE(get(rrop, real{0}));
+    REQUIRE(rrop == 0);
+    REQUIRE(!rrop.signbit());
     REQUIRE(static_cast<real128>(real{"-0.", 10, 100}) == 0);
     REQUIRE(static_cast<real128>(real{"-0.", 10, 100}).signbit());
+    REQUIRE((real{"-0.", 10, 100}.get(rrop)));
+    REQUIRE(get(rrop, real{"-0.", 10, 100}));
+    REQUIRE(rrop == 0);
+    REQUIRE(rrop.signbit());
     REQUIRE(isnan(static_cast<real128>(real{"nan", 10, 100})));
+    REQUIRE((real{"nan", 10, 100}.get(rrop)));
+    REQUIRE(get(rrop, real{"nan", 10, 100}));
+    REQUIRE(rrop.isnan());
     REQUIRE(static_cast<real128>(real{"inf", 10, 100}) == real128_inf());
+    REQUIRE((real{"inf", 10, 100}.get(rrop)));
+    REQUIRE(get(rrop, real{"inf", 10, 100}));
+    REQUIRE(rrop.isinf());
     REQUIRE(static_cast<real128>(real{"-inf", 10, 100}) == -real128_inf());
+    REQUIRE((real{"-inf", 10, 100}.get(rrop)));
+    REQUIRE(get(rrop, real{"-inf", 10, 100}));
+    REQUIRE(rrop.isinf());
     // Big and small.
+    rrop = 1;
     real r0{1};
     ::mpfr_mul_2ui(r0._get_mpfr_t(), r0.get_mpfr_t(), 20000ul, MPFR_RNDN);
     REQUIRE(static_cast<real128>(r0) == real128_inf());
+    REQUIRE((r0.get(rrop)));
+    REQUIRE(get(rrop, r0));
+    REQUIRE(rrop == real128_inf());
     r0 = 1;
     ::mpfr_mul_2ui(r0._get_mpfr_t(), r0.get_mpfr_t(), 262145ul, MPFR_RNDN);
     REQUIRE(static_cast<real128>(r0) == real128_inf());
+    REQUIRE((r0.get(rrop)));
+    REQUIRE(get(rrop, r0));
+    REQUIRE(rrop == real128_inf());
     r0 = 1;
     ::mpfr_div_2ui(r0._get_mpfr_t(), r0.get_mpfr_t(), 20000ul, MPFR_RNDN);
     REQUIRE(static_cast<real128>(r0) == 0);
+    REQUIRE((r0.get(rrop)));
+    REQUIRE(get(rrop, r0));
+    REQUIRE(rrop == 0);
     r0 = 1;
     ::mpfr_div_2ui(r0._get_mpfr_t(), r0.get_mpfr_t(), 262145ul, MPFR_RNDN);
     REQUIRE(static_cast<real128>(r0) == 0);
+    REQUIRE((r0.get(rrop)));
+    REQUIRE(get(rrop, r0));
+    REQUIRE(rrop == 0);
     // Subnormals.
     REQUIRE(static_cast<real128>(real{real128{"3.40917866435610111081769936359662259e-4957"}})
             == real128{"3.40917866435610111081769936359662259e-4957"});
+    REQUIRE((real{real128{"3.40917866435610111081769936359662259e-4957"}}.get(rrop)));
+    REQUIRE(get(rrop, real{real128{"3.40917866435610111081769936359662259e-4957"}}));
+    REQUIRE(rrop == real128{"3.40917866435610111081769936359662259e-4957"});
     REQUIRE(static_cast<real128>(real{real128{"-3.40917866435610111081769936359662259e-4957"}})
             == -real128{"3.40917866435610111081769936359662259e-4957"});
+    REQUIRE((real{real128{"-3.40917866435610111081769936359662259e-4957"}}.get(rrop)));
+    REQUIRE(get(rrop, real{real128{"-3.40917866435610111081769936359662259e-4957"}}));
+    REQUIRE(rrop == -real128{"3.40917866435610111081769936359662259e-4957"});
     // A couple of normal values.
     REQUIRE(static_cast<real128>(real{real128{"3.40917866435610111081769936359662259e-4"}})
             == real128{"3.40917866435610111081769936359662259e-4"});
+    REQUIRE((real{real128{"3.40917866435610111081769936359662259e-4"}}.get(rrop)));
+    REQUIRE(get(rrop, real{real128{"3.40917866435610111081769936359662259e-4"}}));
+    REQUIRE(rrop == real128{"3.40917866435610111081769936359662259e-4"});
     REQUIRE(static_cast<real128>(real{-real128{"3.40917866435610111081769936359662259e-4"}})
             == real128{"-3.40917866435610111081769936359662259e-4"});
+    REQUIRE((real{real128{"-3.40917866435610111081769936359662259e-4"}}.get(rrop)));
+    REQUIRE(get(rrop, real{real128{"-3.40917866435610111081769936359662259e-4"}}));
+    REQUIRE(rrop == -real128{"3.40917866435610111081769936359662259e-4"});
     // A real with less precision than real128.
     REQUIRE(static_cast<real128>(real{123, 32}) == real128{123});
+    REQUIRE((real{123, 32}.get(rrop)));
+    REQUIRE(get(rrop, real{123, 32}));
+    REQUIRE(rrop == 123);
     REQUIRE(static_cast<real128>(real{-123, 32}) == -real128{123});
+    REQUIRE((real{-123, 32}.get(rrop)));
+    REQUIRE(get(rrop, real{-123, 32}));
+    REQUIRE(rrop == -123);
     // Larger precision.
     REQUIRE(abs(static_cast<real128>(real{"1.1", 10, 300}) - real128{"1.1"}) < 1E-33);
+    REQUIRE((real{"1.1", 10, 300}.get(rrop)));
+    REQUIRE(get(rrop, real{"1.1", 10, 300}));
+    REQUIRE(abs(rrop - real128{"1.1"}) < 1E-33);
     REQUIRE(abs(static_cast<real128>(real{"-1.1", 10, 300}) - real128{"-1.1"}) < 1E-33);
+    REQUIRE((real{"-1.1", 10, 300}.get(rrop)));
+    REQUIRE(get(rrop, real{"-1.1", 10, 300}));
+    REQUIRE(abs(rrop - real128{"-1.1"}) < 1E-33);
 #endif
 }
 
