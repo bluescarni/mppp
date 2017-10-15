@@ -1301,7 +1301,7 @@ TEST_CASE("real conversion")
     tuple_for_each(int_types{}, int_conv_tester{});
     tuple_for_each(fp_types{}, fp_conv_tester{});
     // Bool conversion.
-    bool brop;
+    bool brop = false;
     REQUIRE(static_cast<bool>(real{123}));
     REQUIRE(real{123}.get(brop));
     REQUIRE(get(brop, real{123}));
