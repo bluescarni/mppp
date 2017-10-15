@@ -129,7 +129,7 @@ struct int_ctor_tester {
         real_reset_default_prec();
         REQUIRE(real{T(0)}.zero_p());
         REQUIRE(!real{T(0)}.signbit());
-        REQUIRE(real{T(0)}.get_prec() == std::numeric_limits<T>::digits);
+        REQUIRE(real{T(0)}.get_prec() == std::numeric_limits<T>::digits + std::is_signed<T>::value);
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
         real_set_default_prec(101);
@@ -596,11 +596,11 @@ struct int_ass_tester {
         real r{12};
         r.set_prec(123);
         r = T(0);
-        REQUIRE(r.get_prec() == std::numeric_limits<T>::digits);
+        REQUIRE(r.get_prec() == std::numeric_limits<T>::digits + std::is_signed<T>::value);
         REQUIRE(r.zero_p());
         r.set_prec(123);
         r = T(42);
-        REQUIRE(r.get_prec() == std::numeric_limits<T>::digits);
+        REQUIRE(r.get_prec() == std::numeric_limits<T>::digits + std::is_signed<T>::value);
         REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{"42", 10, 100}.get_mpfr_t()));
         real_set_default_prec(200);
         r.set_prec(123);

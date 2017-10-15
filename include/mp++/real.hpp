@@ -182,8 +182,9 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
-    static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-    return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits);
+    static_assert(std::numeric_limits<T>::digits < std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
+    // NOTE: for signed integers, include the sign bit as well.
+    return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits) + std::is_signed<T>::value;
 }
 
 // Utility function to determine the number of base-2 digits of the significand
