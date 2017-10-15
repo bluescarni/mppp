@@ -32,7 +32,7 @@ namespace mppp
  *  @{
  */
 
-/// Minimum precision for a \link mppp::real real \endlink.
+/// Minimum precision for a \link mppp::real real\endlink.
 /**
  * \rststar
  * This compile-time constant represents the minimum valid precision
@@ -40,14 +40,14 @@ namespace mppp
  * not less than the ``MPFR_PREC_MIN`` MPFR constant.
  * \endrststar
  *
- * @return the minimum valid precision for a \link mppp::real real \endlink.
+ * @return the minimum valid precision for a \link mppp::real real\endlink.
  */
 constexpr ::mpfr_prec_t real_prec_min()
 {
     return MPFR_PREC_MIN;
 }
 
-/// Maximum precision for a \link mppp::real real \endlink.
+/// Maximum precision for a \link mppp::real real\endlink.
 /**
  * \rststar
  * This compile-time constant represents the maximum valid precision
@@ -55,7 +55,7 @@ constexpr ::mpfr_prec_t real_prec_min()
  * not greater than the ``MPFR_PREC_MAX`` MPFR constant.
  * \endrststar
  *
- * @return the maximum valid precision for a \link mppp::real real \endlink.
+ * @return the maximum valid precision for a \link mppp::real real\endlink.
  */
 constexpr ::mpfr_prec_t real_prec_max()
 {

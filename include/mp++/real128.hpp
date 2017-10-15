@@ -1024,7 +1024,7 @@ public:
  *  @{
  */
 
-/// Conversion function to mp++ types for \link mppp::real128 real128 \endlink.
+/// Conversion function to mp++ types for \link mppp::real128 real128\endlink.
 /**
  * \rststar
  * This function will convert the input :cpp:class:`~mppp::real128` ``x`` to a
@@ -1035,7 +1035,7 @@ public:
  * \endrststar
  *
  * @param rop the variable which will store the result of the conversion.
- * @param x the input \link mppp::real128 real128 \endlink.
+ * @param x the input \link mppp::real128 real128\endlink.
  *
  * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``x``
  * does not represent a finite value.
@@ -1091,7 +1091,7 @@ constexpr real128 abs(const real128 &x)
 
 /// Multiply by power of 2 (\p int overload).
 /**
- * @param x the input \link mppp::real128 real128 \endlink.
+ * @param x the input \link mppp::real128 real128\endlink.
  * @param n the power of 2 by which \p x will be multiplied.
  *
  * @return \p x multiplied by \f$ 2^n \f$.
@@ -1103,7 +1103,7 @@ inline real128 scalbn(const real128 &x, int n)
 
 /// Multiply by power of 2 (\p long overload).
 /**
- * @param x the input \link mppp::real128 real128 \endlink.
+ * @param x the input \link mppp::real128 real128\endlink.
  * @param n the power of 2 by which \p x will be multiplied.
  *
  * @return \p x multiplied by \f$ 2^n \f$.
@@ -1133,7 +1133,7 @@ inline real128 scalbln(const real128 &x, long n)
  * \endrststar
  *
  * @param os the target stream.
- * @param x the input \link mppp::real128 real128 \endlink.
+ * @param x the input \link mppp::real128 real128\endlink.
  *
  * @return a reference to \p os.
  *
@@ -1172,7 +1172,7 @@ inline std::istream &operator>>(std::istream &is, real128 &x)
  *  @{
  */
 
-/// Sign bit of a \link mppp::real128 real128 \endlink.
+/// Sign bit of a \link mppp::real128 real128\endlink.
 /**
  * @param x the \link mppp::real128 real128 \endlink whose sign bit will be returned.
  *
@@ -1183,7 +1183,7 @@ inline bool signbit(const real128 &x)
     return x.signbit();
 }
 
-/// Categorise a \link mppp::real128 real128 \endlink.
+/// Categorise a \link mppp::real128 real128\endlink.
 /**
  * @param x the \link mppp::real128 real128 \endlink whose floating-point category will be returned.
  *
@@ -2775,7 +2775,7 @@ constexpr real128 two_48()
  *  @{
  */
 
-/// The number of binary digits in the significand of a \link mppp::real128 real128 \endlink.
+/// The number of binary digits in the significand of a \link mppp::real128 real128\endlink.
 /**
  * @return the integral constant 113.
  */

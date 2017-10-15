@@ -373,7 +373,7 @@ inline mpfr_prec_t real_get_default_prec()
  * @param p the desired value for the default precision for \link mppp::real real \endlink objects.
  *
  * @throws std::invalid_argument if \p p is nonzero and not in the range established by
- * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
+ * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
  */
 inline void real_set_default_prec(::mpfr_prec_t p)
 {
@@ -536,7 +536,7 @@ public:
      * @param p the \link mppp::real_prec real_prec \endlink that wraps the desired precision value.
      *
      * @throws std::invalid_argument if the precision value is outside the range established by
-     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
+     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
     explicit real(real_prec p)
     {
@@ -570,7 +570,7 @@ public:
      * @param p the desired precision.
      *
      * @throws std::invalid_argument if \p p is outside the range established by
-     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
+     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
     explicit real(const real &other, ::mpfr_prec_t p)
     {
@@ -785,7 +785,7 @@ public:
      *
      * @throws std::overflow_error if an overflow occurs in the computation of the automatically-deduced precision.
      * @throws std::invalid_argument if \p p is nonzero and outside the range established by
-     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
+     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
     explicit real(const RealInteroperable &x,
@@ -1744,7 +1744,7 @@ public:
      * @return a reference to \p this.
      *
      * @throws std::invalid_argument if the value of \p p is not in the range established by
-     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
+     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
     real &set_prec(::mpfr_prec_t p)
     {
@@ -1764,7 +1764,7 @@ public:
      * @return a reference to \p this.
      *
      * @throws std::invalid_argument if the value of \p p is not in the range established by
-     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max() \endlink.
+     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
     real &prec_round(::mpfr_prec_t p)
     {
@@ -2145,7 +2145,7 @@ private:
     mpfr_struct_t m_mpfr;
 };
 
-/// Destructively set the precision of a \link mppp::real real \endlink.
+/// Destructively set the precision of a \link mppp::real real\endlink.
 /**
  * \ingroup real_prec
  * \rststar
@@ -2182,7 +2182,7 @@ inline void prec_round(real &r, ::mpfr_prec_t p)
     r.prec_round(p);
 }
 
-/// Get the precision of a \link mppp::real real \endlink.
+/// Get the precision of a \link mppp::real real\endlink.
 /**
  * \ingroup real_prec
  *
@@ -2217,7 +2217,7 @@ using real_set_args_enabler = enable_if_t<is_detected<real_set_t, Args...>::valu
 
 #endif
 
-/// Generic setter for \link mppp::real real \endlink.
+/// Generic setter for \link mppp::real real\endlink.
 /**
  * \rststar
  * This function will use the arguments ``args`` to set the value of the :cpp:class:`~mppp::real` ``r``,
@@ -2298,7 +2298,7 @@ inline real &set_zero(real &r, int sign = 0)
      *  @{
      */
 
-    /// Generic conversion function for \link mppp::real real \endlink.
+    /// Generic conversion function for \link mppp::real real\endlink.
     /**
      * \rststar
      * This function will convert the input :cpp:class:`~mppp::real` ``x`` to a
@@ -2701,7 +2701,7 @@ inline bool regular_p(const real &r)
     return r.regular_p();
 }
 
-/// Detect the sign of a \link mppp::real real \endlink.
+/// Detect the sign of a \link mppp::real real\endlink.
 /**
  * @param r the \link mppp::real real \endlink that will be examined.
  *
@@ -2715,7 +2715,7 @@ inline int sgn(const real &r)
     return r.sgn();
 }
 
-/// Get the sign bit of a \link mppp::real real \endlink.
+/// Get the sign bit of a \link mppp::real real\endlink.
 /**
  * @param r the \link mppp::real real \endlink that will be examined.
  *
@@ -2971,7 +2971,7 @@ using real_compound_op_types_enabler
  *  @{
  */
 
-/// Identity operator for \link mppp::real real \endlink.
+/// Identity operator for \link mppp::real real\endlink.
 /**
  * \rststar
  * This operator will return a copy of the input
@@ -3143,7 +3143,7 @@ inline real dispatch_binary_add(const real128 &x, T &&a)
 #endif
 }
 
-/// Binary addition involving \link mppp::real real \endlink.
+/// Binary addition involving \link mppp::real real\endlink.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
 inline real operator+(T &&a, RealOpTypes<T> &&b)
@@ -3186,7 +3186,7 @@ inline void dispatch_in_place_add(integer<SSize> &n, T &&r)
 }
 }
 
-/// In-place addition involving \link mppp::real real \endlink.
+/// In-place addition involving \link mppp::real real\endlink.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
 inline T &operator+=(T &a, RealCompoundOpTypes<T> &&b)

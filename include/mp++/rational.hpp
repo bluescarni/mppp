@@ -1323,7 +1323,7 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
  *  @{
  */
 
-/// Generic conversion function for \link mppp::rational rational \endlink.
+/// Generic conversion function for \link mppp::rational rational\endlink.
 /**
  * \rststar
  * This function will convert the input :cpp:class:`~mppp::rational` ``q`` to a
@@ -1334,7 +1334,7 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
  * \endrststar
  *
  * @param rop the variable which will store the result of the conversion.
- * @param q the input \link mppp::rational rational \endlink.
+ * @param q the input \link mppp::rational rational\endlink.
  *
  * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
  * a C++ integral which cannot represent the truncated value of ``q``.

@@ -2262,7 +2262,7 @@ inline integer<SSize> &set_negative_one(integer<SSize> &n)
  *  @{
  */
 
-/// Generic conversion function for \link mppp::integer integer \endlink.
+/// Generic conversion function for \link mppp::integer integer\endlink.
 /**
  * \rststar
  * This function will convert the input :cpp:class:`~mppp::integer` ``n`` to a
@@ -2273,7 +2273,7 @@ inline integer<SSize> &set_negative_one(integer<SSize> &n)
  * \endrststar
  *
  * @param rop the variable which will store the result of the conversion.
- * @param n the input \link mppp::integer integer \endlink.
+ * @param n the input \link mppp::integer integer\endlink.
  *
  * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
  * a C++ integral which cannot represent the value of ``n``.
