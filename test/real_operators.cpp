@@ -61,4 +61,9 @@ TEST_CASE("real plus")
     unsigned un = 5;
     un += real{23};
     std::cout << un << '\n';
+    r0 += -1;
+    std::cout << r0 << '\n';
+    int sn = -5;
+    sn += real{-23};
+    std::cout << sn << '\n';
 }

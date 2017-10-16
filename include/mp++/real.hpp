@@ -3051,10 +3051,9 @@ inline unsigned real_op_bool_cast(const bool &n)
 
 #endif
 
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_supported_integral<U>, std::is_unsigned<U>>::value,
-                int> = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_integral<U>, std::is_unsigned<U>>::value,
+                      int> = 0>
 inline real dispatch_binary_add(T &&a, const U &n)
 {
     if (real_op_bool_cast(n) <= std::numeric_limits<unsigned long>::max()) {
@@ -3064,21 +3063,31 @@ inline real dispatch_binary_add(T &&a, const U &n)
                                    },
                                    std::forward<T>(a));
     }
-    return dispatch_binary_add(std::forward<T>(a), integer<2>(n));
+    // NOTE: the idea here is that we will be converting n to an integer and to an
+    // integer addition instead. We still want to maintain the original precision
+    // of n however, so we cannot just re-use the dispatch for addition with integer
+    // (otherwise we would be deducing the precision of n as an integer instead of
+    // type U).
+    // NOTE: we could use a TLS integer here, however pragmatically an integer of size 2
+    // should always guarantee static storage on contemporary architectures.
+    return mpfr_nary_op_return(real_dd_prec(n),
+                               [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                                   ::mpfr_add_z(rop, op, integer<2>{n}.get_mpz_view(), rnd);
+                               },
+                               std::forward<T>(a));
 }
 
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, is_supported_integral<T>, std::is_unsigned<T>>::value,
-                int> = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, std::is_integral<T>, std::is_unsigned<T>>::value,
+                      int> = 0>
 inline real dispatch_binary_add(const T &n, U &&a)
 {
     return dispatch_binary_add(std::forward<U>(a), n);
 }
 
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_supported_integral<U>, std::is_signed<U>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_integral<U>, std::is_signed<U>>::value, int> = 0>
 inline real dispatch_binary_add(T &&a, const U &n)
 {
     if (n >= std::numeric_limits<long>::min() && n <= std::numeric_limits<long>::max()) {
@@ -3088,12 +3097,16 @@ inline real dispatch_binary_add(T &&a, const U &n)
                                    },
                                    std::forward<T>(a));
     }
-    return dispatch_binary_add(std::forward<T>(a), integer<2>(n));
+    return mpfr_nary_op_return(real_dd_prec(n),
+                               [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                                   ::mpfr_add_z(rop, op, integer<2>{n}.get_mpz_view(), rnd);
+                               },
+                               std::forward<T>(a));
 }
 
-template <typename T, typename U,
-          enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, is_supported_integral<T>, std::is_signed<T>>::value,
-                      int> = 0>
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_same<real, uncvref_t<U>>, std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
 inline real dispatch_binary_add(const T &n, U &&a)
 {
     return dispatch_binary_add(std::forward<U>(a), n);
@@ -3113,6 +3126,8 @@ inline real dispatch_binary_add(T &&a, const U &x)
     assert((std::is_same<U, long double>::value));
     // There's no long double add primitive in MPFR. Let's just construct
     // a temporary real instead.
+    // NOTE: the assignment will set correctly the precision of tmp to the number of binary
+    // digits in long double, or the default precision.
     MPPP_MAYBE_TLS real tmp;
     tmp = x;
     return dispatch_binary_add(std::forward<T>(a), tmp);
@@ -3178,6 +3193,9 @@ inline void dispatch_in_place_add(real &a, const integer<SSize> &n)
 template <std::size_t SSize, typename T, enable_if_t<std::is_same<real, uncvref_t<T>>::value, int> = 0>
 inline void dispatch_in_place_add(integer<SSize> &n, T &&r)
 {
+    // NOTE: the plan here is that we will compute the result using real arithmetics, and we will
+    // then convert the result into an integer. This is equivalent to doing:
+    // n = n + r
     MPPP_MAYBE_TLS real tmp;
     mpfr_nary_op(
         real_dd_prec(n),
@@ -3215,7 +3233,13 @@ inline void dispatch_in_place_add(real &a, T n)
                      },
                      a, a);
     } else {
-        dispatch_in_place_add(a, integer<2>{n});
+        // NOTE: as in the binary operator, make sure we deduce the precision of
+        // the result using n before the conversion to integer.
+        mpfr_nary_op(real_dd_prec(n),
+                     [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                         ::mpfr_add_z(rop, op, integer<2>{n}.get_mpz_view(), rnd);
+                     },
+                     a, a);
     }
 }
 
@@ -3224,20 +3248,61 @@ template <typename T, typename U,
                       int> = 0>
 inline void dispatch_in_place_add(T &n, U &&r)
 {
+    MPPP_MAYBE_TLS real tmp;
     if (real_op_bool_cast(n) <= std::numeric_limits<unsigned long>::max()) {
-        MPPP_MAYBE_TLS real tmp;
         mpfr_nary_op(real_dd_prec(n),
                      [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
                          ::mpfr_add_ui(rop, op, static_cast<unsigned long>(n), rnd);
                      },
                      tmp, std::forward<U>(r));
-        get(n, tmp);
     } else {
-        MPPP_MAYBE_TLS integer<2> tmp;
-        tmp = n;
-        dispatch_in_place_add(tmp, std::forward<U>(r));
-        get(n, tmp);
+        mpfr_nary_op(real_dd_prec(n),
+                     [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                         ::mpfr_add_z(rop, op, integer<2>{n}.get_mpz_view(), rnd);
+                     },
+                     tmp, std::forward<U>(r));
     }
+    get(n, tmp);
+}
+
+template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+inline void dispatch_in_place_add(real &a, T n)
+{
+    if (n >= std::numeric_limits<long>::min() && n <= std::numeric_limits<long>::max()) {
+        mpfr_nary_op(real_dd_prec(n),
+                     [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                         ::mpfr_add_si(rop, op, static_cast<long>(n), rnd);
+                     },
+                     a, a);
+    } else {
+        mpfr_nary_op(real_dd_prec(n),
+                     [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                         ::mpfr_add_z(rop, op, integer<2>{n}.get_mpz_view(), rnd);
+                     },
+                     a, a);
+    }
+}
+
+template <
+    typename T, typename U,
+    enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline void dispatch_in_place_add(T &n, U &&r)
+{
+    MPPP_MAYBE_TLS real tmp;
+    if (n >= std::numeric_limits<long>::min() && n <= std::numeric_limits<long>::max()) {
+        mpfr_nary_op(real_dd_prec(n),
+                     [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                         ::mpfr_add_si(rop, op, static_cast<long>(n), rnd);
+                     },
+                     tmp, std::forward<U>(r));
+    } else {
+        mpfr_nary_op(real_dd_prec(n),
+                     [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) {
+                         ::mpfr_add_z(rop, op, integer<2>{n}.get_mpz_view(), rnd);
+                     },
+                     tmp, std::forward<U>(r));
+    }
+    get(n, tmp);
 }
 }
 
