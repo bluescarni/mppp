@@ -394,7 +394,7 @@ private:
     {
         dispatch_c_string_ctor(s, base);
     }
-    explicit rational(const ptag &p, const std::string &s, int base) : rational(p, s.c_str(), base) {}
+    explicit rational(const ptag &, const std::string &s, int base) : rational(s.c_str(), base) {}
 #if MPPP_CPLUSPLUS >= 201703L
     explicit rational(const ptag &, const std::string_view &s, int base) : rational(s.data(), s.data() + s.size(), base)
     {
