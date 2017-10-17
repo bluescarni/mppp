@@ -316,10 +316,10 @@ so will result in undefined behaviour.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N4mppp8rational8rationalEPKci">
-<span id="mppp::rational::rational__cCP.i"></span><span class="target" id="classmppp_1_1rational_1a8a6aaadffc797aa05310882103f6b584"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEPKci" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor from C string. </p>
-<p>This constructor will initialize <code class="docutils literal"><span class="pre">this</span></code> from the null-terminated string <code class="docutils literal"><span class="pre">s</span></code>, which must represent
+<dt id="_CPPv2N4mppp8rational8rationalERK10StringTypei">
+<span id="mppp::rational::rational__StringTypeCR.i"></span><span class="target" id="classmppp_1_1rational_1ad5a95ae60b68d8ef18566766a72b8ccc"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType">StringType</a> &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERK10StringTypei" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor from string. </p>
+<p>This constructor will initialize <code class="docutils literal"><span class="pre">this</span></code> from the <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal"><span class="pre">StringType</span></code></a> <code class="docutils literal"><span class="pre">s</span></code>, which must represent
 a rational value in base <code class="docutils literal"><span class="pre">base</span></code>. The expected format is either a numerator-denominator pair separated
 by the division operator <code class="docutils literal"><span class="pre">/</span></code>, or just a numerator (in which case the denominator will be set to one).
 The format for numerator and denominator is described in the documentation of the constructor from string
@@ -334,27 +334,7 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the denominator is zero. </li>
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the string constructor of <a class="reference internal" href="integer.html#classmppp_1_1integer"><span class="std std-ref">mppp::integer</span></a>. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp8rational8rationalERKNSt6stringEi">
-<span id="mppp::rational::rational__ssCR.i"></span><span class="target" id="classmppp_1_1rational_1ad1c7406ebd962a0c5133bc29a9187928"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERKNSt6stringEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor from C++ string (equivalent to the constructor from C string). </p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the input string. </li>
-<li><code class="docutils literal"><span class="pre">base</span></code>: the base used in the string representation.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from C string. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the string constructor of <a class="reference internal" href="integer.html#classmppp_1_1integer"><span class="std std-ref">mppp::integer</span></a>, or by memory errors in standard containers. </li>
 </ul>
 </dd>
 </dl>
@@ -366,7 +346,7 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 <span id="mppp::rational::rational__cCP.cCP.i"></span><span class="target" id="classmppp_1_1rational_1af8f2af54f3e3b5a5f882f3c7289311dd"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>begin</em>, <em class="property">const</em> char *<em>end</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalEPKcPKci" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from range of characters. </p>
 <p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> from the content of the input half-open range, which is interpreted as the string representation of a rational in base <code class="docutils literal"><span class="pre">base</span></code>.</p>
-<p>Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and invoke the constructor from C string.</p>
+<p>Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and invoke the constructor from string.</p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -377,34 +357,7 @@ of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from C string. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp8rational8rationalERKNSt11string_viewEi">
-<span id="mppp::rational::rational__std::string_viewCR.i"></span><span class="target" id="classmppp_1_1rational_1a2b3bbd472378ae2c56757bd0824db819"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rational8rationalERKNSt11string_viewEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor from string view. </p>
-<p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> from the content of the input string view, which is interpreted as the string representation of a rational in base <code class="docutils literal"><span class="pre">base</span></code>.</p>
-<p>Internally, the constructor will invoke the constructor from a range of characters.</p>
-<p><div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This constructor is available only if at least C++17 is being used.</p>
-</div>
-</p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the <code class="docutils literal"><span class="pre">std::string_view</span></code> that will be used for construction. </li>
-<li><code class="docutils literal"><span class="pre">base</span></code>: the base used in the string representation.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from C string. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string, or by memory errors in standard containers. </li>
 </ul>
 </dd>
 </dl>
@@ -514,6 +467,80 @@ will take care of releasing them when the destructor is called.</p>
 </dd></dl>
 
 <dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mppp8rationalaSERR1T">
+<span id="mppp::rational::assign-operator__TRR"></span><span class="target" id="classmppp_1_1rational_1af9d3c3dc9b609cacb825598814c0621b"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span>T &amp;&amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assignment from integrals. </p>
+<p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> satisfies the <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="mppp::RationalIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalIntegralInteroperable</span></code></a> concept.
+<code class="docutils literal"><span class="pre">n</span></code> will be assigned to the numerator, and <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer7set_oneEv" title="mppp::integer::set_one"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::set_one()</span></code></a> will be called on the denominator.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the integral value that will be assigned to <code class="docutils literal"><span class="pre">this</span></code>.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp8rationalaSERK23RationalFPInteroperableI5SSizeE">
+<span id="mppp::rational::assign-operator__RationalFPInteroperable:SSize:CR"></span><span class="target" id="classmppp_1_1rational_1ae423cc45f58ef5d4d11d9fe664eb3f64"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp23RationalFPInteroperableE" title="mppp::RationalFPInteroperable">RationalFPInteroperable</a>&lt;SSize&gt; &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERK23RationalFPInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assignment from floating-point values. </p>
+<p><p>The body of this operator is equivalent to:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">rational</span><span class="p">{</span><span class="n">x</span><span class="p">};</span>
+</pre></div>
+</div>
+<p>That is, a temporary rational is constructed from <code class="docutils literal"><span class="pre">x</span></code> and it is then move-assigned to <code class="docutils literal"><span class="pre">this</span></code>.</p>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">x</span></code>: the floating-point assignment argument.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from floating-point. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp8rationalaSERK10StringType">
+<span id="mppp::rational::assign-operator__StringTypeCR"></span><span class="target" id="classmppp_1_1rational_1aa7deca44cdd3a56e9df805be5f9bcebc"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType">StringType</a> &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERK10StringType" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assignment from string. </p>
+<p><p>The body of this operator is equivalent to:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">rational</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
+</pre></div>
+</div>
+<p>That is, a temporary rational is constructed from <code class="docutils literal"><span class="pre">s</span></code> and it is then move-assigned to <code class="docutils literal"><span class="pre">this</span></code>.</p>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">s</span></code>: the string that will be used for the assignment.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv2N4mppp8rationalaSEK5mpz_t">
 <span id="mppp::rational::assign-operator__mpz_tC"></span><span class="target" id="classmppp_1_1rational_1ab6bd9113f5891c91548aba16ca5f9ae1"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assignment from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
@@ -596,132 +623,6 @@ will take care of releasing them when the destructor is called.</p>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">q</span></code>: the input GMP rational.</li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mppp8rationalaSERR1T">
-<span id="mppp::rational::assign-operator__TRR"></span><span class="target" id="classmppp_1_1rational_1af9d3c3dc9b609cacb825598814c0621b"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span>T &amp;&amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from integrals. </p>
-<p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> satisfies the <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="mppp::RationalIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalIntegralInteroperable</span></code></a> concept.
-<code class="docutils literal"><span class="pre">n</span></code> will be assigned to the numerator, and <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer7set_oneEv" title="mppp::integer::set_one"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::set_one()</span></code></a> will be called on the denominator.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">n</span></code>: the integral value that will be assigned to <code class="docutils literal"><span class="pre">this</span></code>.</li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp8rationalaSERK23RationalFPInteroperableI5SSizeE">
-<span id="mppp::rational::assign-operator__RationalFPInteroperable:SSize:CR"></span><span class="target" id="classmppp_1_1rational_1ae423cc45f58ef5d4d11d9fe664eb3f64"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp23RationalFPInteroperableE" title="mppp::RationalFPInteroperable">RationalFPInteroperable</a>&lt;SSize&gt; &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERK23RationalFPInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from floating-point values. </p>
-<p><p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">rational</span><span class="p">{</span><span class="n">x</span><span class="p">};</span>
-</pre></div>
-</div>
-<p>That is, a temporary rational is constructed from <code class="docutils literal"><span class="pre">x</span></code> and it is then move-assigned to <code class="docutils literal"><span class="pre">this</span></code>.</p>
-</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the floating-point assignment argument.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from floating-point. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp8rationalaSEPKc">
-<span id="mppp::rational::assign-operator__cCP"></span><span class="target" id="classmppp_1_1rational_1a517bec1d090f98a83ec315ecdc4ea69b"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from C string. </p>
-<p><p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">rational</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
-</pre></div>
-</div>
-<p>That is, a temporary rational is constructed from <code class="docutils literal"><span class="pre">s</span></code> and it is then move-assigned to <code class="docutils literal"><span class="pre">this</span></code>.</p>
-</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the C string that will be used for the assignment.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp8rationalaSERKNSt6stringE">
-<span id="mppp::rational::assign-operator__ssCR"></span><span class="target" id="classmppp_1_1rational_1a1994249d6db3e17139f2b8e7bffc4da3"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from C++ string (equivalent to the assignment from C string). </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the C++ string that will be used for the assignment.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment operator from C string. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp8rationalaSERKNSt11string_viewE">
-<span id="mppp::rational::assign-operator__std::string_viewCR"></span><span class="target" id="classmppp_1_1rational_1ae11810679b956149bf0faae7ec16f4aa"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8rationalaSERKNSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from string view. </p>
-<p><p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">rational</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
-</pre></div>
-</div>
-<p>That is, a temporary rational is constructed from <code class="docutils literal"><span class="pre">s</span></code> and it is then move-assigned to <code class="docutils literal"><span class="pre">this</span></code>.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This operator is available only if at least C++17 is being used.</p>
-</div>
-</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the <code class="docutils literal"><span class="pre">std::string_view</span></code> that will be used for the assignment.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string view. </li>
 </ul>
 </dd>
 </dl>

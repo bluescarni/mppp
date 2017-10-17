@@ -293,10 +293,10 @@ builtins.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N4mppp7real1287real128EPKc">
-<span id="mppp::real128::real128__cCP"></span><span class="target" id="classmppp_1_1real128_1a7b3f50922d424735e37875ed08ecef44"></span><code class="descname">real128</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real1287real128EPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor from C string. </p>
-<p><p>This constructor will initialise p this from the null-terminated string <code class="docutils literal"><span class="pre">s</span></code>.
+<dt id="_CPPv2N4mppp7real1287real128ERK10StringType">
+<span id="mppp::real128::real128__StringTypeCR"></span><span class="target" id="classmppp_1_1real128_1a4124a5280e7d46ff365ed049ed44bb52"></span><code class="descname">real128</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType">StringType</a> &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real1287real128ERK10StringType" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor from string. </p>
+<p><p>This constructor will initialise p this from the <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal"><span class="pre">StringType</span></code></a> <code class="docutils literal"><span class="pre">s</span></code>.
 The accepted string formats are detailed in the quadmath library’s documentation
 (see the link below). Leading whitespaces are accepted (and ignored), but trailing whitespaces
 will raise an error.</p>
@@ -308,31 +308,13 @@ will raise an error.</p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the null-terminated string that will be used to initialise <code class="docutils literal"><span class="pre">this</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">s</span></code>: the string that will be used to initialise <code class="docutils literal"><span class="pre">this</span></code>.</li>
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">std::invalid_argument</span></code>: if <code class="docutils literal"><span class="pre">s</span></code> does not represent a valid quadruple-precision floating-point value. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp7real1287real128ERKNSt6stringE">
-<span id="mppp::real128::real128__ssCR"></span><span class="target" id="classmppp_1_1real128_1a5a295dc4c13a90c334b233d6edcf847b"></span><code class="descname">real128</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real1287real128ERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor from C++ string (equivalent to the constructor from C string). </p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the input string.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from C string. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by memory errors in standard containers. </li>
 </ul>
 </dd>
 </dl>
@@ -344,7 +326,7 @@ will raise an error.</p>
 <span id="mppp::real128::real128__cCP.cCP"></span><span class="target" id="classmppp_1_1real128_1adb516c900fc50b057853a819199b4b5c"></span><code class="descname">real128</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>begin</em>, <em class="property">const</em> char *<em>end</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real1287real128EPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from range of characters. </p>
 <p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> from the content of the input half-open range, which is interpreted as the string representation of a floating-point value.</p>
-<p>Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and invoke the constructor from C string.</p>
+<p>Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and invoke the constructor from string.</p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -354,33 +336,7 @@ will raise an error.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from C string. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp7real1287real128ERKNSt11string_viewE">
-<span id="mppp::real128::real128__std::string_viewCR"></span><span class="target" id="classmppp_1_1real128_1abf12e9aa4c768c2bd7da60a5507c2aea"></span><code class="descname">real128</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real1287real128ERKNSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor from string view. </p>
-<p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> from the content of the input string view, which is interpreted as the string representation of a floating-point value.</p>
-<p>Internally, the constructor will invoke the constructor from a range of characters.</p>
-<p><div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This constructor is available only if at least C++17 is being used.</p>
-</div>
-</p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the <code class="docutils literal"><span class="pre">std::string_view</span></code> that will be used for construction.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from a range of characters. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string or by memory errors in standard containers. </li>
 </ul>
 </dd>
 </dl>
@@ -490,9 +446,9 @@ will raise an error.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N4mppp7real128aSEPKc">
-<span id="mppp::real128::assign-operator__cCP"></span><span class="target" id="classmppp_1_1real128_1a972f6e2299314024e917384d7f048aff"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real128aSEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from C string. </p>
+<dt id="_CPPv2N4mppp7real128aSERK10StringType">
+<span id="mppp::real128::assign-operator__StringTypeCR"></span><span class="target" id="classmppp_1_1real128_1a5a663085d47214c691d1ef4797a282aa"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType">StringType</a> &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real128aSERK10StringType" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assignment from string. </p>
 <p><p>The body of this operator is equivalent to:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">real128</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
 </pre></div>
@@ -505,65 +461,12 @@ will raise an error.</p>
 <dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the C string that will be used for the assignment.</li>
+<li><code class="docutils literal"><span class="pre">s</span></code>: the string that will be used for the assignment.</li>
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp7real128aSERKNSt6stringE">
-<span id="mppp::real128::assign-operator__ssCR"></span><span class="target" id="classmppp_1_1real128_1aa3e2315a536ca885d6edcc292ad9d6ac"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real128aSERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from C++ string (equivalent to the assignment from C string). </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the C++ string that will be used for the assignment.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment operator from C string. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp7real128aSERKNSt11string_viewE">
-<span id="mppp::real128::assign-operator__std::string_viewCR"></span><span class="target" id="classmppp_1_1real128_1acef7f3aef53d61da75dec4f16f8557a4"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real128aSERKNSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from string view. </p>
-<p><p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">real128</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
-</pre></div>
-</div>
-<p>That is, a temporary <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> is constructed from <code class="docutils literal"><span class="pre">s</span></code> and it is then move-assigned to
-<code class="docutils literal"><span class="pre">this</span></code>.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This operator is available only if at least C++17 is being used.</p>
-</div>
-</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the <code class="docutils literal"><span class="pre">std::string_view</span></code> that will be used for the assignment.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string view. </li>
 </ul>
 </dd>
 </dl>

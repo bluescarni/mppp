@@ -310,10 +310,13 @@ Via the GMP interfacing facilities, it is thus possible to use directly the GMP 
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N4mppp7integer7integerEPKci">
-<span id="mppp::integer::integer__cCP.i"></span><span class="target" id="classmppp_1_1integer_1a2b8d02e6505010c94be62ad1bbf8c12c"></span><code class="descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerEPKci" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor from C string. </p>
-<p>This constructor will initialize <code class="docutils literal"><span class="pre">this</span></code> from the null-terminated string <code class="docutils literal"><span class="pre">s</span></code>, which must represent an integer value in base <code class="docutils literal"><span class="pre">base</span></code>. The expected format is the same as specified by the <code class="docutils literal"><span class="pre">mpz_set_str()</span></code> GMP function. <code class="docutils literal"><span class="pre">base</span></code> may vary from 2 to 62, or be zero. In the latter case, the base is inferred from the leading characters of the string.</p>
+<dt id="_CPPv2N4mppp7integer7integerERK10StringTypei">
+<span id="mppp::integer::integer__StringTypeCR.i"></span><span class="target" id="classmppp_1_1integer_1a24f4df5e99787f91beaa02dc8658ea8e"></span><code class="descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType">StringType</a> &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerERK10StringTypei" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor from string. </p>
+<p>This constructor will initialize <code class="docutils literal"><span class="pre">this</span></code> from the <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal"><span class="pre">StringType</span></code></a> <code class="docutils literal"><span class="pre">s</span></code>, which must represent
+an integer value in base <code class="docutils literal"><span class="pre">base</span></code>. The expected format is the same as specified by the <code class="docutils literal"><span class="pre">mpz_set_str()</span></code>
+GMP function. <code class="docutils literal"><span class="pre">base</span></code> may vary from 2 to 62, or be zero. In the latter case, the base is inferred
+from the leading characters of the string.</p>
 <p><div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference external" href="https://gmplib.org/manual/Assigning-Integers.html">https://gmplib.org/manual/Assigning-Integers.html</a></p>
@@ -327,27 +330,8 @@ Via the GMP interfacing facilities, it is thus possible to use directly the GMP 
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">std::invalid_argument</span></code>: if the <code class="docutils literal"><span class="pre">base</span></code> parameter is invalid or if <code class="docutils literal"><span class="pre">s</span></code> is not a valid string representation of an integer in the specified base.</li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp7integer7integerERKNSt6stringEi">
-<span id="mppp::integer::integer__ssCR.i"></span><span class="target" id="classmppp_1_1integer_1a1cf2bec3d70529baa25e2b78a1aded6e"></span><code class="descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerERKNSt6stringEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor from C++ string (equivalent to the constructor from C string). </p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the input string. </li>
-<li><code class="docutils literal"><span class="pre">base</span></code>: the base used in the string representation.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from C string. </li>
+<li><code class="docutils literal"><span class="pre">std::invalid_argument</span></code>: if the <code class="docutils literal"><span class="pre">base</span></code> parameter is invalid or if <code class="docutils literal"><span class="pre">s</span></code> is not a valid string representation of an integer in the specified base. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by memory errors in standard containers.</li>
 </ul>
 </dd>
 </dl>
@@ -359,7 +343,7 @@ Via the GMP interfacing facilities, it is thus possible to use directly the GMP 
 <span id="mppp::integer::integer__cCP.cCP.i"></span><span class="target" id="classmppp_1_1integer_1ac26d6f552b81bcefdb36bdaf1eb69a24"></span><code class="descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>begin</em>, <em class="property">const</em> char *<em>end</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerEPKcPKci" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from range of characters. </p>
 <p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> from the content of the input half-open range, which is interpreted as the string representation of an integer in base <code class="docutils literal"><span class="pre">base</span></code>.</p>
-<p>Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and invoke the constructor from C string.</p>
+<p>Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and invoke the constructor from string.</p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -370,34 +354,7 @@ Via the GMP interfacing facilities, it is thus possible to use directly the GMP 
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from C string, or by memory allocation errors in standard containers. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp7integer7integerERKNSt11string_viewEi">
-<span id="mppp::integer::integer__std::string_viewCR.i"></span><span class="target" id="classmppp_1_1integer_1a0f3a9a26be6a48b8f71c1286280a6ada"></span><code class="descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerERKNSt11string_viewEi" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor from string view. </p>
-<p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> from the content of the input string view, which is interpreted as the string representation of an integer in base <code class="docutils literal"><span class="pre">base</span></code>.</p>
-<p>Internally, the constructor will invoke the constructor from a range of characters.</p>
-<p><div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This constructor is available only if at least C++17 is being used.</p>
-</div>
-</p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the <code class="docutils literal"><span class="pre">std::string_view</span></code> that will be used for construction. </li>
-<li><code class="docutils literal"><span class="pre">base</span></code>: the base used in the string representation.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from a range of characters. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string, or by memory allocation errors in standard containers. </li>
 </ul>
 </dd>
 </dl>
@@ -515,6 +472,34 @@ will take care of releasing them when the destructor is called.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="_CPPv2N4mppp7integeraSERK10StringType">
+<span id="mppp::integer::assign-operator__StringTypeCR"></span><span class="target" id="classmppp_1_1integer_1a20cfdb49f237017b8bd04280c13bcaa2"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType">StringType</a> &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integeraSERK10StringType" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assignment from string. </p>
+<p><p>The body of this operator is equivalent to:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">integer</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
+</pre></div>
+</div>
+<p>That is, a temporary integer is constructed from the <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal"><span class="pre">StringType</span></code></a>
+<code class="docutils literal"><span class="pre">s</span></code> and it is then move-assigned to <code class="docutils literal"><span class="pre">this</span></code>.</p>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">s</span></code>: the string that will be used for the assignment.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv2N4mppp7integeraSEK5mpz_t">
 <span id="mppp::integer::assign-operator__mpz_tC"></span><span class="target" id="classmppp_1_1integer_1a0a3eb0f86c914225832b41ff3003d33a"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> mpz_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integeraSEK5mpz_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Copy assignment from <code class="docutils literal"><span class="pre">mpz_t</span></code>. </p>
@@ -565,85 +550,6 @@ will take care of releasing them when the destructor is called.</p>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">n</span></code>: the input GMP integer.</li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp7integeraSEPKc">
-<span id="mppp::integer::assign-operator__cCP"></span><span class="target" id="classmppp_1_1integer_1a3f50e8306af69560a7a1f5a8b53e49f7"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integeraSEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from C string. </p>
-<p><p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">integer</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
-</pre></div>
-</div>
-<p>That is, a temporary integer is constructed from <code class="docutils literal"><span class="pre">s</span></code> and it is then move-assigned to <code class="docutils literal"><span class="pre">this</span></code>.</p>
-</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the C string that will be used for the assignment.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp7integeraSERKNSt6stringE">
-<span id="mppp::integer::assign-operator__ssCR"></span><span class="target" id="classmppp_1_1integer_1a5c3f2785d882980c7eed9ac76e31a4eb"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integeraSERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from C++ string (equivalent to the assignment from C string). </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the C++ string that will be used for the assignment.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the assignment operator from C string. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv2N4mppp7integeraSERKNSt11string_viewE">
-<span id="mppp::integer::assign-operator__std::string_viewCR"></span><span class="target" id="classmppp_1_1integer_1a6ab17b1579a21c1661d76ad0c119244c"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> std::string_view &amp;<em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integeraSERKNSt11string_viewE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assignment from string view. </p>
-<p><p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">integer</span><span class="p">{</span><span class="n">s</span><span class="p">};</span>
-</pre></div>
-</div>
-<p>That is, a temporary integer is constructed from <code class="docutils literal"><span class="pre">s</span></code> and it is then move-assigned to <code class="docutils literal"><span class="pre">this</span></code>.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This operator is available only if at least C++17 is being used.</p>
-</div>
-</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">s</span></code>: the <code class="docutils literal"><span class="pre">std::string_view</span></code> that will be used for the assignment.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string view. </li>
 </ul>
 </dd>
 </dl>
