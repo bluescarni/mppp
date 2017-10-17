@@ -80,24 +80,22 @@ inline namespace detail
 template <typename T>
 using is_real128_cpp_interoperable =
 #if defined(MPPP_WITH_MPFR) && defined(__clang__)
-    std::integral_constant<bool, conjunction<is_cpp_interoperable<T>, negation<std::is_same<T, long double>>>::value>;
+    conjunction<is_cpp_interoperable<T>, negation<std::is_same<T, long double>>>;
 #else
     is_cpp_interoperable<T>;
 #endif
 
 template <typename T, typename U>
-using are_real128_cpp_op_types = std::integral_constant<
-    bool, disjunction<conjunction<std::is_same<T, real128>, std::is_same<U, real128>>,
-                      conjunction<std::is_same<T, real128>, is_real128_cpp_interoperable<U>>,
-                      conjunction<std::is_same<U, real128>, is_real128_cpp_interoperable<T>>>::value>;
+using are_real128_cpp_op_types = disjunction<conjunction<std::is_same<T, real128>, std::is_same<U, real128>>,
+                                             conjunction<std::is_same<T, real128>, is_real128_cpp_interoperable<U>>,
+                                             conjunction<std::is_same<U, real128>, is_real128_cpp_interoperable<T>>>;
 
 template <typename T>
-using is_real128_mppp_interoperable = std::integral_constant<bool, disjunction<is_integer<T>, is_rational<T>>::value>;
+using is_real128_mppp_interoperable = disjunction<is_integer<T>, is_rational<T>>;
 
 template <typename T, typename U>
-using are_real128_mppp_op_types = std::integral_constant<
-    bool, disjunction<conjunction<std::is_same<T, real128>, is_real128_mppp_interoperable<U>>,
-                      conjunction<std::is_same<U, real128>, is_real128_mppp_interoperable<T>>>::value>;
+using are_real128_mppp_op_types = disjunction<conjunction<std::is_same<T, real128>, is_real128_mppp_interoperable<U>>,
+                                              conjunction<std::is_same<U, real128>, is_real128_mppp_interoperable<T>>>;
 }
 
 template <typename T>
