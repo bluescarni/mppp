@@ -18,6 +18,7 @@
 
 #include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
+#include <mp++/detail/type_traits.hpp>
 
 #if MPFR_VERSION_MAJOR < 3
 
