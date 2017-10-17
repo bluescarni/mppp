@@ -11,7 +11,7 @@ Common concepts
    support concepts natively, mp++ will employ a concept emulation layer in order to provide the same functionality as native
    C++ concepts.
 
-   Since the syntax of true C++ concepts is clearer than that of the concept emulation layer, the mp++ documentation describes
+   Since the syntax of native C++ concepts is clearer than that of the concept emulation layer, the mp++ documentation describes
    and refers to concepts in their native C++ form.
 
 .. cpp:concept:: template <typename T> mppp::CppInteroperable
@@ -29,3 +29,14 @@ Common concepts
 
    ``long double`` is also supported, but only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled
    (see the :ref:`installation instructions <installation>`).
+
+.. cpp:concept:: template <typename T> mppp::StringType
+
+   This concept is satisfied by C++ string-like types. Specifically, the concept will be true if ``T`` is
+   any of the following:
+
+   * ``std::string``,
+   * ``const char *``,
+   * ``char *``.
+
+   Additionally, if at least C++17 is being used, the concept is satisfied also by ``std::string_view``.

@@ -57,8 +57,7 @@ inline namespace detail
 {
 
 template <typename T>
-using is_string_type = disjunction<std::is_same<T, std::string>,
-                                   conjunction<std::is_pointer<T>, std::is_same<remove_cv_t<remove_pointer_t<T>>, char>>
+using is_string_type = disjunction<std::is_same<T, std::string>, std::is_same<T, const char *>, std::is_same<T, char *>
 #if MPPP_CPLUSPLUS >= 201703L
                                    ,
                                    std::is_same<T, std::string_view>
