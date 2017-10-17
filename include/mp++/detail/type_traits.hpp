@@ -120,9 +120,6 @@ template <typename T>
 using make_unsigned_t = std::make_unsigned_t<T>;
 
 template <typename T>
-using remove_pointer_t = std::remove_pointer_t<T>;
-
-template <typename T>
 using remove_cv_t = std::remove_cv_t<T>;
 
 #else
@@ -132,9 +129,6 @@ using enable_if_t = typename std::enable_if<B, T>::type;
 
 template <typename T>
 using make_unsigned_t = typename std::make_unsigned<T>::type;
-
-template <typename T>
-using remove_pointer_t = typename std::remove_pointer<T>::type;
 
 template <typename T>
 using remove_cv_t = typename std::remove_cv<T>::type;
