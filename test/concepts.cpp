@@ -9,6 +9,7 @@
 #include <mp++/config.hpp>
 
 #include <mp++/concepts.hpp>
+#include <mp++/detail/type_traits.hpp>
 #if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
@@ -20,7 +21,7 @@
 
 using namespace mppp;
 
-template <typename T, string_type_enabler<T> = 0>
+template <typename T, enable_if_t<is_string_type<T>::value, int> = 0>
 void check_dispatch(const T &s)
 {
     std::ostringstream o;
@@ -65,9 +66,9 @@ TEST_CASE("concepts")
     check_dispatch(s2);
     check_dispatch(&s2[0]);
 #if MPPP_CPLUSPLUS >= 201703L
-    const std::string_view sv1{s};
+    const std::string_view sv1{"bubbbbba"};
     check_dispatch(sv1);
-    std::string_view sv2{s};
+    std::string_view sv2{"bubbbba"};
     check_dispatch(sv2);
 #endif
 }
