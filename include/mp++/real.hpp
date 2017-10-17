@@ -2334,14 +2334,14 @@ inline namespace detail
 
 // A small helper to init the pairs in the functions below. We need this because
 // we cannot take the address of a const real as a real *.
-template <typename Arg, enable_if_t<!is_ncvrvr<Arg &&>::value, int> = 0>
+template <typename Arg, enable_if_t<!is_ncrvr<Arg &&>::value, int> = 0>
 inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
     // arg is not a non-const rvalue ref, we cannot steal from it. Init with nullptr.
     return std::make_pair(static_cast<real *>(nullptr), c_max(arg.get_prec(), min_prec));
 }
 
-template <typename Arg, enable_if_t<is_ncvrvr<Arg &&>::value, int> = 0>
+template <typename Arg, enable_if_t<is_ncrvr<Arg &&>::value, int> = 0>
 inline std::pair<real *, ::mpfr_prec_t> mpfr_nary_op_init_pair(::mpfr_prec_t min_prec, Arg &&arg)
 {
     // arg is a non-const rvalue ref, and a candidate for stealing resources.
@@ -2355,7 +2355,7 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &) {}
 
 // NOTE: we need 2 overloads for this, as we cannot extract a non-const pointer from
 // arg0 if arg0 is a const ref.
-template <typename Arg0, typename... Args, enable_if_t<!is_ncvrvr<Arg0 &&>::value, int> = 0>
+template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int> = 0>
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
 {
     // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
@@ -2364,7 +2364,7 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
 }
 
-template <typename Arg0, typename... Args, enable_if_t<is_ncvrvr<Arg0 &&>::value, int> = 0>
+template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int> = 0>
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
 {
     const auto prec0 = arg0.get_prec();
@@ -2947,10 +2947,10 @@ inline real real_nan(::mpfr_prec_t p = 0)
 /** @} */
 
 template <typename T, typename U>
-using are_real_op_types = std::integral_constant<
-    bool, disjunction<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>,
-                      conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<uncvref_t<U>>>,
-                      conjunction<std::is_same<real, uncvref_t<U>>, is_real_interoperable<uncvref_t<T>>>>::value>;
+using are_real_op_types
+    = disjunction<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>,
+                  conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<uncvref_t<U>>>,
+                  conjunction<std::is_same<real, uncvref_t<U>>, is_real_interoperable<uncvref_t<T>>>>;
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
