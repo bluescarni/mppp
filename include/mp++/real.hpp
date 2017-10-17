@@ -819,14 +819,27 @@ private:
                                         + std::to_string(base));
         }
     }
+    // A tag to call private ctors.
+    struct ptag {
+    };
+    explicit real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
+    {
+        construct_from_c_string(s, base, p);
+    }
+    explicit real(const ptag &, const std::string &s, int base, ::mpfr_prec_t p) : real(s.c_str(), base, p) {}
+#if MPPP_CPLUSPLUS >= 201703L
+    explicit real(const std::string_view &s, int base, ::mpfr_prec_t p) : real(s.data(), s.data() + s.size(), base, p)
+    {
+    }
+#endif
 
 public:
-    /// Constructor from C string, base and precision.
+    /// Constructor from string, base and precision.
     /**
      * \rststar
-     * This constructor will set ``this`` to the value represented by the string ``s``, which is interpreted
-     * as a floating-point number in base ``base``. ``base`` must be either zero (in which case the base will be
-     * automatically deduced) or a number in the [2,62] range. The valid string formats are detailed in the
+     * This constructor will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` ``s``, which
+     * is interpreted as a floating-point number in base ``base``. ``base`` must be either zero (in which case the base
+     * will be automatically deduced) or a number in the [2,62] range. The valid string formats are detailed in the
      * documentation of the MPFR function ``mpfr_set_str()``. Note that leading whitespaces are ignored, but trailing
      * whitespaces will raise an error.
      *
@@ -837,7 +850,7 @@ public:
      *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
      * \endrststar
      *
-     * @param s the input C string.
+     * @param s the input string.
      * @param base the base used in the string representation.
      * @param p the desired precision.
      *
@@ -846,76 +859,69 @@ public:
      * - \p p is either outside the valid bounds for a precision value, or it is zero and no
      *   default precision value has been set,
      * - \p s cannot be interpreted as a floating-point number.
+     * @throws unspecified any exception thrown by memory errors in standard containers.
      */
-    explicit real(const char *s, int base, ::mpfr_prec_t p)
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit real(const StringType &s,
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    explicit real(const T &s,
+#endif
+                  int base, ::mpfr_prec_t p)
+        : real(ptag{}, s, base, p)
     {
-        construct_from_c_string(s, base, p);
     }
-    /// Constructor from C string and precision.
-    /**
-     * This constructor is equivalent to the constructor from C string with a ``base`` value hard-coded to 10.
-     *
-     * @param s the input C string.
-     * @param p the desired precision.
-     *
-     * @throws unspecified any exception thrown by the constructor from C string, base and precision.
-     */
-    explicit real(const char *s, ::mpfr_prec_t p) : real(s, 10, p) {}
-    /// Constructor from C string.
-    /**
-     * This constructor is equivalent to the constructor from C string with a ``base`` value hard-coded to 10
-     * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
-     *
-     * @param s the input C string.
-     *
-     * @throws unspecified any exception thrown by the constructor from C string, base and precision.
-     */
-    explicit real(const char *s) : real(s, 10, 0) {}
-    /// Constructor from C++ string, base and precision.
-    /**
-     * This constructor is equivalent to the constructor from C string, base and precision.
-     *
-     * @param s the input C++ string.
-     * @param base the base used in the string representation.
-     * @param p the desired precision.
-     *
-     * @throws unspecified any exception thrown by the constructor from C string, base and precision.
-     */
-    explicit real(const std::string &s, int base, ::mpfr_prec_t p) : real(s.c_str(), base, p) {}
-    /// Constructor from C++ string and precision.
-    /**
-     * This constructor is equivalent to the constructor from C++ string with a ``base`` value hard-coded to 10.
-     *
-     * @param s the input C++ string.
-     * @param p the desired precision.
-     *
-     * @throws unspecified any exception thrown by the constructor from C++ string, base and precision.
-     */
-    explicit real(const std::string &s, ::mpfr_prec_t p) : real(s, 10, p) {}
-    /// Constructor from C++ string.
-    /**
-     * This constructor is equivalent to the constructor from C++ string with a ``base`` value hard-coded to 10
-     * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
-     *
-     * @param s the input C++ string.
-     *
-     * @throws unspecified any exception thrown by the constructor from C++ string, base and precision.
-     */
-    explicit real(const std::string &s) : real(s, 10, 0) {}
+        /// Constructor from string and precision.
+        /**
+         * This constructor is equivalent to the constructor from string with a ``base`` value hard-coded to 10.
+         *
+         * @param s the input string.
+         * @param p the desired precision.
+         *
+         * @throws unspecified any exception thrown by the constructor from string, base and precision.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit real(const StringType &s,
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    explicit real(const T &s,
+#endif
+                  ::mpfr_prec_t p)
+        : real(s, 10, p)
+    {
+    }
+        /// Constructor from string.
+        /**
+         * This constructor is equivalent to the constructor from string with a ``base`` value hard-coded to 10
+         * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
+         *
+         * @param s the input string.
+         *
+         * @throws unspecified any exception thrown by the constructor from string, base and precision.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit real(const StringType &s)
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    explicit real(const T &s)
+#endif
+        : real(s, 10, 0)
+    {
+    }
     /// Constructor from range of characters, base and precision.
     /**
      * This constructor will initialise \p this from the content of the input half-open range,
      * which is interpreted as the string representation of a floating-point value in base \p base.
      *
      * Internally, the constructor will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the constructor from C string, base and precision.
+     * string terminator, and invoke the constructor from string, base and precision.
      *
      * @param begin the start of the input range.
      * @param end the end of the input range.
      * @param base the base used in the string representation.
      * @param p the desired precision.
      *
-     * @throws unspecified any exception thrown by the constructor from C string, or by memory
+     * @throws unspecified any exception thrown by the constructor from string, or by memory
      * allocation errors in standard containers.
      */
     explicit real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
@@ -948,62 +954,6 @@ public:
      * @throws unspecified any exception thrown by the constructor from range of characters, base and precision.
      */
     explicit real(const char *begin, const char *end) : real(begin, end, 10, 0) {}
-#if MPPP_CPLUSPLUS >= 201703L
-    /// Constructor from string view, base and precision.
-    /**
-     * This constructor will initialise \p this from the content of the input string view,
-     * which is interpreted as the string representation of a floating-point value in base \p base.
-     *
-     * Internally, the constructor will invoke the constructor from a range of characters.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This constructor is available only if at least C++17 is being used.
-     * \endrststar
-     *
-     * @param s the string view that will be used for construction.
-     * @param base the base used in the string representation.
-     * @param p the desired precision.
-     *
-     * @throws unspecified any exception thrown by the constructor from a range of characters.
-     */
-    explicit real(const std::string_view &s, int base, ::mpfr_prec_t p) : real(s.data(), s.data() + s.size(), base, p)
-    {
-    }
-    /// Constructor from string view and precision.
-    /**
-     * This constructor is equivalent to the constructor from string view with a ``base`` value hard-coded to 10.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This constructor is available only if at least C++17 is being used.
-     * \endrststar
-     *
-     * @param s the input string view.
-     * @param p the desired precision.
-     *
-     * @throws unspecified any exception thrown by the constructor from string view, base and precision.
-     */
-    explicit real(const std::string_view &s, ::mpfr_prec_t p) : real(s, 10, p) {}
-    /// Constructor from string view.
-    /**
-     * This constructor is equivalent to the constructor from string view with a ``base`` value hard-coded to 10
-     * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This constructor is available only if at least C++17 is being used.
-     * \endrststar
-     *
-     * @param s the input string view.
-     *
-     * @throws unspecified any exception thrown by the constructor from string view, base and precision.
-     */
-    explicit real(const std::string_view &s) : real(s, 10, 0) {}
-#endif
     /// Copy constructor from ``mpfr_t``.
     /**
      * This constructor will initialise ``this`` with an exact deep copy of ``x``.
@@ -1236,7 +1186,7 @@ public:
 
 private:
     // Implementation of the assignment from string.
-    void string_assignment(const char *s, int base)
+    void string_assignment_impl(const char *s, int base)
     {
         if (mppp_unlikely(base && (base < 2 || base > 62))) {
             throw std::invalid_argument("Cannot assign a real from a string in base " + std::to_string(base)
@@ -1250,75 +1200,59 @@ private:
                                         + std::to_string(base));
         }
     }
-
-public:
-    /// Assignment from C string.
-    /**
-     * \rststar
-     * This operator will set ``this`` to the value represented by the string ``s``, which is interpreted
-     * as a floating-point number in base 10. The precision of ``this`` will be set to the value returned
-     * by :cpp:func:`~mppp::real_get_default_prec()`. If no default precision has been set, an error will
-     * be raised. If ``s`` is not a valid representation of a floating-point number in base 10, ``this``
-     * will be set to NaN and an error will be raised.
-     * \endrststar
-     *
-     * @param s the C string that will be assigned to \p this.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::invalid_argument if a default precision has not been set, or if \p s cannot be parsed
-     * as a floating-point value in base 10.
-     */
-    real &operator=(const char *s)
+    // Dispatching for string assignment.
+    real &string_assignment(const char *s)
     {
         const auto dp = real_get_default_prec();
         if (mppp_unlikely(!dp)) {
             throw std::invalid_argument("Cannot assign a string to a real if a default precision is not set");
         }
         set_prec_impl<false>(dp);
-        string_assignment(s, 10);
+        string_assignment_impl(s, 10);
         return *this;
     }
-    /// Assignment from C++ string.
-    /**
-     * This operator is equivalent to the assignment operator from C string.
-     *
-     * @param s the C++ string that will be assigned to \p this.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment operator from C string.
-     */
-    real &operator=(const std::string &s)
+    real &string_assignment(const std::string &s)
     {
-        return operator=(s.c_str());
+        return string_assignment(s.c_str());
     }
 #if MPPP_CPLUSPLUS >= 201703L
-    /// Assignment from string view.
-    /**
-     * This operator is equivalent to the assignment operator from C string.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This operator is available only if at least C++17 is being used.
-     * \endrststar
-     *
-     * @param s the string view that will be assigned to \p this.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment operator from C string,
-     * or by memory allocation errors in standard containers.
-     */
     real &operator=(const std::string_view &s)
     {
         MPPP_MAYBE_TLS std::vector<char> buffer;
         buffer.assign(s.begin(), s.end());
         buffer.emplace_back('\0');
-        return operator=(buffer.data());
+        return string_assignment(buffer.data());
     }
 #endif
+
+public:
+    /// Assignment from string.
+    /**
+     * \rststar
+     * This operator will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` ``s``, which is
+     * interpreted as a floating-point number in base 10. The precision of ``this`` will be set to the value returned by
+     * :cpp:func:`~mppp::real_get_default_prec()`. If no default precision has been set, an error will be raised. If
+     * ``s`` is not a valid representation of a floating-point number in base 10, ``this`` will be set to NaN and an
+     * error will be raised.
+     * \endrststar
+     *
+     * @param s the string that will be assigned to \p this.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::invalid_argument if a default precision has not been set, or if \p s cannot be parsed
+     * as a floating-point value in base 10.
+     * @throws unspecified any exception thrown by memory allocation errors in standard containers.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    real &operator=(const StringType &s)
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    real &operator=(const T &s)
+#endif
+    {
+        return string_assignment(s);
+    }
     /// Copy assignment from ``mpfr_t``.
     /**
      * This operator will set ``this`` to a deep copy of ``x``.
@@ -1421,15 +1355,35 @@ public:
         dispatch_assignment<false>(x);
         return *this;
     }
-    /// Setter to C string.
+
+private:
+    // Implementation of string setters.
+    real &set_impl(const char *s, int base)
+    {
+        string_assignment_impl(s, base);
+        return *this;
+    }
+    real &set_impl(const std::string &s, int base)
+    {
+        return set(s.c_str(), base);
+    }
+#if MPPP_CPLUSPLUS >= 201703L
+    real &set_impl(const std::string_view &s, int base)
+    {
+        return set(s.data(), s.data() + s.size(), base);
+    }
+#endif
+
+public:
+    /// Setter to string.
     /**
      * \rststar
-     * This method will set ``this`` to the value represented by the string ``s``, which will be interpreted
-     * as a floating-point number in base ``base``. ``base`` must be either 0 (in which case the base is
-     * automatically deduced), or a value in the [2,62] range. Contrary to the assignment operator from C string, the
-     * global default precision is ignored and the precision of the assignment is dictated by the precision of ``this``.
-     * Consequently, the precision of ``this`` will not be altered by the assignment, and a rounding might occur,
-     * depending on the operands.
+     * This method will set ``this`` to the value represented by the :cpp:concept:`~mppp::StringType` ``s``, which will
+     * be interpreted as a floating-point number in base ``base``. ``base`` must be either 0 (in which case the base is
+     * automatically deduced), or a value in the [2,62] range. Contrary to the assignment operator from string,
+     * the global default precision is ignored and the precision of the assignment is dictated by the precision of
+     * ``this``. Consequently, the precision of ``this`` will not be altered by the assignment, and a rounding might
+     * occur, depending on the operands.
      *
      * If ``s`` is not a valid representation of a floating-point number in base ``base``, ``this``
      * will be set to NaN and an error will be raised.
@@ -1445,33 +1399,20 @@ public:
      *
      * @return a reference to \p this.
      *
-     * @throws std::invalid_argument if \p s cannot be parsed as a floating-point value in base 10, or if the value of
-     * \p base is invalid.
+     * @throws std::invalid_argument if \p s cannot be parsed as a floating-point value in base 10, or if the value
+     * of \p base is invalid.
+     * @throws unspecified any exception thrown by memory
+     * allocation errors in standard containers.
      */
-    real &set(const char *s, int base = 10)
+#if defined(MPPP_HAVE_CONCEPTS)
+    real &set(const StringType &s,
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    real &set(const T &s,
+#endif
+              int base = 10)
     {
-        string_assignment(s, base);
-        return *this;
-    }
-    /// Set to C++ string.
-    /**
-     * \rststar
-     * This setter is equivalent to the setter to C string.
-     *
-     * .. seealso ::
-     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     * \endrststar
-     *
-     * @param s the string to which \p this will be set.
-     * @param base the base used in the string representation.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the setter to C string.
-     */
-    real &set(const std::string &s, int base = 10)
-    {
-        return set(s.c_str(), base);
+        return set_impl(s, base);
     }
     /// Set to character range.
     /**
@@ -1479,7 +1420,7 @@ public:
      * which is interpreted as the string representation of a floating-point value in base \p base.
      *
      * Internally, the setter will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the setter to C string.
+     * string terminator, and invoke the setter to string.
      *
      * @param begin the start of the input range.
      * @param end the end of the input range.
@@ -1487,7 +1428,7 @@ public:
      *
      * @return a reference to \p this.
      *
-     * @throws unspecified any exception thrown by the setter to C string, or by memory
+     * @throws unspecified any exception thrown by the setter to string, or by memory
      * allocation errors in standard containers.
      */
     real &set(const char *begin, const char *end, int base = 10)
@@ -1497,32 +1438,6 @@ public:
         buffer.emplace_back('\0');
         return set(buffer.data(), base);
     }
-#if MPPP_CPLUSPLUS >= 201703L
-    /// Set to string view.
-    /**
-     * \rststar
-     * This setter is equivalent to the setter to character range.
-     *
-     * .. note::
-     *
-     *   This setter is available only if at least C++17 is being used.
-     *
-     * .. seealso ::
-     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     * \endrststar
-     *
-     * @param s the string view to which \p this will be set.
-     * @param base the base used in the string representation.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the setter to character range.
-     */
-    real &set(const std::string_view &s, int base = 10)
-    {
-        return set(s.data(), s.data() + s.size(), base);
-    }
-#endif
     /// Set to an ``mpfr_t``.
     /**
      * \rststar
