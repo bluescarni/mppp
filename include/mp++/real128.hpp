@@ -388,10 +388,21 @@ public:
     {
         dispatch_mppp_construction(x);
     }
-    /// Constructor from C string.
+
+private:
+    // A tag to call private ctors.
+    struct ptag {
+    };
+    explicit real128(const ptag &, const char *s) : m_value(str_to_float128(s)) {}
+    explicit real128(const ptag &p, const std::string &s) : real128(p, s.c_str()) {}
+#if MPPP_CPLUSPLUS >= 201703L
+    explicit real128(const ptag &, const std::string_view &s) : real128(s.data(), s.data() + s.size()) {}
+#endif
+public:
+    /// Constructor from string.
     /**
      * \rststar
-     * This constructor will initialise \p this from the null-terminated string ``s``.
+     * This constructor will initialise \p this from the :cpp:concept:`~mppp::StringType` ``s``.
      * The accepted string formats are detailed in the quadmath library's documentation
      * (see the link below). Leading whitespaces are accepted (and ignored), but trailing whitespaces
      * will raise an error.
@@ -400,31 +411,34 @@ public:
      *    https://gcc.gnu.org/onlinedocs/libquadmath/strtoflt128.html
      * \endrststar
      *
-     * @param s the null-terminated string that will be used to initialise \p this.
+     * @param s the string that will be used to initialise \p this.
      *
      * @throws std::invalid_argument if \p s does not represent a valid quadruple-precision
      * floating-point value.
+     * @throws unspecified any exception thrown by memory errors in standard containers.
      */
-    explicit real128(const char *s) : m_value(str_to_float128(s)) {}
-    /// Constructor from C++ string (equivalent to the constructor from C string).
-    /**
-     * @param s the input string.
-     *
-     * @throws unspecified any exception thrown by the constructor from C string.
-     */
-    explicit real128(const std::string &s) : real128(s.c_str()) {}
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit real128(const StringType &s)
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    explicit real128(const T &s)
+#endif
+        : real128(ptag{}, s)
+    {
+    }
     /// Constructor from range of characters.
     /**
      * This constructor will initialise \p this from the content of the input half-open range, which is interpreted
      * as the string representation of a floating-point value.
      *
      * Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and
-     * invoke the constructor from C string.
+     * invoke the constructor from string.
      *
      * @param begin the begin of the input range.
      * @param end the end of the input range.
      *
-     * @throws unspecified any exception thrown by the constructor from C string.
+     * @throws unspecified any exception thrown by the constructor from string or by memory errors in standard
+     * containers.
      */
     explicit real128(const char *begin, const char *end)
     {
@@ -433,26 +447,6 @@ public:
         buffer.emplace_back('\0');
         m_value = str_to_float128(buffer.data());
     }
-#if MPPP_CPLUSPLUS >= 201703L
-    /// Constructor from string view.
-    /**
-     * This constructor will initialise \p this from the content of the input string view,
-     * which is interpreted as the string representation of a floating-point value.
-     *
-     * Internally, the constructor will invoke the constructor from a range of characters.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This constructor is available only if at least C++17 is being used.
-     * \endrststar
-     *
-     * @param s the \p std::string_view that will be used for construction.
-     *
-     * @throws unspecified any exception thrown by the constructor from a range of characters.
-     */
-    explicit real128(const std::string_view &s) : real128(s.data(), s.data() + s.size()) {}
-#endif
     /// Defaulted copy assignment operator.
     /**
      * @param other the assignment argument.
@@ -536,71 +530,34 @@ public:
     {
         return *this = real128{x};
     }
-    /// Assignment from C string.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = real128{s};
-     *
-     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``s`` and it is then move-assigned to
-     * ``this``.
-     * \endrststar
-     *
-     * @param s the C string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string.
-     */
-    real128 &operator=(const char *s)
-    {
-        return *this = real128{s};
-    }
-    /// Assignment from C++ string (equivalent to the assignment from C string).
-    /**
-     * @param s the C++ string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment operator from C string.
-     */
-    real128 &operator=(const std::string &s)
-    {
-        return operator=(s.c_str());
-    }
-#if MPPP_CPLUSPLUS >= 201703L
-    /// Assignment from string view.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = real128{s};
-     *
-     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``s`` and it is then move-assigned to
-     * ``this``.
-     *
-     * .. note::
-     *
-     *   This operator is available only if at least C++17 is being used.
-     *
-     * \endrststar
-     *
-     * @param s the \p std::string_view that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string view.
-     */
-    real128 &operator=(const std::string_view &s)
-    {
-        return *this = real128{s};
-    }
+        /// Assignment from string.
+        /**
+         * \rststar
+         * The body of this operator is equivalent to:
+         *
+         * .. code-block:: c++
+         *
+         *    return *this = real128{s};
+         *
+         * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``s`` and it is then move-assigned to
+         * ``this``.
+         * \endrststar
+         *
+         * @param s the string that will be used for the assignment.
+         *
+         * @return a reference to \p this.
+         *
+         * @throws unspecified any exception thrown by the constructor from string.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    real128 &operator=(const StringType &s)
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    real128 &operator=(const T &s)
 #endif
+    {
+        return *this = real128{s};
+    }
 /// Conversion operator to interoperable C++ types.
 /**
  * \rststar

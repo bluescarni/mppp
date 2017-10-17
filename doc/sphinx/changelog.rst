@@ -31,6 +31,10 @@ New
 Changes
 ~~~~~~~
 
+- Introduce a :cpp:concept:`~mppp::StringType` concept and use it to reduce the number of overloads in the
+  constructors/assignment operators from string (`#63 <https://github.com/bluescarni/mppp/pull/63>`__,
+  `#64 <https://github.com/bluescarni/mppp/pull/64>`__).
+
 - The :cpp:class:`~mppp::integer` functions accepting the return value as a parameter will now
   demote a return value with dynamic storage to static storage if the other arguments all have static storage
   (`#58 <https://github.com/bluescarni/mppp/pull/58>`__).
