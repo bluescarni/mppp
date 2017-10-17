@@ -1160,18 +1160,34 @@ public:
         : m_int(x)
     {
     }
-    /// Constructor from C string.
+
+private:
+    // A tag to call private ctors.
+    struct ptag {
+    };
+    explicit integer(const ptag &, const char *s, int base) : m_int(s, base) {}
+    explicit integer(const ptag &, const std::string &s, int base) : m_int(s.c_str(), base) {}
+#if MPPP_CPLUSPLUS >= 201703L
+    explicit integer(const ptag &, const std::string_view &s, int base) : integer(s.data(), s.data() + s.size(), base)
+    {
+    }
+#endif
+public:
+    /// Constructor from string.
     /**
-     * This constructor will initialize \p this from the null-terminated string \p s, which must represent
-     * an integer value in base \p base. The expected format is the same as specified by the \p mpz_set_str()
-     * GMP function. \p base may vary from 2 to 62, or be zero. In the latter case, the base is inferred
+     * \rststar
+     * This constructor will initialize ``this`` from the :cpp:concept:`~mppp::StringType` ``s``, which must represent
+     * an integer value in base ``base``. The expected format is the same as specified by the ``mpz_set_str()``
+     * GMP function. ``base`` may vary from 2 to 62, or be zero. In the latter case, the base is inferred
      * from the leading characters of the string.
+     * \endrststar
      *
      * @param s the input string.
      * @param base the base used in the string representation.
      *
      * @throws std::invalid_argument if the \p base parameter is invalid or if \p s is not a valid string representation
      * of an integer in the specified base.
+     * @throws unspecified any exception thrown by memory errors in standard containers.
      *
      * \rststar
      * .. seealso::
@@ -1179,52 +1195,32 @@ public:
      *    https://gmplib.org/manual/Assigning-Integers.html
      * \endrststar
      */
-    explicit integer(const char *s, int base = 10) : m_int(s, base) {}
-    /// Constructor from C++ string (equivalent to the constructor from C string).
-    /**
-     * @param s the input string.
-     * @param base the base used in the string representation.
-     *
-     * @throws unspecified any exception thrown by the constructor from C string.
-     */
-    explicit integer(const std::string &s, int base = 10) : integer(s.c_str(), base) {}
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit integer(const StringType &s,
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    explicit integer(const T &s,
+#endif
+                     int base = 10)
+        : integer(ptag{}, s, base)
+    {
+    }
     /// Constructor from range of characters.
     /**
      * This constructor will initialise \p this from the content of the input half-open range,
      * which is interpreted as the string representation of an integer in base \p base.
      *
      * Internally, the constructor will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the constructor from C string.
+     * string terminator, and invoke the constructor from string.
      *
      * @param begin the begin of the input range.
      * @param end the end of the input range.
      * @param base the base used in the string representation.
      *
-     * @throws unspecified any exception thrown by the constructor from C string, or by memory
+     * @throws unspecified any exception thrown by the constructor from string, or by memory
      * allocation errors in standard containers.
      */
     explicit integer(const char *begin, const char *end, int base = 10) : m_int(begin, end, base) {}
-#if MPPP_CPLUSPLUS >= 201703L
-    /// Constructor from string view.
-    /**
-     * This constructor will initialise \p this from the content of the input string view,
-     * which is interpreted as the string representation of an integer in base \p base.
-     *
-     * Internally, the constructor will invoke the constructor from a range of characters.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This constructor is available only if at least C++17 is being used.
-     * \endrststar
-     *
-     * @param s the \p std::string_view that will be used for construction.
-     * @param base the base used in the string representation.
-     *
-     * @throws unspecified any exception thrown by the constructor from a range of characters.
-     */
-    explicit integer(const std::string_view &s, int base = 10) : integer(s.data(), s.data() + s.size(), base) {}
-#endif
     /// Copy constructor from \p mpz_t.
     /**
      * This constructor will initialize \p this with the value of the GMP integer \p n. The storage type of \p this
@@ -1430,69 +1426,34 @@ public:
         return *this;
     }
 #endif
-    /// Assignment from C string.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = integer{s};
-     *
-     * That is, a temporary integer is constructed from ``s`` and it is then move-assigned to ``this``.
-     * \endrststar
-     *
-     * @param s the C string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string.
-     */
-    integer &operator=(const char *s)
-    {
-        return *this = integer{s};
-    }
-    /// Assignment from C++ string (equivalent to the assignment from C string).
-    /**
-     * @param s the C++ string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment operator from C string.
-     */
-    integer &operator=(const std::string &s)
-    {
-        return operator=(s.c_str());
-    }
-#if MPPP_CPLUSPLUS >= 201703L
-    /// Assignment from string view.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = integer{s};
-     *
-     * That is, a temporary integer is constructed from ``s`` and it is then move-assigned to ``this``.
-     *
-     * .. note::
-     *
-     *   This operator is available only if at least C++17 is being used.
-     *
-     * \endrststar
-     *
-     * @param s the \p std::string_view that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string view.
-     */
-    integer &operator=(const std::string_view &s)
-    {
-        return *this = integer{s};
-    }
+        /// Assignment from string.
+        /**
+         * \rststar
+         * The body of this operator is equivalent to:
+         *
+         * .. code-block:: c++
+         *
+         *    return *this = integer{s};
+         *
+         * That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
+         * ``s`` and it is then move-assigned to ``this``.
+         * \endrststar
+         *
+         * @param s the string that will be used for the assignment.
+         *
+         * @return a reference to \p this.
+         *
+         * @throws unspecified any exception thrown by the constructor from string.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    integer &operator=(const StringType &s)
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    integer &operator=(const T &s)
 #endif
+    {
+        return *this = integer{s};
+    }
     /// Set to zero.
     /**
      * After calling this method, the storage type of \p this will be static and its value will be zero.
