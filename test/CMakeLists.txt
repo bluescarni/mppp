@@ -28,6 +28,7 @@ function(ADD_MPPP_TESTCASE arg1)
   add_test(${arg1} ${arg1})
 endfunction()
 
+ADD_MPPP_TESTCASE(concepts)
 ADD_MPPP_TESTCASE(integer_abs)
 ADD_MPPP_TESTCASE(integer_addsub_ui)
 ADD_MPPP_TESTCASE(integer_arith)

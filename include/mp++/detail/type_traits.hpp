@@ -110,24 +110,47 @@ struct negation : std::integral_constant<bool, !B::value> {
 
 #endif
 
-// Some handy aliases.
-template <typename T>
-using unref_t = typename std::remove_reference<T>::type;
-
-template <typename T>
-using uncvref_t = typename std::remove_cv<unref_t<T>>::type;
-
-// Detect non-const non-volatile rvalue references.
-template <typename T>
-using is_ncvrvr = conjunction<std::is_rvalue_reference<T>, negation<std::is_const<unref_t<T>>>,
-                              negation<std::is_volatile<unref_t<T>>>>;
-
 // Small helpers, like C++14.
+#if MPPP_CPLUSPLUS >= 201402L
+
+template <bool B, typename T = void>
+using enable_if_t = std::enable_if_t<B, T>;
+
+template <typename T>
+using make_unsigned_t = std::make_unsigned_t<T>;
+
+template <typename T>
+using remove_pointer_t = std::remove_pointer_t<T>;
+
+template <typename T>
+using remove_cv_t = std::remove_cv_t<T>;
+
+#else
+
 template <bool B, typename T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
 
 template <typename T>
 using make_unsigned_t = typename std::make_unsigned<T>::type;
+
+template <typename T>
+using remove_pointer_t = typename std::remove_pointer<T>::type;
+
+template <typename T>
+using remove_cv_t = typename std::remove_cv<T>::type;
+
+#endif
+
+// Some handy aliases.
+template <typename T>
+using unref_t = typename std::remove_reference<T>::type;
+
+template <typename T>
+using uncvref_t = remove_cv_t<unref_t<T>>;
+
+// Detect non-const rvalue references.
+template <typename T>
+using is_ncrvr = conjunction<std::is_rvalue_reference<T>, negation<std::is_const<unref_t<T>>>>;
 }
 }
 
