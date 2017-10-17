@@ -12,6 +12,7 @@
 #if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
+#include <sstream>
 #include <string>
 
 #define CATCH_CONFIG_MAIN
@@ -19,10 +20,22 @@
 
 using namespace mppp;
 
+template <typename T, string_type_enabler<T> = 0>
+void check_dispatch(const T &s)
+{
+    std::ostringstream o;
+    o << s;
+    REQUIRE(o.str() == s);
+}
+
 TEST_CASE("concepts")
 {
     REQUIRE(is_string_type<char *>::value);
     REQUIRE(is_string_type<const char *>::value);
+    REQUIRE(is_string_type<char[]>::value);
+    REQUIRE(is_string_type<char[1]>::value);
+    REQUIRE(is_string_type<char[2]>::value);
+    REQUIRE(is_string_type<char[10]>::value);
     REQUIRE(!is_string_type<char>::value);
     REQUIRE(!is_string_type<const char>::value);
     REQUIRE(!is_string_type<int>::value);
@@ -30,10 +43,31 @@ TEST_CASE("concepts")
     REQUIRE(!is_string_type<std::string &>::value);
     REQUIRE(!is_string_type<const std::string &>::value);
     REQUIRE(!is_string_type<const std::string>::value);
+    REQUIRE(!is_string_type<char(&)[]>::value);
+    REQUIRE(!is_string_type<char(&)[1]>::value);
+    REQUIRE(!is_string_type<const char[2]>::value);
+    REQUIRE(!is_string_type<char(&&)[10]>::value);
 #if MPPP_CPLUSPLUS >= 201703L
     REQUIRE(is_string_type<std::string_view>::value);
     REQUIRE(!is_string_type<std::string_view &>::value);
     REQUIRE(!is_string_type<const std::string_view &>::value);
     REQUIRE(!is_string_type<const std::string_view>::value);
+#endif
+    std::string s{"foo"};
+    check_dispatch(std::string{"foo"});
+    check_dispatch(s);
+    check_dispatch(static_cast<const std::string &>(s));
+    const char s1[] = "blab";
+    check_dispatch(s1);
+    check_dispatch(&s1[0]);
+    check_dispatch("blab");
+    char s2[] = "blab";
+    check_dispatch(s2);
+    check_dispatch(&s2[0]);
+#if MPPP_CPLUSPLUS >= 201703L
+    const std::string_view sv1{s};
+    check_dispatch(sv1);
+    std::string_view sv2{s};
+    check_dispatch(sv2);
 #endif
 }

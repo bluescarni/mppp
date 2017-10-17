@@ -14,6 +14,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <mp++/detail/type_traits.hpp>
+
 #if __GNU_MP_VERSION < 5
 
 #error Minimum supported GMP version is 5.
@@ -27,7 +29,7 @@ inline namespace detail
 {
 
 // mpz_t is an array of some struct.
-using mpz_struct_t = std::remove_extent<::mpz_t>::type;
+using mpz_struct_t = remove_extent_t<::mpz_t>;
 // Integral types used for allocation size and number of limbs.
 using mpz_alloc_t = decltype(std::declval<mpz_struct_t>()._mp_alloc);
 using mpz_size_t = decltype(std::declval<mpz_struct_t>()._mp_size);
@@ -55,7 +57,7 @@ struct mpz_raii {
 };
 
 // mpq_t is an array of some struct.
-using mpq_struct_t = std::remove_extent<::mpq_t>::type;
+using mpq_struct_t = remove_extent_t<::mpq_t>;
 
 // Simple RAII holder for GMP rationals.
 struct mpq_raii {
@@ -75,7 +77,7 @@ struct mpq_raii {
 };
 
 // mpf_t is an array of some struct.
-using mpf_struct_t = std::remove_extent<::mpf_t>::type;
+using mpf_struct_t = remove_extent_t<::mpf_t>;
 
 // Simple RAII holder for GMP floats.
 struct mpf_raii {

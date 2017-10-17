@@ -122,6 +122,9 @@ using make_unsigned_t = std::make_unsigned_t<T>;
 template <typename T>
 using remove_cv_t = std::remove_cv_t<T>;
 
+template <typename T>
+using remove_extent_t = std::remove_extent_t<T>;
+
 #else
 
 template <bool B, typename T = void>
@@ -132,6 +135,9 @@ using make_unsigned_t = typename std::make_unsigned<T>::type;
 
 template <typename T>
 using remove_cv_t = typename std::remove_cv<T>::type;
+
+template <typename T>
+using remove_extent_t = typename std::remove_extent<T>::type;
 
 #endif
 

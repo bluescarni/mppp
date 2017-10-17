@@ -37,6 +37,7 @@ Common concepts
 
    * ``std::string``,
    * ``const char *``,
-   * ``char *``.
+   * ``char *``,
+   * a ``char`` array of any size.
 
    Additionally, if at least C++17 is being used, the concept is satisfied also by ``std::string_view``.

@@ -18,6 +18,7 @@
 
 #include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
+#include <mp++/detail/type_traits.hpp>
 
 #if MPFR_VERSION_MAJOR < 3
 
@@ -32,7 +33,7 @@ inline namespace detail
 {
 
 // mpfr_t is an array of some struct.
-using mpfr_struct_t = std::remove_extent<::mpfr_t>::type;
+using mpfr_struct_t = remove_extent_t<::mpfr_t>;
 
 // Simple RAII holder for MPFR floats.
 struct mpfr_raii {
