@@ -387,12 +387,25 @@ private:
             canonicalise();
         }
     }
+    // A tag to call private ctors.
+    struct ptag {
+    };
+    explicit rational(const ptag &, const char *s, int base) : m_den(1u)
+    {
+        dispatch_c_string_ctor(s, base);
+    }
+    explicit rational(const ptag &, const std::string &s, int base) : rational(s.c_str(), base) {}
+#if MPPP_CPLUSPLUS >= 201703L
+    explicit rational(const ptag &, const std::string_view &s, int base) : rational(s.data(), s.data() + s.size(), base)
+    {
+    }
+#endif
 
 public:
-    /// Constructor from C string.
+    /// Constructor from string.
     /**
      * \rststar
-     * This constructor will initialize ``this`` from the null-terminated string ``s``, which must represent
+     * This constructor will initialize ``this`` from the :cpp:concept:`~mppp::StringType` ``s``, which must represent
      * a rational value in base ``base``. The expected format is either a numerator-denominator pair separated
      * by the division operator ``/``, or just a numerator (in which case the denominator will be set to one).
      * The format for numerator and denominator is described in the documentation of the constructor from string
@@ -403,33 +416,33 @@ public:
      * @param base the base used in the string representation.
      *
      * @throws zero_division_error if the denominator is zero.
-     * @throws unspecified any exception thrown by the string constructor of mppp::integer.
+     * @throws unspecified any exception thrown by the string constructor of mppp::integer, or by
+     * memory errors in standard containers.
      */
-    explicit rational(const char *s, int base = 10) : m_den(1u)
+#if defined(MPPP_HAVE_CONCEPTS)
+    explicit rational(const StringType &s,
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    explicit rational(const T &s,
+#endif
+                      int base = 10)
+        : rational(ptag{}, s, base)
     {
-        dispatch_c_string_ctor(s, base);
     }
-    /// Constructor from C++ string (equivalent to the constructor from C string).
-    /**
-     * @param s the input string.
-     * @param base the base used in the string representation.
-     *
-     * @throws unspecified any exception thrown by the constructor from C string.
-     */
-    explicit rational(const std::string &s, int base = 10) : rational(s.c_str(), base) {}
     /// Constructor from range of characters.
     /**
      * This constructor will initialise \p this from the content of the input half-open range,
      * which is interpreted as the string representation of a rational in base \p base.
      *
      * Internally, the constructor will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the constructor from C string.
+     * string terminator, and invoke the constructor from string.
      *
      * @param begin the begin of the input range.
      * @param end the end of the input range.
      * @param base the base used in the string representation.
      *
-     * @throws unspecified any exception thrown by the constructor from C string.
+     * @throws unspecified any exception thrown by the constructor from string, or by
+     * memory errors in standard containers.
      */
     explicit rational(const char *begin, const char *end, int base = 10) : m_den(1u)
     {
@@ -439,27 +452,6 @@ public:
         buffer.emplace_back('\0');
         dispatch_c_string_ctor(buffer.data(), base);
     }
-#if MPPP_CPLUSPLUS >= 201703L
-    /// Constructor from string view.
-    /**
-     * This constructor will initialise \p this from the content of the input string view,
-     * which is interpreted as the string representation of a rational in base \p base.
-     *
-     * Internally, the constructor will invoke the constructor from a range of characters.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This constructor is available only if at least C++17 is being used.
-     * \endrststar
-     *
-     * @param s the \p std::string_view that will be used for construction.
-     * @param base the base used in the string representation.
-     *
-     * @throws unspecified any exception thrown by the constructor from C string.
-     */
-    explicit rational(const std::string_view &s, int base = 10) : rational(s.data(), s.data() + s.size(), base) {}
-#endif
     /// Constructor from \p mpz_t.
     /**
      * This constructor will initialise the numerator of \p this with the input GMP integer \p n,
@@ -548,6 +540,85 @@ public:
             other.m_den.set_one();
         }
         return *this;
+    }
+/// Assignment from integrals.
+/**
+ * \rststar
+ * This operator is enabled only if ``T`` satisfies the :cpp:concept:`~mppp::RationalIntegralInteroperable` concept.
+ * ``n`` will be assigned to the numerator, and :cpp:func:`mppp::integer::set_one()` will be called on the denominator.
+ * \endrststar
+ *
+ * @param n the integral value that will be assigned to \p this.
+ *
+ * @return a reference to \p this.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <typename T>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+    requires RationalIntegralInteroperable<uncvref_t<T>, SSize>
+#endif
+#else
+    template <typename T, enable_if_t<is_rational_integral_interoperable<uncvref_t<T>, SSize>::value, int> = 0>
+#endif
+        rational &operator=(T &&n)
+    {
+        m_num = std::forward<T>(n);
+        m_den.set_one();
+        return *this;
+    }
+/// Assignment from floating-point values.
+/**
+ * \rststar
+ * The body of this operator is equivalent to:
+ *
+ * .. code-block:: c++
+ *
+ *    return *this = rational{x};
+ *
+ * That is, a temporary rational is constructed from ``x`` and it is then move-assigned to ``this``.
+ * \endrststar
+ *
+ * @param x the floating-point assignment argument.
+ *
+ * @return a reference to \p this.
+ *
+ * @throws unspecified any exception thrown by the constructor from floating-point.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+    rational &operator=(const RationalFPInteroperable<SSize> &x)
+#else
+    template <typename T, enable_if_t<is_rational_fp_interoperable<T, SSize>::value, int> = 0>
+    rational &operator=(const T &x)
+#endif
+    {
+        return *this = rational{x};
+    }
+        /// Assignment from string.
+        /**
+         * \rststar
+         * The body of this operator is equivalent to:
+         *
+         * .. code-block:: c++
+         *
+         *    return *this = rational{s};
+         *
+         * That is, a temporary rational is constructed from ``s`` and it is then move-assigned to ``this``.
+         * \endrststar
+         *
+         * @param s the string that will be used for the assignment.
+         *
+         * @return a reference to \p this.
+         *
+         * @throws unspecified any exception thrown by the constructor from string.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    rational &operator=(const StringType &s)
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    rational &operator=(const T &s)
+#endif
+    {
+        return *this = rational{s};
     }
     /// Assignment from \p mpz_t.
     /**
@@ -638,121 +709,6 @@ public:
         m_num = ::mpz_t{*mpq_numref(q)};
         m_den = ::mpz_t{*mpq_denref(q)};
         return *this;
-    }
-#endif
-/// Assignment from integrals.
-/**
- * \rststar
- * This operator is enabled only if ``T`` satisfies the :cpp:concept:`~mppp::RationalIntegralInteroperable` concept.
- * ``n`` will be assigned to the numerator, and :cpp:func:`mppp::integer::set_one()` will be called on the denominator.
- * \endrststar
- *
- * @param n the integral value that will be assigned to \p this.
- *
- * @return a reference to \p this.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-    template <typename T>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-    requires RationalIntegralInteroperable<uncvref_t<T>, SSize>
-#endif
-#else
-    template <typename T, enable_if_t<is_rational_integral_interoperable<uncvref_t<T>, SSize>::value, int> = 0>
-#endif
-        rational &operator=(T &&n)
-    {
-        m_num = std::forward<T>(n);
-        m_den.set_one();
-        return *this;
-    }
-/// Assignment from floating-point values.
-/**
- * \rststar
- * The body of this operator is equivalent to:
- *
- * .. code-block:: c++
- *
- *    return *this = rational{x};
- *
- * That is, a temporary rational is constructed from ``x`` and it is then move-assigned to ``this``.
- * \endrststar
- *
- * @param x the floating-point assignment argument.
- *
- * @return a reference to \p this.
- *
- * @throws unspecified any exception thrown by the constructor from floating-point.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-    rational &operator=(const RationalFPInteroperable<SSize> &x)
-#else
-    template <typename T, enable_if_t<is_rational_fp_interoperable<T, SSize>::value, int> = 0>
-    rational &operator=(const T &x)
-#endif
-    {
-        return *this = rational{x};
-    }
-    /// Assignment from C string.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = rational{s};
-     *
-     * That is, a temporary rational is constructed from ``s`` and it is then move-assigned to ``this``.
-     * \endrststar
-     *
-     * @param s the C string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string.
-     */
-    rational &operator=(const char *s)
-    {
-        return *this = rational{s};
-    }
-    /// Assignment from C++ string (equivalent to the assignment from C string).
-    /**
-     * @param s the C++ string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the assignment operator from C string.
-     */
-    rational &operator=(const std::string &s)
-    {
-        return operator=(s.c_str());
-    }
-#if MPPP_CPLUSPLUS >= 201703L
-    /// Assignment from string view.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = rational{s};
-     *
-     * That is, a temporary rational is constructed from ``s`` and it is then move-assigned to ``this``.
-     *
-     * .. note::
-     *
-     *   This operator is available only if at least C++17 is being used.
-     *
-     * \endrststar
-     *
-     * @param s the \p std::string_view that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string view.
-     */
-    rational &operator=(const std::string_view &s)
-    {
-        return *this = rational{s};
     }
 #endif
     /// Convert to string.
