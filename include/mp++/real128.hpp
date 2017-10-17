@@ -394,7 +394,7 @@ private:
     struct ptag {
     };
     explicit real128(const ptag &, const char *s) : m_value(str_to_float128(s)) {}
-    explicit real128(const ptag &p, const std::string &s) : real128(p, s.c_str()) {}
+    explicit real128(const ptag &, const std::string &s) : real128(s.c_str()) {}
 #if MPPP_CPLUSPLUS >= 201703L
     explicit real128(const ptag &, const std::string_view &s) : real128(s.data(), s.data() + s.size()) {}
 #endif

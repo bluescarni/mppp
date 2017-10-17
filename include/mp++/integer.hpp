@@ -1166,7 +1166,7 @@ private:
     struct ptag {
     };
     explicit integer(const ptag &, const char *s, int base) : m_int(s, base) {}
-    explicit integer(const ptag &, const std::string &s, int base) : m_int(s.c_str(), base) {}
+    explicit integer(const ptag &, const std::string &s, int base) : integer(s.c_str(), base) {}
 #if MPPP_CPLUSPLUS >= 201703L
     explicit integer(const ptag &, const std::string_view &s, int base) : integer(s.data(), s.data() + s.size(), base)
     {
