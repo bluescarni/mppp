@@ -1308,6 +1308,34 @@ public:
     {
         return *this = integer{x};
     }
+        /// Assignment from string.
+        /**
+         * \rststar
+         * The body of this operator is equivalent to:
+         *
+         * .. code-block:: c++
+         *
+         *    return *this = integer{s};
+         *
+         * That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
+         * ``s`` and it is then move-assigned to ``this``.
+         * \endrststar
+         *
+         * @param s the string that will be used for the assignment.
+         *
+         * @return a reference to \p this.
+         *
+         * @throws unspecified any exception thrown by the constructor from string.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    integer &operator=(const StringType &s)
+#else
+    template <typename T, string_type_enabler<T> = 0>
+    integer &operator=(const T &s)
+#endif
+    {
+        return *this = integer{s};
+    }
     /// Copy assignment from \p mpz_t.
     /**
      * This assignment operator will copy into \p this the value of the GMP integer \p n. The storage type of \p this
@@ -1426,34 +1454,6 @@ public:
         return *this;
     }
 #endif
-        /// Assignment from string.
-        /**
-         * \rststar
-         * The body of this operator is equivalent to:
-         *
-         * .. code-block:: c++
-         *
-         *    return *this = integer{s};
-         *
-         * That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
-         * ``s`` and it is then move-assigned to ``this``.
-         * \endrststar
-         *
-         * @param s the string that will be used for the assignment.
-         *
-         * @return a reference to \p this.
-         *
-         * @throws unspecified any exception thrown by the constructor from string.
-         */
-#if defined(MPPP_HAVE_CONCEPTS)
-    integer &operator=(const StringType &s)
-#else
-    template <typename T, string_type_enabler<T> = 0>
-    integer &operator=(const T &s)
-#endif
-    {
-        return *this = integer{s};
-    }
     /// Set to zero.
     /**
      * After calling this method, the storage type of \p this will be static and its value will be zero.
