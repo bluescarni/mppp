@@ -75,9 +75,11 @@ TEST_CASE("real plus")
     r0 = real{};
     r0 += 1.1l;
     std::cout << r0 << '\n';
+#if defined(MPPP_WITH_QUADMATH)
     r0 = real{};
     r0 += real128{"1.1"};
     std::cout << r0 << '\n';
+#endif
     std::cout << std::setprecision(50);
     float f0 = 1.1f;
     f0 += real{"1.1", 100};
@@ -88,7 +90,9 @@ TEST_CASE("real plus")
     long double ld0 = 1.1l;
     ld0 += real{"1.1", 100};
     std::cout << ld0 << '\n';
+#if defined(MPPP_WITH_QUADMATH)
     real128 qd0{"1.1"};
     qd0 += real{"1.1", 100};
     std::cout << qd0 << '\n';
+#endif
 }
