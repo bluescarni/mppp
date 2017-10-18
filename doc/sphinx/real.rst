@@ -74,6 +74,14 @@ Concepts
    * one type satisfies :cpp:concept:`~mppp::CvrReal` and the other type, after the removal of reference
      and cv qualifiers, satisfies :cpp:concept:`~mppp::RealInteroperable`.
 
+.. cpp:concept:: template <typename T, typename U> mppp::RealCompoundOpTypes
+
+   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
+   generic in-place :ref:`operators <real_operators>`
+   involving :cpp:class:`~mppp::real`. Specifically, the concept will be ``true`` if
+   ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RealOpTypes` and ``T``, after the removal
+   of reference, is not const.
+
 .. _real_functions:
 
 Functions
