@@ -828,7 +828,7 @@ private:
     }
     explicit real(const ptag &, const std::string &s, int base, ::mpfr_prec_t p) : real(s.c_str(), base, p) {}
 #if MPPP_CPLUSPLUS >= 201703L
-    explicit real(const std::string_view &s, int base, ::mpfr_prec_t p) : real(s.data(), s.data() + s.size(), base, p)
+    explicit real(const ptag &, const std::string_view &s, int base, ::mpfr_prec_t p) : real(s.data(), s.data() + s.size(), base, p)
     {
     }
 #endif
@@ -1216,7 +1216,7 @@ private:
         return string_assignment(s.c_str());
     }
 #if MPPP_CPLUSPLUS >= 201703L
-    real &operator=(const std::string_view &s)
+    real &string_assignment(const std::string_view &s)
     {
         MPPP_MAYBE_TLS std::vector<char> buffer;
         buffer.assign(s.begin(), s.end());
