@@ -108,6 +108,28 @@ TEST_CASE("real add")
     add(r1, real{12, 123}, real{34, 128});
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{46}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
+    // Some tests with rvalue refs/overlapping arguments.
+    add(r1,std::move(r1),std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{92}.get_mpfr_t()));
+    add(r1,r1,std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{184}.get_mpfr_t()));
+    add(r1,std::move(r1),r1);
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{368}.get_mpfr_t()));
+    r1 = real{};
+    add(r1,real{10,50},real{12,51});
+    REQUIRE(r1.get_prec() == 51);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{22}.get_mpfr_t()));
+    r1 = real{};
+    add(r1,real{10,52},real{12,51});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{22}.get_mpfr_t()));
+    r1 = real{0,123};
+    add(r1,real{10,52},real{12,51});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{22}.get_mpfr_t()));
 }
 
 TEST_CASE("real sub")
@@ -133,6 +155,30 @@ TEST_CASE("real sub")
     sub(r1, real{12, 123}, real{34, 128});
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{-22}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
+    // Some tests with rvalue refs/overlapping arguments.
+    sub(r1,std::move(r1),std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{0}.get_mpfr_t()));
+    r1 = real{123,128};
+    sub(r1,r1,std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{0}.get_mpfr_t()));
+    r1 = real{123,128};
+    sub(r1,std::move(r1),r1);
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{0}.get_mpfr_t()));
+    r1 = real{};
+    sub(r1,real{10,50},real{12,51});
+    REQUIRE(r1.get_prec() == 51);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{-2}.get_mpfr_t()));
+    r1 = real{};
+    sub(r1,real{10,52},real{12,51});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{-2}.get_mpfr_t()));
+    r1 = real{0,123};
+    sub(r1,real{10,52},real{12,51});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{-2}.get_mpfr_t()));
 }
 
 TEST_CASE("real mul")
@@ -158,6 +204,29 @@ TEST_CASE("real mul")
     mul(r1, real{12, 123}, real{34, 128});
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{408}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
+    // Some tests with rvalue refs/overlapping arguments.
+    r1 = real{2,128};
+    mul(r1,std::move(r1),std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{4}.get_mpfr_t()));
+    mul(r1,r1,std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{16}.get_mpfr_t()));
+    mul(r1,std::move(r1),r1);
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{256}.get_mpfr_t()));
+    r1 = real{};
+    mul(r1,real{10,50},real{12,51});
+    REQUIRE(r1.get_prec() == 51);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{120}.get_mpfr_t()));
+    r1 = real{};
+    mul(r1,real{10,52},real{12,51});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{120}.get_mpfr_t()));
+    r1 = real{0,123};
+    mul(r1,real{10,52},real{12,51});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{120}.get_mpfr_t()));
 }
 
 TEST_CASE("real div")
@@ -183,6 +252,31 @@ TEST_CASE("real div")
     div(r1, real{12, 123}, real{32, 128});
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{"0.375", 64}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
+    // Some tests with rvalue refs/overlapping arguments.
+    r1 = real{256,128};
+    div(r1,std::move(r1),std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{1}.get_mpfr_t()));
+    r1 = real{256,128};
+    div(r1,r1,std::move(r1));
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{1}.get_mpfr_t()));
+    r1 = real{256,128};
+    div(r1,std::move(r1),r1);
+    REQUIRE(r1.get_prec() == 128);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{1}.get_mpfr_t()));
+    r1 = real{};
+    div(r1,real{10,50},real{5,51});
+    REQUIRE(r1.get_prec() == 51);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{2}.get_mpfr_t()));
+    r1 = real{};
+    div(r1,real{10,52},real{5,51});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{2}.get_mpfr_t()));
+    r1 = real{0,123};
+    div(r1,real{10,52},real{5,51});
+    REQUIRE(r1.get_prec() == 52);
+    REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{2}.get_mpfr_t()));
 }
 
 TEST_CASE("real fma")
@@ -224,6 +318,18 @@ TEST_CASE("real fma")
                   static_cast<const real &>(real{2, 12}));
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{44}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
+    // Overlap + rvalue.
+    r1 = 0;
+    fma_wrap(r1,std::move(r1),std::move(r1),std::move(r1));
+    REQUIRE(r1.zero_p());
+    fma_wrap(r1,r1,std::move(r1),std::move(r1));
+    REQUIRE(r1.zero_p());
+    fma_wrap(r1,r1,r1,std::move(r1));
+    REQUIRE(r1.zero_p());
+    fma_wrap(r1,std::move(r1),r1,std::move(r1));
+    REQUIRE(r1.zero_p());
+    fma_wrap(r1,std::move(r1),std::move(r1),r1);
+    REQUIRE(r1.zero_p());
 }
 
 TEST_CASE("real fms")
@@ -265,4 +371,16 @@ TEST_CASE("real fms")
                   static_cast<const real &>(real{2, 12}));
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), real{40}.get_mpfr_t()));
     REQUIRE(r1.get_prec() == 128);
+    // Overlap + rvalue.
+    r1 = 0;
+    fms_wrap(r1,std::move(r1),std::move(r1),std::move(r1));
+    REQUIRE(r1.zero_p());
+    fms_wrap(r1,r1,std::move(r1),std::move(r1));
+    REQUIRE(r1.zero_p());
+    fms_wrap(r1,r1,r1,std::move(r1));
+    REQUIRE(r1.zero_p());
+    fms_wrap(r1,std::move(r1),r1,std::move(r1));
+    REQUIRE(r1.zero_p());
+    fms_wrap(r1,std::move(r1),std::move(r1),r1);
+    REQUIRE(r1.zero_p());
 }

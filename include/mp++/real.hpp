@@ -2626,7 +2626,7 @@ inline bool regular_p(const real &r)
  * @return a positive value if \p r is positive, zero if \p r is zero, a negative value if \p thris
  * is negative.
  *
- * @throws std::domain_error if \p r is NaN.
+ * @throws unspecified any exception thrown by mppp::real::sgn().
  */
 inline int sgn(const real &r)
 {
