@@ -21,7 +21,7 @@ Types
 
 .. cpp:type:: __float128
 
-   A quadruple-precision floating-point type available in the GCC compiler on most contemporary platforms.
+   A quadruple-precision floating-point type available in recent versions of the GCC and clang compilers.
    This is the type wrapped by the :cpp:class:`~mppp::real128` class.
 
    .. seealso::

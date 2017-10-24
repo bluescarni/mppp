@@ -177,7 +177,7 @@ using real128_op_types_enabler
  *
  * Most of the functionality is exposed via plain :ref:`functions <real128_functions>`, with the
  * general convention that the functions are named after the corresponding quadmath functions minus the trailing ``q``
- * suffix. For instance, the quadmath call
+ * suffix. For instance, the quadmath code
  *
  * .. code-block:: c++
  *
@@ -518,7 +518,7 @@ public:
          *
          * @return a reference to \p this.
          *
-         * @throws unspecified any exception thrown by the construction of a \link mppp::real128 real128 \endlink from
+         * @throws unspecified any exception thrown by the construction of a \link mppp::real128 real128\endlink from
          * ``x``.
          */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1031,7 +1031,7 @@ inline real128 fma(const real128 &x, const real128 &y, const real128 &z)
 
 /// Unary absolute value.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose absolute value will be computed.
+ * @param x the \link mppp::real128 real128\endlink whose absolute value will be computed.
  *
  * @return the absolute value of \p x.
  */
@@ -1107,11 +1107,11 @@ inline std::ostream &operator<<(std::ostream &os, const real128 &x)
  * \endrststar
  *
  * @param is the input stream.
- * @param x the \link mppp::real128 real128 \endlink to which the string extracted from the stream will be assigned.
+ * @param x the \link mppp::real128 real128\endlink to which the string extracted from the stream will be assigned.
  *
  * @return a reference to \p is.
  *
- * @throws unspecified any exception thrown by \link mppp::real128 real128 \endlink's assignment operator from string.
+ * @throws unspecified any exception thrown by \link mppp::real128 real128\endlink's assignment operator from string.
  */
 inline std::istream &operator>>(std::istream &is, real128 &x)
 {
@@ -1129,7 +1129,7 @@ inline std::istream &operator>>(std::istream &is, real128 &x)
 
 /// Sign bit of a \link mppp::real128 real128\endlink.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose sign bit will be returned.
+ * @param x the \link mppp::real128 real128\endlink whose sign bit will be returned.
  *
  * @return the sign bit of \p x (as returned by mppp::real128::signbit()).
  */
@@ -1140,7 +1140,7 @@ inline bool signbit(const real128 &x)
 
 /// Categorise a \link mppp::real128 real128\endlink.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose floating-point category will be returned.
+ * @param x the \link mppp::real128 real128\endlink whose floating-point category will be returned.
  *
  * @return the category of the value of \p x, as established by mppp::real128::fpclassify().
  */
@@ -1149,9 +1149,9 @@ constexpr int fpclassify(const real128 &x)
     return x.fpclassify();
 }
 
-/// Detect if a \link mppp::real128 real128 \endlink is NaN.
+/// Detect if a \link mppp::real128 real128\endlink is NaN.
 /**
- * @param x the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128\endlink argument.
  *
  * @return \p true if \p x is NaN, \p false otherwise.
  */
@@ -1160,9 +1160,9 @@ constexpr bool isnan(const real128 &x)
     return x.isnan();
 }
 
-/// Detect if a \link mppp::real128 real128 \endlink is infinite.
+/// Detect if a \link mppp::real128 real128\endlink is infinite.
 /**
- * @param x the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128\endlink argument.
  *
  * @return \p true if \p x is infinite, \p false otherwise.
  */
@@ -1171,9 +1171,9 @@ constexpr bool isinf(const real128 &x)
     return x.isinf();
 }
 
-/// Detect if a \link mppp::real128 real128 \endlink is finite.
+/// Detect if a \link mppp::real128 real128\endlink is finite.
 /**
- * @param x the \link mppp::real128 real128 \endlink argument.
+ * @param x the \link mppp::real128 real128\endlink argument.
  *
  * @return \p true if \p x is finite, \p false otherwise.
  */
@@ -1251,7 +1251,7 @@ constexpr bool real128_gt(const real128 &, const real128 &);
 /**
  * If \p x is less than negative zero, the result will be NaN.
  *
- * @param x the \link mppp::real128 real128 \endlink whose square root will be returned.
+ * @param x the \link mppp::real128 real128\endlink whose square root will be returned.
  *
  * @return the nonnegative square root of \p x.
  */
@@ -1262,7 +1262,7 @@ inline real128 sqrt(real128 x)
 
 /// Unary cube root.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose cube root will be returned.
+ * @param x the \link mppp::real128 real128\endlink whose cube root will be returned.
  *
  * @return the real cube root of \p x.
  */
@@ -1276,8 +1276,8 @@ inline real128 cbrt(real128 x)
  * The calculation is performed without undue overflow or underflow during the intermediate
  * steps of the calculation.
  *
- * @param x the first \link mppp::real128 real128 \endlink argument.
- * @param y the second \link mppp::real128 real128 \endlink argument.
+ * @param x the first \link mppp::real128 real128\endlink argument.
+ * @param y the second \link mppp::real128 real128\endlink argument.
  *
  * @return the euclidean distance \f$ \sqrt{x^2+y^2} \f$.
  */
@@ -1358,7 +1358,7 @@ inline real128 pow(const T &x, const U &y)
 
 /// Unary natural exponential function.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose natural exponential function be computed.
+ * @param x the \link mppp::real128 real128\endlink whose natural exponential function be computed.
  *
  * @return \f$ \mathrm{e} \f$ raised to the power of \p x.
  */
@@ -1369,7 +1369,7 @@ inline real128 exp(real128 x)
 
 /// Unary natural logarithm.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose natural logarithm will be computed.
+ * @param x the \link mppp::real128 real128\endlink whose natural logarithm will be computed.
  *
  * @return the natural logarithm of \p x.
  */
@@ -1380,7 +1380,7 @@ inline real128 log(real128 x)
 
 /// Unary base-10 logarithm.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose base-10 logarithm will be computed.
+ * @param x the \link mppp::real128 real128\endlink whose base-10 logarithm will be computed.
  *
  * @return the base-10 logarithm of \p x.
  */
@@ -1391,7 +1391,7 @@ inline real128 log10(real128 x)
 
 /// Unary base-2 logarithm.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose base-2 logarithm will be computed.
+ * @param x the \link mppp::real128 real128\endlink whose base-2 logarithm will be computed.
  *
  * @return the base-2 logarithm of \p x.
  */
@@ -1408,7 +1408,7 @@ inline real128 log2(real128 x)
 
 /// Unary sine.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose sine will be computed.
+ * @param x the \link mppp::real128 real128\endlink whose sine will be computed.
  *
  * @return the sine of \p x.
  */
@@ -1419,7 +1419,7 @@ inline real128 sin(real128 x)
 
 /// Unary cosine.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose cosine will be computed.
+ * @param x the \link mppp::real128 real128\endlink whose cosine will be computed.
  *
  * @return the cosine of \p x.
  */
@@ -1436,7 +1436,7 @@ inline real128 cos(real128 x)
 
 /// Identity operator.
 /**
- * @param x the \link mppp::real128 real128 \endlink that will be copied.
+ * @param x the \link mppp::real128 real128\endlink that will be copied.
  *
  * @return a copy of \p x.
  */
@@ -1466,7 +1466,7 @@ constexpr real128 dispatch_add(const T &x, const real128 &y)
 }
 }
 
-/// Binary addition involving \link mppp::real128 real128 \endlink and C++ types.
+/// Binary addition involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * @param x the first operand.
  * @param y the second operand.
@@ -1500,14 +1500,14 @@ inline real128 dispatch_add(const T &x, const real128 &y)
 }
 }
 
-/// Binary addition involving \link mppp::real128 real128 \endlink and mp++ types.
+/// Binary addition involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * @param x the first operand.
  * @param y the second operand.
  *
  * @return \f$ x + y \f$.
  *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
  * from the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1544,7 +1544,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(T &x, const real128 &y)
 }
 }
 
-/// In-place addition involving \link mppp::real128 real128 \endlink and C++ types.
+/// In-place addition involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * \rststar
  * .. note::
@@ -1585,7 +1585,7 @@ inline void dispatch_in_place_add(T &x, const real128 &y)
 }
 }
 
-/// In-place addition involving \link mppp::real128 real128 \endlink and mp++ types.
+/// In-place addition involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * @param x the augend.
  * @param y the addend.
@@ -1593,7 +1593,7 @@ inline void dispatch_in_place_add(T &x, const real128 &y)
  * @return a reference to \p x, after it has been incremented by \p y.
  *
  * @throws unspecified any exception thrown by the corresponding binary operator, or by the conversion
- * of \link mppp::real128 real128 \endlink to the mp++ type.
+ * of \link mppp::real128 real128\endlink to the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
@@ -1617,7 +1617,7 @@ inline T &operator+=(T &x, const U &y)
  *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
  * \endrststar
  *
- * @param x the \link mppp::real128 real128 \endlink that will be increased.
+ * @param x the \link mppp::real128 real128\endlink that will be increased.
  *
  * @return a reference to \p x after the increment.
  */
@@ -1637,7 +1637,7 @@ inline MPPP_CONSTEXPR_14 real128 &operator++(real128 &x)
  *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
  * \endrststar
  *
- * @param x the \link mppp::real128 real128 \endlink that will be increased.
+ * @param x the \link mppp::real128 real128\endlink that will be increased.
  *
  * @return a copy of \p x before the increment.
  */
@@ -1650,7 +1650,7 @@ inline MPPP_CONSTEXPR_14 real128 operator++(real128 &x, int)
 
 /// Negation operator.
 /**
- * @param x the \link mppp::real128 real128 \endlink whose opposite will be returned.
+ * @param x the \link mppp::real128 real128\endlink whose opposite will be returned.
  *
  * @return \f$ -x \f$.
  */
@@ -1680,7 +1680,7 @@ constexpr real128 dispatch_sub(const T &x, const real128 &y)
 }
 }
 
-/// Binary subtraction involving \link mppp::real128 real128 \endlink and C++ types.
+/// Binary subtraction involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * @param x the first operand.
  * @param y the second operand.
@@ -1714,14 +1714,14 @@ inline real128 dispatch_sub(const T &x, const real128 &y)
 }
 }
 
-/// Binary subtraction involving \link mppp::real128 real128 \endlink and mp++ types.
+/// Binary subtraction involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * @param x the first operand.
  * @param y the second operand.
  *
  * @return \f$ x - y \f$.
  *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
  * from the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1756,7 +1756,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(T &x, const real128 &y)
 }
 }
 
-/// In-place subtraction involving \link mppp::real128 real128 \endlink and C++ types.
+/// In-place subtraction involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * \rststar
  * .. note::
@@ -1797,7 +1797,7 @@ inline void dispatch_in_place_sub(T &x, const real128 &y)
 }
 }
 
-/// In-place subtraction involving \link mppp::real128 real128 \endlink and mp++ types.
+/// In-place subtraction involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * @param x the minuend.
  * @param y the subtrahend.
@@ -1805,7 +1805,7 @@ inline void dispatch_in_place_sub(T &x, const real128 &y)
  * @return a reference to \p x, after it has been decremented by \p y.
  *
  * @throws unspecified any exception thrown by the corresponding binary operator, or by the conversion
- * of \link mppp::real128 real128 \endlink to the mp++ type.
+ * of \link mppp::real128 real128\endlink to the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
@@ -1829,7 +1829,7 @@ inline T &operator-=(T &x, const U &y)
  *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
  * \endrststar
  *
- * @param x the \link mppp::real128 real128 \endlink that will be decreased.
+ * @param x the \link mppp::real128 real128\endlink that will be decreased.
  *
  * @return a reference to \p x after the decrement.
  */
@@ -1849,7 +1849,7 @@ inline MPPP_CONSTEXPR_14 real128 &operator--(real128 &x)
  *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
  * \endrststar
  *
- * @param x the \link mppp::real128 real128 \endlink that will be decreased.
+ * @param x the \link mppp::real128 real128\endlink that will be decreased.
  *
  * @return a copy of \p x before the decrement.
  */
@@ -1881,7 +1881,7 @@ constexpr real128 dispatch_mul(const T &x, const real128 &y)
 }
 }
 
-/// Binary multiplication involving \link mppp::real128 real128 \endlink and C++ types.
+/// Binary multiplication involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * @param x the first operand.
  * @param y the second operand.
@@ -1915,14 +1915,14 @@ inline real128 dispatch_mul(const T &x, const real128 &y)
 }
 }
 
-/// Binary multiplication involving \link mppp::real128 real128 \endlink and mp++ types.
+/// Binary multiplication involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * @param x the first operand.
  * @param y the second operand.
  *
  * @return \f$ x \times y \f$.
  *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
  * from the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1957,7 +1957,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_mul(T &x, const real128 &y)
 }
 }
 
-/// In-place multiplication involving \link mppp::real128 real128 \endlink and C++ types.
+/// In-place multiplication involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * \rststar
  * .. note::
@@ -1998,7 +1998,7 @@ inline void dispatch_in_place_mul(T &x, const real128 &y)
 }
 }
 
-/// In-place multiplication involving \link mppp::real128 real128 \endlink and mp++ types.
+/// In-place multiplication involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * @param x the multiplicand.
  * @param y the multiplicator.
@@ -2006,7 +2006,7 @@ inline void dispatch_in_place_mul(T &x, const real128 &y)
  * @return a reference to \p x, after it has been multiplied by \p y.
  *
  * @throws unspecified any exception thrown by the corresponding binary operator, or by the conversion
- * of \link mppp::real128 real128 \endlink to the mp++ type.
+ * of \link mppp::real128 real128\endlink to the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
@@ -2041,7 +2041,7 @@ constexpr real128 dispatch_div(const T &x, const real128 &y)
 }
 }
 
-/// Binary division involving \link mppp::real128 real128 \endlink and C++ types.
+/// Binary division involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * @param x the first operand.
  * @param y the second operand.
@@ -2075,14 +2075,14 @@ inline real128 dispatch_div(const T &x, const real128 &y)
 }
 }
 
-/// Binary division involving \link mppp::real128 real128 \endlink and mp++ types.
+/// Binary division involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * @param x the first operand.
  * @param y the second operand.
  *
  * @return \f$ x / y \f$.
  *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
  * from the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2117,7 +2117,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_div(T &x, const real128 &y)
 }
 }
 
-/// In-place division involving \link mppp::real128 real128 \endlink and C++ types.
+/// In-place division involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * \rststar
  * .. note::
@@ -2158,7 +2158,7 @@ inline void dispatch_in_place_div(T &x, const real128 &y)
 }
 }
 
-/// In-place division involving \link mppp::real128 real128 \endlink and mp++ types.
+/// In-place division involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * @param x the dividend.
  * @param y the divisor.
@@ -2166,7 +2166,7 @@ inline void dispatch_in_place_div(T &x, const real128 &y)
  * @return a reference to \p x, after it has been divided by \p y.
  *
  * @throws unspecified any exception thrown by the corresponding binary operator, or by the conversion
- * of \link mppp::real128 real128 \endlink to the mp++ type.
+ * of \link mppp::real128 real128\endlink to the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
@@ -2201,7 +2201,7 @@ constexpr bool dispatch_eq(const T &x, const real128 &y)
 }
 }
 
-/// Equality operator involving \link mppp::real128 real128 \endlink and C++ types.
+/// Equality operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * \rststar
  * The implementation uses the comparison operator of the :cpp:type:`__float128` type.
@@ -2228,7 +2228,54 @@ constexpr bool operator==(const T &x, const U &y)
     return dispatch_eq(x, y);
 }
 
-/// Inequality operator involving \link mppp::real128 real128 \endlink and C++ types.
+inline namespace detail
+{
+
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
+inline bool dispatch_eq(const real128 &x, const T &y)
+{
+    return x == real128{y};
+}
+
+template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
+inline bool dispatch_eq(const T &x, const real128 &y)
+{
+    return real128{x} == y;
+}
+}
+
+/// Equality operator involving \link mppp::real128 real128\endlink and mp++ types.
+/**
+ * \rststar
+ * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
+ * and then uses the equality operator of :cpp:class:`~mppp::real128`.
+ *
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN compares
+ *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
+ *    for an equality predicate that handles NaN specially.
+ * \endrststar
+ *
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \f$ x = y \f$, \p false otherwise.
+ *
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
+ * from the mp++ type.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator==(const T &x, const Real128MpppOpTypes<T> &y)
+#else
+template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
+inline bool operator==(const T &x, const U &y)
+#endif
+{
+    return dispatch_eq(x, y);
+}
+
+/// Inequality operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * \rststar
  * The implementation uses the comparison operator of the :cpp:type:`__float128` type.
@@ -2255,23 +2302,7 @@ constexpr bool operator!=(const T &x, const U &y)
     return !(x == y);
 }
 
-inline namespace detail
-{
-
-template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
-inline bool dispatch_eq(const real128 &x, const T &y)
-{
-    return x == real128{y};
-}
-
-template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
-inline bool dispatch_eq(const T &x, const real128 &y)
-{
-    return real128{x} == y;
-}
-}
-
-/// Equality operator involving \link mppp::real128 real128 \endlink and mp++ types.
+/// Inequality operator involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * \rststar
  * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
@@ -2288,38 +2319,7 @@ inline bool dispatch_eq(const T &x, const real128 &y)
  *
  * @return \p true if \f$ x = y \f$, \p false otherwise.
  *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
- * from the mp++ type.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline bool operator==(const T &x, const Real128MpppOpTypes<T> &y)
-#else
-template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
-inline bool operator==(const T &x, const U &y)
-#endif
-{
-    return dispatch_eq(x, y);
-}
-
-/// Inequality operator involving \link mppp::real128 real128 \endlink and mp++ types.
-/**
- * \rststar
- * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
- * and then uses the equality operator of :cpp:class:`~mppp::real128`.
- *
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
- *    for an equality predicate that handles NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x = y \f$, \p false otherwise.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
  * from the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2354,7 +2354,7 @@ constexpr bool dispatch_lt(const T &x, const real128 &y)
 }
 }
 
-/// Less-than operator involving \link mppp::real128 real128 \endlink and C++ types.
+/// Less-than operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * \rststar
  * The implementation uses the less-than operator of the :cpp:type:`__float128` type.
@@ -2397,7 +2397,7 @@ inline bool dispatch_lt(const T &x, const real128 &y)
 }
 }
 
-/// Less-than operator involving \link mppp::real128 real128 \endlink and mp++ types.
+/// Less-than operator involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * \rststar
  * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
@@ -2415,7 +2415,7 @@ inline bool dispatch_lt(const T &x, const real128 &y)
  *
  * @return \p true if \f$ x < y \f$, \p false otherwise.
  *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
  * from the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2450,7 +2450,7 @@ constexpr bool dispatch_lte(const T &x, const real128 &y)
 }
 }
 
-/// Less-than or equal operator involving \link mppp::real128 real128 \endlink and C++ types.
+/// Less-than or equal operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * \rststar
  * The implementation uses the less-than or equal operator of the :cpp:type:`__float128` type.
@@ -2491,7 +2491,7 @@ inline bool dispatch_lte(const T &x, const real128 &y)
 }
 }
 
-/// Less-than or equal operator involving \link mppp::real128 real128 \endlink and mp++ types.
+/// Less-than or equal operator involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * \rststar
  * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
@@ -2507,7 +2507,7 @@ inline bool dispatch_lte(const T &x, const real128 &y)
  *
  * @return \p true if \f$ x \leq y \f$, \p false otherwise.
  *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
  * from the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2542,7 +2542,7 @@ constexpr bool dispatch_gt(const T &x, const real128 &y)
 }
 }
 
-/// Greater-than operator involving \link mppp::real128 real128 \endlink and C++ types.
+/// Greater-than operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * \rststar
  * The implementation uses the greater-than operator of the :cpp:type:`__float128` type.
@@ -2585,7 +2585,7 @@ inline bool dispatch_gt(const T &x, const real128 &y)
 }
 }
 
-/// Greater-than operator involving \link mppp::real128 real128 \endlink and mp++ types.
+/// Greater-than operator involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * \rststar
  * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
@@ -2603,7 +2603,7 @@ inline bool dispatch_gt(const T &x, const real128 &y)
  *
  * @return \p true if \f$ x > y \f$, \p false otherwise.
  *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
  * from the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2638,7 +2638,7 @@ constexpr bool dispatch_gte(const T &x, const real128 &y)
 }
 }
 
-/// Greater-than or equal operator involving \link mppp::real128 real128 \endlink and C++ types.
+/// Greater-than or equal operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
  * \rststar
  * The implementation uses the greater-than or equal operator of the :cpp:type:`__float128` type.
@@ -2679,7 +2679,7 @@ inline bool dispatch_gte(const T &x, const real128 &y)
 }
 }
 
-/// Greater-than or equal operator involving \link mppp::real128 real128 \endlink and mp++ types.
+/// Greater-than or equal operator involving \link mppp::real128 real128\endlink and mp++ types.
 /**
  * \rststar
  * The implementation promotes the non-:cpp:class:`~mppp::real128` argument to :cpp:class:`~mppp::real128`,
@@ -2695,7 +2695,7 @@ inline bool dispatch_gte(const T &x, const real128 &y)
  *
  * @return \p true if \f$ x \geq y \f$, \p false otherwise.
  *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128 \endlink
+ * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
  * from the mp++ type.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -2809,7 +2809,7 @@ constexpr real128 real128_sqrt2()
 // http://en.cppreference.com/w/cpp/language/inline
 // Note that constexpr static member variables are implicitly inline instead.
 
-/// The number of binary digits in the significand of a \link mppp::real128 real128 \endlink (113).
+/// The number of binary digits in the significand of a \link mppp::real128 real128\endlink (113).
 inline constexpr unsigned sig_digits_128 = real128_sig_digits();
 
 /// Quadruple-precision \f$ +\infty \f$ constant.

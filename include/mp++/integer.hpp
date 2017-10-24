@@ -5117,7 +5117,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
  *
  * @return a reference to \p is.
  *
- * @throws unspecified any exception thrown by \link mppp::integer integer \endlink's assignment operator from string.
+ * @throws unspecified any exception thrown by \link mppp::integer integer\endlink's assignment operator from string.
  */
 template <std::size_t SSize>
 inline std::istream &operator>>(std::istream &is, integer<SSize> &n)
