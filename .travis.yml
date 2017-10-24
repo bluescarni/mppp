@@ -37,14 +37,14 @@ matrix:
           - g++-4.8
           - cmake3
     - env: MPPP_BUILD="DebugGCC48DebugGMPUnstable"
-      compiler: gcc
+      language: python
+      python: 3.6
       os: linux
       addons:
         apt:
           packages:
           - g++-4.8
           - cmake3
-          - python-pip
           - autoconf
           - texinfo
     - env: MPPP_BUILD="CoverageGCC5"

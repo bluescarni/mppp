@@ -40,7 +40,7 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMPUnstable" ]]; then
-    pip install --upgrade --force-reinstall --user mercurial urllib3[secure];
+    pip install --upgrade --force-reinstall --user mercurial;
     # Download and compile locally the latest GMP in debug mode.
     /home/travis/.local/bin/hg clone https://gmplib.org/repo/gmp/ gmp_unstable;
     cd gmp_unstable;
