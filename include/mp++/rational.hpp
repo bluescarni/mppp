@@ -1669,7 +1669,7 @@ inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
  *
  * @return a reference to \p is.
  *
- * @throws unspecified any exception thrown by \link mppp::rational rational \endlink's assignment operator from string.
+ * @throws unspecified any exception thrown by \link mppp::rational rational\endlink's assignment operator from string.
  */
 template <std::size_t SSize>
 inline std::istream &operator>>(std::istream &is, rational<SSize> &q)
