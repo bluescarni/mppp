@@ -162,7 +162,7 @@ from and conversion to primitive types must always be requested explicitly. As a
 </div>
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#real128-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding quadmath functions minus the trailing <code class="docutils literal"><span class="pre">q</span></code>
-suffix. For instance, the quadmath call</p>
+suffix. For instance, the quadmath code</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">__float128</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">.5</span><span class="p">;</span>
 <span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="o">::</span><span class="n">sinq</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
 </pre></div>
@@ -438,7 +438,7 @@ will raise an error.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the construction of a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from <code class="docutils literal"><span class="pre">x</span></code>. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the construction of a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from <code class="docutils literal"><span class="pre">x</span></code>. </li>
 </ul>
 </dd>
 </dl>
@@ -795,7 +795,7 @@ inside <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::
 <dl class="type">
 <dt id="_CPPv210__float128">
 <span id="__float128"></span><em class="property">type </em><code class="descclassname"></code><code class="descname">__float128</code><a class="headerlink" href="#_CPPv210__float128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>A quadruple-precision floating-point type available in the GCC compiler on most contemporary platforms.
+<dd><p>A quadruple-precision floating-point type available in recent versions of the GCC and clang compilers.
 This is the type wrapped by the <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> class.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
@@ -915,7 +915,7 @@ rounded once.</p>
 <dd>the absolute value of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose absolute value will be computed.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose absolute value will be computed.</li>
 </ul>
 </dd>
 </dl>
@@ -968,7 +968,7 @@ rounded once.</p>
 <dd>the sign bit of <code class="docutils literal"><span class="pre">x</span></code> (as returned by <a class="reference internal" href="#classmppp_1_1real128_1a1c72f163cdd2d7fb625b34b442fc2d76"><span class="std std-ref">mppp::real128::signbit()</span></a>). </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose sign bit will be returned.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose sign bit will be returned.</li>
 </ul>
 </dd>
 </dl>
@@ -984,7 +984,7 @@ rounded once.</p>
 <dd>the category of the value of <code class="docutils literal"><span class="pre">x</span></code>, as established by <a class="reference internal" href="#classmppp_1_1real128_1ad3be701f5ad8ba44047a4562d0169409"><span class="std std-ref">mppp::real128::fpclassify()</span></a>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose floating-point category will be returned.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose floating-point category will be returned.</li>
 </ul>
 </dd>
 </dl>
@@ -994,13 +994,13 @@ rounded once.</p>
 <dl class="function">
 <dt id="_CPPv2N4mppp5isnanERK7real128">
 <span id="mppp::isnan__real128CRCE"></span><span class="target" id="group__real128__comparison_1gaf81596dd871df337caaecf77c745e09e"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">isnan</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp5isnanERK7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Detect if a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> is NaN. </p>
+<dd><p>Detect if a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> is NaN. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">x</span></code> is NaN, <code class="docutils literal"><span class="pre">false</span></code> otherwise. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> argument.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> argument.</li>
 </ul>
 </dd>
 </dl>
@@ -1010,13 +1010,13 @@ rounded once.</p>
 <dl class="function">
 <dt id="_CPPv2N4mppp5isinfERK7real128">
 <span id="mppp::isinf__real128CRCE"></span><span class="target" id="group__real128__comparison_1ga0cec865969a69fd4b170b46744b92050"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">isinf</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp5isinfERK7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Detect if a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> is infinite. </p>
+<dd><p>Detect if a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> is infinite. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">x</span></code> is infinite, <code class="docutils literal"><span class="pre">false</span></code> otherwise. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> argument.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> argument.</li>
 </ul>
 </dd>
 </dl>
@@ -1026,13 +1026,13 @@ rounded once.</p>
 <dl class="function">
 <dt id="_CPPv2N4mppp6finiteERK7real128">
 <span id="mppp::finite__real128CRCE"></span><span class="target" id="group__real128__comparison_1gad87fd3960b4d2376ffd8da2c470edaa8"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">finite</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6finiteERK7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Detect if a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> is finite. </p>
+<dd><p>Detect if a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> is finite. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">x</span></code> is finite, <code class="docutils literal"><span class="pre">false</span></code> otherwise. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> argument.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> argument.</li>
 </ul>
 </dd>
 </dl>
@@ -1123,7 +1123,7 @@ standard library (e.g., <code class="docutils literal"><span class="pre">std::so
 <dd>the nonnegative square root of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose square root will be returned.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose square root will be returned.</li>
 </ul>
 </dd>
 </dl>
@@ -1139,7 +1139,7 @@ standard library (e.g., <code class="docutils literal"><span class="pre">std::so
 <dd>the real cube root of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose cube root will be returned.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose cube root will be returned.</li>
 </ul>
 </dd>
 </dl>
@@ -1156,8 +1156,8 @@ standard library (e.g., <code class="docutils literal"><span class="pre">std::so
 <dd>the euclidean distance <span class="math">\( \sqrt{x^2+y^2} \)</span>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the first <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> argument. </li>
-<li><code class="docutils literal"><span class="pre">y</span></code>: the second <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> argument.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the first <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> argument. </li>
+<li><code class="docutils literal"><span class="pre">y</span></code>: the second <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> argument.</li>
 </ul>
 </dd>
 </dl>
@@ -1202,7 +1202,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <dd>the sine of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose sine will be computed.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose sine will be computed.</li>
 </ul>
 </dd>
 </dl>
@@ -1218,7 +1218,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <dd>the cosine of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose cosine will be computed.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose cosine will be computed.</li>
 </ul>
 </dd>
 </dl>
@@ -1237,7 +1237,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <dd><span class="math">\( \mathrm{e} \)</span> raised to the power of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose natural exponential function be computed.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose natural exponential function be computed.</li>
 </ul>
 </dd>
 </dl>
@@ -1253,7 +1253,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <dd>the natural logarithm of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose natural logarithm will be computed.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose natural logarithm will be computed.</li>
 </ul>
 </dd>
 </dl>
@@ -1269,7 +1269,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <dd>the base-10 logarithm of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose base-10 logarithm will be computed.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose base-10 logarithm will be computed.</li>
 </ul>
 </dd>
 </dl>
@@ -1285,7 +1285,7 @@ after the conversion of one of the operands to <a class="reference internal" hre
 <dd>the base-2 logarithm of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose base-2 logarithm will be computed.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose base-2 logarithm will be computed.</li>
 </ul>
 </dd>
 </dl>
@@ -1338,12 +1338,12 @@ library if precise and forward-compatible control on the printing format is need
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">is</span></code>: the input stream. </li>
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> to which the string extracted from the stream will be assigned.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> to which the string extracted from the stream will be assigned.</li>
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a>‘s assignment operator from string. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a>’s assignment operator from string. </li>
 </ul>
 </dd>
 </dl>
@@ -1363,7 +1363,7 @@ library if precise and forward-compatible control on the printing format is need
 <dd>a copy of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> that will be copied.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> that will be copied.</li>
 </ul>
 </dd>
 </dl>
@@ -1375,7 +1375,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppplERK1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::add-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1gaabfb38f4e35bd331d91d586a0cc07f51"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary addition involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>Binary addition involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><span class="math">\( x + y \)</span>. </dd>
@@ -1394,7 +1394,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppplERK1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::add-operator__TCR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1ga3afe0f8af0b3af4dddc3c2fcbc6d2c25"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERK1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary addition involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>Binary addition involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><span class="math">\( x + y \)</span>.</dd>
@@ -1406,7 +1406,7 @@ library if precise and forward-compatible control on the printing format is need
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -1418,7 +1418,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mppppLER1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::add-assign-operator__TR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1ga0d53cb13d6e44a09b0c84b7bb468d7d3"></span><em class="property">constexpr</em> T &amp;<code class="descclassname">mppp::</code><code class="descname">operator+=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppppLER1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place addition involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>In-place addition involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This operator is marked as <code class="docutils literal"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
@@ -1442,7 +1442,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mppppLER1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::add-assign-operator__TR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1ga161d2a9f41e25d3ae125afe406a52375"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator+=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppppLER1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place addition involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>In-place addition involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">x</span></code>, after it has been incremented by <code class="docutils literal"><span class="pre">y</span></code>.</dd>
@@ -1454,7 +1454,7 @@ library if precise and forward-compatible control on the printing format is need
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the corresponding binary operator, or by the conversion of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> to the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the corresponding binary operator, or by the conversion of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> to the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -1476,7 +1476,7 @@ library if precise and forward-compatible control on the printing format is need
 <dd>a reference to <code class="docutils literal"><span class="pre">x</span></code> after the increment. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> that will be increased.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> that will be increased.</li>
 </ul>
 </dd>
 </dl>
@@ -1498,7 +1498,7 @@ library if precise and forward-compatible control on the printing format is need
 <dd>a copy of <code class="docutils literal"><span class="pre">x</span></code> before the increment. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> that will be increased.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> that will be increased.</li>
 </ul>
 </dd>
 </dl>
@@ -1514,7 +1514,7 @@ library if precise and forward-compatible control on the printing format is need
 <dd><span class="math">\( -x \)</span>. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> whose opposite will be returned.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> whose opposite will be returned.</li>
 </ul>
 </dd>
 </dl>
@@ -1526,7 +1526,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmiERK1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::sub-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1gaf74c4b91a3683e6e6d00b2d0ec1b0540"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary subtraction involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>Binary subtraction involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><span class="math">\( x - y \)</span>. </dd>
@@ -1545,7 +1545,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmiERK1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::sub-operator__TCR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1gaa4af4eaf8a4bfb18b02a058ad9045c5d"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERK1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary subtraction involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>Binary subtraction involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><span class="math">\( x - y \)</span>.</dd>
@@ -1557,7 +1557,7 @@ library if precise and forward-compatible control on the printing format is need
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -1569,7 +1569,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmIER1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::sub-assign-operator__TR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1gaa238fbe11f245414f6a5b4a10886438f"></span><em class="property">constexpr</em> T &amp;<code class="descclassname">mppp::</code><code class="descname">operator-=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmIER1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place subtraction involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>In-place subtraction involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This operator is marked as <code class="docutils literal"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
@@ -1593,7 +1593,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmIER1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::sub-assign-operator__TR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1ga37fbd3e18297a74146d40ef7c443bd78"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator-=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmIER1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place subtraction involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>In-place subtraction involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">x</span></code>, after it has been decremented by <code class="docutils literal"><span class="pre">y</span></code>.</dd>
@@ -1605,7 +1605,7 @@ library if precise and forward-compatible control on the printing format is need
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the corresponding binary operator, or by the conversion of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> to the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the corresponding binary operator, or by the conversion of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> to the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -1627,7 +1627,7 @@ library if precise and forward-compatible control on the printing format is need
 <dd>a reference to <code class="docutils literal"><span class="pre">x</span></code> after the decrement. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> that will be decreased.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> that will be decreased.</li>
 </ul>
 </dd>
 </dl>
@@ -1649,7 +1649,7 @@ library if precise and forward-compatible control on the printing format is need
 <dd>a copy of <code class="docutils literal"><span class="pre">x</span></code> before the decrement. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> that will be decreased.</li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> that will be decreased.</li>
 </ul>
 </dd>
 </dl>
@@ -1661,7 +1661,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmlERK1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::mul-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1ga3af0b31581dc5a3736f634fede059381"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp::</code><code class="descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmlERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary multiplication involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>Binary multiplication involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><span class="math">\( x \times y \)</span>. </dd>
@@ -1680,7 +1680,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmlERK1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::mul-operator__TCR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1ga7ed90101fa2b236e2022677ebda1c300"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp::</code><code class="descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmlERK1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary multiplication involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>Binary multiplication involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><span class="math">\( x \times y \)</span>.</dd>
@@ -1692,7 +1692,7 @@ library if precise and forward-compatible control on the printing format is need
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -1704,7 +1704,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmLER1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::mul-assign-operator__TR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1gad06befd81459806ad6cefd79f841aad4"></span><em class="property">constexpr</em> T &amp;<code class="descclassname">mppp::</code><code class="descname">operator*=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmLER1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place multiplication involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>In-place multiplication involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This operator is marked as <code class="docutils literal"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
@@ -1728,7 +1728,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmLER1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::mul-assign-operator__TR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1ga11d74354d15cd52b42191409d761422e"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator*=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmLER1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place multiplication involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>In-place multiplication involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">x</span></code>, after it has been multiplied by <code class="docutils literal"><span class="pre">y</span></code>.</dd>
@@ -1740,7 +1740,7 @@ library if precise and forward-compatible control on the printing format is need
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the corresponding binary operator, or by the conversion of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> to the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the corresponding binary operator, or by the conversion of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> to the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -1752,7 +1752,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppdvERK1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::div-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1gadfa60968b47d5295d62766652e68b1f9"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp::</code><code class="descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdvERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary division involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>Binary division involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><span class="math">\( x / y \)</span>. </dd>
@@ -1771,7 +1771,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppdvERK1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::div-operator__TCR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1gaeb0664312cf71989b967941b7e24347a"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp::</code><code class="descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdvERK1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary division involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>Binary division involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><span class="math">\( x / y \)</span>.</dd>
@@ -1783,7 +1783,7 @@ library if precise and forward-compatible control on the printing format is need
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -1795,7 +1795,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppdVER1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::div-assign-operator__TR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1ga31820762e1720a74b4599f0984d947f4"></span><em class="property">constexpr</em> T &amp;<code class="descclassname">mppp::</code><code class="descname">operator/=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdVER1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place division involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>In-place division involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This operator is marked as <code class="docutils literal"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
@@ -1819,7 +1819,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppdVER1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::div-assign-operator__TR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1gafe0887020ee8c728daeb5054b8334a24"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator/=</code><span class="sig-paren">(</span>T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdVER1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>In-place division involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>In-place division involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">x</span></code>, after it has been divided by <code class="docutils literal"><span class="pre">y</span></code>.</dd>
@@ -1831,7 +1831,7 @@ library if precise and forward-compatible control on the printing format is need
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the corresponding binary operator, or by the conversion of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> to the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the corresponding binary operator, or by the conversion of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> to the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -1843,34 +1843,7 @@ library if precise and forward-compatible control on the printing format is need
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppeqERK1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::eq-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1ga2f23621656dcc177130477a5f0bc0fd1"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeqERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Equality operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
-<p><p>The implementation uses the comparison operator of the <a class="reference internal" href="#_CPPv210__float128" title="__float128"><code class="xref cpp cpp-type docutils literal"><span class="pre">__float128</span></code></a> type.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This operator does not handle NaN in a special way (that is, NaN compares
-different from any value, including NaN itself). See <a class="reference internal" href="#_CPPv2N4mppp16real128_equal_toERK7real128RK7real128" title="mppp::real128_equal_to"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::real128_equal_to()</span></code></a>
-for an equality predicate that handles NaN specially.</p>
-</div>
-</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal"><span class="pre">true</span></code> if <span class="math">\( x = y \)</span>, <code class="docutils literal"><span class="pre">false</span></code> otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">x</span></code>: the first operand. </li>
-<li><code class="docutils literal"><span class="pre">y</span></code>: the second operand.</li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppneERK1TRK17Real128CppOpTypesI1TE">
-<span id="mppp::neq-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1ga7763e71e5d6ca8e52407b32e6c8a64d3"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Inequality operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>Equality operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><p>The implementation uses the comparison operator of the <a class="reference internal" href="#_CPPv210__float128" title="__float128"><code class="xref cpp cpp-type docutils literal"><span class="pre">__float128</span></code></a> type.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -1897,7 +1870,7 @@ for an equality predicate that handles NaN specially.</p>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppeqERK1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::eq-operator__TCR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1ga4ba1cc9a1914ddb569a867992c65871d"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeqERK1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Equality operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>Equality operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><p>The implementation promotes the non-<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> argument to <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>,
 and then uses the equality operator of <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>.</p>
 <div class="admonition note">
@@ -1918,7 +1891,34 @@ for an equality predicate that handles NaN specially.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from the mp++ type. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppneERK1TRK17Real128CppOpTypesI1TE">
+<span id="mppp::neq-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1ga7763e71e5d6ca8e52407b32e6c8a64d3"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Inequality operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
+<p><p>The implementation uses the comparison operator of the <a class="reference internal" href="#_CPPv210__float128" title="__float128"><code class="xref cpp cpp-type docutils literal"><span class="pre">__float128</span></code></a> type.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This operator does not handle NaN in a special way (that is, NaN compares
+different from any value, including NaN itself). See <a class="reference internal" href="#_CPPv2N4mppp16real128_equal_toERK7real128RK7real128" title="mppp::real128_equal_to"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::real128_equal_to()</span></code></a>
+for an equality predicate that handles NaN specially.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><code class="docutils literal"><span class="pre">true</span></code> if <span class="math">\( x = y \)</span>, <code class="docutils literal"><span class="pre">false</span></code> otherwise. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">x</span></code>: the first operand. </li>
+<li><code class="docutils literal"><span class="pre">y</span></code>: the second operand.</li>
 </ul>
 </dd>
 </dl>
@@ -1930,7 +1930,7 @@ for an equality predicate that handles NaN specially.</p>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppneERK1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::neq-operator__TCR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1ga3310d5dda6596ef452fc017b02d1d21f"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Inequality operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>Inequality operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><p>The implementation promotes the non-<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> argument to <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>,
 and then uses the equality operator of <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>.</p>
 <div class="admonition note">
@@ -1951,7 +1951,7 @@ for an equality predicate that handles NaN specially.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -1963,7 +1963,7 @@ for an equality predicate that handles NaN specially.</p>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppltERK1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::lt-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1ga262109ae2ce509dfb758cc0039e44c2b"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppltERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Less-than operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>Less-than operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><p>The implementation uses the less-than operator of the <a class="reference internal" href="#_CPPv210__float128" title="__float128"><code class="xref cpp cpp-type docutils literal"><span class="pre">__float128</span></code></a> type.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -1991,7 +1991,7 @@ NaN specially.</p>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppltERK1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::lt-operator__TCR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1gace139fe4343fb3be7ae17cf55d7b90c0"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppltERK1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Less-than operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>Less-than operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><p>The implementation promotes the non-<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> argument to <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>,
 and then uses the less-than operator of <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>.</p>
 <div class="admonition note">
@@ -2013,7 +2013,7 @@ NaN specially.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -2025,7 +2025,7 @@ NaN specially.</p>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppleERK1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::lte-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1ga3860888cc5863a33865b95d50c7717d4"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppleERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Less-than or equal operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>Less-than or equal operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><p>The implementation uses the less-than or equal operator of the <a class="reference internal" href="#_CPPv210__float128" title="__float128"><code class="xref cpp cpp-type docutils literal"><span class="pre">__float128</span></code></a> type.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -2051,7 +2051,7 @@ less than or equal to any value, and no value is less than or equal to NaN).</p>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppleERK1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::lte-operator__TCR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1ga065b17a14c9fc9b6664d265467b66baf"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppleERK1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Less-than or equal operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>Less-than or equal operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><p>The implementation promotes the non-<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> argument to <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>,
 and then uses the less-than or equal operator of <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>.</p>
 <div class="admonition note">
@@ -2071,7 +2071,7 @@ less than or equal to any value, and no value is less than or equal to NaN).</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -2083,7 +2083,7 @@ less than or equal to any value, and no value is less than or equal to NaN).</p>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppgtERK1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::gt-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1ga5f51c8019a454013bdce82964c30ab72"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgtERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Greater-than operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>Greater-than operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><p>The implementation uses the greater-than operator of the <a class="reference internal" href="#_CPPv210__float128" title="__float128"><code class="xref cpp cpp-type docutils literal"><span class="pre">__float128</span></code></a> type.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -2111,7 +2111,7 @@ NaN specially.</p>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppgtERK1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::gt-operator__TCR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1gad24cda65453b11acf64fc36056d427e2"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgtERK1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Greater-than operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>Greater-than operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><p>The implementation promotes the non-<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> argument to <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>,
 and then uses the greater-than operator of <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>.</p>
 <div class="admonition note">
@@ -2133,7 +2133,7 @@ NaN specially.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -2145,7 +2145,7 @@ NaN specially.</p>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppgeERK1TRK17Real128CppOpTypesI1TE">
 <span id="mppp::gte-operator__TCR.Real128CppOpTypes:T:CRCE"></span><span class="target" id="group__real128__operators_1ga7495462366c80692ccb604fec954e55d"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp17Real128CppOpTypesE" title="mppp::Real128CppOpTypes">Real128CppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgeERK1TRK17Real128CppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Greater-than or equal operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and C++ types. </p>
+<dd><p>Greater-than or equal operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and C++ types. </p>
 <p><p>The implementation uses the greater-than or equal operator of the <a class="reference internal" href="#_CPPv210__float128" title="__float128"><code class="xref cpp cpp-type docutils literal"><span class="pre">__float128</span></code></a> type.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -2171,7 +2171,7 @@ greater than or equal to any value, and no value is greater than or equal to NaN
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppgeERK1TRK18Real128MpppOpTypesI1TE">
 <span id="mppp::gte-operator__TCR.Real128MpppOpTypes:T:CR"></span><span class="target" id="group__real128__operators_1gac0ce11854e831b11795fc7f4bac3f31c"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp18Real128MpppOpTypesE" title="mppp::Real128MpppOpTypes">Real128MpppOpTypes</a>&lt;T&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgeERK1TRK18Real128MpppOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Greater-than or equal operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> and mp++ types. </p>
+<dd><p>Greater-than or equal operator involving <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> and mp++ types. </p>
 <p><p>The implementation promotes the non-<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> argument to <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>,
 and then uses the greater-than or equal operator of <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>.</p>
 <div class="admonition note">
@@ -2191,7 +2191,7 @@ greater than or equal to any value, and no value is greater than or equal to NaN
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> from the mp++ type. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the constructor of <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> from the mp++ type. </li>
 </ul>
 </dd>
 </dl>
@@ -2214,7 +2214,7 @@ from the quadmath library.</p>
 <dl class="member">
 <dt id="_CPPv2N4mppp14sig_digits_128E">
 <span id="mppp::sig_digits_128__unsigned"></span><span class="target" id="group__real128__constants_1ga6ad2a046b6c6489596105d7ca589ad58"></span><em class="property">constexpr</em> unsigned <code class="descclassname">mppp::</code><code class="descname">sig_digits_128</code> = real128_sig_digits()<a class="headerlink" href="#_CPPv2N4mppp14sig_digits_128E" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>The number of binary digits in the significand of a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128 </span></a> (113). </p>
+<dd><p>The number of binary digits in the significand of a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> (113). </p>
 </dd></dl>
 
 <dl class="member">
@@ -2326,7 +2326,7 @@ from the quadmath library.</p>
       &copy;2016-2017, Francesco Biscani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
