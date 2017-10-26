@@ -17,20 +17,18 @@ Concepts
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalInteroperable
 
    This concept is satisfied if the type ``T`` can interoperate with a :cpp:class:`~mppp::rational`
-   with static size ``SSize``. Specifically, this concept will be ``true`` if either:
+   with static size ``SSize``. Specifically, this concept will be ``true`` if ``T`` satisfies
+   :cpp:concept:`~mppp::CppInteroperable` or it is an :cpp:class:`~mppp::integer` with static size ``SSize``.
 
-   * ``T`` is :cpp:concept:`CppInteroperable`, or
-   * ``T`` is an :cpp:class:`~mppp::integer` with static size ``SSize``.
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalCvrInteroperable
 
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalIntegralInteroperable
+   This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
+   satisfies :cpp:concept:`~mppp::RationalInteroperable`.
 
-   This concept is satisfied if ``T`` is a :cpp:concept:`~mppp::RationalInteroperable` type and it is not
-   a floating-point type.
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalCvrIntegralInteroperable
 
-.. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalFPInteroperable
-
-   This concept is satisfied if ``T`` is both a :cpp:concept:`~mppp::RationalInteroperable` and
-   a floating-point type.
+   This concept is satisfied if ``T`` is a :cpp:concept:`~mppp::RationalCvrInteroperable` type and it is not
+   a floating-point type (after the removal of reference and cv qualifiers).
 
 .. cpp:concept:: template <typename T, typename U> mppp::RationalOpTypes
 

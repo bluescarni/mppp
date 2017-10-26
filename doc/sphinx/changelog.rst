@@ -31,6 +31,8 @@ New
 Changes
 ~~~~~~~
 
+- Various simplifications in the :cpp:class:`~mppp::rational` API (`#66 <https://github.com/bluescarni/mppp/pull/66>`__).
+
 - Introduce a :cpp:concept:`~mppp::StringType` concept and use it to reduce the number of overloads in the
   constructors/assignment operators from string (`#63 <https://github.com/bluescarni/mppp/pull/63>`__,
   `#64 <https://github.com/bluescarni/mppp/pull/64>`__).
