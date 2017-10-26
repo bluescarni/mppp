@@ -36,6 +36,8 @@ ADD_MPPP_TESTCASE(integer_arith_ops)
 if(NOT MINGW)
     # At the moment this test results in a linking error in conjunction
     # with catch. Needs to be investigated.
+    # NOTE: this might be related to the binary size, we can try splitting
+    # some tests up more.
     ADD_MPPP_TESTCASE(integer_basic)
 endif()
 ADD_MPPP_TESTCASE(integer_bin)
@@ -58,7 +60,10 @@ ADD_MPPP_TESTCASE(integer_view)
 ADD_MPPP_TESTCASE(rational_abs)
 ADD_MPPP_TESTCASE(rational_arith)
 ADD_MPPP_TESTCASE(rational_arith_ops)
-ADD_MPPP_TESTCASE(rational_basic)
+if(NOT MINGW)
+    # NOTE: same as above.
+    ADD_MPPP_TESTCASE(rational_basic)
+endif()
 ADD_MPPP_TESTCASE(rational_hash)
 ADD_MPPP_TESTCASE(rational_inv)
 ADD_MPPP_TESTCASE(rational_is_zero_one)
