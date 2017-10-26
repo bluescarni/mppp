@@ -41,8 +41,7 @@ namespace mppp
 {
 
 template <typename T, std::size_t SSize>
-using is_rational_interoperable
-    = disjunction<is_cpp_interoperable<uncvref_t<T>>, std::is_same<uncvref_t<T>, integer<SSize>>>;
+using is_rational_interoperable = disjunction<is_cpp_interoperable<T>, std::is_same<T, integer<SSize>>>;
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -52,14 +51,25 @@ using rational_interoperable_enabler = enable_if_t<is_rational_interoperable<T, 
 #endif
 
 template <typename T, std::size_t SSize>
-using is_rational_integral_interoperable
-    = conjunction<is_rational_interoperable<T, SSize>, negation<std::is_floating_point<uncvref_t<T>>>>;
+using is_rational_cvr_interoperable = is_rational_interoperable<uncvref_t<T>, SSize>;
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
+concept bool RationalCvrInteroperable = is_rational_cvr_interoperable<T, SSize>::value;
 #else
-using rational_integral_interoperable_enabler = enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int>;
+using rational_cvr_interoperable_enabler = enable_if_t<is_rational_cvr_interoperable<T, SSize>::value, int>;
+#endif
+
+template <typename T, std::size_t SSize>
+using is_rational_cvr_integral_interoperable
+    = conjunction<is_rational_cvr_interoperable<T, SSize>, negation<std::is_floating_point<uncvref_t<T>>>>;
+
+template <typename T, std::size_t SSize>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RationalCvrIntegralInteroperable = is_rational_cvr_integral_interoperable<T, SSize>::value;
+#else
+using rational_cvr_integral_interoperable_enabler
+    = enable_if_t<is_rational_cvr_integral_interoperable<T, SSize>::value, int>;
 #endif
 
 inline namespace detail
@@ -278,27 +288,27 @@ private:
         m_den = mpq_denref(&mpq.m_mpq);
     }
 #endif
-    template <typename T, rational_integral_interoperable_enabler<T, SSize> = 0>
+    template <typename T, enable_if_t<is_rational_cvr_integral_interoperable<T, SSize>::value, int> = 0>
     explicit rational(const ptag &, T &&n) : m_num(std::forward<T>(n)), m_den(1u)
     {
     }
 
 public:
-/// Floating-point constructor.
+/// Generic constructor.
 /**
  * \rststar
- * This constructor will initialize a rational with the floating-point value ``x``. The construction will fail if ``x``
- * is not finite.
+ * This constructor will initialize a rational with the value ``x``. The construction will fail if ``x``
+ * is a non-finite floating-point value.
  * \endrststar
  *
- * @param x the floating-point value that will be used to initialize \p this.
+ * @param x the value that will be used to initialize \p this.
  *
- * @throws std::domain_error if \p x is not finite.
+ * @throws std::domain_error if \p x is a non-finite floating-point value.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    explicit rational(RationalInteroperable<SSize> &&x)
+    explicit rational(RationalCvrInteroperable<SSize> &&x)
 #else
-    template <typename T, rational_interoperable_enabler<T, SSize> = 0>
+    template <typename T, rational_cvr_interoperable_enabler<T, SSize> = 0>
     explicit rational(T &&x)
 #endif
         : rational(ptag{}, std::forward<decltype(x)>(x))
@@ -308,7 +318,7 @@ public:
 /**
  * \rststar
  * This constructor is enabled only if both ``T`` and ``U`` satisfy the
- * :cpp:concept:`~mppp::RationalIntegralInteroperable` concept. The input value ``n`` will be used to initialise the
+ * :cpp:concept:`~mppp::RationalCvrIntegralInteroperable` concept. The input value ``n`` will be used to initialise the
  * numerator, while ``d`` will be used to initialise the denominator. If ``make_canonical`` is ``true``
  * (the default), then :cpp:func:`~mppp::rational::canonicalise()` will be called after the construction
  * of numerator and denominator.
@@ -328,11 +338,11 @@ public:
  * @throws zero_division_error if the denominator is zero.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <RationalIntegralInteroperable<SSize> T, RationalIntegralInteroperable<SSize> U>
+    template <RationalCvrIntegralInteroperable<SSize> T, RationalCvrIntegralInteroperable<SSize> U>
 #else
     template <typename T, typename U,
-              enable_if_t<conjunction<is_rational_integral_interoperable<T, SSize>,
-                                      is_rational_integral_interoperable<U, SSize>>::value,
+              enable_if_t<conjunction<is_rational_cvr_integral_interoperable<T, SSize>,
+                                      is_rational_cvr_integral_interoperable<U, SSize>>::value,
                           int> = 0>
 #endif
     explicit rational(T &&n, U &&d, bool make_canonical = true) : m_num(std::forward<T>(n)), m_den(std::forward<U>(d))
@@ -518,7 +528,8 @@ public:
     }
 
 private:
-    template <typename T, rational_integral_interoperable_enabler<T, SSize> = 0>
+    // Implementation of the generic assignment operator.
+    template <typename T, enable_if_t<is_rational_cvr_integral_interoperable<T, SSize>::value, int> = 0>
     void dispatch_assignment(T &&n)
     {
         m_num = std::forward<T>(n);
@@ -531,10 +542,23 @@ private:
     }
 
 public:
+    /// Generic assignment operator.
+    /**
+     * \rststar
+     * This operator will assign ``x`` to ``this``.
+     * \endrststar
+     *
+     * @param x the assignment argument.
+     *
+     * @return a reference to ``this``.
+     *
+     * @throws unspecified any exception thrown by the generic constructor of \link mppp::rational\endlink,
+     * if ``x`` is a floating-point value.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
-    rational &operator=(RationalInteroperable<SSize> &&x)
+    rational &operator=(RationalCvrInteroperable<SSize> &&x)
 #else
-    template <typename T, rational_interoperable_enabler<T, SSize> = 0>
+    template <typename T, rational_cvr_interoperable_enabler<T, SSize> = 0>
     rational &operator=(T &&x)
 #endif
     {
@@ -2321,13 +2345,13 @@ inline bool dispatch_equality(const rational<SSize> &op1, const rational<SSize> 
     return op1.get_num() == op2.get_num() && op1.get_den() == op2.get_den();
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_rational_cvr_integral_interoperable<T, SSize>::value, int> = 0>
 inline bool dispatch_equality(const rational<SSize> &op1, const T &op2)
 {
     return op1.get_den().is_one() && op1.get_num() == op2;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_rational_cvr_integral_interoperable<T, SSize>::value, int> = 0>
 inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 {
     return dispatch_equality(op2, op1);
