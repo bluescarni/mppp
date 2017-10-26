@@ -41,7 +41,8 @@ namespace mppp
 {
 
 template <typename T, std::size_t SSize>
-using is_rational_interoperable = disjunction<is_cpp_interoperable<uncvref_t<T>>, std::is_same<uncvref_t<T>, integer<SSize>>>;
+using is_rational_interoperable
+    = disjunction<is_cpp_interoperable<uncvref_t<T>>, std::is_same<uncvref_t<T>, integer<SSize>>>;
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -242,7 +243,8 @@ public:
 
 private:
     // A tag for private constrcutors.
-    struct ptag {};
+    struct ptag {
+    };
     template <typename T, enable_if_t<disjunction<std::is_same<float, T>, std::is_same<double, T>>::value, int> = 0>
     explicit rational(const ptag &, const T &x)
     {
@@ -299,7 +301,7 @@ public:
     template <typename T, rational_interoperable_enabler<T, SSize> = 0>
     explicit rational(T &&x)
 #endif
-     : rational(ptag{}, std::forward<decltype(x)>(x))
+        : rational(ptag{}, std::forward<decltype(x)>(x))
     {
     }
 /// Constructor from numerator and denominator.
@@ -333,8 +335,7 @@ public:
                                       is_rational_integral_interoperable<U, SSize>>::value,
                           int> = 0>
 #endif
-        explicit rational(T &&n, U &&d, bool make_canonical = true)
-        : m_num(std::forward<T>(n)), m_den(std::forward<U>(d))
+    explicit rational(T &&n, U &&d, bool make_canonical = true) : m_num(std::forward<T>(n)), m_den(std::forward<U>(d))
     {
         if (mppp_unlikely(m_den.is_zero())) {
             throw zero_division_error("Cannot construct a rational with zero as denominator");
@@ -515,6 +516,7 @@ public:
         }
         return *this;
     }
+
 private:
     template <typename T, rational_integral_interoperable_enabler<T, SSize> = 0>
     void dispatch_assignment(T &&n)
@@ -527,6 +529,7 @@ private:
     {
         *this = rational{x};
     }
+
 public:
 #if defined(MPPP_HAVE_CONCEPTS)
     rational &operator=(RationalInteroperable<SSize> &&x)
