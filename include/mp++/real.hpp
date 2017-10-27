@@ -828,7 +828,8 @@ private:
     }
     explicit real(const ptag &, const std::string &s, int base, ::mpfr_prec_t p) : real(s.c_str(), base, p) {}
 #if MPPP_CPLUSPLUS >= 201703L
-    explicit real(const ptag &, const std::string_view &s, int base, ::mpfr_prec_t p) : real(s.data(), s.data() + s.size(), base, p)
+    explicit real(const ptag &, const std::string_view &s, int base, ::mpfr_prec_t p)
+        : real(s.data(), s.data() + s.size(), base, p)
     {
     }
 #endif
