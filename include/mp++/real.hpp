@@ -119,11 +119,11 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
     // and wrap it into a smart pointer.
     ::mpfr_exp_t exp(0);
     smart_mpfr_str str(::mpfr_get_str(nullptr, &exp, base, 0, r, MPFR_RNDN), ::mpfr_free_str);
+    // LCOV_EXCL_START
     if (mppp_unlikely(!str)) {
-        // LCOV_EXCL_START
         throw std::runtime_error("Error in the conversion of a real to string: the call to mpfr_get_str() failed");
-        // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_STOP
 
     // Print the string, inserting a decimal point after the first digit.
     bool dot_added = false;
@@ -214,12 +214,12 @@ inline ::mpfr_prec_t real_deduce_precision(const integer<SSize> &n)
     // Infer the precision from the bit size of n.
     const auto ls = n.size();
     // Check that ls * GMP_NUMB_BITS is representable by mpfr_prec_t.
+    // LCOV_EXCL_START
     if (mppp_unlikely(ls > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
                                / unsigned(GMP_NUMB_BITS))) {
-        // LCOV_EXCL_START
         throw std::overflow_error("The deduced precision for a real from an integer is too large");
-        // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_STOP
     return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(ls) * GMP_NUMB_BITS);
 }
 
@@ -230,6 +230,7 @@ inline ::mpfr_prec_t real_deduce_precision(const rational<SSize> &q)
     const auto n_size = q.get_num().size();
     const auto d_size = q.get_den().size();
     // Overflow checks.
+    // LCOV_EXCL_START
     if (mppp_unlikely(
             // Overflow in total size.
             (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
@@ -237,10 +238,9 @@ inline ::mpfr_prec_t real_deduce_precision(const rational<SSize> &q)
             || ((n_size + d_size)
                 > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
                       / unsigned(GMP_NUMB_BITS)))) {
-        // LCOV_EXCL_START
         throw std::overflow_error("The deduced precision for a real from a rational is too large");
-        // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_STOP
     return static_cast<::mpfr_prec_t>(static_cast<::mpfr_prec_t>(n_size + d_size) * GMP_NUMB_BITS);
 }
 
