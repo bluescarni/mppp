@@ -8,9 +8,11 @@
 
 #include <mp++/config.hpp>
 
+#include <limits>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
+#include <utility>
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -19,6 +21,21 @@ using namespace mppp;
 
 using int_t = integer<1>;
 using rat_t = rational<1>;
+
+TEST_CASE("real identity")
+{
+    real r0{};
+    REQUIRE((+r0).zero_p());
+    REQUIRE(!(+r0).signbit());
+    REQUIRE((+real{}).zero_p());
+    REQUIRE(!(+real{}).signbit());
+    REQUIRE((+r0).get_prec() == real_prec_min());
+    REQUIRE((+real{}).get_prec() == real_prec_min());
+    r0 = 123;
+    REQUIRE(::mpfr_cmp_ui((+r0).get_mpfr_t(), 123ul) == 0);
+    REQUIRE((+r0).get_prec() == std::numeric_limits<int>::digits + 1);
+    REQUIRE(::mpfr_cmp_ui((+std::move(r0)).get_mpfr_t(), 123ul) == 0);
+}
 
 TEST_CASE("real plus")
 {

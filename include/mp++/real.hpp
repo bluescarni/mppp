@@ -341,7 +341,7 @@ template <typename... Args>
 using cvr_real_enabler = enable_if_t<conjunction<std::is_same<uncvref_t<Args>, real>...>::value, int>;
 #endif
 
-/// Get the default precision for \link mppp::real real \endlink objects.
+/// Get the default precision for \link mppp::real real\endlink objects.
 /**
  * \ingroup real_prec
  * \rststar
@@ -356,14 +356,14 @@ using cvr_real_enabler = enable_if_t<conjunction<std::is_same<uncvref_t<Args>, r
  * from multiple threads the default precision.
  * \endrststar
  *
- * @return the value of the default precision for \link mppp::real real \endlink objects.
+ * @return the value of the default precision for \link mppp::real real\endlink objects.
  */
 inline mpfr_prec_t real_get_default_prec()
 {
     return real_constants<>::default_prec.load(std::memory_order_relaxed);
 }
 
-/// Set the default precision for \link mppp::real real \endlink objects.
+/// Set the default precision for \link mppp::real real\endlink objects.
 /**
  * \ingroup real_prec
  * \rststar
@@ -371,10 +371,10 @@ inline mpfr_prec_t real_get_default_prec()
  * is used.
  * \endrststar
  *
- * @param p the desired value for the default precision for \link mppp::real real \endlink objects.
+ * @param p the desired value for the default precision for \link mppp::real real\endlink objects.
  *
  * @throws std::invalid_argument if \p p is nonzero and not in the range established by
- * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
+ * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
  */
 inline void real_set_default_prec(::mpfr_prec_t p)
 {
@@ -386,7 +386,7 @@ inline void real_set_default_prec(::mpfr_prec_t p)
     real_constants<>::default_prec.store(p, std::memory_order_relaxed);
 }
 
-/// Reset the default precision for \link mppp::real real \endlink objects.
+/// Reset the default precision for \link mppp::real real\endlink objects.
 /**
  * \ingroup real_prec
  * \rststar
@@ -414,7 +414,7 @@ inline ::mpfr_prec_t real_dd_prec(const T &x)
 }
 }
 
-/// Auxiliary class for initialising a \link mppp::real real \endlink from a precision value.
+/// Auxiliary class for initialising a \link mppp::real real\endlink from a precision value.
 /**
  * \rststar
  * This class is used as the only construction argument for a specific :cpp:class:`~mppp::real`
@@ -534,10 +534,10 @@ public:
      * will initialise ``x`` with 42 bits of precision and a value of NaN.
      * \endrststar
      *
-     * @param p the \link mppp::real_prec real_prec \endlink that wraps the desired precision value.
+     * @param p the \link mppp::real_prec real_prec\endlink that wraps the desired precision value.
      *
      * @throws std::invalid_argument if the precision value is outside the range established by
-     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
+     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
     explicit real(real_prec p)
     {
@@ -558,7 +558,7 @@ public:
     /**
      * The copy constructor performs an exact deep copy of the input object.
      *
-     * @param other the \link mppp::real real \endlink that will be copied.
+     * @param other the \link mppp::real real\endlink that will be copied.
      */
     real(const real &other) : real(&other.m_mpfr) {}
     /// Copy constructor with custom precision.
@@ -567,11 +567,11 @@ public:
      * is smaller than the precision of \p other, a rounding operation will be performed,
      * otherwise the value will be copied exactly.
      *
-     * @param other the \link mppp::real real \endlink that will be copied.
+     * @param other the \link mppp::real real\endlink that will be copied.
      * @param p the desired precision.
      *
      * @throws std::invalid_argument if \p p is outside the range established by
-     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
+     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
     explicit real(const real &other, ::mpfr_prec_t p)
     {
@@ -587,7 +587,7 @@ public:
      *    destruction and copy/move assignment. After re-assignment, ``other`` can be used normally again.
      * \endrststar
      *
-     * @param other the \link mppp::real real \endlink that will be moved.
+     * @param other the \link mppp::real real\endlink that will be moved.
      */
     real(real &&other) noexcept
     {
@@ -786,7 +786,7 @@ public:
      *
      * @throws std::overflow_error if an overflow occurs in the computation of the automatically-deduced precision.
      * @throws std::invalid_argument if \p p is nonzero and outside the range established by
-     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
+     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
     explicit real(const RealInteroperable &x,
@@ -1008,7 +1008,7 @@ public:
     /**
      * The operator will deep-copy \p other into \p this.
      *
-     * @param other the \link mppp::real real \endlink that will be copied into \p this.
+     * @param other the \link mppp::real real\endlink that will be copied into \p this.
      *
      * @return a reference to \p this.
      */
@@ -1031,7 +1031,7 @@ public:
     }
     /// Move assignment operator.
     /**
-     * @param other the \link mppp::real real \endlink that will be moved into \p this.
+     * @param other the \link mppp::real real\endlink that will be moved into \p this.
      *
      * @return a reference to \p this.
      */
@@ -1304,7 +1304,7 @@ public:
         m_mpfr = *x;
         return *this;
     }
-    /// Set to another \link mppp::real real \endlink value.
+    /// Set to another \link mppp::real real\endlink value.
     /**
      * \rststar
      * This method will set ``this`` to the value of ``other``. Contrary to the copy assignment operator,
@@ -1506,7 +1506,7 @@ public:
         ::mpfr_set_zero(&m_mpfr, sign);
         return *this;
     }
-    /// Swap \link mppp::real real \endlink objects.
+    /// Swap \link mppp::real real\endlink objects.
     /**
      * This function will efficiently swap the content of \p a and \p b.
      *
@@ -1661,7 +1661,7 @@ public:
      * @return a reference to \p this.
      *
      * @throws std::invalid_argument if the value of \p p is not in the range established by
-     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
+     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
     real &set_prec(::mpfr_prec_t p)
     {
@@ -1681,7 +1681,7 @@ public:
      * @return a reference to \p this.
      *
      * @throws std::invalid_argument if the value of \p p is not in the range established by
-     * \link mppp::real_prec_min() real_prec_min() \endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
+     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
     real &prec_round(::mpfr_prec_t p)
     {
@@ -2072,7 +2072,7 @@ private:
  * of ``r`` will be set to NaN.
  * \endrststar
  *
- * @param r the \link mppp::real real \endlink whose precision will be set.
+ * @param r the \link mppp::real real\endlink whose precision will be set.
  * @param p the desired precision.
  *
  * @throws unspecified any exception thrown by mppp::real::set_prec().
@@ -2082,7 +2082,7 @@ inline void set_prec(real &r, ::mpfr_prec_t p)
     r.set_prec(p);
 }
 
-/// Set the precision of a \link mppp::real real \endlink maintaining the current value.
+/// Set the precision of a \link mppp::real real\endlink maintaining the current value.
 /**
  * \ingroup real_prec
  * \rststar
@@ -2091,7 +2091,7 @@ inline void set_prec(real &r, ::mpfr_prec_t p)
  * otherwise the value will be preserved exactly.
  * \endrststar
  *
- * @param r the \link mppp::real real \endlink whose precision will be set.
+ * @param r the \link mppp::real real\endlink whose precision will be set.
  * @param p the desired precision.
  *
  * @throws unspecified any exception thrown by mppp::real::prec_round().
@@ -2105,7 +2105,7 @@ inline void prec_round(real &r, ::mpfr_prec_t p)
 /**
  * \ingroup real_prec
  *
- * @param r the \link mppp::real real \endlink whose precision will be returned.
+ * @param r the \link mppp::real real\endlink whose precision will be returned.
  *
  * @return the precision of \p r.
  */
@@ -2150,7 +2150,7 @@ using real_set_args_enabler = enable_if_t<is_detected<real_set_t, Args...>::valu
  * The input arguments must satisfy the :cpp:concept:`~mppp::RealSetArgs` concept.
  * \endrststar
  *
- * @param r the \link mppp::real real \endlink that will be set.
+ * @param r the \link mppp::real real\endlink that will be set.
  * @param args the arguments that will be passed to mppp::real::set().
  *
  * @return a reference to \p r.
@@ -2167,12 +2167,12 @@ inline real &set(real &r, const Args &... args)
     return r.set(args...);
 }
 
-/// Set \link mppp::real real \endlink to NaN.
+/// Set \link mppp::real real\endlink to NaN.
 /**
  * This function will set \p r to NaN with an unspecified sign bit. The precision of \p r
  * will not be altered.
  *
- * @param r the \link mppp::real real \endlink argument.
+ * @param r the \link mppp::real real\endlink argument.
  *
  * @return a reference to \p r.
  */
@@ -2181,12 +2181,12 @@ inline real &set_nan(real &r)
     return r.set_nan();
 }
 
-/// Set \link mppp::real real \endlink to infinity.
+/// Set \link mppp::real real\endlink to infinity.
 /**
  * This function will set \p r to infinity. The sign bit will be positive if \p sign
  * is nonnegative, negative otherwise. The precision of \p r will not be altered.
  *
- * @param r the \link mppp::real real \endlink argument.
+ * @param r the \link mppp::real real\endlink argument.
  * @param sign the sign of the infinity to which \p r will be set.
  *
  * @return a reference to \p r.
@@ -2196,12 +2196,12 @@ inline real &set_inf(real &r, int sign = 0)
     return r.set_inf(sign);
 }
 
-/// Set \link mppp::real real \endlink to zero.
+/// Set \link mppp::real real\endlink to zero.
 /**
  * This function will set \p r to zero. The sign bit will be positive if \p sign
  * is nonnegative, negative otherwise. The precision of \p r will not be altered.
  *
- * @param r the \link mppp::real real \endlink argument.
+ * @param r the \link mppp::real real\endlink argument.
  * @param sign the sign of the zero to which \p r will be set.
  *
  * @return a reference to \p r.
@@ -2383,7 +2383,7 @@ inline real mpfr_nary_op_return(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0,
  *  @{
  */
 
-/// Ternary \link mppp::real real \endlink addition.
+/// Ternary \link mppp::real real\endlink addition.
 /**
  * This function will compute \f$a+b\f$, storing the result in \p rop.
  * The precision of the result will be set to the largest precision among the operands.
@@ -2404,7 +2404,7 @@ inline real &add(real &rop, T &&a, U &&b)
     return mpfr_nary_op(0, ::mpfr_add, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-    /// Ternary \link mppp::real real \endlink subtraction.
+    /// Ternary \link mppp::real real\endlink subtraction.
     /**
      * This function will compute \f$a-b\f$, storing the result in \p rop.
      * The precision of the result will be set to the largest precision among the operands.
@@ -2425,7 +2425,7 @@ inline real &sub(real &rop, T &&a, U &&b)
     return mpfr_nary_op(0, ::mpfr_sub, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-    /// Ternary \link mppp::real real \endlink multiplication.
+    /// Ternary \link mppp::real real\endlink multiplication.
     /**
      * This function will compute \f$a \times b\f$, storing the result in \p rop.
      * The precision of the result will be set to the largest precision among the operands.
@@ -2446,7 +2446,7 @@ inline real &mul(real &rop, T &&a, U &&b)
     return mpfr_nary_op(0, ::mpfr_mul, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-    /// Ternary \link mppp::real real \endlink division.
+    /// Ternary \link mppp::real real\endlink division.
     /**
      * This function will compute \f$a / b\f$, storing the result in \p rop.
      * The precision of the result will be set to the largest precision among the operands.
@@ -2467,7 +2467,7 @@ inline real &div(real &rop, T &&a, U &&b)
     return mpfr_nary_op(0, ::mpfr_div, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-    /// Quaternary \link mppp::real real \endlink fused multiply–add.
+    /// Quaternary \link mppp::real real\endlink fused multiply–add.
     /**
      * This function will compute \f$a \times b + c\f$, storing the result in \p rop.
      * The precision of the result will be set to the largest precision among the operands.
@@ -2489,7 +2489,7 @@ inline real &fma(real &rop, T &&a, U &&b, V &&c)
     return mpfr_nary_op(0, ::mpfr_fma, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-/// Ternary \link mppp::real real \endlink fused multiply–add.
+/// Ternary \link mppp::real real\endlink fused multiply–add.
 /**
  * \rststar
  * This function will compute and return :math:`a \times b + c`.
@@ -2513,7 +2513,7 @@ inline real fma(T &&a, U &&b, V &&c)
     return mpfr_nary_op_return(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-    /// Quaternary \link mppp::real real \endlink fused multiply–sub.
+    /// Quaternary \link mppp::real real\endlink fused multiply–sub.
     /**
      * This function will compute \f$a \times b - c\f$, storing the result in \p rop.
      * The precision of the result will be set to the largest precision among the operands.
@@ -2535,7 +2535,7 @@ inline real &fms(real &rop, T &&a, U &&b, V &&c)
     return mpfr_nary_op(0, ::mpfr_fms, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-/// Ternary \link mppp::real real \endlink fused multiply–sub.
+/// Ternary \link mppp::real real\endlink fused multiply–sub.
 /**
  * \rststar
  * This function will compute and return :math:`a \times b - c`.
@@ -2565,9 +2565,9 @@ inline real fms(T &&a, U &&b, V &&c)
  *  @{
  */
 
-/// Detect if a \link mppp::real real \endlink is NaN.
+/// Detect if a \link mppp::real real\endlink is NaN.
 /**
- * @param r the \link mppp::real real \endlink that will be examined.
+ * @param r the \link mppp::real real\endlink that will be examined.
  *
  * @return \p true if \p r is NaN, \p false otherwise.
  */
@@ -2576,9 +2576,9 @@ inline bool nan_p(const real &r)
     return r.nan_p();
 }
 
-/// Detect if a \link mppp::real real \endlink is infinity.
+/// Detect if a \link mppp::real real\endlink is infinity.
 /**
- * @param r the \link mppp::real real \endlink that will be examined.
+ * @param r the \link mppp::real real\endlink that will be examined.
  *
  * @return \p true if \p r is an infinity, \p false otherwise.
  */
@@ -2587,9 +2587,9 @@ inline bool inf_p(const real &r)
     return r.inf_p();
 }
 
-/// Detect if \link mppp::real real \endlink is a finite number.
+/// Detect if \link mppp::real real\endlink is a finite number.
 /**
- * @param r the \link mppp::real real \endlink that will be examined.
+ * @param r the \link mppp::real real\endlink that will be examined.
  *
  * @return \p true if \p r is a finite number (i.e., not NaN or infinity), \p false otherwise.
  */
@@ -2598,9 +2598,9 @@ inline bool number_p(const real &r)
     return r.number_p();
 }
 
-/// Detect if a \link mppp::real real \endlink is zero.
+/// Detect if a \link mppp::real real\endlink is zero.
 /**
- * @param r the \link mppp::real real \endlink that will be examined.
+ * @param r the \link mppp::real real\endlink that will be examined.
  *
  * @return \p true if \p r is zero, \p false otherwise.
  */
@@ -2609,9 +2609,9 @@ inline bool zero_p(const real &r)
     return r.zero_p();
 }
 
-/// Detect if a \link mppp::real real \endlink is a regular number.
+/// Detect if a \link mppp::real real\endlink is a regular number.
 /**
- * @param r the \link mppp::real real \endlink that will be examined.
+ * @param r the \link mppp::real real\endlink that will be examined.
  *
  * @return \p true if \p r is a regular number (i.e., not NaN, infinity or zero), \p false otherwise.
  */
@@ -2622,7 +2622,7 @@ inline bool regular_p(const real &r)
 
 /// Detect the sign of a \link mppp::real real\endlink.
 /**
- * @param r the \link mppp::real real \endlink that will be examined.
+ * @param r the \link mppp::real real\endlink that will be examined.
  *
  * @return a positive value if \p r is positive, zero if \p r is zero, a negative value if \p thris
  * is negative.
@@ -2636,7 +2636,7 @@ inline int sgn(const real &r)
 
 /// Get the sign bit of a \link mppp::real real\endlink.
 /**
- * @param r the \link mppp::real real \endlink that will be examined.
+ * @param r the \link mppp::real real\endlink that will be examined.
  *
  * @return the sign bit of \p r.
  */
@@ -2774,7 +2774,7 @@ inline real cos(T &&r)
  *  @{
  */
 
-/// Output stream operator for \link mppp::real real \endlink objects.
+/// Output stream operator for \link mppp::real real\endlink objects.
 /**
  * \rststar
  * This operator will insert into the stream ``os`` a string representation of ``r``
@@ -2788,7 +2788,7 @@ inline real cos(T &&r)
  * \endrststar
  *
  * @param os the target stream.
- * @param r the \link mppp::real real \endlink that will be directed to \p os.
+ * @param r the \link mppp::real real\endlink that will be directed to \p os.
  *
  * @return a reference to \p os.
  *
@@ -2800,18 +2800,18 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
     return os;
 }
 
-/// Input stream operator for \link mppp::real real \endlink objects.
+/// Input stream operator for \link mppp::real real\endlink objects.
 /**
  * \rststar
  * This operator is equivalent to extracting a line from the stream and assigning it to ``x``.
  * \endrststar
  *
  * @param is the input stream.
- * @param x the \link mppp::real real \endlink to which the string extracted from the stream will be assigned.
+ * @param x the \link mppp::real real\endlink to which the string extracted from the stream will be assigned.
  *
  * @return a reference to \p is.
  *
- * @throws unspecified any exception thrown by \link mppp::real real \endlink's assignment operator from string.
+ * @throws unspecified any exception thrown by \link mppp::real real\endlink's assignment operator from string.
  */
 inline std::istream &operator>>(std::istream &is, real &x)
 {
@@ -2855,7 +2855,7 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
 /**
  * @param p the desired precision.
  *
- * @return a \link mppp::real real \endlink NaN.
+ * @return a \link mppp::real real\endlink NaN.
  */
 inline real real_nan(::mpfr_prec_t p = 0)
 {
@@ -2893,22 +2893,21 @@ using real_compound_op_types_enabler
 /// Identity operator for \link mppp::real real\endlink.
 /**
  * \rststar
- * This operator will return a copy of the input
- * object ``r``, whose type must satisfy the :cpp:concept:`~mppp::CvrReal` concept.
+ * This operator will return a copy of the input :cpp:class:`~mppp::real` ``r``.
  * \endrststar
  *
- * @param r the \link mppp::real real \endlink that will be copied.
+ * @param r the \link mppp::real real\endlink that will be copied.
  *
  * @return a copy of \p r.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+inline real operator+(CvrReal &&r)
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real operator+(T &&r)
+#endif
 {
-    return std::forward<T>(r);
+    return std::forward<decltype(r)>(r);
 }
 
 inline namespace detail
