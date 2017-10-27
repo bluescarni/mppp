@@ -12,7 +12,8 @@ Common concepts
    C++ concepts.
 
    Since the syntax of native C++ concepts is clearer than that of the concept emulation layer, the mp++ documentation describes
-   and refers to concepts in their native C++ form.
+   and refers to concepts in their native C++ form. As long as concepts are not part of the C++ standard, mp++'s concepts
+   will be subject to breaking changes, and they should not be considered as part of the public mp++ API.
 
 .. cpp:concept:: template <typename T> mppp::CppInteroperable
 
