@@ -1976,7 +1976,7 @@ public:
     /**
      * This method will set \p this to its absolute value.
      *
-     * @return reference to \p this.
+     * @return a reference to \p this.
      */
     integer &abs()
     {
