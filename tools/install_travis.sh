@@ -51,12 +51,12 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMPUnstable" ]]; then
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "CoverageGCC5" ]]; then
-    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_CXX_STANDARD=14 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
+    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_CXX_STANDARD=14 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage" -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM} ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-5;
 elif [[ "${MPPP_BUILD}" == "CoverageGCC7" ]]; then
-    CXX=g++-7 CC=gcc-7 cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage" ../;
+    CXX=g++-7 CC=gcc-7 cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage" -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM} ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-7;
@@ -67,7 +67,7 @@ elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     CXX=g++-6 CC=gcc-6 ABI=32 ./configure --disable-shared;
     make -j2;
     cd ..;
-    CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -D_GLIBCXX_CONCEPT_CHECKS -fconcepts" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a ../;
+    CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -D_GLIBCXX_CONCEPT_CHECKS -fconcepts" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM} ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-6;
