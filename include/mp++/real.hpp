@@ -3313,6 +3313,11 @@ inline T &operator+=(T &a, U &&b)
     return a;
 }
 
+inline bool operator==(const real &x, const real &y)
+{
+    return ::mpfr_equal_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
+}
+
 /** @} */
 }
 
