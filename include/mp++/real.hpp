@@ -1623,6 +1623,28 @@ public:
     {
         return mpfr_get_prec(&m_mpfr);
     }
+    /// Negate in-place.
+    /**
+     * This method will set ``this`` to ``-this``.
+     *
+     * @return a reference to ``this``.
+     */
+    real &neg()
+    {
+        ::mpfr_neg(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
+    /// In-place absolute value.
+    /**
+     * This method will set ``this`` to its absolute value.
+     *
+     * @return a reference to ``this``.
+     */
+    real &abs()
+    {
+        ::mpfr_abs(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
 
 private:
     // Utility function to check precision in set_prec().
@@ -2557,6 +2579,76 @@ template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 inline real fms(T &&a, U &&b, V &&c)
 {
     return mpfr_nary_op_return(0, ::mpfr_fms, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
+}
+
+/// Unary negation for \link mppp::real real\endlink.
+/**
+ * @param x the \link mppp::real real\endlink that will be negated.
+ *
+ * @return the negative of \p x.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real neg(CvrReal &&x)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real neg(T &&x)
+#endif
+{
+    return mpfr_nary_op_return(0, ::mpfr_neg, std::forward<decltype(x)>(x));
+}
+
+/// Binary negation for \link mppp::real real\endlink.
+/**
+ * This function will set \p rop to the negation of \p x.
+ *
+ * @param rop the \link mppp::real real\endlink that will hold the result.
+ * @param x the \link mppp::real real\endlink that will be negated.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real &neg(real &rop, CvrReal &&x)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real neg(real &rop, T &&x)
+#endif
+{
+    return mpfr_nary_op(0, ::mpfr_neg, rop, std::forward<decltype(x)>(x));
+}
+
+/// Unary absolute value for \link mppp::real real\endlink.
+/**
+ * @param x the \link mppp::real real\endlink whose absolute value will be computed.
+ *
+ * @return the absolute value of \p x.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real abs(CvrReal &&x)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real abs(T &&x)
+#endif
+{
+    return mpfr_nary_op_return(0, ::mpfr_abs, std::forward<decltype(x)>(x));
+}
+
+/// Binary absolute value for \link mppp::real real\endlink.
+/**
+ * This function will set \p rop to the absolute value of \p x.
+ *
+ * @param rop the \link mppp::real real\endlink that will hold the result.
+ * @param x the \link mppp::real real\endlink whose absolute value will be computed.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real &abs(real &rop, CvrReal &&x)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real abs(real &rop, T &&x)
+#endif
+{
+    return mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<decltype(x)>(x));
 }
 
 /** @} */
