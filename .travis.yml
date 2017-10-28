@@ -47,7 +47,7 @@ matrix:
           - mercurial
           - autoconf
           - texinfo
-    - env: MPPP_BUILD="CoverageGCC5" SPLIT_TEST_NUM="2" TEST_NSPLIT="0"
+    - env: MPPP_BUILD="CoverageGCC5" SPLIT_TEST_NUM="0" TEST_NSPLIT="2"
       compiler: gcc
       os: linux
       addons:
@@ -57,7 +57,7 @@ matrix:
           packages:
           - gcc-5
           - g++-5
-    - env: MPPP_BUILD="CoverageGCC5" SPLIT_TEST_NUM="2" TEST_NSPLIT="1"
+    - env: MPPP_BUILD="CoverageGCC5" SPLIT_TEST_NUM="1" TEST_NSPLIT="2"
       compiler: gcc
       os: linux
       addons:
@@ -67,7 +67,7 @@ matrix:
           packages:
           - gcc-5
           - g++-5
-    - env: MPPP_BUILD="CoverageGCC7" SPLIT_TEST_NUM="2" TEST_NSPLIT="0"
+    - env: MPPP_BUILD="CoverageGCC7" SPLIT_TEST_NUM="0" TEST_NSPLIT="2"
       compiler: gcc
       os: linux
       addons:
@@ -77,7 +77,7 @@ matrix:
           packages:
           - gcc-7
           - g++-7
-    - env: MPPP_BUILD="CoverageGCC7" SPLIT_TEST_NUM="2" TEST_NSPLIT="1"
+    - env: MPPP_BUILD="CoverageGCC7" SPLIT_TEST_NUM="1" TEST_NSPLIT="2"
       compiler: gcc
       os: linux
       addons:
@@ -87,7 +87,7 @@ matrix:
           packages:
           - gcc-7
           - g++-7
-    - env: MPPP_BUILD="Coverage32GCC6" SPLIT_TEST_NUM="2" TEST_NSPLIT="0"
+    - env: MPPP_BUILD="Coverage32GCC6" SPLIT_TEST_NUM="0" TEST_NSPLIT="2"
       compiler: gcc
       os: linux
       addons:
@@ -102,7 +102,7 @@ matrix:
           - g++-6
           - g++-6-multilib
           - cmake3
-    - env: MPPP_BUILD="Coverage32GCC6" SPLIT_TEST_NUM="2" TEST_NSPLIT="1"
+    - env: MPPP_BUILD="Coverage32GCC6" SPLIT_TEST_NUM="1" TEST_NSPLIT="2"
       compiler: gcc
       os: linux
       addons:
