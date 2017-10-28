@@ -163,12 +163,12 @@ from and conversion to primitive types must always be requested explicitly. As a
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#real128-functions"><span class="std std-ref">functions</span></a>, with the
 general convention that the functions are named after the corresponding quadmath functions minus the trailing <code class="docutils literal"><span class="pre">q</span></code>
 suffix. For instance, the quadmath code</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">__float128</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">.5</span><span class="p">;</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">__float128</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 <span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="o">::</span><span class="n">sinq</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>that computes the sine of 0.5 in quadruple precision, storing the result in <code class="docutils literal"><span class="pre">b</span></code>, becomes</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">real128</span> <span class="n">a</span><span class="p">{</span><span class="mf">.5</span><span class="p">};</span>
+<p>that computes the sine of 1 in quadruple precision, storing the result in <code class="docutils literal"><span class="pre">b</span></code>, becomes</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">real128</span> <span class="n">a</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
 <span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
 </pre></div>
 </div>
