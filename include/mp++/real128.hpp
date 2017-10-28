@@ -181,14 +181,14 @@ using real128_op_types_enabler
  *
  * .. code-block:: c++
  *
- *    __float128 a = .5;
+ *    __float128 a = 1;
  *    auto b = ::sinq(a);
  *
- * that computes the sine of 0.5 in quadruple precision, storing the result in ``b``, becomes
+ * that computes the sine of 1 in quadruple precision, storing the result in ``b``, becomes
  *
  * .. code-block:: c++
  *
- *    real128 a{.5};
+ *    real128 a{1};
  *    auto b = sin(a);
  *
  * where the ``sin()`` function is resolved via argument-dependent lookup.
