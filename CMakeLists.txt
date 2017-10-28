@@ -118,6 +118,20 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATIO
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" DESTINATION include)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" DESTINATION include/mp++)
 
+# This is just a simple counter variable, internal use only.
+set(_MPPP_TEST_NUM "0")
+# Check splitting options. These need to be set from the command line.
+# - MPPP_TEST_NSPLIT: number of chunks into which the unit tests will be divided (must be > 1).
+# - MPPP_TEST_SPLIT_NUM: 0-based index of the chunk to run.
+if(MPPP_TEST_NSPLIT AND "${MPPP_TEST_SPLIT_NUM}" STREQUAL "")
+	message(FATAL_ERROR "Test splitting was requested, but the MPPP_TEST_SPLIT_NUM variable was not set.")
+elseif(NOT MPPP_TEST_NSPLIT AND NOT "${MPPP_TEST_SPLIT_NUM}" STREQUAL "")
+	message(FATAL_ERROR "The MPPP_TEST_SPLIT_NUM variable was set, but test splitting was not requested.")
+endif()
+if(MPPP_TEST_NSPLIT)
+	message(STATUS "Tests will be split into ${MPPP_TEST_NSPLIT} chunks. The chunk with index ${MPPP_TEST_SPLIT_NUM} will be processed.")
+endif()
+
 if(MPPP_BUILD_TESTS)
     enable_testing()
     add_subdirectory(test)
