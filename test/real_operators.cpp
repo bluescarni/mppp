@@ -18,6 +18,7 @@
 #if defined(MPPP_WITH_QUADMATH)
 #include <mp++/real128.hpp>
 #endif
+#include <stdexcept>
 #include <utility>
 
 #define CATCH_CONFIG_MAIN
@@ -416,5 +417,68 @@ TEST_CASE("real left in-place add")
     REQUIRE(r0.get_prec() == 5);
     real_reset_default_prec();
 #endif
+}
+
+TEST_CASE("real right in-place add")
+{
+    // Integrals.
+    {
+    int n = 3;
+    n += real{2};
+    REQUIRE(n == 5);
+    n = 1;
+    REQUIRE_THROWS_AS(n += real{std::numeric_limits<int>::max()}, std::overflow_error);
+    REQUIRE(n == 1);
+    n = -1;
+    REQUIRE_THROWS_AS(n += real{std::numeric_limits<int>::min()}, std::overflow_error);
+    REQUIRE(n == -1);
+    real_set_default_prec(5);
+    n = 5;
+    n += real{123};
+    REQUIRE(n == static_cast<int>(5 + real{123}));
+    REQUIRE(n == static_cast<int>(real{5} + real{123}));
+    real_reset_default_prec();
+    }
+    {
+    unsigned n = 3;
+    n += real{2};
+    REQUIRE(n == 5);
+    real_set_default_prec(5);
+    n += real{123};
+    REQUIRE(n == static_cast<unsigned>(5 + real{123}));
+    REQUIRE(n == static_cast<unsigned>(real{5} + real{123}));
+    real_reset_default_prec();
+    }
+    {
+    bool n = 3;
+    n += real{2};
+    REQUIRE(n);
+    real_set_default_prec(5);
+    n += real{123};
+    REQUIRE(n);
+    n += real{-1};
+    REQUIRE(!n);
+    real_reset_default_prec();
+    }
+    {
+    long long n = 3;
+    n += real{2};
+    REQUIRE(n == 5);
+    real_set_default_prec(5);
+    n += real{123};
+    REQUIRE(n == static_cast<long long>(5 + real{123}));
+    REQUIRE(n == static_cast<long long>(real{5} + real{123}));
+    real_reset_default_prec();
+    }
+    {
+    unsigned long long n = 3;
+    n += real{2};
+    REQUIRE(n == 5);
+    real_set_default_prec(5);
+    n += real{123};
+    REQUIRE(n == static_cast<unsigned long long>(5 + real{123}));
+    REQUIRE(n == static_cast<unsigned long long>(real{5} + real{123}));
+    real_reset_default_prec();
+    }
 }
 
