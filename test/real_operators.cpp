@@ -115,6 +115,12 @@ TEST_CASE("real binary add")
     real_reset_default_prec();
     REQUIRE((real{1, 10} + 10ll == real{11}));
     REQUIRE((real{1, 10} + 10ll).get_prec() == std::numeric_limits<long long>::digits + 1);
+    REQUIRE((real{0, 10} + std::numeric_limits<long long>::max() == real{std::numeric_limits<long long>::max()}));
+    REQUIRE((real{0, 10} + std::numeric_limits<long long>::max()).get_prec()
+            == std::numeric_limits<long long>::digits + 1);
+    REQUIRE((real{0, 10} + std::numeric_limits<long long>::min() == real{std::numeric_limits<long long>::min()}));
+    REQUIRE((real{0, 10} + std::numeric_limits<long long>::min()).get_prec()
+            == std::numeric_limits<long long>::digits + 1);
     REQUIRE((10ll + real{1, 10} == real{11}));
     REQUIRE((10ll + real{1, 10}).get_prec() == std::numeric_limits<long long>::digits + 1);
     REQUIRE((real{1, 100} + 10ll == real{11}));
@@ -135,6 +141,10 @@ TEST_CASE("real binary add")
     REQUIRE((real{1, 10} + 10ull).get_prec() == std::numeric_limits<unsigned long long>::digits);
     REQUIRE((10ull + real{1, 10} == real{11}));
     REQUIRE((10ull + real{1, 10}).get_prec() == std::numeric_limits<unsigned long long>::digits);
+    REQUIRE((real{0, 10} + std::numeric_limits<unsigned long long>::max()
+             == real{std::numeric_limits<unsigned long long>::max()}));
+    REQUIRE((real{0, 10} + std::numeric_limits<unsigned long long>::max()).get_prec()
+            == std::numeric_limits<unsigned long long>::digits);
     REQUIRE((real{1, 100} + 10ull == real{11}));
     REQUIRE((real{1, 100} + 10ull).get_prec() == std::max(100, std::numeric_limits<unsigned long long>::digits));
     REQUIRE((10ull + real{1, 100} == real{11}));
@@ -264,79 +274,147 @@ TEST_CASE("real binary add")
 #endif
 }
 
-TEST_CASE("real plus")
+TEST_CASE("real left in-place add")
 {
-    real r0{123};
-    REQUIRE(::mpfr_cmp_ui((+r0).get_mpfr_t(), 123ul) == 0);
-    REQUIRE(::mpfr_cmp_ui((+real{123}).get_mpfr_t(), 123ul) == 0);
-    std::cout << (real{123} + real{4}) << '\n';
-    std::cout << (real{123} + int_t{4}) << '\n';
-    std::cout << (int_t{4} + real{123}) << '\n';
-    std::cout << (real{123} + rat_t{4}) << '\n';
-    std::cout << (rat_t{4} + real{123}) << '\n';
-    std::cout << (real{123} + 34u) << '\n';
-    std::cout << (36u + real{123}) << '\n';
-    std::cout << (real{123} + -34) << '\n';
-    std::cout << (-36 + real{123}) << '\n';
-    std::cout << (real{123} + true) << '\n';
-    std::cout << (false + real{123}) << '\n';
-    std::cout << (real{123} + 1.2f) << '\n';
-    std::cout << (1.2f + real{123}) << '\n';
-    std::cout << (real{123} + 1.2) << '\n';
-    std::cout << (1.2 + real{123}) << '\n';
-    std::cout << (real{123} + 1.2l) << '\n';
-    std::cout << (1.2l + real{123}) << '\n';
+    real r0, r1;
+    r0 += r1;
+    REQUIRE(r0.zero_p());
+    REQUIRE(!r0.signbit());
+    r0 = 5;
+    r1 = 6;
+    r0 += r1;
+    REQUIRE(r0 == real{11});
+    r0 = real{};
+    r0 += real{12345678ll};
+    REQUIRE(r0 == real{12345678ll});
+    REQUIRE(r0.get_prec() == std::numeric_limits<long long>::digits + 1);
+    // Integrals.
+    r0 = real{};
+    r0 += 123;
+    REQUIRE(r0 == real{123});
+    REQUIRE(r0.get_prec() == std::numeric_limits<int>::digits + 1);
+    real_set_default_prec(5);
+    r0 = real{};
+    r0 += 123;
+    REQUIRE((r0 == real{123, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+    r0 = real{};
+    r0 += 123u;
+    REQUIRE(r0 == real{123u});
+    REQUIRE(r0.get_prec() == std::numeric_limits<unsigned>::digits);
+    real_set_default_prec(5);
+    r0 = real{};
+    r0 += 123u;
+    REQUIRE((r0 == real{123u, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+    r0 = real{};
+    r0 += true;
+    REQUIRE(r0 == real{1});
+    REQUIRE(r0.get_prec() == std::max<::mpfr_prec_t>(std::numeric_limits<bool>::digits, real_prec_min()));
+    real_set_default_prec(5);
+    r0 = real{};
+    r0 += true;
+    REQUIRE((r0 == real{1, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+    r0 = real{};
+    r0 += 123ll;
+    REQUIRE(r0 == real{123ll});
+    REQUIRE(r0.get_prec() == std::numeric_limits<long long>::digits + 1);
+    r0 = real{};
+    r0 += std::numeric_limits<long long>::max();
+    REQUIRE(r0 == real{std::numeric_limits<long long>::max()});
+    REQUIRE(r0.get_prec() == std::numeric_limits<long long>::digits + 1);
+    r0 = real{};
+    r0 += std::numeric_limits<long long>::min();
+    REQUIRE(r0 == real{std::numeric_limits<long long>::min()});
+    REQUIRE(r0.get_prec() == std::numeric_limits<long long>::digits + 1);
+    real_set_default_prec(5);
+    r0 = real{};
+    r0 += 123ll;
+    REQUIRE((r0 == real{123ll, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+    r0 = real{};
+    r0 += 123ull;
+    REQUIRE(r0 == real{123ull});
+    REQUIRE(r0.get_prec() == std::numeric_limits<unsigned long long>::digits);
+    r0 = real{};
+    r0 += std::numeric_limits<unsigned long long>::max();
+    REQUIRE(r0 == real{std::numeric_limits<unsigned long long>::max()});
+    REQUIRE(r0.get_prec() == std::numeric_limits<unsigned long long>::digits);
+    real_set_default_prec(5);
+    r0 = real{};
+    r0 += 123ll;
+    REQUIRE((r0 == real{123ll, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+    // Floating-point.
+    r0 = real{};
+    r0 += 123.f;
+    REQUIRE(r0 == real{123.f});
+    REQUIRE(r0.get_prec() == dig2mpfr_prec<float>());
+    real_set_default_prec(5);
+    r0 = real{};
+    r0 += 123.f;
+    REQUIRE((r0 == real{123.f, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+    r0 = real{};
+    r0 += 123.;
+    REQUIRE(r0 == real{123.});
+    REQUIRE(r0.get_prec() == dig2mpfr_prec<double>());
+    real_set_default_prec(5);
+    r0 = real{};
+    r0 += 123.;
+    REQUIRE((r0 == real{123., 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+    r0 = real{};
+    r0 += 123.l;
+    REQUIRE(r0 == real{123.l});
+    REQUIRE(r0.get_prec() == dig2mpfr_prec<long double>());
+    real_set_default_prec(5);
+    r0 = real{};
+    r0 += 123.l;
+    REQUIRE((r0 == real{123.l, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+    // Integer.
+    r0 = real{};
+    r0 += int_t{123};
+    REQUIRE(r0 == real{int_t{123}});
+    REQUIRE(r0.get_prec() == GMP_NUMB_BITS);
+    real_set_default_prec(5);
+    r0 = real{};
+    r0 += int_t{123};
+    REQUIRE((r0 == real{int_t{123}, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+    // Rational.
+    r0 = real{};
+    r0 += rat_t{123};
+    REQUIRE(r0 == real{rat_t{123}});
+    REQUIRE(r0.get_prec() == GMP_NUMB_BITS * 2);
+    real_set_default_prec(5);
+    r0 = real{};
+    r0 += rat_t{123};
+    REQUIRE((r0 == real{rat_t{123}, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
 #if defined(MPPP_WITH_QUADMATH)
-    std::cout << (real{123} + real128{"1.1"}) << '\n';
-    std::cout << (real128{"1.1"} + real{123}) << '\n';
-#endif
-    std::cout << (r0 += real{45}) << '\n';
-    std::cout << (r0 += int_t{45}) << '\n';
-    int_t n0{56};
-    n0 += real{45};
-    std::cout << n0 << '\n';
-    r0 += rat_t{1, 2};
-    std::cout << r0 << '\n';
-    rat_t q0{1, 2};
-    q0 += real{1};
-    std::cout << q0 << '\n';
-    r0 += 1u;
-    std::cout << r0 << '\n';
-    unsigned un = 5;
-    un += real{23};
-    std::cout << un << '\n';
-    r0 += -1;
-    std::cout << r0 << '\n';
-    int sn = -5;
-    sn += real{-23};
-    std::cout << sn << '\n';
     r0 = real{};
-    r0 += 1.1f;
-    std::cout << r0 << '\n';
+    r0 += real128{123};
+    REQUIRE(r0 == real{real128{123}});
+    REQUIRE(r0.get_prec() == 113);
+    real_set_default_prec(5);
     r0 = real{};
-    r0 += 1.1;
-    std::cout << r0 << '\n';
-    r0 = real{};
-    r0 += 1.1l;
-    std::cout << r0 << '\n';
-#if defined(MPPP_WITH_QUADMATH)
-    r0 = real{};
-    r0 += real128{"1.1"};
-    std::cout << r0 << '\n';
-#endif
-    std::cout << std::setprecision(50);
-    float f0 = 1.1f;
-    f0 += real{"1.1", 100};
-    std::cout << f0 << '\n';
-    double d0 = 1.1;
-    d0 += real{"1.1", 100};
-    std::cout << d0 << '\n';
-    long double ld0 = 1.1l;
-    ld0 += real{"1.1", 100};
-    std::cout << ld0 << '\n';
-#if defined(MPPP_WITH_QUADMATH)
-    real128 qd0{"1.1"};
-    qd0 += real{"1.1", 100};
-    std::cout << qd0 << '\n';
+    r0 += real128{123};
+    REQUIRE((r0 == real{real128{123}, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
 #endif
 }
+

@@ -3169,6 +3169,12 @@ inline real dispatch_binary_add(const real128 &x, T &&a)
 }
 
 /// Binary addition involving \link mppp::real real\endlink.
+/**
+ * @param a the first summand.
+ * @param b the second summand.
+ *
+ * @return \f$a+b\f$.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
 inline real operator+(T &&a, RealOpTypes<T> &&b)
@@ -3393,6 +3399,12 @@ inline void dispatch_in_place_add(real128 &x, T &&r)
 }
 
 /// In-place addition involving \link mppp::real real\endlink.
+/**
+ * @param a the augend.
+ * @param b the addend.
+ *
+ * @return a reference to \p a.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
 inline T &operator+=(T &a, RealCompoundOpTypes<T> &&b)
@@ -3405,6 +3417,13 @@ inline T &operator+=(T &a, U &&b)
     return a;
 }
 
+/// Equality operator involving \link mppp::real real\endlink.
+/**
+ * @param x the first operand.
+ * @param y the second operand.
+ *
+ * @return \p true if \p x is equal to \p y, \p false otherwise.
+ */
 inline bool operator==(const real &x, const real &y)
 {
     return ::mpfr_equal_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
