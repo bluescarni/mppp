@@ -1150,22 +1150,8 @@ public:
      * :cpp:func:`~mppp::real_get_default_prec()`. If ``dp`` is nonzero, then ``dp`` will be used
      * as a new precision for ``this`` and a rounding operation might occurr during the assignment.
      *
-     * Otherwise, if ``dp`` is zero, the precision of ``this`` will be set according to the following
-     * heuristics:
-     *
-     * * if ``x`` is a C++ integral type ``I``, then the precision is set to the bit width of ``I``;
-     * * if ``x`` is a C++ floating-point type ``F``, then the precision is set to the number of binary digits
-     *   in the significand of ``F``;
-     * * if ``x`` is :cpp:class:`~mppp::integer`, then the precision is set to the number of bits in use by
-     *   ``x`` (rounded up to the next multiple of the limb type's bit width);
-     * * if ``x`` is :cpp:class:`~mppp::rational`, then the precision is set to the sum of the number of bits
-     *   used by numerator and denominator (as established by the previous heuristic for :cpp:class:`~mppp::integer`);
-     * * if ``x`` is :cpp:class:`~mppp::real128`, then the precision is set to 113.
-     *
-     * These heuristics aim at ensuring that, whatever the type of ``x``, its value is preserved exactly after
-     * the assignment.
-     *
-     * Assignment from ``bool`` will set ``this`` to 1 for ``true``, and ``0`` for ``false``.
+     * Otherwise, if ``dp`` is zero, the precision of ``this`` will be set according to the same
+     * heuristics described in the generic constructor.
      * \endrststar
      *
      * @param x the assignment argument.
@@ -3170,6 +3156,18 @@ inline real dispatch_binary_add(const real128 &x, T &&a)
 
 /// Binary addition involving \link mppp::real real\endlink.
 /**
+ * \rststar
+ * The precision of the result will be set to the largest precision among the operands.
+ * If one of the operands is not a :cpp:class:`~mppp::real`, its precision is determined
+ * as follows:
+ *
+ * * if the default precision ``dp`` returned by :cpp:func:`~mppp::real_get_default_prec()`
+ *   is nonzero, then the precision of the non-:cpp:class:`~mppp::real` operand
+ *   is set to ``dp``; otherwise,
+ * * the precision of the non-:cpp:class:`~mppp::real` operand will be determined according to the same
+ *   heuristics described in the generic constructor for :cpp:class:`~mppp::real`.
+ * \endrststar
+ *
  * @param a the first summand.
  * @param b the second summand.
  *
