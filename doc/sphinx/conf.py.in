@@ -145,8 +145,9 @@ html_theme_options = {
     'github_user': 'bluescarni',
     'github_repo': 'mppp',
     'github_banner': True,
-    'fixed_sidebar': True,
-    'description': 'Multiprecision for modern C++'
+    'description': 'Multiprecision for modern C++',
+    'travis_button': True,
+    'codecov_button': True
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
