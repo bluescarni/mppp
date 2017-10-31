@@ -85,6 +85,18 @@ TEST_CASE("real binary add")
     REQUIRE((real{1, 100} + 10).get_prec() == 100);
     REQUIRE((10 + real{1, 100} == real{11}));
     REQUIRE((10 + real{1, 100}).get_prec() == 100);
+    REQUIRE((real{1, 10} + 10 == real{1, 10} + real{10}));
+    REQUIRE((real{1, 10} + std::numeric_limits<int>::max() == real{1, 10} + real{std::numeric_limits<int>::max()}));
+    REQUIRE((real{-1, 10} + std::numeric_limits<int>::min() == real{-1, 10} + real{std::numeric_limits<int>::min()}));
+    REQUIRE((10 + real{1, 10} == real{10} + real{1, 10}));
+    REQUIRE((std::numeric_limits<int>::max() + real{1, 10} == real{std::numeric_limits<int>::max()} + real{1, 10}));
+    REQUIRE((std::numeric_limits<int>::min() + real{-1, 10} == real{std::numeric_limits<int>::min()} + real{-1, 10}));
+    REQUIRE((real{1, 100} + 10 == real{1, 100} + real{10}));
+    REQUIRE((real{1, 100} + std::numeric_limits<int>::max() == real{1, 100} + real{std::numeric_limits<int>::max()}));
+    REQUIRE((real{-1, 100} + std::numeric_limits<int>::min() == real{-1, 100} + real{std::numeric_limits<int>::min()}));
+    REQUIRE((10 + real{1, 100} == real{10} + real{1, 100}));
+    REQUIRE((std::numeric_limits<int>::max() + real{1, 100} == real{std::numeric_limits<int>::max()} + real{1, 100}));
+    REQUIRE((std::numeric_limits<int>::min() + real{-1, 100} == real{std::numeric_limits<int>::min()} + real{-1, 100}));
     real_reset_default_prec();
     REQUIRE((real{1, 10} + true == real{2}));
     REQUIRE((real{1, 10} + true).get_prec() == 10);
@@ -113,6 +125,18 @@ TEST_CASE("real binary add")
     REQUIRE((real{1, 100} + 10u).get_prec() == 100);
     REQUIRE((10u + real{1, 100} == real{11}));
     REQUIRE((10u + real{1, 100}).get_prec() == 100);
+    REQUIRE((real{1, 10} + 10u == real{1, 10} + real{10u}));
+    REQUIRE((real{1, 10} + std::numeric_limits<unsigned>::max()
+             == real{1, 10} + real{std::numeric_limits<unsigned>::max()}));
+    REQUIRE((10u + real{1, 10} == real{10u} + real{1, 10}));
+    REQUIRE((std::numeric_limits<unsigned>::max() + real{1, 10u}
+             == real{std::numeric_limits<unsigned>::max()} + real{1, 10u}));
+    REQUIRE((real{1, 100} + 10u == real{1, 100} + real{10u}));
+    REQUIRE((real{1, 100} + std::numeric_limits<unsigned>::max()
+             == real{1, 100} + real{std::numeric_limits<unsigned>::max()}));
+    REQUIRE((10u + real{1, 100} == real{10u} + real{1, 100}));
+    REQUIRE((std::numeric_limits<unsigned>::max() + real{1, 100}
+             == real{std::numeric_limits<unsigned>::max()} + real{1, 100}));
     real_reset_default_prec();
     REQUIRE((real{1, 10} + 10ll == real{11}));
     REQUIRE((real{1, 10} + 10ll).get_prec() == std::numeric_limits<long long>::digits + 1);
@@ -137,6 +161,26 @@ TEST_CASE("real binary add")
     REQUIRE((real{1, 100} + 10ll).get_prec() == 100);
     REQUIRE((10ll + real{1, 100} == real{11}));
     REQUIRE((10ll + real{1, 100}).get_prec() == 100);
+    REQUIRE((real{1, 10} + 10ll == real{1, 10} + real{10ll}));
+    REQUIRE((real{1, 10} + std::numeric_limits<long long>::max()
+             == real{1, 10} + real{std::numeric_limits<long long>::max()}));
+    REQUIRE((real{-1, 10} + std::numeric_limits<long long>::min()
+             == real{-1, 10} + real{std::numeric_limits<long long>::min()}));
+    REQUIRE((10ll + real{1, 10} == real{10ll} + real{1, 10}));
+    REQUIRE((std::numeric_limits<long long>::max() + real{1, 10}
+             == real{std::numeric_limits<long long>::max()} + real{1, 10}));
+    REQUIRE((std::numeric_limits<long long>::min() + real{-1, 10}
+             == real{std::numeric_limits<long long>::min()} + real{-1, 10}));
+    REQUIRE((real{1, 100} + 10ll == real{1, 100} + real{10ll}));
+    REQUIRE((real{1, 100} + std::numeric_limits<long long>::max()
+             == real{1, 100} + real{std::numeric_limits<long long>::max()}));
+    REQUIRE((real{-1, 100} + std::numeric_limits<long long>::min()
+             == real{-1, 100} + real{std::numeric_limits<long long>::min()}));
+    REQUIRE((10ll + real{1, 100} == real{10ll} + real{1, 100}));
+    REQUIRE((std::numeric_limits<long long>::max() + real{1, 100}
+             == real{std::numeric_limits<long long>::max()} + real{1, 100}));
+    REQUIRE((std::numeric_limits<long long>::min() + real{-1, 100}
+             == real{std::numeric_limits<long long>::min()} + real{-1, 100}));
     real_reset_default_prec();
     REQUIRE((real{1, 10} + 10ull == real{11}));
     REQUIRE((real{1, 10} + 10ull).get_prec() == std::numeric_limits<unsigned long long>::digits);
@@ -159,6 +203,18 @@ TEST_CASE("real binary add")
     REQUIRE((real{1, 100} + 10ull).get_prec() == 100);
     REQUIRE((10ull + real{1, 100} == real{11}));
     REQUIRE((10ull + real{1, 100}).get_prec() == 100);
+    REQUIRE((real{1, 10} + 10ull == real{1, 10} + real{10ull}));
+    REQUIRE((real{1, 10} + std::numeric_limits<unsigned long long>::max()
+             == real{1, 10} + real{std::numeric_limits<unsigned long long>::max()}));
+    REQUIRE((10ull + real{1, 10} == real{10ull} + real{1, 10}));
+    REQUIRE((std::numeric_limits<unsigned long long>::max() + real{1, 10u}
+             == real{std::numeric_limits<unsigned long long>::max()} + real{1, 10u}));
+    REQUIRE((real{1, 100} + 10ull == real{1, 100} + real{10ull}));
+    REQUIRE((real{1, 100} + std::numeric_limits<unsigned long long>::max()
+             == real{1, 100} + real{std::numeric_limits<unsigned long long>::max()}));
+    REQUIRE((10ull + real{1, 100} == real{10ull} + real{1, 100}));
+    REQUIRE((std::numeric_limits<unsigned long long>::max() + real{1, 100}
+             == real{std::numeric_limits<unsigned long long>::max()} + real{1, 100}));
     real_reset_default_prec();
     // Floating-point.
     REQUIRE((real{1, 10} + 10.f == real{11}));
@@ -233,6 +289,12 @@ TEST_CASE("real binary add")
     REQUIRE((real{1, 100} + int_t{10}).get_prec() == 100);
     REQUIRE((int_t{10} + real{1, 100} == real{11}));
     REQUIRE((int_t{10} + real{1, 100}).get_prec() == 100);
+    REQUIRE((real{"32193821093809210101283092183091283092183", 10} + int_t{"32193821093809210101283092183091283092183"}
+             == real{"32193821093809210101283092183091283092183", 10}
+                    + real{int_t{"32193821093809210101283092183091283092183"}}));
+    REQUIRE((int_t{"32193821093809210101283092183091283092183"} + real{"32193821093809210101283092183091283092183", 10}
+             == real{int_t{"32193821093809210101283092183091283092183"}}
+                    + real{"32193821093809210101283092183091283092183", 10}));
     real_reset_default_prec();
     // Rational.
     REQUIRE((real{1, 10} + rat_t{10} == real{11}));
@@ -252,6 +314,12 @@ TEST_CASE("real binary add")
     REQUIRE((real{1, 100} + rat_t{10}).get_prec() == 100);
     REQUIRE((rat_t{10} + real{1, 100} == real{11}));
     REQUIRE((rat_t{10} + real{1, 100}).get_prec() == 100);
+    REQUIRE((real{"32193821093809210101283092183091283092183", 10} + rat_t{"32193821093809210101283092183091283092183"}
+             == real{"32193821093809210101283092183091283092183", 10}
+                    + real{rat_t{"32193821093809210101283092183091283092183"}}));
+    REQUIRE((rat_t{"32193821093809210101283092183091283092183"} + real{"32193821093809210101283092183091283092183", 10}
+             == real{rat_t{"32193821093809210101283092183091283092183"}}
+                    + real{"32193821093809210101283092183091283092183", 10}));
     real_reset_default_prec();
 #if defined(MPPP_WITH_QUADMATH)
     REQUIRE((real{1, 10} + real128{10} == real{11}));
@@ -423,62 +491,61 @@ TEST_CASE("real right in-place add")
 {
     // Integrals.
     {
-    int n = 3;
-    n += real{2};
-    REQUIRE(n == 5);
-    n = 1;
-    REQUIRE_THROWS_AS(n += real{std::numeric_limits<int>::max()}, std::overflow_error);
-    REQUIRE(n == 1);
-    n = -1;
-    REQUIRE_THROWS_AS(n += real{std::numeric_limits<int>::min()}, std::overflow_error);
-    REQUIRE(n == -1);
-    real_set_default_prec(5);
-    n = 5;
-    n += real{123};
-    REQUIRE(n == static_cast<int>(5 + real{123}));
-    REQUIRE(n == static_cast<int>(real{5} + real{123}));
-    real_reset_default_prec();
+        int n = 3;
+        n += real{2};
+        REQUIRE(n == 5);
+        n = 1;
+        REQUIRE_THROWS_AS(n += real{std::numeric_limits<int>::max()}, std::overflow_error);
+        REQUIRE(n == 1);
+        n = -1;
+        REQUIRE_THROWS_AS(n += real{std::numeric_limits<int>::min()}, std::overflow_error);
+        REQUIRE(n == -1);
+        real_set_default_prec(5);
+        n = 5;
+        n += real{123};
+        REQUIRE(n == static_cast<int>(5 + real{123}));
+        REQUIRE(n == static_cast<int>(real{5} + real{123}));
+        real_reset_default_prec();
     }
     {
-    unsigned n = 3;
-    n += real{2};
-    REQUIRE(n == 5);
-    real_set_default_prec(5);
-    n += real{123};
-    REQUIRE(n == static_cast<unsigned>(5 + real{123}));
-    REQUIRE(n == static_cast<unsigned>(real{5} + real{123}));
-    real_reset_default_prec();
+        unsigned n = 3;
+        n += real{2};
+        REQUIRE(n == 5);
+        real_set_default_prec(5);
+        n += real{123};
+        REQUIRE(n == static_cast<unsigned>(5 + real{123}));
+        REQUIRE(n == static_cast<unsigned>(real{5} + real{123}));
+        real_reset_default_prec();
     }
     {
-    bool n = 3;
-    n += real{2};
-    REQUIRE(n);
-    real_set_default_prec(5);
-    n += real{123};
-    REQUIRE(n);
-    n += real{-1};
-    REQUIRE(!n);
-    real_reset_default_prec();
+        bool n = true;
+        n += real{2};
+        REQUIRE(n);
+        real_set_default_prec(5);
+        n += real{123};
+        REQUIRE(n);
+        n += real{-1};
+        REQUIRE(!n);
+        real_reset_default_prec();
     }
     {
-    long long n = 3;
-    n += real{2};
-    REQUIRE(n == 5);
-    real_set_default_prec(5);
-    n += real{123};
-    REQUIRE(n == static_cast<long long>(5 + real{123}));
-    REQUIRE(n == static_cast<long long>(real{5} + real{123}));
-    real_reset_default_prec();
+        long long n = 3;
+        n += real{2};
+        REQUIRE(n == 5);
+        real_set_default_prec(5);
+        n += real{123};
+        REQUIRE(n == static_cast<long long>(5 + real{123}));
+        REQUIRE(n == static_cast<long long>(real{5} + real{123}));
+        real_reset_default_prec();
     }
     {
-    unsigned long long n = 3;
-    n += real{2};
-    REQUIRE(n == 5);
-    real_set_default_prec(5);
-    n += real{123};
-    REQUIRE(n == static_cast<unsigned long long>(5 + real{123}));
-    REQUIRE(n == static_cast<unsigned long long>(real{5} + real{123}));
-    real_reset_default_prec();
+        unsigned long long n = 3;
+        n += real{2};
+        REQUIRE(n == 5);
+        real_set_default_prec(5);
+        n += real{123};
+        REQUIRE(n == static_cast<unsigned long long>(5 + real{123}));
+        REQUIRE(n == static_cast<unsigned long long>(real{5} + real{123}));
+        real_reset_default_prec();
     }
 }
-

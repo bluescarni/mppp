@@ -2998,20 +2998,22 @@ inline real dispatch_binary_add(T &&a, U &&b)
     return mpfr_nary_op_return(0, ::mpfr_add, std::forward<T>(a), std::forward<U>(b));
 }
 
-template <typename T, typename U, enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
 inline real dispatch_binary_add(T &&a, const U &x)
 {
     MPPP_MAYBE_TLS real tmp;
     tmp = x;
-    return dispatch_binary_add(std::forward<T>(a),tmp);
+    return dispatch_binary_add(std::forward<T>(a), tmp);
 }
 
-template <typename T, typename U, enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
-inline real dispatch_binary_add(const U &x, T &&a)
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_binary_add(const T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
     tmp = x;
-    return dispatch_binary_add(tmp, std::forward<T>(a));
+    return dispatch_binary_add(tmp, std::forward<U>(a));
 }
 }
 
@@ -3019,20 +3021,18 @@ inline real dispatch_binary_add(const U &x, T &&a)
 /**
  * \rststar
  * The precision of the result will be set to the largest precision among the operands.
- * If one of the operands is not a :cpp:class:`~mppp::real`, its precision is determined
- * as follows:
  *
- * * if the default precision ``dp`` returned by :cpp:func:`~mppp::real_get_default_prec()`
- *   is nonzero, then the precision of the non-:cpp:class:`~mppp::real` operand
- *   is set to ``dp``; otherwise,
- * * the precision of the non-:cpp:class:`~mppp::real` operand will be determined according to the same
- *   heuristics described in the generic constructor for :cpp:class:`~mppp::real`.
+ * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+ * (following the same heuristics described in the generic assignment operator of :cpp:class:`~mppp::real`)
+ * before performing the operation.
  * \endrststar
  *
  * @param a the first summand.
  * @param b the second summand.
  *
  * @return \f$a+b\f$.
+ *
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
@@ -3066,7 +3066,17 @@ inline void dispatch_in_place_add(real &a, const T &x)
     dispatch_in_place_add(a, tmp);
 }
 
-template <typename T, typename U, enable_if_t<conjunction<is_real_interoperable<T>,std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+// NOTE: split this in two parts: for C++ types and real128, we use directly the cast
+// operator, for integer and rational we use the get() function.
+template <typename T, typename U,
+          enable_if_t<conjunction<disjunction<is_cpp_interoperable<T>
+#if defined(MPPP_WITH_QUADMATH)
+                                              ,
+                                              std::is_same<T, real128>
+#endif
+                                              >,
+                                  std::is_same<real, uncvref_t<U>>>::value,
+                      int> = 0>
 inline void dispatch_in_place_add(T &x, U &&a)
 {
     MPPP_MAYBE_TLS real tmp;
@@ -3074,14 +3084,64 @@ inline void dispatch_in_place_add(T &x, U &&a)
     dispatch_in_place_add(tmp, std::forward<U>(a));
     x = static_cast<T>(tmp);
 }
+
+template <typename T, typename U,
+          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
+                      int> = 0>
+inline void dispatch_in_place_add(T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    dispatch_in_place_add(tmp, std::forward<U>(a));
+    if (mppp_unlikely(!get(x, tmp))) {
+        if (is_integer<T>::value) {
+            // Conversion to integer can fail only if the source value is not finite.
+            assert(!tmp.number_p());
+            throw std::domain_error("The result of the in-place addition of the real " + a.to_string()
+                                    + " to the integer " + x.to_string() + " is the non-finite value "
+                                    + tmp.to_string());
+        }
+        // Conversion to rational can fail if the source value is not finite, or if the conversion
+        // results in overflow in the manipulation of the real exponent.
+        if (!tmp.number_p()) {
+            throw std::domain_error("The result of the in-place addition of the real " + a.to_string()
+                                    + " to the rational " + x.to_string() + " is the non-finite value "
+                                    + tmp.to_string());
+        }
+        throw std::overflow_error("The conversion of the real " + tmp.to_string()
+                                  + " to rational during the in-place addition of the real " + a.to_string()
+                                  + " to the rational " + x.to_string() + " triggers an internal overflow condition");
+    }
+}
 }
 
 /// In-place addition involving \link mppp::real real\endlink.
 /**
+ * \rststar
+ * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
+ * to the expression:
+ *
+ * .. code-block:: c++
+ *
+ *    a = a + b;
+ *
+ * Otherwise, this operator is equivalent to the expression:
+ *
+ * .. code-block:: c++
+ *
+ *    a = static_cast<T>(a + b);
+ *
+ * That is, the operation is always performed via the corresponding binary operator
+ * and the result is assigned back to ``a``, after a conversion if necessary.
+ * \endrststar
+ *
  * @param a the augend.
  * @param b the addend.
  *
  * @return a reference to \p a.
+ *
+ * @throws unspecified any exception thrown by the corresponding binary operator,
+ * or by the generic conversion operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
