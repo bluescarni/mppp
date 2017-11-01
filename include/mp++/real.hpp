@@ -2735,13 +2735,13 @@ inline bool signbit(const real &r)
      * @return a reference to \p rop.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+inline real &sqrt(real &rop, CvrReal &&op)
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &sqrt(real &rop, T &&op)
+#endif
 {
-    return mpfr_nary_op(0, ::mpfr_sqrt, rop, std::forward<T>(op));
+    return mpfr_nary_op(0, ::mpfr_sqrt, rop, std::forward<decltype(op)>(op));
 }
 
 /// Unary square root.
@@ -2751,13 +2751,13 @@ inline real &sqrt(real &rop, T &&op)
  * @return the square root of \p r.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+inline real sqrt(CvrReal &&r)
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real sqrt(T &&r)
+#endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_sqrt, std::forward<T>(r));
+    return mpfr_nary_op_return(0, ::mpfr_sqrt, std::forward<decltype(r)>(r));
 }
 
     /** @} */
@@ -2780,13 +2780,13 @@ inline real sqrt(T &&r)
      * @return a reference to \p rop.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+inline real &sin(real &rop, CvrReal &&op)
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &sin(real &rop, T &&op)
+#endif
 {
-    return mpfr_nary_op(0, ::mpfr_sin, rop, std::forward<T>(op));
+    return mpfr_nary_op(0, ::mpfr_sin, rop, std::forward<decltype(op)>(op));
 }
 
 /// Unary sine.
@@ -2796,13 +2796,13 @@ inline real &sin(real &rop, T &&op)
  * @return the sine of \p r.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+inline real sin(CvrReal &&r)
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real sin(T &&r)
+#endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_sin, std::forward<T>(r));
+    return mpfr_nary_op_return(0, ::mpfr_sin, std::forward<decltype(r)>(r));
 }
 
     /// Binary cosine.
@@ -2813,13 +2813,13 @@ inline real sin(T &&r)
      * @return a reference to \p rop.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+inline real &cos(real &rop, CvrReal &&op)
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real &cos(real &rop, T &&op)
+#endif
 {
-    return mpfr_nary_op(0, ::mpfr_cos, rop, std::forward<T>(op));
+    return mpfr_nary_op(0, ::mpfr_cos, rop, std::forward<decltype(op)>(op));
 }
 
 /// Unary cosine.
@@ -2829,13 +2829,13 @@ inline real &cos(real &rop, T &&op)
  * @return the cosine of \p r.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
+inline real cos(CvrReal &&r)
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-#endif
 inline real cos(T &&r)
+#endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_cos, std::forward<T>(r));
+    return mpfr_nary_op_return(0, ::mpfr_cos, std::forward<decltype(r)>(r));
 }
 
 /** @} */
