@@ -9,6 +9,7 @@
 #include <mp++/config.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -496,6 +497,7 @@ TEST_CASE("real right in-place add")
         REQUIRE(n == 5);
         n = 1;
         REQUIRE_THROWS_AS(n += real{std::numeric_limits<int>::max()}, std::overflow_error);
+        REQUIRE_THROWS_AS((n += real{"inf", 5}), std::domain_error);
         REQUIRE(n == 1);
         n = -1;
         REQUIRE_THROWS_AS(n += real{std::numeric_limits<int>::min()}, std::overflow_error);
@@ -511,7 +513,12 @@ TEST_CASE("real right in-place add")
         unsigned n = 3;
         n += real{2};
         REQUIRE(n == 5);
+        n = 1;
+        REQUIRE_THROWS_AS(n += real{std::numeric_limits<unsigned>::max()}, std::overflow_error);
+        REQUIRE_THROWS_AS((n += real{"inf", 5}), std::domain_error);
+        REQUIRE(n == 1u);
         real_set_default_prec(5);
+        n = 5;
         n += real{123};
         REQUIRE(n == static_cast<unsigned>(5 + real{123}));
         REQUIRE(n == static_cast<unsigned>(real{5} + real{123}));
@@ -532,7 +539,15 @@ TEST_CASE("real right in-place add")
         long long n = 3;
         n += real{2};
         REQUIRE(n == 5);
+        n = 1;
+        REQUIRE_THROWS_AS(n += real{std::numeric_limits<long long>::max()}, std::overflow_error);
+        REQUIRE_THROWS_AS((n += real{"inf", 5}), std::domain_error);
+        REQUIRE(n == 1);
+        n = -1;
+        REQUIRE_THROWS_AS(n += real{std::numeric_limits<long long>::min()}, std::overflow_error);
+        REQUIRE(n == -1);
         real_set_default_prec(5);
+        n = 5;
         n += real{123};
         REQUIRE(n == static_cast<long long>(5 + real{123}));
         REQUIRE(n == static_cast<long long>(real{5} + real{123}));
@@ -542,10 +557,86 @@ TEST_CASE("real right in-place add")
         unsigned long long n = 3;
         n += real{2};
         REQUIRE(n == 5);
+        n = 1;
+        REQUIRE_THROWS_AS(n += real{std::numeric_limits<unsigned long long>::max()}, std::overflow_error);
+        REQUIRE_THROWS_AS((n += real{"inf", 5}), std::domain_error);
+        REQUIRE(n == 1u);
         real_set_default_prec(5);
+        n = 5;
         n += real{123};
         REQUIRE(n == static_cast<unsigned long long>(5 + real{123}));
         REQUIRE(n == static_cast<unsigned long long>(real{5} + real{123}));
         real_reset_default_prec();
     }
+    // Floating-point.
+    {
+        float x = 3;
+        x += real{2};
+        REQUIRE(x == 5.f);
+        if (std::numeric_limits<float>::is_iec559) {
+            x = std::numeric_limits<float>::max();
+            x += real{std::numeric_limits<float>::max()};
+            REQUIRE(std::isinf(x));
+        }
+    }
+    {
+        double x = 3;
+        x += real{2};
+        REQUIRE(x == 5.);
+        if (std::numeric_limits<double>::is_iec559) {
+            x = std::numeric_limits<double>::max();
+            x += real{std::numeric_limits<double>::max()};
+            REQUIRE(std::isinf(x));
+        }
+    }
+    {
+        long double x = 3;
+        x += real{2};
+        REQUIRE(x == 5.l);
+        if (std::numeric_limits<long double>::is_iec559) {
+            x = std::numeric_limits<long double>::max();
+            x += real{std::numeric_limits<long double>::max()};
+            REQUIRE(std::isinf(x));
+        }
+    }
+    // Integer.
+    {
+        int_t n{3};
+        n += real{2};
+        REQUIRE(n == 5);
+        n = 1;
+        REQUIRE_THROWS_AS((n += real{"inf", 5}), std::domain_error);
+        REQUIRE(n == 1);
+        real_set_default_prec(5);
+        n = 5;
+        n += real{123};
+        REQUIRE(n == static_cast<int_t>(int_t{5} + real{123}));
+        REQUIRE(n == static_cast<int_t>(real{int_t{5}} + real{123}));
+        real_reset_default_prec();
+    }
+    // Rational.
+    {
+        rat_t n{3};
+        n += real{2};
+        REQUIRE(n == 5);
+        n = 1;
+        REQUIRE_THROWS_AS((n += real{"inf", 5}), std::domain_error);
+        REQUIRE(n == 1);
+        real_set_default_prec(5);
+        n = 5;
+        n += real{123};
+        REQUIRE(n == static_cast<rat_t>(rat_t{5} + real{123}));
+        REQUIRE(n == static_cast<rat_t>(real{rat_t{5}} + real{123}));
+        real_reset_default_prec();
+    }
+#if defined(MPPP_WITH_QUADMATH)
+    {
+        real128 x{3};
+        x += real{2};
+        REQUIRE(x == 5);
+        x = real128{"1.1897E4932"};
+        x += real{real128{"1.1897E4932"}};
+        REQUIRE(isinf(x));
+    }
+#endif
 }
