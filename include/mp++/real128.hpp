@@ -2724,6 +2724,34 @@ constexpr real128 two_48()
 {
     return real128{1} / (1ull << 48);
 }
+
+// Recursively calculate 2**N, where N is a power of two greater than 32.
+template <unsigned long N>
+constexpr real128 two_ptwo()
+{
+    static_assert(N > 32u && !(N & (N - 1u)), "Invalid value for N.");
+    return two_ptwo<N / 2u>() * two_ptwo<N / 2u>();
+}
+
+template <>
+constexpr real128 two_ptwo<32ul>()
+{
+    return real128{1} * (1ull << 32);
+}
+
+// Recursively calculate 2**-N, where N is a power of two greater than 32.
+template <unsigned long N>
+constexpr real128 two_ntwo()
+{
+    static_assert(N > 32u && !(N & (N - 1u)), "Invalid value for N.");
+    return two_ntwo<N / 2u>() * two_ntwo<N / 2u>();
+}
+
+template <>
+constexpr real128 two_ntwo<32ul>()
+{
+    return real128{1} / (1ull << 32);
+}
 }
 
 /** @defgroup real128_constants real128_constants
@@ -2737,6 +2765,27 @@ constexpr real128 two_48()
 constexpr unsigned real128_sig_digits()
 {
     return 113u;
+}
+
+/// The largest positive finite value representable by \link mppp::real128 real128\endlink.
+/**
+ * @return approximately \f$ 1.18973 \times 10^{4932}\f$.
+ */
+constexpr real128 real128_max()
+{
+    return (18446744073709551615ull * two_112() + 281474976710655ull * two_48() + 1) * two_ptwo<8192>()
+           * two_ptwo<4096>() * two_ptwo<2048>() * two_ptwo<1024>() * two_ptwo<512>() * two_ptwo<256>()
+           * two_ptwo<128>() * two_ptwo<64>() * two_ptwo<32>() * (1ull << 31);
+}
+
+/// The smallest positive value representable by \link mppp::real128 real128\endlink with full precision.
+/**
+ * @return approximately \f$ 3.3621 \times 10^{-4932}\f$.
+ */
+constexpr real128 real128_min()
+{
+    return two_ntwo<8192>() * two_ntwo<4096>() * two_ntwo<2048>() * two_ntwo<1024>() * two_ntwo<512>() * two_ntwo<256>()
+           * two_ntwo<128>() * two_ntwo<64>() * two_ntwo<32>() / (1ull << 30);
 }
 
 /// The positive \f$ \infty \f$ constant.
@@ -2811,6 +2860,12 @@ constexpr real128 real128_sqrt2()
 
 /// The number of binary digits in the significand of a \link mppp::real128 real128\endlink (113).
 inline constexpr unsigned sig_digits_128 = real128_sig_digits();
+
+/// The largest positive finite value representable by \link mppp::real128 real128\endlink.
+inline constexpr real128 max_128 = real128_max();
+
+/// The smallest positive value representable by \link mppp::real128 real128\endlink with full precision.
+inline constexpr real128 min_128 = real128_min();
 
 /// Quadruple-precision \f$ +\infty \f$ constant.
 inline constexpr real128 inf_128 = real128_inf();
