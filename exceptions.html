@@ -34,8 +34,34 @@
 
   </head>
   <body>
-  <div class="document">
-    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="exceptions">
+<h1>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h1>
+<p><em>#include &lt;mp++/exceptions.hpp&gt;</em></p>
+<dl class="class">
+<dt id="_CPPv2N4mppp19zero_division_errorE">
+<span id="mppp::zero_division_error"></span><span class="target" id="structmppp_1_1zero__division__error"></span><em class="property">struct </em><code class="descclassname">mppp::</code><code class="descname">zero_division_error</code><a class="headerlink" href="#_CPPv2N4mppp19zero_division_errorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Exception to signal division by zero. </p>
+<p><p>This exception inherits all members (including constructors) from
+<a class="reference external" href="http://en.cppreference.com/w/cpp/error/domain_error">std::domain_error</a>. It will be thrown
+when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
+represent infinities.</p>
+ </p>
+<p>Inherits from std::domain_error</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="index.html">mp++</a></h1>
@@ -56,6 +82,30 @@
 
 
 
+    
+
+<p>
+<a href="https://travis-ci.org/bluescarni/mppp">
+    <img
+        alt="https://secure.travis-ci.org/bluescarni/mppp.svg?branch=master"
+        src="https://secure.travis-ci.org/bluescarni/mppp.svg?branch=master"
+    />
+</a>
+</p>
+
+
+
+
+    
+
+<p>
+<a href="https://codecov.io/github/bluescarni/mppp">
+    <img
+    alt="https://codecov.io/github/bluescarni/mppp/coverage.svg?branch=master"
+    src="https://codecov.io/github/bluescarni/mppp/coverage.svg?branch=master"
+    />
+</a>
+</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
@@ -95,33 +145,8 @@
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="exceptions">
-<h1>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h1>
-<p><em>#include &lt;mp++/exceptions.hpp&gt;</em></p>
-<dl class="class">
-<dt id="_CPPv2N4mppp19zero_division_errorE">
-<span id="mppp::zero_division_error"></span><span class="target" id="structmppp_1_1zero__division__error"></span><em class="property">struct </em><code class="descclassname">mppp::</code><code class="descname">zero_division_error</code><a class="headerlink" href="#_CPPv2N4mppp19zero_division_errorE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Exception to signal division by zero. </p>
-<p><p>This exception inherits all members (including constructors) from
-<a class="reference external" href="http://en.cppreference.com/w/cpp/error/domain_error">std::domain_error</a>. It will be thrown
-when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
-represent infinities.</p>
- </p>
-<p>Inherits from std::domain_error</p>
-</dd></dl>
-
-</div>
-
-
-          </div>
-        </div>
-      </div>
-    <div class="clearer"></div>
-  </div>
+      <div class="clearer"></div>
+    </div>
     <div class="footer">
       &copy;2016-2017, Francesco Biscani.
       
