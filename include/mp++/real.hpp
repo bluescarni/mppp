@@ -3106,9 +3106,11 @@ inline void dispatch_in_place_add(T &x, U &&a)
                                     + " to the rational " + x.to_string() + " is the non-finite value "
                                     + tmp.to_string());
         }
+        // LCOV_EXCL_START
         throw std::overflow_error("The conversion of the real " + tmp.to_string()
                                   + " to rational during the in-place addition of the real " + a.to_string()
                                   + " to the rational " + x.to_string() + " triggers an internal overflow condition");
+        // LCOV_EXCL_STOP
     }
 }
 }

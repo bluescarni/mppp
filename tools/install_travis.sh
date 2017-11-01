@@ -40,9 +40,8 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMPUnstable" ]]; then
-    pip3 install --upgrade --force-reinstall --user mercurial;
     # Download and compile locally the latest GMP in debug mode.
-    /home/travis/.local/bin/hg clone https://gmplib.org/repo/gmp/ gmp_unstable;
+    hg clone https://gmplib.org/repo/gmp/ gmp_unstable;
     cd gmp_unstable;
     ./.bootstrap
     CXX=g++-4.8 CC=gcc-4.8 ./configure --disable-shared --enable-assert --enable-alloca=debug --disable-assembly CFLAGS="-g -fsanitize=address";

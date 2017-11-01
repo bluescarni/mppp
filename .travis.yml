@@ -41,13 +41,10 @@ matrix:
       os: linux
       addons:
         apt:
-          sources:
-          - deadsnakes
           packages:
           - g++-4.8
           - cmake3
-          - python3.6
-          - python3-pip
+          - mercurial
           - autoconf
           - texinfo
     - env: MPPP_BUILD="CoverageGCC5" SPLIT_TEST_NUM="0" TEST_NSPLIT="2"
