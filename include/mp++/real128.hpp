@@ -2736,7 +2736,7 @@ constexpr real128 two_ptwo()
 template <>
 constexpr real128 two_ptwo<32ul>()
 {
-    return real128{1} * (1ull << 32);
+    return real128{1ull << 32};
 }
 
 // Recursively calculate 2**-N, where N is a power of two greater than 32.
@@ -2750,7 +2750,7 @@ constexpr real128 two_ntwo()
 template <>
 constexpr real128 two_ntwo<32ul>()
 {
-    return real128{1} / (1ull << 32);
+    return 1 / real128{1ull << 32};
 }
 }
 
