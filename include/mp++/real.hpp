@@ -2501,8 +2501,7 @@ inline real &fma(real &rop, T &&a, U &&b, V &&c)
 /**
  * \rststar
  * This function will compute and return :math:`a \times b + c`.
- * The precision of the result will be set to the largest precision among the operands,
- * which must all satisfy the :cpp:concept:`~mppp::CvrReal` concept.
+ * The precision of the result will be set to the largest precision among the operands.
  * \endrststar
  *
  * @param a the first operand.
@@ -2547,8 +2546,7 @@ inline real &fms(real &rop, T &&a, U &&b, V &&c)
 /**
  * \rststar
  * This function will compute and return :math:`a \times b - c`.
- * The precision of the result will be set to the largest precision among the operands,
- * which must all satisfy the :cpp:concept:`~mppp::CvrReal` concept.
+ * The precision of the result will be set to the largest precision among the operands.
  * \endrststar
  *
  * @param a the first operand.

@@ -9,5 +9,5 @@ Reference
    concepts.rst
    integer.rst
    rational.rst
-   real.rst
    real128.rst
+   real.rst
