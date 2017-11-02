@@ -634,8 +634,8 @@ TEST_CASE("real right in-place add")
         real128 x{3};
         x += real{2};
         REQUIRE(x == 5);
-        x = real128{"1.1897E4932"};
-        x += real{real128{"1.1897E4932"}};
+        x = real128_max();
+        x += real{real128_max()};
         REQUIRE(isinf(x));
     }
 #endif

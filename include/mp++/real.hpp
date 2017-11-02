@@ -3021,9 +3021,12 @@ inline real dispatch_binary_add(const T &x, U &&a)
  * The precision of the result will be set to the largest precision among the operands.
  *
  * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * (following the same heuristics described in the generic assignment operator of :cpp:class:`~mppp::real`)
- * before performing the operation.
- * \endrststar
+ * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
+ *\endrststar
  *
  * @param a the first summand.
  * @param b the second summand.
