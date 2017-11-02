@@ -2738,20 +2738,6 @@ constexpr real128 two_ptwo<32ul>()
 {
     return real128{1ull << 32};
 }
-
-// Recursively calculate 2**-N, where N is a power of two greater than 32.
-template <unsigned long N>
-constexpr real128 two_ntwo()
-{
-    static_assert(N > 32u && !(N & (N - 1u)), "Invalid value for N.");
-    return two_ntwo<N / 2u>() * two_ntwo<N / 2u>();
-}
-
-template <>
-constexpr real128 two_ntwo<32ul>()
-{
-    return 1 / real128{1ull << 32};
-}
 }
 
 /** @defgroup real128_constants real128_constants
@@ -2784,8 +2770,9 @@ constexpr real128 real128_max()
  */
 constexpr real128 real128_min()
 {
-    return two_ntwo<8192>() * two_ntwo<4096>() * two_ntwo<2048>() * two_ntwo<1024>() * two_ntwo<512>() * two_ntwo<256>()
-           * two_ntwo<128>() * two_ntwo<64>() * two_ntwo<32>() / (1ull << 30);
+    return 1
+           / (two_ptwo<8192>() * two_ptwo<4096>() * two_ptwo<2048>() * two_ptwo<1024>() * two_ptwo<512>()
+              * two_ptwo<256>() * two_ptwo<128>() * two_ptwo<64>() * two_ptwo<32>() * (1ull << 30));
 }
 
 /// The positive \f$ \infty \f$ constant.
