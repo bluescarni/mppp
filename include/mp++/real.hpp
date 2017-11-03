@@ -3157,6 +3157,32 @@ inline void dispatch_in_place_add(T &x, U &&a)
     x = static_cast<T>(tmp);
 }
 
+template <typename T>
+inline void real_in_place_convert(T &x, const real &tmp, const real &a, const char *op)
+{
+    if (mppp_unlikely(!get(x, tmp))) {
+        if (is_integer<T>::value) {
+            // Conversion to integer can fail only if the source value is not finite.
+            assert(!tmp.number_p());
+            throw std::domain_error(std::string{"The result of the in-place "} + op + " of the real " + a.to_string()
+                                    + " with the integer " + x.to_string() + " is the non-finite value "
+                                    + tmp.to_string());
+        }
+        // Conversion to rational can fail if the source value is not finite, or if the conversion
+        // results in overflow in the manipulation of the real exponent.
+        if (!tmp.number_p()) {
+            throw std::domain_error(std::string{"The result of the in-place "} + op + " of the real " + a.to_string()
+                                    + " with the rational " + x.to_string() + " is the non-finite value "
+                                    + tmp.to_string());
+        }
+        // LCOV_EXCL_START
+        throw std::overflow_error("The conversion of the real " + tmp.to_string() + " to rational during the in-place "
+                                  + op + " of the real " + a.to_string() + " with the rational " + x.to_string()
+                                  + " triggers an internal overflow condition");
+        // LCOV_EXCL_STOP
+    }
+}
+
 template <typename T, typename U,
           enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
                       int> = 0>
@@ -3165,27 +3191,7 @@ inline void dispatch_in_place_add(T &x, U &&a)
     MPPP_MAYBE_TLS real tmp;
     tmp = x;
     dispatch_in_place_add(tmp, std::forward<U>(a));
-    if (mppp_unlikely(!get(x, tmp))) {
-        if (is_integer<T>::value) {
-            // Conversion to integer can fail only if the source value is not finite.
-            assert(!tmp.number_p());
-            throw std::domain_error("The result of the in-place addition of the real " + a.to_string()
-                                    + " to the integer " + x.to_string() + " is the non-finite value "
-                                    + tmp.to_string());
-        }
-        // Conversion to rational can fail if the source value is not finite, or if the conversion
-        // results in overflow in the manipulation of the real exponent.
-        if (!tmp.number_p()) {
-            throw std::domain_error("The result of the in-place addition of the real " + a.to_string()
-                                    + " to the rational " + x.to_string() + " is the non-finite value "
-                                    + tmp.to_string());
-        }
-        // LCOV_EXCL_START
-        throw std::overflow_error("The conversion of the real " + tmp.to_string()
-                                  + " to rational during the in-place addition of the real " + a.to_string()
-                                  + " to the rational " + x.to_string() + " triggers an internal overflow condition");
-        // LCOV_EXCL_STOP
-    }
+    real_in_place_convert(x, tmp, a, "addition");
 }
 }
 
@@ -3309,6 +3315,93 @@ inline real operator-(T &&a, U &&b)
 #endif
 {
     return dispatch_binary_sub(std::forward<T>(a), std::forward<decltype(b)>(b));
+}
+
+inline namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline void dispatch_in_place_sub(T &a, U &&b)
+{
+    sub(a, a, std::forward<U>(b));
+}
+
+template <typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
+inline void dispatch_in_place_sub(real &a, const T &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    dispatch_in_place_sub(a, tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<disjunction<is_cpp_interoperable<T>
+#if defined(MPPP_WITH_QUADMATH)
+                                              ,
+                                              std::is_same<T, real128>
+#endif
+                                              >,
+                                  std::is_same<real, uncvref_t<U>>>::value,
+                      int> = 0>
+inline void dispatch_in_place_sub(T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    dispatch_in_place_sub(tmp, std::forward<U>(a));
+    x = static_cast<T>(tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
+                      int> = 0>
+inline void dispatch_in_place_sub(T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    dispatch_in_place_sub(tmp, std::forward<U>(a));
+    real_in_place_convert(x, tmp, a, "subtraction");
+}
+}
+
+/// In-place subtraction involving \link mppp::real real\endlink.
+/**
+ * \rststar
+ * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
+ * to the expression:
+ *
+ * .. code-block:: c++
+ *
+ *    a = a - b;
+ *
+ * Otherwise, this operator is equivalent to the expression:
+ *
+ * .. code-block:: c++
+ *
+ *    a = static_cast<T>(a - b);
+ *
+ * That is, the operation is always performed via the corresponding binary operator
+ * and the result is assigned back to ``a``, after a conversion if necessary.
+ * \endrststar
+ *
+ * @param a the minuend.
+ * @param b the subtrahend.
+ *
+ * @return a reference to \p a.
+ *
+ * @throws unspecified any exception thrown by the corresponding binary operator,
+ * or by the generic conversion operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator-=(T &a, RealCompoundOpTypes<T> &&b)
+#else
+template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
+inline T &operator-=(T &a, U &&b)
+#endif
+{
+    dispatch_in_place_sub(a, std::forward<decltype(b)>(b));
+    return a;
 }
 
 /// Equality operator involving \link mppp::real real\endlink.
