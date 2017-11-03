@@ -419,18 +419,14 @@ inline ::mpfr_prec_t real_dd_prec(const T &x)
  *  @{
  */
 
-/// Special initialisation for \link mppp::real real\endlink.
+/// Special initialisation tags for \link mppp::real real\endlink.
 /**
  * \rststar
  * This scoped enum is used to initialise a :cpp:class:`~mppp::real` with
  * one of the three special values NaN, infinity or zero.
  * \endrststar
  */
-enum class real_init {
-    nan, ///< NaN.
-    inf, ///< Infinity.
-    zero ///< Zero.
-};
+enum class real_kind { nan = MPFR_NAN_KIND, inf = MPFR_INF_KIND, zero = MPFR_ZERO_KIND };
 
 /** @} */
 
@@ -578,19 +574,19 @@ public:
         // Mark the other as moved-from.
         other.m_mpfr._mpfr_d = nullptr;
     }
-    /// Constructor from a special value.
+    /// Constructor from a special value, sign and precision.
     /**
      * \rststar
      * This constructor will initialise ``this`` with one of the special values
-     * specified by the :cpp:type:`~mppp::real_init` enum. The precision of ``this``
+     * specified by the :cpp:type:`~mppp::real_kind` enum. The precision of ``this``
      * will be ``p``. If ``p`` is zero, the precision will be set to the default
      * precision (as indicated by :cpp:func:`~mppp::real_get_default_prec()`).
      *
-     * If ``ri`` is not NaN, the sign bit will be set to positive if ``sign``
+     * If ``k`` is not NaN, the sign bit will be set to positive if ``sign``
      * is nonnegative, negative otherwise.
      * \endrststar
      *
-     * @param ri the desired special value.
+     * @param k the desired special value.
      * @param sign the desired sign for \p this.
      * @param p the desired precision for \p this.
      *
@@ -598,7 +594,7 @@ public:
      * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink,
      * or if \p p is zero but no default precision has been set.
      */
-    explicit real(real_init ri, int sign = 0, ::mpfr_prec_t p = 0)
+    explicit real(real_kind k, int sign, ::mpfr_prec_t p)
     {
         ::mpfr_prec_t prec;
         if (p) {
@@ -612,17 +608,38 @@ public:
             prec = dp;
         }
         ::mpfr_init2(&m_mpfr, prec);
-        switch (ri) {
-            case real_init::nan:
+        switch (k) {
+            case real_kind::nan:
                 break;
-            case real_init::inf:
+            case real_kind::inf:
                 set_inf(sign);
                 break;
-            case real_init::zero:
+            case real_kind::zero:
                 set_zero(sign);
                 break;
         }
     }
+    /// Constructor from a special value and precision.
+    /**
+     * This constructor is equivalent to the constructor from a special value, sign and precision
+     * with a hard-coded sign of 0.
+     *
+     * @param k the desired special value.
+     * @param p the desired precision for \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from a special value, sign and precision.
+     */
+    explicit real(real_kind k, ::mpfr_prec_t p) : real(k, 0, p) {}
+    /// Constructor from a special value.
+    /**
+     * This constructor is equivalent to the constructor from a special value, sign and precision
+     * with a hard-coded sign of 0 and hard-coded precision of 0.
+     *
+     * @param k the desired special value.
+     *
+     * @throws unspecified any exception thrown by the constructor from a special value, sign and precision.
+     */
+    explicit real(real_kind k) : real(k, 0, 0) {}
 
 private:
     // A helper to determine the precision to use in the generic constructors. The precision

@@ -552,6 +552,81 @@ TEST_CASE("real constructors")
 #endif
 }
 
+TEST_CASE("real kind constructors")
+{
+    // Ctor from nan.
+    real r0{real_kind::nan, 12};
+    REQUIRE(r0.nan_p());
+    REQUIRE(r0.get_prec() == 12);
+    r0 = real{real_kind::nan, 0, 11};
+    REQUIRE(r0.nan_p());
+    REQUIRE(r0.get_prec() == 11);
+    r0 = real{real_kind::nan, -1, 10};
+    REQUIRE(r0.nan_p());
+    REQUIRE(r0.get_prec() == 10);
+    real_set_default_prec(9);
+    r0 = real{real_kind::nan};
+    REQUIRE(r0.nan_p());
+    REQUIRE(r0.get_prec() == 9);
+    real_reset_default_prec();
+    // Ctor from inf.
+    r0 = real{real_kind::inf, 12};
+    REQUIRE(r0.inf_p());
+    REQUIRE(r0.get_prec() == 12);
+    REQUIRE(!r0.signbit());
+    r0 = real{real_kind::inf, -1, 11};
+    REQUIRE(r0.inf_p());
+    REQUIRE(r0.get_prec() == 11);
+    REQUIRE(r0.signbit());
+    r0 = real{real_kind::inf, 0, 10};
+    REQUIRE(r0.inf_p());
+    REQUIRE(r0.get_prec() == 10);
+    REQUIRE(!r0.signbit());
+    real_set_default_prec(9);
+    r0 = real{real_kind::inf};
+    REQUIRE(r0.inf_p());
+    REQUIRE(r0.get_prec() == 9);
+    REQUIRE(!r0.signbit());
+    real_reset_default_prec();
+    // Ctor from zero.
+    r0 = real{real_kind::zero, 12};
+    REQUIRE(r0.zero_p());
+    REQUIRE(r0.get_prec() == 12);
+    REQUIRE(!r0.signbit());
+    r0 = real{real_kind::zero, -1, 11};
+    REQUIRE(r0.zero_p());
+    REQUIRE(r0.get_prec() == 11);
+    REQUIRE(r0.signbit());
+    r0 = real{real_kind::zero, 0, 10};
+    REQUIRE(r0.zero_p());
+    REQUIRE(r0.get_prec() == 10);
+    REQUIRE(!r0.signbit());
+    real_set_default_prec(9);
+    r0 = real{real_kind::zero};
+    REQUIRE(r0.zero_p());
+    REQUIRE(r0.get_prec() == 9);
+    REQUIRE(!r0.signbit());
+    real_reset_default_prec();
+    // Error handling.
+    REQUIRE_THROWS_PREDICATE((real{real_kind::nan, 0, -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of -1: the maximum allowed precision is "
+                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + std::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE((real{real_kind::nan, -100}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == "Cannot init a real with a precision of -100: the maximum allowed precision is "
+                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
+                      + std::to_string(real_prec_min());
+    });
+    REQUIRE_THROWS_PREDICATE((real{real_kind::nan}), std::invalid_argument, [](const std::invalid_argument &ex) {
+        return ex.what()
+               == std::string{"Cannot init a real with an automatically-deduced precision if "
+                              "the global default precision has not been set"};
+    });
+}
+
 struct int_ass_tester {
     template <typename T>
     void operator()(const T &) const
