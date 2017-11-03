@@ -30,7 +30,7 @@ Types
 
 .. doxygentypedef:: mppp::mpfr_struct_t
 
-.. doxygenenum:: mppp::real_init
+.. doxygenenum:: mppp::real_kind
 
 Concepts
 --------
