@@ -640,3 +640,317 @@ TEST_CASE("real right in-place add")
     }
 #endif
 }
+
+TEST_CASE("real neg copy")
+{
+    real r0{};
+    REQUIRE((-r0).zero_p());
+    REQUIRE((-r0).signbit());
+    REQUIRE((-real{}).zero_p());
+    REQUIRE((-real{}).signbit());
+    REQUIRE((-r0).get_prec() == real_prec_min());
+    REQUIRE((-real{}).get_prec() == real_prec_min());
+    r0 = 123;
+    REQUIRE(::mpfr_cmp_si((-r0).get_mpfr_t(), -123l) == 0);
+    REQUIRE((-r0).get_prec() == std::numeric_limits<int>::digits + 1);
+    REQUIRE(::mpfr_cmp_si((-std::move(r0)).get_mpfr_t(), -123l) == 0);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+}
+
+TEST_CASE("real binary sub")
+{
+    real r0, r1;
+    REQUIRE(real{} - real{} == real{});
+    REQUIRE((real{} - real{}).get_prec() == real_prec_min());
+    r0 = 23;
+    r1 = -1;
+    REQUIRE(r0 - r1 == real{24});
+    REQUIRE(std::move(r0) - r1 == real{24});
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+    r0 = real{23};
+    REQUIRE(r0 - std::move(r1) == real{24});
+    REQUIRE(!r1.get_mpfr_t()->_mpfr_d);
+    r1 = real{-1};
+    REQUIRE(std::move(r0) - std::move(r1) == real{24});
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+    REQUIRE(r1.get_mpfr_t()->_mpfr_d);
+    r0 = real{23};
+    REQUIRE((real{1, 10} - real{2, 20} == real{-1}));
+    REQUIRE((real{1, 10} - real{2, 20}).get_prec() == 20);
+    REQUIRE((real{1, 20} - real{2, 10} == real{-1}));
+    REQUIRE((real{1, 20} - real{2, 10}).get_prec() == 20);
+    // Addition with integrals.
+    REQUIRE((real{1, 10} - 10 == real{-9}));
+    REQUIRE((real{1, 10} - 10).get_prec() == std::numeric_limits<int>::digits + 1);
+    REQUIRE((10 - real{1, 10} == real{9}));
+    REQUIRE((10 - real{1, 10}).get_prec() == std::numeric_limits<int>::digits + 1);
+    REQUIRE((real{1, 100} - 10 == real{-9}));
+    REQUIRE((real{1, 100} - 10).get_prec() == std::max(100, std::numeric_limits<int>::digits + 1));
+    REQUIRE((10 - real{1, 100} == real{9}));
+    REQUIRE((10 - real{1, 100}).get_prec() == std::max(100, std::numeric_limits<int>::digits + 1));
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - 10 == real{-9}));
+    REQUIRE((real{1, 10} - 10).get_prec() == 12);
+    REQUIRE((10 - real{1, 10} == real{9}));
+    REQUIRE((10 - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 100} - 10 == real{-9}));
+    REQUIRE((real{1, 100} - 10).get_prec() == 100);
+    REQUIRE((10 - real{1, 100} == real{9}));
+    REQUIRE((10 - real{1, 100}).get_prec() == 100);
+    REQUIRE((real{1, 10} - 10 == real{1, 10} - real{10}));
+    REQUIRE((real{-1, 10} - std::numeric_limits<int>::max() == real{-1, 10} - real{std::numeric_limits<int>::max()}));
+    REQUIRE((real{1, 10} - std::numeric_limits<int>::min() == real{1, 10} - real{std::numeric_limits<int>::min()}));
+    REQUIRE((10 - real{1, 10} == real{10} - real{1, 10}));
+    REQUIRE((std::numeric_limits<int>::max() - real{-1, 10} == real{std::numeric_limits<int>::max()} - real{-1, 10}));
+    REQUIRE((std::numeric_limits<int>::min() - real{1, 10} == real{std::numeric_limits<int>::min()} - real{1, 10}));
+    REQUIRE((real{1, 100} - 10 == real{1, 100} - real{10}));
+    REQUIRE((real{-1, 100} - std::numeric_limits<int>::max() == real{-1, 100} - real{std::numeric_limits<int>::max()}));
+    REQUIRE((real{1, 100} - std::numeric_limits<int>::min() == real{1, 100} - real{std::numeric_limits<int>::min()}));
+    REQUIRE((10 - real{1, 100} == real{10} - real{1, 100}));
+    REQUIRE((std::numeric_limits<int>::max() - real{1, 100} == real{std::numeric_limits<int>::max()} - real{1, 100}));
+    REQUIRE((std::numeric_limits<int>::min() - real{-1, 100} == real{std::numeric_limits<int>::min()} - real{-1, 100}));
+    real_reset_default_prec();
+    REQUIRE((real{1, 10} - true == real{0}));
+    REQUIRE((real{1, 10} - true).get_prec() == 10);
+    REQUIRE((false - real{1, 10} == real{-1}));
+    REQUIRE((false - real{1, 10}).get_prec() == 10);
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - true == real{0}));
+    REQUIRE((real{1, 10} - true).get_prec() == 12);
+    REQUIRE((false - real{1, 10} == real{-1}));
+    REQUIRE((false - real{1, 10}).get_prec() == 12);
+    real_reset_default_prec();
+    REQUIRE((real{1, 10} - 10u == real{-9}));
+    REQUIRE((real{1, 10} - 10u).get_prec() == std::numeric_limits<unsigned>::digits);
+    REQUIRE((10u - real{1, 10} == real{9}));
+    REQUIRE((10u - real{1, 10}).get_prec() == std::numeric_limits<unsigned>::digits);
+    REQUIRE((real{1, 100} - 10u == real{-9}));
+    REQUIRE((real{1, 100} - 10u).get_prec() == std::max(100, std::numeric_limits<unsigned>::digits));
+    REQUIRE((10u - real{1, 100} == real{9}));
+    REQUIRE((10u - real{1, 100}).get_prec() == std::max(100, std::numeric_limits<unsigned>::digits));
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - 10u == real{-9}));
+    REQUIRE((real{1, 10} - 10u).get_prec() == 12);
+    REQUIRE((10u - real{1, 10} == real{9}));
+    REQUIRE((10u - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 100} - 10u == real{-9}));
+    REQUIRE((real{1, 100} - 10u).get_prec() == 100);
+    REQUIRE((10u - real{1, 100} == real{9}));
+    REQUIRE((10u - real{1, 100}).get_prec() == 100);
+    REQUIRE((real{1, 10} - 10u == real{1, 10} - real{10u}));
+    REQUIRE((real{1, 10} - std::numeric_limits<unsigned>::max()
+             == real{1, 10} - real{std::numeric_limits<unsigned>::max()}));
+    REQUIRE((10u - real{1, 10} == real{10u} - real{1, 10}));
+    REQUIRE((std::numeric_limits<unsigned>::max() - real{1, 10u}
+             == real{std::numeric_limits<unsigned>::max()} - real{1, 10u}));
+    REQUIRE((real{1, 100} - 10u == real{1, 100} - real{10u}));
+    REQUIRE((real{1, 100} - std::numeric_limits<unsigned>::max()
+             == real{1, 100} - real{std::numeric_limits<unsigned>::max()}));
+    REQUIRE((10u - real{1, 100} == real{10u} - real{1, 100}));
+    REQUIRE((std::numeric_limits<unsigned>::max() - real{1, 100}
+             == real{std::numeric_limits<unsigned>::max()} - real{1, 100}));
+    real_reset_default_prec();
+    REQUIRE((real{1, 10} - 10ll == real{-9}));
+    REQUIRE((real{1, 10} - 10ll).get_prec() == std::numeric_limits<long long>::digits + 1);
+    REQUIRE((real{0, 10} - std::numeric_limits<long long>::max() == -real{std::numeric_limits<long long>::max()}));
+    REQUIRE((real{0, 10} - std::numeric_limits<long long>::max()).get_prec()
+            == std::numeric_limits<long long>::digits + 1);
+    REQUIRE((real{0, 10} - std::numeric_limits<long long>::min() == -real{std::numeric_limits<long long>::min()}));
+    REQUIRE((real{0, 10} - std::numeric_limits<long long>::min()).get_prec()
+            == std::numeric_limits<long long>::digits + 1);
+    REQUIRE((10ll - real{1, 10} == real{9}));
+    REQUIRE((10ll - real{1, 10}).get_prec() == std::numeric_limits<long long>::digits + 1);
+    REQUIRE((real{1, 100} - 10ll == real{-9}));
+    REQUIRE((real{1, 100} - 10ll).get_prec() == std::max(100, std::numeric_limits<long long>::digits + 1));
+    REQUIRE((10ll - real{1, 100} == real{9}));
+    REQUIRE((10ll - real{1, 100}).get_prec() == std::max(100, std::numeric_limits<long long>::digits + 1));
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - 10ll == real{-9}));
+    REQUIRE((real{1, 10} - 10ll).get_prec() == 12);
+    REQUIRE((10ll - real{1, 10} == real{9}));
+    REQUIRE((10ll - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 100} - 10ll == real{-9}));
+    REQUIRE((real{1, 100} - 10ll).get_prec() == 100);
+    REQUIRE((10ll - real{1, 100} == real{9}));
+    REQUIRE((10ll - real{1, 100}).get_prec() == 100);
+    REQUIRE((real{1, 10} - 10ll == real{1, 10} - real{10ll}));
+    REQUIRE((real{1, 10} - std::numeric_limits<long long>::max()
+             == real{1, 10} - real{std::numeric_limits<long long>::max()}));
+    REQUIRE((real{-1, 10} - std::numeric_limits<long long>::min()
+             == real{-1, 10} - real{std::numeric_limits<long long>::min()}));
+    REQUIRE((10ll - real{1, 10} == real{10ll} - real{1, 10}));
+    REQUIRE((std::numeric_limits<long long>::max() - real{1, 10}
+             == real{std::numeric_limits<long long>::max()} - real{1, 10}));
+    REQUIRE((std::numeric_limits<long long>::min() - real{-1, 10}
+             == real{std::numeric_limits<long long>::min()} - real{-1, 10}));
+    REQUIRE((real{1, 100} - 10ll == real{1, 100} - real{10ll}));
+    REQUIRE((real{1, 100} - std::numeric_limits<long long>::max()
+             == real{1, 100} - real{std::numeric_limits<long long>::max()}));
+    REQUIRE((real{-1, 100} - std::numeric_limits<long long>::min()
+             == real{-1, 100} - real{std::numeric_limits<long long>::min()}));
+    REQUIRE((10ll - real{1, 100} == real{10ll} - real{1, 100}));
+    REQUIRE((std::numeric_limits<long long>::max() - real{1, 100}
+             == real{std::numeric_limits<long long>::max()} - real{1, 100}));
+    REQUIRE((std::numeric_limits<long long>::min() - real{-1, 100}
+             == real{std::numeric_limits<long long>::min()} - real{-1, 100}));
+    real_reset_default_prec();
+    REQUIRE((real{1, 10} - 10ull == real{-9}));
+    REQUIRE((real{1, 10} - 10ull).get_prec() == std::numeric_limits<unsigned long long>::digits);
+    REQUIRE((10ull - real{1, 10} == real{9}));
+    REQUIRE((10ull - real{1, 10}).get_prec() == std::numeric_limits<unsigned long long>::digits);
+    REQUIRE((real{0, 10} - std::numeric_limits<unsigned long long>::max()
+             == -real{std::numeric_limits<unsigned long long>::max()}));
+    REQUIRE((real{0, 10} - std::numeric_limits<unsigned long long>::max()).get_prec()
+            == std::numeric_limits<unsigned long long>::digits);
+    REQUIRE((real{1, 100} - 10ull == real{-9}));
+    REQUIRE((real{1, 100} - 10ull).get_prec() == std::max(100, std::numeric_limits<unsigned long long>::digits));
+    REQUIRE((10ull - real{1, 100} == real{9}));
+    REQUIRE((10ull - real{1, 100}).get_prec() == std::max(100, std::numeric_limits<unsigned long long>::digits));
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - 10ull == real{-9}));
+    REQUIRE((real{1, 10} - 10ull).get_prec() == 12);
+    REQUIRE((10ull - real{1, 10} == real{9}));
+    REQUIRE((10ull - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 100} - 10ull == real{-9}));
+    REQUIRE((real{1, 100} - 10ull).get_prec() == 100);
+    REQUIRE((10ull - real{1, 100} == real{9}));
+    REQUIRE((10ull - real{1, 100}).get_prec() == 100);
+    REQUIRE((real{1, 10} - 10ull == real{1, 10} - real{10ull}));
+    REQUIRE((real{1, 10} - std::numeric_limits<unsigned long long>::max()
+             == real{1, 10} - real{std::numeric_limits<unsigned long long>::max()}));
+    REQUIRE((10ull - real{1, 10} == real{10ull} - real{1, 10}));
+    REQUIRE((std::numeric_limits<unsigned long long>::max() - real{1, 10u}
+             == real{std::numeric_limits<unsigned long long>::max()} - real{1, 10u}));
+    REQUIRE((real{1, 100} - 10ull == real{1, 100} - real{10ull}));
+    REQUIRE((real{1, 100} - std::numeric_limits<unsigned long long>::max()
+             == real{1, 100} - real{std::numeric_limits<unsigned long long>::max()}));
+    REQUIRE((10ull - real{1, 100} == real{10ull} - real{1, 100}));
+    REQUIRE((std::numeric_limits<unsigned long long>::max() - real{1, 100}
+             == real{std::numeric_limits<unsigned long long>::max()} - real{1, 100}));
+    real_reset_default_prec();
+    // Floating-point.
+    REQUIRE((real{1, 10} - 10.f == real{-9}));
+    REQUIRE((real{1, 10} - 10.f).get_prec() == dig2mpfr_prec<float>());
+    REQUIRE((10.f - real{1, 10} == real{9}));
+    REQUIRE((10.f - real{1, 10}).get_prec() == dig2mpfr_prec<float>());
+    REQUIRE((real{1, 100} - 10.f == real{-9}));
+    REQUIRE((real{1, 100} - 10.f).get_prec() == std::max<::mpfr_prec_t>(100, dig2mpfr_prec<float>()));
+    REQUIRE((10.f - real{1, 100} == real{9}));
+    REQUIRE((10.f - real{1, 100}).get_prec() == std::max<::mpfr_prec_t>(100, dig2mpfr_prec<float>()));
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - 10.f == real{-9}));
+    REQUIRE((real{1, 10} - 10.f).get_prec() == 12);
+    REQUIRE((10.f - real{1, 10} == real{9}));
+    REQUIRE((10.f - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 100} - 10.f == real{-9}));
+    REQUIRE((real{1, 100} - 10.f).get_prec() == 100);
+    REQUIRE((10.f - real{1, 100} == real{9}));
+    REQUIRE((10.f - real{1, 100}).get_prec() == 100);
+    real_reset_default_prec();
+    REQUIRE((real{1, 10} - 10. == real{-9}));
+    REQUIRE((real{1, 10} - 10.).get_prec() == dig2mpfr_prec<double>());
+    REQUIRE((10. - real{1, 10} == real{9}));
+    REQUIRE((10. - real{1, 10}).get_prec() == dig2mpfr_prec<double>());
+    REQUIRE((real{1, 100} - 10. == real{-9}));
+    REQUIRE((real{1, 100} - 10.).get_prec() == std::max<::mpfr_prec_t>(100, dig2mpfr_prec<double>()));
+    REQUIRE((10. - real{1, 100} == real{9}));
+    REQUIRE((10. - real{1, 100}).get_prec() == std::max<::mpfr_prec_t>(100, dig2mpfr_prec<double>()));
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - 10. == real{-9}));
+    REQUIRE((real{1, 10} - 10.).get_prec() == 12);
+    REQUIRE((10. - real{1, 10} == real{9}));
+    REQUIRE((10. - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 100} - 10. == real{-9}));
+    REQUIRE((real{1, 100} - 10.).get_prec() == 100);
+    REQUIRE((10. - real{1, 100} == real{9}));
+    REQUIRE((10. - real{1, 100}).get_prec() == 100);
+    real_reset_default_prec();
+    REQUIRE((real{1, 10} - 10.l == real{-9}));
+    REQUIRE((real{1, 10} - 10.l).get_prec() == dig2mpfr_prec<long double>());
+    REQUIRE((10.l - real{1, 10} == real{9}));
+    REQUIRE((10.l - real{1, 10}).get_prec() == dig2mpfr_prec<long double>());
+    REQUIRE((real{1, 100} - 10.l == real{-9}));
+    REQUIRE((real{1, 100} - 10.l).get_prec() == std::max<::mpfr_prec_t>(100, dig2mpfr_prec<long double>()));
+    REQUIRE((10.l - real{1, 100} == real{9}));
+    REQUIRE((10.l - real{1, 100}).get_prec() == std::max<::mpfr_prec_t>(100, dig2mpfr_prec<long double>()));
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - 10.l == real{-9}));
+    REQUIRE((real{1, 10} - 10.l).get_prec() == 12);
+    REQUIRE((10.l - real{1, 10} == real{9}));
+    REQUIRE((10.l - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 100} - 10.l == real{-9}));
+    REQUIRE((real{1, 100} - 10.l).get_prec() == 100);
+    REQUIRE((10.l - real{1, 100} == real{9}));
+    REQUIRE((10.l - real{1, 100}).get_prec() == 100);
+    real_reset_default_prec();
+    // Integer.
+    REQUIRE((real{1, 10} - int_t{10} == real{-9}));
+    REQUIRE((real{1, 10} - int_t{10}).get_prec() == GMP_NUMB_BITS);
+    REQUIRE((int_t{10} - real{1, 10} == real{9}));
+    REQUIRE((int_t{10} - real{1, 10}).get_prec() == GMP_NUMB_BITS);
+    REQUIRE((real{1, 100} - int_t{10} == real{-9}));
+    REQUIRE((real{1, 100} - int_t{10}).get_prec() == std::max(100, GMP_NUMB_BITS));
+    REQUIRE((int_t{10} - real{1, 100} == real{9}));
+    REQUIRE((int_t{10} - real{1, 100}).get_prec() == std::max(100, GMP_NUMB_BITS));
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - int_t{10} == real{-9}));
+    REQUIRE((real{1, 10} - int_t{10}).get_prec() == 12);
+    REQUIRE((int_t{10} - real{1, 10} == real{9}));
+    REQUIRE((int_t{10} - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 100} - int_t{10} == real{-9}));
+    REQUIRE((real{1, 100} - int_t{10}).get_prec() == 100);
+    REQUIRE((int_t{10} - real{1, 100} == real{9}));
+    REQUIRE((int_t{10} - real{1, 100}).get_prec() == 100);
+    REQUIRE((real{"32193821093809210101283092183091283092183", 10} - -int_t{"32193821093809210101283092183091283092183"}
+             == real{"32193821093809210101283092183091283092183", 10}
+                    - -real{int_t{"32193821093809210101283092183091283092183"}}));
+    REQUIRE((int_t{"32193821093809210101283092183091283092183"} - -real{"32193821093809210101283092183091283092183", 10}
+             == real{int_t{"32193821093809210101283092183091283092183"}}
+                    - -real{"32193821093809210101283092183091283092183", 10}));
+    real_reset_default_prec();
+    // Rational.
+    REQUIRE((real{1, 10} - rat_t{10} == real{-9}));
+    REQUIRE((real{1, 10} - rat_t{10}).get_prec() == GMP_NUMB_BITS * 2);
+    REQUIRE((rat_t{10} - real{1, 10} == real{9}));
+    REQUIRE((rat_t{10} - real{1, 10}).get_prec() == GMP_NUMB_BITS * 2);
+    REQUIRE((real{1, 100} - rat_t{10} == real{-9}));
+    REQUIRE((real{1, 100} - rat_t{10}).get_prec() == std::max(100, GMP_NUMB_BITS * 2));
+    REQUIRE((rat_t{10} - real{1, 100} == real{9}));
+    REQUIRE((rat_t{10} - real{1, 100}).get_prec() == std::max(100, GMP_NUMB_BITS * 2));
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - rat_t{10} == real{-9}));
+    REQUIRE((real{1, 10} - rat_t{10}).get_prec() == 12);
+    REQUIRE((rat_t{10} - real{1, 10} == real{9}));
+    REQUIRE((rat_t{10} - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 100} - rat_t{10} == real{-9}));
+    REQUIRE((real{1, 100} - rat_t{10}).get_prec() == 100);
+    REQUIRE((rat_t{10} - real{1, 100} == real{9}));
+    REQUIRE((rat_t{10} - real{1, 100}).get_prec() == 100);
+    REQUIRE((real{"32193821093809210101283092183091283092183", 10} - -rat_t{"32193821093809210101283092183091283092183"}
+             == real{"32193821093809210101283092183091283092183", 10}
+                    - -real{rat_t{"32193821093809210101283092183091283092183"}}));
+    REQUIRE((rat_t{"32193821093809210101283092183091283092183"} - -real{"32193821093809210101283092183091283092183", 10}
+             == real{rat_t{"32193821093809210101283092183091283092183"}}
+                    - -real{"32193821093809210101283092183091283092183", 10}));
+    real_reset_default_prec();
+#if defined(MPPP_WITH_QUADMATH)
+    REQUIRE((real{1, 10} - real128{10} == real{-9}));
+    REQUIRE((real{1, 10} - real128{10}).get_prec() == 113);
+    REQUIRE((real128{10} - real{1, 10} == real{9}));
+    REQUIRE((real128{10} - real{1, 10}).get_prec() == 113);
+    REQUIRE((real{1, 200} - real128{10} == real{-9}));
+    REQUIRE((real{1, 200} - real128{10}).get_prec() == 200);
+    REQUIRE((real128{10} - real{1, 200} == real{9}));
+    REQUIRE((real128{10} - real{1, 200}).get_prec() == 200);
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - real128{10} == real{-9}));
+    REQUIRE((real{1, 10} - real128{10}).get_prec() == 12);
+    REQUIRE((real128{10} - real{1, 10} == real{9}));
+    REQUIRE((real128{10} - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 200} - real128{10} == real{-9}));
+    REQUIRE((real{1, 200} - real128{10}).get_prec() == 200);
+    REQUIRE((real128{10} - real{1, 200} == real{9}));
+    REQUIRE((real128{10} - real{1, 200}).get_prec() == 200);
+    real_reset_default_prec();
+#endif
+}

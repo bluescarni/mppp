@@ -3099,8 +3099,8 @@ inline real dispatch_binary_add(const T &x, U &&a)
  * operand to be converted.
  *\endrststar
  *
- * @param a the first summand.
- * @param b the second summand.
+ * @param a the first operand.
+ * @param b the second operand.
  *
  * @return \f$a+b\f$.
  *
@@ -3227,6 +3227,88 @@ inline T &operator+=(T &a, U &&b)
 {
     dispatch_in_place_add(a, std::forward<decltype(b)>(b));
     return a;
+}
+
+    /// Negated copy for \link mppp::real real\endlink.
+    /**
+     * \rststar
+     * This operator will return a negated copy of the input :cpp:class:`~mppp::real` ``r``.
+     * \endrststar
+     *
+     * @param r the \link mppp::real real\endlink that will be negated.
+     *
+     * @return a negated copy of \p r.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real operator-(CvrReal &&r)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real operator-(T &&r)
+#endif
+{
+    real retval{std::forward<decltype(r)>(r)};
+    retval.neg();
+    return retval;
+}
+
+inline namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_binary_sub(T &&a, U &&b)
+{
+    return mpfr_nary_op_return(0, ::mpfr_sub, std::forward<T>(a), std::forward<U>(b));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+inline real dispatch_binary_sub(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_binary_sub(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_binary_sub(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_binary_sub(tmp, std::forward<U>(a));
+}
+}
+
+/// Binary subtraction involving \link mppp::real real\endlink.
+/**
+ * \rststar
+ * The precision of the result will be set to the largest precision among the operands.
+ *
+ * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+ * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
+ *\endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return \f$a-b\f$.
+ *
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline real operator-(T &&a, RealOpTypes<T> &&b)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline real operator-(T &&a, U &&b)
+#endif
+{
+    return dispatch_binary_sub(std::forward<T>(a), std::forward<decltype(b)>(b));
 }
 
 /// Equality operator involving \link mppp::real real\endlink.
