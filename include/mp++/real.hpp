@@ -414,23 +414,25 @@ inline ::mpfr_prec_t real_dd_prec(const T &x)
 }
 }
 
-/// Auxiliary class for initialising a \link mppp::real real\endlink from a precision value.
+// NOTE: this is apparently necessary to work around a doxy bug.
+/** @defgroup real_dummy real_dummy
+ *  @{
+ */
+
+/// Special initialisation for \link mppp::real real\endlink.
 /**
  * \rststar
- * This class is used as the only construction argument for a specific :cpp:class:`~mppp::real`
- * constructor. It will initialise the calling :cpp:class:`~mppp::real` with a precision
- * equal to the value stored in this object, and a value of NaN.
+ * This scoped enum is used to initialise a :cpp:class:`~mppp::real` with
+ * one of the three special values NaN, infinity or zero.
  * \endrststar
  */
-struct real_prec {
-    /// Constructor.
-    /**
-     * @param p the desired precision value.
-     */
-    explicit real_prec(::mpfr_prec_t p) : value{p} {}
-    /// The precision value specified on construction.
-    const ::mpfr_prec_t value;
+enum class real_init {
+    nan, ///< NaN.
+    inf, ///< Infinity.
+    zero ///< Zero.
 };
+
+/** @} */
 
 // For the future:
 // - construction from/conversion to interoperables can probably be improved performance wise, especially
@@ -518,39 +520,19 @@ public:
         ::mpfr_init2(&m_mpfr, dp ? dp : real_prec_min());
         ::mpfr_set_zero(&m_mpfr, 1);
     }
-    /// Constructor from precision.
-    /**
-     * \rststar
-     * This constructor will initialise a :cpp:class:`~mppp::real` with a precision equal to
-     * the :cpp:member:`mppp::real_prec::value` member of the input argument ``p``, and a value
-     * of NaN.
-     *
-     * E.g., the following code,
-     *
-     * .. code-block:: c++
-     *
-     *    real x{real_prec{42}};
-     *
-     * will initialise ``x`` with 42 bits of precision and a value of NaN.
-     * \endrststar
-     *
-     * @param p the \link mppp::real_prec real_prec\endlink that wraps the desired precision value.
-     *
-     * @throws std::invalid_argument if the precision value is outside the range established by
-     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
-     */
-    explicit real(real_prec p)
-    {
-        ::mpfr_init2(&m_mpfr, check_init_prec(p.value));
-    }
 
 private:
-    // A private version of the above without prec checking.
-    explicit real(real_prec p, bool ignore_prec)
+    // A tag to call private ctors.
+    struct ptag {
+    };
+    // Init a real with precision p, setting its value to n. No precision
+    // checking is performed.
+    explicit real(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
     {
         assert(ignore_prec);
+        assert(real_prec_check(p));
         (void)ignore_prec;
-        ::mpfr_init2(&m_mpfr, p.value);
+        ::mpfr_init2(&m_mpfr, p);
     }
 
 public:
@@ -595,6 +577,51 @@ public:
         m_mpfr = other.m_mpfr;
         // Mark the other as moved-from.
         other.m_mpfr._mpfr_d = nullptr;
+    }
+    /// Constructor from a special value.
+    /**
+     * \rststar
+     * This constructor will initialise ``this`` with one of the special values
+     * specified by the :cpp:type:`~mppp::real_init` enum. The precision of ``this``
+     * will be ``p``. If ``p`` is zero, the precision will be set to the default
+     * precision (as indicated by :cpp:func:`~mppp::real_get_default_prec()`).
+     *
+     * If ``ri`` is not NaN, the sign bit will be set to positive if ``sign``
+     * is nonnegative, negative otherwise.
+     * \endrststar
+     *
+     * @param ri the desired special value.
+     * @param sign the desired sign for \p this.
+     * @param p the desired precision for \p this.
+     *
+     * @throws std::invalid_argument if \p p is not within the bounds established by
+     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink,
+     * or if \p p is zero but no default precision has been set.
+     */
+    explicit real(real_init ri, int sign = 0, ::mpfr_prec_t p = 0)
+    {
+        ::mpfr_prec_t prec;
+        if (p) {
+            prec = check_init_prec(p);
+        } else {
+            const auto dp = real_get_default_prec();
+            if (mppp_unlikely(!dp)) {
+                throw std::invalid_argument("Cannot init a real with an automatically-deduced precision if "
+                                            "the global default precision has not been set");
+            }
+            prec = dp;
+        }
+        ::mpfr_init2(&m_mpfr, prec);
+        switch (ri) {
+            case real_init::nan:
+                break;
+            case real_init::inf:
+                set_inf(sign);
+                break;
+            case real_init::zero:
+                set_zero(sign);
+                break;
+        }
     }
 
 private:
@@ -819,9 +846,6 @@ private:
                                         + std::to_string(base));
         }
     }
-    // A tag to call private ctors.
-    struct ptag {
-    };
     explicit real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
     {
         construct_from_c_string(s, base, p);
@@ -2379,7 +2403,7 @@ inline real mpfr_nary_op_return(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0,
     }
     // Either we cannot steal from any arg, or the candidate(s) do not have enough precision.
     // Init a new value and use it instead.
-    real retval{real_prec{p.second}, true};
+    real retval{real::ptag{}, p.second, true};
     f(retval._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
     return retval;
 }
@@ -2907,18 +2931,22 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
 {
     ::mpfr_prec_t prec;
     if (p) {
-        // TODO need prec checking here.
+        if (mppp_unlikely(!real_prec_check(p))) {
+            throw std::invalid_argument("Cannot init a real constant with a precision of " + std::to_string(p)
+                                        + ": the value must be either zero or between "
+                                        + std::to_string(real_prec_min()) + " and " + std::to_string(real_prec_max()));
+        }
         prec = p;
     } else {
         const auto dp = real_get_default_prec();
-        if (!dp) {
-            // TODO.
-            throw;
+        if (mppp_unlikely(!dp)) {
+            throw std::invalid_argument("Cannot init a real constant with an automatically-deduced precision if "
+                                        "the global default precision has not been set");
         }
         prec = dp;
     }
-    real retval{real_prec{prec}, true};
-    f(retval);
+    real retval{real::ptag{}, prec, true};
+    f(retval._get_mpfr_t(), MPFR_RNDN);
     return retval;
 }
 }
@@ -2927,15 +2955,41 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
  *  @{
  */
 
-/// NaN constant.
+/// \link mppp::real Real\endlink \f$\pi\f$ constant.
 /**
+ * \rststar
+ * This function will return a :cpp:class:`~mppp::real` :math:`\pi`
+ * with a precision of ``p``. If ``p`` is zero, the precision
+ * will be set to the value returned by :cpp:func:`~mppp::real_get_default_prec()`.
+ * If no default precision has been set, an error will be raised.
+ * \endrststar
+ *
  * @param p the desired precision.
  *
- * @return a \link mppp::real real\endlink NaN.
+ * @return a \link mppp::real real\endlink \f$\pi\f$.
+ *
+ * @throws std::invalid_argument if \p p is not within the bounds established by
+ * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink,
+ * or if \p p is zero but no default precision has been set.
  */
-inline real real_nan(::mpfr_prec_t p = 0)
+inline real real_pi(::mpfr_prec_t p = 0)
 {
-    return real_constant([](real &) {}, p);
+    return real_constant(::mpfr_const_pi, p);
+}
+
+/// Set \link mppp::real real\endlink to \f$\pi\f$.
+/**
+ * This function will set \p rop to \f$\pi\f$. The precision
+ * of \p rop will not be altered.
+ *
+ * @param rop the \link mppp::real real\endlink that will be set to \f$\pi\f$.
+ *
+ * @return a reference to \p rop.
+ */
+inline real &real_pi(real &rop)
+{
+    ::mpfr_const_pi(rop._get_mpfr_t(), MPFR_RNDN);
+    return rop;
 }
 
 /** @} */

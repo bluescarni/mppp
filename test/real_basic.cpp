@@ -213,42 +213,6 @@ TEST_CASE("real constructors")
     REQUIRE(r1a.get_prec() == 100);
     REQUIRE(r1a.zero_p());
     REQUIRE(!r1a.signbit());
-    // Constructor from prec.
-    real r2{real_prec{42}};
-    REQUIRE(r2.get_prec() == 42);
-    REQUIRE(r2.nan_p());
-    REQUIRE_THROWS_PREDICATE(real{real_prec{0}}, std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what()
-               == "Cannot init a real with a precision of 0: the maximum allowed precision is "
-                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                      + std::to_string(real_prec_min());
-    });
-    REQUIRE_THROWS_PREDICATE(real{real_prec{-12}}, std::invalid_argument, [](const std::invalid_argument &ex) {
-        return ex.what()
-               == "Cannot init a real with a precision of -12: the maximum allowed precision is "
-                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                      + std::to_string(real_prec_min());
-    });
-    if (real_prec_min() > 1) {
-        REQUIRE_THROWS_PREDICATE(real{real_prec{1}}, std::invalid_argument, [](const std::invalid_argument &ex) {
-            return ex.what()
-                   == "Cannot init a real with a precision of 1: the maximum allowed precision is "
-                          + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                          + std::to_string(real_prec_min());
-        });
-    }
-    if (real_prec_max() < std::numeric_limits<::mpfr_prec_t>::max()) {
-        REQUIRE_THROWS_PREDICATE(real{real_prec{std::numeric_limits<::mpfr_prec_t>::max()}}, std::invalid_argument,
-                                 [](const std::invalid_argument &ex) {
-                                     return ex.what()
-                                            == "Cannot init a real with a precision of "
-                                                   + std::to_string(std::numeric_limits<::mpfr_prec_t>::max())
-                                                   + ": the maximum allowed precision is "
-                                                   + std::to_string(real_prec_max())
-                                                   + ", the minimum allowed precision is "
-                                                   + std::to_string(real_prec_min());
-                                 });
-    }
     real_reset_default_prec();
     // Copy ctor.
     real r3{real{4}};
