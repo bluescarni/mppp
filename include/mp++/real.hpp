@@ -3097,7 +3097,7 @@ inline real dispatch_binary_add(const T &x, U &&a)
  * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
  * precision, if set, or it is automatically deduced depending on the type and value of the
  * operand to be converted.
- *\endrststar
+ * \endrststar
  *
  * @param a the first operand.
  * @param b the second operand.
@@ -3297,7 +3297,7 @@ inline real dispatch_binary_sub(const T &x, U &&a)
  * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
  * precision, if set, or it is automatically deduced depending on the type and value of the
  * operand to be converted.
- *\endrststar
+ * \endrststar
  *
  * @param a the first operand.
  * @param b the second operand.
@@ -3401,6 +3401,153 @@ inline T &operator-=(T &a, U &&b)
 #endif
 {
     dispatch_in_place_sub(a, std::forward<decltype(b)>(b));
+    return a;
+}
+
+inline namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_binary_mul(T &&a, U &&b)
+{
+    return mpfr_nary_op_return(0, ::mpfr_mul, std::forward<T>(a), std::forward<U>(b));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+inline real dispatch_binary_mul(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_binary_mul(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_binary_mul(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_binary_mul(tmp, std::forward<U>(a));
+}
+}
+
+/// Binary multiplication involving \link mppp::real real\endlink.
+/**
+ * \rststar
+ * The precision of the result will be set to the largest precision among the operands.
+ *
+ * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+ * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return \f$a\times b\f$.
+ *
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline real operator*(T &&a, RealOpTypes<T> &&b)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline real operator*(T &&a, U &&b)
+#endif
+{
+    return dispatch_binary_mul(std::forward<T>(a), std::forward<decltype(b)>(b));
+}
+
+inline namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, unref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline void dispatch_in_place_mul(T &a, U &&b)
+{
+    mul(a, a, std::forward<U>(b));
+}
+
+template <typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
+inline void dispatch_in_place_mul(real &a, const T &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    dispatch_in_place_mul(a, tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<disjunction<is_cpp_interoperable<T>
+#if defined(MPPP_WITH_QUADMATH)
+                                              ,
+                                              std::is_same<T, real128>
+#endif
+                                              >,
+                                  std::is_same<real, uncvref_t<U>>>::value,
+                      int> = 0>
+inline void dispatch_in_place_mul(T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    dispatch_in_place_mul(tmp, std::forward<U>(a));
+    x = static_cast<T>(tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<disjunction<is_integer<T>, is_rational<T>>, std::is_same<real, uncvref_t<U>>>::value,
+                      int> = 0>
+inline void dispatch_in_place_mul(T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    dispatch_in_place_mul(tmp, std::forward<U>(a));
+    real_in_place_convert(x, tmp, a, "multiplication");
+}
+}
+
+/// In-place multiplication involving \link mppp::real real\endlink.
+/**
+ * \rststar
+ * If ``a`` is a :cpp:class:`~mppp::real`, then this operator is equivalent
+ * to the expression:
+ *
+ * .. code-block:: c++
+ *
+ *    a = a * b;
+ *
+ * Otherwise, this operator is equivalent to the expression:
+ *
+ * .. code-block:: c++
+ *
+ *    a = static_cast<T>(a * b);
+ *
+ * That is, the operation is always performed via the corresponding binary operator
+ * and the result is assigned back to ``a``, after a conversion if necessary.
+ * \endrststar
+ *
+ * @param a the multiplicand.
+ * @param b the multiplicator.
+ *
+ * @return a reference to \p a.
+ *
+ * @throws unspecified any exception thrown by the corresponding binary operator,
+ * or by the generic conversion operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator*=(T &a, RealCompoundOpTypes<T> &&b)
+#else
+template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
+inline T &operator*=(T &a, U &&b)
+#endif
+{
+    dispatch_in_place_mul(a, std::forward<decltype(b)>(b));
     return a;
 }
 
