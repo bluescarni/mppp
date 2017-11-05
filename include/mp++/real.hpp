@@ -2788,6 +2788,76 @@ inline bool signbit(const real &r)
     return r.signbit();
 }
 
+inline namespace detail
+{
+
+inline int dispatch_cmp(const real &a, const real &b)
+{
+    ::mpfr_clear_erangeflag();
+    auto retval = ::mpfr_cmp(a.get_mpfr_t(), b.get_mpfr_t());
+    if (mppp_unlikely(::mpfr_erangeflag_p())) {
+        ::mpfr_clear_erangeflag();
+        throw std::domain_error("Cannot compare two reals if at least one of them is NaN");
+    }
+    return retval;
+}
+
+template <typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
+inline int dispatch_cmp(const real &a, const T &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_cmp(a, tmp);
+}
+
+template <typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
+inline int dispatch_cmp(const T &x, const real &a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_cmp(tmp, a);
+}
+}
+
+/// Comparison involving \link mppp::real real\endlink objects.
+/**
+ * \rststar
+ * This function will compare ``a`` and ``b``, returning:
+ *
+ * - zero if ``a`` equals ``b``,
+ * - a negative value if ``a`` is less than ``b``,
+ * - a positive value if ``a`` is greater than ``b``.
+ *
+ * The comparison is performed via the ``mpfr_cmp()`` function from the MPFR API.
+ * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+ * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
+ *
+ * If at least one NaN value is involved in the comparison, an error will be raised.
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return an integral value expressing how ``a`` compares to ``b``.
+ *
+ * @throws std::domain_error if at least one of the operands is NaN.
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline int cmp(const T &a, const RealOpTypes<T> &b)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline int cmp(const T &a, const U &b)
+#endif
+{
+    return dispatch_cmp(a, b);
+}
+
     /** @} */
 
     /** @defgroup real_roots real_roots
