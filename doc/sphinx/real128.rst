@@ -3,7 +3,7 @@ Quadruple-precision floats
 
 .. note::
 
-   The functionality described in this page is available only if mp++ was configured
+   The functionality described in this section is available only if mp++ was configured
    with the ``MPPP_WITH_QUADMATH`` option enabled (see the :ref:`installation instructions <installation>`).
 
 .. versionadded:: 0.5

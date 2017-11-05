@@ -131,24 +131,23 @@ todo_include_todos = False
 #     'collapse_navigation': False
 # }
 
-html_sidebars = {
-    '**': [
-        'about.html',
-        'navigation.html',
-        'relations.html',
-        'searchbox.html',
-        'donate.html',
-    ]
-}
+import sphinx_bootstrap_theme
+
+html_theme = 'bootstrap'
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 html_theme_options = {
-    'github_user': 'bluescarni',
-    'github_repo': 'mppp',
-    'github_banner': True,
-    'description': 'Multiprecision for modern C++',
-    'travis_button': True,
-    'codecov_button': True
+    'bootswatch_theme': "sandstone"
 }
+
+# html_theme_options = {
+#     'github_user': 'bluescarni',
+#     'github_repo': 'mppp',
+#     'github_banner': True,
+#     'description': 'Multiprecision for modern C++',
+#     'travis_button': True,
+#     'codecov_button': True
+# }
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
