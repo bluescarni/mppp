@@ -318,6 +318,9 @@ template <typename F>
 real real_constant(const F &, ::mpfr_prec_t);
 }
 
+// Fwd declare swap.
+void swap(real &, real &) noexcept;
+
 template <typename T>
 using is_real_interoperable = disjunction<is_cpp_interoperable<T>, is_integer<T>, is_rational<T>
 #if defined(MPPP_WITH_QUADMATH)
@@ -1533,17 +1536,6 @@ public:
         ::mpfr_set_zero(&m_mpfr, sign);
         return *this;
     }
-    /// Swap \link mppp::real real\endlink objects.
-    /**
-     * This function will efficiently swap the content of \p a and \p b.
-     *
-     * @param a the first operand.
-     * @param b the second operand.
-     */
-    friend void swap(real &a, real &b) noexcept
-    {
-        ::mpfr_swap(&a.m_mpfr, &b.m_mpfr);
-    }
     /// Const reference to the internal <tt>mpfr_t</tt>.
     /**
      * This method will return a const pointer to the internal MPFR structure used
@@ -2280,6 +2272,18 @@ inline real &set_inf(real &r, int sign = 0)
 inline real &set_zero(real &r, int sign = 0)
 {
     return r.set_zero(sign);
+}
+
+/// Swap \link mppp::real real\endlink objects.
+/**
+ * This function will efficiently swap the content of \p a and \p b.
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ */
+inline void swap(real &a, real &b) noexcept
+{
+    ::mpfr_swap(a._get_mpfr_t(), b._get_mpfr_t());
 }
 
     /** @} */
