@@ -262,7 +262,7 @@ html_theme_options = {
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'mpdoc'
+htmlhelp_basename = 'mpppdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -290,7 +290,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'mp.tex', 'mp++ Documentation',
+    (master_doc, 'mppp.tex', 'mp++ Documentation',
      'Francesco Biscani', 'manual'),
 ]
 
@@ -332,7 +332,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'mp', 'mp++ Documentation',
+    (master_doc, 'mppp', 'mp++ Documentation',
      [author], 1)
 ]
 
@@ -347,8 +347,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'mp', 'mp++ Documentation',
-     author, 'mp', 'One line description of project.',
+    (master_doc, 'mppp', 'mp++ Documentation',
+     author, 'mppp', 'One line description of project.',
      'Miscellaneous'),
 ]
 
