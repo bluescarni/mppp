@@ -2431,3 +2431,226 @@ TEST_CASE("real right in-place div")
     }
 #endif
 }
+
+TEST_CASE("real eqineq")
+{
+    REQUIRE(real{} == real{});
+    REQUIRE(!(real{} != real{}));
+    REQUIRE(real{1} == real{1});
+    REQUIRE(!(real{1} != real{1}));
+    REQUIRE(!(real{2} == real{1}));
+    REQUIRE(real{2} != real{1});
+    REQUIRE(!(real{"inf", 64} == real{45}));
+    REQUIRE((real{"inf", 64} != real{45}));
+    REQUIRE((-real{"inf", 64} == -real{"inf", 4}));
+    REQUIRE(!(-real{"inf", 64} != -real{"inf", 4}));
+    REQUIRE((real{"inf", 64} == real{"inf", 4}));
+    REQUIRE(!(real{"inf", 64} != real{"inf", 4}));
+    REQUIRE(!(real{"nan", 5} == real{1}));
+    REQUIRE(!(real{1} == real{"nan", 5}));
+    REQUIRE(!(real{"nan", 6} == real{"nan", 5}));
+    REQUIRE((real{"nan", 5} != real{1}));
+    REQUIRE((real{1} != real{"nan", 5}));
+    REQUIRE((real{"nan", 6} != real{"nan", 5}));
+    // Integrals.
+    REQUIRE(!(real{} != 0));
+    REQUIRE(1u == real{1});
+    REQUIRE(!(1ll != real{1}));
+    REQUIRE(!(real{2} == 1ull));
+    REQUIRE(2 != real{1});
+    REQUIRE(!(real{"inf", 64} == 45));
+    REQUIRE((real{"inf", 64} != 45l));
+    REQUIRE(!(real{"nan", 5} == 1));
+    REQUIRE(!(1 == real{"nan", 5}));
+    REQUIRE((real{"nan", 5} != 1ul));
+    REQUIRE((1l != real{"nan", 5}));
+    // FP.
+    REQUIRE(!(real{} != 0.f));
+    REQUIRE(1. == real{1});
+    REQUIRE(!(1.l != real{1}));
+    REQUIRE(!(real{2} == 1.));
+    REQUIRE(2.f != real{1});
+    REQUIRE(!(real{"inf", 64} == 45.));
+    REQUIRE((real{"inf", 64} != 4.l));
+    REQUIRE(!(real{"nan", 5} == 1.));
+    REQUIRE(!(1.l == real{"nan", 5}));
+    REQUIRE((real{"nan", 5} != 1.));
+    REQUIRE((1.f != real{"nan", 5}));
+    // int/rat.
+    REQUIRE(!(real{} != int_t{0}));
+    REQUIRE(rat_t{1u} == real{1});
+    REQUIRE(!(int_t{1ll} != real{1}));
+    REQUIRE(!(real{2} == rat_t{1ull}));
+    REQUIRE(rat_t{2} != real{1});
+    REQUIRE(!(real{"inf", 64} == int_t{45}));
+    REQUIRE((real{"inf", 64} != rat_t{45l}));
+    REQUIRE(!(real{"nan", 5} == int_t{1}));
+    REQUIRE(!(rat_t{1} == real{"nan", 5}));
+    REQUIRE((real{"nan", 5} != int_t{1ul}));
+    REQUIRE((rat_t{1l} != real{"nan", 5}));
+#if defined(MPPP_WITH_QUADMATH)
+    REQUIRE(!(real{} != real128{0}));
+    REQUIRE(real128{1u} == real{1});
+    REQUIRE(!(real128{1ll} != real{1}));
+    REQUIRE(!(real{2} == real128{1ull}));
+    REQUIRE(real128{2} != real{1});
+    REQUIRE(!(real{"inf", 64} == real128{45}));
+    REQUIRE((real{"inf", 64} != real128{45l}));
+    REQUIRE(!(real{"nan", 5} == real128{1}));
+    REQUIRE(!(real128{1} == real{"nan", 5}));
+    REQUIRE((real{"nan", 5} != real128{1ul}));
+    REQUIRE((real128{1l} != real{"nan", 5}));
+#endif
+}
+
+TEST_CASE("real lt")
+{
+    REQUIRE(!(real{} < real{}));
+    REQUIRE(!(real{1} < real{1}));
+    REQUIRE((real{1} < real{2}));
+    REQUIRE(!(real{"inf", 64} < real{45}));
+    REQUIRE(!(-real{"inf", 64} < -real{"inf", 4}));
+    REQUIRE(!(real{"inf", 64} < real{"inf", 4}));
+    REQUIRE(!(real{"nan", 5} < real{1}));
+    REQUIRE(!(real{1} < real{"nan", 5}));
+    REQUIRE(!(real{"nan", 6} < real{"nan", 5}));
+    // Integrals.
+    REQUIRE((1u < real{2}));
+    REQUIRE(!(real{2} < 1ull));
+    REQUIRE(!(real{"inf", 64} < 45));
+    REQUIRE(!(real{"nan", 5} < 1));
+    REQUIRE(!(1 < real{"nan", 5}));
+    // FP.
+    REQUIRE(!(1. < real{1}));
+    REQUIRE((real{0.1} < 1.));
+    REQUIRE(!(real{"inf", 64} < 45.));
+    REQUIRE(!(real{"nan", 5} < 1.));
+    REQUIRE(!(1.l < real{"nan", 5}));
+    // int/rat.
+    REQUIRE((rat_t{0u} < real{1}));
+    REQUIRE(!(real{2} < rat_t{1ull}));
+    REQUIRE(!(real{"inf", 64} < int_t{45}));
+    REQUIRE(!(real{"nan", 5} < int_t{1}));
+    REQUIRE(!(rat_t{1} < real{"nan", 5}));
+#if defined(MPPP_WITH_QUADMATH)
+    REQUIRE((real128{} < real{1}));
+    REQUIRE(!(real{2} < real128{1ull}));
+    REQUIRE(!(real{"inf", 64} < real128{45}));
+    REQUIRE(!(real{"nan", 5} < real128{1}));
+    REQUIRE(!(real128{1} < real{"nan", 5}));
+#endif
+}
+
+TEST_CASE("real lte")
+{
+    REQUIRE((real{} <= real{}));
+    REQUIRE((real{1} <= real{1}));
+    REQUIRE((real{1} <= real{2}));
+    REQUIRE(!(real{"inf", 64} <= real{45}));
+    REQUIRE((-real{"inf", 64} <= -real{"inf", 4}));
+    REQUIRE((real{"inf", 64} <= real{"inf", 4}));
+    REQUIRE(!(real{"nan", 5} <= real{1}));
+    REQUIRE(!(real{1} <= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 6} <= real{"nan", 5}));
+    // Integrals.
+    REQUIRE((1u <= real{2}));
+    REQUIRE(!(real{2} <= 1ull));
+    REQUIRE(!(real{"inf", 64} <= 45));
+    REQUIRE(!(real{"nan", 5} <= 1));
+    REQUIRE(!(1 <= real{"nan", 5}));
+    // FP.
+    REQUIRE((1. <= real{1}));
+    REQUIRE((real{0.1} <= 1.));
+    REQUIRE(!(real{"inf", 64} <= 45.));
+    REQUIRE(!(real{"nan", 5} <= 1.));
+    REQUIRE(!(1.l <= real{"nan", 5}));
+    // int/rat.
+    REQUIRE((rat_t{0u} <= real{1}));
+    REQUIRE(!(real{2} <= rat_t{1ull}));
+    REQUIRE(!(real{"inf", 64} <= int_t{45}));
+    REQUIRE(!(real{"nan", 5} <= int_t{1}));
+    REQUIRE(!(rat_t{1} <= real{"nan", 5}));
+#if defined(MPPP_WITH_QUADMATH)
+    REQUIRE((real128{} <= real{1}));
+    REQUIRE(!(real{2} <= real128{1ull}));
+    REQUIRE(!(real{"inf", 64} <= real128{45}));
+    REQUIRE(!(real{"nan", 5} <= real128{1}));
+    REQUIRE(!(real128{1} <= real{"nan", 5}));
+#endif
+}
+
+TEST_CASE("real gt")
+{
+    REQUIRE(!(real{} > real{}));
+    REQUIRE(!(real{1} > real{1}));
+    REQUIRE(!(real{1} > real{2}));
+    REQUIRE((real{"inf", 64} > real{45}));
+    REQUIRE(!(-real{"inf", 64} > -real{"inf", 4}));
+    REQUIRE(!(real{"inf", 64} > real{"inf", 4}));
+    REQUIRE(!(real{"nan", 5} > real{1}));
+    REQUIRE(!(real{1} > real{"nan", 5}));
+    REQUIRE(!(real{"nan", 6} > real{"nan", 5}));
+    // Integrals.
+    REQUIRE(!(1u > real{2}));
+    REQUIRE((real{2} > 1ull));
+    REQUIRE((real{"inf", 64} > 45));
+    REQUIRE(!(real{"nan", 5} > 1));
+    REQUIRE(!(1 > real{"nan", 5}));
+    // FP.
+    REQUIRE(!(1. > real{1}));
+    REQUIRE(!(real{0.1} > 1.));
+    REQUIRE((real{"inf", 64} > 45.));
+    REQUIRE(!(real{"nan", 5} > 1.));
+    REQUIRE(!(1.l > real{"nan", 5}));
+    // int/rat.
+    REQUIRE(!(rat_t{0u} > real{1}));
+    REQUIRE((real{2} > rat_t{1ull}));
+    REQUIRE((real{"inf", 64} > int_t{45}));
+    REQUIRE(!(real{"nan", 5} > int_t{1}));
+    REQUIRE(!(rat_t{1} > real{"nan", 5}));
+#if defined(MPPP_WITH_QUADMATH)
+    REQUIRE(!(real128{} > real{1}));
+    REQUIRE((real{2} > real128{1ull}));
+    REQUIRE((real{"inf", 64} > real128{45}));
+    REQUIRE(!(real{"nan", 5} > real128{1}));
+    REQUIRE(!(real128{1} > real{"nan", 5}));
+#endif
+}
+
+TEST_CASE("real gte")
+{
+    REQUIRE((real{} >= real{}));
+    REQUIRE((real{1} >= real{1}));
+    REQUIRE(!(real{1} >= real{2}));
+    REQUIRE((real{"inf", 64} >= real{45}));
+    REQUIRE((-real{"inf", 64} >= -real{"inf", 4}));
+    REQUIRE((real{"inf", 64} >= real{"inf", 4}));
+    REQUIRE(!(real{"nan", 5} >= real{1}));
+    REQUIRE(!(real{1} >= real{"nan", 5}));
+    REQUIRE(!(real{"nan", 6} >= real{"nan", 5}));
+    // Integrals.
+    REQUIRE(!(1u >= real{2}));
+    REQUIRE((real{2} >= 1ull));
+    REQUIRE((real{"inf", 64} >= 45));
+    REQUIRE(!(real{"nan", 5} >= 1));
+    REQUIRE(!(1 >= real{"nan", 5}));
+    // FP.
+    REQUIRE((1. >= real{1}));
+    REQUIRE(!(real{0.1} >= 1.));
+    REQUIRE((real{"inf", 64} >= 45.));
+    REQUIRE(!(real{"nan", 5} >= 1.));
+    REQUIRE(!(1.l >= real{"nan", 5}));
+    // int/rat.
+    REQUIRE(!(rat_t{0u} >= real{1}));
+    REQUIRE((real{2} >= rat_t{1ull}));
+    REQUIRE((real{"inf", 64} >= int_t{45}));
+    REQUIRE(!(real{"nan", 5} >= int_t{1}));
+    REQUIRE(!(rat_t{1} >= real{"nan", 5}));
+#if defined(MPPP_WITH_QUADMATH)
+    REQUIRE(!(real128{} >= real{1}));
+    REQUIRE((real{2} >= real128{1ull}));
+    REQUIRE((real{"inf", 64} >= real128{45}));
+    REQUIRE(!(real{"nan", 5} >= real128{1}));
+    REQUIRE(!(real128{1} >= real{"nan", 5}));
+#endif
+}

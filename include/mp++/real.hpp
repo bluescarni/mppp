@@ -2788,38 +2788,7 @@ inline bool signbit(const real &r)
     return r.signbit();
 }
 
-inline namespace detail
-{
-
-inline int dispatch_cmp(const real &a, const real &b)
-{
-    ::mpfr_clear_erangeflag();
-    auto retval = ::mpfr_cmp(a.get_mpfr_t(), b.get_mpfr_t());
-    if (mppp_unlikely(::mpfr_erangeflag_p())) {
-        ::mpfr_clear_erangeflag();
-        throw std::domain_error("Cannot compare two reals if at least one of them is NaN");
-    }
-    return retval;
-}
-
-template <typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
-inline int dispatch_cmp(const real &a, const T &x)
-{
-    MPPP_MAYBE_TLS real tmp;
-    tmp = x;
-    return dispatch_cmp(a, tmp);
-}
-
-template <typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
-inline int dispatch_cmp(const T &x, const real &a)
-{
-    MPPP_MAYBE_TLS real tmp;
-    tmp = x;
-    return dispatch_cmp(tmp, a);
-}
-}
-
-/// Comparison involving \link mppp::real real\endlink objects.
+/// \link mppp::real Real\endlink comparison.
 /**
  * \rststar
  * This function will compare ``a`` and ``b``, returning:
@@ -2828,15 +2797,10 @@ inline int dispatch_cmp(const T &x, const real &a)
  * - a negative value if ``a`` is less than ``b``,
  * - a positive value if ``a`` is greater than ``b``.
  *
- * The comparison is performed via the ``mpfr_cmp()`` function from the MPFR API.
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- *
  * If at least one NaN value is involved in the comparison, an error will be raised.
+ *
+ * This function is useful to distinguish the three possible cases. The comparison operators
+ * are recommended instead if it is needed to distinguish only two cases.
  * \endrststar
  *
  * @param a the first operand.
@@ -2845,17 +2809,16 @@ inline int dispatch_cmp(const T &x, const real &a)
  * @return an integral value expressing how ``a`` compares to ``b``.
  *
  * @throws std::domain_error if at least one of the operands is NaN.
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline int cmp(const T &a, const RealOpTypes<T> &b)
-#else
-template <typename T, typename U, real_op_types_enabler<T, U> = 0>
-inline int cmp(const T &a, const U &b)
-#endif
+inline int cmp(const real &a, const real &b)
 {
-    return dispatch_cmp(a, b);
+    ::mpfr_clear_erangeflag();
+    auto retval = ::mpfr_cmp(a.get_mpfr_t(), b.get_mpfr_t());
+    if (mppp_unlikely(::mpfr_erangeflag_p())) {
+        ::mpfr_clear_erangeflag();
+        throw std::domain_error("Cannot compare two reals if at least one of them is NaN");
+    }
+    return retval;
 }
 
     /** @} */
@@ -3853,16 +3816,235 @@ inline T &operator/=(T &a, U &&b)
     return a;
 }
 
+inline namespace detail
+{
+
+// Common dispatch functions for comparison operators involving real.
+template <typename F, typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
+inline bool dispatch_real_comparison(const F &f, const real &a, const T &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return f(a.get_mpfr_t(), tmp.get_mpfr_t());
+}
+
+template <typename F, typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
+inline bool dispatch_real_comparison(const F &f, const T &x, const real &a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return f(tmp.get_mpfr_t(), a.get_mpfr_t());
+}
+
+template <typename F>
+inline bool dispatch_real_comparison(const F &f, const real &a, const real &b)
+{
+    return f(a.get_mpfr_t(), b.get_mpfr_t()) != 0;
+}
+}
+
 /// Equality operator involving \link mppp::real real\endlink.
 /**
- * @param x the first operand.
- * @param y the second operand.
+ * \rststar
+ * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
+ * equal to ``b``, ``false`` otherwise. The comparison is performed via the
+ * ``mpfr_equal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
+ * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
+ * The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
  *
- * @return \p true if \p x is equal to \p y, \p false otherwise.
+ * If at least one NaN value is involved in the comparison, ``false`` will be returned.
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return ``true`` if ``a`` is equal to ``b``, ``false`` otherwise.
+ *
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
-inline bool operator==(const real &x, const real &y)
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator==(const T &a, const RealOpTypes<T> &b)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline bool operator==(const T &a, const U &b)
+#endif
 {
-    return ::mpfr_equal_p(x.get_mpfr_t(), y.get_mpfr_t()) != 0;
+    return dispatch_real_comparison(::mpfr_equal_p, a, b);
+}
+
+/// Inequality operator involving \link mppp::real real\endlink.
+/**
+ * \rststar
+ * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
+ * different from ``b``, ``false`` otherwise. The comparison is performed via the
+ * ``mpfr_equal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
+ * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
+ * The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
+ *
+ * If at least one NaN value is involved in the comparison, ``true`` will be returned.
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return ``true`` if ``a`` is different from ``b``, ``false`` otherwise.
+ *
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator!=(const T &a, const RealOpTypes<T> &b)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline bool operator!=(const T &a, const U &b)
+#endif
+{
+    return !(a == b);
+}
+
+/// Greater-than operator involving \link mppp::real real\endlink.
+/**
+ * \rststar
+ * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
+ * greater than ``b``, ``false`` otherwise. The comparison is performed via the
+ * ``mpfr_greater_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
+ * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
+ * The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
+ *
+ * If at least one NaN value is involved in the comparison, ``false`` will be returned.
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return ``true`` if ``a`` is greater than ``b``, ``false`` otherwise.
+ *
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator>(const T &a, const RealOpTypes<T> &b)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline bool operator>(const T &a, const U &b)
+#endif
+{
+    return dispatch_real_comparison(::mpfr_greater_p, a, b);
+}
+
+/// Greater-than or equal operator involving \link mppp::real real\endlink.
+/**
+ * \rststar
+ * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
+ * greater than or equal to ``b``, ``false`` otherwise. The comparison is performed via the
+ * ``mpfr_greaterequal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
+ * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
+ * The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
+ *
+ * If at least one NaN value is involved in the comparison, ``false`` will be returned.
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return ``true`` if ``a`` is greater than or equal to ``b``, ``false`` otherwise.
+ *
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator>=(const T &a, const RealOpTypes<T> &b)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline bool operator>=(const T &a, const U &b)
+#endif
+{
+    return dispatch_real_comparison(::mpfr_greaterequal_p, a, b);
+}
+
+/// Less-than operator involving \link mppp::real real\endlink.
+/**
+ * \rststar
+ * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
+ * less than ``b``, ``false`` otherwise. The comparison is performed via the
+ * ``mpfr_less_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
+ * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
+ * The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
+ *
+ * If at least one NaN value is involved in the comparison, ``false`` will be returned.
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return ``true`` if ``a`` is less than ``b``, ``false`` otherwise.
+ *
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator<(const T &a, const RealOpTypes<T> &b)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline bool operator<(const T &a, const U &b)
+#endif
+{
+    return dispatch_real_comparison(::mpfr_less_p, a, b);
+}
+
+/// Less-than or equal operator involving \link mppp::real real\endlink.
+/**
+ * \rststar
+ * This operator will compare ``a`` and ``b``, returning ``true`` if ``a`` is
+ * less than or equal to ``b``, ``false`` otherwise. The comparison is performed via the
+ * ``mpfr_lessequal_p()`` function from the MPFR API. Non-:cpp:class:`~mppp::real`
+ * operands will be converted to :cpp:class:`~mppp::real` before performing the operation.
+ * The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
+ *
+ * If at least one NaN value is involved in the comparison, ``false`` will be returned.
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return ``true`` if ``a`` is less than or equal to ``b``, ``false`` otherwise.
+ *
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline bool operator<=(const T &a, const RealOpTypes<T> &b)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline bool operator<=(const T &a, const U &b)
+#endif
+{
+    return dispatch_real_comparison(::mpfr_lessequal_p, a, b);
 }
 
 /** @} */
