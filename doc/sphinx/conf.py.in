@@ -131,24 +131,23 @@ todo_include_todos = False
 #     'collapse_navigation': False
 # }
 
-html_sidebars = {
-    '**': [
-        'about.html',
-        'navigation.html',
-        'relations.html',
-        'searchbox.html',
-        'donate.html',
-    ]
-}
+import sphinx_bootstrap_theme
+
+html_theme = 'bootstrap'
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 html_theme_options = {
-    'github_user': 'bluescarni',
-    'github_repo': 'mppp',
-    'github_banner': True,
-    'description': 'Multiprecision for modern C++',
-    'travis_button': True,
-    'codecov_button': True
+    'bootswatch_theme': "sandstone"
 }
+
+# html_theme_options = {
+#     'github_user': 'bluescarni',
+#     'github_repo': 'mppp',
+#     'github_banner': True,
+#     'description': 'Multiprecision for modern C++',
+#     'travis_button': True,
+#     'codecov_button': True
+# }
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -262,7 +261,7 @@ html_theme_options = {
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'mpdoc'
+htmlhelp_basename = 'mpppdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -290,7 +289,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'mp.tex', 'mp++ Documentation',
+    (master_doc, 'mppp.tex', 'mp++ Documentation',
      'Francesco Biscani', 'manual'),
 ]
 
@@ -332,7 +331,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'mp', 'mp++ Documentation',
+    (master_doc, 'mppp', 'mp++ Documentation',
      [author], 1)
 ]
 
@@ -347,8 +346,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'mp', 'mp++ Documentation',
-     author, 'mp', 'One line description of project.',
+    (master_doc, 'mppp', 'mp++ Documentation',
+     author, 'mppp', 'One line description of project.',
      'Miscellaneous'),
 ]
 
