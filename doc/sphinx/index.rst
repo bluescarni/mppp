@@ -32,6 +32,7 @@ mp++ is released under the `MPL2 <https://www.mozilla.org/en-US/MPL/2.0/FAQ/>`__
    not yet available in mp++'s stable releases.
 
 .. toctree::
+   :maxdepth: 2
 
    installation.rst
    reference.rst
