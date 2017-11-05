@@ -31,6 +31,8 @@ New
 Changes
 ~~~~~~~
 
+- Use the sphinx bootstrap theme for the html documentation (`#71 <https://github.com/bluescarni/mppp/pull/71>`__).
+
 - Various simplifications in the :cpp:class:`~mppp::rational` API (`#66 <https://github.com/bluescarni/mppp/pull/66>`__).
 
 - Introduce a :cpp:concept:`~mppp::StringType` concept and use it to reduce the number of overloads in the
