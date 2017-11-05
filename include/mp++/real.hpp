@@ -2113,6 +2113,28 @@ private:
     mpfr_struct_t m_mpfr;
 };
 
+template <typename T, typename U>
+using are_real_op_types
+    = disjunction<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>,
+                  conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<uncvref_t<U>>>,
+                  conjunction<std::is_same<real, uncvref_t<U>>, is_real_interoperable<uncvref_t<T>>>>;
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RealOpTypes = (CvrReal<T> && CvrReal<U>) || (CvrReal<T> && RealInteroperable<uncvref_t<U>>)
+                           || (CvrReal<U> && RealInteroperable<uncvref_t<T>>);
+#else
+using real_op_types_enabler = enable_if_t<are_real_op_types<T, U>::value, int>;
+#endif
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RealCompoundOpTypes = RealOpTypes<T, U> && !std::is_const<unref_t<T>>::value;
+#else
+using real_compound_op_types_enabler
+    = enable_if_t<conjunction<are_real_op_types<T, U>, negation<std::is_const<unref_t<T>>>>::value, int>;
+#endif
+
 /// Destructively set the precision of a \link mppp::real real\endlink.
 /**
  * \ingroup real_prec
@@ -2768,7 +2790,7 @@ inline bool signbit(const real &r)
      *  @{
      */
 
-    /// Binary square root.
+    /// Binary \link mppp::real real\endlink square root.
     /**
      * @param rop the return value.
      * @param op the operand.
@@ -2785,7 +2807,7 @@ inline real &sqrt(real &rop, T &&op)
     return mpfr_nary_op(0, ::mpfr_sqrt, rop, std::forward<decltype(op)>(op));
 }
 
-/// Unary square root.
+/// Unary \link mppp::real real\endlink square root.
 /**
  * @param r the operand.
  *
@@ -2807,13 +2829,94 @@ inline real sqrt(T &&r)
      *  @{
      */
 
+/// Ternary \link mppp::real real\endlink exponentiation.
+/**
+ * This function will set \p rop to \p op1 raised to the power of \p op2.
+ * The precision of \p rop will be set to the largest precision among the operands.
+ *
+ * @param rop the return value.
+ * @param op1 the base.
+ * @param op2 the exponent.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &pow(real &rop, T &&op1, U &&op2)
+{
+    return mpfr_nary_op(0, ::mpfr_pow, rop, std::forward<T>(op1), std::forward<U>(op2));
+}
+
+inline namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_pow(T &&op1, U &&op2)
+{
+    return mpfr_nary_op_return(0, ::mpfr_pow, std::forward<T>(op1), std::forward<U>(op2));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+inline real dispatch_pow(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_pow(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_pow(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_pow(tmp, std::forward<U>(a));
+}
+}
+
+/// Binary \link mppp::real real\endlink exponentiation.
+/**
+ * \rststar
+ * The precision of the result will be set to the largest precision among the operands.
+ *
+ * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+ * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+ * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+ * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+ * precision, if set, or it is automatically deduced depending on the type and value of the
+ * operand to be converted.
+ * \endrststar
+ *
+ * @param op1 the base.
+ * @param op2 the exponent.
+ *
+ * @return \p op1 raised to the power of \p op2.
+ *
+ * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline real pow(T &&op1, RealOpTypes<T> &&op2)
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+inline real pow(T &&op1, U &&op2)
+#endif
+{
+    return dispatch_pow(std::forward<decltype(op1)>(op1), std::forward<decltype(op2)>(op2));
+}
+
     /** @} */
 
     /** @defgroup real_trig real_trig
      *  @{
      */
 
-    /// Binary sine.
+    /// Binary \link mppp::real real\endlink sine.
     /**
      * @param rop the return value.
      * @param op the operand.
@@ -2830,7 +2933,7 @@ inline real &sin(real &rop, T &&op)
     return mpfr_nary_op(0, ::mpfr_sin, rop, std::forward<decltype(op)>(op));
 }
 
-/// Unary sine.
+/// Unary \link mppp::real real\endlink sine.
 /**
  * @param r the operand.
  *
@@ -2846,7 +2949,7 @@ inline real sin(T &&r)
     return mpfr_nary_op_return(0, ::mpfr_sin, std::forward<decltype(r)>(r));
 }
 
-    /// Binary cosine.
+    /// Binary \link mppp::real real\endlink cosine.
     /**
      * @param rop the return value.
      * @param op the operand.
@@ -2863,7 +2966,7 @@ inline real &cos(real &rop, T &&op)
     return mpfr_nary_op(0, ::mpfr_cos, rop, std::forward<decltype(op)>(op));
 }
 
-/// Unary cosine.
+/// Unary \link mppp::real real\endlink cosine.
 /**
  * @param r the operand.
  *
@@ -3010,28 +3113,6 @@ inline real &real_pi(real &rop)
 }
 
 /** @} */
-
-template <typename T, typename U>
-using are_real_op_types
-    = disjunction<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>,
-                  conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<uncvref_t<U>>>,
-                  conjunction<std::is_same<real, uncvref_t<U>>, is_real_interoperable<uncvref_t<T>>>>;
-
-template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool RealOpTypes = (CvrReal<T> && CvrReal<U>) || (CvrReal<T> && RealInteroperable<uncvref_t<U>>)
-                           || (CvrReal<U> && RealInteroperable<uncvref_t<T>>);
-#else
-using real_op_types_enabler = enable_if_t<are_real_op_types<T, U>::value, int>;
-#endif
-
-template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool RealCompoundOpTypes = RealOpTypes<T, U> && !std::is_const<unref_t<T>>::value;
-#else
-using real_compound_op_types_enabler
-    = enable_if_t<conjunction<are_real_op_types<T, U>, negation<std::is_const<unref_t<T>>>>::value, int>;
-#endif
 
 /** @defgroup real_operators real_operators
  *  @{

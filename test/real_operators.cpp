@@ -2225,7 +2225,7 @@ TEST_CASE("real left in-place div")
     // Floating-point.
     r0 = real{1, real_prec_min()};
     r0 /= 123.f;
-    REQUIRE(r0 == (char)1 / real{123.f});
+    REQUIRE(r0 == char(1) / real{123.f});
     REQUIRE(r0.get_prec() == dig2mpfr_prec<float>());
     real_set_default_prec(5);
     r0 = real{1};
