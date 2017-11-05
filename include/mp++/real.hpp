@@ -437,6 +437,11 @@ enum class real_kind { nan = MPFR_NAN_KIND, inf = MPFR_INF_KIND, zero = MPFR_ZER
 // - construction from/conversion to interoperables can probably be improved performance wise, especially
 //   if we exploit the mpfr_t internals.
 // - probably we should have a build in the CI against the latest MPFR, built with sanitizers on.
+// - probably we should have MPFR as well in the 32bit coverage build.
+// - investigate the applicability of a cache.
+// - see if it's needed to provide alternate interoperable function/operators that do *not* promote
+//   the non-real to real (there's a bunch of functions for direct interface with GMP and cpp types
+//   in the MPFR API: arithmetic, comparison, etc.).
 
 /// Multiprecision floating-point class.
 /**
@@ -2286,28 +2291,28 @@ inline void swap(real &a, real &b) noexcept
     ::mpfr_swap(a._get_mpfr_t(), b._get_mpfr_t());
 }
 
-    /** @} */
+/** @} */
 
-    /** @defgroup real_conversion real_conversion
-     *  @{
-     */
+/** @defgroup real_conversion real_conversion
+ *  @{
+ */
 
-    /// Generic conversion function for \link mppp::real real\endlink.
-    /**
-     * \rststar
-     * This function will convert the input :cpp:class:`~mppp::real` ``x`` to a
-     * :cpp:concept:`~mppp::RealInteroperable` type, storing the result of the conversion into ``rop``.
-     * If the conversion is successful, the function
-     * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
-     * not be altered.
-     * \endrststar
-     *
-     * @param rop the variable which will store the result of the conversion.
-     * @param x the input \link mppp::real real\endlink.
-     *
-     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
-     * specified in the documentation of the conversion operator for \link mppp::real real\endlink.
-     */
+/// Generic conversion function for \link mppp::real real\endlink.
+/**
+ * \rststar
+ * This function will convert the input :cpp:class:`~mppp::real` ``x`` to a
+ * :cpp:concept:`~mppp::RealInteroperable` type, storing the result of the conversion into ``rop``.
+ * If the conversion is successful, the function
+ * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
+ * not be altered.
+ * \endrststar
+ *
+ * @param rop the variable which will store the result of the conversion.
+ * @param x the input \link mppp::real real\endlink.
+ *
+ * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail in the ways
+ * specified in the documentation of the conversion operator for \link mppp::real real\endlink.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 inline bool get(RealInteroperable &rop, const real &x)
 #else
@@ -2479,17 +2484,17 @@ inline real &add(real &rop, T &&a, U &&b)
     return mpfr_nary_op(0, ::mpfr_add, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-    /// Ternary \link mppp::real real\endlink subtraction.
-    /**
-     * This function will compute \f$a-b\f$, storing the result in \p rop.
-     * The precision of the result will be set to the largest precision among the operands.
-     *
-     * @param rop the return value.
-     * @param a the first operand.
-     * @param b the second operand.
-     *
-     * @return a reference to \p rop.
-     */
+/// Ternary \link mppp::real real\endlink subtraction.
+/**
+ * This function will compute \f$a-b\f$, storing the result in \p rop.
+ * The precision of the result will be set to the largest precision among the operands.
+ *
+ * @param rop the return value.
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return a reference to \p rop.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2500,17 +2505,17 @@ inline real &sub(real &rop, T &&a, U &&b)
     return mpfr_nary_op(0, ::mpfr_sub, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-    /// Ternary \link mppp::real real\endlink multiplication.
-    /**
-     * This function will compute \f$a \times b\f$, storing the result in \p rop.
-     * The precision of the result will be set to the largest precision among the operands.
-     *
-     * @param rop the return value.
-     * @param a the first operand.
-     * @param b the second operand.
-     *
-     * @return a reference to \p rop.
-     */
+/// Ternary \link mppp::real real\endlink multiplication.
+/**
+ * This function will compute \f$a \times b\f$, storing the result in \p rop.
+ * The precision of the result will be set to the largest precision among the operands.
+ *
+ * @param rop the return value.
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return a reference to \p rop.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2521,17 +2526,17 @@ inline real &mul(real &rop, T &&a, U &&b)
     return mpfr_nary_op(0, ::mpfr_mul, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-    /// Ternary \link mppp::real real\endlink division.
-    /**
-     * This function will compute \f$a / b\f$, storing the result in \p rop.
-     * The precision of the result will be set to the largest precision among the operands.
-     *
-     * @param rop the return value.
-     * @param a the first operand.
-     * @param b the second operand.
-     *
-     * @return a reference to \p rop.
-     */
+/// Ternary \link mppp::real real\endlink division.
+/**
+ * This function will compute \f$a / b\f$, storing the result in \p rop.
+ * The precision of the result will be set to the largest precision among the operands.
+ *
+ * @param rop the return value.
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return a reference to \p rop.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2542,18 +2547,18 @@ inline real &div(real &rop, T &&a, U &&b)
     return mpfr_nary_op(0, ::mpfr_div, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-    /// Quaternary \link mppp::real real\endlink fused multiply–add.
-    /**
-     * This function will compute \f$a \times b + c\f$, storing the result in \p rop.
-     * The precision of the result will be set to the largest precision among the operands.
-     *
-     * @param rop the return value.
-     * @param a the first operand.
-     * @param b the second operand.
-     * @param c the third operand.
-     *
-     * @return a reference to \p rop.
-     */
+/// Quaternary \link mppp::real real\endlink fused multiply–add.
+/**
+ * This function will compute \f$a \times b + c\f$, storing the result in \p rop.
+ * The precision of the result will be set to the largest precision among the operands.
+ *
+ * @param rop the return value.
+ * @param a the first operand.
+ * @param b the second operand.
+ * @param c the third operand.
+ *
+ * @return a reference to \p rop.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U, CvrReal V>
 #else
@@ -2587,18 +2592,18 @@ inline real fma(T &&a, U &&b, V &&c)
     return mpfr_nary_op_return(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-    /// Quaternary \link mppp::real real\endlink fused multiply–sub.
-    /**
-     * This function will compute \f$a \times b - c\f$, storing the result in \p rop.
-     * The precision of the result will be set to the largest precision among the operands.
-     *
-     * @param rop the return value.
-     * @param a the first operand.
-     * @param b the second operand.
-     * @param c the third operand.
-     *
-     * @return a reference to \p rop.
-     */
+/// Quaternary \link mppp::real real\endlink fused multiply–sub.
+/**
+ * This function will compute \f$a \times b - c\f$, storing the result in \p rop.
+ * The precision of the result will be set to the largest precision among the operands.
+ *
+ * @param rop the return value.
+ * @param a the first operand.
+ * @param b the second operand.
+ * @param c the third operand.
+ *
+ * @return a reference to \p rop.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U, CvrReal V>
 #else
@@ -2821,19 +2826,19 @@ inline int cmp(const real &a, const real &b)
     return retval;
 }
 
-    /** @} */
+/** @} */
 
-    /** @defgroup real_roots real_roots
-     *  @{
-     */
+/** @defgroup real_roots real_roots
+ *  @{
+ */
 
-    /// Binary \link mppp::real real\endlink square root.
-    /**
-     * @param rop the return value.
-     * @param op the operand.
-     *
-     * @return a reference to \p rop.
-     */
+/// Binary \link mppp::real real\endlink square root.
+/**
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to \p rop.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 inline real &sqrt(real &rop, CvrReal &&op)
 #else
@@ -2860,11 +2865,11 @@ inline real sqrt(T &&r)
     return mpfr_nary_op_return(0, ::mpfr_sqrt, std::forward<decltype(r)>(r));
 }
 
-    /** @} */
+/** @} */
 
-    /** @defgroup real_exponentiation real_exponentiation
-     *  @{
-     */
+/** @defgroup real_exponentiation real_exponentiation
+ *  @{
+ */
 
 /// Ternary \link mppp::real real\endlink exponentiation.
 /**
@@ -2947,19 +2952,19 @@ inline real pow(T &&op1, U &&op2)
     return dispatch_pow(std::forward<decltype(op1)>(op1), std::forward<decltype(op2)>(op2));
 }
 
-    /** @} */
+/** @} */
 
-    /** @defgroup real_trig real_trig
-     *  @{
-     */
+/** @defgroup real_trig real_trig
+ *  @{
+ */
 
-    /// Binary \link mppp::real real\endlink sine.
-    /**
-     * @param rop the return value.
-     * @param op the operand.
-     *
-     * @return a reference to \p rop.
-     */
+/// Binary \link mppp::real real\endlink sine.
+/**
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to \p rop.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 inline real &sin(real &rop, CvrReal &&op)
 #else
@@ -2986,13 +2991,13 @@ inline real sin(T &&r)
     return mpfr_nary_op_return(0, ::mpfr_sin, std::forward<decltype(r)>(r));
 }
 
-    /// Binary \link mppp::real real\endlink cosine.
-    /**
-     * @param rop the return value.
-     * @param op the operand.
-     *
-     * @return a reference to \p rop.
-     */
+/// Binary \link mppp::real real\endlink cosine.
+/**
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to \p rop.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 inline real &cos(real &rop, CvrReal &&op)
 #else
@@ -3353,16 +3358,16 @@ inline T &operator+=(T &a, U &&b)
     return a;
 }
 
-    /// Negated copy for \link mppp::real real\endlink.
-    /**
-     * \rststar
-     * This operator will return a negated copy of the input :cpp:class:`~mppp::real` ``r``.
-     * \endrststar
-     *
-     * @param r the \link mppp::real real\endlink that will be negated.
-     *
-     * @return a negated copy of \p r.
-     */
+/// Negated copy for \link mppp::real real\endlink.
+/**
+ * \rststar
+ * This operator will return a negated copy of the input :cpp:class:`~mppp::real` ``r``.
+ * \endrststar
+ *
+ * @param r the \link mppp::real real\endlink that will be negated.
+ *
+ * @return a negated copy of \p r.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 inline real operator-(CvrReal &&r)
 #else
@@ -3825,7 +3830,7 @@ inline bool dispatch_real_comparison(const F &f, const real &a, const T &x)
 {
     MPPP_MAYBE_TLS real tmp;
     tmp = x;
-    return f(a.get_mpfr_t(), tmp.get_mpfr_t());
+    return f(a.get_mpfr_t(), tmp.get_mpfr_t()) != 0;
 }
 
 template <typename F, typename T, enable_if_t<is_real_interoperable<T>::value, int> = 0>
@@ -3833,7 +3838,7 @@ inline bool dispatch_real_comparison(const F &f, const T &x, const real &a)
 {
     MPPP_MAYBE_TLS real tmp;
     tmp = x;
-    return f(tmp.get_mpfr_t(), a.get_mpfr_t());
+    return f(tmp.get_mpfr_t(), a.get_mpfr_t()) != 0;
 }
 
 template <typename F>
