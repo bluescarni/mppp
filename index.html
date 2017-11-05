@@ -1,12 +1,10 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Welcome to mp++’s documentation! &#8212; mp++ 0.5 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -22,24 +20,109 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installation" href="installation.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
 
   </head>
   <body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">
+          mp++</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.5</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
             
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Welcome to mp++’s documentation!</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="installation.html" title="Next Chapter: Installation"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Installation &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/index.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
   <div class="section" id="welcome-to-mp-s-documentation">
 <h1>Welcome to mp++’s documentation!<a class="headerlink" href="#welcome-to-mp-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>mp++ is a C++11 header-only library for multiprecision arithmetic, currently supporting integers,
@@ -77,114 +160,20 @@ not yet available in mp++’s stable releases.</p>
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="integer.html#the-integer-class">The <code class="docutils literal"><span class="pre">integer</span></code> class</a></li>
-<li class="toctree-l3"><a class="reference internal" href="integer.html#types">Types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="integer.html#concepts">Concepts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="integer.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="integer.html#assignment">Assignment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="integer.html#conversion">Conversion</a></li>
-<li class="toctree-l4"><a class="reference internal" href="integer.html#arithmetic">Arithmetic</a></li>
-<li class="toctree-l4"><a class="reference internal" href="integer.html#division">Division</a></li>
-<li class="toctree-l4"><a class="reference internal" href="integer.html#comparison">Comparison</a></li>
-<li class="toctree-l4"><a class="reference internal" href="integer.html#number-theoretic-functions">Number theoretic functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="integer.html#exponentiation">Exponentiation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="integer.html#roots">Roots</a></li>
-<li class="toctree-l4"><a class="reference internal" href="integer.html#input-output">Input/Output</a></li>
-<li class="toctree-l4"><a class="reference internal" href="integer.html#other">Other</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="integer.html#operators">Operators</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="rational.html#the-rational-class">The <code class="docutils literal"><span class="pre">rational</span></code> class</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rational.html#concepts">Concepts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rational.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="rational.html#conversion">Conversion</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rational.html#arithmetic">Arithmetic</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rational.html#comparison">Comparison</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rational.html#exponentiation">Exponentiation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rational.html#input-output">Input/Output</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rational.html#other">Other</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="rational.html#operators">Operators</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="real128.html#the-real128-class">The <code class="docutils literal"><span class="pre">real128</span></code> class</a></li>
-<li class="toctree-l3"><a class="reference internal" href="real128.html#types">Types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="real128.html#concepts">Concepts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="real128.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="real128.html#conversion">Conversion</a></li>
-<li class="toctree-l4"><a class="reference internal" href="real128.html#arithmetic">Arithmetic</a></li>
-<li class="toctree-l4"><a class="reference internal" href="real128.html#comparison">Comparison</a></li>
-<li class="toctree-l4"><a class="reference internal" href="real128.html#roots">Roots</a></li>
-<li class="toctree-l4"><a class="reference internal" href="real128.html#exponentiation">Exponentiation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="real128.html#trigonometry">Trigonometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="real128.html#logarithms-and-exponentials">Logarithms and exponentials</a></li>
-<li class="toctree-l4"><a class="reference internal" href="real128.html#input-output">Input/Output</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="real128.html#operators">Operators</a></li>
-<li class="toctree-l3"><a class="reference internal" href="real128.html#constants">Constants</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#integer-benchmarks">Integer benchmarks</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="benchmarks.html#dot-product">Dot product</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#limb-unsigned-integers">1-limb unsigned integers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#limb-signed-integers">1-limb signed integers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#integer2-dot-product-unsigned">2-limb unsigned integers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#id3">2-limb signed integers</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="benchmarks.html#vector-multiplication">Vector multiplication</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#integer1-vec-mul-unsigned">1-limb unsigned integers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#id5">1-limb signed integers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#integer2-vec-mul-unsigned">2-limb unsigned integers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#id7">2-limb signed integers</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="benchmarks.html#sorting">Sorting</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#id8">1-limb unsigned integers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#id9">1-limb signed integers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#id10">2-limb unsigned integers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="benchmarks.html#id11">2-limb signed integers</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="benchmarks.html#integer-benchmarks">Integer benchmarks</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#unreleased">0.5 (unreleased)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#new">New</a></li>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#changes">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#fix">Fix</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id1">0.4 (2017-07-29)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#id2">New</a></li>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#id3">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#id4">Fix</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id5">0.3 (2017-06-12)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#id6">New</a></li>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#id7">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#id8">Fix</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id9">0.2 (2017-05-09)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#id10">New</a></li>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#id11">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="changelog.html#id12">Fix</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#unreleased">0.5 (unreleased)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id1">0.4 (2017-07-29)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id5">0.3 (2017-06-12)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id9">0.2 (2017-05-09)</a></li>
 </ul>
 </li>
 </ul>
@@ -192,101 +181,21 @@ not yet available in mp++’s stable releases.</p>
 </div>
 
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="#">mp++</a></h1>
-
-
-
-<p class="blurb">Multiprecision for modern C++</p>
-
-
-
-
-<p>
-<iframe src="https://ghbtns.com/github-btn.html?user=bluescarni&repo=mppp&type=watch&count=true&size=large&v=2"
-  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
-</p>
-
-
-
-
-
-    
-
-<p>
-<a href="https://travis-ci.org/bluescarni/mppp">
-    <img
-        alt="https://secure.travis-ci.org/bluescarni/mppp.svg?branch=master"
-        src="https://secure.travis-ci.org/bluescarni/mppp.svg?branch=master"
-    />
-</a>
-</p>
-
-
-
-
-    
-
-<p>
-<a href="https://codecov.io/github/bluescarni/mppp">
-    <img
-    alt="https://codecov.io/github/bluescarni/mppp/coverage.svg?branch=master"
-    src="https://codecov.io/github/bluescarni/mppp/coverage.svg?branch=master"
-    />
-</a>
-</p>
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="installation.html" title="next chapter">Installation</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2016-2017, Francesco Biscani.
       
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
       
-      |
-      <a href="_sources/index.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-    <a href="https://github.com/bluescarni/mppp" class="github">
-        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
-    </a>
-    
-
-    
+    </p>
+    <p>
+        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
+    </p>
+  </div>
+</footer>
   </body>
 </html>
