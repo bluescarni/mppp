@@ -225,6 +225,7 @@ using real128_op_types_enabler
  *
  * .. seealso::
  *    https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+ *
  *    https://gcc.gnu.org/onlinedocs/libquadmath/
  * \endrststar
  */
