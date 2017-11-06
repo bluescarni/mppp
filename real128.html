@@ -229,8 +229,8 @@ which are not <code class="docutils literal"><span class="pre">constexpr</span><
 builtins.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference external" href="https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html">https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html</a>
-<a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/">https://gcc.gnu.org/onlinedocs/libquadmath/</a></p>
+<p><a class="reference external" href="https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html">https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html</a></p>
+<p class="last"><a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/">https://gcc.gnu.org/onlinedocs/libquadmath/</a></p>
 </div>
  </p>
 <div class="breathe-sectiondef docutils container">
@@ -1071,7 +1071,7 @@ rounded once.</p>
 <dl class="function">
 <dt id="_CPPv2N4mppp16real128_equal_toERK7real128RK7real128">
 <span id="mppp::real128_equal_to__real128CR.real128CRCE"></span><span class="target" id="group__real128__comparison_1gac869f8f3933f29b28290e87160a9f262"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">real128_equal_to</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp16real128_equal_toERK7real128RK7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Equality predicate with special NaN handling. </p>
+<dd><p>Equality predicate with special NaN handling for <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a>. </p>
 <p><p>If both <code class="docutils literal"><span class="pre">x</span></code> and <code class="docutils literal"><span class="pre">y</span></code> are not NaN, this function is identical to the equality operator for
 <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>. If at least one operand is NaN, this function will return <code class="docutils literal"><span class="pre">true</span></code>
 if both operands are NaN, <code class="docutils literal"><span class="pre">false</span></code> otherwise.</p>
@@ -1094,7 +1094,7 @@ values equal to each other.</p>
 <dl class="function">
 <dt id="_CPPv2N4mppp10real128_ltERK7real128RK7real128">
 <span id="mppp::real128_lt__real128CR.real128CRCE"></span><span class="target" id="group__real128__comparison_1gabb5ad9dd661bd047c865733340df8b8e"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">real128_lt</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10real128_ltERK7real128RK7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Less-than predicate with special NaN handling. </p>
+<dd><p>Less-than predicate with special NaN handling for <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a>. </p>
 <p><p>If both <code class="docutils literal"><span class="pre">x</span></code> and <code class="docutils literal"><span class="pre">y</span></code> are not NaN, this function is identical to the less-than operator for
 <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>. If at least one operand is NaN, this function will return <code class="docutils literal"><span class="pre">true</span></code>
 if <code class="docutils literal"><span class="pre">x</span></code> is not NaN, <code class="docutils literal"><span class="pre">false</span></code> otherwise.</p>
@@ -1118,7 +1118,7 @@ standard library (e.g., <code class="docutils literal"><span class="pre">std::so
 <dl class="function">
 <dt id="_CPPv2N4mppp10real128_gtERK7real128RK7real128">
 <span id="mppp::real128_gt__real128CR.real128CRCE"></span><span class="target" id="group__real128__comparison_1ga9923fdadeb9e7e05590ddf7833a03dd5"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">real128_gt</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10real128_gtERK7real128RK7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Greater-than predicate with special NaN handling. </p>
+<dd><p>Greater-than predicate with special NaN handling for <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a>. </p>
 <p><p>If both <code class="docutils literal"><span class="pre">x</span></code> and <code class="docutils literal"><span class="pre">y</span></code> are not NaN, this function is identical to the greater-than operator for
 <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>. If at least one operand is NaN, this function will return <code class="docutils literal"><span class="pre">true</span></code>
 if <code class="docutils literal"><span class="pre">y</span></code> is not NaN, <code class="docutils literal"><span class="pre">false</span></code> otherwise.</p>
