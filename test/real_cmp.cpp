@@ -11,6 +11,7 @@
 #include <mp++/real.hpp>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include "test_utils.hpp"
 
@@ -132,4 +133,53 @@ TEST_CASE("real cmp")
     REQUIRE_THROWS_PREDICATE(cmp(real{"nan", 5}, real{"nan", 5}), std::domain_error, [](const std::domain_error &ex) {
         return ex.what() == std::string("Cannot compare two reals if at least one of them is NaN");
     });
+}
+
+TEST_CASE("real real_equal_to")
+{
+    REQUIRE(real_equal_to(real{}, real{}));
+    REQUIRE(real_equal_to(real{1}, real{1}));
+    REQUIRE(!real_equal_to(real{2}, real{1}));
+    REQUIRE(!real_equal_to(real{1}, real{2}));
+    REQUIRE(!real_equal_to(real{"-nan", 5}, real{2}));
+    REQUIRE(real_equal_to(real{"nan", 5}, real{"-nan", 6}));
+    REQUIRE(!real_equal_to(real{2}, real{"nan", 5}));
+}
+
+TEST_CASE("real real_lt")
+{
+    REQUIRE(!real_lt(real{}, real{}));
+    REQUIRE(!real_lt(real{1}, real{1}));
+    REQUIRE(!real_lt(real{2}, real{1}));
+    REQUIRE(real_lt(real{1}, real{2}));
+    REQUIRE(!real_lt(real{"-nan", 5}, real{2}));
+    REQUIRE(!real_lt(real{"nan", 5}, real{"-nan", 6}));
+    REQUIRE(real_lt(real{2}, real{"nan", 5}));
+    real r0, r1{std::move(r0)};
+    (void)r1;
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+    REQUIRE(real_lt(real{2}, r0));
+    REQUIRE(!real_lt(r0, real{2}));
+    REQUIRE(!real_lt(r0, r0));
+    REQUIRE(real_lt(real{"nan", 5}, r0));
+    REQUIRE(!real_lt(r0, real{"-nan", 5}));
+}
+
+TEST_CASE("real real_gt")
+{
+    REQUIRE(!real_gt(real{}, real{}));
+    REQUIRE(!real_gt(real{1}, real{1}));
+    REQUIRE(real_gt(real{2}, real{1}));
+    REQUIRE(!real_gt(real{1}, real{2}));
+    REQUIRE(real_gt(real{"-nan", 5}, real{2}));
+    REQUIRE(!real_gt(real{"nan", 5}, real{"-nan", 6}));
+    REQUIRE(!real_gt(real{2}, real{"nan", 5}));
+    real r0, r1{std::move(r0)};
+    (void)r1;
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+    REQUIRE(!real_gt(real{2}, r0));
+    REQUIRE(real_gt(r0, real{2}));
+    REQUIRE(!real_gt(r0, r0));
+    REQUIRE(!real_gt(real{"nan", 5}, r0));
+    REQUIRE(real_gt(r0, real{"-nan", 5}));
 }
