@@ -2107,6 +2107,7 @@ public:
     /// In-place square root.
     /**
      * This method will set ``this`` to its square root.
+     * The precision of ``this`` will not be altered.
      *
      * @return a reference to ``this``.
      */
@@ -2118,6 +2119,7 @@ public:
     /// In-place sine.
     /**
      * This method will set ``this`` to its sine.
+     * The precision of ``this`` will not be altered.
      *
      * @return a reference to ``this``.
      */
@@ -2129,6 +2131,7 @@ public:
     /// In-place cosine.
     /**
      * This method will set ``this`` to its cosine.
+     * The precision of ``this`` will not be altered.
      *
      * @return a reference to ``this``.
      */
@@ -2140,6 +2143,7 @@ public:
     /// In-place exponential.
     /**
      * This method will set ``this`` to its exponential.
+     * The precision of ``this`` will not be altered.
      *
      * @return a reference to ``this``.
      */
@@ -2958,6 +2962,10 @@ inline bool real_gt(const real &a, const real &b)
 
 /// Binary \link mppp::real real\endlink square root.
 /**
+ * This function will compute the square root of ``op`` and store it
+ * into ``rop``. The precision of the result will be equal to the precision
+ * of ``op``.
+ *
  * @param rop the return value.
  * @param op the operand.
  *
@@ -2975,6 +2983,10 @@ inline real &sqrt(real &rop, T &&op)
 
 /// Unary \link mppp::real real\endlink square root.
 /**
+ * This function will compute and return the square root of ``op``.
+ * The precision of the result will be equal to the precision
+ * of ``r``.
+ *
  * @param r the operand.
  *
  * @return the square root of \p r.
@@ -3084,6 +3096,10 @@ inline real pow(T &&op1, U &&op2)
 
 /// Binary \link mppp::real real\endlink sine.
 /**
+ * This function will compute the sine of ``op`` and store it
+ * into ``rop``. The precision of the result will be equal to the precision
+ * of ``op``.
+ *
  * @param rop the return value.
  * @param op the operand.
  *
@@ -3101,6 +3117,10 @@ inline real &sin(real &rop, T &&op)
 
 /// Unary \link mppp::real real\endlink sine.
 /**
+ * This function will compute and return the sine of ``op``.
+ * The precision of the result will be equal to the precision
+ * of ``r``.
+ *
  * @param r the operand.
  *
  * @return the sine of \p r.
@@ -3117,6 +3137,10 @@ inline real sin(T &&r)
 
 /// Binary \link mppp::real real\endlink cosine.
 /**
+ * This function will compute the cosine of ``op`` and store it
+ * into ``rop``. The precision of the result will be equal to the precision
+ * of ``op``.
+ *
  * @param rop the return value.
  * @param op the operand.
  *
@@ -3134,6 +3158,10 @@ inline real &cos(real &rop, T &&op)
 
 /// Unary \link mppp::real real\endlink cosine.
 /**
+ * This function will compute and return the cosine of ``op``.
+ * The precision of the result will be equal to the precision
+ * of ``r``.
+ *
  * @param r the operand.
  *
  * @return the cosine of \p r.
@@ -3156,6 +3184,10 @@ inline real cos(T &&r)
 
 /// Binary \link mppp::real real\endlink exponential.
 /**
+ * This function will compute the exponential of ``op`` and store it
+ * into ``rop``. The precision of the result will be equal to the precision
+ * of ``op``.
+ *
  * @param rop the return value.
  * @param op the operand.
  *
@@ -3173,6 +3205,10 @@ inline real &exp(real &rop, T &&op)
 
 /// Unary \link mppp::real real\endlink exponential.
 /**
+ * This function will compute and return the exponential of ``op``.
+ * The precision of the result will be equal to the precision
+ * of ``r``.
+ *
  * @param r the operand.
  *
  * @return the exponential of \p r.
