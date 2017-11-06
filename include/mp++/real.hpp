@@ -316,6 +316,14 @@ real mpfr_nary_op_return(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
 
 template <typename F>
 real real_constant(const F &, ::mpfr_prec_t);
+
+// Wrapper for calling mpfr_lgamma().
+inline void real_lgamma_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t)
+{
+    // NOTE: we ignore the sign for consistency with lgamma.
+    int signp;
+    ::mpfr_lgamma(rop, &signp, op, MPFR_RNDN);
+}
 }
 
 // Fwd declare swap.
@@ -2152,6 +2160,30 @@ public:
         ::mpfr_exp(&m_mpfr, &m_mpfr, MPFR_RNDN);
         return *this;
     }
+    /// In-place Gamma function.
+    /**
+     * This method will set ``this`` to its Gamma function.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &gamma()
+    {
+        ::mpfr_gamma(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
+    /// In-place logarithm of the absolute value of the Gamma function.
+    /**
+     * This method will set ``this`` to the logarithm of the absolute value of its Gamma function.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &lgamma()
+    {
+        real_lgamma_wrapper(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
 
 private:
     mpfr_struct_t m_mpfr;
@@ -3221,6 +3253,94 @@ inline real exp(T &&r)
 #endif
 {
     return mpfr_nary_op_return(0, ::mpfr_exp, std::forward<decltype(r)>(r));
+}
+
+/** @} */
+
+/** @defgroup real_gamma real_gamma
+ *  @{
+ */
+
+/// Binary \link mppp::real real\endlink Gamma function.
+/**
+ * This function will compute the Gamma function of ``op`` and store it
+ * into ``rop``. The precision of the result will be equal to the precision
+ * of ``op``.
+ *
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real &gamma(real &rop, CvrReal &&op)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real &gamma(real &rop, T &&op)
+#endif
+{
+    return mpfr_nary_op(0, ::mpfr_gamma, rop, std::forward<decltype(op)>(op));
+}
+
+/// Unary \link mppp::real real\endlink Gamma function.
+/**
+ * This function will compute and return the Gamma function of ``op``.
+ * The precision of the result will be equal to the precision
+ * of ``r``.
+ *
+ * @param r the operand.
+ *
+ * @return the Gamma function of \p r.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real gamma(CvrReal &&r)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real gamma(T &&r)
+#endif
+{
+    return mpfr_nary_op_return(0, ::mpfr_gamma, std::forward<decltype(r)>(r));
+}
+
+/// Binary \link mppp::real real\endlink logarithm of the absolute value of the Gamma function.
+/**
+ * This function will compute the logarithm of the absolute value of the Gamma function of ``op`` and store it
+ * into ``rop``. The precision of the result will be equal to the precision
+ * of ``op``.
+ *
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real &lgamma(real &rop, CvrReal &&op)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real &lgamma(real &rop, T &&op)
+#endif
+{
+    return mpfr_nary_op(0, real_lgamma_wrapper, std::forward<decltype(op)>(op));
+}
+
+/// Unary \link mppp::real real\endlink logarithm of the absolute value of the Gamma function.
+/**
+ * This function will compute and return the logarithm of the absolute value of the Gamma function of ``op``.
+ * The precision of the result will be equal to the precision
+ * of ``r``.
+ *
+ * @param r the operand.
+ *
+ * @return the logarithm of the absolute value of the Gamma function of \p r.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real lgamma(CvrReal &&r)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real lgamma(T &&r)
+#endif
+{
+    return mpfr_nary_op_return(0, real_lgamma_wrapper, std::forward<decltype(r)>(r));
 }
 
 /** @} */

@@ -158,6 +158,14 @@ Logarithms and exponentials
 .. doxygengroup:: real_logexp
    :content-only:
 
+.. _real_gamma:
+
+Gamma functions
+~~~~~~~~~~~~~~~
+
+.. doxygengroup:: real_gamma
+   :content-only:
+
 .. _real_io:
 
 Input/Output
