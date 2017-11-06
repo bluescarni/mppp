@@ -2083,7 +2083,6 @@ public:
     {
         return dispatch_get(rop);
     }
-
     /// Convert to string.
     /**
      * \rststar
@@ -2104,6 +2103,50 @@ public:
         std::ostringstream oss;
         mpfr_to_stream(&m_mpfr, oss, base);
         return oss.str();
+    }
+    /// In-place square root.
+    /**
+     * This method will set ``this`` to its square root.
+     *
+     * @return a reference to ``this``.
+     */
+    real &sqrt()
+    {
+        ::mpfr_sqrt(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
+    /// In-place sine.
+    /**
+     * This method will set ``this`` to its sine.
+     *
+     * @return a reference to ``this``.
+     */
+    real &sin()
+    {
+        ::mpfr_sin(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
+    /// In-place cosine.
+    /**
+     * This method will set ``this`` to its cosine.
+     *
+     * @return a reference to ``this``.
+     */
+    real &cos()
+    {
+        ::mpfr_cos(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
+    /// In-place exponential.
+    /**
+     * This method will set ``this`` to its exponential.
+     *
+     * @return a reference to ``this``.
+     */
+    real &exp()
+    {
+        ::mpfr_exp(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
     }
 
 private:
@@ -3110,6 +3153,39 @@ inline real cos(T &&r)
 /** @defgroup real_logexp real_logexp
  *  @{
  */
+
+/// Binary \link mppp::real real\endlink exponential.
+/**
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real &exp(real &rop, CvrReal &&op)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real &exp(real &rop, T &&op)
+#endif
+{
+    return mpfr_nary_op(0, ::mpfr_exp, rop, std::forward<decltype(op)>(op));
+}
+
+/// Unary \link mppp::real real\endlink exponential.
+/**
+ * @param r the operand.
+ *
+ * @return the exponential of \p r.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real exp(CvrReal &&r)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real exp(T &&r)
+#endif
+{
+    return mpfr_nary_op_return(0, ::mpfr_exp, std::forward<decltype(r)>(r));
+}
 
 /** @} */
 
