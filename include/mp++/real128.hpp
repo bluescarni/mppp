@@ -225,6 +225,7 @@ using real128_op_types_enabler
  *
  * .. seealso::
  *    https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+ *
  *    https://gcc.gnu.org/onlinedocs/libquadmath/
  * \endrststar
  */
@@ -1182,7 +1183,7 @@ constexpr bool finite(const real128 &x)
     return x.finite();
 }
 
-/// Equality predicate with special NaN handling.
+/// Equality predicate with special NaN handling for \link mppp::real128 real128\endlink.
 /**
  * \rststar
  * If both ``x`` and ``y`` are not NaN, this function is identical to the equality operator for
@@ -1201,7 +1202,7 @@ constexpr bool finite(const real128 &x)
  */
 constexpr bool real128_equal_to(const real128 &, const real128 &);
 
-/// Less-than predicate with special NaN handling.
+/// Less-than predicate with special NaN handling for \link mppp::real128 real128\endlink.
 /**
  * \rststar
  * If both ``x`` and ``y`` are not NaN, this function is identical to the less-than operator for
@@ -1221,7 +1222,7 @@ constexpr bool real128_equal_to(const real128 &, const real128 &);
  */
 constexpr bool real128_lt(const real128 &, const real128 &);
 
-/// Greater-than predicate with special NaN handling.
+/// Greater-than predicate with special NaN handling for \link mppp::real128 real128\endlink.
 /**
  * \rststar
  * If both ``x`` and ``y`` are not NaN, this function is identical to the greater-than operator for
