@@ -91,7 +91,7 @@ struct int_ctor_tester {
             std::atomic<bool> fail(false);
             auto f = [&fail
 // NOTE: MSVC requires capturing of these constexpr variables.
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
                       ,
                       min, max
 #endif
@@ -908,7 +908,7 @@ struct int_convert_tester {
             }
             std::atomic<bool> fail(false);
             auto f = [&fail
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
                       ,
                       min, max
 #endif
