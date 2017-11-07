@@ -92,7 +92,7 @@ struct int_ctor_tester {
             REQUIRE(lex_cast(max) == lex_cast(rational{max}));
             std::atomic<bool> fail(false);
             auto f = [&fail
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
                       ,
                       min, max
 #endif
