@@ -4254,7 +4254,11 @@ inline bool dispatch_real_comparison(const F &f, const real &a, const real &b)
  * precision, if set, or it is automatically deduced depending on the type and value of the
  * operand to be converted.
  *
- * If at least one NaN value is involved in the comparison, ``false`` will be returned.
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN compares
+ *    different from any value, including NaN itself). See :cpp:func:`mppp::real_equal_to()`
+ *    for an equality predicate that handles NaN specially.
+ *
  * \endrststar
  *
  * @param a the first operand.
@@ -4288,7 +4292,11 @@ inline bool operator==(const T &a, const U &b)
  * precision, if set, or it is automatically deduced depending on the type and value of the
  * operand to be converted.
  *
- * If at least one NaN value is involved in the comparison, ``true`` will be returned.
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN compares
+ *    different from any value, including NaN itself). See :cpp:func:`mppp::real_equal_to()`
+ *    for an equality predicate that handles NaN specially.
+ *
  * \endrststar
  *
  * @param a the first operand.
@@ -4322,7 +4330,12 @@ inline bool operator!=(const T &a, const U &b)
  * precision, if set, or it is automatically deduced depending on the type and value of the
  * operand to be converted.
  *
- * If at least one NaN value is involved in the comparison, ``false`` will be returned.
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN is never
+ *    greater than any value, and no value is greater than NaN).
+ *    See :cpp:func:`mppp::real_gt()` for a greater-than predicate that handles
+ *    NaN specially.
+ *
  * \endrststar
  *
  * @param a the first operand.
@@ -4356,7 +4369,10 @@ inline bool operator>(const T &a, const U &b)
  * precision, if set, or it is automatically deduced depending on the type and value of the
  * operand to be converted.
  *
- * If at least one NaN value is involved in the comparison, ``false`` will be returned.
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN is never
+ *    greater than or equal to any value, and no value is greater than or equal to NaN).
+ *
  * \endrststar
  *
  * @param a the first operand.
@@ -4390,7 +4406,12 @@ inline bool operator>=(const T &a, const U &b)
  * precision, if set, or it is automatically deduced depending on the type and value of the
  * operand to be converted.
  *
- * If at least one NaN value is involved in the comparison, ``false`` will be returned.
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN is never
+ *    less than any value, and no value is less than NaN).
+ *    See :cpp:func:`mppp::real_lt()` for a less-than predicate that handles
+ *    NaN specially.
+ *
  * \endrststar
  *
  * @param a the first operand.
@@ -4424,7 +4445,10 @@ inline bool operator<(const T &a, const U &b)
  * precision, if set, or it is automatically deduced depending on the type and value of the
  * operand to be converted.
  *
- * If at least one NaN value is involved in the comparison, ``false`` will be returned.
+ * .. note::
+ *    This operator does not handle NaN in a special way (that is, NaN is never
+ *    less than or equal to any value, and no value is less than or equal to NaN).
+ *
  * \endrststar
  *
  * @param a the first operand.

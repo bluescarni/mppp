@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Implement the :cpp:class:`~mppp::real` class (`#40 <https://github.com/bluescarni/mppp/pull/40>`__).
+
 - Add non-throwing GMP-style conversion functions (`#59 <https://github.com/bluescarni/mppp/pull/59>`__,
   `#61 <https://github.com/bluescarni/mppp/pull/61>`__).
 
