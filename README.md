@@ -5,6 +5,7 @@
 [![codecov.io](https://codecov.io/github/bluescarni/mppp/coverage.svg?branch=master)](https://codecov.io/github/bluescarni/mppp?branch=master)
 [![Docs](https://media.readthedocs.org/static/projects/badges/passing.svg)](http://bluescarni.github.io/mppp/)
 [![Join the chat at https://gitter.im/bluescarni/mppp](https://badges.gitter.im/bluescarni/mppp.svg)](https://gitter.im/bluescarni/mppp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/mppp/badges/version.svg)](https://anaconda.org/conda-forge/mppp)
 
 mp++ is a C++11 header-only library for multiprecision arithmetic, currently supporting integers,
 rationals and quadruple-precision floats. Based on well-known libraries such as [GMP](http://www.gmplib.org>),
