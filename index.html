@@ -125,23 +125,17 @@
       
   <div class="section" id="welcome-to-mp-s-documentation">
 <h1>Welcome to mp++’s documentation!<a class="headerlink" href="#welcome-to-mp-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>mp++ is a C++11 header-only library for multiprecision arithmetic, currently supporting integers,
-rationals and quadruple-precision floats. Based on well-known libraries such as <a class="reference external" href="http://www.gmplib.org">GMP</a>,
-<a class="reference external" href="http://www.mpfr.org">MPFR</a>, and others, mp++ has two main objectives:</p>
-<ul class="simple">
-<li>to maximise performance for small integers and rationals,</li>
-<li>to provide a modern, consistent and unified C++ interface to several lower-level multiprecision libraries.</li>
-</ul>
-<p>mp++ adopts various techniques to improve performance on small multiprecision integers and rationals.
-In particular, a small buffer optimisation and custom implementations of basic mathematical primitives are
-instrumental in achieving a performance increase, with respect to GMP and other libraries, which can be
-substantial (see the <a class="reference internal" href="benchmarks.html#benchmarks"><span class="std std-ref">benchmarks</span></a> section). The price to pay is a
-small overhead when operating on large integers.</p>
-<p>mp++ is a spinoff of the <a class="reference external" href="https://github.com/bluescarni/piranha">Piranha</a> library. It was created to cater to
-the requirements of computer algebra systems, which typically need to be able
-to manipulate arbitrarily-large numbers but which, in practice, often end up storing many small values
-(e.g., as coefficients in a polynomial or entries in a matrix).</p>
-<p>mp++ is released under the <a class="reference external" href="https://www.mozilla.org/en-US/MPL/2.0/FAQ/">MPL2</a> license.</p>
+<p>mp++ is a C++11 header-only library for multiprecision arithmetic, currently supporting arbitrary-precision integers,
+rationals and floats, and quadruple-precision floats.</p>
+<p>Based on well-known libraries such as <a class="reference external" href="http://www.gmplib.org">GMP</a>, <a class="reference external" href="http://www.mpfr.org">MPFR</a>, and others,
+mp++ was initially conceived as a <a class="reference external" href="http://www.gmplib.org">GMP</a> wrapper with a special focus on performance with
+small operands. In particular, a small buffer optimisation and custom implementations of basic mathematical primitives are
+instrumental in achieving a performance increase, with respect to GMP and other integer multiprecision libraries, which can be
+substantial (see the <a class="reference internal" href="benchmarks.html#benchmarks"><span class="std std-ref">benchmarks</span></a> section). The price to pay is a small overhead when operating on large integers.</p>
+<p>Eventually, a multiprecision rational class and two multiprecision floating-point classes were added, and today a secondary objective
+of mp++ is to provide a modern, consistent and unified C++ interface to several lower-level multiprecision libraries.</p>
+<p>mp++ is a spinoff of the <a class="reference external" href="https://github.com/bluescarni/piranha">Piranha</a> library, released under the
+<a class="reference external" href="https://www.mozilla.org/en-US/MPL/2.0/FAQ/">MPL2</a> license.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This documentation refers to the latest development version of mp++, and it may describe features
@@ -163,6 +157,7 @@ not yet available in mp++’s stable releases.</p>
 <li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
