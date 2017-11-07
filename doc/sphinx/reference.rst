@@ -10,3 +10,4 @@ Reference
    integer.rst
    rational.rst
    real128.rst
+   real.rst

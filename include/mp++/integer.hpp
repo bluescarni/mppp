@@ -632,7 +632,7 @@ union integer_union {
             throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
                                     + std::to_string(x));
         }
-        // NOTE: static checks for overflows are done in mpfr.hpp.
+        // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         MPPP_MAYBE_TLS mpz_raii tmp;
@@ -956,7 +956,7 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
  * Binary functions in GMP are usually implemented via three-arguments functions, in which the first
  * argument is a reference to the return value. The exponentiation function ``mpz_pow_ui()``, for instance,
  * takes three arguments: the return value, the base and the exponent. There are two overloads of the corresponding
- * :ref:`exponentiation <integer_exponentiation>` function:
+ * :ref:`exponentiation <integer_exponentiation>` function for :cpp:class:`~mppp::integer`:
  *
  * * a ternary overload semantically equivalent to ``mpz_pow_ui()``,
  * * a binary overload taking as inputs the base and the exponent, and returning the result

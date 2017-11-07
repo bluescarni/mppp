@@ -19,6 +19,8 @@ class integer;
 
 template <std::size_t>
 class rational;
+
+class real;
 }
 
 #endif

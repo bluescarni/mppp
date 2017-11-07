@@ -274,7 +274,7 @@ private:
             throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
                                     + std::to_string(x));
         }
-        // NOTE: static checks for overflows are done in mpfr.hpp.
+        // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
         MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
         MPPP_MAYBE_TLS mpf_raii mpf(static_cast<::mp_bitcnt_t>(d2));

@@ -26,10 +26,10 @@ mp++ has the following dependencies:
 
 * the `GMP <http://www.gmplib.org>`__ library, **mandatory** (GMP 5 and later versions are supported,
   the `MPIR <http://mpir.org/>`__ fork of GMP can also be used);
-* the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library, *optional*, currently used only for
-  supporting the ``long double`` type (MPFR 3 or a later version is required);
+* the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
+  of the :cpp:class:`~mppp::real` class and for providing support for the ``long double`` type (MPFR 3 or a later version is required);
 * the `quadmath library <https://gcc.gnu.org/onlinedocs/libquadmath/>`__ from GCC, *optional*, used
-  in the implementation of the :cpp:class:`~mppp::real128` type (typically, the quadmath library
+  in the implementation of the :cpp:class:`~mppp::real128` class (typically, the quadmath library
   is part of GCC and it does not need to be installed separately);
 * the `Boost <http://www.boost.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*, currently used
   only in the benchmarking suite.
@@ -96,6 +96,9 @@ If mp++ is installed in a standard prefix, on a typical GNU/Linux system you can
 .. code-block:: console
 
    $ g++ -std=c++11 main.cpp -lgmp
+
+.. note::
+   The ``-std=c++11`` flag is not necessary if your GCC version is recent enough.
 
 If you installed mp++ with optional features enabled, you will need to link the required libraries as well. For instance,
 if both MPFR and quadmath support are enabled, the compilation command on a modern GNU/Linux system will be something like:
