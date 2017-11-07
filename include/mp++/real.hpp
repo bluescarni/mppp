@@ -3751,6 +3751,34 @@ inline T &operator+=(T &a, U &&b)
     return a;
 }
 
+/// Prefix increment for \link mppp::real real\endlink.
+/**
+ * This operator will increment \p x by one.
+ *
+ * @param x the \link mppp::real real\endlink that will be increased.
+ *
+ * @return a reference to \p x after the increment.
+ */
+inline real &operator++(real &x)
+{
+    return x += 1;
+}
+
+/// Suffix increment for \link mppp::real real\endlink.
+/**
+ * This operator will increment \p x by one and return a copy of \p x as it was before the increment.
+ *
+ * @param x the \link mppp::real real\endlink that will be increased.
+ *
+ * @return a copy of \p x before the increment.
+ */
+inline real operator++(real &x, int)
+{
+    auto retval(x);
+    ++x;
+    return retval;
+}
+
 /// Negated copy for \link mppp::real real\endlink.
 /**
  * \rststar
@@ -3947,6 +3975,34 @@ inline real dispatch_binary_mul(const T &x, U &&a)
     tmp = x;
     return dispatch_binary_mul(tmp, std::forward<U>(a));
 }
+}
+
+/// Prefix decrement for \link mppp::real real\endlink.
+/**
+ * This operator will decrement \p x by one.
+ *
+ * @param x the \link mppp::real real\endlink that will be decreased.
+ *
+ * @return a reference to \p x after the decrement.
+ */
+inline real &operator--(real &x)
+{
+    return x -= 1;
+}
+
+/// Suffix decrement for \link mppp::real real\endlink.
+/**
+ * This operator will decrement \p x by one and return a copy of \p x as it was before the decrement.
+ *
+ * @param x the \link mppp::real real\endlink that will be decreased.
+ *
+ * @return a copy of \p x before the decrement.
+ */
+inline real operator--(real &x, int)
+{
+    auto retval(x);
+    --x;
+    return retval;
 }
 
 /// Binary multiplication involving \link mppp::real real\endlink.

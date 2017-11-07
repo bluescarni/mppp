@@ -2654,3 +2654,14 @@ TEST_CASE("real gte")
     REQUIRE(!(real128{1} >= real{"nan", 5}));
 #endif
 }
+
+TEST_CASE("real incdec")
+{
+    real r0{0};
+    REQUIRE(++r0 == 1);
+    REQUIRE(r0++ == 1);
+    REQUIRE(r0 == 2);
+    REQUIRE(--r0 == 1);
+    REQUIRE(r0-- == 1);
+    REQUIRE(r0.zero_p());
+}
