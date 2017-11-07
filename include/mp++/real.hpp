@@ -486,7 +486,7 @@ enum class real_kind { nan = MPFR_NAN_KIND, inf = MPFR_INF_KIND, zero = MPFR_ZER
  *
  * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
  * floating-point primitive types, :cpp:class:`~mppp::integer`, :cpp:class:`~mppp::rational` and
- * :cpp:class:`~mppp::real128` (see :cpp:concept:`~mppp::RealInteroperable`), and it provides overloaded
+ * :cpp:class:`~mppp::real128` (see the :cpp:concept:`~mppp::RealInteroperable` concept), and it provides overloaded
  * :ref:`operators <real_operators>`. Differently from the builtin types, however, this class does not allow any
  * implicit conversion to/from other types (apart from ``bool``): construction from and conversion to primitive types
  * must always be requested explicitly. As a side effect, syntax such as
@@ -511,7 +511,7 @@ enum class real_kind { nan = MPFR_NAN_KIND, inf = MPFR_INF_KIND, zero = MPFR_ZER
  *
  *    mpfr_add(rop,a,b,MPFR_RNDN);
  *
- * that writes the result of ``a + b``, rounded to nearest, into ``rop`` becomes simply
+ * that writes the result of ``a + b``, rounded to nearest, into ``rop``, becomes simply
  *
  * .. code-block:: c++
  *
@@ -525,7 +525,7 @@ enum class real_kind { nan = MPFR_NAN_KIND, inf = MPFR_INF_KIND, zero = MPFR_ZER
  * Binary functions in MPFR are usually implemented via three-operands functions, in which the first
  * operand is a reference to the return value. The exponentiation function ``mpfr_pow()``, for instance,
  * takes three operands: the return value, the base and the exponent. There are two overloads of the corresponding
- * :ref:`exponentiation <real_exponentiation>` function:
+ * :ref:`exponentiation <real_exponentiation>` function for :cpp:class:`~mppp::real`:
  *
  * * a ternary overload similar to ``mpfr_pow()``,
  * * a binary overload taking as inputs the base and the exponent, and returning the result

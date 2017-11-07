@@ -956,7 +956,7 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
  * Binary functions in GMP are usually implemented via three-arguments functions, in which the first
  * argument is a reference to the return value. The exponentiation function ``mpz_pow_ui()``, for instance,
  * takes three arguments: the return value, the base and the exponent. There are two overloads of the corresponding
- * :ref:`exponentiation <integer_exponentiation>` function:
+ * :ref:`exponentiation <integer_exponentiation>` function for :cpp:class:`~mppp::integer`:
  *
  * * a ternary overload semantically equivalent to ``mpz_pow_ui()``,
  * * a binary overload taking as inputs the base and the exponent, and returning the result
