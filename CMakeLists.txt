@@ -1,12 +1,13 @@
 cmake_policy(SET CMP0048 NEW)
 
-project(mp++ VERSION 0.5 LANGUAGES CXX C)
+project(mp++ VERSION 0.6 LANGUAGES CXX C)
 
 cmake_minimum_required(VERSION 3.3.0)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
 message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
+message(STATUS "mp++ version: ${mp++_VERSION}")
 
 include(YACMACompilerLinkerSettings)
 

@@ -412,6 +412,53 @@ TEST_CASE("mpz_t move constructor")
 
 #endif
 
+struct limb_array_ctor_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        std::vector<::mp_limb_t> vlimbs;
+        vlimbs.emplace_back(1u);
+        integer n0{static_cast<::mp_limb_t const *>(nullptr), 0u};
+        REQUIRE(n0 == 0);
+        REQUIRE(n0.is_static());
+        integer n1{vlimbs.data(), 0u};
+        REQUIRE(n1 == 0);
+        REQUIRE(n1.is_static());
+        integer n2{vlimbs.data(), 1};
+        REQUIRE(n2 == 1);
+        REQUIRE(n2.is_static());
+        vlimbs[0] = 42;
+        integer n3{vlimbs.data(), 1};
+        REQUIRE(n3 == 42);
+        REQUIRE(n3.is_static());
+        vlimbs.emplace_back(43);
+        integer n4{vlimbs.data(), 2};
+        REQUIRE(n4 == 42 + (integer{43} << GMP_NUMB_BITS));
+        if (S::value >= 2u) {
+            REQUIRE(n4.is_static());
+        } else {
+            REQUIRE(n4.is_dynamic());
+        }
+        // Test the code snippet in the docs.
+        ::mp_limb_t arr[] = {5, 6, 7};
+        integer n5{arr, 3};
+        REQUIRE(n5 == 5 + (integer{6} << GMP_NUMB_BITS) + (integer{7} << (2 * GMP_NUMB_BITS)));
+        // Error handling.
+        arr[2] = 0;
+        REQUIRE_THROWS_PREDICATE((integer{arr, 3}), std::invalid_argument, [](const std::invalid_argument &ia) {
+            return std::string(ia.what())
+                   == "When initialising an integer from an array of limbs, the last element of the "
+                      "limbs array must be nonzero";
+        });
+    }
+};
+
+TEST_CASE("limb array constructor")
+{
+    tuple_for_each(sizes{}, limb_array_ctor_tester{});
+}
+
 struct copy_move_tester {
     template <typename S>
     void operator()(const S &) const
