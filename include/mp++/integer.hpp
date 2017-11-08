@@ -181,12 +181,12 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
     auto &mpzc = mpz_caches<>::a_cache;
     if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
         // LCOV_EXCL_START
-        if (mppp_unlikely(nlimbs > static_cast<make_unsigned_t<mpz_size_t>>(std::numeric_limits<mpz_size_t>::max()))) {
+        if (mppp_unlikely(nlimbs > static_cast<make_unsigned_t<mpz_alloc_t>>(std::numeric_limits<mpz_alloc_t>::max()))) {
             std::abort();
         }
         // LCOV_EXCL_STOP
         const auto idx = nlimbs - 1u;
-        rop._mp_alloc = static_cast<mpz_size_t>(nlimbs);
+        rop._mp_alloc = static_cast<mpz_alloc_t>(nlimbs);
         rop._mp_size = 0;
         rop._mp_d = mpzc.caches[idx][mpzc.sizes[idx] - 1u];
         --mpzc.sizes[idx];
@@ -208,7 +208,7 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
         // LCOV_EXCL_STOP
         // NOTE: nbits == 0 is allowed.
         ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
-        assert(make_unsigned_t<mpz_size_t>(rop._mp_alloc) >= nlimbs);
+        assert(make_unsigned_t<mpz_alloc_t>(rop._mp_alloc) >= nlimbs);
 #if defined(MPPP_HAVE_THREAD_LOCAL)
     }
 #endif
@@ -219,7 +219,7 @@ inline void mpz_clear_wrap(mpz_struct_t &m)
 {
 #if defined(MPPP_HAVE_THREAD_LOCAL)
     auto &mpzc = mpz_caches<>::a_cache;
-    const auto ualloc = static_cast<make_unsigned_t<mpz_size_t>>(m._mp_alloc);
+    const auto ualloc = static_cast<make_unsigned_t<mpz_alloc_t>>(m._mp_alloc);
     if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
         const auto idx = ualloc - 1u;
         mpzc.caches[idx][mpzc.sizes[idx]] = m._mp_d;
