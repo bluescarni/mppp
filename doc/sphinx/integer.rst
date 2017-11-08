@@ -12,6 +12,16 @@ The ``integer`` class
 Types
 -----
 
+.. cpp:type:: mp_limb_t
+
+   This type is defined by the GMP library. It is used to represents a limb, that is,
+   the part of a multiprecision integer that fits in a single machine word. This is an
+   unsigned integral type, typically 64 or 32 bits wide.
+
+   .. seealso::
+
+      https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types
+
 .. cpp:type:: mp_bitcnt_t
 
    This type is defined by the GMP library. It is an unsigned integral type used to count bits in a multiprecision

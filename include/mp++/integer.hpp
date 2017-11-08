@@ -181,7 +181,8 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
     auto &mpzc = mpz_caches<>::a_cache;
     if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
         // LCOV_EXCL_START
-        if (mppp_unlikely(nlimbs > static_cast<make_unsigned_t<mpz_alloc_t>>(std::numeric_limits<mpz_alloc_t>::max()))) {
+        if (mppp_unlikely(nlimbs
+                          > static_cast<make_unsigned_t<mpz_alloc_t>>(std::numeric_limits<mpz_alloc_t>::max()))) {
             std::abort();
         }
         // LCOV_EXCL_STOP
@@ -716,6 +717,44 @@ union integer_union {
         }
     }
 #endif
+    explicit integer_union(const ::mp_limb_t *p, std::size_t size)
+    {
+        // If size is not zero, then the most significant limb must contain something.
+        if (mppp_unlikely(size && !p[size - 1u])) {
+            throw std::invalid_argument("When initialising an integer from an array of limbs, the last element of the "
+                                        "limbs array must be nonzero");
+        }
+        // NOTE: no builds in the CI have nail bits, cannot test this failure.
+        // LCOV_EXCL_START
+        // All elements of p must be <= GMP_NUMB_MAX.
+        if (mppp_unlikely(std::any_of(p, p + size, [](::mp_limb_t l) { return l > GMP_NUMB_MAX; }))) {
+            throw std::invalid_argument("When initialising an integer from an array of limbs, every element of the "
+                                        "limbs array must not be greater than GMP_NUMB_MAX");
+        }
+        // LCOV_EXCL_STOP
+        if (size <= SSize) {
+            // Fits into small. This constructor will take care
+            // of zeroing out the top limbs as well.
+            ::new (static_cast<void *>(&m_st)) s_storage{static_cast<mpz_size_t>(size), p, size};
+        } else {
+            // Convert size to mpz_size_t before anything else, for exception safety.
+            const auto s = safe_cast<mpz_size_t>(size);
+            // Init the dynamic storage struct.
+            ::new (static_cast<void *>(&m_dy)) d_storage;
+            // Init to zero, with size precallocated limbs.
+            // NOTE: currently this does not throw, it will just abort() in case of overflow,
+            // allocation errors, etc. If this ever becomes throwing, we probably need to move
+            // the init of d_storage below this line, so that if an exception is thrown we have
+            // not constructed the union member yet.
+            mpz_init_nlimbs(m_dy, size);
+            // Copy the input limbs.
+            // NOTE: here we are constructing a *new* object, thus I don't think it's possible that p
+            // overlaps with m_dy._mp_d (unless some UBish stuff is being attempted).
+            copy_limbs_no(p, p + size, m_dy._mp_d);
+            // Assign the size.
+            m_dy._mp_size = s;
+        }
+    }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
     {
@@ -1140,6 +1179,43 @@ public:
      * @param other the object that will be moved into \p this.
      */
     integer(integer &&other) = default;
+    /// Constructor from an array of limbs.
+    /**
+     * \rststar
+     * This constructor will initialise ``this`` with the contents of the array
+     * sized ``size`` starting at ``p``. The array is expected to contain
+     * the limbs of the desired value for ``this``, ordered from the least significant
+     * to the most significant.
+     *
+     * For instance, the following code:
+     *
+     * .. code-block:: c++
+     *
+     *    ::mp_limb_t arr[] = {5,6,7};
+     *    integer<1> n{arr, 3};
+     *
+     * will initialise ``n`` to the value :math:`5 + 6 \times 2^{N} + 7 \times 2^{2N}`,
+     * where :math:`N` is the compile-time GMP constant ``GMP_NUMB_BITS`` representing the number of
+     * value bits in a limb (typically 64 or 32, depending on the platform).
+     *
+     * This constructor always initialises ``this`` to a non-negative value,
+     * and it requires the most significant limb of ``p`` to be nonzero. It also requires
+     * every member of the input array not to be greater than the ``GMP_NUMB_MAX`` GMP constant.
+     * If ``size`` is zero, ``this`` will be initialised to zero.
+     *
+     * .. seealso::
+     *    https://gmplib.org/manual/Low_002dlevel-Functions.html#Low_002dlevel-Functions
+     *
+     * \endrststar
+     *
+     * @param p a pointer to the beginning of the limbs array.
+     * @param size the size of the limbs array.
+     *
+     * @throws std::invalid_argument if the last element of the ``p`` array is zero, or if at least
+     * one element of the ``p`` array is greater than ``GMP_NUMB_MAX``.
+     * @throws std::overflow_error if ``size`` is larger than an implementation-defined limit.
+     */
+    explicit integer(const ::mp_limb_t *p, std::size_t size) : m_int(p, size) {}
 /// Generic constructor.
 /**
  * This constructor will initialize an integer with the value of \p x. The initialization is always
