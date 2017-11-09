@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Multiprecision integers &#8212; mp++ 0.5 documentation</title>
+    <title>Multiprecision integers &#8212; mp++ 0.6 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.5',
+        VERSION:     '0.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -47,7 +47,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           mp++</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.5</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.6</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -312,6 +312,48 @@ Via the GMP interfacing facilities, it is thus possible to use directly the GMP 
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">other</span></code>: the object that will be moved into <code class="docutils literal"><span class="pre">this</span></code>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp7integer7integerEPK9mp_limb_tNSt6size_tE">
+<span id="mppp::integer::integer__mp_limb_tCP.std::s"></span><span class="target" id="classmppp_1_1integer_1afd53f28114a3fabff12b8cee7d5ad40d"></span><code class="descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv29mp_limb_t" title="mp_limb_t">mp_limb_t</a> *<em>p</em>, std::size_t <em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerEPK9mp_limb_tNSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor from an array of limbs. </p>
+<p><p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> with the contents of the array
+sized <code class="docutils literal"><span class="pre">size</span></code> starting at <code class="docutils literal"><span class="pre">p</span></code>. The array is expected to contain
+the limbs of the desired value for <code class="docutils literal"><span class="pre">this</span></code>, ordered from the least significant
+to the most significant.</p>
+<p>For instance, the following code:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="o">::</span><span class="n">mp_limb_t</span> <span class="n">arr</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">};</span>
+<span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">n</span><span class="p">{</span><span class="n">arr</span><span class="p">,</span> <span class="mi">3</span><span class="p">};</span>
+</pre></div>
+</div>
+<p>will initialise <code class="docutils literal"><span class="pre">n</span></code> to the value <span class="math">\(5 + 6 \times 2^{N} + 7 \times 2^{2N}\)</span>,
+where <span class="math">\(N\)</span> is the compile-time GMP constant <code class="docutils literal"><span class="pre">GMP_NUMB_BITS</span></code> representing the number of
+value bits in a limb (typically 64 or 32, depending on the platform).</p>
+<p>This constructor always initialises <code class="docutils literal"><span class="pre">this</span></code> to a non-negative value,
+and it requires the most significant limb of <code class="docutils literal"><span class="pre">p</span></code> to be nonzero. It also requires
+every member of the input array not to be greater than the <code class="docutils literal"><span class="pre">GMP_NUMB_MAX</span></code> GMP constant.
+If <code class="docutils literal"><span class="pre">size</span></code> is zero, <code class="docutils literal"><span class="pre">this</span></code> will be initialised to zero.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="https://gmplib.org/manual/Low_002dlevel-Functions.html#Low_002dlevel-Functions">https://gmplib.org/manual/Low_002dlevel-Functions.html#Low_002dlevel-Functions</a></p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">p</span></code>: a pointer to the beginning of the limbs array. </li>
+<li><code class="docutils literal"><span class="pre">size</span></code>: the size of the limbs array.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::invalid_argument</span></code>: if the last element of the <code class="docutils literal"><span class="pre">p</span></code> array is zero, or if at least one element of the <code class="docutils literal"><span class="pre">p</span></code> array is greater than <code class="docutils literal"><span class="pre">GMP_NUMB_MAX</span></code>. </li>
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal"><span class="pre">size</span></code> is larger than an implementation-defined limit. </li>
 </ul>
 </dd>
 </dl>
@@ -1010,6 +1052,18 @@ pointer.</p>
 </div>
 <div class="section" id="types">
 <h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
+<dl class="type">
+<dt id="_CPPv29mp_limb_t">
+<span id="mp_limb_t"></span><em class="property">type </em><code class="descclassname"></code><code class="descname">mp_limb_t</code><a class="headerlink" href="#_CPPv29mp_limb_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This type is defined by the GMP library. It is used to represents a limb, that is,
+the part of a multiprecision integer that fits in a single machine word. This is an
+unsigned integral type, typically 64 or 32 bits wide.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types">https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types</a></p>
+</div>
+</dd></dl>
+
 <dl class="type">
 <dt id="_CPPv211mp_bitcnt_t">
 <span id="mp_bitcnt_t"></span><em class="property">type </em><code class="descclassname"></code><code class="descname">mp_bitcnt_t</code><a class="headerlink" href="#_CPPv211mp_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>

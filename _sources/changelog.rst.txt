@@ -1,6 +1,19 @@
 Changelog
 =========
 
+0.6 (unreleased)
+----------------
+
+New
+~~~
+
+- Implement construction from an array of limbs for :cpp:class:`~mppp::integer` (`#73 <https://github.com/bluescarni/mppp/pull/73>`__).
+
+Fix
+~~~
+
+- Small fixes regarding the use of GMP type aliases in :cpp:class:`~mppp::integer` (`#73 <https://github.com/bluescarni/mppp/pull/73>`__).
+
 0.5 (2017-11-07)
 ----------------
 
