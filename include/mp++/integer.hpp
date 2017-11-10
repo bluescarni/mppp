@@ -245,9 +245,9 @@ constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
 // outside this function).
 inline void mpz_init_nbits(mpz_struct_t &rop, ::mp_bitcnt_t nbits, std::size_t nlimbs)
 {
-#if defined(MPPP_HAVE_THREAD_LOCAL)
     // Check nlimbs.
     assert(nlimbs == nbits_to_nlimbs(nbits));
+#if defined(MPPP_HAVE_THREAD_LOCAL)
     if (!mpz_init_from_cache_impl(rop, nlimbs)) {
 #endif
         (void)nlimbs;
@@ -1242,11 +1242,19 @@ public:
     /**
      * \rststar
      * This constructor will initialise ``this`` to zero, allocating enough memory
-     * to represent a value of ``nbits`` binary digits. The storage type will be static if ``nbits``
+     * to represent a value with a magnitude of ``nbits`` binary digits. The storage type will be static if ``nbits``
      * is small enough, dynamic otherwise.
      *
      * The first parameter of this constructor, of type :cpp:class:`~mppp::integer_nbits_init`,
      * is unused, and necessary only to disambiguate this constructor from the generic constructor.
+     *
+     * For instance, the code
+     *
+     * .. code-block:: c++
+     *
+     *    integer n{integer_nbits_init{}, 64};
+     *
+     * will initialise an integer ``n`` with value zero and enough storage for a 64-bit value.
      * \endrststar
      *
      * @param nbits the number of bits of storage that will be allocated.
