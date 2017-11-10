@@ -172,13 +172,9 @@ struct mpz_caches {
 template <typename T>
 thread_local mpz_alloc_cache mpz_caches<T>::a_cache;
 
-#endif
-
-// Helper function to init an mpz to zero with nlimbs preallocated limbs.
-inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
+// Implementation of the init of an mpz from cache.
+inline bool mpz_init_from_cache_impl(mpz_alloc_cache &mpzc, mpz_struct_t &rop, std::size_t nlimbs)
 {
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-    auto &mpzc = mpz_caches<>::a_cache;
     if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
         // LCOV_EXCL_START
         if (mppp_unlikely(nlimbs
@@ -191,7 +187,18 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
         rop._mp_size = 0;
         rop._mp_d = mpzc.caches[idx][mpzc.sizes[idx] - 1u];
         --mpzc.sizes[idx];
-    } else {
+        return true;
+    }
+    return false;
+}
+
+#endif
+
+// Helper function to init an mpz to zero with nlimbs preallocated limbs.
+inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
+{
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+    if (!mpz_init_from_cache_impl(mpz_caches<>::a_cache, rop, nlimbs)) {
 #endif
         // LCOV_EXCL_START
         // A bit of horrid overflow checking.
@@ -210,6 +217,26 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
         // NOTE: nbits == 0 is allowed.
         ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
         assert(make_unsigned_t<mpz_alloc_t>(rop._mp_alloc) >= nlimbs);
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+    }
+#endif
+}
+
+// Helper function to init an mpz to zero with enough space for nbits bits.
+inline void mpz_init_nbits(mpz_struct_t &rop, ::mp_bitcnt_t nbits)
+{
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+    const auto nlimbs = nbits / unsigned(GMP_NUMB_BITS) + nbits % unsigned(GMP_NUMB_BITS);
+    // LCOV_EXCL_START
+    // This seems to be a highly theoretical concern at this time.
+    if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max())) {
+        std::abort();
+    }
+    // LCOV_EXCL_STOP
+    if (!mpz_init_from_cache_impl(mpz_caches<>::a_cache, rop, static_cast<std::size_t>(nlimbs))) {
+#endif
+        // NOTE: nbits == 0 is allowed.
+        ::mpz_init2(&rop, nbits);
 #if defined(MPPP_HAVE_THREAD_LOCAL)
     }
 #endif
