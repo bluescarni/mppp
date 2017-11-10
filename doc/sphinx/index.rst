@@ -34,6 +34,7 @@ at `this link <https://zenodo.org/badge/latestdoi/66504757>`__.
    :maxdepth: 2
 
    installation.rst
+   tutorial.rst
    reference.rst
    benchmarks.rst
    changelog.rst
