@@ -459,6 +459,47 @@ TEST_CASE("limb array constructor")
     tuple_for_each(sizes{}, limb_array_ctor_tester{});
 }
 
+struct nbits_ctor_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        integer_nbits_init ini;
+        REQUIRE((integer{ini, 0}.is_static()));
+        REQUIRE((integer{ini, 0}.is_zero()));
+        REQUIRE((integer{ini, 1}.is_static()));
+        REQUIRE((integer{ini, 1}.is_zero()));
+        REQUIRE((integer{ini, 2}.is_static()));
+        REQUIRE((integer{ini, 2}.is_zero()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS}.is_static()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS}.is_zero()));
+        if (S::value == 1) {
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 1}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 1}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 1}.get_mpz_t()->_mp_alloc == 2));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 2}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 2}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 2}.get_mpz_t()->_mp_alloc == 2));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2}.get_mpz_t()->_mp_alloc == 2));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2 + 1}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2 + 1}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2 + 1}.get_mpz_t()->_mp_alloc == 3));
+        }
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value}.is_static()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value}.is_zero()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value + 1}.is_dynamic()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value + 1}.is_zero()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value + 1}.get_mpz_t()->_mp_alloc == S::value + 1));
+    }
+};
+
+TEST_CASE("nbits constructor")
+{
+    tuple_for_each(sizes{}, nbits_ctor_tester{});
+}
+
 struct copy_move_tester {
     template <typename S>
     void operator()(const S &) const

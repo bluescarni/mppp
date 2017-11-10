@@ -76,6 +76,16 @@
 namespace mppp
 {
 
+/// Special \link mppp::integer integer\endlink initialisation tag from number of bits.
+/**
+ * \rststar
+ * This structure is used exclusively to disambiguate the constructor of :cpp:class:`~mppp::integer`
+ * from number of bits. It has no members and it serves no other function.
+ * \endrststar
+ */
+struct integer_nbits_init {
+};
+
 inline namespace detail
 {
 // Some misc tests to check that the mpz struct conforms to our expectations.
@@ -223,19 +233,24 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 #endif
 }
 
-// Helper function to init an mpz to zero with enough space for nbits bits.
-inline void mpz_init_nbits(mpz_struct_t &rop, ::mp_bitcnt_t nbits)
+// Small helper to determine how many GMP limbs we need to fit nbits bits.
+constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
+{
+    return static_cast<::mp_bitcnt_t>(nbits / unsigned(GMP_NUMB_BITS)
+                                      + static_cast<bool>(nbits % unsigned(GMP_NUMB_BITS)));
+}
+
+// Helper function to init an mpz to zero with enough space for nbits bits. The
+// nlimbs parameter must be consistent with the nbits parameter (it will be computed
+// outside this function).
+inline void mpz_init_nbits(mpz_struct_t &rop, ::mp_bitcnt_t nbits, std::size_t nlimbs)
 {
 #if defined(MPPP_HAVE_THREAD_LOCAL)
-    const auto nlimbs = nbits / unsigned(GMP_NUMB_BITS) + nbits % unsigned(GMP_NUMB_BITS);
-    // LCOV_EXCL_START
-    // This seems to be a highly theoretical concern at this time.
-    if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max())) {
-        std::abort();
-    }
-    // LCOV_EXCL_STOP
-    if (!mpz_init_from_cache_impl(rop, static_cast<std::size_t>(nlimbs))) {
+    // Check nlimbs.
+    assert(nlimbs == nbits_to_nlimbs(nbits));
+    if (!mpz_init_from_cache_impl(rop, nlimbs)) {
 #endif
+        (void)nlimbs;
         // NOTE: nbits == 0 is allowed.
         ::mpz_init2(&rop, nbits);
 #if defined(MPPP_HAVE_THREAD_LOCAL)
@@ -558,8 +573,9 @@ union integer_union {
             return;
         }
         // The max number of GMP limbs needed to represent an instance of T.
-        constexpr auto tmp_size = unsigned(std::numeric_limits<T>::digits) / unsigned(GMP_NUMB_BITS)
-                                  + unsigned(std::numeric_limits<T>::digits) % unsigned(GMP_NUMB_BITS);
+        static_assert(unsigned(std::numeric_limits<T>::digits) <= std::numeric_limits<::mp_bitcnt_t>::max(),
+                      "Overflow error.");
+        constexpr auto tmp_size = nbits_to_nlimbs(static_cast<::mp_bitcnt_t>(std::numeric_limits<T>::digits));
         static_assert(tmp_size <= std::numeric_limits<std::size_t>::max(), "Overflow error.");
         std::array<::mp_limb_t, static_cast<std::size_t>(tmp_size)> tmp;
         tmp[0] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
@@ -746,6 +762,19 @@ union integer_union {
     explicit integer_union(const ::mp_limb_t *p, std::size_t size)
     {
         construct_from_limb_array<true>(p, size);
+    }
+    explicit integer_union(const integer_nbits_init &, ::mp_bitcnt_t nbits)
+    {
+        const auto nlimbs = safe_cast<std::size_t>(nbits_to_nlimbs(nbits));
+        if (nlimbs <= SSize) {
+            // Static storage is enough for the requested number of bits. Def init.
+            ::new (static_cast<void *>(&m_st)) s_storage();
+        } else {
+            // Init the dynamic storage struct.
+            ::new (static_cast<void *>(&m_dy)) d_storage;
+            // Init to zero with the desired number of bits.
+            mpz_init_nbits(m_dy, nbits, nlimbs);
+        }
     }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
@@ -1208,6 +1237,22 @@ public:
      * @throws std::overflow_error if ``size`` is larger than an implementation-defined limit.
      */
     explicit integer(const ::mp_limb_t *p, std::size_t size) : m_int(p, size) {}
+    /// Constructor from number of bits.
+    /**
+     * \rststar
+     * This constructor will initialise ``this`` to zero, allocating enough memory
+     * to represent a value of ``nbits`` binary digits. The storage type will be static if ``nbits``
+     * is small enough, dynamic otherwise.
+     *
+     * The first parameter of this constructor, of type :cpp:class:`~mppp::integer_nbits_init`,
+     * is unused, and necessary only to disambiguate this constructor from the generic constructor.
+     * \endrststar
+     *
+     * @param nbits the number of bits of storage that will be allocated.
+     *
+     * @throws std::overflow_error if ``nbits`` is larger than an implementation-defined limit.
+     */
+    explicit integer(integer_nbits_init, ::mp_bitcnt_t nbits) : m_int(integer_nbits_init{}, nbits) {}
 /// Generic constructor.
 /**
  * This constructor will initialize an integer with the value of \p x. The initialization is always

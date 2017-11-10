@@ -31,6 +31,9 @@ Types
 
       https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types
 
+.. doxygenstruct:: mppp::integer_nbits_init
+   :members:
+
 Concepts
 --------
 
