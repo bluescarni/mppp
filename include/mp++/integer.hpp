@@ -525,59 +525,6 @@ union integer_union {
             ::new (static_cast<void *>(&other.m_st)) s_storage();
         }
     }
-    // Machinery for the implementation of the generic ctor follows.
-    // NOTE: the idea of having the generic ctors and the ctors from string implemented in the union
-    // is that it allows the direct construction of the integer object. If the constructors' logic
-    // were implemented in the integer class, we would have first to def-init the union and then
-    // modify it. Like this, we directly initialise just once the data.
-    //
-    // Add a limb at the top of the integer (that is, the new limb will be the new most
-    // significant limb). Requires a non-negative integer. This is used only during generic construction,
-    // do **NOT** use it anywhere else.
-    void push_limb(::mp_limb_t l)
-    {
-        const auto asize = m_st._mp_size;
-        assert(asize >= 0);
-        if (is_static()) {
-            if (std::size_t(asize) < SSize) {
-                // If there's space for an extra limb, write it, update the size,
-                // and return.
-                ++g_st()._mp_size;
-                g_st().m_limbs[std::size_t(asize)] = l;
-                return;
-            }
-            // Store the upper limb.
-            const auto limb_copy = g_st().m_limbs[SSize - 1u];
-            // Make sure the upper limb contains something.
-            // NOTE: This is necessary because this method is used while building an integer during generic
-            // construction, and it might be possible that the current top limb is zero. If that is the case,
-            // the promotion below triggers an assertion failure when destroying
-            // the static int in debug mode.
-            g_st().m_limbs[SSize - 1u] = 1u;
-            // There's no space for the extra limb. Promote the integer and move on.
-            promote(SSize + 1u);
-            // Recover the upper limb.
-            g_dy()._mp_d[SSize - 1u] = limb_copy;
-        }
-        // LCOV_EXCL_START
-        if (g_dy()._mp_alloc == asize) {
-            // There is not enough space for the extra limb, we need to reallocate.
-            // NOTE: same as above, make sure the top limb contains something. mpz_realloc2() seems not to care,
-            // but better safe than sorry.
-            // NOTE: in practice this is never hit on current architectures: the only case we end up here is initing
-            // with a 64bit integer when the limb is 32bit, but in that case we already promoted to size 2 above.
-            const auto limb_copy = g_dy()._mp_d[asize - 1];
-            g_dy()._mp_d[asize - 1] = 1u;
-            // NOTE: we check at the top of dispatch_generic_ctor() that we can compute the second function
-            // argument safely.
-            ::mpz_realloc2(&g_dy(), static_cast<::mp_bitcnt_t>(asize) * 2u * unsigned(GMP_NUMB_BITS));
-            g_dy()._mp_d[asize - 1] = limb_copy;
-        }
-        // LCOV_EXCL_STOP
-        // Write the extra limb, update the size.
-        ++g_dy()._mp_size;
-        g_dy()._mp_d[asize] = l;
-    }
     // This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
     // If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
     // little helper in order to avoid compiler warnings.
@@ -603,25 +550,26 @@ union integer_union {
               enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
-        // NOTE: in push_limb() we need to compute a bit size for mpz_realloc2(), which might be up to twice
-        // the bit size of T. Make sure we can do the computation safely.
-        static_assert(unsigned(std::numeric_limits<T>::digits) <= std::numeric_limits<::mp_bitcnt_t>::max() / 2u,
-                      "Invalid bit width for an unsigned integral type.");
         if (n <= GMP_NUMB_MAX) {
             // Special codepath if n fits directly in a single limb.
             // No need for the mask as we are sure that n <= GMP_NUMB_MAX.
             ::new (static_cast<void *>(&m_st)) s_storage{Neg ? -(n != 0u) : (n != 0u), static_cast<::mp_limb_t>(n)};
             return;
         }
-        // Def construct a static before building a multi-limb integer.
-        ::new (static_cast<void *>(&m_st)) s_storage();
-        while (n) {
-            push_limb(static_cast<::mp_limb_t>(n & GMP_NUMB_MASK));
-            if (GMP_NUMB_BITS >= std::numeric_limits<T>::digits) {
-                break;
-            }
-            checked_rshift(n);
+        constexpr auto tmp_size = unsigned(std::numeric_limits<T>::digits) / unsigned(GMP_NUMB_BITS)
+                                  + unsigned(std::numeric_limits<T>::digits) % unsigned(GMP_NUMB_BITS);
+        static_assert(tmp_size <= std::numeric_limits<std::size_t>::max(), "Overflow error.");
+        std::array<::mp_limb_t, static_cast<std::size_t>(tmp_size)> tmp;
+        tmp[0] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
+        checked_rshift(n);
+        assert(n);
+        tmp[1] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
+        checked_rshift(n);
+        std::size_t size = 2;
+        for (; n; checked_rshift(n)) {
+            tmp[size++] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
         }
+        construct_from_limb_array(tmp.data(), size);
         // Negate if requested.
         if (Neg) {
             neg();
@@ -744,7 +692,7 @@ union integer_union {
         }
     }
 #endif
-    explicit integer_union(const ::mp_limb_t *p, std::size_t size)
+    void construct_from_limb_array(const ::mp_limb_t *p, std::size_t size)
     {
         // If size is not zero, then the most significant limb must contain something.
         if (mppp_unlikely(size && !p[size - 1u])) {
@@ -781,6 +729,10 @@ union integer_union {
             // Assign the size.
             m_dy._mp_size = s;
         }
+    }
+    explicit integer_union(const ::mp_limb_t *p, std::size_t size)
+    {
+        construct_from_limb_array(p, size);
     }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
