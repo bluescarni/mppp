@@ -173,8 +173,9 @@ template <typename T>
 thread_local mpz_alloc_cache mpz_caches<T>::a_cache;
 
 // Implementation of the init of an mpz from cache.
-inline bool mpz_init_from_cache_impl(mpz_alloc_cache &mpzc, mpz_struct_t &rop, std::size_t nlimbs)
+inline bool mpz_init_from_cache_impl(mpz_struct_t &rop, std::size_t nlimbs)
 {
+    auto &mpzc = mpz_caches<>::a_cache;
     if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
         // LCOV_EXCL_START
         if (mppp_unlikely(nlimbs
@@ -198,7 +199,7 @@ inline bool mpz_init_from_cache_impl(mpz_alloc_cache &mpzc, mpz_struct_t &rop, s
 inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 {
 #if defined(MPPP_HAVE_THREAD_LOCAL)
-    if (!mpz_init_from_cache_impl(mpz_caches<>::a_cache, rop, nlimbs)) {
+    if (!mpz_init_from_cache_impl(rop, nlimbs)) {
 #endif
         // LCOV_EXCL_START
         // A bit of horrid overflow checking.
@@ -233,7 +234,7 @@ inline void mpz_init_nbits(mpz_struct_t &rop, ::mp_bitcnt_t nbits)
         std::abort();
     }
     // LCOV_EXCL_STOP
-    if (!mpz_init_from_cache_impl(mpz_caches<>::a_cache, rop, static_cast<std::size_t>(nlimbs))) {
+    if (!mpz_init_from_cache_impl(rop, static_cast<std::size_t>(nlimbs))) {
 #endif
         // NOTE: nbits == 0 is allowed.
         ::mpz_init2(&rop, nbits);
@@ -556,6 +557,7 @@ union integer_union {
             ::new (static_cast<void *>(&m_st)) s_storage{Neg ? -(n != 0u) : (n != 0u), static_cast<::mp_limb_t>(n)};
             return;
         }
+        // The max number of GMP limbs needed to represent an instance of T.
         constexpr auto tmp_size = unsigned(std::numeric_limits<T>::digits) / unsigned(GMP_NUMB_BITS)
                                   + unsigned(std::numeric_limits<T>::digits) % unsigned(GMP_NUMB_BITS);
         static_assert(tmp_size <= std::numeric_limits<std::size_t>::max(), "Overflow error.");
@@ -566,10 +568,14 @@ union integer_union {
         tmp[1] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
         checked_rshift(n);
         std::size_t size = 2;
-        for (; n; checked_rshift(n)) {
-            tmp[size++] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
+        // NOTE: currently this code is hit only on 32-bit archs with 64-bit integers,
+        // we cannot go past 2 limbs size.
+        // LCOV_EXCL_START
+        for (; n; ++size, checked_rshift(n)) {
+            tmp[size] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
         }
-        construct_from_limb_array(tmp.data(), size);
+        // LCOV_EXCL_STOP
+        construct_from_limb_array<false>(tmp.data(), size);
         // Negate if requested.
         if (Neg) {
             neg();
@@ -692,21 +698,28 @@ union integer_union {
         }
     }
 #endif
+    template <bool CheckArray>
     void construct_from_limb_array(const ::mp_limb_t *p, std::size_t size)
     {
-        // If size is not zero, then the most significant limb must contain something.
-        if (mppp_unlikely(size && !p[size - 1u])) {
-            throw std::invalid_argument("When initialising an integer from an array of limbs, the last element of the "
-                                        "limbs array must be nonzero");
+        if (CheckArray) {
+            // If size is not zero, then the most significant limb must contain something.
+            if (mppp_unlikely(size && !p[size - 1u])) {
+                throw std::invalid_argument(
+                    "When initialising an integer from an array of limbs, the last element of the "
+                    "limbs array must be nonzero");
+            }
+            // NOTE: no builds in the CI have nail bits, cannot test this failure.
+            // LCOV_EXCL_START
+            // All elements of p must be <= GMP_NUMB_MAX.
+            if (mppp_unlikely(std::any_of(p, p + size, [](::mp_limb_t l) { return l > GMP_NUMB_MAX; }))) {
+                throw std::invalid_argument("When initialising an integer from an array of limbs, every element of the "
+                                            "limbs array must not be greater than GMP_NUMB_MAX");
+            }
+            // LCOV_EXCL_STOP
+        } else {
+            assert(!size || p[size - 1u]);
+            assert(std::all_of(p, p + size, [](::mp_limb_t l) { return l <= GMP_NUMB_MAX; }));
         }
-        // NOTE: no builds in the CI have nail bits, cannot test this failure.
-        // LCOV_EXCL_START
-        // All elements of p must be <= GMP_NUMB_MAX.
-        if (mppp_unlikely(std::any_of(p, p + size, [](::mp_limb_t l) { return l > GMP_NUMB_MAX; }))) {
-            throw std::invalid_argument("When initialising an integer from an array of limbs, every element of the "
-                                        "limbs array must not be greater than GMP_NUMB_MAX");
-        }
-        // LCOV_EXCL_STOP
         if (size <= SSize) {
             // Fits into small. This constructor will take care
             // of zeroing out the top limbs as well.
@@ -732,7 +745,7 @@ union integer_union {
     }
     explicit integer_union(const ::mp_limb_t *p, std::size_t size)
     {
-        construct_from_limb_array(p, size);
+        construct_from_limb_array<true>(p, size);
     }
     // Copy assignment operator, performs a deep copy maintaining the storage class.
     integer_union &operator=(const integer_union &other)
