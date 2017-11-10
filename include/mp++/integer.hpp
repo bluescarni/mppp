@@ -578,6 +578,7 @@ union integer_union {
         constexpr auto tmp_size = nbits_to_nlimbs(static_cast<::mp_bitcnt_t>(std::numeric_limits<T>::digits));
         static_assert(tmp_size <= std::numeric_limits<std::size_t>::max(), "Overflow error.");
         std::array<::mp_limb_t, static_cast<std::size_t>(tmp_size)> tmp;
+        // We can assign the first two limbs directly, as we know n > GMP_NUMB_MAX.
         tmp[0] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
         checked_rshift(n);
         assert(n);
