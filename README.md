@@ -24,7 +24,8 @@ of mp++ is to provide a modern, consistent and unified C++ interface to several 
 mp++ is a spinoff of the [Piranha](https://github.com/bluescarni/piranha) library, released under the
 [MPL2](https://www.mozilla.org/en-US/MPL/2.0/FAQ/) license.
 
-If you are using mp++ in your research, please consider citing mp++. The DOI of the latest version can always be retrieved
-via [this link](https://zenodo.org/badge/latestdoi/66504757).
+If you are using mp++ as part of your research, teaching, or other activities, we would be grateful if you could star
+the repository and/or cite our work. The DOI of the latest version and other citation resources are available
+at [this link](https://zenodo.org/badge/latestdoi/66504757).
 
 The documentation is available [here](https://bluescarni.github.io/mppp/).
