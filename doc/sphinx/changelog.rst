@@ -7,7 +7,14 @@ Changelog
 New
 ~~~
 
+- Implement construction with preallocated storage for :cpp:class:`~mppp::integer` (`#74 <https://github.com/bluescarni/mppp/pull/74>`__).
+
 - Implement construction from an array of limbs for :cpp:class:`~mppp::integer` (`#73 <https://github.com/bluescarni/mppp/pull/73>`__).
+
+Changes
+~~~~~~~
+
+- Improve construction from C++ integrals for :cpp:class:`~mppp::integer` (`#74 <https://github.com/bluescarni/mppp/pull/74>`__).
 
 Fix
 ~~~

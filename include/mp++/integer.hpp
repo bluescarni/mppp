@@ -80,7 +80,7 @@ namespace mppp
 /**
  * \rststar
  * This structure is used exclusively to disambiguate the constructor of :cpp:class:`~mppp::integer`
- * from number of bits. It has no members and it serves no other function.
+ * from number of bits. It has no members and it serves no other purpose.
  * \endrststar
  */
 struct integer_nbits_init {
@@ -714,6 +714,8 @@ union integer_union {
         }
     }
 #endif
+    // Implementation of the ctor from an array of limbs. CheckArray establishes
+    // if p is checked for sanity.
     template <bool CheckArray>
     void construct_from_limb_array(const ::mp_limb_t *p, std::size_t size)
     {
@@ -759,10 +761,12 @@ union integer_union {
             m_dy._mp_size = s;
         }
     }
+    // Constructor from array of limbs.
     explicit integer_union(const ::mp_limb_t *p, std::size_t size)
     {
         construct_from_limb_array<true>(p, size);
     }
+    // Constructor from number of bits.
     explicit integer_union(const integer_nbits_init &, ::mp_bitcnt_t nbits)
     {
         const auto nlimbs = safe_cast<std::size_t>(nbits_to_nlimbs(nbits));
