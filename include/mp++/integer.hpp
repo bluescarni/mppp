@@ -236,8 +236,7 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 // Small helper to determine how many GMP limbs we need to fit nbits bits.
 constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
 {
-    return static_cast<::mp_bitcnt_t>(nbits / unsigned(GMP_NUMB_BITS)
-                                      + ((nbits % unsigned(GMP_NUMB_BITS)) != 0u));
+    return static_cast<::mp_bitcnt_t>(nbits / unsigned(GMP_NUMB_BITS) + ((nbits % unsigned(GMP_NUMB_BITS)) != 0u));
 }
 
 // Helper function to init an mpz to zero with enough space for nbits bits. The
