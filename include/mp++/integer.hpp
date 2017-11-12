@@ -435,6 +435,7 @@ inline std::size_t uint_to_limb_array(limb_array_t<T> &rop, T n)
         rop[size] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
     }
     // LCOV_EXCL_STOP
+    assert(size <= rop.size());
     return size;
 }
 

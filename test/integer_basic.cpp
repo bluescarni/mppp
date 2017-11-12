@@ -196,11 +196,11 @@ struct int_ass_tester {
         REQUIRE((std::is_assignable<integer &, bool>::value));
         integer n0;
         n0 = false;
-        REQUIRE(!n0);
+        REQUIRE(n0.is_zero());
         REQUIRE(n0.is_static());
         n0.promote();
         n0 = true;
-        REQUIRE(!!n0);
+        REQUIRE(n0 == 1);
         REQUIRE(n0.is_static());
         REQUIRE((!std::is_assignable<integer &, wchar_t>::value));
         REQUIRE((!std::is_assignable<integer &, no_const>::value));
