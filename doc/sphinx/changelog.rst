@@ -9,6 +9,11 @@ New
 
 - Implement construction from an array of limbs for :cpp:class:`~mppp::integer` (`#73 <https://github.com/bluescarni/mppp/pull/73>`__).
 
+Changes
+~~~~~~~
+
+- Update the internal copy of Catch to the latest version, 2.0.1 (`#76 <https://github.com/bluescarni/mppp/pull/76>`__).
+
 Fix
 ~~~
 
