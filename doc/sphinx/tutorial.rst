@@ -68,7 +68,7 @@ All of mp++'s multiprecision classes default-construct to zero:
    real r;
    assert(r == 0);
 
-All of mp++'s multiprecision classes can be initialised from (most of) C++'s fundamental types (see the
+All of mp++'s multiprecision classes can be initialised from (most of) C++'s numerical types (see the
 :cpp:concept:`~mppp::CppInteroperable` concept for a full list):
 
 .. code-block:: c++
@@ -77,3 +77,64 @@ All of mp++'s multiprecision classes can be initialised from (most of) C++'s fun
    assert(rat_t{33u} == 33)
    assert(real128{1.5f} == 1.5f);
    assert(real{3.5} == 3.5);
+
+An important feature of mp++'s multiprecision classes is that all constructors (apart from the default, copy
+and move constructors) are ``explicit``. As a design choice, mp++'s API purposely eschews implicit conversions,
+and, consequently, code like this will not work:
+
+.. code-block:: c++
+
+   int_t n = 42;
+
+Direct initialisastion must be used instead:
+
+.. code-block:: c++
+
+   int_t n{42};
+
+A typical pitfall when using multiprecision classes in C++ is the interaction with floating-point types.
+The following code, for instance,
+
+.. code-block:: c++
+
+   rat_t q{1.1};
+
+could be naively expected to initialise ``q`` to the rational value :math:`\frac{11}{10}`. In reality, on
+modern architectures, ``q`` will be initialised to :math:`\frac{2476979795053773}{2251799813685248}`. This happens
+because the literal ``1.1`` is first converted to a double-precision value by the compiler before being used
+to construct ``q``. Since :math:`1.1` cannot be represented in finite terms in binary, the double-precision value
+that will be passed to construct ``q`` will be the closest double-precision approximation to :math:`\frac{11}{10}` representable
+in binary. In order to initialise ``q`` exactly to :math:`\frac{11}{10}`, :cpp:class:`~mppp::rational`'s constructor
+from numerator and denominator can be used:
+
+.. code-block:: c++
+
+   rat_t q{11, 10};
+
+A similar problem arises when using multiprecision floating-point classes. The following code, for instance,
+
+.. code-block:: c++
+
+   real128 r{1.1};
+
+initialises ``r`` to circa :math:`1.10000000000000008881784197001252323`, which is *not* the closest quadruple-precision approximation
+of :math:`1.1`. Again, this happens because :math:`1.1` is first converted to its double-precision approximation by the compiler,
+and only afterwards it is passed to the :cpp:class:`~mppp::real128` constructor. In this case, there are two ways to rectify
+the situation and initialise ``r`` to the quadruple-precision approximation of :math:`1.1`. The first approach is to use
+a quadruple-precision literal to initialise ``r``:
+
+.. code-block:: c++
+
+   real128 r{1.1q};
+
+This approach might require specific flags to be passed to the compiler. The second approach is to use the :cpp:class:`~mppp::real128`
+constructor from string:
+
+.. code-block:: c++
+
+   real128 r{"1.1"};
+
+This second option is slower than the quadruple-precision literal, but it does not require special flags to be passed to the compiler.
+
+All of mp++'s multiprecision classes can be initialised from string-like entities (see the
+:cpp:concept:`~mppp::StringType` concept for a full list).
