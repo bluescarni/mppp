@@ -361,6 +361,36 @@ If <code class="docutils literal"><span class="pre">size</span></code> is zero, 
 </dd></dl>
 
 <dl class="function">
+<dt id="_CPPv2N4mppp7integer7integerE18integer_nbits_init11mp_bitcnt_t">
+<span id="mppp::integer::integer__integer_nbits_init.mp_bitcnt_t"></span><span class="target" id="classmppp_1_1integer_1ac0bc25ad3fad8d4f3c06146b26f27258"></span><code class="descname">integer</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp18integer_nbits_initE" title="mppp::integer_nbits_init">integer_nbits_init</a>, <a class="reference internal" href="#_CPPv211mp_bitcnt_t" title="mp_bitcnt_t">mp_bitcnt_t</a> <em>nbits</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerE18integer_nbits_init11mp_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor from number of bits. </p>
+<p><p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> to zero, allocating enough memory
+to represent a value with a magnitude of <code class="docutils literal"><span class="pre">nbits</span></code> binary digits. The storage type will be static if <code class="docutils literal"><span class="pre">nbits</span></code>
+is small enough, dynamic otherwise.</p>
+<p>The first parameter of this constructor, of type <a class="reference internal" href="#_CPPv2N4mppp18integer_nbits_initE" title="mppp::integer_nbits_init"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer_nbits_init</span></code></a>,
+is unused, and necessary only to disambiguate this constructor from the generic constructor.</p>
+<p>For instance, the code</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">integer</span> <span class="n">n</span><span class="p">{</span><span class="n">integer_nbits_init</span><span class="p">{},</span> <span class="mi">64</span><span class="p">};</span>
+</pre></div>
+</div>
+<p>will initialise an integer <code class="docutils literal"><span class="pre">n</span></code> with value zero and enough storage for a 64-bit value.</p>
+</p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nbits</span></code>: the number of bits of storage that will be allocated.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal"><span class="pre">nbits</span></code> is larger than an implementation-defined limit. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv2N4mppp7integer7integerERK16CppInteroperable">
 <span id="mppp::integer::integer__CppInteroperableCR"></span><span class="target" id="classmppp_1_1integer_1a0e8c64e110196baf7b8e1dbff3050ea2"></span><code class="descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable">CppInteroperable</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerERK16CppInteroperable" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic constructor. </p>
@@ -519,12 +549,10 @@ will take care of releasing them when the destructor is called.</p>
 <dt id="_CPPv2N4mppp7integeraSERK16CppInteroperable">
 <span id="mppp::integer::assign-operator__CppInteroperableCR"></span><span class="target" id="classmppp_1_1integer_1a928ec89773297d8575ef446be0d71281"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable">CppInteroperable</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integeraSERK16CppInteroperable" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic assignment operator. </p>
-<p><p>The body of this operator is equivalent to:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="o">*</span><span class="k">this</span> <span class="o">=</span> <span class="n">integer</span><span class="p">{</span><span class="n">x</span><span class="p">};</span>
-</pre></div>
-</div>
-<p>That is, a temporary integer is constructed from <code class="docutils literal"><span class="pre">x</span></code> and it is then move-assigned to <code class="docutils literal"><span class="pre">this</span></code>.</p>
-</p>
+<p>This operator will assign <code class="docutils literal"><span class="pre">x</span></code> to <code class="docutils literal"><span class="pre">this</span></code>. The storage type of <code class="docutils literal"><span class="pre">this</span></code> after the assignment
+will depend only on the value of <code class="docutils literal"><span class="pre">x</span></code> (that is, the storage type will be static if the value of <code class="docutils literal"><span class="pre">x</span></code>
+is small enough, dynamic otherwise). Assignment from floating-point types will assign the truncated
+counterpart of <code class="docutils literal"><span class="pre">x</span></code>.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
@@ -535,7 +563,7 @@ will take care of releasing them when the destructor is called.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the generic constructor. </li>
+<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">x</span></code> is a non-finite floating-point value. </li>
 </ul>
 </dd>
 </dl>
@@ -1073,6 +1101,15 @@ number.</p>
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference external" href="https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types">https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types</a></p>
 </div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv2N4mppp18integer_nbits_initE">
+<span id="mppp::integer_nbits_init"></span><span class="target" id="structmppp_1_1integer__nbits__init"></span><em class="property">struct </em><code class="descclassname">mppp::</code><code class="descname">integer_nbits_init</code><a class="headerlink" href="#_CPPv2N4mppp18integer_nbits_initE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Special <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> initialisation tag from number of bits. </p>
+<p><p>This structure is used exclusively to disambiguate the constructor of <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+from number of bits. It has no members and it serves no other purpose.</p>
+ </p>
 </dd></dl>
 
 </div>
