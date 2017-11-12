@@ -14,6 +14,8 @@ New
 Changes
 ~~~~~~~
 
+- Improve the performance of generic assignment for :cpp:class:`~mppp::integer` (`#74 <https://github.com/bluescarni/mppp/pull/74>`__).
+
 - Improve construction from C++ integrals for :cpp:class:`~mppp::integer` (`#74 <https://github.com/bluescarni/mppp/pull/74>`__).
 
 Fix

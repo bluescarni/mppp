@@ -376,6 +376,68 @@ inline unsigned builtin_clz(T n)
 
 #endif
 
+// This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
+// If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
+// little helper in order to avoid compiler warnings.
+template <typename T, enable_if_t<(GMP_NUMB_BITS < std::numeric_limits<T>::digits), int> = 0>
+inline void u_checked_rshift(T &n)
+{
+    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+    n >>= GMP_NUMB_BITS;
+}
+
+template <typename T, enable_if_t<(GMP_NUMB_BITS >= std::numeric_limits<T>::digits), int> = 0>
+inline void u_checked_rshift(T &)
+{
+    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+    assert(false);
+}
+
+// Machinery for the conversion of a large uint to a limb array.
+
+// Definition of the limb array type.
+template <typename T>
+struct limb_array_t_ {
+    // We want only unsigned ints.
+    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Type error.");
+    // Overflow check.
+    static_assert(unsigned(std::numeric_limits<T>::digits) <= std::numeric_limits<::mp_bitcnt_t>::max(),
+                  "Overflow error.");
+    // The max number of GMP limbs needed to represent an instance of T.
+    constexpr static std::size_t size = nbits_to_nlimbs(static_cast<::mp_bitcnt_t>(std::numeric_limits<T>::digits));
+    // Overflow check.
+    static_assert(size <= std::numeric_limits<std::size_t>::max(), "Overflow error.");
+    // The type definition.
+    using type = std::array<::mp_limb_t, static_cast<std::size_t>(size)>;
+};
+
+// Handy alias.
+template <typename T>
+using limb_array_t = typename limb_array_t_<T>::type;
+
+// Convert a large unsigned integer into a limb array, and return the effective size.
+// n must be > GMP_NUMB_MAX.
+template <typename T>
+inline std::size_t uint_to_limb_array(limb_array_t<T> &rop, T n)
+{
+    assert(n > GMP_NUMB_MAX);
+    // We can assign the first two limbs directly, as we know n > GMP_NUMB_MAX.
+    rop[0] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
+    u_checked_rshift(n);
+    assert(n);
+    rop[1] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
+    u_checked_rshift(n);
+    std::size_t size = 2;
+    // NOTE: currently this code is hit only on 32-bit archs with 64-bit integers,
+    // and we have no nail builds: we cannot go past 2 limbs size.
+    // LCOV_EXCL_START
+    for (; n; ++size, u_checked_rshift(n)) {
+        rop[size] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
+    }
+    // LCOV_EXCL_STOP
+    return size;
+}
+
 // The static integer class.
 template <std::size_t SSize>
 struct static_int {
@@ -415,6 +477,8 @@ struct static_int {
     {
         // Input sanity checks.
         assert(size <= s_size && size >= -s_size);
+        // l and size must both be zero or both nonzero.
+        assert((l && size) || (!l && !size));
         m_limbs[0] = l;
         // Zero fill the remaining limbs.
         std::fill(m_limbs.begin() + 1, m_limbs.end(), ::mp_limb_t(0));
@@ -540,19 +604,6 @@ union integer_union {
             ::new (static_cast<void *>(&other.m_st)) s_storage();
         }
     }
-    // This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
-    // If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
-    // little helper in order to avoid compiler warnings.
-    template <typename T, enable_if_t<(GMP_NUMB_BITS < std::numeric_limits<T>::digits), int> = 0>
-    static void checked_rshift(T &n)
-    {
-        n >>= GMP_NUMB_BITS;
-    }
-    template <typename T, enable_if_t<(GMP_NUMB_BITS >= std::numeric_limits<T>::digits), int> = 0>
-    static void checked_rshift(T &)
-    {
-        assert(false);
-    }
     // Special casing for bool.
     void dispatch_generic_ctor(bool b)
     {
@@ -571,26 +622,9 @@ union integer_union {
             ::new (static_cast<void *>(&m_st)) s_storage{Neg ? -(n != 0u) : (n != 0u), static_cast<::mp_limb_t>(n)};
             return;
         }
-        // The max number of GMP limbs needed to represent an instance of T.
-        static_assert(unsigned(std::numeric_limits<T>::digits) <= std::numeric_limits<::mp_bitcnt_t>::max(),
-                      "Overflow error.");
-        constexpr auto tmp_size = nbits_to_nlimbs(static_cast<::mp_bitcnt_t>(std::numeric_limits<T>::digits));
-        static_assert(tmp_size <= std::numeric_limits<std::size_t>::max(), "Overflow error.");
-        std::array<::mp_limb_t, static_cast<std::size_t>(tmp_size)> tmp;
-        // We can assign the first two limbs directly, as we know n > GMP_NUMB_MAX.
-        tmp[0] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
-        checked_rshift(n);
-        assert(n);
-        tmp[1] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
-        checked_rshift(n);
-        std::size_t size = 2;
-        // NOTE: currently this code is hit only on 32-bit archs with 64-bit integers,
-        // we cannot go past 2 limbs size.
-        // LCOV_EXCL_START
-        for (; n; ++size, checked_rshift(n)) {
-            tmp[size] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
-        }
-        // LCOV_EXCL_STOP
+        // Convert n into an array of limbs.
+        limb_array_t<T> tmp;
+        const auto size = uint_to_limb_array(tmp, n);
         construct_from_limb_array<false>(tmp.data(), size);
         // Negate if requested.
         if (Neg) {
@@ -623,8 +657,7 @@ union integer_union {
     }
 #if defined(MPPP_WITH_MPFR)
     // Construction from long double, requires MPFR.
-    template <typename T, enable_if_t<std::is_same<T, long double>::value, int> = 0>
-    void dispatch_generic_ctor(T x)
+    void dispatch_generic_ctor(long double x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
@@ -957,8 +990,6 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 // - gcd() can be improved (see notes).
 // - functions still to be de-branched: all the mpn implementations, if worth it.
 //   Probably better to wait for benchmarks before moving.
-// - performance improvements for the assignment operators to integrals, at least (maybe floats as well?): avoid
-//   cting temporary.
 // - performance improvements for arithmetic with C++ integrals? (e.g., use add_ui() and similar rather than cting
 //   temporary).
 
@@ -1406,23 +1437,155 @@ public:
      * @return a reference to \p this.
      */
     integer &operator=(integer &&other) = default;
+
+private:
+    // Implementation of the assignment from unsigned C++ integral.
+    template <typename T, bool Neg = false,
+              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    void dispatch_assignment(T n)
+    {
+        const auto s = is_static();
+        if (n <= GMP_NUMB_MAX) {
+            // Optimise the case in which n fits in a single limb.
+            const auto size = static_cast<mpz_size_t>(n != 0);
+            if (s) {
+                // Just write the limb into static storage.
+                m_int.g_st()._mp_size = Neg ? -size : size;
+                m_int.g_st().m_limbs[0] = static_cast<::mp_limb_t>(n);
+                // Zero fill the remaining limbs.
+                std::fill(m_int.g_st().m_limbs.begin() + 1, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+            } else {
+                // Destroy the dynamic structure, re-init an appropriate static.
+                m_int.destroy_dynamic();
+                // The constructor will take care of zeroing the upper limbs.
+                ::new (static_cast<void *>(&m_int.m_st)) s_storage(Neg ? -size : size, static_cast<::mp_limb_t>(n));
+            }
+            return;
+        }
+        // Convert n into an array of limbs.
+        limb_array_t<T> tmp;
+        const auto size = uint_to_limb_array(tmp, n);
+        if (s && size <= SSize) {
+            // this is static, and n also fits in static. Overwrite the existing value.
+            // NOTE: we know size is small, casting is fine.
+            m_int.g_st()._mp_size = static_cast<mpz_size_t>(size);
+            copy_limbs_no(tmp.data(), tmp.data() + size, m_int.g_st().m_limbs.data());
+            // Zero fill the remaining limbs.
+            std::fill(m_int.g_st().m_limbs.begin() + size, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+        } else if (!s && size > SSize) {
+            // this is dynamic and n requires dynamic storage.
+            // Convert the size to mpz_size_t, do it before anything else for exception safety.
+            const auto new_mpz_size = safe_cast<mpz_size_t>(size);
+            if (m_int.g_dy()._mp_alloc < new_mpz_size) {
+                // There's not enough space for the new integer. We'll clear the existing
+                // mpz_t (but not destory it), and re-init with the necessary number of limbs.
+                mpz_clear_wrap(m_int.g_dy());
+                mpz_init_nlimbs(m_int.g_dy(), size);
+            }
+            // Assign the new size.
+            m_int.g_dy()._mp_size = new_mpz_size;
+            // Copy over.
+            copy_limbs_no(tmp.data(), tmp.data() + size, m_int.g_dy()._mp_d);
+        } else if (s && size > SSize) {
+            // this is static and n requires dynamic storage.
+            const auto new_mpz_size = safe_cast<mpz_size_t>(size);
+            // Destroy static.
+            m_int.g_st().~s_storage();
+            // Init the dynamic struct.
+            ::new (static_cast<void *>(&m_int.m_dy)) d_storage;
+            // Init to zero, with the necessary amount of allocated limbs.
+            // NOTE: need to use m_dy instead of g_dy() here as usual: the alloc
+            // tag has not been set yet.
+            mpz_init_nlimbs(m_int.m_dy, size);
+            // Assign the new size.
+            m_int.g_dy()._mp_size = new_mpz_size;
+            // Copy over.
+            copy_limbs_no(tmp.data(), tmp.data() + size, m_int.g_dy()._mp_d);
+        } else {
+            // This is dynamic and n fits into static.
+            assert(!s && size <= SSize);
+            // Destroy the dynamic storage.
+            m_int.destroy_dynamic();
+            // Init a static with the content from tmp. The constructor
+            // will zero the upper limbs.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage{static_cast<mpz_size_t>(size), tmp.data(), size};
+        }
+        // Negate if requested.
+        if (Neg) {
+            neg();
+        }
+    }
+    // Assignment from signed integral: take its abs() and negate if necessary, as usual.
+    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    void dispatch_assignment(T n)
+    {
+        if (n >= T(0)) {
+            // Positive value, just cast to unsigned.
+            dispatch_assignment(static_cast<make_unsigned_t<T>>(n));
+        } else {
+            // Negative value, use its abs.
+            dispatch_assignment<make_unsigned_t<T>, true>(nint_abs(n));
+        }
+    }
+    // Special casing for bool.
+    void dispatch_assignment(bool n)
+    {
+        if (is_static()) {
+            m_int.g_st()._mp_size = static_cast<mpz_size_t>(n);
+            m_int.g_st().m_limbs[0] = static_cast<::mp_limb_t>(n);
+            // Zero out the upper limbs.
+            std::fill(m_int.g_st().m_limbs.begin() + 1, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+        } else {
+            m_int.destroy_dynamic();
+            // Construct from size and single limb. This will zero the upper limbs.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage{static_cast<mpz_size_t>(n), static_cast<::mp_limb_t>(n)};
+        }
+    }
+    // Assignment from float/double. Uses the mpz_set_d() function.
+    template <typename T, enable_if_t<disjunction<std::is_same<T, float>, std::is_same<T, double>>::value, int> = 0>
+    void dispatch_assignment(T x)
+    {
+        if (mppp_unlikely(!std::isfinite(x))) {
+            throw std::domain_error("Cannot assign the non-finite floating-point value " + std::to_string(x)
+                                    + " to an integer");
+        }
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
+        *this = &tmp.m_mpz;
+    }
+#if defined(MPPP_WITH_MPFR)
+    // Assignment from long double, requires MPFR.
+    void dispatch_assignment(long double x)
+    {
+        if (mppp_unlikely(!std::isfinite(x))) {
+            throw std::domain_error("Cannot assign the non-finite floating-point value " + std::to_string(x)
+                                    + " to an integer");
+        }
+        // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
+        constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
+        MPPP_MAYBE_TLS mpfr_raii mpfr(static_cast<::mpfr_prec_t>(d2));
+        MPPP_MAYBE_TLS mpz_raii tmp;
+        ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
+        ::mpfr_get_z(&tmp.m_mpz, &mpfr.m_mpfr, MPFR_RNDZ);
+        *this = &tmp.m_mpz;
+    }
+#endif
+
+public:
 /// Generic assignment operator.
 /**
  * \rststar
- * The body of this operator is equivalent to:
- *
- * .. code-block:: c++
- *
- *    return *this = integer{x};
- *
- * That is, a temporary integer is constructed from ``x`` and it is then move-assigned to ``this``.
+ * This operator will assign ``x`` to ``this``. The storage type of ``this`` after the assignment
+ * will depend only on the value of ``x`` (that is, the storage type will be static if the value of ``x``
+ * is small enough, dynamic otherwise). Assignment from floating-point types will assign the truncated
+ * counterpart of ``x``.
  * \endrststar
  *
  * @param x the assignment argument.
  *
  * @return a reference to \p this.
  *
- * @throws unspecified any exception thrown by the generic constructor.
+ * @throws std::domain_error if ``x`` is a non-finite floating-point value.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
     integer &operator=(const CppInteroperable &x)
@@ -1431,27 +1594,28 @@ public:
     integer &operator=(const T &x)
 #endif
     {
-        return *this = integer{x};
+        dispatch_assignment(x);
+        return *this;
     }
-        /// Assignment from string.
-        /**
-         * \rststar
-         * The body of this operator is equivalent to:
-         *
-         * .. code-block:: c++
-         *
-         *    return *this = integer{s};
-         *
-         * That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
-         * ``s`` and it is then move-assigned to ``this``.
-         * \endrststar
-         *
-         * @param s the string that will be used for the assignment.
-         *
-         * @return a reference to \p this.
-         *
-         * @throws unspecified any exception thrown by the constructor from string.
-         */
+/// Assignment from string.
+/**
+ * \rststar
+ * The body of this operator is equivalent to:
+ *
+ * .. code-block:: c++
+ *
+ *    return *this = integer{s};
+ *
+ * That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
+ * ``s`` and it is then move-assigned to ``this``.
+ * \endrststar
+ *
+ * @param s the string that will be used for the assignment.
+ *
+ * @return a reference to \p this.
+ *
+ * @throws unspecified any exception thrown by the constructor from string.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
     integer &operator=(const StringType &s)
 #else
