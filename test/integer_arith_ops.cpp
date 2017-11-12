@@ -115,8 +115,8 @@ struct add_tester {
             REQUIRE_THROWS_PREDICATE(
                 retval += std::numeric_limits<double>::infinity(), std::domain_error, [](const std::domain_error &ex) {
                     return std::string(ex.what())
-                           == "Cannot construct an integer from the non-finite floating-point value "
-                                  + std::to_string(std::numeric_limits<double>::infinity());
+                           == "Cannot assign the non-finite floating-point value "
+                                  + std::to_string(std::numeric_limits<double>::infinity()) + " to an integer";
                 });
         }
         // In-place with interop on the lhs.
@@ -274,8 +274,8 @@ struct sub_tester {
             REQUIRE_THROWS_PREDICATE(
                 retval -= std::numeric_limits<double>::infinity(), std::domain_error, [](const std::domain_error &ex) {
                     return std::string(ex.what())
-                           == "Cannot construct an integer from the non-finite floating-point value "
-                                  + std::to_string(-std::numeric_limits<double>::infinity());
+                           == "Cannot assign the non-finite floating-point value "
+                                  + std::to_string(-std::numeric_limits<double>::infinity()) + " to an integer";
                 });
         }
         // In-place with interop on the lhs.
@@ -434,8 +434,8 @@ struct mul_tester {
             REQUIRE_THROWS_PREDICATE(
                 retval *= std::numeric_limits<double>::infinity(), std::domain_error, [](const std::domain_error &ex) {
                     return std::string(ex.what())
-                           == "Cannot construct an integer from the non-finite floating-point value "
-                                  + std::to_string(std::numeric_limits<double>::infinity());
+                           == "Cannot assign the non-finite floating-point value "
+                                  + std::to_string(std::numeric_limits<double>::infinity()) + " to an integer";
                 });
         }
         // In-place with interop on the lhs.
@@ -593,9 +593,10 @@ struct div_tester {
             REQUIRE((integer{-4} / 0. == -std::numeric_limits<double>::infinity()));
             REQUIRE_THROWS_PREDICATE(retval /= 0., std::domain_error, [&retval](const std::domain_error &ex) {
                 return std::string(ex.what())
-                       == "Cannot construct an integer from the non-finite floating-point value "
+                       == "Cannot assign the non-finite floating-point value "
                               + (retval.sgn() > 0 ? std::to_string(std::numeric_limits<double>::infinity())
-                                                  : std::to_string(-std::numeric_limits<double>::infinity()));
+                                                  : std::to_string(-std::numeric_limits<double>::infinity()))
+                              + " to an integer";
             });
         }
         // Type traits.
