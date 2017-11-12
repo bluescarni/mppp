@@ -23,7 +23,7 @@ mp++ is a spinoff of the `Piranha <https://github.com/bluescarni/piranha>`__ lib
 
 If you are using mp++ as part of your research, teaching, or other activities, we would be grateful if you could star
 the repository and/or cite our work. The DOI of the latest version and other citation resources are available
-at `this link <https://zenodo.org/badge/latestdoi/66504757>`__.
+at `this link <https://doi.org/10.5281/zenodo.1043579>`__.
 
 .. note::
 
