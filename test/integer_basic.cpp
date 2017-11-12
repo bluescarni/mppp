@@ -136,6 +136,82 @@ TEST_CASE("integral constructors")
     tuple_for_each(sizes{}, int_ctor_tester{});
 }
 
+struct int_ass_tester {
+    template <typename S>
+    struct runner {
+        template <typename Int>
+        void operator()(const Int &) const
+        {
+            using integer = integer<S::value>;
+            REQUIRE((std::is_assignable<integer &, Int>::value));
+            integer n0;
+            n0 = Int(0);
+            REQUIRE(n0 == 0);
+            REQUIRE(n0.is_static());
+            auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
+            n0 = min;
+            REQUIRE(n0 == min);
+            n0 = max;
+            REQUIRE(n0 == max);
+            std::atomic<bool> fail(false);
+            auto f = [&fail
+// NOTE: MSVC requires capturing of these constexpr variables.
+#if defined(_MSC_VER) && !defined(__clang__)
+                      ,
+                      min, max
+#endif
+            ](unsigned n) {
+                auto dist = get_int_dist(min, max);
+                std::uniform_int_distribution<int> sdist(0, 1);
+                std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
+                for (auto i = 0; i < ntries; ++i) {
+                    integer n1;
+                    if (sdist(rng)) {
+                        n1.promote();
+                    }
+                    auto tmp = static_cast<Int>(dist(eng));
+                    n1 = tmp;
+                    if (n1 != tmp) {
+                        fail.store(false);
+                    }
+                }
+            };
+            std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+            t0.join();
+            t1.join();
+            t2.join();
+            t3.join();
+            REQUIRE(!fail.load());
+            // Update the rng seed so that it does not generate the same sequence
+            // for the next integral type.
+            mt_rng_seed += 4u;
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(int_types{}, runner<S>{});
+        // Some testing for bool.
+        using integer = integer<S::value>;
+        REQUIRE((std::is_assignable<integer &, bool>::value));
+        integer n0;
+        n0 = false;
+        REQUIRE(n0.is_zero());
+        REQUIRE(n0.is_static());
+        n0.promote();
+        n0 = true;
+        REQUIRE(n0 == 1);
+        REQUIRE(n0.is_static());
+        REQUIRE((!std::is_assignable<integer &, wchar_t>::value));
+        REQUIRE((!std::is_assignable<integer &, no_const>::value));
+    }
+};
+
+TEST_CASE("integral assignment")
+{
+    tuple_for_each(sizes{}, int_ass_tester{});
+}
+
 using fp_types = std::tuple<float, double
 #if defined(MPPP_WITH_MPFR)
                             ,
@@ -210,6 +286,87 @@ struct fp_ctor_tester {
 TEST_CASE("floating-point constructors")
 {
     tuple_for_each(sizes{}, fp_ctor_tester{});
+}
+
+struct fp_ass_tester {
+    template <typename S>
+    struct runner {
+        template <typename Float>
+        void operator()(const Float &) const
+        {
+            using integer = integer<S::value>;
+            REQUIRE((std::is_assignable<integer &, Float>::value));
+            integer n0;
+            if (std::numeric_limits<Float>::is_iec559) {
+                REQUIRE_THROWS_PREDICATE(
+                    n0 = std::numeric_limits<Float>::infinity(), std::domain_error, [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot assign the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<Float>::infinity()) + " to an integer";
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    n0 = -std::numeric_limits<Float>::infinity(), std::domain_error, [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot assign the non-finite floating-point value "
+                                      + std::to_string(-std::numeric_limits<Float>::infinity()) + " to an integer";
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    n0 = std::numeric_limits<Float>::quiet_NaN(), std::domain_error, [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot assign the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<Float>::quiet_NaN()) + " to an integer";
+                    });
+            }
+            n0 = Float(0);
+            REQUIRE(n0 == 0);
+            REQUIRE(n0.is_static());
+            n0.promote();
+            n0 = Float(1.5);
+            REQUIRE(n0 == 1);
+            REQUIRE(n0.is_static());
+            n0 = Float(-1.5);
+            REQUIRE(n0 == -1);
+            n0 = Float(123.9);
+            REQUIRE(n0 == 123);
+            n0 = Float(-123.9);
+            REQUIRE(n0 == -123);
+            // Random testing.
+            std::atomic<bool> fail(false);
+            auto f = [&fail](unsigned n) {
+                std::uniform_real_distribution<Float> dist(Float(-100), Float(100));
+                std::uniform_int_distribution<int> sdist(0, 1);
+                std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
+                for (auto i = 0; i < ntries; ++i) {
+                    integer n1;
+                    if (sdist(rng)) {
+                        n1.promote();
+                    }
+                    auto tmp = dist(eng);
+                    n1 = tmp;
+                    if (std::trunc(tmp) != n1) {
+                        fail.store(false);
+                    }
+                }
+            };
+            std::thread t0(f, 0u), t1(f, 1u), t2(f, 2u), t3(f, 3u);
+            t0.join();
+            t1.join();
+            t2.join();
+            t3.join();
+            REQUIRE(!fail.load());
+            mt_rng_seed += 4u;
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(fp_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("floating-point assignment")
+{
+    tuple_for_each(sizes{}, fp_ass_tester{});
 }
 
 struct string_ctor_tester {
@@ -457,6 +614,47 @@ struct limb_array_ctor_tester {
 TEST_CASE("limb array constructor")
 {
     tuple_for_each(sizes{}, limb_array_ctor_tester{});
+}
+
+struct nbits_ctor_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        integer_nbits_init ini;
+        REQUIRE((integer{ini, 0}.is_static()));
+        REQUIRE((integer{ini, 0}.is_zero()));
+        REQUIRE((integer{ini, 1}.is_static()));
+        REQUIRE((integer{ini, 1}.is_zero()));
+        REQUIRE((integer{ini, 2}.is_static()));
+        REQUIRE((integer{ini, 2}.is_zero()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS}.is_static()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS}.is_zero()));
+        if (S::value == 1) {
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 1}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 1}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 1}.get_mpz_t()->_mp_alloc == 2));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 2}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 2}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 2}.get_mpz_t()->_mp_alloc == 2));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2}.get_mpz_t()->_mp_alloc == 2));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2 + 1}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2 + 1}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2 + 1}.get_mpz_t()->_mp_alloc == 3));
+        }
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value}.is_static()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value}.is_zero()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value + 1}.is_dynamic()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value + 1}.is_zero()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value + 1}.get_mpz_t()->_mp_alloc == S::value + 1));
+    }
+};
+
+TEST_CASE("nbits constructor")
+{
+    tuple_for_each(sizes{}, nbits_ctor_tester{});
 }
 
 struct copy_move_tester {
