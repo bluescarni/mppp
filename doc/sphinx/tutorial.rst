@@ -73,7 +73,7 @@ All of mp++'s multiprecision classes can be initialised from (most of) C++'s num
 
 .. code-block:: c++
 
-   assert(int_n{-42} == -42)
+   assert(int_t{-42} == -42)
    assert(rat_t{33u} == 33)
    assert(real128{1.5f} == 1.5f);
    assert(real{3.5} == 3.5);
@@ -137,4 +137,22 @@ constructor from string:
 This second option is slower than the quadruple-precision literal, but it does not require special flags to be passed to the compiler.
 
 All of mp++'s multiprecision classes can be initialised from string-like entities (see the
-:cpp:concept:`~mppp::StringType` concept for a full list).
+:cpp:concept:`~mppp::StringType` concept for a full list). By default, string input is interpreted as the base-10 representation
+of the desired value, and parsing follows (hopefully) intuitive rules:
+
+.. code-block:: c++
+
+   assert(int_t{"-42"} == -42)
+   assert(rat_t{"3/2"} == 1.5)
+   assert(real128{"2.5"} == 2.5);
+   assert(real{"-3.125E-2", 100} == -0.03125);
+
+Note that for :cpp:class:`~mppp::real` we need to provide the precision as an additional parameter when constructing from string (in
+this specific example, 100 bits of precision are used). Depending on the multiprecision class, additional string constructors are available
+which allow to specify a different base for the representation of the value:
+
+.. code-block:: c++
+
+   assert(int_t{"-101010", 2} == -42)          // Base 2.
+   assert(rat_t{"2a/1c", 16} == 1.5)           // Base 16.
+   assert(real{"7B.1", 32, 100} == 235.03125); // Base 32, 100 digits of precision.
