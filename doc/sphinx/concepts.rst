@@ -13,7 +13,7 @@ Common concepts
 
    Since the syntax of native C++ concepts is clearer than that of the concept emulation layer, the mp++ documentation describes
    and refers to concepts in their native C++ form. As long as concepts are not part of the C++ standard, mp++'s concepts
-   will be subject to breaking changes, and they should not be considered as part of the public mp++ API.
+   will be subject to breaking changes, and they should not be regarded as part of the public mp++ API.
 
 .. cpp:concept:: template <typename T> mppp::CppInteroperable
 
@@ -28,7 +28,7 @@ Common concepts
    * ``long long`` and ``unsigned long long``,
    * ``float`` and ``double``.
 
-   ``long double`` is also supported, but only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled
+   ``long double`` is also included, but only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled
    (see the :ref:`installation instructions <installation>`).
 
 .. cpp:concept:: template <typename T> mppp::StringType
