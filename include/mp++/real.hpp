@@ -2530,7 +2530,7 @@ inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
     if (mppp_unlikely(::mpfr_erangeflag_p())) {
         ::mpfr_clear_erangeflag();
         throw std::overflow_error("Cannot extract the exponent of the real value " + r.to_string()
-                                  + ": the value is too large");
+                                  + ": the exponent's magnitude is too large");
     }
     // LCOV_EXCL_STOP
     n = &m.m_mpz;
