@@ -123,12 +123,12 @@ mpq_struct_t get_mpq_view(const rational<SSize> &);
  *    rational<1> q = 5;
  *    int m = q;
  *
- * will not work, and direct initialization and explicit casting should be used instead:
+ * will not work, and direct initialization should be used instead:
  *
  * .. code-block:: c++
  *
  *    rational<1> q{5};
- *    int m = static_cast<int>(q);
+ *    int m{q};
  *
  * Most of the functionality is exposed via plain :ref:`functions <rational_functions>`, with the
  * general convention that the functions are named after the corresponding GMP functions minus the leading ``mpq_``

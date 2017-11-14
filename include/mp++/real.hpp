@@ -496,12 +496,12 @@ enum class real_kind { nan = MPFR_NAN_KIND, inf = MPFR_INF_KIND, zero = MPFR_ZER
  *    real r = 5;
  *    int m = r;
  *
- * will not work, and direct initialization and explicit casting should be used instead:
+ * will not work, and direct initialization should be used instead:
  *
  * .. code-block:: c++
  *
  *    real r{5};
- *    int m = static_cast<int>(r);
+ *    int m{r};
  *
  * Most of the functionality is exposed via plain :ref:`functions <real_functions>`, with the
  * general convention that the functions are named after the corresponding MPFR functions minus the leading ``mpfr_``
