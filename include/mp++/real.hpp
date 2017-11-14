@@ -2394,6 +2394,24 @@ inline real &set(real &r, const Args &... args)
     return r.set(args...);
 }
 
+/// Set \link mppp::real real\endlink to \f$n\times 2^e\f$.
+/**
+ * This function will set ``r`` to \f$n\times 2^e\f$. The precision of ``r``
+ * will not be altered. If ``n`` is zero, the result will be positive zero.
+ *
+ * @param r the \link mppp::real real\endlink argument.
+ * @param n the \link mppp::integer integer\endlink multiplier.
+ * @param e the exponent.
+ *
+ * @return a reference to ``r``.
+ */
+template <std::size_t SSize>
+inline real &set_z_2exp(real &r, const integer<SSize> &n, ::mpfr_exp_t e)
+{
+    ::mpfr_set_z_2exp(r._get_mpfr_t(), n.get_mpz_view(), e, MPFR_RNDN);
+    return r;
+}
+
 /// Set \link mppp::real real\endlink to NaN.
 /**
  * This function will set \p r to NaN with an unspecified sign bit. The precision of \p r
@@ -2480,6 +2498,43 @@ inline bool get(T &rop, const real &x)
 #endif
 {
     return x.get(rop);
+}
+
+/// Extract the significand and the exponent of a \link mppp::real real\endlink.
+/**
+ * This function will extract the scaled significand of ``r`` into ``n``, and return the
+ * exponent ``e`` such that ``r`` equals \f$n\times 2^e\f$.
+ *
+ * If ``r`` is not finite, an error will be raised.
+ *
+ * @param n the \link mppp::integer integer\endlink that will contain the scaled
+ * significand of ``r``.
+ * @param r the input \link mppp::real real\endlink.
+ *
+ * @return the exponent ``e`` such that ``r`` equals \f$n\times 2^e\f$.
+ *
+ * @throws std::domain_error if ``r`` is not finite.
+ * @throws std::overflow_error if the output exponent is larger than an implementation-defined
+ * value.
+ */
+template <std::size_t SSize>
+inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
+{
+    if (mppp_unlikely(!r.number_p())) {
+        throw std::domain_error("Cannot extract the significand and the exponent of a non-finite real");
+    }
+    MPPP_MAYBE_TLS mpz_raii m;
+    ::mpfr_clear_erangeflag();
+    auto retval = ::mpfr_get_z_2exp(&m.m_mpz, r.get_mpfr_t());
+    // LCOV_EXCL_START
+    if (mppp_unlikely(::mpfr_erangeflag_p())) {
+        ::mpfr_clear_erangeflag();
+        throw std::overflow_error("Cannot extract the exponent of the real value " + r.to_string()
+                                  + ": the exponent's magnitude is too large");
+    }
+    // LCOV_EXCL_STOP
+    n = &m.m_mpz;
+    return retval;
 }
 
 /** @} */
