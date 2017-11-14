@@ -88,7 +88,7 @@ Let's see a few examples:
 In the code above, we are creating a multiprecision integer ``n`` from the C++ ``int`` literal ``42``. We are then converting
 ``n`` back to ``int``, and checking that the converted value is the original one. As a general rule, mp++ will strive
 to preserve the exact input value during construction and conversion. If this is not possible, what happens next depends
-on the types and values involved. For instance, like in C++, initialising an :cpp:class:`~mppp::integer`
+on the types and values involved. For instance, initialising an :cpp:class:`~mppp::integer`
 with a floating-point value results in truncation:
 
 .. code-block:: c++
@@ -120,8 +120,8 @@ in case of overflow, and it will produce the truncated value when constructing f
    int n{int_t{1} << 1024};       // int construction from very large value, raises std::overflow_error.
    assert(int{rat_t{4, 3}} == 1); // int construction from rational truncates.
 
-On the other hand, conversion of :cpp:class:`~mppp::integer` objects to C++ floating-point types might not preserve the exact value
-without raising any error:
+On the other hand, conversion of :cpp:class:`~mppp::integer` objects to C++ floating-point types does not raise any error
+even if it does not preserve the exact value:
 
 .. code-block:: c++
 
@@ -149,4 +149,4 @@ which allow to specify a different base for the representation of the value:
 
    assert(int_t{"-101010", 2} == -42)          // Base 2.
    assert(rat_t{"2a/1c", 16} == 1.5)           // Base 16.
-   assert(real{"7B.1", 32, 100} == 235.03125); // Base 32, 100 digits of precision.
+   assert(real{"7B.1", 32, 100} == 235.03125); // Base 32, 100 bits of precision.
