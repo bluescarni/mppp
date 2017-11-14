@@ -12,8 +12,6 @@
 #include <mp++/real.hpp>
 #include <utility>
 
-#include "test_utils.hpp"
-
 using namespace mppp;
 
 TEST_CASE("real exp")
