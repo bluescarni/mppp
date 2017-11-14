@@ -1351,6 +1351,17 @@ and (by extension) <a class="reference internal" href="#_CPPv2N4mppp4realE" titl
 </dd></dl>
 
 <dl class="type">
+<dt id="_CPPv210mpfr_exp_t">
+<span id="mpfr_exp_t"></span><em class="property">type </em><code class="descclassname"></code><code class="descname">mpfr_exp_t</code><a class="headerlink" href="#_CPPv210mpfr_exp_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>An integral type defined by the MPFR library, used to represent the exponent of <code class="docutils literal"><span class="pre">mpfr_t</span></code>
+and (by extension) <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> objects.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types">http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types</a></p>
+</div>
+</dd></dl>
+
+<dl class="type">
 <dt id="_CPPv2N4mppp13mpfr_struct_tE">
 <span id="mppp::mpfr_struct_t"></span><span class="target" id="mpfr_8hpp_1ae4fc758938822fe3fe4b113407fed318"></span><em class="property">typedef </em>std::remove_extent&lt;mpfr_t&gt;::type <code class="descclassname">mppp::</code><code class="descname">mpfr_struct_t</code><a class="headerlink" href="#_CPPv2N4mppp13mpfr_struct_tE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>The MPFR structure underlying <code class="docutils literal"><span class="pre">mpfr_t</span></code>. </p>
@@ -1622,6 +1633,27 @@ the body of this function is equivalent to</p>
 </dd></dl>
 
 <dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp10set_z_2expER4realRK7integerI5SSizeE10mpfr_exp_t">
+<span id="mppp::set_z_2exp__realR.integer:SSize:CR.mpfr_exp_t"></span><span class="target" id="group__real__assignment_1ga132db37503d2ee04262494096bd6bb44"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">set_z_2exp</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv210mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10set_z_2expER4realRK7integerI5SSizeE10mpfr_exp_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Set <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> to <span class="math">\(n\times 2^e\)</span>. </p>
+<p>This function will set <code class="docutils literal"><span class="pre">r</span></code> to <span class="math">\(n\times 2^e\)</span>. The precision of <code class="docutils literal"><span class="pre">r</span></code> will not be altered. If <code class="docutils literal"><span class="pre">n</span></code> is zero, the result will be positive zero.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">r</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">r</span></code>: the <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> argument. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: the <a class="reference internal" href="integer.html#classmppp_1_1integer"><span class="std std-ref">integer</span></a> multiplier. </li>
+<li><code class="docutils literal"><span class="pre">e</span></code>: the exponent.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv2N4mppp7set_nanER4real">
 <span id="mppp::set_nan__realR"></span><span class="target" id="group__real__assignment_1ga3ad9696c160ec786488a03ef0aca7fca"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">set_nan</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7set_nanER4real" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> to NaN. </p>
@@ -1709,6 +1741,33 @@ not be altered.</p>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">rop</span></code>: the variable which will store the result of the conversion. </li>
 <li><code class="docutils literal"><span class="pre">x</span></code>: the input <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp10get_z_2expER7integerI5SSizeERK4real">
+<span id="mppp::get_z_2exp__integer:SSize:R.realCR"></span><span class="target" id="group__real__conversion_1gac2b8e27bb46b51269d97decd176f638d"></span><a class="reference internal" href="#_CPPv210mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <code class="descclassname">mppp::</code><code class="descname">get_z_2exp</code><span class="sig-paren">(</span><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10get_z_2expER7integerI5SSizeERK4real" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Extract the significand and the exponent of a <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
+<p>This function will extract the scaled significand of <code class="docutils literal"><span class="pre">r</span></code> into <code class="docutils literal"><span class="pre">n</span></code>, and return the exponent <code class="docutils literal"><span class="pre">e</span></code> such that <code class="docutils literal"><span class="pre">r</span></code> equals <span class="math">\(n\times 2^e\)</span>.</p>
+<p>If <code class="docutils literal"><span class="pre">r</span></code> is not finite, an error will be raised.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the exponent <code class="docutils literal"><span class="pre">e</span></code> such that <code class="docutils literal"><span class="pre">r</span></code> equals <span class="math">\(n\times 2^e\)</span>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the <a class="reference internal" href="integer.html#classmppp_1_1integer"><span class="std std-ref">integer</span></a> that will contain the scaled significand of <code class="docutils literal"><span class="pre">r</span></code>. </li>
+<li><code class="docutils literal"><span class="pre">r</span></code>: the input <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">r</span></code> is not finite. </li>
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if the output exponent is larger than an implementation-defined value. </li>
 </ul>
 </dd>
 </dl>

@@ -28,6 +28,15 @@ Types
 
       http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
 
+.. cpp:type:: mpfr_exp_t
+
+   An integral type defined by the MPFR library, used to represent the exponent of ``mpfr_t``
+   and (by extension) :cpp:class:`~mppp::real` objects.
+
+   .. seealso::
+
+      http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
+
 .. doxygentypedef:: mppp::mpfr_struct_t
 
 .. doxygenenum:: mppp::real_kind
