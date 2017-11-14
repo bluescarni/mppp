@@ -49,8 +49,8 @@ API is designed around `argument-dependent lookup <https://en.wikipedia.org/wiki
 which essentially means that you can call mp++'s functions without prepending ``mppp::`` or employing ``using``
 directives.
 
-Constructing values
--------------------
+Construction, conversion and assignment
+---------------------------------------
 
 All of mp++'s multiprecision classes default-construct to zero:
 
@@ -68,75 +68,69 @@ All of mp++'s multiprecision classes default-construct to zero:
    real r;
    assert(r == 0);
 
-All of mp++'s multiprecision classes can be initialised from (most of) C++'s numerical types (see the
-:cpp:concept:`~mppp::CppInteroperable` concept for a full list):
+All of mp++'s multiprecision classes support a uniform style of initialisastion and conversion based
+on curly brackets. Using the same syntax, it is possible to:
 
-.. code-block:: c++
+* initialise multiprecision objects from objects of (most of) C++'s numerical types (see the
+  :cpp:concept:`~mppp::CppInteroperable` concept for a full list),
+* initialise multiprecision objects from multiprecision objects of a different type,
+* initialise C++ numerical objects from multiprecision objects.
 
-   assert(int_t{-42} == -42)
-   assert(rat_t{33u} == 33)
-   assert(real128{1.5f} == 1.5f);
-   assert(real{3.5} == 3.5);
-
-An important feature of mp++'s multiprecision classes is that all constructors (apart from the default, copy
-and move constructors) are ``explicit``. As a design choice, mp++'s API purposely eschews implicit conversions,
-and, consequently, code like this will not work:
-
-.. code-block:: c++
-
-   int_t n = 42;
-
-Direct initialisastion must be used instead:
+Let's see a few examples:
 
 .. code-block:: c++
 
    int_t n{42};
+   assert(n == 42);
+   int m{n};
+   assert(m == 42);
 
-A typical pitfall when using multiprecision classes in C++ is the interaction with floating-point types.
-The following code, for instance,
-
-.. code-block:: c++
-
-   rat_t q{1.1};
-
-could be naively expected to initialise ``q`` to the rational value :math:`\frac{11}{10}`. In reality, on
-modern architectures, ``q`` will be initialised to :math:`\frac{2476979795053773}{2251799813685248}`. This happens
-because the literal ``1.1`` is first converted to a double-precision value by the compiler before being used
-to construct ``q``. Since :math:`1.1` cannot be represented in finite terms in binary, the double-precision value
-that will be passed to construct ``q`` will be the closest double-precision approximation to :math:`\frac{11}{10}` representable
-in binary. In order to initialise ``q`` exactly to :math:`\frac{11}{10}`, :cpp:class:`~mppp::rational`'s constructor
-from numerator and denominator can be used:
+In the code above, we are creating a multiprecision integer ``n`` from the C++ ``int`` literal ``42``. We are then converting
+``n`` back to ``int``, and checking that the converted value is the original one. As a general rule, mp++ will strive
+to preserve the exact input value during construction and conversion. If this is not possible, what happens next depends
+on the types and values involved. For instance, like in C++, initialising an :cpp:class:`~mppp::integer`
+with a floating-point value results in truncation:
 
 .. code-block:: c++
 
-   rat_t q{11, 10};
+   int_t n{1.23};
+   assert(n == 1);
 
-A similar problem arises when using multiprecision floating-point classes. The following code, for instance,
-
-.. code-block:: c++
-
-   real128 r{1.1};
-
-initialises ``r`` to circa :math:`1.10000000000000008881784197001252323`, which is *not* the closest quadruple-precision approximation
-of :math:`1.1`. Again, this happens because :math:`1.1` is first converted to its double-precision approximation by the compiler,
-and only afterwards it is passed to the :cpp:class:`~mppp::real128` constructor. In this case, there are two ways to rectify
-the situation and initialise ``r`` to the quadruple-precision approximation of :math:`1.1`. The first approach is to use
-a quadruple-precision literal to initialise ``r``:
+In a similar fashion, initialising an :cpp:class:`~mppp::integer` with a :cpp:class:`~mppp::rational` also
+results in truncation:
 
 .. code-block:: c++
 
-   real128 r{1.1q};
+   int_t n{rat_t{-7, 3}};
+   assert(n == -2);
 
-This approach might require specific flags to be passed to the compiler. The second approach is to use the :cpp:class:`~mppp::real128`
-constructor from string:
+:cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational` cannot represent non-finite values, thus construction
+from such values will raise an exception:
 
 .. code-block:: c++
 
-   real128 r{"1.1"};
+   int_t n{std::numeric_limits<double>::infinity()};  // Raises std::domain_error.
+   rat_t q{std::numeric_limits<double>::quiet_NaN()}; // Raises std::domain_error.
 
-This second option is slower than the quadruple-precision literal, but it does not require special flags to be passed to the compiler.
+Construction of C++ integrals from :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational` might fail
+in case of overflow, and it will produce the truncated value when constructing from :cpp:class:`~mppp::rational`:
 
-All of mp++'s multiprecision classes can be initialised from string-like entities (see the
+.. code-block:: c++
+
+   int n{int_t{1} << 1024};       // int construction from very large value, raises std::overflow_error.
+   assert(int{rat_t{4, 3}} == 1); // int construction from rational truncates.
+
+On the other hand, conversion of :cpp:class:`~mppp::integer` objects to C++ floating-point types might not preserve the exact value
+without raising any error:
+
+.. code-block:: c++
+
+   float f{int_t{"32327737199221993919239912"}}; // Constructs a single-precision approximation
+                                                 // of the original integer.
+
+The documentation of the multiprecision classes explains in detail the behaviour during construction and conversion.
+
+All of mp++'s multiprecision classes can also be initialised from string-like entities (see the
 :cpp:concept:`~mppp::StringType` concept for a full list). By default, string input is interpreted as the base-10 representation
 of the desired value, and parsing follows (hopefully) intuitive rules:
 
