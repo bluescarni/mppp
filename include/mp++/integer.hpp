@@ -54,6 +54,18 @@
 #include <Winnt.h>
 // clang-format on
 
+// We use the BitScanReverse(64) intrinsic in the implementation of limb_msnb(), but
+// only if we are *not* on MSVC+clang.
+// https://msdn.microsoft.com/en-us/library/fbxyd7zd.aspx
+#if !defined(__clang__)
+#if _WIN64
+#pragma intrinsic(_BitScanReverse64)
+#else
+#include <intrin.h>
+#pragma intrinsic(_BitScanReverse)
+#endif
+#endif
+
 // Disable some warnings for MSVC.
 #pragma warning(push)
 #pragma warning(disable : 4127)
@@ -341,12 +353,7 @@ inline ::mp_limb_t limb_add_overflow(::mp_limb_t a, ::mp_limb_t b, ::mp_limb_t *
 }
 
 // Implementation of the function to count the number of leading zeroes
-// in an unsigned integral value. Only GCC and clang for now.
-// NOTE: MSVC seems to have similar intrinsics, but it's not clear if they
-// are available only on certain platforms:
-// https://msdn.microsoft.com/en-us/library/bb384809.aspx
-// https://stackoverflow.com/questions/355967/how-to-use-msvc-intrinsics-to-get-the-equivalent-of-this-gcc-code/20468180
-// Let's implement it only on clang/GCC for now.
+// in an unsigned integral value for GCC/clang.
 #if defined(__clang__) || defined(__GNUC__)
 
 // Dispatch based on the integer type.
@@ -375,6 +382,34 @@ inline unsigned builtin_clz(T n)
 }
 
 #endif
+
+// Determine the size in (numeric) bits of limb l.
+// l does not need to be masked (we will mask inside this function),
+// and, after masking, it cannot be zero.
+inline unsigned limb_size_nbits(::mp_limb_t l)
+{
+    assert((l & GMP_NUMB_MASK) != 0u);
+#if defined(__clang__) || defined(__GNUC__)
+    // Implementation using GCC/clang builtins.
+    // NOTE: here we need std::numeric_limits<::mp_limb_t>::digits (instead of GMP_NUMB_BITS) because
+    // builtin_clz() counts zeroes also in the nail bits.
+    return (unsigned(std::numeric_limits<::mp_limb_t>::digits) - builtin_clz(l & GMP_NUMB_MASK));
+#elif defined(_MSC_VER)
+    // Implementation using MSVC's intrinsics.
+    unsigned long index;
+#if _WIN64
+    _BitScanReverse64
+#else
+    _BitScanReverse
+#endif
+        (&index, l & GMP_NUMB_MASK);
+    return static_cast<unsigned>(index) + 1u;
+#else
+    // Implementation via GMP.
+    // NOTE: assuming GMP knows how to deal with nails, so not masking.
+    return static_cast<unsigned>(::mpn_sizeinbase(&l, 1, 2));
+#endif
+}
 
 // This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
 // If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
@@ -2173,30 +2208,21 @@ public:
      */
     std::size_t nbits() const
     {
-#if defined(__clang__) || defined(__GNUC__)
         const std::size_t ls = size();
-        const ::mp_limb_t *lptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
-        if (ls) {
-            // LCOV_EXCL_START
-            if (mppp_unlikely(ls > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
-                throw std::overflow_error("Overflow in the computation of the number of bits required to represent an "
-                                          "integer - the limb size is "
-                                          + std::to_string(ls));
-            }
-            // LCOV_EXCL_STOP
-            // Index of the most significant limb.
-            const std::size_t idx = ls - 1u;
-            // The most significant limb.
-            const ::mp_limb_t msl = lptr[idx] & GMP_NUMB_MASK;
-            // NOTE: here we need std::numeric_limits<::mp_limb_t>::digits (instead of GMP_NUMB_BITS) because
-            // builtin_clz() counts zeroes also in the nail bits.
-            return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS)
-                                            + (unsigned(std::numeric_limits<::mp_limb_t>::digits) - builtin_clz(msl)));
+        if (!ls) {
+            return 0;
         }
-        return 0;
-#else
-        return m_int.m_st._mp_size ? ::mpz_sizeinbase(get_mpz_view(), 2) : 0u;
-#endif
+        const ::mp_limb_t *lptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
+        // LCOV_EXCL_START
+        if (mppp_unlikely(ls > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
+            throw std::overflow_error("Overflow in the computation of the number of bits required to represent an "
+                                      "integer - the limb size is "
+                                      + std::to_string(ls));
+        }
+        // LCOV_EXCL_STOP
+        // Index of the most significant limb.
+        const std::size_t idx = ls - 1u;
+        return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS) + limb_size_nbits(lptr[idx]));
     }
     /// Size in limbs.
     /**
