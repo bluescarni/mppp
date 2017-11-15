@@ -186,18 +186,20 @@ struct mpz_alloc_cache {
 
 #if defined(MPPP_HAVE_THREAD_LOCAL)
 
-template <typename = void>
-struct mpz_caches {
-    static thread_local mpz_alloc_cache a_cache;
-};
-
-template <typename T>
-thread_local mpz_alloc_cache mpz_caches<T>::a_cache;
+// Getter for the thread local allocation cache.
+// NOTE: static objects inside inline functions always refer to the same
+// object in different TUs:
+// https://stackoverflow.com/questions/32172137/local-static-thread-local-variables-of-inline-functions
+inline mpz_alloc_cache &get_mpz_alloc_cache()
+{
+    static thread_local mpz_alloc_cache mpzc;
+    return mpzc;
+}
 
 // Implementation of the init of an mpz from cache.
 inline bool mpz_init_from_cache_impl(mpz_struct_t &rop, std::size_t nlimbs)
 {
-    auto &mpzc = mpz_caches<>::a_cache;
+    auto &mpzc = get_mpz_alloc_cache();
     if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
         // LCOV_EXCL_START
         if (mppp_unlikely(nlimbs
@@ -273,7 +275,7 @@ inline void mpz_init_nbits(mpz_struct_t &rop, ::mp_bitcnt_t nbits, std::size_t n
 inline void mpz_clear_wrap(mpz_struct_t &m)
 {
 #if defined(MPPP_HAVE_THREAD_LOCAL)
-    auto &mpzc = mpz_caches<>::a_cache;
+    auto &mpzc = get_mpz_alloc_cache();
     const auto ualloc = static_cast<make_unsigned_t<mpz_alloc_t>>(m._mp_alloc);
     if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
         const auto idx = ualloc - 1u;
