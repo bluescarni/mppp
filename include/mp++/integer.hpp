@@ -1036,6 +1036,7 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 //   with the nails similarly all zero. This applies both to limb vectors and to single limb arguments.
 //   """
 //   Need to go through and check all uses of the MASK/NUMB_MAX (and all mentions of nails) one by one.
+//   Maybe add static check for NUMB_MAX when dting static ints?
 
 /// Multiprecision integer class.
 /**
