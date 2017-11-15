@@ -1028,6 +1028,12 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 //   Probably better to wait for benchmarks before moving.
 // - performance improvements for arithmetic with C++ integrals? (e.g., use add_ui() and similar rather than cting
 //   temporary).
+// - it seems like most (all?) uses of GMP_NUMB_MASK & friends may be superfluous. From the GMP docs:
+//   """
+//   All the mpn functions accepting limb data will expect the nail bits to be zero on entry, and will return data
+//   with the nails similarly all zero. This applies both to limb vectors and to single limb arguments.
+//   """
+//   Need to go through and check all uses of the MASK/NUMB_MAX (and all mentions of nails) one by one.
 
 /// Multiprecision integer class.
 /**
