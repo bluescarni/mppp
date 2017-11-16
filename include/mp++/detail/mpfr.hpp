@@ -26,6 +26,15 @@
 
 #endif
 
+#if GMP_NAIL_BITS
+
+// See:
+// https://gmplib.org/list-archives/gmp-discuss/2012-November/005189.html
+
+#error MPFR is incompatible with GMP if nails are enabled.
+
+#endif
+
 namespace mppp
 {
 
