@@ -548,6 +548,9 @@ struct static_int {
         // The limb is coming in from the decomposition of an uintegral value,
         // it should not have any nail bit set.
         assert(l <= GMP_NUMB_MAX);
+        // NOTE: this is ok if l is zero: after init, the size will be zero
+        // and either all limbs have been set to zero (for SSize <= opt_size),
+        // or only the first limb has been set to zero (for SSize > opt_size).
         m_limbs[0] = l;
         // Zero fill the remaining limbs, if needed.
         zero_upper_limbs(1);
@@ -2388,8 +2391,14 @@ public:
     bool odd_p() const
     {
         if (is_static()) {
-            // NOTE: as usual we assume that a zero static integer has all limbs set to zero.
-            return (m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & ::mp_limb_t(1);
+            if (SSize <= s_storage::opt_size) {
+                // NOTE: when SSize is an optimised size, we can be sure the first limb
+                // has been zeroed even if the value of the integer is zero.
+                return (m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & ::mp_limb_t(1);
+            } else {
+                // Otherwise, we add an extra check for zero.
+                return m_int.g_st()._mp_size && ((m_int.g_st().m_limbs[0] & GMP_NUMB_MASK) & ::mp_limb_t(1));
+            }
         }
         return mpz_odd_p(&m_int.g_dy());
     }
@@ -2713,8 +2722,8 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 0> &)
 {
-    auto rdata = &rop.m_limbs[0];
-    auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
+    auto rdata = rop.m_limbs.data();
+    auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
     const auto size1 = op1._mp_size;
     // NOTE: cannot trust the size member from op2, as op2 could've been negated if
     // we are actually subtracting.
@@ -2825,8 +2834,8 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 1> &)
 {
-    auto rdata = &rop.m_limbs[0];
-    auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
+    auto rdata = rop.m_limbs.data();
+    auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
     // NOTE: both asizes have to be 0 or 1 here.
     assert((asize1 == 1 && data1[0] != 0u) || (asize1 == 0 && data1[0] == 0u));
     assert((asize2 == 1 && data2[0] != 0u) || (asize2 == 0 && data2[0] == 0u));
@@ -2886,8 +2895,8 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 2> &)
 {
-    auto rdata = &rop.m_limbs[0];
-    auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
+    auto rdata = rop.m_limbs.data();
+    auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
     if (sign1 == sign2) {
         // NOTE: this handles the case in which the numbers have the same sign, including 0 + 0.
         //
@@ -3032,8 +3041,8 @@ template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
                                   unsigned long op2, const std::integral_constant<int, 0> &)
 {
-    auto rdata = &rop.m_limbs[0];
-    auto data1 = &op1.m_limbs[0];
+    auto rdata = rop.m_limbs.data();
+    auto data1 = op1.m_limbs.data();
     const auto size1 = op1._mp_size;
     const auto l2 = static_cast<::mp_limb_t>(op2);
     // mpn functions require nonzero arguments.
@@ -3135,8 +3144,8 @@ template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
                                   unsigned long op2, const std::integral_constant<int, 2> &)
 {
-    auto rdata = &rop.m_limbs[0];
-    auto data1 = &op1.m_limbs[0];
+    auto rdata = rop.m_limbs.data();
+    auto data1 = op1.m_limbs.data();
     const auto l2 = static_cast<::mp_limb_t>(op2);
     if ((sign1 >= 0 && AddOrSub) || (sign1 <= 0 && !AddOrSub)) {
         // op1 non-negative and addition, or op1 non-positive and subtraction. Implement
@@ -3355,8 +3364,8 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
         rop._mp_size = 0;
         return 0u;
     }
-    auto rdata = &rop.m_limbs[0];
-    auto data1 = &op1.m_limbs[0], data2 = &op2.m_limbs[0];
+    auto rdata = rop.m_limbs.data();
+    auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
     const auto max_asize = std::size_t(asize1 + asize2);
     // Temporary storage, to be used if we cannot write into rop.
     std::array<::mp_limb_t, SSize * 2u> res;
@@ -4167,6 +4176,8 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
         q._mp_size = 0;
         return;
     }
+    // NOTE: we checked outside that the divisor is not zero, and now asize1 >= asize2. Hence,
+    // both operands are nonzero.
     // We need to take care of potentially overlapping arguments. We know that q and r are distinct, but op1
     // could overlap with q or r, and op2 could overlap with op1, q or r.
     std::array<::mp_limb_t, SSize> op1_alt, op2_alt;
