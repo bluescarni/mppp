@@ -40,13 +40,8 @@ ADD_MPPP_TESTCASE(integer_abs)
 ADD_MPPP_TESTCASE(integer_addsub_ui)
 ADD_MPPP_TESTCASE(integer_arith)
 ADD_MPPP_TESTCASE(integer_arith_ops)
-if(NOT MINGW)
-    # At the moment this test results in a linking error in conjunction
-    # with catch. Needs to be investigated.
-    # NOTE: this might be related to the binary size, we can try splitting
-    # some tests up more.
-    ADD_MPPP_TESTCASE(integer_basic)
-endif()
+ADD_MPPP_TESTCASE(integer_basic_01)
+ADD_MPPP_TESTCASE(integer_basic_02)
 ADD_MPPP_TESTCASE(integer_bin)
 ADD_MPPP_TESTCASE(integer_divexact)
 ADD_MPPP_TESTCASE(integer_even_odd)
