@@ -1069,6 +1069,17 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 //   is not too hard to do, see this commit for instance:
 //   30c23c8984d2955d19c35af84e7845dba88d94c0
 //   If in the future we want to remove the extra masking, we can take this commit as a starting point.
+// - regarding the zeroing of the upper limbs in static_int. The idea here is that, to implement optimised basic
+//   primitives for small static sizes, it is convenient to rely on the fact that unused limbs are zeroed out.
+//   This has a series of consequences:
+//   - whenever we write into the static int, we must take care of zeroing out the upper limbs
+//     that are unused in the representation of the current value. This holds both when using the mpn_ functions
+//     and when implementing our own specialised primitives;
+//   - if the static size is small, we can copy/assign limb arrays around without caring for the effective size, as
+//     all limbs are always initialised to some value. With large static size, we cannot do that as the upper
+//     limbs are not necessarily inited;
+//   - if the static size is small, we can just peek into the limbs without caring for the real size, this saves
+//     branching (see the odd_p() implementation for instance).
 
 /// Multiprecision integer class.
 /**
