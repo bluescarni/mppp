@@ -174,8 +174,9 @@ struct mpz_alloc_cache {
 #if !defined(NDEBUG)
         std::cout << "Cleaning up the mpz alloc cache." << std::endl;
 #endif
-        void (*ffp)(void *, std::size_t);
+        void (*ffp)(void *, std::size_t) = nullptr;
         ::mp_get_memory_functions(nullptr, nullptr, &ffp);
+        assert(ffp != nullptr);
         for (std::size_t i = 0; i < max_size; ++i) {
             for (std::size_t j = 0; j < sizes[i]; ++j) {
                 ffp(static_cast<void *>(caches[i][j]), i + 1u);
@@ -457,6 +458,7 @@ using limb_array_t = typename limb_array_t_<T>::type;
 template <typename T>
 inline std::size_t uint_to_limb_array(limb_array_t<T> &rop, T n)
 {
+    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
     assert(n > GMP_NUMB_MAX);
     // We can assign the first two limbs directly, as we know n > GMP_NUMB_MAX.
     rop[0] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
