@@ -494,21 +494,47 @@ struct static_int {
     // take care of ensuring that this invariant is respected (see dtor_checks() and
     // zero_unused_limbs(), for instance).
     static const std::size_t opt_size = 2;
-    // NOTE: init limbs to zero, in order to avoid reading uninited limbs during copies/moves
-    // (additionally, in some few-limbs optimisations we operate on the whole limb
-    // array regardless of the integer size, for performance reasons - if we didn't init to zero,
-    // we would have wrong results as well).
-    // NOTE: it might be possible here to avoid the zero init of the limbs, at least in case
-    // of static sizes > opt_size, but it's not clear to me if it is worth it to go down this path.
-    // Let's just mention it for now. Note that the matter of zeroing the unused limbs is not
-    // always dealt with consistenly throughout the code: here and elsewhere (e.g., set_zero(), and see
-    // also some equivalent bits in rational) we zero regardless, but in zero_unused_limbs() we check
-    // about opt_size. Let's leave this discussion for when we optimize the mpn_ implementations
-    // (if ever).
-    static_int() : _mp_size(0), m_limbs() {}
+    // Zero the limbs from index idx up to the end of the limbs array, but only
+    // if the static size is a target for special optimisations.
+    void zero_upper_limbs(std::size_t idx)
+    {
+        if (SSize <= opt_size) {
+            std::fill(m_limbs.begin() + idx, m_limbs.end(), ::mp_limb_t(0));
+        }
+    }
+    // Zero the limbs that are not used for representing the value, but only
+    // if the static size is a target for special optimisations.
+    // This is normally not needed, but it is useful when using the GMP mpn api on a static int:
+    // the GMP api does not clear unused limbs, but we rely on unused limbs being zero when optimizing operations
+    // for few static limbs.
+    void zero_unused_limbs()
+    {
+        zero_upper_limbs(static_cast<std::size_t>(abs_size()));
+    }
+    // Default constructor, inits to zero.
+    static_int() : _mp_size(0)
+    {
+        // Zero the limbs, if needed.
+        zero_upper_limbs(0);
+    }
     // Let's avoid copying the _mp_alloc member, as it is never written to and it must always
     // have the same value.
-    static_int(const static_int &other) : _mp_size(other._mp_size), m_limbs(other.m_limbs) {}
+    static_int(const static_int &other) : _mp_size(other._mp_size)
+    {
+        if (SSize <= opt_size) {
+            // In this case, we know that other's upper limbs are already
+            // properly zeroed.
+            m_limbs = other.m_limbs;
+        } else {
+            // Otherwise, we cannot read potentially uninited limbs.
+            const auto asize = other.abs_size();
+            // Copy over the limbs. This is safe, as other is a distinct object from this.
+            copy_limbs_no(other.m_limbs.data(), other.m_limbs.data() + asize, m_limbs.data());
+            // Zero the upper limbs if needed.
+            zero_upper_limbs(static_cast<std::size_t>(asize));
+        }
+    }
+    // Same as copy constructor.
     static_int(static_int &&other) noexcept : static_int(other) {}
     // These 2 constructors are used in the generic constructor of integer_union.
     //
@@ -519,9 +545,12 @@ struct static_int {
         assert(size <= s_size && size >= -s_size);
         // l and size must both be zero or both nonzero.
         assert((l && size) || (!l && !size));
+        // The limb is coming in from the decomposition of an uintegral value,
+        // it should not have any nail bit set.
+        assert(l <= GMP_NUMB_MAX);
         m_limbs[0] = l;
-        // Zero fill the remaining limbs.
-        std::fill(m_limbs.begin() + 1, m_limbs.end(), ::mp_limb_t(0));
+        // Zero fill the remaining limbs, if needed.
+        zero_upper_limbs(1);
     }
     // Constructor from a (signed) size and a limb range. The limbs in the range will be
     // copied as the least significant limbs.
@@ -535,14 +564,24 @@ struct static_int {
         // NOTE: here we are constructing a *new* object, thus I don't think it's possible that begin
         // overlaps with m_limbs.data() (unless some UBish stuff is being attempted).
         copy_limbs_no(begin, begin + asize, m_limbs.data());
-        // Zero the remaining limbs, if any.
-        std::fill(m_limbs.begin() + asize, m_limbs.end(), ::mp_limb_t(0));
+        // Zero fill the remaining limbs, if needed.
+        zero_upper_limbs(asize);
     }
     static_int &operator=(const static_int &other)
     {
         _mp_size = other._mp_size;
-        // NOTE: self assignment of std::array should be fine.
-        m_limbs = other.m_limbs;
+        if (SSize <= opt_size) {
+            // In this case, we know other's upper limbs are properly zeroed out.
+            // NOTE: self assignment of std::array should be fine.
+            m_limbs = other.m_limbs;
+        } else {
+            // Otherwise, we must avoid reading from uninited limbs.
+            // Copy over the limbs. There's potential overlap here.
+            const auto asize = other.abs_size();
+            copy_limbs(other.m_limbs.data(), other.m_limbs.data() + asize, m_limbs.data());
+            // Zero the upper limbs, if necessary.
+            zero_upper_limbs(asize);
+        }
         return *this;
     }
     static_int &operator=(static_int &&other) noexcept
@@ -581,20 +620,6 @@ struct static_int {
     ~static_int()
     {
         assert(dtor_checks());
-    }
-    // Zero the limbs that are not used for representing the value.
-    // This is normally not needed, but it is useful when using the GMP mpn api on a static int:
-    // the GMP api does not clear unused limbs, but we rely on unused limbs being zero when optimizing operations
-    // for few static limbs.
-    void zero_unused_limbs()
-    {
-        // Don't do anything if the static size is larger that the maximum size for which the
-        // few-limbs optimisations are activated.
-        if (SSize <= opt_size) {
-            for (auto i = static_cast<std::size_t>(abs_size()); i < SSize; ++i) {
-                m_limbs[i] = 0u;
-            }
-        }
     }
     // Size in limbs (absolute value of the _mp_size member).
     mpz_size_t abs_size() const
@@ -890,8 +915,7 @@ union integer_union {
         } else if (s1 && !s2) {
             // Destroy static.
             g_st().~s_storage();
-            // Construct the dynamic struct, shallow-copying from
-            // other.
+            // Construct the dynamic struct, shallow-copying from other.
             ::new (static_cast<void *>(&m_dy)) d_storage(other.g_dy());
             // Downgrade the other to an empty static.
             other.g_dy().~d_storage();
@@ -1503,7 +1527,7 @@ private:
                 m_int.g_st()._mp_size = Neg ? -size : size;
                 m_int.g_st().m_limbs[0] = static_cast<::mp_limb_t>(n);
                 // Zero fill the remaining limbs.
-                std::fill(m_int.g_st().m_limbs.begin() + 1, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+                m_int.g_st().zero_upper_limbs(1);
             } else {
                 // Destroy the dynamic structure, re-init an appropriate static.
                 m_int.destroy_dynamic();
@@ -1521,7 +1545,7 @@ private:
             m_int.g_st()._mp_size = static_cast<mpz_size_t>(size);
             copy_limbs_no(tmp.data(), tmp.data() + size, m_int.g_st().m_limbs.data());
             // Zero fill the remaining limbs.
-            std::fill(m_int.g_st().m_limbs.begin() + size, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+            m_int.g_st().zero_upper_limbs(size);
         } else if (!s && size > SSize) {
             // this is dynamic and n requires dynamic storage.
             // Convert the size to mpz_size_t, do it before anything else for exception safety.
@@ -1584,7 +1608,7 @@ private:
             m_int.g_st()._mp_size = static_cast<mpz_size_t>(n);
             m_int.g_st().m_limbs[0] = static_cast<::mp_limb_t>(n);
             // Zero out the upper limbs.
-            std::fill(m_int.g_st().m_limbs.begin() + 1, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+            m_int.g_st().zero_upper_limbs(1);
         } else {
             m_int.destroy_dynamic();
             // Construct from size and single limb. This will zero the upper limbs.
@@ -1701,12 +1725,8 @@ public:
             // this is static, n fits into static. Copy over.
             m_int.g_st()._mp_size = n->_mp_size;
             copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
-            if (SSize <= static_int<SSize>::opt_size) {
-                // Zero the non-copied limbs, but only if the static size is not greater than
-                // the size for which special optimisations kick in. See the documentation
-                // of zero_unused_limbs().
-                std::fill(m_int.g_st().m_limbs.begin() + asize, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
-            }
+            // Zero the non-copied limbs, if necessary.
+            m_int.g_st().zero_upper_limbs(asize);
         } else if (!s && asize > SSize) {
             // Dynamic to dynamic.
             ::mpz_set(&m_int.m_dy, n);
@@ -1722,7 +1742,7 @@ public:
             assert(!s && asize <= SSize);
             // Destroy the dynamic storage.
             m_int.destroy_dynamic();
-            // Init a static with the content from n.
+            // Init a static with the content from n. This will zero the upper limbs.
             ::new (static_cast<void *>(&m_int.m_st)) s_storage{n->_mp_size, n->_mp_d, asize};
         }
         return *this;
@@ -1762,12 +1782,8 @@ public:
             // this is static, n fits into static. Copy over.
             m_int.g_st()._mp_size = n->_mp_size;
             copy_limbs_no(n->_mp_d, n->_mp_d + asize, m_int.g_st().m_limbs.data());
-            if (SSize <= static_int<SSize>::opt_size) {
-                // Zero the non-copied limbs, but only if the static size is not greater than
-                // the size for which special optimisations kick in. See the documentation
-                // of zero_unused_limbs().
-                std::fill(m_int.g_st().m_limbs.begin() + asize, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
-            }
+            // Zero the non-copied limbs, if necessary.
+            m_int.g_st().zero_upper_limbs(asize);
             // Clear out n.
             mpz_clear_wrap(*n);
         } else if (!s && asize > SSize) {
@@ -1785,7 +1801,7 @@ public:
             assert(!s && asize <= SSize);
             // Destroy the dynamic storage.
             m_int.destroy_dynamic();
-            // Init a static with the content from n.
+            // Init a static with the content from n. This will zero the upper limbs.
             ::new (static_cast<void *>(&m_int.m_st)) s_storage{n->_mp_size, n->_mp_d, asize};
             // Clear out n.
             mpz_clear_wrap(*n);
@@ -1809,8 +1825,8 @@ public:
     {
         if (is_static()) {
             m_int.g_st()._mp_size = 0;
-            // Zero out the whole limbs array (equivalent to the def ctor of static int).
-            std::fill(m_int.g_st().m_limbs.begin(), m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+            // Zero out the whole limbs array, if needed.
+            m_int.g_st().zero_upper_limbs(0);
         } else {
             m_int.destroy_dynamic();
             // Def construction of static results in zero.
@@ -1826,9 +1842,8 @@ private:
         if (is_static()) {
             m_int.g_st()._mp_size = PlusOrMinus ? 1 : -1;
             m_int.g_st().m_limbs[0] = 1;
-            // Zero the unused limbs, for the usual reason that optimised implementations
-            // expect zeroes in unused limbs.
-            std::fill(m_int.g_st().m_limbs.begin() + 1, m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+            // Zero the unused limbs, if needed.
+            m_int.g_st().zero_upper_limbs(1);
         } else {
             m_int.destroy_dynamic();
             // Construct from a single limb the static. This will zero any unused limb.
@@ -3206,7 +3221,8 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, un
         // unsigned long to an ::mp_limb_t, modulo nail bits. This because in the optimised version
         // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an
         // integer.
-        // NOTE: it does not look like this can be hit on any modern setup.
+        // NOTE: it does not look like this can be hit on any modern setup, apart from Win32, and we
+        // don't check coverage on that.
         add(rop, op1, integer<SSize>{op2});
         return rop;
     }
@@ -3391,11 +3407,14 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
 }
 
 #if defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+
 inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 {
     return ::UnsignedMultiply128(op1, op2, hi);
 }
+
 #elif defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+
 inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 {
     using dlimb_t = MPPP_UINT128;
@@ -3403,7 +3422,9 @@ inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
     *hi = static_cast<::mp_limb_t>(res >> 64);
     return static_cast<::mp_limb_t>(res);
 }
+
 #elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
+
 inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 {
     using dlimb_t = std::uint_least64_t;
@@ -3411,6 +3432,7 @@ inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
     *hi = static_cast<::mp_limb_t>(res >> 32);
     return static_cast<::mp_limb_t>(res);
 }
+
 #endif
 
 // 1-limb optimization via dlimb.
@@ -3495,6 +3517,8 @@ inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &o
     const std::size_t retval
         = static_mul_impl(rop, op1, op2, asize1, asize2, sign1, sign2, integer_static_mul_algo<static_int<SSize>>{});
     if (integer_static_mul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
+        // If we used the mpn functions, and actually wrote into the result,
+        // zero the unused limbs on top (if necessary).
         rop.zero_unused_limbs();
     }
     return retval;
@@ -3733,6 +3757,8 @@ inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSi
     const std::size_t retval = static_addmul_impl(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
                                                   integer_static_addmul_algo<static_int<SSize>>{});
     if (integer_static_addmul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
+        // If we used the mpn functions, and actually wrote into the result,
+        // zero the unused limbs on top (if necessary).
         rop.zero_unused_limbs();
     }
     return retval;
@@ -3985,6 +4011,8 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
 {
     const std::size_t retval = static_mul_2exp_impl(rop, n, s, integer_static_mul_2exp_algo<static_int<SSize>>{});
     if (integer_static_mul_2exp_algo<static_int<SSize>>::value == 0 && retval == 0u) {
+        // If we used the mpn functions, and actually wrote into the result,
+        // zero the unused limbs on top (if necessary).
         rop.zero_unused_limbs();
     }
     return retval;
@@ -4314,6 +4342,7 @@ inline void static_div(static_int<SSize> &q, static_int<SSize> &r, const static_
     }
     static_div_impl(q, r, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
     if (integer_static_div_algo<static_int<SSize>>::value == 0) {
+        // If we used the mpn functions, zero the unused limbs on top (if necessary).
         q.zero_unused_limbs();
         r.zero_unused_limbs();
     }
@@ -4413,6 +4442,7 @@ inline void static_divexact(static_int<SSize> &q, const static_int<SSize> &op1, 
     // NOTE: use integer_static_div_algo for the algorithm selection.
     static_divexact_impl(q, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
     if (integer_static_div_algo<static_int<SSize>>::value == 0) {
+        // If we used the mpn functions, zero the unused limbs on top (if necessary).
         q.zero_unused_limbs();
     }
 }
@@ -4644,6 +4674,7 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
 {
     static_tdiv_q_2exp_impl(rop, n, s, integer_static_tdiv_q_2exp_algo<static_int<SSize>>{});
     if (integer_static_tdiv_q_2exp_algo<static_int<SSize>>::value == 0) {
+        // If we used the mpn functions, zero the unused limbs on top (if necessary).
         rop.zero_unused_limbs();
     }
 }
@@ -4869,13 +4900,14 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
     }
     // Handle zeroes.
     if (!asize1) {
-        rop._mp_size = asize2;
-        rop.m_limbs = op2.m_limbs;
+        // NOTE: use the assignment operator of static_int here,
+        // which automatically copies only the limbs that are set
+        // (if needed).
+        rop = op2;
         return;
     }
     if (!asize2) {
-        rop._mp_size = asize1;
-        rop.m_limbs = op1.m_limbs;
+        rop = op1;
         return;
     }
     // Special casing if an operand has asize 1.
@@ -4929,6 +4961,7 @@ inline integer<SSize> &gcd(integer<SSize> &rop, const integer<SSize> &op1, const
             rop.set_zero();
         }
         static_gcd(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
+        // Currently GCD is always done via mpn. Make sure to zero the upper limbs, if needed.
         rop._get_union().g_st().zero_unused_limbs();
         return rop;
     }
@@ -5365,7 +5398,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
         if (overlap) {
             copy_limbs_no(out_ptr, out_ptr + new_size, rs.m_limbs.data());
         }
-        // Clear out unused limbs.
+        // Clear out unused limbs, if needed.
         rs.zero_unused_limbs();
         return;
     }
