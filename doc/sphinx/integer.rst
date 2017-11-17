@@ -112,6 +112,14 @@ Comparison
 .. doxygengroup:: integer_comparison
    :content-only:
 
+.. _integer_logic:
+
+Logic
+~~~~~
+
+.. doxygengroup:: integer_logic
+   :content-only:
+
 .. _integer_ntheory:
 
 Number theoretic functions

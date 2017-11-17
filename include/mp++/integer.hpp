@@ -4845,6 +4845,91 @@ inline bool is_negative_one(const integer<SSize> &n)
 
 /** @} */
 
+/** @defgroup integer_logic integer_logic
+ *  @{
+ */
+
+inline namespace detail
+{
+
+template <std::size_t SSize>
+inline bool static_bitwise_ior(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
+    bool pos1 = true, pos2 = true;
+    if (asize1 < 0) {
+        asize1 = -asize1;
+        pos1 = false;
+    }
+    if (asize2 < 0) {
+        asize2 = -asize2;
+        pos2 = false;
+    }
+    // Handle zeroes: this will result simply in a copy.
+    if (!asize1) {
+        rop._mp_size = asize2;
+        rop.m_limbs = op2.m_limbs;
+        return true;
+    }
+    if (!asize2) {
+        rop._mp_size = asize1;
+        rop.m_limbs = op1.m_limbs;
+        return true;
+    }
+    if (pos1 && pos2) {
+        // This is the easiest case: just OR all the limbs into rop.
+        const static_int<SSize> *max_op = &op1;
+        mpz_size_t max_asize = asize1, min_asize = asize2;
+        if (asize2 > asize1) {
+            max_op = &op2;
+            std::swap(max_asize, min_asize);
+        }
+        // Write the size of rop.
+        rop._mp_size = max_asize;
+        // OR the limbs up to min_asize.
+        mpz_size_t i = 0;
+        for (; i < min_asize; ++i) {
+            rop.m_limbs[static_cast<std::size_t>(i)] = op1.m_limbs[static_cast<std::size_t>(i)] | op2.m_limbs[static_cast<std::size_t>(i)];
+        }
+        // Copy the remaining limbs.
+        for (; i < max_asize; ++i) {
+            rop.m_limbs[static_cast<std::size_t>(i)] = max_op->m_limbs[static_cast<std::size_t>(i)];
+        }
+        // Zero the top limbs.
+        std::fill(rop.m_limbs.begin() + max_asize, rop.m_limbs.end(), ::mp_limb_t(0));
+        return true;
+    }
+    return false;
+    // Compute the size in bits of the top limb and the whole number.
+    const std::size_t top_size1 = limb_size_nbits(op1.m_limbs[static_cast<std::size_t>(asize1 - 1)]);
+    const std::size_t top_size2 = limb_size_nbits(op2.m_limbs[static_cast<std::size_t>(asize2 - 1)]);
+    const std::size_t nbits1 = static_cast<std::size_t>(asize1 - 1) * unsigned(GMP_NUMB_BITS) + top_size1;
+    const std::size_t nbits2 = static_cast<std::size_t>(asize2 - 1) * unsigned(GMP_NUMB_BITS) + top_size2;
+}
+
+}
+
+template <std::size_t SSize>
+inline integer<SSize> &bitwise_ior(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool sr = rop.is_static(), s1 = op1.is_static(), s2 = op2.is_static();
+    if (mppp_likely(s1 && s2)) {
+        if (!sr) {
+            rop.set_zero();
+        }
+        // ????
+
+        return rop;
+    }
+    if (sr) {
+        rop._get_union().promote();
+    }
+    ::mpz_ior(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    return rop;
+}
+
+/** @} */
+
 /** @defgroup integer_ntheory integer_ntheory
  *  @{
  */
