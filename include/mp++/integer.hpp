@@ -580,7 +580,7 @@ struct static_int {
             const auto asize = other.abs_size();
             copy_limbs(other.m_limbs.data(), other.m_limbs.data() + asize, m_limbs.data());
             // Zero the upper limbs, if necessary.
-            zero_upper_limbs(asize);
+            zero_upper_limbs(static_cast<std::size_t>(asize));
         }
         return *this;
     }
@@ -4904,10 +4904,17 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
         // which automatically copies only the limbs that are set
         // (if needed).
         rop = op2;
+        if (rop._mp_size < 0) {
+            // NOTE: we want the result to be positive.
+            rop._mp_size = -rop._mp_size;
+        }
         return;
     }
     if (!asize2) {
         rop = op1;
+        if (rop._mp_size < 0) {
+            rop._mp_size = -rop._mp_size;
+        }
         return;
     }
     // Special casing if an operand has asize 1.
