@@ -2021,6 +2021,8 @@ private:
         // NOTE: contrary to real128, the MPFR format does not have a hidden bit on top.
         //
         // Init retval with the highest limb.
+        //
+        // NOTE: MPFR does not support nail builds in GMP, so we don't have to worry about that.
         real128 retval{m_mpfr._mpfr_d[--nlimbs]};
         // Init the number of read bits.
         // NOTE: we have read a full limb in the line above, so mp_bits_per_limb bits. If mp_bits_per_limb > 113,

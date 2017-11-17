@@ -295,7 +295,7 @@ private:
         std::size_t ls = n_bits / unsigned(GMP_NUMB_BITS) + static_cast<bool>(rem_bits);
         assert(ls && n_bits && ls == n.size());
         // Init value with the most significant limb, and move to the next limb.
-        m_value = ptr[--ls];
+        m_value = ptr[--ls] & GMP_NUMB_MASK;
         // Number of bits read so far from n: it is the size in bits of the top limb.
         auto read_bits = static_cast<unsigned>(rem_bits ? rem_bits : unsigned(GMP_NUMB_BITS));
         assert(read_bits);
@@ -309,7 +309,7 @@ private:
             m_value = ::scalbnq(m_value, static_cast<int>(rbits));
             // Add the bottom part, and move to the next limb. We might need to remove lower bits
             // in case rbits is not exactly GMP_NUMB_BITS.
-            m_value += ptr[--ls] >> (unsigned(GMP_NUMB_BITS) - rbits);
+            m_value += (ptr[--ls] & GMP_NUMB_MASK) >> (unsigned(GMP_NUMB_BITS) - rbits);
             // Update the number of read bits.
             // NOTE: read_bits can never be increased past sig_digits, due to the definition of rbits.
             // Hence, this addition can never overflow (as sig_digits is unsigned itself).
