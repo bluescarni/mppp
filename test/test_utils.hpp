@@ -206,9 +206,9 @@ inline void max_integer(mppp::mpz_raii &m, unsigned n)
     }
     MPPP_MAYBE_TLS mppp::mpz_raii tmp;
     // Set the first limb.
-    ::mpz_set_str(&m.m_mpz, lex_cast(::mp_limb_t(-1) & GMP_NUMB_MASK).c_str(), 10);
+    ::mpz_set_str(&m.m_mpz, lex_cast(GMP_NUMB_MAX).c_str(), 10);
     for (unsigned i = 1u; i < n; ++i) {
-        ::mpz_set_str(&tmp.m_mpz, lex_cast(::mp_limb_t(-1) & GMP_NUMB_MASK).c_str(), 10);
+        ::mpz_set_str(&tmp.m_mpz, lex_cast(GMP_NUMB_MAX).c_str(), 10);
         ::mpz_mul_2exp(&m.m_mpz, &m.m_mpz, GMP_NUMB_BITS);
         ::mpz_add(&m.m_mpz, &m.m_mpz, &tmp.m_mpz);
     }

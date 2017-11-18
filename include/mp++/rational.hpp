@@ -244,11 +244,11 @@ public:
         assert(other.m_den.is_static());
         // Set other's numerator to 0 (see integer::set_zero()).
         other.m_num.m_int.g_st()._mp_size = 0;
-        std::fill(other.m_num.m_int.g_st().m_limbs.begin(), other.m_num.m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+        other.m_num.m_int.g_st().zero_upper_limbs(0);
         // Set other's denominator to 1 (see integer::set_one()).
         other.m_den.m_int.g_st()._mp_size = 1;
         other.m_den.m_int.g_st().m_limbs[0] = 1;
-        std::fill(other.m_den.m_int.g_st().m_limbs.begin() + 1, other.m_den.m_int.g_st().m_limbs.end(), ::mp_limb_t(0));
+        other.m_den.m_int.g_st().zero_upper_limbs(1);
     }
 
 private:
