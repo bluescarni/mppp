@@ -13,3 +13,4 @@ on to the full :ref:`C++ reference <reference>`.
    tutorial_prelim.rst
    tutorial_constr.rst
    tutorial_io.rst
+   tutorial_numtower.rst
