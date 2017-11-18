@@ -66,7 +66,8 @@ in case of overflow, and it will produce the truncated value when constructing f
 
 .. code-block:: c++
 
-   int n{int_t{1} << 1024};         // int construction from very large value, raises std::overflow_error.
+   int n{int_t{1} << 1024};         // int construction from very large value,
+                                    // raises std::overflow_error.
    assert((int{rat_t{4, 3}} == 1)); // int construction from rational truncates.
 
 On the other hand, conversion of :cpp:class:`~mppp::integer` objects to C++ floating-point types does not raise any error
