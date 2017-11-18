@@ -16,6 +16,8 @@ New
 Changes
 ~~~~~~~
 
+- Split an :cpp:class:`~mppp::integer` test in two parts to curb memory usage during compilation (`#80 <https://github.com/bluescarni/mppp/pull/80>`__).
+
 - Use bit counting intrinsics in MSVC (`#79 <https://github.com/bluescarni/mppp/pull/79>`__).
 
 - Update the internal copy of Catch to the latest version, 2.0.1 (`#76 <https://github.com/bluescarni/mppp/pull/76>`__).
@@ -28,6 +30,8 @@ Fix
 ~~~
 
 - Small fixes regarding the use of GMP type aliases in :cpp:class:`~mppp::integer` (`#73 <https://github.com/bluescarni/mppp/pull/73>`__).
+
+- Various internal cleanups in :cpp:class:`~mppp::integer` (`#80 <https://github.com/bluescarni/mppp/pull/80>`__).
 
 0.5 (2017-11-07)
 ----------------
