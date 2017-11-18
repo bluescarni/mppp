@@ -148,7 +148,7 @@ using real128_op_types_enabler
  * This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
  * (which features up to 36 decimal digits of precision).
  * The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available in GCC
- * and recent Clang versions on most contemporary platforms, on top of which it provides the following additions:
+ * and recent Clang versions on most modern platforms, on top of which it provides the following additions:
  *
  * * interoperability with other mp++ classes,
  * * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
