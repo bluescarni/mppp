@@ -149,6 +149,8 @@ matrix:
           - g++-5
           - texlive
           - texlive-latex-extra
+          - texlive-xetex
+          - lmodern
           - latexmk
     - env: MPPP_BUILD="OSXDebug"
       os: osx

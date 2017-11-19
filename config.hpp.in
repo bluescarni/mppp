@@ -11,7 +11,7 @@
 
 // Start of defines instantiated by CMake.
 // clang-format off
-#define MPPP_VERSION @mp++_VERSION@
+#define MPPP_VERSION_STRING "@mp++_VERSION@"
 #define MPPP_VERSION_MAJOR @mp++_VERSION_MAJOR@
 #define MPPP_VERSION_MINOR @mp++_VERSION_MINOR@
 @MPPP_ENABLE_MPFR@
