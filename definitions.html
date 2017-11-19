@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Namespaces &#8212; mp++ 0.6 documentation</title>
+    <title>Macros and definitions &#8212; mp++ 0.6 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Exceptions" href="exceptions.html" />
-    <link rel="prev" title="Macros and definitions" href="definitions.html" />
+    <link rel="next" title="Namespaces" href="namespaces.html" />
+    <link rel="prev" title="Reference" href="reference.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -81,7 +81,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Namespaces</a></li>
+<li><a class="reference internal" href="#">Macros and definitions</a></li>
 </ul>
 </ul>
 </li>
@@ -91,11 +91,11 @@
               
                 
   <li>
-    <a href="definitions.html" title="Previous Chapter: Macros and definitions"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Macros and de...</span>
+    <a href="reference.html" title="Previous Chapter: Reference"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Reference</span>
     </a>
   </li>
   <li>
-    <a href="exceptions.html" title="Next Chapter: Exceptions"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Exceptions &raquo;</span>
+    <a href="namespaces.html" title="Next Chapter: Namespaces"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Namespaces &raquo;</span>
     </a>
   </li>
               
@@ -105,7 +105,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="_sources/namespaces.rst.txt"
+  <a href="_sources/definitions.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -129,9 +129,44 @@
   <div class="row">
     <div class="col-md-12 content">
       
-  <div class="section" id="namespaces">
-<h1>Namespaces<a class="headerlink" href="#namespaces" title="Permalink to this headline">¶</a></h1>
-<p>All the functionality of the library is included within the <code class="docutils literal"><span class="pre">mppp</span></code> namespace.</p>
+  <div class="section" id="macros-and-definitions">
+<h1>Macros and definitions<a class="headerlink" href="#macros-and-definitions" title="Permalink to this headline">¶</a></h1>
+<p><em>#include &lt;mp++/config.hpp&gt;</em></p>
+<dl class="macro">
+<dt id="c.MPPP_VERSION_STRING">
+<code class="descname">MPPP_VERSION_STRING</code><a class="headerlink" href="#c.MPPP_VERSION_STRING" title="Permalink to this definition">¶</a></dt>
+<dd><p>This definition expands to a string literal containing the full version of the mp++ library
+(e.g., for version 0.6 this macro expands to <code class="docutils literal"><span class="pre">&quot;0.6&quot;</span></code>).</p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.MPPP_VERSION_MAJOR">
+<code class="descname">MPPP_VERSION_MAJOR</code><a class="headerlink" href="#c.MPPP_VERSION_MAJOR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This definition expands to an integral literal corresponding to the major mp++ version (e.g.,
+for version 0.6, this macro expands to <code class="docutils literal"><span class="pre">0</span></code>).</p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.MPPP_VERSION_MINOR">
+<code class="descname">MPPP_VERSION_MINOR</code><a class="headerlink" href="#c.MPPP_VERSION_MINOR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This definition expands to an integral literal corresponding to the minor mp++ version (e.g.,
+for version 0.6, this macro expands to <code class="docutils literal"><span class="pre">6</span></code>).</p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.MPPP_WITH_QUADMATH">
+<code class="descname">MPPP_WITH_QUADMATH</code><a class="headerlink" href="#c.MPPP_WITH_QUADMATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>This name is defined if mp++ was configured with support for the quadmath library
+(see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.MPPP_WITH_MPFR">
+<code class="descname">MPPP_WITH_MPFR</code><a class="headerlink" href="#c.MPPP_WITH_MPFR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This name is defined if mp++ was configured with support for the MPFR library
+(see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
+</dd></dl>
+
 </div>
 
 

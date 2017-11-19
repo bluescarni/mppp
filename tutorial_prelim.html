@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Preliminaries &#8212; mp++ 0.6 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Construction, conversion and assignment" href="tutorial_constr.html" />
+    <link rel="prev" title="Tutorial" href="tutorial.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          mp++</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.6</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Preliminaries</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="tutorial.html" title="Previous Chapter: Tutorial"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Tutorial</span>
+    </a>
+  </li>
+  <li>
+    <a href="tutorial_constr.html" title="Next Chapter: Construction, conversion and assignment"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Construction,... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/tutorial_prelim.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="preliminaries">
+<h1>Preliminaries<a class="headerlink" href="#preliminaries" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we will assume that the global mp++ header has been included:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;mp++/mp++.hpp&gt;</span><span class="cp"></span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">mp++.hpp</span></code> header will pull in the public mp++ API in its entirety. It is also possible
+to include individual mp++ headers instead of <code class="docutils literal"><span class="pre">mp++.hpp</span></code>, e.g.:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;mp++/integer.hpp&gt;  // For the integer multiprecision class</span><span class="cp"></span>
+                             <span class="c1">// and associated functions.</span>
+<span class="cp">#include</span> <span class="cpf">&lt;mp++/rational.hpp&gt; // For the rational multiprecision class</span><span class="cp"></span>
+                             <span class="c1">// and associated functions.</span>
+</pre></div>
+</div>
+<p>Including individual headers rather than the global <code class="docutils literal"><span class="pre">mp++.hpp</span></code> header is in general a good idea
+if you don’t need all the features provided by mp++, and it may improve compilation times.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The headers within the <code class="docutils literal"><span class="pre">mp++/detail</span></code> subdirectory are implementation details, and they should not be relied
+upon as they change in breaking ways from version to version.</p>
+</div>
+<p>We will also assume, for convenience, that mp++’s multiprecision classes have been lifted into the root namespace,
+and we will introduce a couple of handy aliases for the <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>
+classes:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="n">int_t</span> <span class="o">=</span> <span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">rat_t</span> <span class="o">=</span> <span class="n">mppp</span><span class="o">::</span><span class="n">rational</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> are class templates parametrised over a positive
+integral value (referred to as <em>static size</em>) which indicates how many limbs will be stored in static storage
+before resorting to dynamic memory allocation. In the definitions above, <code class="docutils literal"><span class="pre">int_t</span></code> and <code class="docutils literal"><span class="pre">rat_t</span></code> will store
+values of size up to 1 limb without resorting to heap memory allocation. On modern 64-bit architectures,
+this means in practice that <code class="docutils literal"><span class="pre">int_t</span></code> will be able to represent in static storage integers whose absolute
+value is less than <span class="math">\(2^{64}\)</span>. A static size of 1 is a good default choice.</p>
+<p>In this tutorial, we will <strong>not</strong> assume that mp++’s functions have been pulled into the global namespace: the mp++
+API is designed around <a class="reference external" href="https://en.wikipedia.org/wiki/Argument-dependent_name_lookup">argument-dependent lookup</a>,
+which essentially means that you can call mp++’s functions without prepending <code class="docutils literal"><span class="pre">mppp::</span></code> or employing <code class="docutils literal"><span class="pre">using</span></code>
+directives.</p>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>The numerical tower and type coercion &#8212; mp++ 0.6 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Reference" href="reference.html" />
+    <link rel="prev" title="Input and output" href="tutorial_io.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          mp++</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.6</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">The numerical tower and type coercion</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="tutorial_io.html" title="Previous Chapter: Input and output"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Input and output</span>
+    </a>
+  </li>
+  <li>
+    <a href="reference.html" title="Next Chapter: Reference"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Reference &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/tutorial_numtower.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="the-numerical-tower-and-type-coercion">
+<h1>The numerical tower and type coercion<a class="headerlink" href="#the-numerical-tower-and-type-coercion" title="Permalink to this headline">¶</a></h1>
+<p>Before proceeding to show how mp++’s classes can be used to perform actual computations,
+it is useful to introduce the hierarchy on top of which mp++’s type coercion
+is built.</p>
+<p>In a broad sense, mp++’s aims to extend C++’s type hierarchy with multiprecision
+numerical types. In C++, when numerical operands of different types are involved
+in an arithmetic operation, all operands are converted (or <em>coerced</em>) into a
+common type determined from the types of the operands. The converted operands
+are then used in place of the original operands to perform the operation,
+and the type of the result will be the common type. For instance:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">5l</span><span class="p">;</span>   <span class="c1">// &#39;4&#39; is int, &#39;5l&#39; is long: a will be long.</span>
+<span class="k">auto</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">4.f</span> <span class="o">+</span> <span class="mi">5l</span><span class="p">;</span> <span class="c1">// &#39;4.f&#39; is float, &#39;5l&#39; is long: b will be float.</span>
+<span class="k">auto</span> <span class="n">c</span> <span class="o">=</span> <span class="mf">4.f</span> <span class="o">+</span> <span class="mf">5.</span><span class="p">;</span> <span class="c1">// &#39;4.f&#39; is float, &#39;5.&#39; is double: c will be double.</span>
+</pre></div>
+</div>
+<p>In order to determine the common type, C++ assigns a rank to each fundamental type.
+In an operation involving operands of different types, the type of the result will be
+the type with the highest rank among the types of the operands. Although there are
+a few complications and caveats, the general rule in C++ is that integral types have
+a lower rank than floating-point types, and that, within the integral and floating-point
+types, a higher range or bit width translates to a higher rank. The underlying
+idea is that automatic type coercion should not change the value of an operand <a class="footnote-reference" href="#f1" id="id1">[1]</a>.</p>
+<p>mp++ extends C++’s type hierarchy in a (hopefully) natural way:</p>
+<ul class="simple">
+<li><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> has a rank higher than any C++ integral type, but lower
+than any C++ floating-point type;</li>
+<li><a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> has a rank higher than <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>, but lower
+than any C++ floating-point type;</li>
+<li><a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> has a rank higher than any C++ floating-point type;</li>
+<li><a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> has a rank higher than <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>.</li>
+</ul>
+<p>In other words, mp++’s type hierarchy (or <em>numerical tower</em>) from the lowest rank to the highest is the following:</p>
+<ul class="simple">
+<li>C++ integral types,</li>
+<li><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>,</li>
+<li><a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>,</li>
+<li>C++ floating-point types,</li>
+<li><a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>,</li>
+<li><a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>.</li>
+</ul>
+<p>Note that up to and including <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>, types with higher rank can represent exactly all values
+of any type with a lower rank. The floating-point types, however, cannot represent exactly all values representable
+by <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>, <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> or even the C++ integral types. It should also be noted
+that <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>’s precision is set at runtime, and it is thus possible to create <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>
+objects with a precision lower than <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> or any of the C++ floating-point types. Regardless,
+when it comes to type coercion, <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> is always assigned a rank higher than any other type.</p>
+<p>mp++’s type coercion rules extend beyond arithmetic operators. The exponentiation functions <code class="docutils literal"><span class="pre">pow()</span></code>, for instance,
+also use the type hierarchy to determine the type of the result. Type coercion is also applied in the comparison operators,
+where arguments of different types are promoted to the common type before actually carrying out the comparison.</p>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="f1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Strictly speaking, this is of course not true. On modern architectures, a large enough
+64-bit <code class="docutils literal"><span class="pre">long</span> <span class="pre">long</span></code> will be subject to a lossy conversion to, e.g., <code class="docutils literal"><span class="pre">float</span></code>
+during type coercion.</td></tr>
+</tbody>
+</table>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

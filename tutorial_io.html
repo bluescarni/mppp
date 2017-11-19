@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Input and output &#8212; mp++ 0.6 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="The numerical tower and type coercion" href="tutorial_numtower.html" />
+    <link rel="prev" title="Construction, conversion and assignment" href="tutorial_constr.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          mp++</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.6</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Input and output</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="tutorial_constr.html" title="Previous Chapter: Construction, conversion and assignment"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Construction,...</span>
+    </a>
+  </li>
+  <li>
+    <a href="tutorial_numtower.html" title="Next Chapter: The numerical tower and type coercion"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">The numerical... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/tutorial_io.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="input-and-output">
+<h1>Input and output<a class="headerlink" href="#input-and-output" title="Permalink to this headline">¶</a></h1>
+<p>All of mp++’s multiprecision classes support stream insertion and extraction. E.g., values can be printed
+to screen in the canonical C++ way:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>        <span class="c1">// &quot;42&quot;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">6</span><span class="o">/</span><span class="mi">7</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>      <span class="c1">// &quot;-6/7&quot;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">real128</span><span class="p">{</span><span class="s">&quot;1.1&quot;</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>   <span class="c1">// &quot;1.10000000000000000000000000000000008e+00&quot;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">real</span><span class="p">{</span><span class="s">&quot;1.3&quot;</span><span class="p">,</span> <span class="mi">150</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span> <span class="c1">// &quot;1.3000000000000000000000000000000000000000000006&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A current limitation of all stream insertion operators is that they ignore any formatting flag that may be set in the stream
+object. This limitation will be lifted in the future.</p>
+</div>
+<p>Stream extraction is equivalent to construction from string:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">istringstream</span> <span class="n">iss</span><span class="p">;</span>
+
+<span class="n">int_t</span> <span class="n">n</span><span class="p">;</span>
+<span class="n">iss</span><span class="p">.</span><span class="n">str</span><span class="p">(</span><span class="s">&quot;123&quot;</span><span class="p">);</span>
+<span class="n">iss</span> <span class="o">&gt;&gt;</span> <span class="n">n</span><span class="p">;</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">123</span><span class="p">);</span>
+<span class="n">iss</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+
+<span class="n">rat_t</span> <span class="n">q</span><span class="p">;</span>
+<span class="n">iss</span><span class="p">.</span><span class="n">str</span><span class="p">(</span><span class="s">&quot;1/3&quot;</span><span class="p">);</span>
+<span class="n">iss</span> <span class="o">&gt;&gt;</span> <span class="n">q</span><span class="p">;</span>
+<span class="n">assert</span><span class="p">((</span><span class="n">q</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">}));</span>
+</pre></div>
+</div>
+<p>All of mp++’s multiprecision classes also provide <code class="docutils literal"><span class="pre">to_string()</span></code> member functions that convert the multiprecision
+values into string representations (see, e.g., <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer9to_stringEi" title="mppp::integer::to_string"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::to_string()</span></code></a>, <a class="reference internal" href="rational.html#_CPPv2NK4mppp8rational9to_stringEi" title="mppp::rational::to_string"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::rational::to_string()</span></code></a>,
+etc.). These member functions always return an “exact” string representation of the multiprecision value: feeding back
+the string representation to a constructor from string will initialise a value identical to the original one.</p>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -64,6 +64,7 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -201,9 +202,9 @@ must always be requested explicitly. As a side effect, syntax such as</p>
 <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="n">r</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>will not work, and direct initialization and explicit casting should be used instead:</p>
+<p>will not work, and direct initialization should be used instead:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">real</span> <span class="n">r</span><span class="p">{</span><span class="mi">5</span><span class="p">};</span>
-<span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">r</span><span class="p">);</span>
+<span class="kt">int</span> <span class="n">m</span><span class="p">{</span><span class="n">r</span><span class="p">};</span>
 </pre></div>
 </div>
 <p>Most of the functionality is exposed via plain <a class="reference internal" href="#real-functions"><span class="std std-ref">functions</span></a>, with the
