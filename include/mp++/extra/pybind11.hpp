@@ -9,7 +9,15 @@
 #ifndef MPPP_PY_UTILS_HPP
 #define MPPP_PY_UTILS_HPP
 
+#if defined(__clang__) || defined(__GNUC__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+
+#endif
+
 #include <Python.h>
+#include <pybind11/pybind11.h>
 
 #if PY_MAJOR_VERSION < 2 || (PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION < 7)
 
@@ -23,22 +31,20 @@
 
 #endif
 
+#include <mp++/mp++.hpp>
+
 #include <cassert>
 #include <cstddef>
-#include <gmp.h>
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <mp++/mp++.hpp>
-#include <mpfr.h>
 #include <new>
-#include <pybind11/pybind11.h>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
 
-namespace mppp_py
+namespace mppp_pybind11
 {
 
 namespace py = pybind11;
@@ -49,6 +55,8 @@ inline namespace detail
 template <typename = void>
 struct globals_ {
     static bool inited;
+    static std::unique_ptr<py::module> mpmath;
+    static std::unique_ptr<py::object> mpmath_mp;
     static std::unique_ptr<py::object> mpf_class;
     static std::unique_ptr<py::object> mpf_isinf;
     static std::unique_ptr<py::object> mpf_isnan;
@@ -56,10 +64,14 @@ struct globals_ {
     static std::unique_ptr<py::int_> gmp_numb_bits;
 };
 
-using globals = globals_<>;
-
 template <typename T>
 bool globals_<T>::inited = false;
+
+template <typename T>
+std::unique_ptr<py::module> globals_<T>::mpmath;
+
+template <typename T>
+std::unique_ptr<py::object> globals_<T>::mpmath_mp;
 
 template <typename T>
 std::unique_ptr<py::object> globals_<T>::mpf_class;
@@ -75,6 +87,23 @@ std::unique_ptr<py::object> globals_<T>::fraction_class;
 
 template <typename T>
 std::unique_ptr<py::int_> globals_<T>::gmp_numb_bits;
+
+using globals = globals_<>;
+
+// Cleanup function to clear global variables
+inline void cleanup()
+{
+#if !defined(NDEBUG)
+    std::cout << "Cleaning up mppp_pybind11 data." << std::endl;
+#endif
+    globals::mpmath.reset();
+    globals::mpmath_mp.reset();
+    globals::mpf_class.reset();
+    globals::mpf_isinf.reset();
+    globals::mpf_isnan.reset();
+    globals::fraction_class.reset();
+    globals::gmp_numb_bits.reset();
+}
 }
 
 // Main initialisation function.
@@ -84,21 +113,23 @@ inline void init(py::module &m)
         // Don't do anything if we inited already.
         return;
     }
-    globals::inited = true;
+
+    // Small helper to clean up if something goes wrong
+    // during initialisation.
+    struct auto_cleaner {
+        ~auto_cleaner()
+        {
+            if (m_armed) {
+                cleanup();
+            }
+        }
+        bool m_armed = true;
+    };
+    auto_cleaner ac;
 
     // Expose and register the cleanup function.
-    auto cleanup_func = m.def("_mppp_py_utils_cleanup", []() {
-#if !defined(NDEBUG)
-        std::cout << "Cleaning up mppp_py_utils data." << std::endl;
-#endif
-        globals::mpf_class.reset();
-        globals::mpf_isinf.reset();
-        globals::mpf_isnan.reset();
-        globals::fraction_class.reset();
-        globals::gmp_numb_bits.reset();
-    });
-    auto atexit_mod = py::module::import("atexit");
-    atexit_mod.attr("register")(m.attr("_mppp_py_utils_cleanup"));
+    m.def("_mppp_pybind11_cleanup", cleanup);
+    py::module::import("atexit").attr("register")(m.attr("_mppp_pybind11_cleanup"));
 
     // GMP bits setup.
     globals::gmp_numb_bits.reset(new py::int_(GMP_NUMB_BITS));
@@ -108,6 +139,7 @@ inline void init(py::module &m)
     bool have_mpmath = false;
     try {
         mpmath_mod = py::module::import("mpmath");
+        globals::mpmath.reset(new py::module(mpmath_mod));
         have_mpmath = true;
     } catch (py::error_already_set &eas) {
         // NOTE: this will restore the current Python error flags,
@@ -125,17 +157,25 @@ inline void init(py::module &m)
         }
     }
     if (have_mpmath) {
+        auto mpmath_mp = mpmath_mod.attr("mp");
+        globals::mpmath_mp.reset(new py::object(std::move(mpmath_mp)));
         auto mpf_class = mpmath_mod.attr("mpf");
-        globals::mpf_class.reset(new py::object(mpf_class));
+        globals::mpf_class.reset(new py::object(std::move(mpf_class)));
         auto mpf_isinf = mpmath_mod.attr("isinf");
-        globals::mpf_isinf.reset(new py::object(mpf_isinf));
+        globals::mpf_isinf.reset(new py::object(std::move(mpf_isinf)));
         auto mpf_isnan = mpmath_mod.attr("isnan");
-        globals::mpf_isnan.reset(new py::object(mpf_isnan));
+        globals::mpf_isnan.reset(new py::object(std::move(mpf_isnan)));
     }
 
     // The fraction class.
     auto fraction_class = py::module::import("fractions").attr("Fraction");
-    globals::fraction_class.reset(new py::object(fraction_class));
+    globals::fraction_class.reset(new py::object(std::move(fraction_class)));
+
+    // Mark as inited.
+    globals::inited = true;
+
+    // Disarm the auto cleaner.
+    ac.m_armed = false;
 }
 
 inline namespace detail
@@ -232,7 +272,7 @@ inline py::int_ mppp_int_to_py(const mppp::integer<SSize> &src)
     py::int_ retval(ptr[--size] & GMP_NUMB_MASK);
     // Add the rest of the limbs arithmetically.
     while (size) {
-        retval = retval.attr("__lshift__")(*mppp_py::globals::gmp_numb_bits)
+        retval = retval.attr("__lshift__")(*mppp_pybind11::globals::gmp_numb_bits)
                      .attr("__add__")(py::int_(ptr[--size] & GMP_NUMB_MASK));
     }
     // Negate if needed.
@@ -253,11 +293,11 @@ struct type_caster<mppp::integer<SSize>> {
     PYBIND11_TYPE_CASTER(mppp::integer<SSize>, _("integer[") + _<SSize>() + _("]"));
     bool load(handle src, bool)
     {
-        return mppp_py::py_integer_to_mppp_int(value, src.ptr());
+        return mppp_pybind11::py_integer_to_mppp_int(value, src.ptr());
     }
     static handle cast(const mppp::integer<SSize> &src, return_value_policy, handle)
     {
-        return mppp_py::mppp_int_to_py(src).release();
+        return mppp_pybind11::mppp_int_to_py(src).release();
     }
 };
 
@@ -266,12 +306,12 @@ struct type_caster<mppp::rational<SSize>> {
     PYBIND11_TYPE_CASTER(mppp::rational<SSize>, _("rational[") + _<SSize>() + _("]"));
     bool load(handle src, bool)
     {
-        if (!::PyObject_IsInstance(src.ptr(), mppp_py::globals::fraction_class->ptr())) {
+        if (!::PyObject_IsInstance(src.ptr(), mppp_pybind11::globals::fraction_class->ptr())) {
             return false;
         }
         mppp::integer<SSize> num, den;
-        if (!mppp_py::py_integer_to_mppp_int(num, src.attr("numerator").ptr())
-            || !mppp_py::py_integer_to_mppp_int(den, src.attr("denominator").ptr())) {
+        if (!mppp_pybind11::py_integer_to_mppp_int(num, src.attr("numerator").ptr())
+            || !mppp_pybind11::py_integer_to_mppp_int(den, src.attr("denominator").ptr())) {
             throw std::runtime_error(
                 "Could not interpret the numerator/denominator of a Python fraction as integer objects");
         }
@@ -280,21 +320,24 @@ struct type_caster<mppp::rational<SSize>> {
     }
     static handle cast(const mppp::rational<SSize> &src, return_value_policy, handle)
     {
-        return (*mppp_py::globals::fraction_class)(mppp_py::mppp_int_to_py(src.get_num()),
-                                                   mppp_py::mppp_int_to_py(src.get_den()))
+        return (*mppp_pybind11::globals::fraction_class)(mppp_pybind11::mppp_int_to_py(src.get_num()),
+                                                         mppp_pybind11::mppp_int_to_py(src.get_den()))
             .release();
     }
 };
+
+#if defined(MPPP_WITH_MPFR)
 
 template <>
 struct type_caster<mppp::real> {
     PYBIND11_TYPE_CASTER(mppp::real, _("real"));
     bool load(handle src, bool)
     {
-        if (!mppp_py::globals::mpf_class || !::PyObject_IsInstance(src.ptr(), mppp_py::globals::mpf_class->ptr())) {
+        if (!mppp_pybind11::globals::mpmath
+            || !::PyObject_IsInstance(src.ptr(), mppp_pybind11::globals::mpf_class->ptr())) {
             return false;
         }
-        const auto prec = src.attr("context").attr("prec").cast<::mpfr_prec_t>();
+        const auto prec = mppp_pybind11::globals::mpmath_mp->attr("prec").cast<::mpfr_prec_t>();
         value.set_prec(prec);
         const auto mpf_tuple = src.attr("_mpf_").cast<tuple>();
         auto neg_if_needed = [this, &mpf_tuple]() {
@@ -302,14 +345,14 @@ struct type_caster<mppp::real> {
                 this->value.neg();
             }
         };
-        if ((*mppp_py::globals::mpf_isinf)(src).cast<bool>()) {
+        if ((*mppp_pybind11::globals::mpf_isinf)(src).cast<bool>()) {
             set_inf(value);
             neg_if_needed();
-        } else if ((*mppp_py::globals::mpf_isnan)(src).cast<bool>()) {
+        } else if ((*mppp_pybind11::globals::mpf_isnan)(src).cast<bool>()) {
             set_nan(value);
         } else {
             mppp::integer<1> sig;
-            if (!mppp_py::py_integer_to_mppp_int(sig, int_(mpf_tuple[1]).ptr())) {
+            if (!mppp_pybind11::py_integer_to_mppp_int(sig, int_(mpf_tuple[1]).ptr())) {
                 throw std::runtime_error("Could not interpret the significand of an mpf value as an integer object");
             }
             set_z_2exp(value, sig, mpf_tuple[2].cast<::mpfr_exp_t>());
@@ -319,31 +362,48 @@ struct type_caster<mppp::real> {
     }
     static handle cast(const mppp::real &src, return_value_policy, handle)
     {
-        if (!mppp_py::globals::mpf_class) {
+        if (!mppp_pybind11::globals::mpmath) {
             throw std::runtime_error("Cannot convert a real to an mpf if mpmath is not available");
         }
         if (src.inf_p()) {
             if (std::numeric_limits<double>::has_infinity) {
-                return (*mppp_py::globals::mpf_class)(src.sgn() > 0 ? std::numeric_limits<double>::infinity()
-                                                                    : -std::numeric_limits<double>::infinity())
+                return (*mppp_pybind11::globals::mpf_class)(src.sgn() > 0 ? std::numeric_limits<double>::infinity()
+                                                                          : -std::numeric_limits<double>::infinity())
                     .release();
             } else {
-                return (*mppp_py::globals::mpf_class)(src.sgn() > 0 ? "inf" : "-inf").release();
+                return (*mppp_pybind11::globals::mpf_class)(src.sgn() > 0 ? "inf" : "-inf").release();
             }
         }
         if (src.nan_p()) {
             if (std::numeric_limits<double>::has_quiet_NaN) {
-                return (*mppp_py::globals::mpf_class)(std::numeric_limits<double>::quiet_NaN()).release();
+                return (*mppp_pybind11::globals::mpf_class)(std::numeric_limits<double>::quiet_NaN()).release();
             } else {
-                return (*mppp_py::globals::mpf_class)("nan").release();
+                return (*mppp_pybind11::globals::mpf_class)("nan").release();
             }
+        }
+        const auto prec = mppp_pybind11::globals::mpmath_mp->attr("prec").cast<::mpfr_prec_t>();
+        const auto src_prec = src.get_prec();
+        if (prec < src_prec) {
+            throw std::invalid_argument("Cannot convert the real " + src.to_string()
+                                        + " to an mpf: the precision of the real is " + std::to_string(src_prec)
+                                        + ", but the current mpf precision is only " + std::to_string(prec)
+                                        + " (please increase the current mpf precision to at least "
+                                        + std::to_string(src_prec) + " in order to avoid this error)");
         }
         mppp::integer<1> tmp;
         const auto exp = get_z_2exp(tmp, src);
-        return (*mppp_py::globals::mpf_class)(make_tuple(mppp_py::mppp_int_to_py(tmp), exp)).release();
+        return (*mppp_pybind11::globals::mpf_class)(make_tuple(mppp_pybind11::mppp_int_to_py(tmp), exp)).release();
     }
 };
+
+#endif
 }
 }
+
+#if defined(__clang__) || defined(__GNUC__)
+
+#pragma GCC diagnostic pop
+
+#endif
 
 #endif
