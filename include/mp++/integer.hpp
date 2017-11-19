@@ -1111,12 +1111,12 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
  *    integer<1> n = 5;
  *    int m = n;
  *
- * will not work, and direct initialization and explicit casting should be used instead:
+ * will not work, and direct initialization should be used instead:
  *
  * .. code-block:: c++
  *
  *    integer<1> n{5};
- *    int m = static_cast<int>(n);
+ *    int m{n};
  *
  * Most of the functionality is exposed via plain :ref:`functions <integer_functions>`, with the
  * general convention that the functions are named after the corresponding GMP functions minus the leading ``mpz_``

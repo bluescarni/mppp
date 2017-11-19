@@ -6,7 +6,7 @@
 [![Docs](https://media.readthedocs.org/static/projects/badges/passing.svg)](http://bluescarni.github.io/mppp/)
 [![Join the chat at https://gitter.im/bluescarni/mppp](https://badges.gitter.im/bluescarni/mppp.svg)](https://gitter.im/bluescarni/mppp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mppp/badges/version.svg)](https://anaconda.org/conda-forge/mppp)
-[![DOI](https://zenodo.org/badge/66504757.svg)](https://zenodo.org/badge/latestdoi/66504757)
+[![DOI](https://zenodo.org/badge/66504757.svg)](https://doi.org/10.5281/zenodo.1043579)
 
 mp++ is a C++11 header-only library for multiprecision arithmetic, currently supporting arbitrary-precision integers,
 rationals and floats, and quadruple-precision floats.
@@ -24,7 +24,8 @@ of mp++ is to provide a modern, consistent and unified C++ interface to several 
 mp++ is a spinoff of the [Piranha](https://github.com/bluescarni/piranha) library, released under the
 [MPL2](https://www.mozilla.org/en-US/MPL/2.0/FAQ/) license.
 
-If you are using mp++ in your research, please consider citing mp++. The DOI of the latest version can always be retrieved
-via [this link](https://zenodo.org/badge/latestdoi/66504757).
+If you are using mp++ as part of your research, teaching, or other activities, we would be grateful if you could star
+the repository and/or cite our work. The DOI of the latest version and other citation resources are available
+at [this link](https://doi.org/10.5281/zenodo.1043579).
 
 The documentation is available [here](https://bluescarni.github.io/mppp/).

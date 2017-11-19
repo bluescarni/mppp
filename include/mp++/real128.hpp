@@ -148,7 +148,7 @@ using real128_op_types_enabler
  * This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
  * (which features up to 36 decimal digits of precision).
  * The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available in GCC
- * and recent Clang versions on most contemporary platforms, on top of which it provides the following additions:
+ * and recent Clang versions on most modern platforms, on top of which it provides the following additions:
  *
  * * interoperability with other mp++ classes,
  * * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
@@ -168,12 +168,12 @@ using real128_op_types_enabler
  *    real128 r = 5.23;
  *    int m = r;
  *
- * will not work, and direct initialization and explicit casting should be used instead:
+ * will not work, and direct initialization should be used instead:
  *
  * .. code-block:: c++
  *
  *    real128 r{5.23};
- *    int m = static_cast<int>(r);
+ *    int m{r};
  *
  * Most of the functionality is exposed via plain :ref:`functions <real128_functions>`, with the
  * general convention that the functions are named after the corresponding quadmath functions minus the trailing ``q``
