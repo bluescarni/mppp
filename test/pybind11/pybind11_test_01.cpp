@@ -1,8 +1,38 @@
 #include <mp++/extra/pybind11.hpp>
 #include <mp++/mp++.hpp>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#if defined(__clang__) || defined(__GNUC__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+
+#endif
+
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
+#if defined(__clang__) || defined(__GNUC__)
+
+#pragma GCC diagnostic pop
+
+#endif
 
 namespace py = pybind11;
+
+template <typename T>
+static inline std::vector<T> test_vector(const std::vector<T> &v)
+{
+    return v;
+}
+
+template <typename T>
+static inline std::unordered_map<std::string, T> test_unordered_map(const std::unordered_map<std::string, T> &us)
+{
+    return us;
+}
 
 PYBIND11_PLUGIN(pybind11_test_01)
 {
@@ -18,7 +48,32 @@ PYBIND11_PLUGIN(pybind11_test_01)
 
 #if defined(MPPP_WITH_MPFR)
     m.def("test_real_conversion", [](const mppp::real &r) { return r; });
-    m.def("flup", []() { return mppp::real{"1.1", 1024}; });
+#endif
+
+#if defined(MPPP_WITH_QUADMATH)
+    m.def("test_real128_conversion", [](const mppp::real128 &r) { return r; });
+#endif
+
+    m.def("test_vector_conversion", test_vector<mppp::integer<1>>);
+    m.def("test_vector_conversion", test_vector<mppp::integer<2>>);
+    m.def("test_vector_conversion", test_vector<mppp::rational<1>>);
+    m.def("test_vector_conversion", test_vector<mppp::rational<2>>);
+#if defined(MPPP_WITH_QUADMATH)
+    m.def("test_vector_conversion", test_vector<mppp::real128>);
+#endif
+#if defined(MPPP_WITH_MPFR)
+    m.def("test_vector_conversion", test_vector<mppp::real>);
+#endif
+
+    m.def("test_unordered_map_conversion", test_unordered_map<mppp::integer<1>>);
+    m.def("test_unordered_map_conversion", test_unordered_map<mppp::integer<2>>);
+    m.def("test_unordered_map_conversion", test_unordered_map<mppp::rational<1>>);
+    m.def("test_unordered_map_conversion", test_unordered_map<mppp::rational<2>>);
+#if defined(MPPP_WITH_QUADMATH)
+    m.def("test_unordered_map_conversion", test_unordered_map<mppp::real128>);
+#endif
+#if defined(MPPP_WITH_MPFR)
+    m.def("test_unordered_map_conversion", test_unordered_map<mppp::real>);
 #endif
 
     return m.ptr();
