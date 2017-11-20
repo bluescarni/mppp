@@ -378,6 +378,15 @@ struct type_caster<mppp::real> {
         if (!mppp_pybind11::globals::mpmath) {
             throw std::runtime_error("Cannot convert a real to an mpf if mpmath is not available");
         }
+        const auto prec = mppp_pybind11::globals::mpmath_mp->attr("prec").cast<::mpfr_prec_t>();
+        const auto src_prec = src.get_prec();
+        if (prec < src_prec) {
+            throw std::invalid_argument("Cannot convert the real " + src.to_string()
+                                        + " to an mpf: the precision of the real (" + std::to_string(src_prec)
+                                        + ") is smaller than the current mpf precision (" + std::to_string(prec)
+                                        + "). Please increase the current mpf precision to at least "
+                                        + std::to_string(src_prec) + " in order to avoid this error");
+        }
         // Handle special values first.
         if (src.inf_p()) {
             if (std::numeric_limits<double>::has_infinity) {
@@ -394,15 +403,6 @@ struct type_caster<mppp::real> {
             } else {
                 return (*mppp_pybind11::globals::mpf_class)("nan").release();
             }
-        }
-        const auto prec = mppp_pybind11::globals::mpmath_mp->attr("prec").cast<::mpfr_prec_t>();
-        const auto src_prec = src.get_prec();
-        if (prec < src_prec) {
-            throw std::invalid_argument("Cannot convert the real " + src.to_string()
-                                        + " to an mpf: the precision of the real (" + std::to_string(src_prec)
-                                        + ") is smaller than the current mpf precision (" + std::to_string(prec)
-                                        + "). Please increase the current mpf precision to at least "
-                                        + std::to_string(src_prec) + " in order to avoid this error");
         }
         mppp::integer<1> tmp;
         const auto exp = get_z_2exp(tmp, src);
@@ -454,6 +454,14 @@ struct type_caster<mppp::real128> {
         if (!mppp_pybind11::globals::mpmath) {
             throw std::runtime_error("Cannot convert a real128 to an mpf if mpmath is not available");
         }
+        const auto prec = mppp_pybind11::globals::mpmath_mp->attr("prec").cast<::mpfr_prec_t>();
+        if (prec != mppp::safe_cast<::mpfr_prec_t>(mppp::real128_sig_digits())) {
+            throw std::invalid_argument(
+                "Cannot convert the real128 " + src.to_string() + " to an mpf: the precision of real128 ("
+                + std::to_string(mppp::real128_sig_digits()) + ") is different from the current mpf precision ("
+                + std::to_string(prec) + "). Please change the current mpf precision to "
+                + std::to_string(mppp::real128_sig_digits()) + " in order to avoid this error");
+        }
         if (isinf(src)) {
             if (std::numeric_limits<double>::has_infinity) {
                 return (*mppp_pybind11::globals::mpf_class)(src > 0 ? std::numeric_limits<double>::infinity()
@@ -469,14 +477,6 @@ struct type_caster<mppp::real128> {
             } else {
                 return (*mppp_pybind11::globals::mpf_class)("nan").release();
             }
-        }
-        const auto prec = mppp_pybind11::globals::mpmath_mp->attr("prec").cast<::mpfr_prec_t>();
-        if (prec != mppp::safe_cast<::mpfr_prec_t>(mppp::real128_sig_digits())) {
-            throw std::invalid_argument(
-                "Cannot convert the real128 " + src.to_string() + " to an mpf: the precision of real128 ("
-                + std::to_string(mppp::real128_sig_digits()) + ") is different from the current mpf precision ("
-                + std::to_string(prec) + "). Please change the current mpf precision to "
-                + std::to_string(mppp::real128_sig_digits()) + " in order to avoid this error");
         }
         int exp;
         const auto fr = scalbln(frexp(src, &exp), mppp::safe_cast<long>(mppp::real128_sig_digits()));
