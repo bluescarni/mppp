@@ -341,19 +341,30 @@ struct type_caster<mppp::real> {
         }
         const auto prec = src.attr("context").attr("prec").cast<::mpfr_prec_t>();
         value.set_prec(prec);
+        // NOTE: the _mpf_ tuple contains three elements:
+        // - the sign of the mpf,
+        // - an integral value n,
+        // - an exponent e such that n*2**e equals the mpf.
         const auto mpf_tuple = src.attr("_mpf_").cast<tuple>();
+        // Little helper to negate the value, depending on the sign in the tuple.
         auto neg_if_needed = [this, &mpf_tuple]() {
             if (mpf_tuple[0].cast<int>()) {
                 this->value.neg();
             }
         };
         if ((*mppp_pybind11::globals::mpf_isinf)(src).cast<bool>()) {
+            // Handle inf.
             set_inf(value);
             neg_if_needed();
         } else if ((*mppp_pybind11::globals::mpf_isnan)(src).cast<bool>()) {
+            // Handle NaN.
             set_nan(value);
         } else {
+            // Normal value.
             mppp::integer<1> sig;
+            // NOTE: the tuple returned by _mpf_ might contain an mpz from gmpy, instead of a Python integer. Thus, we
+            // need to convert to a Python integer in order to be extra sure we pass an object of the correct type
+            // to py_integer_to_mppp_int().
             if (!mppp_pybind11::py_integer_to_mppp_int(sig, int_(mpf_tuple[1]).ptr())) {
                 throw std::runtime_error("Could not interpret the significand of an mpf value as an integer object");
             }
@@ -367,6 +378,7 @@ struct type_caster<mppp::real> {
         if (!mppp_pybind11::globals::mpmath) {
             throw std::runtime_error("Cannot convert a real to an mpf if mpmath is not available");
         }
+        // Handle special values first.
         if (src.inf_p()) {
             if (std::numeric_limits<double>::has_infinity) {
                 return (*mppp_pybind11::globals::mpf_class)(src.sgn() > 0 ? std::numeric_limits<double>::infinity()
@@ -467,8 +479,7 @@ struct type_caster<mppp::real128> {
                 + std::to_string(mppp::real128_sig_digits()) + " in order to avoid this error");
         }
         int exp;
-        auto fr = mppp::real128{::frexpq(src.m_value, &exp)};
-        fr = scalbln(fr, mppp::safe_cast<long>(mppp::real128_sig_digits()));
+        const auto fr = scalbln(frexp(src, &exp), mppp::safe_cast<long>(mppp::real128_sig_digits()));
         return (*mppp_pybind11::globals::mpf_class)(
                    make_tuple(mppp_pybind11::mppp_int_to_py(mppp::integer<1>(fr)),
                               static_cast<long>(mppp::integer<1>{exp} - mppp::real128_sig_digits())))
