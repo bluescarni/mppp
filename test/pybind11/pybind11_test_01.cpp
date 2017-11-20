@@ -38,6 +38,22 @@ PYBIND11_MODULE(pybind11_test_01, m)
 {
     mppp_pybind11::init(m);
 
+    m.def("has_quadmath", []() {
+#if defined(MPPP_WITH_QUADMATH)
+        return true;
+#else
+        return false;
+#endif
+    });
+
+    m.def("has_mpfr", []() {
+#if defined(MPPP_WITH_MPFR)
+        return true;
+#else
+        return false;
+#endif
+    });
+
     m.def("test_int1_conversion", [](const mppp::integer<1> &n) { return n; });
     m.def("test_int2_conversion", [](const mppp::integer<2> &n) { return n; });
 
@@ -46,10 +62,20 @@ PYBIND11_MODULE(pybind11_test_01, m)
 
 #if defined(MPPP_WITH_MPFR)
     m.def("test_real_conversion", [](const mppp::real &r) { return r; });
+    m.def("test_real_conversion", [](const mppp::real &r, ::mpfr_prec_t prec) { return mppp::real{r, prec}; });
 #endif
 
 #if defined(MPPP_WITH_QUADMATH)
     m.def("test_real128_conversion", [](const mppp::real128 &r) { return r; });
+#endif
+
+    m.def("test_overload", [](const mppp::integer<1> &n) { return n; });
+    m.def("test_overload", [](const mppp::rational<1> &q) { return q; });
+#if defined(MPPP_WITH_QUADMATH)
+    m.def("test_overload", [](const mppp::real128 &r) { return r; });
+#endif
+#if defined(MPPP_WITH_MPFR)
+    m.def("test_overload", [](const mppp::real &r) { return r; });
 #endif
 
     m.def("test_vector_conversion", test_vector<mppp::integer<1>>);
