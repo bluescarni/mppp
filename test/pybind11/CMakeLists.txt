@@ -32,14 +32,13 @@ function(ADD_MPPP_PYBIND11_TESTCASE arg1)
         set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
         set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
     endif()
+    # Copy over the Python test runner.
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/run_${arg1}.py" "${CMAKE_CURRENT_BINARY_DIR}/run_${arg1}.py")
+    # Add the actual test.
+    add_test(NAME ${arg1} COMMAND "${PYTHON_EXECUTABLE}" run_${arg1}.py WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endfunction()
 
-# Copy over the Python test runner.
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/run_tests.py" "${CMAKE_CURRENT_BINARY_DIR}/run_tests.py")
-
 ADD_MPPP_PYBIND11_TESTCASE(pybind11_test_01)
-
-add_test(NAME pybind11 COMMAND "${PYTHON_EXECUTABLE}" run_tests.py WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Change the split test number in the parent scope.
 if(MPPP_TEST_NSPLIT)
