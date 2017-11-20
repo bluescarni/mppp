@@ -6,6 +6,13 @@ find_package(pybind11 REQUIRED)
 
 # NOTE: this is very similar to function for creating C++ tests.
 function(ADD_MPPP_PYBIND11_TESTCASE arg1)
+    if(MPPP_TEST_NSPLIT)
+        math(EXPR __MPPP_TEST_NUM "(${_MPPP_TEST_NUM} + 1) % ${MPPP_TEST_NSPLIT}")
+        set(_MPPP_TEST_NUM ${__MPPP_TEST_NUM} PARENT_SCOPE)
+    endif()
+    if(MPPP_TEST_NSPLIT AND "${MPPP_TEST_SPLIT_NUM}" STREQUAL "${_MPPP_TEST_NUM}")
+        return()
+    endif()
     pybind11_add_module(${arg1} ${arg1}.cpp)
     target_link_libraries(${arg1} PRIVATE mp++)
     target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
@@ -33,3 +40,8 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/run_tests.py" "${CMAKE_CURRENT_BINAR
 ADD_MPPP_PYBIND11_TESTCASE(pybind11_test_01)
 
 add_test(NAME pybind11 COMMAND "${PYTHON_EXECUTABLE}" run_tests.py WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+
+# Change the split test number in the parent scope.
+if(MPPP_TEST_NSPLIT)
+    set(_MPPP_TEST_NUM ${_MPPP_TEST_NUM} PARENT_SCOPE)
+endif()
