@@ -23,7 +23,8 @@ if you don't need all the features provided by mp++, and it may improve compilat
 .. note::
 
    The headers within the ``mp++/detail`` subdirectory are implementation details, and they should not be relied
-   upon as they change in breaking ways from version to version.
+   upon as they change in breaking ways from version to version. The headers within the ``mp++/extra`` subdirectory
+   are part of the public API but they are **not** included by the global ``mp++.hpp`` header.
 
 We will also assume, for convenience, that mp++'s multiprecision classes have been lifted into the root namespace,
 and we will introduce a couple of handy aliases for the :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
