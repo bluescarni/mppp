@@ -34,10 +34,8 @@ static inline std::unordered_map<std::string, T> test_unordered_map(const std::u
     return us;
 }
 
-PYBIND11_PLUGIN(pybind11_test_01)
+PYBIND11_MODULE(pybind11_test_01, m)
 {
-    py::module m("pybind11_test_01", "");
-
     mppp_pybind11::init(m);
 
     m.def("test_int1_conversion", [](const mppp::integer<1> &n) { return n; });
@@ -75,6 +73,4 @@ PYBIND11_PLUGIN(pybind11_test_01)
 #if defined(MPPP_WITH_MPFR)
     m.def("test_unordered_map_conversion", test_unordered_map<mppp::real>);
 #endif
-
-    return m.ptr();
 }

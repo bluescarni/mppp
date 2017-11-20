@@ -6,13 +6,14 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#ifndef MPPP_PY_UTILS_HPP
-#define MPPP_PY_UTILS_HPP
+#ifndef MPPP_EXTRA_PYBIND11_HPP
+#define MPPP_EXTRA_PYBIND11_HPP
 
 #if defined(__clang__) || defined(__GNUC__)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wdeprecated"
 
 #endif
 
@@ -27,6 +28,8 @@
 
 #if PY_MAJOR_VERSION == 2
 
+// This includes the definition of the long integer structure
+// in Python 2.x.
 #include <longintrepr.h>
 
 #endif
