@@ -1006,6 +1006,26 @@ inline bool get(T &rop, const real128 &x)
     return x.get(rop);
 }
 
+/// Decompose a \link mppp::real128 real128\endlink into a normalized fraction and an integral power of two.
+/**
+ * \rststar
+ * If ``x`` is zero, this function will return zero and store zero in ``exp``. Otherwise,
+ * this function will return a :cpp:class:`~mppp::real128` :math:`r` with an absolute value in the
+ * :math:`\left[0.5,1\right)` range, and it will store an integer value :math:`n` in ``exp``
+ * such that :math:`r \times 2^n` equals to :math:`r`. If ``x`` is a non-finite value, the return
+ * value will be ``x`` and an unspecified value will be stored in ``exp``.
+ * \endrststar
+ *
+ * @param x the input \link mppp::real128 real128\endlink.
+ * @param exp a pointer to the value that will store the exponent.
+ *
+ * @return the binary significand of ``x``.
+ */
+inline real128 frexp(const real128 &x, int *exp)
+{
+    return real128{::frexpq(x.m_value, exp)};
+}
+
 /** @} */
 
 /** @defgroup real128_arithmetic real128_arithmetic
