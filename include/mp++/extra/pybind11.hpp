@@ -108,7 +108,13 @@ inline void cleanup()
 }
 }
 
-// Main initialisation function.
+/// Initialisation function for the pybind11 integration.
+/**
+ * This function should be called right after the ``PYBIND11_MODULE()`` invocation, and it must be
+ * passed the second argument to ``PYBIND11_MODULE()``.
+ *
+ * @param m the target pybind11 module.
+ */
 inline void init(py::module &m)
 {
     if (globals::inited) {

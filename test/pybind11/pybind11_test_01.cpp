@@ -20,8 +20,6 @@
 
 #endif
 
-namespace py = pybind11;
-
 template <typename T>
 static inline std::vector<T> test_vector(const std::vector<T> &v)
 {
@@ -29,9 +27,9 @@ static inline std::vector<T> test_vector(const std::vector<T> &v)
 }
 
 template <typename T>
-static inline std::unordered_map<std::string, T> test_unordered_map(const std::unordered_map<std::string, T> &us)
+static inline std::unordered_map<std::string, T> test_unordered_map(const std::unordered_map<std::string, T> &um)
 {
-    return us;
+    return um;
 }
 
 PYBIND11_MODULE(pybind11_test_01, m)
