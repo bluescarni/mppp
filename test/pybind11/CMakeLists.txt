@@ -33,9 +33,9 @@ function(ADD_MPPP_PYBIND11_TESTCASE arg1)
         set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
     endif()
     # Copy over the Python test runner.
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/run_${arg1}.py" "${CMAKE_CURRENT_BINARY_DIR}/run_${arg1}.py")
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/run_${arg1}.py" "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/run_${arg1}.py")
     # Add the actual test.
-    add_test(NAME ${arg1} COMMAND "${PYTHON_EXECUTABLE}" run_${arg1}.py WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+    add_test(NAME ${arg1} COMMAND "${PYTHON_EXECUTABLE}" run_${arg1}.py WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}")
 endfunction()
 
 ADD_MPPP_PYBIND11_TESTCASE(pybind11_test_01)
