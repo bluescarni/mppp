@@ -35,7 +35,8 @@ Changes
 Fix
 ~~~
 
-- Various internal cleanups in :cpp:class:`~mppp::integer` (`#80 <https://github.com/bluescarni/mppp/pull/80>`__).
+- Various internal cleanups in :cpp:class:`~mppp::integer` (`#80 <https://github.com/bluescarni/mppp/pull/80>`__,
+  `#85 <https://github.com/bluescarni/mppp/pull/85>`__).
 
 - Small fixes regarding the use of GMP type aliases in :cpp:class:`~mppp::integer` (`#73 <https://github.com/bluescarni/mppp/pull/73>`__).
 
