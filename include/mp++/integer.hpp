@@ -478,6 +478,29 @@ inline std::size_t uint_to_limb_array(limb_array_t<T> &rop, T n)
     return size;
 }
 
+// Small utility to check that no nail bits are set.
+inline bool check_no_nails(const ::mp_limb_t &l)
+{
+    return l <= GMP_NUMB_MAX;
+}
+
+// Small utility to compute the absolute value of the size of a 2-limbs number from its lo and hi limbs.
+// Requires no nail bits in hi or lo.
+inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
+{
+    assert(check_no_nails(lo) && check_no_nails(hi));
+    // NOTE: this contraption ensures the correct result. The possibilities for hi/lo
+    // nonzero are:
+    // hi | lo | asize
+    // ---------------
+    //  1 |  1 |     2
+    //  1 |  0 |     2
+    //  0 |  1 |     1
+    //  0 |  0 |     0
+    // Use '|' instead of '||' as we don't need to short circuit on this.
+    return static_cast<mpz_size_t>(((lo != 0u) | (hi != 0u)) * ((hi != 0u) + 1));
+}
+
 // The static integer class.
 template <std::size_t SSize>
 struct static_int {
@@ -2946,18 +2969,9 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             assert(data1[0] >= data2[0] || data1[1] > data2[1]);
             // This can never wrap around, at most it goes to zero.
             const auto hi = data1[1] - data2[1] - static_cast<::mp_limb_t>(data1[0] < data2[0]);
-            // asize can be 0, 1 or 2.
-            // NOTE: this contraption ensures the correct result. The possibilities for hi/lo
-            // nonzero are:
-            // hi | lo | asize
-            // ---------------
-            //  1 |  1 |     2
-            //  1 |  0 |     2
-            //  0 |  1 |     1
-            //  0 |  0 |     0
-            // The sign1 (which cannot be zero due to the branch we are in) takes care of the sign of the size.
-            // Use '|' instead of '||' as we don't need to short circuit on this.
-            rop._mp_size = sign1 * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
+            // asize can be 0, 1 or 2. The sign1 (which cannot be zero due to the branch we are in)
+            // takes care of the sign of the size.
+            rop._mp_size = sign1 * size_from_lohi(lo, hi);
             rdata[0] = lo;
             rdata[1] = hi;
         } else {
@@ -3173,9 +3187,7 @@ inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize
             return false;
         }
         // Compute the new asize. It can be 0, 1 or 2.
-        // NOTE: see the comments in the 2-limb specialisation for addition.
-        rop._mp_size
-            = (AddOrSub ? 1 : -1) * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
+        rop._mp_size = (AddOrSub ? 1 : -1) * size_from_lohi(lo, hi);
         // Write out.
         rdata[0] = lo;
         rdata[1] = hi;
@@ -3189,8 +3201,7 @@ inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize
             // Sub from hi the borrow.
             const auto hi = data1[1] - static_cast<::mp_limb_t>(data1[0] < l2);
             // The final asize can be 2, 1 or 0. Sign is negative for add, positive for sub.
-            rop._mp_size
-                = (AddOrSub ? -1 : 1) * (static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1));
+            rop._mp_size = (AddOrSub ? -1 : 1) * size_fom_lohi(lo, hi);
             rdata[0] = lo;
             rdata[1] = hi;
         } else {
@@ -3742,8 +3753,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
             // This can never wrap around, at most it goes to zero.
             const auto hi = rop.m_limbs[1] - prod[1] - static_cast<::mp_limb_t>(rop.m_limbs[0] < prod[0]);
             // asize can be 0, 1 or 2.
-            // NOTE: see the comments in the 2-limb specialisation for addition.
-            rop._mp_size = signr * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
+            rop._mp_size = signr * size_from_lohi(lo, hi);
             rop.m_limbs[0] = lo;
             rop.m_limbs[1] = hi;
         } else {
