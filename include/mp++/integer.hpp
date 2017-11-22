@@ -4877,61 +4877,66 @@ inline bool is_negative_one(const integer<SSize> &n)
 inline namespace detail
 {
 
+inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const static_int<1> &op2, mpz_size_t,
+                            mpz_size_t, int sign1, int sign2)
+{
+    const ::mp_limb_t l1 = op1.m_limbs[0] & GMP_NUMB_MASK, l2 = op2.m_limbs[0] & GMP_NUMB_MASK;
+    if (sign1 >= 0 && sign2 >= 0) {
+        // The easy case: both are nonnegative.
+        ::mp_limb_t ret = l1 | l2;
+        rop._mp_size = ret != 0u;
+        rop.m_limbs[0] = ret;
+        return;
+    }
+    // NOTE: my understanding is the following:
+    // - the size of the operands is considered to be their real bit size, plus a phantom bit
+    //   on top due to the fake two's complement representation for negative numbers;
+    // - the size of the result will be the max operand size.
+    // For instance, for ORing 25 and -5 we start like this:
+    // ... 0 1 1 0 0 1 | <-- 25 (5 "real bits", plus a fake bit on top)
+    // ... 0 0 0 1 0 1   <-- 5
+    // We do the two's complement of 5 to produce -5:
+    // ... 0 1 1 0 0 1 | <-- 25
+    // ... 1 1 1 0 1 1   <-- -5 (in two's complement)
+    // ---------------
+    // ... 1 1 1 0 1 1
+    // The result has the "top" bit set, thus it's a negative number. We take again
+    // the two's complement to get its absolute value:
+    // ... 0 0 0 1 0 1
+    // So the final result is -5.
+    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    rop._mp_size = -1;
+    switch (sign_mask) {
+        case 1u:
+            // op1 negative, op2 nonnegative.
+            rop.m_limbs[0] = (~((~l1 + 1u) | l2) + 1u) & GMP_NUMB_MASK;
+            break;
+        case 2u:
+            // op1 nonnegative, op2 negative.
+            rop.m_limbs[0] = (~((~l2 + 1u) | l1) + 1u) & GMP_NUMB_MASK;
+            break;
+        case 3u:
+            // Both negative.
+            rop.m_limbs[0] = (~((~l1 + 1u) | (~l2 + 1u)) + 1u) & GMP_NUMB_MASK;
+            break;
+    }
+}
+
 template <std::size_t SSize>
-inline bool static_bitwise_ior(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+inline void static_ior(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
     mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
-    bool pos1 = true, pos2 = true;
+    int sign1 = asize1 != 0, sign2 = asize2 != 0;
     if (asize1 < 0) {
         asize1 = -asize1;
-        pos1 = false;
+        sign1 = -1;
     }
     if (asize2 < 0) {
         asize2 = -asize2;
-        pos2 = false;
+        sign2 = -1;
     }
-    // Handle zeroes: this will result simply in a copy.
-    if (!asize1) {
-        rop._mp_size = asize2;
-        rop.m_limbs = op2.m_limbs;
-        return true;
-    }
-    if (!asize2) {
-        rop._mp_size = asize1;
-        rop.m_limbs = op1.m_limbs;
-        return true;
-    }
-    if (pos1 && pos2) {
-        // This is the easiest case: just OR all the limbs into rop.
-        const static_int<SSize> *max_op = &op1;
-        mpz_size_t max_asize = asize1, min_asize = asize2;
-        if (asize2 > asize1) {
-            max_op = &op2;
-            std::swap(max_asize, min_asize);
-        }
-        // Write the size of rop.
-        rop._mp_size = max_asize;
-        // OR the limbs up to min_asize.
-        mpz_size_t i = 0;
-        for (; i < min_asize; ++i) {
-            rop.m_limbs[static_cast<std::size_t>(i)] = op1.m_limbs[static_cast<std::size_t>(i)] | op2.m_limbs[static_cast<std::size_t>(i)];
-        }
-        // Copy the remaining limbs.
-        for (; i < max_asize; ++i) {
-            rop.m_limbs[static_cast<std::size_t>(i)] = max_op->m_limbs[static_cast<std::size_t>(i)];
-        }
-        // Zero the top limbs.
-        std::fill(rop.m_limbs.begin() + max_asize, rop.m_limbs.end(), ::mp_limb_t(0));
-        return true;
-    }
-    return false;
-    // Compute the size in bits of the top limb and the whole number.
-    const std::size_t top_size1 = limb_size_nbits(op1.m_limbs[static_cast<std::size_t>(asize1 - 1)]);
-    const std::size_t top_size2 = limb_size_nbits(op2.m_limbs[static_cast<std::size_t>(asize2 - 1)]);
-    const std::size_t nbits1 = static_cast<std::size_t>(asize1 - 1) * unsigned(GMP_NUMB_BITS) + top_size1;
-    const std::size_t nbits2 = static_cast<std::size_t>(asize2 - 1) * unsigned(GMP_NUMB_BITS) + top_size2;
+    static_ior_impl(rop, op1, op2, asize1, asize2, sign1, sign2);
 }
-
 }
 
 template <std::size_t SSize>
@@ -4942,8 +4947,7 @@ inline integer<SSize> &bitwise_ior(integer<SSize> &rop, const integer<SSize> &op
         if (!sr) {
             rop.set_zero();
         }
-        // ????
-
+        static_ior(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
         return rop;
     }
     if (sr) {
@@ -6569,6 +6573,20 @@ inline bool operator>=(const T &op1, const U &op2)
 #endif
 {
     return !(op1 < op2);
+}
+
+template <std::size_t SSize>
+inline integer<SSize> operator|(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval;
+    bitwise_ior(retval, op1, op2);
+    return retval;
+}
+
+template <std::size_t SSize>
+inline integer<SSize> &operator|=(integer<SSize> &rop, const integer<SSize> &op)
+{
+    return bitwise_ior(rop, rop, op);
 }
 
 /** @} */
