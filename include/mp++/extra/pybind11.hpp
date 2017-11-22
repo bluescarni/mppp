@@ -411,6 +411,7 @@ struct type_caster<mppp::real> {
             }
         }
         mppp::integer<1> tmp;
+        // NOTE: this function will run internal checks on overflow.
         const auto exp = get_z_2exp(tmp, src);
         return (*mppp_pybind11::globals::mpf_class)(make_tuple(mppp_pybind11::mppp_int_to_py(tmp), exp)).release();
     }
@@ -449,8 +450,20 @@ struct type_caster<mppp::real128> {
             if (!mppp_pybind11::py_integer_to_mppp_int(sig, int_(mpf_tuple[1]).ptr())) {
                 throw std::runtime_error("Could not interpret the significand of an mpf value as an integer object");
             }
+            // NOTE: we have to be careful here. We might have a very large significand
+            // coming in from the _mpf_ tuple (i.e., very high precision), even if the final value
+            // is small. If the significand is larger than 113 bits, then we will scale it down
+            // and adjust the exponent accordingly.
+            auto exp = mppp::integer<1>{mpf_tuple[2].cast<long>()};
+            const auto sig_nbits = sig.nbits();
+            if (sig_nbits > mppp::real128_sig_digits()) {
+                sig >>= (sig_nbits - mppp::real128_sig_digits());
+                exp += (sig_nbits - mppp::real128_sig_digits());
+            }
+            // Now we can set safely the real128 to the significand.
             value = sig;
-            value = scalbln(value, mpf_tuple[2].cast<long>());
+            // Offset by the (possibly adjusted) exponent.
+            value = scalbln(value, static_cast<long>(exp));
             neg_if_needed();
         }
         return true;
