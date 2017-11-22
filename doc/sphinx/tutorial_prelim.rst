@@ -7,8 +7,8 @@ In this tutorial, we will assume that the global mp++ header has been included:
 
    #include <mp++/mp++.hpp>
 
-The ``mp++.hpp`` header will pull in the public mp++ API in its entirety. It is also possible
-to include individual mp++ headers instead of ``mp++.hpp``, e.g.:
+The ``mp++.hpp`` header will pull in the public mp++ API in its entirety.
+It is also possible to include individual mp++ headers instead of ``mp++.hpp``, e.g.:
 
 .. code-block:: c++
 
@@ -20,10 +20,10 @@ to include individual mp++ headers instead of ``mp++.hpp``, e.g.:
 Including individual headers rather than the global ``mp++.hpp`` header is in general a good idea
 if you don't need all the features provided by mp++, and it may improve compilation times.
 
-.. note::
+.. warning::
 
-   The headers within the ``mp++/detail`` subdirectory are implementation details, and they should not be relied
-   upon as they change in breaking ways from version to version.
+   Do **not** include headers from the ``mp++/detail`` subdirectory! They contain
+   implementation details which may change from version to version in incompatible ways.
 
 We will also assume, for convenience, that mp++'s multiprecision classes have been lifted into the root namespace,
 and we will introduce a couple of handy aliases for the :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`

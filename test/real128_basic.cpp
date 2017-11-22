@@ -390,3 +390,17 @@ TEST_CASE("real128 conversions")
     REQUIRE(get(rrop, real128{"-3.40917866435610111081769936359662259e-4957"}));
     REQUIRE((rrop == rat_t{-32135, int_t{1} << 16480ul}));
 }
+
+TEST_CASE("real128 frexp")
+{
+    int exp;
+    REQUIRE(frexp(real128{}, &exp) == 0);
+    REQUIRE(exp == 0);
+    REQUIRE(frexp(real128_inf(), &exp) == real128_inf());
+    REQUIRE(frexp(-real128_inf(), &exp) == -real128_inf());
+    REQUIRE(isnan(frexp(real128_nan(), &exp)));
+    REQUIRE(frexp(real128{16}, &exp) == real128{"0.5"});
+    REQUIRE(exp == 5);
+    REQUIRE(frexp(1 / real128{16}, &exp) == real128{"0.5"});
+    REQUIRE(exp == -3);
+}
