@@ -3015,7 +3015,7 @@ inline integer<SSize> &add(integer<SSize> &rop, const integer<SSize> &op1, const
     const bool s1 = op1.is_static(), s2 = op2.is_static();
     bool sr = rop.is_static();
     if (mppp_likely(s1 && s2)) {
-        // If both op1 and op2 are static, we will try to do the statid add.
+        // If both op1 and op2 are static, we will try to do the static add.
         // We might need to downgrade rop to static.
         if (!sr) {
             // NOTE: here we are sure rop is distinct from op1/op2, as
@@ -4716,12 +4716,10 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
 template <std::size_t SSize>
 inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
 {
-    const bool sn = n.is_static();
-    bool sr = rop.is_static();
+    const bool sn = n.is_static(), sr = rop.is_static();
     if (mppp_likely(sn)) {
         if (!sr) {
             rop.set_zero();
-            sr = true;
         }
         static_tdiv_q_2exp(rop._get_union().g_st(), n._get_union().g_st(), s);
         return rop;
@@ -5411,7 +5409,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
         if (!size) {
             // Special casing for zero.
             rs._mp_size = 0;
-            rs.zero_unused_limbs();
+            rs.zero_upper_limbs(0);
             return;
         }
         // In case of overlap we need to go through a tmp variable.
