@@ -1,6 +1,8 @@
 Macros and definitions
 ======================
 
+.. versionadded:: 0.6
+
 *#include <mp++/config.hpp>*
 
 .. c:macro:: MPPP_VERSION_STRING

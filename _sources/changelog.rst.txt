@@ -7,6 +7,10 @@ Changelog
 New
 ~~~
 
+- Implement :ref:`integration with pybind11 <tutorial_pybind11>` (`#81 <https://github.com/bluescarni/mppp/pull/81>`__).
+
+- Implement the ``frexp()`` primitive for :cpp:class:`~mppp::real128` (`#81 <https://github.com/bluescarni/mppp/pull/81>`__).
+
 - Implement the ``get/set_z_2exp()`` primitives for :cpp:class:`~mppp::real` (`#77 <https://github.com/bluescarni/mppp/pull/77>`__).
 
 - Implement construction with preallocated storage for :cpp:class:`~mppp::integer` (`#74 <https://github.com/bluescarni/mppp/pull/74>`__).

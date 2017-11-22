@@ -913,6 +913,28 @@ not be altered.</p>
 </p>
 </dd></dl>
 
+<dl class="function">
+<dt id="_CPPv2N4mppp5frexpERK7real128Pi">
+<span id="mppp::frexp__real128CR.iP"></span><span class="target" id="group__real128__conversion_1gaef50ae6784a0e893692f11f93a07dcf6"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp::</code><code class="descname">frexp</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em>, int *<em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp5frexpERK7real128Pi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Decompose a <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> into a normalized fraction and an integral power of two. </p>
+<p>If <code class="docutils literal"><span class="pre">x</span></code> is zero, this function will return zero and store zero in <code class="docutils literal"><span class="pre">exp</span></code>. Otherwise,
+this function will return a <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> <span class="math">\(r\)</span> with an absolute value in the
+<span class="math">\(\left[0.5,1\right)\)</span> range, and it will store an integer value <span class="math">\(n\)</span> in <code class="docutils literal"><span class="pre">exp</span></code>
+such that <span class="math">\(r \times 2^n\)</span> equals to <span class="math">\(r\)</span>. If <code class="docutils literal"><span class="pre">x</span></code> is a non-finite value, the return
+value will be <code class="docutils literal"><span class="pre">x</span></code> and an unspecified value will be stored in <code class="docutils literal"><span class="pre">exp</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the binary significand of <code class="docutils literal"><span class="pre">x</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">x</span></code>: the input <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a>. </li>
+<li><code class="docutils literal"><span class="pre">exp</span></code>: a pointer to the value that will store the exponent.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
 </div>
 <div class="section" id="arithmetic">
 <span id="real128-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>

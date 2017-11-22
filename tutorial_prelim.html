@@ -135,8 +135,8 @@
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;mp++/mp++.hpp&gt;</span><span class="cp"></span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">mp++.hpp</span></code> header will pull in the public mp++ API in its entirety. It is also possible
-to include individual mp++ headers instead of <code class="docutils literal"><span class="pre">mp++.hpp</span></code>, e.g.:</p>
+<p>The <code class="docutils literal"><span class="pre">mp++.hpp</span></code> header will pull in the public mp++ API in its entirety.
+It is also possible to include individual mp++ headers instead of <code class="docutils literal"><span class="pre">mp++.hpp</span></code>, e.g.:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;mp++/integer.hpp&gt;  // For the integer multiprecision class</span><span class="cp"></span>
                              <span class="c1">// and associated functions.</span>
 <span class="cp">#include</span> <span class="cpf">&lt;mp++/rational.hpp&gt; // For the rational multiprecision class</span><span class="cp"></span>
@@ -145,10 +145,10 @@ to include individual mp++ headers instead of <code class="docutils literal"><sp
 </div>
 <p>Including individual headers rather than the global <code class="docutils literal"><span class="pre">mp++.hpp</span></code> header is in general a good idea
 if you don’t need all the features provided by mp++, and it may improve compilation times.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The headers within the <code class="docutils literal"><span class="pre">mp++/detail</span></code> subdirectory are implementation details, and they should not be relied
-upon as they change in breaking ways from version to version.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do <strong>not</strong> include headers from the <code class="docutils literal"><span class="pre">mp++/detail</span></code> subdirectory! They contain
+implementation details which may change from version to version in incompatible ways.</p>
 </div>
 <p>We will also assume, for convenience, that mp++’s multiprecision classes have been lifted into the root namespace,
 and we will introduce a couple of handy aliases for the <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>

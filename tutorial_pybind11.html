@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Integration with pybind11 &#8212; mp++ 0.6 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Reference" href="reference.html" />
+    <link rel="prev" title="The numerical tower and type coercion" href="tutorial_numtower.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          mp++</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.6</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Integration with pybind11</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="tutorial_numtower.html" title="Previous Chapter: The numerical tower and type coercion"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; The numerical...</span>
+    </a>
+  </li>
+  <li>
+    <a href="reference.html" title="Next Chapter: Reference"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Reference &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/tutorial_pybind11.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="integration-with-pybind11">
+<span id="tutorial-pybind11"></span><h1>Integration with pybind11<a class="headerlink" href="#integration-with-pybind11" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The functionality described in this section is experimental, and it may be
+subject to API changes in future versions.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.6.</span></p>
+</div>
+<p><em>#include &lt;mp++/extra/pybind11.hpp&gt;</em></p>
+<p>The <code class="docutils literal"><span class="pre">mp++/extra/pybind11.hpp</span></code> header provides facilities to seamlessly translate
+mp++ multiprecision objects to/from Python in <a class="reference external" href="https://github.com/pybind/pybind11">pybind11</a>
+modules. The functionality currently includes a single function in the <code class="docutils literal"><span class="pre">mppp_pybind11</span></code> namespace.</p>
+<dl class="function">
+<dt id="_CPPv2N13mppp_pybind114initERN2py6moduleE">
+<span id="mppp_pybind11::init__py::moduleR"></span><span class="target" id="pybind11_8hpp_1a9f9347b18583f77f01cc951725c2065d"></span>void <code class="descclassname">mppp_pybind11::</code><code class="descname">init</code><span class="sig-paren">(</span>py::module &amp;<em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N13mppp_pybind114initERN2py6moduleE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Initialisation function for the pybind11 integration. </p>
+<p>This function should be called right after the <code class="docutils literal"><span class="pre">PYBIND11_MODULE()</span></code> invocation, and it must be passed the second argument to <code class="docutils literal"><span class="pre">PYBIND11_MODULE()</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">m</span></code>: the target pybind11 module. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<p>Including the <code class="docutils literal"><span class="pre">mp++/extra/pybind11.hpp</span></code> header and invoking the <a class="reference internal" href="#_CPPv2N13mppp_pybind114initERN2py6moduleE" title="mppp_pybind11::init"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp_pybind11::init()</span></code></a>
+function will register <a class="reference external" href="http://pybind11.readthedocs.io/en/master/advanced/cast/custom.html">custom type casters</a>
+that will automatically translate to/from Python mp++ objects used as arguments and return values in
+functions exposed from C++ in pybind11 modules. The translation rules are the following:</p>
+<ul class="simple">
+<li><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects are converted to/from Python integers,</li>
+<li><a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> objects are converted to/from Python <a class="reference external" href="https://docs.python.org/3.6/library/fractions.html">fractions</a>,</li>
+<li><a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> and <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> objects are translated to/from <a class="reference external" href="http://mpmath.org/">mpmath’s mpf objects</a>.</li>
+</ul>
+<p>If the mpmath library is not installed, the translations for <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> and <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> will be disabled
+at runtime.</p>
+<p>Let’s take a look at an example of a pybind11 module enabling automatic translation of mp++ objects:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;mp++/mp++.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;mp++/extra/pybind11.hpp&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;unordered_map&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;pybind11/pybind11.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;pybind11/stl.h&gt;</span><span class="cp"></span>
+
+<span class="c1">// A couple of functions accepting and returning C++ containers.</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">static</span> <span class="kr">inline</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">test_vector</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="k">static</span> <span class="kr">inline</span> <span class="n">std</span><span class="o">::</span><span class="n">unordered_map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="n">test_unordered_map</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">unordered_map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">um</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">um</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">PYBIND11_MODULE</span><span class="p">(</span><span class="n">pybind11_test_01</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Init the pybind11 integration for this module.</span>
+    <span class="n">mppp_pybind11</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+
+    <span class="c1">// Expose a few functions testing the automatic translation of mp++ objects.</span>
+    <span class="c1">// -------------------------------------------------------------------------</span>
+
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_int1_conversion&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">n</span><span class="p">;</span> <span class="p">});</span>
+
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_rat1_conversion&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">mppp</span><span class="o">::</span><span class="n">rational</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">q</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">q</span><span class="p">;</span> <span class="p">});</span>
+
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_real_conversion&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">mppp</span><span class="o">::</span><span class="n">real</span> <span class="o">&amp;</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">r</span><span class="p">;</span> <span class="p">});</span>
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_real_conversion&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">mppp</span><span class="o">::</span><span class="n">real</span> <span class="o">&amp;</span><span class="n">r</span><span class="p">,</span> <span class="o">::</span><span class="n">mpfr_prec_t</span> <span class="n">prec</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">mppp</span><span class="o">::</span><span class="n">real</span><span class="p">{</span><span class="n">r</span><span class="p">,</span> <span class="n">prec</span><span class="p">};</span> <span class="p">});</span>
+
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_real128_conversion&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">mppp</span><span class="o">::</span><span class="n">real128</span> <span class="o">&amp;</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">r</span><span class="p">;</span> <span class="p">});</span>
+
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_overload&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">n</span><span class="p">;</span> <span class="p">});</span>
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_overload&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">mppp</span><span class="o">::</span><span class="n">rational</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">q</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">q</span><span class="p">;</span> <span class="p">});</span>
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_overload&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">mppp</span><span class="o">::</span><span class="n">real128</span> <span class="o">&amp;</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">r</span><span class="p">;</span> <span class="p">});</span>
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_overload&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="k">const</span> <span class="n">mppp</span><span class="o">::</span><span class="n">real</span> <span class="o">&amp;</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">r</span><span class="p">;</span> <span class="p">});</span>
+
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_vector_conversion&quot;</span><span class="p">,</span> <span class="n">test_vector</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;&gt;</span><span class="p">);</span>
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_vector_conversion&quot;</span><span class="p">,</span> <span class="n">test_vector</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">rational</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;&gt;</span><span class="p">);</span>
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_vector_conversion&quot;</span><span class="p">,</span> <span class="n">test_vector</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">real128</span><span class="o">&gt;</span><span class="p">);</span>
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_vector_conversion&quot;</span><span class="p">,</span> <span class="n">test_vector</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">real</span><span class="o">&gt;</span><span class="p">);</span>
+
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_unordered_map_conversion&quot;</span><span class="p">,</span> <span class="n">test_unordered_map</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;&gt;</span><span class="p">);</span>
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_unordered_map_conversion&quot;</span><span class="p">,</span> <span class="n">test_unordered_map</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">rational</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;&gt;</span><span class="p">);</span>
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_unordered_map_conversion&quot;</span><span class="p">,</span> <span class="n">test_unordered_map</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">real128</span><span class="o">&gt;</span><span class="p">);</span>
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_unordered_map_conversion&quot;</span><span class="p">,</span> <span class="n">test_unordered_map</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">real</span><span class="o">&gt;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that the exposed functions just return a copy of their input parameter.
+Now let’s try to call the exposed functions from Python:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pybind11_test_01</span> <span class="k">as</span> <span class="nn">p</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fractions</span> <span class="k">import</span> <span class="n">Fraction</span> <span class="k">as</span> <span class="n">F</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_int1_conversion</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="go">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_int1_conversion</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">-1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_rat1_conversion</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">Fraction(3, 4)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_rat1_conversion</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="go">Fraction(-1, 2)</span>
+</pre></div>
+</div>
+<p>Indeed, the Python objects passed as arguments to the exposed functions are correctly translated to mp++ objects
+before being passed to the C++ functions, and the mp++ return values are correctly translated back to the original Python objects.</p>
+<p>Let’s try with some floating-point objects:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mpmath</span> <span class="k">import</span> <span class="n">mpf</span><span class="p">,</span> <span class="n">mp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">))</span>
+<span class="go">mpf(&#39;1.1000000000000001&#39;)</span>
+</pre></div>
+</div>
+<p>The default precision in mpmath is 53 (double-precision), and indeed the conversion between <code class="docutils literal"><span class="pre">mpf</span></code> on the Python side
+and <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> on the C++ side is done with 53 bits of precision. We can increase the precision to 200 bits and
+verify that the value is correctly preserved and translated:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">))</span>
+<span class="go">mpf(&#39;1.1000000000000000000000000000000000000000000000000000000000002&#39;)</span>
+</pre></div>
+</div>
+<p>If the precision is set <strong>exactly</strong> to 113, <code class="docutils literal"><span class="pre">mpf</span></code> objects can be converted to <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">113</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real128_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">))</span>
+<span class="go">mpf(&#39;1.10000000000000000000000000000000008&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">114</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real128_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+     <span class="o">...</span>
+<span class="gr">TypeError</span>: <span class="n">test_real128_conversion(): incompatible function arguments. The following argument types are supported:</span>
+<span class="go">    1. (arg0: real128) -&gt; real128</span>
+
+<span class="go">Invoked with: mpf(&#39;1.09999999999999999999999999999999998&#39;)</span>
+</pre></div>
+</div>
+<p>A <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> will be successfully converted to an <code class="docutils literal"><span class="pre">mpf</span></code> iff the current mpmath working precision is exactly 113.
+A <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> will be successfully converted to an <code class="docutils literal"><span class="pre">mpf</span></code> iff its precision is not greater than the current mpmath working precision:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">53</span><span class="p">;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">),</span> <span class="mi">100</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+     <span class="o">...</span>
+<span class="gr">ValueError</span>: <span class="n">Cannot convert the real 1.1000000000000000888178419700125 to an mpf: the precision of the real (100) is smaller than the current mpf precision (53). Please increase the current mpf precision to at least 100 in order to avoid this error</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">),</span> <span class="mi">100</span><span class="p">)</span>
+<span class="go">mpf(&#39;1.1000000000000000000000000000003&#39;)</span>
+</pre></div>
+</div>
+<p>Overloaded functions are supported as well:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_overload</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">-2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_overload</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="go">Fraction(6, 7)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_overload</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.3&quot;</span><span class="p">))</span>
+<span class="go">mpf(&#39;1.2999999999999999999999999999994&#39;)</span>
+</pre></div>
+</div>
+<p>Note that, due to the fact that <code class="docutils literal"><span class="pre">mpf</span></code> arguments can be converted both to <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> and <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>,
+overloads with <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> arguments should be exposed <strong>before</strong> overloads with <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> arguments
+(otherwise, the <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> overload will always be preferred).</p>
+<p>Finally, we can verify that the conversion between mp++ and Python works also when containers are involved:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_vector_conversion</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="go">[1, 2, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_vector_conversion</span><span class="p">([</span><span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])</span>
+<span class="go">[Fraction(1, 1), Fraction(1, 2), Fraction(1, 3)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_vector_conversion</span><span class="p">([</span><span class="n">mpf</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">mpf</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+<span class="go">[mpf(&#39;1.0&#39;), mpf(&#39;2.0&#39;), mpf(&#39;3.0&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_unordered_map_conversion</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
+<span class="go">{&#39;a&#39;: 1, &#39;b&#39;: 3}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_unordered_map_conversion</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)})</span>
+<span class="go">{&#39;a&#39;: Fraction(1, 2), &#39;b&#39;: Fraction(1, 3)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_unordered_map_conversion</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">mpf</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">mpf</span><span class="p">(</span><span class="mi">3</span><span class="p">)})</span>
+<span class="go">{&#39;a&#39;: mpf(&#39;1.0&#39;), &#39;b&#39;: mpf(&#39;3.0&#39;)}</span>
+</pre></div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
