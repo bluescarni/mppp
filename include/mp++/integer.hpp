@@ -4932,6 +4932,55 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
     }
 }
 
+inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const static_int<2> &op2, mpz_size_t,
+                            mpz_size_t, int sign1, int sign2)
+{
+    const ::mp_limb_t lo1 = (op1.m_limbs[0] & GMP_NUMB_MASK), hi1 = (op1.m_limbs[1] & GMP_NUMB_MASK),
+                      lo2 = (op2.m_limbs[0] & GMP_NUMB_MASK), hi2 = (op2.m_limbs[1] & GMP_NUMB_MASK);
+    if (sign1 >= 0 && sign2 >= 0) {
+        // The easy case: both are nonnegative.
+        const ::mp_limb_t lo = lo1 | lo2, hi = hi1 | hi2;
+        rop._mp_size = size_from_lohi(lo, hi);
+        rop.m_limbs[0] = lo;
+        rop.m_limbs[1] = hi;
+        return;
+    }
+    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    std::array<::mp_limb_t, 2> tmp1, tmp2;
+    auto twosc = [](std::array<::mp_limb_t, 2> &arr, ::mp_limb_t lo, ::mp_limb_t hi) {
+        arr[0] = (~lo + 1u) & GMP_NUMB_MASK;
+        arr[1] = (~hi + unsigned(lo == 0u)) & GMP_NUMB_MASK;
+    };
+    switch (sign_mask) {
+        case 1u:
+            // op1 negative, op2 nonnegative.
+            twosc(tmp1, lo1, hi1);
+            // NOTE: here lo2, hi2 and the 2 limbs in tmp1 have already
+            // been masked for nail bits.
+            rop.m_limbs[0] = tmp1[0] | lo2;
+            rop.m_limbs[1] = tmp1[1] | hi2;
+            twosc(rop.m_limbs, rop.m_limbs[0], rop.m_limbs[1]);
+            break;
+        case 2u:
+            // op1 nonnegative, op2 negative.
+            twosc(tmp2, lo2, hi2);
+            rop.m_limbs[0] = tmp2[0] | lo1;
+            rop.m_limbs[1] = tmp2[1] | hi1;
+            twosc(rop.m_limbs, rop.m_limbs[0], rop.m_limbs[1]);
+            break;
+        case 3u:
+            // Both negative.
+            twosc(tmp1, lo1, hi1);
+            twosc(tmp2, lo2, hi2);
+            rop.m_limbs[0] = tmp1[0] | tmp2[0];
+            rop.m_limbs[1] = tmp1[1] | tmp2[1];
+            twosc(rop.m_limbs, rop.m_limbs[0], rop.m_limbs[1]);
+            break;
+    }
+    // Size is -1 or -2.
+    rop._mp_size = -2 + (rop.m_limbs[1] == 0u);
+}
+
 template <std::size_t SSize>
 inline void static_ior(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
