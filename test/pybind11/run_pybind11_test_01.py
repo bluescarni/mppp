@@ -41,7 +41,7 @@ class Test01(unittest.TestCase):
             return
 
         try:
-            from mpmath import mpf, mp, workprec, isnan
+            from mpmath import mpf, mp, workprec, isnan, isinf
         except ImportError:
             return
 
@@ -88,6 +88,12 @@ class Test01(unittest.TestCase):
         if not p.has_mpfr():
             with workprec(2000):
                 self.assertTrue(p.test_overload(mpf(2)**-16495) != 0)
+
+        # Test we don't end up to inf if the significand has more than 113 bits.
+        mp.prec = 40000
+        foo = mpf("1.1")
+        with workprec(113):
+            self.assertFalse(isinf(p.test_real128_conversion(foo)))
 
         # Restore prec on exit.
         mp.prec = 53
