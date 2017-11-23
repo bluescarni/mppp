@@ -127,6 +127,76 @@ struct ior_tester {
         random_xy(4, 2);
         random_xy(4, 3);
         random_xy(4, 4);
+
+        // Size-specific testing.
+        if (S::value == 1u) {
+            n2 = GMP_NUMB_MAX;
+            n3 = GMP_NUMB_MAX;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_ior(n1, n2, n3);
+            ::mpz_ior(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_ior(n1, n2, n3);
+            ::mpz_ior(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = 0;
+            ::mpz_set_si(&m2.m_mpz, 0);
+            n3.neg();
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            bitwise_ior(n1, n2, n3);
+            ::mpz_ior(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+        }
+
+        if (S::value == 2u) {
+            n2 = GMP_NUMB_MAX;
+            n3 = GMP_NUMB_MAX;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_ior(n1, n2, n3);
+            ::mpz_ior(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_ior(n1, n2, n3);
+            ::mpz_ior(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = 0;
+            ::mpz_set_si(&m2.m_mpz, 0);
+            n3.neg();
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            bitwise_ior(n1, n2, n3);
+            ::mpz_ior(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            // Fill the high limbs too.
+            n2 = GMP_NUMB_MAX;
+            n3 = GMP_NUMB_MAX;
+            n2 <<= GMP_NUMB_BITS;
+            n3 <<= GMP_NUMB_BITS;
+            n2 += GMP_NUMB_MAX;
+            n3 += GMP_NUMB_MAX;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_ior(n1, n2, n3);
+            ::mpz_ior(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_ior(n1, n2, n3);
+            ::mpz_ior(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 >>= GMP_NUMB_BITS;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            bitwise_ior(n1, n2, n3);
+            ::mpz_ior(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_ior(n1, n3, n2);
+            ::mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+        }
     }
 };
 
