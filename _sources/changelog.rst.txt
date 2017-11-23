@@ -7,7 +7,7 @@ Changelog
 New
 ~~~
 
-- Implement :ref:`integration with pybind11 <tutorial_pybind11>` (`#81 <https://github.com/bluescarni/mppp/pull/81>`__).
+- Initial implementation of the :ref:`pybind11 integration utilities <tutorial_pybind11>` (`#81 <https://github.com/bluescarni/mppp/pull/81>`__).
 
 - Implement the ``frexp()`` primitive for :cpp:class:`~mppp::real128` (`#81 <https://github.com/bluescarni/mppp/pull/81>`__).
 
@@ -19,6 +19,8 @@ New
 
 Changes
 ~~~~~~~
+
+- Simplifications in the bit shifting primitives for :cpp:class:`~mppp::integer` (`#85 <https://github.com/bluescarni/mppp/pull/85>`__).
 
 - Split an :cpp:class:`~mppp::integer` test in two parts to curb memory usage during compilation (`#80 <https://github.com/bluescarni/mppp/pull/80>`__).
 
@@ -33,7 +35,8 @@ Changes
 Fix
 ~~~
 
-- Various internal cleanups in :cpp:class:`~mppp::integer` (`#80 <https://github.com/bluescarni/mppp/pull/80>`__).
+- Various internal cleanups in :cpp:class:`~mppp::integer` (`#80 <https://github.com/bluescarni/mppp/pull/80>`__,
+  `#85 <https://github.com/bluescarni/mppp/pull/85>`__).
 
 - Small fixes regarding the use of GMP type aliases in :cpp:class:`~mppp::integer` (`#73 <https://github.com/bluescarni/mppp/pull/73>`__).
 
