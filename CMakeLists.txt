@@ -45,6 +45,8 @@ option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if M
 mark_as_advanced(MPPP_BENCHMARK_FLINT)
 option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
+option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
+mark_as_advanced(MPPP_TEST_PYBIND11)
 
 if(YACMA_COMPILER_IS_GNUCXX)
     # This is just a hackish way of detecting concepts, need to revisit once

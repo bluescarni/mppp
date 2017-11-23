@@ -478,6 +478,29 @@ inline std::size_t uint_to_limb_array(limb_array_t<T> &rop, T n)
     return size;
 }
 
+// Small utility to check that no nail bits are set.
+inline bool check_no_nails(const ::mp_limb_t &l)
+{
+    return l <= GMP_NUMB_MAX;
+}
+
+// Small utility to compute the absolute value of the size of a 2-limbs number from its lo and hi limbs.
+// Requires no nail bits in hi or lo.
+inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
+{
+    assert(check_no_nails(lo) && check_no_nails(hi));
+    // NOTE: this contraption ensures the correct result. The possibilities for hi/lo
+    // nonzero are:
+    // hi | lo | asize
+    // ---------------
+    //  1 |  1 |     2
+    //  1 |  0 |     2
+    //  0 |  1 |     1
+    //  0 |  0 |     0
+    // Use '|' instead of '||' as we don't need to short circuit on this.
+    return static_cast<mpz_size_t>(((lo != 0u) | (hi != 0u)) * ((hi != 0u) + 1));
+}
+
 // The static integer class.
 template <std::size_t SSize>
 struct static_int {
@@ -2946,18 +2969,9 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             assert(data1[0] >= data2[0] || data1[1] > data2[1]);
             // This can never wrap around, at most it goes to zero.
             const auto hi = data1[1] - data2[1] - static_cast<::mp_limb_t>(data1[0] < data2[0]);
-            // asize can be 0, 1 or 2.
-            // NOTE: this contraption ensures the correct result. The possibilities for hi/lo
-            // nonzero are:
-            // hi | lo | asize
-            // ---------------
-            //  1 |  1 |     2
-            //  1 |  0 |     2
-            //  0 |  1 |     1
-            //  0 |  0 |     0
-            // The sign1 (which cannot be zero due to the branch we are in) takes care of the sign of the size.
-            // Use '|' instead of '||' as we don't need to short circuit on this.
-            rop._mp_size = sign1 * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
+            // asize can be 0, 1 or 2. The sign1 (which cannot be zero due to the branch we are in)
+            // takes care of the sign of the size.
+            rop._mp_size = sign1 * size_from_lohi(lo, hi);
             rdata[0] = lo;
             rdata[1] = hi;
         } else {
@@ -2993,6 +3007,8 @@ inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, 
     if (integer_static_add_algo<static_int<SSize>>::value == 0 && retval) {
         // If we used the mpn functions and we actually wrote into rop, then
         // make sure we zero out the unused limbs.
+        // NOTE: this is necessary because, in theory, we may end up using mpn functions also for SSize <= opt_size.
+        // This is not the case on any tested build so far.
         rop.zero_unused_limbs();
     }
     return retval;
@@ -3015,7 +3031,7 @@ inline integer<SSize> &add(integer<SSize> &rop, const integer<SSize> &op1, const
     const bool s1 = op1.is_static(), s2 = op2.is_static();
     bool sr = rop.is_static();
     if (mppp_likely(s1 && s2)) {
-        // If both op1 and op2 are static, we will try to do the statid add.
+        // If both op1 and op2 are static, we will try to do the static add.
         // We might need to downgrade rop to static.
         if (!sr) {
             // NOTE: here we are sure rop is distinct from op1/op2, as
@@ -3171,9 +3187,7 @@ inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize
             return false;
         }
         // Compute the new asize. It can be 0, 1 or 2.
-        // NOTE: see the comments in the 2-limb specialisation for addition.
-        rop._mp_size
-            = (AddOrSub ? 1 : -1) * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
+        rop._mp_size = (AddOrSub ? 1 : -1) * size_from_lohi(lo, hi);
         // Write out.
         rdata[0] = lo;
         rdata[1] = hi;
@@ -3187,8 +3201,7 @@ inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize
             // Sub from hi the borrow.
             const auto hi = data1[1] - static_cast<::mp_limb_t>(data1[0] < l2);
             // The final asize can be 2, 1 or 0. Sign is negative for add, positive for sub.
-            rop._mp_size
-                = (AddOrSub ? -1 : 1) * (static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1));
+            rop._mp_size = (AddOrSub ? -1 : 1) * size_from_lohi(lo, hi);
             rdata[0] = lo;
             rdata[1] = hi;
         } else {
@@ -3216,6 +3229,7 @@ inline bool static_addsub_ui(static_int<SSize> &rop, const static_int<SSize> &op
     if (integer_static_addsub_ui_algo<static_int<SSize>>::value == 0 && retval) {
         // If we used the mpn functions and we actually wrote into rop, then
         // make sure we zero out the unused limbs.
+        // NOTE: same as above, we may have used mpn function when SSize <= opt_size.
         rop.zero_unused_limbs();
     }
     return retval;
@@ -3539,6 +3553,7 @@ inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &o
     if (integer_static_mul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
         // If we used the mpn functions, and actually wrote into the result,
         // zero the unused limbs on top (if necessary).
+        // NOTE: same as above, we may end up using mpn functions for SSize <= opt_size.
         rop.zero_unused_limbs();
     }
     return retval;
@@ -3738,8 +3753,7 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
             // This can never wrap around, at most it goes to zero.
             const auto hi = rop.m_limbs[1] - prod[1] - static_cast<::mp_limb_t>(rop.m_limbs[0] < prod[0]);
             // asize can be 0, 1 or 2.
-            // NOTE: see the comments in the 2-limb specialisation for addition.
-            rop._mp_size = signr * static_cast<int>((lo != 0u) | (hi != 0u)) * (static_cast<int>(hi != 0u) + 1);
+            rop._mp_size = signr * size_from_lohi(lo, hi);
             rop.m_limbs[0] = lo;
             rop.m_limbs[1] = hi;
         } else {
@@ -3779,6 +3793,7 @@ inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSi
     if (integer_static_addmul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
         // If we used the mpn functions, and actually wrote into the result,
         // zero the unused limbs on top (if necessary).
+        // NOTE: as usual, potential of mpn use on optimised size.
         rop.zero_unused_limbs();
     }
     return retval;
@@ -3844,15 +3859,11 @@ inline integer<SSize> &submul(integer<SSize> &rop, const integer<SSize> &op1, co
 inline namespace detail
 {
 
-// Selection of the algorithm for static mul_2exp.
-template <typename SInt>
-using integer_static_mul_2exp_algo = std::integral_constant<int, (SInt::s_size > 2) ? 0 : SInt::s_size>;
-
 // mpn implementation.
 template <std::size_t SSize>
-inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, std::size_t s,
-                                        const std::integral_constant<int, 0> &)
+inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSize> &n, std::size_t s)
 {
+    static_assert(SSize > static_int<SSize>::opt_size, "Cannot use mpn functions for optimised static size.");
     mpz_size_t asize = n._mp_size;
     if (s == 0u || asize == 0) {
         // If shift is zero, or the operand is zero, write n into rop and return success.
@@ -3930,9 +3941,7 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
 }
 
 // 1-limb optimisation.
-template <std::size_t SSize>
-inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, std::size_t s,
-                                        const std::integral_constant<int, 1> &)
+inline std::size_t static_mul_2exp(static_int<1> &rop, const static_int<1> &n, std::size_t s)
 {
     const ::mp_limb_t l = n.m_limbs[0] & GMP_NUMB_MASK;
     if (s == 0u || l == 0u) {
@@ -3960,9 +3969,7 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
 }
 
 // 2-limb optimisation.
-template <std::size_t SSize>
-inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, std::size_t s,
-                                        const std::integral_constant<int, 2> &)
+inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, std::size_t s)
 {
     mpz_size_t asize = n._mp_size;
     if (s == 0u || asize == 0) {
@@ -4024,18 +4031,6 @@ inline std::size_t static_mul_2exp_impl(static_int<SSize> &rop, const static_int
     // asize is at least 1.
     rop._mp_size = sign * (1 + (hi != 0u));
     return 0u;
-}
-
-template <std::size_t SSize>
-inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSize> &n, std::size_t s)
-{
-    const std::size_t retval = static_mul_2exp_impl(rop, n, s, integer_static_mul_2exp_algo<static_int<SSize>>{});
-    if (integer_static_mul_2exp_algo<static_int<SSize>>::value == 0 && retval == 0u) {
-        // If we used the mpn functions, and actually wrote into the result,
-        // zero the unused limbs on top (if necessary).
-        rop.zero_unused_limbs();
-    }
-    return retval;
 }
 }
 
@@ -4365,6 +4360,7 @@ inline void static_div(static_int<SSize> &q, static_int<SSize> &r, const static_
     static_div_impl(q, r, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
     if (integer_static_div_algo<static_int<SSize>>::value == 0) {
         // If we used the mpn functions, zero the unused limbs on top (if necessary).
+        // NOTE: as usual, potential of mpn use on optimised size.
         q.zero_unused_limbs();
         r.zero_unused_limbs();
     }
@@ -4465,6 +4461,7 @@ inline void static_divexact(static_int<SSize> &q, const static_int<SSize> &op1, 
     static_divexact_impl(q, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
     if (integer_static_div_algo<static_int<SSize>>::value == 0) {
         // If we used the mpn functions, zero the unused limbs on top (if necessary).
+        // NOTE: as usual, potential of mpn use on optimised size.
         q.zero_unused_limbs();
     }
 }
@@ -4573,15 +4570,11 @@ inline integer<SSize> divexact(const integer<SSize> &n, const integer<SSize> &d)
 inline namespace detail
 {
 
-// Selection of the algorithm for static tdiv_q_2exp.
-template <typename SInt>
-using integer_static_tdiv_q_2exp_algo = std::integral_constant<int, (SInt::s_size > 2) ? 0 : SInt::s_size>;
-
 // mpn implementation.
 template <std::size_t SSize>
-inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s,
-                                    const std::integral_constant<int, 0> &)
+inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s)
 {
+    static_assert(SSize > static_int<SSize>::opt_size, "Cannot use mpn functions for optimised static size.");
     mpz_size_t asize = n._mp_size;
     if (s == 0u || asize == 0) {
         // If shift is zero, or the operand is zero, write n into rop and return.
@@ -4622,9 +4615,7 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
 }
 
 // 1-limb optimisation.
-template <std::size_t SSize>
-inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s,
-                                    const std::integral_constant<int, 1> &)
+inline void static_tdiv_q_2exp(static_int<1> &rop, const static_int<1> &n, ::mp_bitcnt_t s)
 {
     const ::mp_limb_t l = n.m_limbs[0] & GMP_NUMB_MASK;
     if (s == 0u || l == 0u) {
@@ -4645,9 +4636,7 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
 }
 
 // 2-limb optimisation.
-template <std::size_t SSize>
-inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s,
-                                    const std::integral_constant<int, 2> &)
+inline void static_tdiv_q_2exp(static_int<2> &rop, const static_int<2> &n, ::mp_bitcnt_t s)
 {
     mpz_size_t asize = n._mp_size;
     if (s == 0u || asize == 0) {
@@ -4690,16 +4679,6 @@ inline void static_tdiv_q_2exp_impl(static_int<SSize> &rop, const static_int<SSi
     // or one less than that.
     rop._mp_size = sign * (asize - ((rop.m_limbs[std::size_t(asize - 1)] & GMP_NUMB_MASK) == 0u));
 }
-
-template <std::size_t SSize>
-inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &n, ::mp_bitcnt_t s)
-{
-    static_tdiv_q_2exp_impl(rop, n, s, integer_static_tdiv_q_2exp_algo<static_int<SSize>>{});
-    if (integer_static_tdiv_q_2exp_algo<static_int<SSize>>::value == 0) {
-        // If we used the mpn functions, zero the unused limbs on top (if necessary).
-        rop.zero_unused_limbs();
-    }
-}
 }
 
 /// Ternary right shift.
@@ -4716,12 +4695,10 @@ inline void static_tdiv_q_2exp(static_int<SSize> &rop, const static_int<SSize> &
 template <std::size_t SSize>
 inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
 {
-    const bool sn = n.is_static();
-    bool sr = rop.is_static();
+    const bool sn = n.is_static(), sr = rop.is_static();
     if (mppp_likely(sn)) {
         if (!sr) {
             rop.set_zero();
-            sr = true;
         }
         static_tdiv_q_2exp(rop._get_union().g_st(), n._get_union().g_st(), s);
         return rop;
@@ -5411,7 +5388,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
         if (!size) {
             // Special casing for zero.
             rs._mp_size = 0;
-            rs.zero_unused_limbs();
+            rs.zero_upper_limbs(0);
             return;
         }
         // In case of overlap we need to go through a tmp variable.

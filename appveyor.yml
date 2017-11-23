@@ -20,12 +20,12 @@ environment:
 install:
 - if [%BUILD_TYPE%]==[MSVC15_32] set PATH=C:\Miniconda36\Scripts;%PATH%
 - if [%BUILD_TYPE%]==[MSVC15_32] conda config --add channels conda-forge --force
-- if [%BUILD_TYPE%]==[MSVC15_32] conda create -y --name mppp cmake mpir mpfr
+- if [%BUILD_TYPE%]==[MSVC15_32] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath
 - if [%BUILD_TYPE%]==[MSVC15_32] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC15_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
 - if [%BUILD_TYPE%]==[MSVC15_64] conda config --add channels conda-forge --force
-- if [%BUILD_TYPE%]==[MSVC15_64] conda create -y --name mppp cmake mpir mpfr
+- if [%BUILD_TYPE%]==[MSVC15_64] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath
 - if [%BUILD_TYPE%]==[MSVC15_64] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] set PATH=C:\Miniconda36\Scripts;%PATH%
@@ -58,9 +58,13 @@ build_script:
 
 - if [%BUILD_TYPE%]==[MSVC15_32] cmake .. -G "Visual Studio 14 2015" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
 - if [%BUILD_TYPE%]==[MSVC15_32] cmake --build . --config Debug
+- if [%BUILD_TYPE%]==[MSVC15_32] cmake .. -G "Visual Studio 14 2015" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_TEST_PYBIND11=yes
+- if [%BUILD_TYPE%]==[MSVC15_32] cmake --build . --config Release --target pybind11_test_01
 
 - if [%BUILD_TYPE%]==[MSVC15_64] cmake .. -G "Visual Studio 14 2015 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
 - if [%BUILD_TYPE%]==[MSVC15_64] cmake --build . --config Debug
+- if [%BUILD_TYPE%]==[MSVC15_64] cmake .. -G "Visual Studio 14 2015 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_TEST_PYBIND11=yes
+- if [%BUILD_TYPE%]==[MSVC15_64] cmake --build . --config Release --target pybind11_test_01
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] cmake --build .
@@ -73,7 +77,17 @@ build_script:
 - if [%COMPILER%]==[MinGW] mingw32-make -j2 VERBOSE=1
 
 test_script:
-- ctest -V
+- if [%BUILD_TYPE%]==[MSVC15_32] ctest -V -C Debug -E pybind11
+- if [%BUILD_TYPE%]==[MSVC15_32] ctest -V -C Release -R pybind11
+
+- if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Debug -E pybind11
+- if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Release -R pybind11
+
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] ctest -V
+
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] ctest -V
+
+- if [%COMPILER%]==[MinGW] ctest -V
 
 # Enable this to be able to login to the build worker. You can use the
 # `remmina` program in Ubuntu, use the login information that the line below
