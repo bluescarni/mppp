@@ -78,14 +78,14 @@ struct ior_tester {
                 REQUIRE(n1 == integer{&m1.m_mpz});
                 REQUIRE(n1 == (n2 | n3));
                 // Overlapping arguments.
-                auto old_n1{n1};
+                integer old_n1{n1};
                 ::mpz_ior(&m1.m_mpz, &m1.m_mpz, &m3.m_mpz);
                 bitwise_ior(n1, n1, n3);
                 REQUIRE(n1 == integer{&m1.m_mpz});
                 REQUIRE(n1 == (old_n1 | n3));
                 old_n1 |= n3;
                 REQUIRE(n1 == old_n1);
-                auto old_n2{n2};
+                integer old_n2{n2};
                 ::mpz_ior(&m2.m_mpz, &m1.m_mpz, &m2.m_mpz);
                 bitwise_ior(n2, n1, n2);
                 REQUIRE(n1 == integer{&m1.m_mpz});
