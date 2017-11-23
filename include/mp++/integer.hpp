@@ -4982,6 +4982,78 @@ inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const 
 }
 
 template <std::size_t SSize>
+inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2)
+{
+    auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
+    // Handle zeroes.
+    if (!sign1) {
+        rop._mp_size = op2._mp_size;
+        copy_limbs(data2, data2 + asize2, rop.m_limbs.data());
+        return;
+    }
+    if (!sign2) {
+        rop._mp_size = op1._mp_size;
+        copy_limbs(data1, data1 + asize1, rop.m_limbs.data());
+        return;
+    }
+    // Make sure data1/asize1 refer to the largest operand.
+    if (asize1 < asize2) {
+        std::swap(data1, data2);
+        std::swap(asize1, asize2);
+    }
+    if (sign1 > 0 && sign2 > 0) {
+        // The easy case: both are nonnegative.
+        // Set the size.
+        rop._mp_size = asize1;
+        ::mpn_ior_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
+        // Copy extra limbs from data1.
+        copy_limbs(data1 + asize2, data1 + asize1, rop.m_limbs.data() + asize2);
+        return;
+    }
+    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    auto twosc = [](::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n) {
+
+    };
+
+#if 0
+    std::array<::mp_limb_t, 2> tmp1, tmp2;
+    auto twosc = [](std::array<::mp_limb_t, 2> &arr, ::mp_limb_t lo, ::mp_limb_t hi) {
+        arr[0] = (~lo + 1u) & GMP_NUMB_MASK;
+        arr[1] = (~hi + unsigned(lo == 0u)) & GMP_NUMB_MASK;
+    };
+    switch (sign_mask) {
+        case 1u:
+            // op1 negative, op2 nonnegative.
+            twosc(tmp1, lo1, hi1);
+            // NOTE: here lo2, hi2 and the 2 limbs in tmp1 have already
+            // been masked for nail bits.
+            rop.m_limbs[0] = tmp1[0] | lo2;
+            rop.m_limbs[1] = tmp1[1] | hi2;
+            twosc(rop.m_limbs, rop.m_limbs[0], rop.m_limbs[1]);
+            break;
+        case 2u:
+            // op1 nonnegative, op2 negative.
+            twosc(tmp2, lo2, hi2);
+            rop.m_limbs[0] = tmp2[0] | lo1;
+            rop.m_limbs[1] = tmp2[1] | hi1;
+            twosc(rop.m_limbs, rop.m_limbs[0], rop.m_limbs[1]);
+            break;
+        case 3u:
+            // Both negative.
+            twosc(tmp1, lo1, hi1);
+            twosc(tmp2, lo2, hi2);
+            rop.m_limbs[0] = tmp1[0] | tmp2[0];
+            rop.m_limbs[1] = tmp1[1] | tmp2[1];
+            twosc(rop.m_limbs, rop.m_limbs[0], rop.m_limbs[1]);
+            break;
+    }
+    // Size is -1 or -2.
+    rop._mp_size = -2 + (rop.m_limbs[1] == 0u);
+#endif
+}
+
+template <std::size_t SSize>
 inline void static_ior(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
     mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
