@@ -83,6 +83,10 @@ test_script:
 - if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Debug -E pybind11
 - if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Release -R pybind11
 
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] ctest -V
+
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] ctest -V
+
 - if [%COMPILER%]==[MinGW] ctest -V
 
 # Enable this to be able to login to the build worker. You can use the

@@ -3201,7 +3201,7 @@ inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize
             // Sub from hi the borrow.
             const auto hi = data1[1] - static_cast<::mp_limb_t>(data1[0] < l2);
             // The final asize can be 2, 1 or 0. Sign is negative for add, positive for sub.
-            rop._mp_size = (AddOrSub ? -1 : 1) * size_fom_lohi(lo, hi);
+            rop._mp_size = (AddOrSub ? -1 : 1) * size_from_lohi(lo, hi);
             rdata[0] = lo;
             rdata[1] = hi;
         } else {
