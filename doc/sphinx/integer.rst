@@ -114,8 +114,10 @@ Comparison
 
 .. _integer_logic:
 
-Logic
-~~~~~
+Logic and bit fiddling
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 0.6
 
 .. doxygengroup:: integer_logic
    :content-only:

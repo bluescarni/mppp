@@ -4894,48 +4894,58 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
     const ::mp_limb_t l1 = op1.m_limbs[0] & GMP_NUMB_MASK, l2 = op2.m_limbs[0] & GMP_NUMB_MASK;
     if (sign1 >= 0 && sign2 >= 0) {
         // The easy case: both are nonnegative.
+        // NOTE: no need to mask, as we masked l1 and l2 already, and OR
+        // won't turn on any upper bit.
         ::mp_limb_t ret = l1 | l2;
         rop._mp_size = ret != 0u;
         rop.m_limbs[0] = ret;
         return;
     }
     // NOTE: my understanding is the following:
-    // - the size of the operands is considered to be their real bit size, plus a phantom bit
-    //   on top due to the fake two's complement representation for negative numbers;
+    // - the size of the operands is considered to be their real bit size, rounded up to GMP_NUMB_BITS,
+    //   plus a phantom sign bit on top due to the fake two's complement representation for negative numbers.
+    //   We never need to represent explicitly this fake bit;
     // - the size of the result will be the max operand size.
     // For instance, for ORing 25 and -5 we start like this:
-    // ... 0 1 1 0 0 1 | <-- 25 (5 "real bits", plus a fake bit on top)
+    // ... 0 1 1 0 0 1 | <-- 25 (5 "real bits", plus a fake bit on top at index GMP_NUMB_BITS)
     // ... 0 0 0 1 0 1   <-- 5
     // We do the two's complement of 5 to produce -5:
     // ... 0 1 1 0 0 1 | <-- 25
     // ... 1 1 1 0 1 1   <-- -5 (in two's complement)
     // ---------------
     // ... 1 1 1 0 1 1
-    // The result has the "top" bit set, thus it's a negative number. We take again
+    // The result has the sign bit set, thus it's a negative number. We take again
     // the two's complement to get its absolute value:
     // ... 0 0 0 1 0 1
     // So the final result is -5.
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    // NOTE: at least 1 of the operands is strictly negative, so the result
+    // has to be negative as well (because of ORing the sign bits).
     rop._mp_size = -1;
     switch (sign_mask) {
         case 1u:
             // op1 negative, op2 nonnegative.
-            rop.m_limbs[0] = (~((~l1 + 1u) | l2) + 1u) & GMP_NUMB_MASK;
+            // NOTE: here we know that the values we are 2sc-ing are not zero
+            // (they are strictly negative). The complement will turn on
+            // the nail bits, which will remain turned on after the ORing.
+            // The final 2sc will set them back to zero, so no need to mask.
+            rop.m_limbs[0] = ~((~l1 + 1u) | l2) + 1u;
             break;
         case 2u:
             // op1 nonnegative, op2 negative.
-            rop.m_limbs[0] = (~((~l2 + 1u) | l1) + 1u) & GMP_NUMB_MASK;
+            rop.m_limbs[0] = ~((~l2 + 1u) | l1) + 1u;
             break;
         case 3u:
             // Both negative.
-            rop.m_limbs[0] = (~((~l1 + 1u) | (~l2 + 1u)) + 1u) & GMP_NUMB_MASK;
+            rop.m_limbs[0] = ~((~l1 + 1u) | (~l2 + 1u)) + 1u;
             break;
     }
 }
 
-// Small helper to compute the two's complement of a 2-limbs static integer.
+// Small helper to compute the two's complement of a nonzero 2-limbs static integer.
 inline void twosc(std::array<::mp_limb_t, 2> &arr, ::mp_limb_t lo, ::mp_limb_t hi)
 {
+    assert(hi != 0u || lo != 0u);
     arr[0] = (~lo + 1u) & GMP_NUMB_MASK;
     arr[1] = (~hi + unsigned(lo == 0u)) & GMP_NUMB_MASK;
 }
@@ -5027,6 +5037,8 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
     // Handle zeroes.
     if (!sign1) {
+        // NOTE: manual copy rather than assignment, to avoid
+        // a few branches.
         rop._mp_size = op2._mp_size;
         copy_limbs(data2, data2 + asize2, rop.m_limbs.data());
         return;
@@ -5058,13 +5070,21 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         case 1u:
             // op1 negative, op2 nonnegative.
             twosc(tmp1.data(), data1, asize1);
+            // NOTE: in all 3 cases, the mpn_ior_n() is done with the minimum size among the operands
+            // (asize2). In this case, due to the twosc, the first most significant limbs in tmp1 might
+            // be zero, but according to the mpn docs this is not a problem.
             ::mpn_ior_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
+            // Copy over the remaining limbs from the largest operand.
             copy_limbs(tmp1.data() + asize2, tmp1.data() + asize1, rop.m_limbs.data() + asize2);
+            // The final twosc. This will return the effective abs size, which we need to negate.
             rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize1);
             break;
         case 2u:
             // op1 nonnegative, op2 negative.
             twosc(tmp2.data(), data2, asize2);
+            // NOTE: after the twosc, the limbs in tmp2 from asize2 to asize1 should be set
+            // to all 1s. We don't need to actually do that: ORing op1 with these high all-1 limbs
+            // produces all-1 limbs in the result, and the final twosc will flip them back to zero.
             ::mpn_ior_n(rop.m_limbs.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
             rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize2);
             break;
@@ -5077,6 +5097,7 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     }
 }
 
+// The dispatching function for the static implementation.
 template <std::size_t SSize>
 inline void static_ior(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
@@ -5090,10 +5111,23 @@ inline void static_ior(static_int<SSize> &rop, const static_int<SSize> &op1, con
         asize2 = -asize2;
         sign2 = -1;
     }
+    // NOTE: currently the implementation dispatches only on the static size: there's no need to
+    // zero upper limbs as mpn functions are never used in cased of optimised size.
     static_ior_impl(rop, op1, op2, asize1, asize2, sign1, sign2);
 }
 }
 
+/// Bitwise OR for \link mppp::integer integer\endlink.
+/**
+ * This function will set ``rop`` to the bitwise OR of ``op1`` and ``op2``. Negative operands
+ * are treated as-if they were represented using two's complement.
+ *
+ * @param rop the return value.
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ *
+ * @return a reference to ``rop``.
+ */
 template <std::size_t SSize>
 inline integer<SSize> &bitwise_ior(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
 {
