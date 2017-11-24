@@ -442,6 +442,20 @@ struct ior_tester {
             ::mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
         }
+        // A couple of tests for the operators.
+        REQUIRE((integer{} | 0) == 0);
+        REQUIRE((0 | integer{}) == 0);
+        REQUIRE((integer{25} | -5) == -5);
+        REQUIRE((-5ll | integer{25}) == -5);
+        REQUIRE((std::is_same<integer, decltype(-5ll | integer{25})>::value));
+        n1 = 25;
+        n1 |= -5;
+        REQUIRE(n1 == -5);
+        int tmp_int = 25;
+        tmp_int |= integer{-5};
+        REQUIRE(tmp_int == -5);
+        REQUIRE((std::is_same<integer &, decltype(n1 |= -5)>::value));
+        REQUIRE((std::is_same<int &, decltype(tmp_int |= integer{-5})>::value));
     }
 };
 

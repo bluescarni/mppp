@@ -6759,18 +6759,102 @@ inline bool operator>=(const T &op1, const U &op2)
     return !(op1 < op2);
 }
 
+inline namespace detail
+{
+
+// Dispatch for binary OR.
 template <std::size_t SSize>
-inline integer<SSize> operator|(const integer<SSize> &op1, const integer<SSize> &op2)
+inline integer<SSize> dispatch_operator_or(const integer<SSize> &op1, const integer<SSize> &op2)
 {
     integer<SSize> retval;
     bitwise_ior(retval, op1, op2);
     return retval;
 }
 
-template <std::size_t SSize>
-inline integer<SSize> &operator|=(integer<SSize> &rop, const integer<SSize> &op)
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_operator_or(const integer<SSize> &op1, const T &op2)
 {
-    return bitwise_ior(rop, rop, op);
+    return dispatch_operator_or(op1, integer<SSize>{op2});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_operator_or(const T &op1, const integer<SSize> &op2)
+{
+    return dispatch_operator_or(op2, op1);
+}
+
+// Dispatching for in-place OR.
+template <std::size_t SSize>
+inline void dispatch_in_place_or(integer<SSize> &rop, const integer<SSize> &op)
+{
+    bitwise_ior(rop, rop, op);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_or(integer<SSize> &rop, const T &op)
+{
+    dispatch_in_place_or(rop, integer<SSize>{op});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop | op);
+}
+}
+
+/// Binary bitwise OR operator for \link mppp::integer integer\endlink.
+/**
+ * \rststar
+ * This operator returns the bitwise OR of ``op1`` and ``op2``. Negative operands
+ * are treated as-if they were represented using two's complement.
+ *
+ * The operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
+ * The return type is :cpp:class:`~mppp::integer`.
+ * \endrststar
+ *
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ *
+ * @return the bitwise OR of ``op1`` and ``op2``.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerIntegralOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+#endif
+    inline integer_common_t<T, U> operator|(const T &op1, const U &op2)
+{
+    return dispatch_operator_or(op1, op2);
+}
+
+/// In-place bitwise OR operator for \link mppp::integer integer\endlink.
+/**
+ * \rststar
+ * This operator will set ``rop`` to the bitwise OR of ``rop`` and ``op``. Negative operands
+ * are treated as-if they were represented using two's complement.
+ * \endrststar
+ *
+ * @param rop the first operand.
+ * @param op the second operand.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator|=(T &rop, const IntegerIntegralOpTypes<T> &op)
+#else
+template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline T &operator|=(T &rop, const U &op)
+#endif
+{
+    dispatch_in_place_or(rop, op);
+    return rop;
 }
 
 /** @} */
