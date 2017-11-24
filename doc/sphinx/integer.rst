@@ -44,7 +44,7 @@ Concepts
    involving :cpp:class:`~mppp::integer`. Specifically, the concept will be ``true`` if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size ``SSize``, or
-   * one type is :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::CppInteroperable` type.
+   * one type is an :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::CppInteroperable` type.
 
    Note that the modulo and bit-shifting operators have additional restrictions.
 
@@ -56,12 +56,7 @@ Concepts
    if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size ``SSize``, or
-   * one type is :cpp:class:`~mppp::integer` and the other is an integral :cpp:concept:`~mppp::CppInteroperable` type.
-
-.. cpp:concept:: template <typename T> mppp::IntegerShiftType
-
-   This concept is satisfied if ``T`` is a type that can be used as shift argument in the bit shifting operators for
-   :cpp:class:`~mppp::integer`. Specifically, this concept is satisfied by all :cpp:concept:`~mppp::CppInteroperable` integral types.
+   * one type is an :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::CppIntegralInteroperable` type.
 
 .. _integer_functions:
 
