@@ -24,9 +24,9 @@ static int ntries = 1000;
 using namespace mppp;
 using namespace mppp_test;
 
-using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2> /*,
+using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
-                         std::integral_constant<std::size_t, 10>*/>;
+                         std::integral_constant<std::size_t, 10>>;
 
 static std::mt19937 rng;
 
