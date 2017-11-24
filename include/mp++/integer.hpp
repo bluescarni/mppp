@@ -4907,16 +4907,16 @@ inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const 
     //   We never need to represent explicitly this fake bit;
     // - the size of the result will be the max operand size.
     // For instance, for ORing 25 and -5 we start like this:
-    // ... 0 1 1 0 0 1 | <-- 25 (5 "real bits", plus a fake bit on top at index GMP_NUMB_BITS)
-    // ... 0 0 0 1 0 1   <-- 5
+    // (0) ... 0 1 1 0 0 1 | <-- 25 (5 "real bits", plus a fake bit on top at index GMP_NUMB_BITS)
+    // (0) ... 0 0 0 1 0 1   <-- 5
     // We do the two's complement of 5 to produce -5:
-    // ... 0 1 1 0 0 1 | <-- 25
-    // ... 1 1 1 0 1 1   <-- -5 (in two's complement)
+    // (0) ... 0 1 1 0 0 1 | <-- 25
+    // (1) ... 1 1 1 0 1 1   <-- -5 (in two's complement)
     // ---------------
-    // ... 1 1 1 0 1 1
+    // (1) ... 1 1 1 0 1 1
     // The result has the sign bit set, thus it's a negative number. We take again
     // the two's complement to get its absolute value:
-    // ... 0 0 0 1 0 1
+    // (0) ... 0 0 0 1 0 1
     // So the final result is -5.
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
     // NOTE: at least 1 of the operands is strictly negative, so the result
@@ -4998,7 +4998,8 @@ inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const 
     rop._mp_size = -2 + (rop.m_limbs[1] == 0u);
 }
 
-// Compute the two's complement of an n-limbs nonzero integer.
+// Compute the two's complement of an n-limbs nonzero integer. The new size of
+// the integer will be returned.
 inline mpz_size_t twosc(::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n)
 {
     assert(n > 0);
