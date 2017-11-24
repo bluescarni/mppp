@@ -4888,6 +4888,119 @@ inline namespace detail
 {
 
 // 1-limb implementation.
+inline bool static_not_impl(static_int<1> &rop, const static_int<1> &op, mpz_size_t, int sign)
+{
+    const ::mp_limb_t l = op.m_limbs[0] & GMP_NUMB_MASK;
+    if (sign >= 0) {
+        if (mppp_unlikely(l == GMP_NUMB_MAX)) {
+            // NOTting would overflow the limb.
+            return false;
+        }
+        rop._mp_size = -1;
+        rop.m_limbs[0] = l + 1u;
+        return true;
+    }
+    // Size can be zero or 1.
+    rop._mp_size = l != 1u;
+    rop.m_limbs[0] = l - 1u;
+    return true;
+}
+
+// 2-limbs implementation.
+inline bool static_not_impl(static_int<2> &rop, const static_int<2> &op, mpz_size_t, int sign)
+{
+    const ::mp_limb_t lo = op.m_limbs[0] & GMP_NUMB_MASK, hi = op.m_limbs[1] & GMP_NUMB_MASK;
+    if (sign >= 0) {
+        if (mppp_unlikely(lo == GMP_NUMB_MAX && hi == GMP_NUMB_MAX)) {
+            // The static has the maximum possible value, NOT will overflow it.
+            return false;
+        }
+        const ::mp_limb_t new_lo = (lo + 1u) & GMP_NUMB_MASK, new_hi = hi + unsigned(lo == GMP_NUMB_MAX);
+        // asize can be -1 or -2, never zero.
+        rop._mp_size = -1 - (new_hi != 0u);
+        rop.m_limbs[0] = new_lo;
+        rop.m_limbs[1] = new_hi;
+        return true;
+    }
+    const ::mp_limb_t new_lo = (lo - 1u) & GMP_NUMB_MASK, new_hi = hi - unsigned(lo == 0u);
+    // Size could be 0, 1 or 2.
+    rop._mp_size = size_from_lohi(new_lo, new_hi);
+    rop.m_limbs[0] = new_lo;
+    rop.m_limbs[1] = new_hi;
+    return true;
+}
+
+// n-limbs implementation.
+template <std::size_t SSize>
+inline bool static_not_impl(static_int<SSize> &rop, const static_int<SSize> &op, mpz_size_t asize, int sign)
+{
+    auto data = op.m_limbs.data();
+    if (sign >= 0) {
+        if (mppp_unlikely(static_cast<mpz_size_t>(SSize) == asize && std::all_of(data, data + asize, [](::mp_limb_t l) {
+                              return (l & GMP_NUMB_MASK) == GMP_NUMB_MAX;
+                          }))) {
+            // If the current size is the max possible static size, and the value
+            // is the max possible value, then we will overflow.
+            return false;
+        }
+        if (sign) {
+            const ::mp_limb_t cy = ::mpn_add_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1);
+            rop._mp_size = -asize - static_cast<mpz_size_t>(cy);
+        } else {
+            // Special case zero, as mpn functions don't want zero operands.
+            rop.m_limbs[0] = 1;
+            rop._mp_size = -1;
+        }
+        return true;
+    }
+    ::mpn_sub_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1);
+    // Size will be the original asize minus possibly 1, if the original topmost limb
+    // has become zero.
+    rop._mp_size
+        = asize - static_cast<mpz_size_t>((rop.m_limbs[static_cast<std::size_t>(asize - 1)] & GMP_NUMB_MASK) == 0u);
+    return true;
+}
+
+template <std::size_t SSize>
+inline bool static_not(static_int<SSize> &rop, const static_int<SSize> &op)
+{
+    mpz_size_t asize = op._mp_size;
+    int sign = asize != 0;
+    if (asize < 0) {
+        asize = -asize;
+        sign = -1;
+    }
+    // NOTE: currently the implementation dispatches only on the static size: there's no need to
+    // zero upper limbs as mpn functions are never used in cased of optimised size.
+    return static_not_impl(rop, op, asize, sign);
+}
+}
+
+template <std::size_t SSize>
+inline integer<SSize> &bitwise_not(integer<SSize> &rop, const integer<SSize> &op)
+{
+    bool sr = rop.is_static();
+    const bool s = op.is_static();
+    if (mppp_likely(s)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
+        if (mppp_likely(static_not(rop._get_union().g_st(), op._get_union().g_st()))) {
+            return rop;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote();
+    }
+    ::mpz_com(&rop._get_union().g_dy(), op.get_mpz_view());
+    return rop;
+}
+
+inline namespace detail
+{
+
+// 1-limb implementation.
 inline void static_ior_impl(static_int<1> &rop, const static_int<1> &op1, const static_int<1> &op2, mpz_size_t,
                             mpz_size_t, int sign1, int sign2)
 {
@@ -6757,6 +6870,14 @@ inline bool operator>=(const T &op1, const U &op2)
 #endif
 {
     return !(op1 < op2);
+}
+
+template <std::size_t SSize>
+integer<SSize> operator~(const integer<SSize> &n)
+{
+    integer<SSize> retval;
+    bitwise_not(retval, n);
+    return retval;
 }
 
 inline namespace detail

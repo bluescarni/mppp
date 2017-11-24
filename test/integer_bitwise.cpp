@@ -463,3 +463,36 @@ TEST_CASE("integer ior")
 {
     tuple_for_each(sizes{}, ior_tester{});
 }
+
+struct not_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        // Start with all zeroes.
+        mpz_raii m1, m2;
+        integer n1, n2;
+        ::mpz_com(&m1.m_mpz, &m2.m_mpz);
+        bitwise_not(n1, n2);
+        REQUIRE(n1 == integer{&m1.m_mpz});
+        REQUIRE(n1 == ~n2);
+        // Try 1/-1;
+        n2 = 1;
+        ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+        ::mpz_com(&m1.m_mpz, &m2.m_mpz);
+        bitwise_not(n1, n2);
+        REQUIRE(n1 == integer{&m1.m_mpz});
+        REQUIRE(n1 == ~n2);
+        n2 = -1;
+        ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+        ::mpz_com(&m1.m_mpz, &m2.m_mpz);
+        bitwise_not(n1, n2);
+        REQUIRE(n1 == integer{&m1.m_mpz});
+        REQUIRE(n1 == ~n2);
+    }
+};
+
+TEST_CASE("integer not")
+{
+    tuple_for_each(sizes{}, not_tester{});
+}
