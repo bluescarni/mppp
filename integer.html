@@ -1124,7 +1124,7 @@ generic binary <a class="reference internal" href="#integer-operators"><span cla
 involving <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>. Specifically, the concept will be <code class="docutils literal"><span class="pre">true</span></code> if either:</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> are both <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with the same static size <code class="docutils literal"><span class="pre">SSize</span></code>, or</li>
-<li>one type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and the other is a <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> type.</li>
+<li>one type is an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and the other is a <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> type.</li>
 </ul>
 <p>Note that the modulo and bit-shifting operators have additional restrictions.</p>
 </dd></dl>
@@ -1138,15 +1138,8 @@ involving <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mpp
 if either:</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> are both <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with the same static size <code class="docutils literal"><span class="pre">SSize</span></code>, or</li>
-<li>one type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and the other is an integral <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> type.</li>
+<li>one type is an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and the other is a <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppIntegralInteroperable</span></code></a> type.</li>
 </ul>
-</dd></dl>
-
-<dl class="concept">
-<dt id="_CPPv2I0EN4mppp16IntegerShiftTypeE">
-template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">IntegerShiftType</code><a class="headerlink" href="#_CPPv2I0EN4mppp16IntegerShiftTypeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied if <code class="docutils literal"><span class="pre">T</span></code> is a type that can be used as shift argument in the bit shifting operators for
-<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>. Specifically, this concept is satisfied by all <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> integral types.</p>
 </dd></dl>
 
 </div>
@@ -2536,8 +2529,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
-<dt id="_CPPv2N4mppplsERK7integerI5SSizeE16IntegerShiftType">
-<span id="mppp::lshift-operator__integer:SSize:CR.IntegerShiftType"></span><span class="target" id="group__integer__operators_1ga5731ef1f693f48a29790cca8c087c993"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv2I0EN4mppp16IntegerShiftTypeE" title="mppp::IntegerShiftType">IntegerShiftType</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppplsERK7integerI5SSizeE16IntegerShiftType" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mppplsERK7integerI5SSizeE24CppIntegralInteroperable">
+<span id="mppp::lshift-operator__integer:SSize:CR.CppIntegralInteroperable"></span><span class="target" id="group__integer__operators_1ga9a06a8b20d10c3663ef753ea5f7bd439"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable">CppIntegralInteroperable</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppplsERK7integerI5SSizeE24CppIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary left shift operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -2560,8 +2553,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
-<dt id="_CPPv2N4mppplSER7integerI5SSizeE16IntegerShiftType">
-<span id="mppp::lshift-assign-operator__integer:SSize:R.IntegerShiftType"></span><span class="target" id="group__integer__operators_1ga87ce3d01aa4efe2a81b0d377ee35a346"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">operator&lt;&lt;=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv2I0EN4mppp16IntegerShiftTypeE" title="mppp::IntegerShiftType">IntegerShiftType</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppplSER7integerI5SSizeE16IntegerShiftType" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mppplSER7integerI5SSizeE24CppIntegralInteroperable">
+<span id="mppp::lshift-assign-operator__integer:SSize:R.CppIntegralInteroperable"></span><span class="target" id="group__integer__operators_1ga2c369ce95a52c89f8b67eac9853b9ec2"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">operator&lt;&lt;=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable">CppIntegralInteroperable</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppplSER7integerI5SSizeE24CppIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place left shift operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -2584,8 +2577,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
-<dt id="_CPPv2N4mppprsERK7integerI5SSizeE16IntegerShiftType">
-<span id="mppp::rshift-operator__integer:SSize:CR.IntegerShiftType"></span><span class="target" id="group__integer__operators_1ga29818c4479c33ec69d7eb17649a62cb5"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv2I0EN4mppp16IntegerShiftTypeE" title="mppp::IntegerShiftType">IntegerShiftType</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprsERK7integerI5SSizeE16IntegerShiftType" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mppprsERK7integerI5SSizeE24CppIntegralInteroperable">
+<span id="mppp::rshift-operator__integer:SSize:CR.CppIntegralInteroperable"></span><span class="target" id="group__integer__operators_1gaf64dc03eb9f14dc19995befcfb490025"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable">CppIntegralInteroperable</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprsERK7integerI5SSizeE24CppIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary right shift operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -2608,8 +2601,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
-<dt id="_CPPv2N4mppprSER7integerI5SSizeE16IntegerShiftType">
-<span id="mppp::rshift-assign-operator__integer:SSize:R.IntegerShiftType"></span><span class="target" id="group__integer__operators_1ga70877b789b5ca5408508bd60f9172485"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">operator&gt;&gt;=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv2I0EN4mppp16IntegerShiftTypeE" title="mppp::IntegerShiftType">IntegerShiftType</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprSER7integerI5SSizeE16IntegerShiftType" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mppprSER7integerI5SSizeE24CppIntegralInteroperable">
+<span id="mppp::rshift-assign-operator__integer:SSize:R.CppIntegralInteroperable"></span><span class="target" id="group__integer__operators_1ga0d2df44c54261f551d47cadb63a0ea1a"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">operator&gt;&gt;=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable">CppIntegralInteroperable</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprSER7integerI5SSizeE24CppIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place right shift operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
