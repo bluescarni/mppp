@@ -31,6 +31,10 @@ Common concepts
    ``long double`` is also included, but only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled
    (see the :ref:`installation instructions <installation>`).
 
+.. cpp:concept:: template <typename T> mppp::CppIntegralInteroperable
+
+   This concept is satisfied if ``T`` is an integral :cpp:concept:`~mppp::CppInteroperable` type.
+
 .. cpp:concept:: template <typename T> mppp::StringType
 
    This concept is satisfied by C++ string-like types. Specifically, the concept will be true if ``T`` is

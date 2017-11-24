@@ -2710,13 +2710,13 @@ using integer_op_types_enabler
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 concept bool IntegerIntegralOpTypes
-    = is_same_ssize_integer<T, U>::value || (is_integer<T>::value && CppInteroperable<U> && std::is_integral<U>::value)
-      || (is_integer<U>::value && CppInteroperable<T> && std::is_integral<T>::value);
+    = is_same_ssize_integer<T, U>::value
+      || (is_integer<T>::value && CppIntegralInteroperable<U>) || (is_integer<U>::value && CppIntegralInteroperable<T>);
 #else
-using integer_integral_op_types_enabler = enable_if_t<
-    disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_cpp_interoperable<U>, std::is_integral<U>>,
-                conjunction<is_integer<U>, is_cpp_interoperable<T>, std::is_integral<T>>>::value,
-    int>;
+using integer_integral_op_types_enabler
+    = enable_if_t<disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_supported_integral<U>>,
+                              conjunction<is_integer<U>, is_supported_integral<T>>>::value,
+                  int>;
 #endif
 
 /** @defgroup integer_arithmetic integer_arithmetic
@@ -6177,17 +6177,6 @@ inline T &operator%=(T &rop, const U &op)
     return rop;
 }
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
-
-template <typename T>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool IntegerShiftType = CppInteroperable<T> &&std::is_integral<T>::value;
-#else
-using integer_shift_type_enabler = enable_if_t<conjunction<is_cpp_interoperable<T>, std::is_integral<T>>::value, int>;
-#endif
-
-#endif
-
 /// Binary left shift operator.
 /**
  * @param n the multiplicand.
@@ -6199,9 +6188,9 @@ using integer_shift_type_enabler = enable_if_t<conjunction<is_cpp_interoperable<
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline integer<SSize> operator<<(const integer<SSize> &n, IntegerShiftType s)
+inline integer<SSize> operator<<(const integer<SSize> &n, CppIntegralInteroperable s)
 #else
-template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
 inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 #endif
 {
@@ -6221,9 +6210,9 @@ inline integer<SSize> operator<<(const integer<SSize> &n, T s)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline integer<SSize> &operator<<=(integer<SSize> &rop, IntegerShiftType s)
+inline integer<SSize> &operator<<=(integer<SSize> &rop, CppIntegralInteroperable s)
 #else
-template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
 inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 #endif
 {
@@ -6242,9 +6231,9 @@ inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline integer<SSize> operator>>(const integer<SSize> &n, IntegerShiftType s)
+inline integer<SSize> operator>>(const integer<SSize> &n, CppIntegralInteroperable s)
 #else
-template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
 inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 #endif
 {
@@ -6264,9 +6253,9 @@ inline integer<SSize> operator>>(const integer<SSize> &n, T s)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline integer<SSize> &operator>>=(integer<SSize> &rop, IntegerShiftType s)
+inline integer<SSize> &operator>>=(integer<SSize> &rop, CppIntegralInteroperable s)
 #else
-template <typename T, std::size_t SSize, integer_shift_type_enabler<T> = 0>
+template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
 inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
 #endif
 {

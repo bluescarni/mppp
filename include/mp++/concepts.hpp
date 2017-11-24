@@ -73,6 +73,13 @@ concept bool StringType = is_string_type<T>::value;
 #else
 using string_type_enabler = enable_if_t<is_string_type<T>::value, int>;
 #endif
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool CppIntegralInteroperable = is_supported_integral<T>::value;
+#else
+using cpp_integral_interoperable_enabler = enable_if_t<is_supported_integral<T>::value, int>;
+#endif
 }
 
 #endif
