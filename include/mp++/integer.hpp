@@ -5014,9 +5014,14 @@ inline mpz_size_t twosc(::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n)
     }
     // Add 1.
     if (size) {
-        // If rop is nonzero, use the mpn_add_1() primitive, updating
-        // the size with the value of the carry.
-        size += static_cast<mpz_size_t>(::mpn_add_1(rop, rop, size, 1));
+        // If rop is nonzero, use the mpn_add_1() primitive, storing the carry
+        // and updating the size if necessary.
+        if (::mpn_add_1(rop, rop, size, 1)) {
+            // This needs to hold as sp is nonzero: 2sc can never
+            // overflow the highest limb.
+            assert(size < n);
+            rop[size++] = 1;
+        }
     } else {
         // If rop is zero, we cannot use mpn functions, just set the value directly.
         rop[0] = 1;
