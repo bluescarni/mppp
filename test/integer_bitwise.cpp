@@ -235,7 +235,7 @@ struct ior_tester {
             ::mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
             std::array<::mp_limb_t, 2> arr1;
-            arr1 = {0u, GMP_NUMB_MAX};
+            arr1 = {{0u, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 2};
             ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
             bitwise_ior(n1, n2, n3);
@@ -322,7 +322,7 @@ struct ior_tester {
             REQUIRE(n1 == integer{&m1.m_mpz});
             // 3 limbs.
             std::array<::mp_limb_t, 3> arr1;
-            arr1 = {GMP_NUMB_MAX, GMP_NUMB_MAX, GMP_NUMB_MAX};
+            arr1 = {{GMP_NUMB_MAX, GMP_NUMB_MAX, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 3};
             n3 = n2;
             ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
@@ -341,7 +341,7 @@ struct ior_tester {
             bitwise_ior(n1, n3, n2);
             ::mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
-            arr1 = {GMP_NUMB_MAX, 0u, GMP_NUMB_MAX};
+            arr1 = {{GMP_NUMB_MAX, 0u, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 3};
             ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
             bitwise_ior(n1, n2, n3);
@@ -366,7 +366,7 @@ struct ior_tester {
             bitwise_ior(n1, n3, n2);
             ::mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
-            arr1 = {0u, GMP_NUMB_MAX, GMP_NUMB_MAX};
+            arr1 = {{0u, GMP_NUMB_MAX, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 3};
             ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
             bitwise_ior(n1, n2, n3);
@@ -391,7 +391,7 @@ struct ior_tester {
             bitwise_ior(n1, n3, n2);
             ::mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
-            arr1 = {0u, 0u, GMP_NUMB_MAX};
+            arr1 = {{0u, 0u, GMP_NUMB_MAX}};
             n2 = integer{arr1.data(), 3};
             ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
             bitwise_ior(n1, n2, n3);
@@ -416,7 +416,7 @@ struct ior_tester {
             bitwise_ior(n1, n3, n2);
             ::mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
             REQUIRE(n1 == integer{&m1.m_mpz});
-            arr1 = {0u, 0u, ::mp_limb_t{1} << (GMP_NUMB_BITS - 1)};
+            arr1 = {{0u, 0u, ::mp_limb_t{1} << (GMP_NUMB_BITS - 1)}};
             n2 = integer{arr1.data(), 3};
             ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
             bitwise_ior(n1, n2, n3);
