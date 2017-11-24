@@ -5060,21 +5060,21 @@ inline void static_ior_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             twosc(tmp1.data(), data1, asize1);
             ::mpn_ior_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
             copy_limbs(tmp1.data() + asize2, tmp1.data() + asize1, rop.m_limbs.data() + asize2);
+            rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize1);
             break;
         case 2u:
             // op1 nonnegative, op2 negative.
             twosc(tmp2.data(), data2, asize2);
             ::mpn_ior_n(rop.m_limbs.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
-            std::fill(rop.m_limbs.data() + asize2, rop.m_limbs.data() + asize1, ::mp_limb_t(GMP_NUMB_MAX));
+            rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize2);
             break;
         case 3u:
             twosc(tmp1.data(), data1, asize1);
             twosc(tmp2.data(), data2, asize2);
             ::mpn_ior_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
-            std::fill(rop.m_limbs.data() + asize2, rop.m_limbs.data() + asize1, ::mp_limb_t(GMP_NUMB_MAX));
+            rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize2);
             break;
     }
-    rop._mp_size = -twosc(rop.m_limbs.data(), rop.m_limbs.data(), asize1);
 }
 
 template <std::size_t SSize>
