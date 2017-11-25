@@ -4977,7 +4977,7 @@ inline bool static_not(static_int<SSize> &rop, const static_int<SSize> &op)
         sign = -1;
     }
     // NOTE: currently the implementation dispatches only on the static size: there's no need to
-    // zero upper limbs as mpn functions are never used in cased of optimised size.
+    // zero upper limbs as mpn functions are never used in case of optimised size.
     return static_not_impl(rop, op, asize, sign);
 }
 }
@@ -5101,24 +5101,18 @@ inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const 
             twosc(tmp1, lo1, hi1);
             // NOTE: here lo2, hi2 and the 2 limbs in tmp1 have already
             // been masked for nail bits.
-            rop.m_limbs[0] = tmp1[0] | lo2;
-            rop.m_limbs[1] = tmp1[1] | hi2;
-            twosc(rop.m_limbs, rop.m_limbs[0], rop.m_limbs[1]);
+            twosc(rop.m_limbs, tmp1[0] | lo2, tmp1[1] | hi2);
             break;
         case 2u:
             // op1 nonnegative, op2 negative.
             twosc(tmp2, lo2, hi2);
-            rop.m_limbs[0] = tmp2[0] | lo1;
-            rop.m_limbs[1] = tmp2[1] | hi1;
-            twosc(rop.m_limbs, rop.m_limbs[0], rop.m_limbs[1]);
+            twosc(rop.m_limbs, tmp2[0] | lo1, tmp2[1] | hi1);
             break;
         case 3u:
             // Both negative.
             twosc(tmp1, lo1, hi1);
             twosc(tmp2, lo2, hi2);
-            rop.m_limbs[0] = tmp1[0] | tmp2[0];
-            rop.m_limbs[1] = tmp1[1] | tmp2[1];
-            twosc(rop.m_limbs, rop.m_limbs[0], rop.m_limbs[1]);
+            twosc(rop.m_limbs, tmp1[0] | tmp2[0], tmp1[1] | tmp2[1]);
             break;
     }
     // Size is -1 or -2: we could have 1-limb operands, and even with
@@ -5247,7 +5241,7 @@ inline void static_ior(static_int<SSize> &rop, const static_int<SSize> &op1, con
         sign2 = -1;
     }
     // NOTE: currently the implementation dispatches only on the static size: there's no need to
-    // zero upper limbs as mpn functions are never used in cased of optimised size.
+    // zero upper limbs as mpn functions are never used in case of optimised size.
     static_ior_impl(rop, op1, op2, asize1, asize2, sign1, sign2);
 }
 }
