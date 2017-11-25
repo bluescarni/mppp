@@ -4944,8 +4944,14 @@ inline bool static_not_impl(static_int<SSize> &rop, const static_int<SSize> &op,
             return false;
         }
         if (sign) {
-            const ::mp_limb_t cy = ::mpn_add_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1);
-            rop._mp_size = -asize - static_cast<mpz_size_t>(cy);
+            const auto cy
+                = static_cast<mpz_size_t>(::mpn_add_1(rop.m_limbs.data(), data, static_cast<::mp_size_t>(asize), 1));
+            if (cy) {
+                // If there's a carry, we'll need to write into the upper limb.
+                assert(asize < static_cast<mpz_size_t>(SSize));
+                rop.m_limbs[static_cast<std::size_t>(asize)] = 1;
+            }
+            rop._mp_size = -asize - cy;
         } else {
             // Special case zero, as mpn functions don't want zero operands.
             rop.m_limbs[0] = 1;
@@ -4976,6 +4982,16 @@ inline bool static_not(static_int<SSize> &rop, const static_int<SSize> &op)
 }
 }
 
+/// Bitwise NOT for \link mppp::integer integer\endlink.
+/**
+ * This function will set ``rop`` to the bitwise NOT (i.e., the one's complement) of ``op``. Negative operands
+ * are treated as-if they were represented using two's complement.
+ *
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to ``rop``.
+ */
 template <std::size_t SSize>
 inline integer<SSize> &bitwise_not(integer<SSize> &rop, const integer<SSize> &op)
 {
@@ -6872,11 +6888,22 @@ inline bool operator>=(const T &op1, const U &op2)
     return !(op1 < op2);
 }
 
+/// Unary bitwise NOT operator for \link mppp::integer integer\endlink.
+/**
+ * \rststar
+ * This operator returns the bitwise NOT (i.e., the one's complement) of ``op``. Negative operands
+ * are treated as-if they were represented using two's complement.
+ * \endrststar
+ *
+ * @param op the operand.
+ *
+ * @return the bitwise NOT of ``op``.
+ */
 template <std::size_t SSize>
-integer<SSize> operator~(const integer<SSize> &n)
+integer<SSize> operator~(const integer<SSize> &op)
 {
     integer<SSize> retval;
-    bitwise_not(retval, n);
+    bitwise_not(retval, op);
     return retval;
 }
 
