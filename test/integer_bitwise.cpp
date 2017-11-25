@@ -759,3 +759,477 @@ TEST_CASE("integer not")
 {
     tuple_for_each(sizes{}, not_tester{});
 }
+
+struct and_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        // Start with all zeroes.
+        mpz_raii m1, m2, m3;
+        integer n1, n2, n3;
+        ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+        bitwise_and(n1, n2, n3);
+        REQUIRE(n1 == integer{&m1.m_mpz});
+        REQUIRE(n1 == (n2 & n3));
+        mpz_raii tmp1, tmp2;
+        std::uniform_int_distribution<int> sdist(0, 1);
+        // Run a variety of tests with operands with x and y number of limbs.
+        auto random_xy = [&](unsigned x, unsigned y) {
+            for (int i = 0; i < ntries; ++i) {
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset rop every once in a while.
+                    n1 = integer{};
+                }
+                random_integer(tmp1, x, rng);
+                ::mpz_set(&m2.m_mpz, &tmp1.m_mpz);
+                random_integer(tmp2, y, rng);
+                ::mpz_set(&m3.m_mpz, &tmp2.m_mpz);
+                n2 = integer(&tmp1.m_mpz);
+                n3 = integer(&tmp2.m_mpz);
+                if (sdist(rng)) {
+                    ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+                    n2.neg();
+                }
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
+                if (sdist(rng)) {
+                    ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+                    n3.neg();
+                }
+                if (n3.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n3.promote();
+                }
+                ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+                bitwise_and(n1, n2, n3);
+                REQUIRE(n1 == integer{&m1.m_mpz});
+                REQUIRE(n1 == (n2 & n3));
+                bitwise_and(n1, n3, n2);
+                ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+                REQUIRE(n1 == integer{&m1.m_mpz});
+                // Overlapping arguments.
+                integer old_n1{n1};
+                ::mpz_and(&m1.m_mpz, &m1.m_mpz, &m3.m_mpz);
+                bitwise_and(n1, n1, n3);
+                REQUIRE(n1 == integer{&m1.m_mpz});
+                REQUIRE(n1 == (old_n1 & n3));
+                bitwise_and(n1, n3, n2);
+                ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+                REQUIRE(n1 == integer{&m1.m_mpz});
+                old_n1 &= n3;
+                REQUIRE(n1 == old_n1);
+                integer old_n2{n2};
+                ::mpz_and(&m2.m_mpz, &m1.m_mpz, &m2.m_mpz);
+                bitwise_and(n2, n1, n2);
+                REQUIRE(n1 == integer{&m1.m_mpz});
+                REQUIRE(n1 == (n1 & old_n2));
+                bitwise_and(n1, n3, n2);
+                ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+                REQUIRE(n1 == integer{&m1.m_mpz});
+                old_n1 = n1;
+                ::mpz_and(&m1.m_mpz, &m1.m_mpz, &m1.m_mpz);
+                bitwise_and(n1, n1, n1);
+                REQUIRE(n1 == integer{&m1.m_mpz});
+                REQUIRE(n1 == (old_n1 & old_n1));
+                bitwise_and(n1, n3, n2);
+                ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+                REQUIRE(n1 == integer{&m1.m_mpz});
+                old_n1 &= old_n1;
+                REQUIRE(n1 == old_n1);
+            }
+        };
+
+        random_xy(1, 0);
+        random_xy(0, 1);
+        random_xy(1, 1);
+
+        random_xy(0, 2);
+        random_xy(1, 2);
+        random_xy(2, 0);
+        random_xy(2, 1);
+        random_xy(2, 2);
+
+        random_xy(0, 3);
+        random_xy(1, 3);
+        random_xy(2, 3);
+        random_xy(3, 0);
+        random_xy(3, 1);
+        random_xy(3, 2);
+        random_xy(3, 3);
+
+        random_xy(0, 4);
+        random_xy(1, 4);
+        random_xy(2, 4);
+        random_xy(3, 4);
+        random_xy(4, 0);
+        random_xy(4, 1);
+        random_xy(4, 2);
+        random_xy(4, 3);
+        random_xy(4, 4);
+
+        // Size-specific testing.
+        if (S::value == 1u) {
+            n2 = GMP_NUMB_MAX;
+            n3 = GMP_NUMB_MAX;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = 0;
+            ::mpz_set_si(&m2.m_mpz, 0);
+            n3.neg();
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = -(integer{GMP_NUMB_MAX} - 1);
+            n3 = -3;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = -(integer{GMP_NUMB_MAX} - 3);
+            n3 = -7;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+        }
+
+        if (S::value == 2u) {
+            n2 = GMP_NUMB_MAX;
+            n3 = GMP_NUMB_MAX;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = 0;
+            ::mpz_set_si(&m2.m_mpz, 0);
+            n3.neg();
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            // Fill the high limbs too.
+            n2 = GMP_NUMB_MAX;
+            n3 = GMP_NUMB_MAX;
+            n2 <<= GMP_NUMB_BITS;
+            n3 <<= GMP_NUMB_BITS;
+            n2 += GMP_NUMB_MAX;
+            n3 += GMP_NUMB_MAX;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 >>= GMP_NUMB_BITS;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            std::array<::mp_limb_t, 2> arr1;
+            arr1 = {{0u, GMP_NUMB_MAX}};
+            n2 = integer{arr1.data(), 2};
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = -(integer{GMP_NUMB_MAX} - 1) - (integer{GMP_NUMB_MAX} << GMP_NUMB_BITS);
+            n3 = -3;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = -(integer{GMP_NUMB_MAX} - 3) - (integer{GMP_NUMB_MAX} << GMP_NUMB_BITS);
+            n3 = -7;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+        }
+
+        if (S::value >= 3u) {
+            n2 = GMP_NUMB_MAX;
+            n3 = GMP_NUMB_MAX;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = 0;
+            ::mpz_set_si(&m2.m_mpz, 0);
+            n3.neg();
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            // Fill the high limbs too.
+            n2 = GMP_NUMB_MAX;
+            n3 = GMP_NUMB_MAX;
+            n2 <<= GMP_NUMB_BITS;
+            n3 <<= GMP_NUMB_BITS;
+            n2 += GMP_NUMB_MAX;
+            n3 += GMP_NUMB_MAX;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 >>= GMP_NUMB_BITS;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            // 3 limbs.
+            std::array<::mp_limb_t, 3> arr1;
+            arr1 = {{GMP_NUMB_MAX, GMP_NUMB_MAX, GMP_NUMB_MAX}};
+            n2 = integer{arr1.data(), 3};
+            n3 = n2;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            arr1 = {{GMP_NUMB_MAX, 0u, GMP_NUMB_MAX}};
+            n2 = integer{arr1.data(), 3};
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n3.neg();
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            arr1 = {{0u, GMP_NUMB_MAX, GMP_NUMB_MAX}};
+            n2 = integer{arr1.data(), 3};
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n3.neg();
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            arr1 = {{0u, 0u, GMP_NUMB_MAX}};
+            n2 = integer{arr1.data(), 3};
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n3.neg();
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            arr1 = {{0u, 0u, ::mp_limb_t{1} << (GMP_NUMB_BITS - 1)}};
+            n2 = integer{arr1.data(), 3};
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2.neg();
+            ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n3.neg();
+            ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            bitwise_and(n1, n3, n2);
+            ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = -(integer{GMP_NUMB_MAX} - 1) - (integer{GMP_NUMB_MAX} << GMP_NUMB_BITS);
+            n3 = -3;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+            n2 = -(integer{GMP_NUMB_MAX} - 3) - (integer{GMP_NUMB_MAX} << GMP_NUMB_BITS);
+            n3 = -7;
+            ::mpz_set(&m2.m_mpz, n2.get_mpz_view());
+            ::mpz_set(&m3.m_mpz, n3.get_mpz_view());
+            bitwise_and(n1, n2, n3);
+            ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
+            REQUIRE(n1 == integer{&m1.m_mpz});
+        }
+        // A couple of tests for the operators.
+        REQUIRE((integer{} & 0) == 0);
+        REQUIRE((0 & integer{}) == 0);
+        REQUIRE((integer{25} & -6) == 24);
+        REQUIRE((-6ll & integer{25}) == 24);
+        REQUIRE((std::is_same<integer, decltype(-5ll & integer{25})>::value));
+        n1 = 25;
+        n1 &= -6;
+        REQUIRE(n1 == 24);
+        int tmp_int = 25;
+        tmp_int &= integer{-6};
+        REQUIRE(tmp_int == 24);
+        REQUIRE((std::is_same<integer &, decltype(n1 &= -5)>::value));
+        REQUIRE((std::is_same<int &, decltype(tmp_int &= integer{-5})>::value));
+    }
+};
+
+TEST_CASE("integer and")
+{
+    tuple_for_each(sizes{}, and_tester{});
+}
