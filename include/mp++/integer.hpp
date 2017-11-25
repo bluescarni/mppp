@@ -5125,7 +5125,9 @@ inline void static_ior_impl(static_int<2> &rop, const static_int<2> &op1, const 
 // the integer will be returned.
 inline mpz_size_t twosc(::mp_limb_t *rop, const ::mp_limb_t *sp, mpz_size_t n)
 {
+    // Make sure the size is nonzero, and the value is nonzero as well.
     assert(n > 0);
+    assert(std::any_of(sp, sp + n, [](::mp_limb_t l) { return (l & GMP_NUMB_MASK) != 0u; }));
     // Create a copy so we can compare to the original value later.
     auto size = n;
     // Flip the bits.
