@@ -5528,6 +5528,68 @@ inline integer<SSize> &bitwise_and(integer<SSize> &rop, const integer<SSize> &op
     return rop;
 }
 
+inline namespace detail
+{
+
+// 1-limb implementation.
+inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const static_int<1> &op2, mpz_size_t,
+                            mpz_size_t, int sign1, int sign2)
+{
+    const ::mp_limb_t l1 = op1.m_limbs[0] & GMP_NUMB_MASK, l2 = op2.m_limbs[0] & GMP_NUMB_MASK;
+    if (sign1 >= 0 && sign2 >= 0) {
+        // The easy case: both are nonnegative.
+        // NOTE: no need to mask, as we masked l1 and l2 already, and XOR
+        // won't turn on any upper bit.
+        ::mp_limb_t ret = l1 ^ l2;
+        rop._mp_size = ret != 0u;
+        rop.m_limbs[0] = ret;
+        return false;
+    }
+    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    switch (sign_mask) {
+        case 1u: {
+            // op1 negative, op2 nonnegative. In this case, the result will be negative,
+            // unless the XORing results in zero: in that
+            // case, we return failure as we need extra storage for the result.
+            ::mp_limb_t ret = (~l1 + 1u) ^ l2;
+            // NOTE: need to mask here, as nail bits will have been flipped
+            // by the NOTing above.
+            if (mppp_unlikely(!(ret & GMP_NUMB_MASK))) {
+                return false;
+            }
+            // The NOT here will flip back the nail bits, no need to mask.
+            ret = ~ret + 1u;
+            rop._mp_size = -(ret != 0u);
+            rop.m_limbs[0] = ret;
+            return true;
+        }
+        case 2u: {
+            // Specular of the above.
+            ::mp_limb_t ret = l1 ^ (~l2 + 1u);
+            if (mppp_unlikely(!(ret & GMP_NUMB_MASK))) {
+                return false;
+            }
+            ret = ~ret + 1u;
+            rop._mp_size = -(ret != 0u);
+            rop.m_limbs[0] = ret;
+            return true;
+        }
+        case 3u: {
+            // Both negative: the result will be nonnegative.
+            // NOTE: the XOR will zero the nail bits, no need to mask.
+            const ::mp_limb_t ret = (~l1 + 1u) ^ (~l2 + 1u);
+            rop._mp_size = (ret != 0u);
+            rop.m_limbs[0] = ret;
+            return true;
+        }
+    }
+    // LCOV_EXCL_START
+    assert(false);
+    return true;
+    // LCOV_EXCL_STOP
+}
+}
+
 /** @} */
 
 /** @defgroup integer_ntheory integer_ntheory
