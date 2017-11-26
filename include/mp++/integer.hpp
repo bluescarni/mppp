@@ -5392,6 +5392,20 @@ inline bool static_and_impl(static_int<2> &rop, const static_int<2> &op1, const 
     // LCOV_EXCL_STOP
 }
 
+// Small helper to compute the abs size of a static int, knowing it must
+// be at most asize > 0.
+template <std::size_t SSize>
+inline mpz_size_t compute_static_int_asize(const static_int<SSize> &r, mpz_size_t asize)
+{
+    assert(asize > 0);
+    if (!(r.m_limbs[static_cast<std::size_t>(asize - 1)] & GMP_NUMB_MASK)) {
+        --asize;
+        for (; asize && !(r.m_limbs[static_cast<std::size_t>(asize - 1)] & GMP_NUMB_MASK); --asize) {
+        }
+    }
+    return asize;
+}
+
 // mpn implementation.
 template <std::size_t SSize>
 inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
@@ -5409,23 +5423,12 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         std::swap(asize1, asize2);
         std::swap(sign1, sign2);
     }
-    // Small helper to compute the abs size of a static int, knowing it must
-    // be at most asize > 0.
-    auto compute_size = [](static_int<SSize> &r, mpz_size_t asize) -> mpz_size_t {
-        assert(asize > 0);
-        if (!(r.m_limbs[static_cast<std::size_t>(asize - 1)] & GMP_NUMB_MASK)) {
-            --asize;
-            for (; asize && !(r.m_limbs[static_cast<std::size_t>(asize - 1)] & GMP_NUMB_MASK); --asize) {
-            }
-        }
-        return asize;
-    };
     if (sign1 > 0 && sign2 > 0) {
         // The easy case: both are nonnegative.
         // Compute the and.
         ::mpn_and_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
         // The asize will be at most asize2. Upper limbs could be zero due to the ANDing.
-        rop._mp_size = compute_size(rop, asize2);
+        rop._mp_size = compute_static_int_asize(rop, asize2);
         return true;
     }
     const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
@@ -5440,7 +5443,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             ::mpn_and_n(rop.m_limbs.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
             // NOTE: size cannot be larger than asize2, as all the limbs above that limit from op1
             // will be set to zero by the ANDing.
-            rop._mp_size = compute_size(rop, asize2);
+            rop._mp_size = compute_static_int_asize(rop, asize2);
             return true;
         case 2u:
             // op1 nonnegative, op2 negative.
@@ -5452,7 +5455,7 @@ inline bool static_and_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // in op1 means simply copying op1 over.
             copy_limbs(data1 + asize2, data1 + asize1, rop.m_limbs.data() + asize2);
             // Compute the final size. It can be at most asize1.
-            rop._mp_size = compute_size(rop, asize1);
+            rop._mp_size = compute_static_int_asize(rop, asize1);
             return true;
         case 3u:
             twosc(tmp1.data(), data1, asize1);
@@ -5588,6 +5591,206 @@ inline bool static_xor_impl(static_int<1> &rop, const static_int<1> &op1, const 
     return true;
     // LCOV_EXCL_STOP
 }
+
+// 2-limbs implementation.
+inline bool static_xor_impl(static_int<2> &rop, const static_int<2> &op1, const static_int<2> &op2, mpz_size_t,
+                            mpz_size_t, int sign1, int sign2)
+{
+    const ::mp_limb_t lo1 = (op1.m_limbs[0] & GMP_NUMB_MASK), hi1 = (op1.m_limbs[1] & GMP_NUMB_MASK),
+                      lo2 = (op2.m_limbs[0] & GMP_NUMB_MASK), hi2 = (op2.m_limbs[1] & GMP_NUMB_MASK);
+    if (sign1 >= 0 && sign2 >= 0) {
+        // The easy case: both are nonnegative.
+        const ::mp_limb_t lo = lo1 ^ lo2, hi = hi1 ^ hi2;
+        rop._mp_size = size_from_lohi(lo, hi);
+        rop.m_limbs[0] = lo;
+        rop.m_limbs[1] = hi;
+        return true;
+    }
+    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    std::array<::mp_limb_t, 2> tmp1, tmp2;
+    switch (sign_mask) {
+        case 1u: {
+            // op1 negative, op2 nonnegative. Result will be negative, unless
+            // it overflows.
+            twosc(tmp1, lo1, hi1);
+            // NOTE: here lo2, hi2 and the 2 limbs in tmp1 have already
+            // been masked for nail bits. The XOR will not change nail bits.
+            const ::mp_limb_t new_lo = tmp1[0] ^ lo2, new_hi = tmp1[1] ^ hi2;
+            if (mppp_unlikely(!new_lo && !new_hi)) {
+                return false;
+            }
+            twosc(rop.m_limbs, new_lo, new_hi);
+            rop._mp_size = -size_from_lohi(rop.m_limbs[0], rop.m_limbs[1]);
+            return true;
+        }
+        case 2u: {
+            // Mirror of the above.
+            twosc(tmp2, lo2, hi2);
+            const ::mp_limb_t new_lo = tmp2[0] ^ lo1, new_hi = tmp2[1] ^ hi1;
+            if (mppp_unlikely(!new_lo && !new_hi)) {
+                return false;
+            }
+            twosc(rop.m_limbs, new_lo, new_hi);
+            rop._mp_size = -size_from_lohi(rop.m_limbs[0], rop.m_limbs[1]);
+            return true;
+        }
+        case 3u: {
+            // Both negative.
+            twosc(tmp1, lo1, hi1);
+            twosc(tmp2, lo2, hi2);
+            rop.m_limbs[0] = tmp1[0] ^ tmp2[0];
+            rop.m_limbs[1] = tmp1[1] ^ tmp2[1];
+            rop._mp_size = size_from_lohi(rop.m_limbs[0], rop.m_limbs[1]);
+            return true;
+        }
+    }
+    // LCOV_EXCL_START
+    assert(false);
+    return true;
+    // LCOV_EXCL_STOP
+}
+
+// mpn implementation.
+template <std::size_t SSize>
+inline bool static_xor_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2)
+{
+    auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
+    // Handle zeroes.
+    if (!sign1) {
+        // NOTE: manual copy rather than assignment, to avoid
+        // a few branches.
+        rop._mp_size = op2._mp_size;
+        copy_limbs(data2, data2 + asize2, rop.m_limbs.data());
+        return true;
+    }
+    if (!sign2) {
+        rop._mp_size = op1._mp_size;
+        copy_limbs(data1, data1 + asize1, rop.m_limbs.data());
+        return true;
+    }
+    // Make sure data1/asize1 refer to the largest operand.
+    if (asize1 < asize2) {
+        std::swap(data1, data2);
+        std::swap(asize1, asize2);
+        std::swap(sign1, sign2);
+    }
+    if (sign1 > 0 && sign2 > 0) {
+        // The easy case: both are nonnegative.
+        // Compute the xor.
+        ::mpn_xor_n(rop.m_limbs.data(), data1, data2, static_cast<::mp_size_t>(asize2));
+        // Limbs from asize2 to asize1 in op1 get copied as-is, as they are XORed with
+        // zeroes from op2.
+        copy_limbs(data1 + asize2, data1 + asize1, rop.m_limbs.data() + asize2);
+        // The asize will be at most asize1. Upper limbs could be zero due to the XORing
+        // (e.g., the values are identical).
+        rop._mp_size = compute_static_int_asize(rop, asize1);
+        return true;
+    }
+    const unsigned sign_mask = unsigned(sign1 < 0) + (unsigned(sign2 < 0) << 1);
+    std::array<::mp_limb_t, SSize> tmp1, tmp2, tmpr;
+    switch (sign_mask) {
+        case 1u:
+            // op1 negative, op2 nonnegative.
+            twosc(tmp1.data(), data1, asize1);
+            // NOTE: in all 3 cases, the mpn_xor_n() is done with the minimum size among the operands
+            // (asize2). In this case, due to the twosc, the first most significant limbs in tmp1 might
+            // be zero, but according to the mpn docs this is not a problem.
+            ::mpn_xor_n(tmpr.data(), tmp1.data(), data2, static_cast<::mp_size_t>(asize2));
+            // Copy over the limbs in tmp1 from asize2 to asize1.
+            copy_limbs_no(tmp1.data() + asize2, tmp1.data() + asize1, tmpr.data() + asize2);
+            // Check for zero.
+            if (mppp_unlikely(std::all_of(tmpr.data(), tmpr.data() + asize1,
+                                          [](::mp_limb_t l) { return (l & GMP_NUMB_MASK) == 0u; }))) {
+                return false;
+            }
+            rop._mp_size = -twosc(rop.m_limbs.data(), tmpr.data(), asize1);
+            return true;
+        case 2u:
+            // op1 nonnegative, op2 negative.
+            twosc(tmp2.data(), data2, asize2);
+            // Do the XOR.
+            ::mpn_xor_n(tmpr.data(), data1, tmp2.data(), static_cast<::mp_size_t>(asize2));
+            // The limbs in tmp2 from asize2 to asize1 have all been set to 1: XORing them
+            // with the corresponding limbs in op1 means bit-flipping the limbs in op1.
+            if (asize2 != asize1) {
+                // NOTE: mpn functions require nonzero operands, so we need to branch here.
+                ::mpn_com(tmpr.data() + asize2, data1 + asize2, asize1 - asize2);
+            }
+            // Check for zero.
+            if (mppp_unlikely(std::all_of(tmpr.data(), tmpr.data() + asize1,
+                                          [](::mp_limb_t l) { return (l & GMP_NUMB_MASK) == 0u; }))) {
+                return false;
+            }
+            rop._mp_size = -twosc(rop.m_limbs.data(), tmpr.data(), asize1);
+            return true;
+        case 3u:
+            twosc(tmp1.data(), data1, asize1);
+            twosc(tmp2.data(), data2, asize2);
+            ::mpn_xor_n(rop.m_limbs.data(), tmp1.data(), tmp2.data(), static_cast<::mp_size_t>(asize2));
+            // Same as above, regarding the all-1 limbs in tmp2.
+            if (asize2 != asize1) {
+                // NOTE: mpn functions require nonzero operands, so we need to branch here.
+                ::mpn_com(rop.m_limbs.data() + asize2, tmp1.data() + asize2, asize1 - asize2);
+            }
+            rop._mp_size = compute_static_int_asize(rop, asize1);
+            return true;
+    }
+    // LCOV_EXCL_START
+    assert(false);
+    return true;
+    // LCOV_EXCL_STOP
+}
+
+template <std::size_t SSize>
+inline bool static_xor(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
+    int sign1 = asize1 != 0, sign2 = asize2 != 0;
+    if (asize1 < 0) {
+        asize1 = -asize1;
+        sign1 = -1;
+    }
+    if (asize2 < 0) {
+        asize2 = -asize2;
+        sign2 = -1;
+    }
+    // NOTE: currently the implementation dispatches only on the static size: there's no need to
+    // zero upper limbs as mpn functions are never used in case of optimised size.
+    return static_xor_impl(rop, op1, op2, asize1, asize2, sign1, sign2);
+}
+}
+
+/// Bitwise XOR for \link mppp::integer integer\endlink.
+/**
+ * This function will set ``rop`` to the bitwise XOR of ``op1`` and ``op2``. Negative operands
+ * are treated as-if they were represented using two's complement.
+ *
+ * @param rop the return value.
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ *
+ * @return a reference to ``rop``.
+ */
+template <std::size_t SSize>
+inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool s1 = op1.is_static(), s2 = op2.is_static();
+    bool sr = rop.is_static();
+    if (mppp_likely(s1 && s2)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
+        if (mppp_likely(static_xor(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st()))) {
+            return rop;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote();
+    }
+    ::mpz_xor(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
+    return rop;
 }
 
 /** @} */
@@ -7409,6 +7612,104 @@ inline T &operator&=(T &rop, const U &op)
 #endif
 {
     dispatch_in_place_and(rop, op);
+    return rop;
+}
+
+inline namespace detail
+{
+
+// Dispatch for binary XOR.
+template <std::size_t SSize>
+inline integer<SSize> dispatch_operator_xor(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    integer<SSize> retval;
+    bitwise_xor(retval, op1, op2);
+    return retval;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_operator_xor(const integer<SSize> &op1, const T &op2)
+{
+    return dispatch_operator_xor(op1, integer<SSize>{op2});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline integer<SSize> dispatch_operator_xor(const T &op1, const integer<SSize> &op2)
+{
+    return dispatch_operator_xor(op2, op1);
+}
+
+// Dispatching for in-place XOR.
+template <std::size_t SSize>
+inline void dispatch_in_place_xor(integer<SSize> &rop, const integer<SSize> &op)
+{
+    bitwise_xor(rop, rop, op);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_xor(integer<SSize> &rop, const T &op)
+{
+    dispatch_in_place_xor(rop, integer<SSize>{op});
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
+{
+    rop = static_cast<T>(rop ^ op);
+}
+}
+
+/// Binary bitwise XOR operator for \link mppp::integer integer\endlink.
+/**
+ * \rststar
+ * This operator returns the bitwise XOR of ``op1`` and ``op2``. Negative operands
+ * are treated as-if they were represented using two's complement.
+ *
+ * The operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
+ * The return type is :cpp:class:`~mppp::integer`.
+ * \endrststar
+ *
+ * @param op1 the first operand.
+ * @param op2 the second operand.
+ *
+ * @return the bitwise XOR of ``op1`` and ``op2``.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+#if !defined(MPPP_DOXYGEN_INVOKED)
+requires IntegerIntegralOpTypes<T, U>
+#endif
+#else
+template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+#endif
+    inline integer_common_t<T, U> operator^(const T &op1, const U &op2)
+{
+    return dispatch_operator_xor(op1, op2);
+}
+
+/// In-place bitwise XOR operator for \link mppp::integer integer\endlink.
+/**
+ * \rststar
+ * This operator will set ``rop`` to the bitwise XOR of ``rop`` and ``op``. Negative operands
+ * are treated as-if they were represented using two's complement.
+ * \endrststar
+ *
+ * @param rop the first operand.
+ * @param op the second operand.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline T &operator^=(T &rop, const IntegerIntegralOpTypes<T> &op)
+#else
+template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline T &operator^=(T &rop, const U &op)
+#endif
+{
+    dispatch_in_place_xor(rop, op);
     return rop;
 }
 
