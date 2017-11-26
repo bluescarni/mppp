@@ -110,12 +110,9 @@ inline void cleanup()
 
 /// Initialisation function for the pybind11 integration.
 /**
- * This function should be called right after the ``PYBIND11_MODULE()`` invocation, and it must be
- * passed the second argument to ``PYBIND11_MODULE()``.
- *
- * @param m the target pybind11 module.
+ * This function should be called right after the ``PYBIND11_MODULE()`` invocation.
  */
-inline void init(py::module &m)
+inline void init()
 {
     if (globals::inited) {
         // Don't do anything if we inited already.
@@ -135,9 +132,9 @@ inline void init(py::module &m)
     };
     auto_cleaner ac;
 
-    // Expose and register the cleanup function.
-    m.def("_mppp_pybind11_cleanup", cleanup);
-    py::module::import("atexit").attr("register")(m.attr("_mppp_pybind11_cleanup"));
+    // Register the cleanup function.
+    // https://github.com/pybind/pybind11/pull/1169
+    py::module::import("atexit").attr("register")(py::cpp_function(cleanup));
 
     // GMP bits setup.
     globals::gmp_numb_bits.reset(new py::int_(GMP_NUMB_BITS));

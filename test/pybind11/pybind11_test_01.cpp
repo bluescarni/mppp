@@ -34,7 +34,7 @@ static inline std::unordered_map<std::string, T> test_unordered_map(const std::u
 
 PYBIND11_MODULE(pybind11_test_01, m)
 {
-    mppp_pybind11::init(m);
+    mppp_pybind11::init();
 
     m.def("has_quadmath", []() {
 #if defined(MPPP_WITH_QUADMATH)
