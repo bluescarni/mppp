@@ -144,21 +144,13 @@ subject to API changes in future versions.</p>
 mp++ multiprecision objects to/from Python in <a class="reference external" href="https://github.com/pybind/pybind11">pybind11</a>
 modules. The functionality currently includes a single function in the <code class="docutils literal"><span class="pre">mppp_pybind11</span></code> namespace.</p>
 <dl class="function">
-<dt id="_CPPv2N13mppp_pybind114initERN2py6moduleE">
-<span id="mppp_pybind11::init__py::moduleR"></span><span class="target" id="pybind11_8hpp_1a9f9347b18583f77f01cc951725c2065d"></span>void <code class="descclassname">mppp_pybind11::</code><code class="descname">init</code><span class="sig-paren">(</span>py::module &amp;<em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N13mppp_pybind114initERN2py6moduleE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N13mppp_pybind114initEv">
+<span id="mppp_pybind11::init"></span><span class="target" id="pybind11_8hpp_1a227e4e3e2a5b5da704f1907627e3de04"></span>void <code class="descclassname">mppp_pybind11::</code><code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N13mppp_pybind114initEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Initialisation function for the pybind11 integration. </p>
-<p>This function should be called right after the <code class="docutils literal"><span class="pre">PYBIND11_MODULE()</span></code> invocation, and it must be passed the second argument to <code class="docutils literal"><span class="pre">PYBIND11_MODULE()</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">m</span></code>: the target pybind11 module. </li>
-</ul>
-</dd>
-</dl>
-</p>
+<p>This function should be called right after the <code class="docutils literal"><span class="pre">PYBIND11_MODULE()</span></code> invocation. </p>
 </dd></dl>
 
-<p>Including the <code class="docutils literal"><span class="pre">mp++/extra/pybind11.hpp</span></code> header and invoking the <a class="reference internal" href="#_CPPv2N13mppp_pybind114initERN2py6moduleE" title="mppp_pybind11::init"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp_pybind11::init()</span></code></a>
+<p>Including the <code class="docutils literal"><span class="pre">mp++/extra/pybind11.hpp</span></code> header and invoking the <a class="reference internal" href="#_CPPv2N13mppp_pybind114initEv" title="mppp_pybind11::init"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp_pybind11::init()</span></code></a>
 function will register <a class="reference external" href="http://pybind11.readthedocs.io/en/master/advanced/cast/custom.html">custom type casters</a>
 that will automatically translate to/from Python mp++ objects used as arguments and return values in
 functions exposed from C++ in pybind11 modules. The translation rules are the following:</p>
@@ -196,7 +188,7 @@ at runtime.</p>
 <span class="n">PYBIND11_MODULE</span><span class="p">(</span><span class="n">pybind11_test_01</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="c1">// Init the pybind11 integration for this module.</span>
-    <span class="n">mppp_pybind11</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+    <span class="n">mppp_pybind11</span><span class="o">::</span><span class="n">init</span><span class="p">();</span>
 
     <span class="c1">// Expose a few functions testing the automatic translation of mp++ objects.</span>
     <span class="c1">// -------------------------------------------------------------------------</span>
@@ -295,6 +287,26 @@ A <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp:
 <p>Note that, due to the fact that <code class="docutils literal"><span class="pre">mpf</span></code> arguments can be converted both to <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> and <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>,
 overloads with <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> arguments should be exposed <strong>before</strong> overloads with <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> arguments
 (otherwise, the <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> overload will always be preferred).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>There’s an important caveat to keep in mind when translating to/from <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>. The IEEE 754 quadruple precision
+format, implemented by <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>, has a limited exponent range. For instance, the value <span class="math">\(2^{-30000}\)</span> becomes
+simply zero in quadruple precision, but, in mpmath, it doesn’t:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">113</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**-</span><span class="mi">30000</span>
+<span class="go">mpf(&#39;1.25930254358409145729153078521520406e-9031&#39;)</span>
+</pre></div>
+</div>
+<p>This happens because mpmath features a much larger (practically unlimited) range for the value of the exponent.
+As a consequence, a conversion from <code class="docutils literal"><span class="pre">mpf</span></code> to <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> will <strong>not</strong> preserve the exact value if the absolute value of the
+exponent is too large:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real128_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**-</span><span class="mi">30000</span><span class="p">)</span>
+<span class="go">mpf(&#39;0.0&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real128_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">30000</span><span class="p">)</span>
+<span class="go">mpf(&#39;+inf&#39;)</span>
+</pre></div>
+</div>
+</div>
 <p>Finally, we can verify that the conversion between mp++ and Python works also when containers are involved:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_vector_conversion</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 <span class="go">[1, 2, 3]</span>

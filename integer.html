@@ -91,6 +91,7 @@
 <li><a class="reference internal" href="#arithmetic">Arithmetic</a></li>
 <li><a class="reference internal" href="#division">Division</a></li>
 <li><a class="reference internal" href="#comparison">Comparison</a></li>
+<li><a class="reference internal" href="#logic-and-bit-fiddling">Logic and bit fiddling</a></li>
 <li><a class="reference internal" href="#number-theoretic-functions">Number theoretic functions</a></li>
 <li><a class="reference internal" href="#exponentiation">Exponentiation</a></li>
 <li><a class="reference internal" href="#roots">Roots</a></li>
@@ -1126,7 +1127,7 @@ involving <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mpp
 <li><code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> are both <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with the same static size <code class="docutils literal"><span class="pre">SSize</span></code>, or</li>
 <li>one type is an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and the other is a <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> type.</li>
 </ul>
-<p>Note that the modulo and bit-shifting operators have additional restrictions.</p>
+<p>Note that the modulo, bit-shifting and bitwise operators have additional restrictions.</p>
 </dd></dl>
 
 <dl class="concept">
@@ -1725,6 +1726,95 @@ not be altered.</p>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">n</span></code>: the integer to be tested.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="section" id="logic-and-bit-fiddling">
+<span id="integer-logic"></span><h3>Logic and bit fiddling<a class="headerlink" href="#logic-and-bit-fiddling" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.6.</span></p>
+</div>
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp11bitwise_notER7integerI5SSizeERK7integerI5SSizeE">
+<span id="mppp::bitwise_not__integer:SSize:R.integer:SSize:CR"></span><span class="target" id="group__integer__logic_1ga0e1c01d1d0058055b507c76c967fbf51"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">bitwise_not</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp11bitwise_notER7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Bitwise NOT for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the bitwise NOT (i.e., the one’s complement) of <code class="docutils literal"><span class="pre">op</span></code>. Negative operands are treated as-if they were represented using two’s complement.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal"><span class="pre">op</span></code>: the operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp11bitwise_iorER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE">
+<span id="mppp::bitwise_ior__integer:SSize:R.integer:SSize:CR.integer:SSize:CR"></span><span class="target" id="group__integer__logic_1ga9fa63dc86f3b928e399cb001d660d61f"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">bitwise_ior</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp11bitwise_iorER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Bitwise OR for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the bitwise OR of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. Negative operands are treated as-if they were represented using two’s complement.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal"><span class="pre">op1</span></code>: the first operand. </li>
+<li><code class="docutils literal"><span class="pre">op2</span></code>: the second operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp11bitwise_andER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE">
+<span id="mppp::bitwise_and__integer:SSize:R.integer:SSize:CR.integer:SSize:CR"></span><span class="target" id="group__integer__logic_1ga7c8a5937dbb9831003d274cd1f02e689"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">bitwise_and</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp11bitwise_andER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Bitwise AND for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the bitwise AND of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. Negative operands are treated as-if they were represented using two’s complement.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal"><span class="pre">op1</span></code>: the first operand. </li>
+<li><code class="docutils literal"><span class="pre">op2</span></code>: the second operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp11bitwise_xorER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE">
+<span id="mppp::bitwise_xor__integer:SSize:R.integer:SSize:CR.integer:SSize:CR"></span><span class="target" id="group__integer__logic_1gaf9b9eb00df451886f25996e4ce9baec7"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">bitwise_xor</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp11bitwise_xorER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Bitwise XOR for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the bitwise XOR of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. Negative operands are treated as-if they were represented using two’s complement.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal"><span class="pre">op1</span></code>: the first operand. </li>
+<li><code class="docutils literal"><span class="pre">op2</span></code>: the second operand.</li>
 </ul>
 </dd>
 </dl>
@@ -2730,6 +2820,176 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">op1</span></code>: first argument. </li>
 <li><code class="docutils literal"><span class="pre">op2</span></code>: second argument.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mpppcoERK7integerI5SSizeE">
+<span id="mppp::inv-operator__integer:SSize:CR"></span><span class="target" id="group__integer__operators_1gab70761c007ab47b7a8d6d50d50bea834"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">operator~</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppcoERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Unary bitwise NOT operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p>This operator returns the bitwise NOT (i.e., the one’s complement) of <code class="docutils literal"><span class="pre">op</span></code>. Negative operands
+are treated as-if they were represented using two’s complement.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the bitwise NOT of <code class="docutils literal"><span class="pre">op</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">op</span></code>: the operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
+<dt id="_CPPv2N4mppporERK1TRK1U">
+<span id="mppp::or-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1ga5f14cfec51b24a533b946686acc311c7"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator|</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppporERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary bitwise OR operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p><p>This operator returns the bitwise OR of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. Negative operands
+are treated as-if they were represented using two’s complement.</p>
+<p>The operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerIntegralOpTypes</span></code></a>.
+The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the bitwise OR of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">op1</span></code>: the first operand. </li>
+<li><code class="docutils literal"><span class="pre">op2</span></code>: the second operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppoRER1TRK22IntegerIntegralOpTypesI1TE">
+<span id="mppp::or-assign-operator__TR.IntegerIntegralOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1gaca2f742f5fd28548114654246d0d2a78"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator|=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppoRER1TRK22IntegerIntegralOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place bitwise OR operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p>This operator will set <code class="docutils literal"><span class="pre">rop</span></code> to the bitwise OR of <code class="docutils literal"><span class="pre">rop</span></code> and <code class="docutils literal"><span class="pre">op</span></code>. Negative operands
+are treated as-if they were represented using two’s complement.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the first operand. </li>
+<li><code class="docutils literal"><span class="pre">op</span></code>: the second operand.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the conversion operator of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
+<dt id="_CPPv2N4mpppanERK1TRK1U">
+<span id="mppp::and-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1gafc814f4cebfd03fdf9ccec2faa6171a4"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator&amp;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppanERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary bitwise AND operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p><p>This operator returns the bitwise AND of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. Negative operands
+are treated as-if they were represented using two’s complement.</p>
+<p>The operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerIntegralOpTypes</span></code></a>.
+The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the bitwise AND of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">op1</span></code>: the first operand. </li>
+<li><code class="docutils literal"><span class="pre">op2</span></code>: the second operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppaNER1TRK22IntegerIntegralOpTypesI1TE">
+<span id="mppp::and-assign-operator__TR.IntegerIntegralOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga59b3a0eb154315878e430f944390c276"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator&amp;=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppaNER1TRK22IntegerIntegralOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place bitwise AND operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p>This operator will set <code class="docutils literal"><span class="pre">rop</span></code> to the bitwise AND of <code class="docutils literal"><span class="pre">rop</span></code> and <code class="docutils literal"><span class="pre">op</span></code>. Negative operands
+are treated as-if they were represented using two’s complement.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the first operand. </li>
+<li><code class="docutils literal"><span class="pre">op</span></code>: the second operand.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the conversion operator of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
+<dt id="_CPPv2N4mpppeoERK1TRK1U">
+<span id="mppp::xor-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1gaf8fac7b1423fba4c573b67f5c361d75a"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator^</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeoERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary bitwise XOR operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p><p>This operator returns the bitwise XOR of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. Negative operands
+are treated as-if they were represented using two’s complement.</p>
+<p>The operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerIntegralOpTypes</span></code></a>.
+The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the bitwise XOR of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">op1</span></code>: the first operand. </li>
+<li><code class="docutils literal"><span class="pre">op2</span></code>: the second operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppeOER1TRK22IntegerIntegralOpTypesI1TE">
+<span id="mppp::xor-assign-operator__TR.IntegerIntegralOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga9d386557f058d25d7475bd8da1740f63"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator^=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeOER1TRK22IntegerIntegralOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place bitwise XOR operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p>This operator will set <code class="docutils literal"><span class="pre">rop</span></code> to the bitwise XOR of <code class="docutils literal"><span class="pre">rop</span></code> and <code class="docutils literal"><span class="pre">op</span></code>. Negative operands
+are treated as-if they were represented using two’s complement.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the first operand. </li>
+<li><code class="docutils literal"><span class="pre">op</span></code>: the second operand.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the conversion operator of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </li>
 </ul>
 </dd>
 </dl>

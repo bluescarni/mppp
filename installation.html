@@ -188,14 +188,17 @@ in the <code class="docutils literal"><span class="pre">include</span></code> su
 </div>
 <div class="section" id="installation-via-conda">
 <h2>Installation via conda<a class="headerlink" href="#installation-via-conda" title="Permalink to this headline">¶</a></h2>
-<p>Since version 0.2, mp++ is available in the <a class="reference external" href="https://conda.io/docs/">conda</a> package manager from the
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.2.</span></p>
+</div>
+<p>mp++ is available in the <a class="reference external" href="https://conda.io/docs/">conda</a> package manager from the
 <a class="reference external" href="https://conda-forge.github.io/">conda-forge</a> channel. Packages for Linux 64-bit, Windows 32/64-bit
 and OSX 64-bit are available. In order to install mp++ via conda, you just need to add <code class="docutils literal"><span class="pre">conda-forge</span></code> to the channels:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>conda config --add channels conda-forge
 conda install mppp
 </pre></div>
 </div>
-<p>(note that the <a class="reference external" href="https://github.com/conda-forge/mppp-feedstock">conda package</a> for mp++ is named <code class="docutils literal"><span class="pre">mppp</span></code> rather than <code class="docutils literal"><span class="pre">mp++</span></code>)</p>
+<p>(note that the <a class="reference external" href="https://anaconda.org/conda-forge/mppp">conda package</a> for mp++ is named <code class="docutils literal"><span class="pre">mppp</span></code> rather than <code class="docutils literal"><span class="pre">mp++</span></code>)</p>
 <p>Please refer to the <a class="reference external" href="https://conda.io/docs/">conda documentation</a> for instructions on how to setup and manage
 your conda installation.</p>
 </div>
@@ -230,6 +233,9 @@ if both MPFR and quadmath support are enabled, the compilation command on a mode
 </div>
 <div class="section" id="including-mp-in-your-project-via-cmake">
 <h2>Including mp++ in your project via CMake<a class="headerlink" href="#including-mp-in-your-project-via-cmake" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.2.</span></p>
+</div>
 <p>As a part of the mp++ installation, a group of CMake files is installed into <code class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX/lib/cmake/mp++</span></code>.
 This bundle, which is known in the CMake lingo as a <a class="reference external" href="https://cmake.org/cmake/help/v3.3/manual/cmake-packages.7.html">config-file package</a>,
 facilitates the detection and use of mp++ from other CMake-based projects. mp++’s config-file package, once loaded, provides

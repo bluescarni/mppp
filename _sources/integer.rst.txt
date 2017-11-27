@@ -46,7 +46,7 @@ Concepts
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size ``SSize``, or
    * one type is an :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::CppInteroperable` type.
 
-   Note that the modulo and bit-shifting operators have additional restrictions.
+   Note that the modulo, bit-shifting and bitwise operators have additional restrictions.
 
 .. cpp:concept:: template <typename T, typename U> mppp::IntegerIntegralOpTypes
 
@@ -105,6 +105,16 @@ Comparison
 ~~~~~~~~~~
 
 .. doxygengroup:: integer_comparison
+   :content-only:
+
+.. _integer_logic:
+
+Logic and bit fiddling
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 0.6
+
+.. doxygengroup:: integer_logic
    :content-only:
 
 .. _integer_ntheory:
