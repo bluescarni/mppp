@@ -9,6 +9,8 @@
 #ifndef MPPP_DETAIL_TYPE_TRAITS_HPP
 #define MPPP_DETAIL_TYPE_TRAITS_HPP
 
+#include <mp++/config.hpp>
+
 #include <type_traits>
 
 namespace mppp
