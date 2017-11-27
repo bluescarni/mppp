@@ -153,6 +153,41 @@ using uncvref_t = remove_cv_t<unref_t<T>>;
 // Detect non-const rvalue references.
 template <typename T>
 using is_ncrvr = conjunction<std::is_rvalue_reference<T>, negation<std::is_const<unref_t<T>>>>;
+
+// Provide internal implementation of some std type traits,
+// we will augment them with non-standard types defined
+// on some compilers.
+template <typename T>
+struct is_integral
+    : std::integral_constant<
+          bool, disjunction<std::is_integral<T>
+#if defined(MPPP_HAVE_GCC_INT128)
+                            ,
+                            // NOTE: for many of these type traits, the result must hold regardless
+                            // of the cv qualifications of T. Hence, we remove them.
+                            // http://eel.is/c++draft/meta.unary.cat
+                            std::is_same<remove_cv_t<T>, __int128_t>, std::is_same<remove_cv_t<T>, __uint128_t>
+#endif
+                            >::value> {
+};
+
+template <typename T>
+struct is_signed : std::integral_constant<bool, disjunction<std::is_signed<T>
+#if defined(MPPP_HAVE_GCC_INT128)
+                                                            ,
+                                                            std::is_same<remove_cv_t<T>, __int128_t>
+#endif
+                                                            >::value> {
+};
+
+template <typename T>
+struct is_unsigned : std::integral_constant<bool, disjunction<std::is_unsigned<T>
+#if defined(MPPP_HAVE_GCC_INT128)
+                                                              ,
+                                                              std::is_same<remove_cv_t<T>, __uint128_t>
+#endif
+                                                              >::value> {
+};
 }
 }
 

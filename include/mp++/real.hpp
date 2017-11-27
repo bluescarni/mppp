@@ -179,12 +179,12 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 #if !defined(MPPP_DOXYGEN_INVOKED)
 
 // Helpers to deduce the precision when constructing/assigning a real via another type.
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
     static_assert(std::numeric_limits<T>::digits < std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
     // NOTE: for signed integers, include the sign bit as well.
-    return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits) + std::is_signed<T>::value;
+    return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits) + is_signed<T>::value;
 }
 
 // Utility function to determine the number of base-2 digits of the significand
@@ -786,7 +786,7 @@ private:
         dispatch_integral_init(p, b);
         ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
         dispatch_integral_init(p, n);
@@ -798,7 +798,7 @@ private:
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
         dispatch_integral_init(p, n);
@@ -1227,8 +1227,7 @@ private:
         dispatch_integral_ass_prec<SetPrec>(b);
         ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
-    template <bool SetPrec, typename T,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <bool SetPrec, typename T, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
     void dispatch_assignment(const T &n)
     {
         dispatch_integral_ass_prec<SetPrec>(n);
@@ -1238,8 +1237,7 @@ private:
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
-    template <bool SetPrec, typename T,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <bool SetPrec, typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     void dispatch_assignment(const T &n)
     {
         dispatch_integral_ass_prec<SetPrec>(n);
@@ -1929,8 +1927,7 @@ private:
         return false;
     }
     template <typename T,
-              enable_if_t<conjunction<negation<std::is_same<bool, T>>, std::is_integral<T>, std::is_unsigned<T>>::value,
-                          int> = 0>
+              enable_if_t<conjunction<negation<std::is_same<bool, T>>, is_integral<T>, is_unsigned<T>>::value, int> = 0>
     T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
@@ -1974,7 +1971,7 @@ private:
         }
         return false;
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
@@ -2114,7 +2111,7 @@ private:
         b = !zero_p();
         return true;
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
     bool dispatch_get(T &n) const
     {
         if (!number_p()) {
@@ -2122,7 +2119,7 @@ private:
         }
         return uint_conversion(n);
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     bool dispatch_get(T &n) const
     {
         if (!number_p()) {

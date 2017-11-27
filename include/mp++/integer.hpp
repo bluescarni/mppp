@@ -75,13 +75,9 @@
 // Checked iterators functionality.
 #include <iterator>
 
-#elif defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
+#elif defined(MPPP_HAVE_GCC_INT128)
 
-// NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
-// http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
-#if defined(__SIZEOF_INT128__)
 #define MPPP_UINT128 __uint128_t
-#endif
 
 #endif
 
@@ -420,14 +416,14 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
 template <typename T, enable_if_t<(GMP_NUMB_BITS < std::numeric_limits<T>::digits), int> = 0>
 inline void u_checked_rshift(T &n)
 {
-    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
     n >>= GMP_NUMB_BITS;
 }
 
 template <typename T, enable_if_t<(GMP_NUMB_BITS >= std::numeric_limits<T>::digits), int> = 0>
 inline void u_checked_rshift(T &)
 {
-    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
     assert(false);
 }
 
@@ -437,7 +433,7 @@ inline void u_checked_rshift(T &)
 template <typename T>
 struct limb_array_t_ {
     // We want only unsigned ints.
-    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Type error.");
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Type error.");
     // Overflow check.
     static_assert(unsigned(std::numeric_limits<T>::digits) <= std::numeric_limits<::mp_bitcnt_t>::max(),
                   "Overflow error.");
@@ -458,7 +454,7 @@ using limb_array_t = typename limb_array_t_<T>::type;
 template <typename T>
 inline std::size_t uint_to_limb_array(limb_array_t<T> &rop, T n)
 {
-    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
     assert(n > GMP_NUMB_MAX);
     // We can assign the first two limbs directly, as we know n > GMP_NUMB_MAX.
     rop[0] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
@@ -703,8 +699,7 @@ union integer_union {
     }
     // Construction from unsigned ints. The Neg flag will negate the integer after construction, it is for use in
     // the constructor from signed ints.
-    template <typename T, bool Neg = false,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <typename T, bool Neg = false, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
         if (n <= GMP_NUMB_MAX) {
@@ -723,7 +718,7 @@ union integer_union {
         }
     }
     // Construction from signed ints.
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
         if (n >= T(0)) {
@@ -1551,8 +1546,7 @@ public:
 
 private:
     // Implementation of the assignment from unsigned C++ integral.
-    template <typename T, bool Neg = false,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <typename T, bool Neg = false, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
     void dispatch_assignment(T n)
     {
         const auto s = is_static();
@@ -1627,7 +1621,7 @@ private:
         }
     }
     // Assignment from signed integral: take its abs() and negate if necessary, as usual.
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     void dispatch_assignment(T n)
     {
         if (n >= T(0)) {
@@ -1977,7 +1971,7 @@ private:
     template <typename T, bool Sign, enable_if_t<(std::numeric_limits<T>::digits <= GMP_NUMB_BITS), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
-        static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+        static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
         if ((Sign && m_int.m_st._mp_size != 1) || (!Sign && m_int.m_st._mp_size != -1)) {
             // If the asize is not 1, the conversion will fail.
@@ -1996,7 +1990,7 @@ private:
     template <typename T, bool Sign, enable_if_t<(std::numeric_limits<T>::digits > GMP_NUMB_BITS), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
-        static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+        static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
         const auto asize = Sign ? static_cast<std::size_t>(m_int.m_st._mp_size)
                                 : static_cast<std::size_t>(nint_abs(m_int.m_st._mp_size));
@@ -2030,8 +2024,7 @@ private:
     }
     // Conversion to unsigned ints, excluding bool.
     template <typename T,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>, negation<std::is_same<bool, T>>>::value,
-                          int> = 0>
+              enable_if_t<conjunction<is_integral<T>, is_unsigned<T>, negation<std::is_same<bool, T>>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
@@ -2064,7 +2057,7 @@ private:
     template <typename T, enable_if_t<sconv_is_small<T>::value, int> = 0>
     std::pair<bool, T> convert_to_signed() const
     {
-        static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
+        static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
         assert(size());
         // Cache for convenience.
         constexpr auto Tmax = static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max());
@@ -2115,7 +2108,7 @@ private:
             return std::make_pair(false, T(0));
         }
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
@@ -5976,7 +5969,7 @@ inline namespace detail
 {
 
 // These helpers are used here and in pow() as well.
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline unsigned long integer_exp_to_ulong(const T &exp)
 {
 #if !defined(__INTEL_COMPILER)
@@ -6032,7 +6025,7 @@ inline integer<SSize> binomial_impl(const integer<SSize> &n, const T &k)
     return integer<SSize>{};
 }
 
-template <typename T, std::size_t SSize, enable_if_t<std::is_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_integral<T>::value, int> = 0>
 inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 {
     return binomial_impl(integer<SSize>{n}, k);
@@ -6180,7 +6173,7 @@ inline namespace detail
 {
 
 // Various helpers for the implementation of pow().
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline bool integer_exp_is_odd(const T &exp)
 {
     return (exp % T(2)) != T(0);
@@ -6195,7 +6188,7 @@ inline bool integer_exp_is_odd(const integer<SSize> &exp)
 // Implementation of pow().
 // integer -- integral overload.
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<std::is_same<T, integer<SSize>>, std::is_integral<T>>::value, int> = 0>
+          enable_if_t<disjunction<std::is_same<T, integer<SSize>>, is_integral<T>>::value, int> = 0>
 inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
 {
     integer<SSize> rop;
@@ -6223,7 +6216,7 @@ inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
 }
 
 // C++ integral -- integer overload.
-template <typename T, std::size_t SSize, enable_if_t<std::is_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_integral<T>::value, int> = 0>
 inline integer<SSize> pow_impl(const T &base, const integer<SSize> &exp)
 {
     return pow_impl(integer<SSize>{base}, exp);

@@ -76,11 +76,10 @@ template <typename T, typename std::enable_if<std::is_same<char, T>::value || st
                                                   || std::is_same<unsigned char, T>::value,
                                               int>::type
                       = 0>
-static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
+static inline std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>
 get_int_dist(T min, T max)
 {
-    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>(min,
-                                                                                                                   max);
+    return std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>(min, max);
 }
 
 struct int_ctor_tester {

@@ -37,15 +37,15 @@ inline namespace detail
 // These are overloads useful to treat in a generic way mppp classes and standard numeric types.
 
 // Sign function for integral types.
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-inline int sgn(const T &n)
+template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
+constexpr int sgn(const T &n)
 {
     return n ? (n > T(0) ? 1 : -1) : 0;
 }
 
 // Zero detection for integral types.
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
-inline bool is_zero(const T &n)
+template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
+constexpr bool is_zero(const T &n)
 {
     return n == T(0);
 }
@@ -88,7 +88,7 @@ constexpr make_unsigned_t<T> nint_abs(T n)
 #if MPPP_CPLUSPLUS >= 201703L
     assert(n < T(0));
 #endif
-    static_assert(std::is_integral<T>::value && std::is_signed<T>::value,
+    static_assert(is_integral<T>::value && is_signed<T>::value,
                   "The sint_abs() function can be used only with signed integral types.");
     using uT = make_unsigned_t<T>;
     // NOTE: the potential cast to "unsigned", rather than uT, is for when uT is a short integral type.
@@ -124,8 +124,8 @@ inline
     std::pair<bool, T>
     unsigned_to_nsigned(U n)
 {
-    static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
-    static_assert(std::is_integral<U>::value && std::is_unsigned<U>::value, "Invalid type.");
+    static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
+    static_assert(is_integral<U>::value && is_unsigned<U>::value, "Invalid type.");
     // Cache a couple of quantities.
     constexpr auto Tmax = static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max());
     constexpr auto Tmin_abs = nint_abs(std::numeric_limits<T>::min());
@@ -184,10 +184,8 @@ inline
 
 // Safe casting functionality between integral types. It will throw if the conversion overflows the range
 // of the target type T.
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_unsigned<T>, std::is_unsigned<U>>::value,
-                int> = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_unsigned<T>, is_unsigned<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
     return n <= std::numeric_limits<T>::max()
@@ -197,10 +195,8 @@ constexpr T safe_cast(const U &n)
                      + std::to_string(n) + " does not fit in the range of the target type " + typeid(T).name());
 }
 
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_signed<T>, std::is_signed<U>>::value,
-                int> = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_signed<T>, is_signed<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
     return (n <= std::numeric_limits<T>::max() && n >= std::numeric_limits<T>::min())
@@ -210,10 +206,8 @@ constexpr T safe_cast(const U &n)
                      + " does not fit in the range of the target type " + typeid(T).name());
 }
 
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_unsigned<T>, std::is_signed<U>>::value,
-                int> = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_unsigned<T>, is_signed<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
     return (n >= U(0) && static_cast<make_unsigned_t<U>>(n) <= std::numeric_limits<T>::max())
@@ -224,10 +218,8 @@ constexpr T safe_cast(const U &n)
                                            + typeid(T).name());
 }
 
-template <
-    typename T, typename U,
-    enable_if_t<conjunction<std::is_integral<T>, std::is_integral<U>, std::is_signed<T>, std::is_unsigned<U>>::value,
-                int> = 0>
+template <typename T, typename U,
+          enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_signed<T>, is_unsigned<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
     return n <= static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max())
