@@ -59,7 +59,9 @@ in the ``include`` subdirectory.
 Installation via conda
 ----------------------
 
-Since version 0.2, mp++ is available in the `conda <https://conda.io/docs/>`__ package manager from the
+.. versionadded:: 0.2
+
+mp++ is available in the `conda <https://conda.io/docs/>`__ package manager from the
 `conda-forge <https://conda-forge.github.io/>`__ channel. Packages for Linux 64-bit, Windows 32/64-bit
 and OSX 64-bit are available. In order to install mp++ via conda, you just need to add ``conda-forge`` to the channels:
 
@@ -68,7 +70,7 @@ and OSX 64-bit are available. In order to install mp++ via conda, you just need 
    conda config --add channels conda-forge
    conda install mppp
 
-(note that the `conda package <https://github.com/conda-forge/mppp-feedstock>`__ for mp++ is named ``mppp`` rather than ``mp++``)
+(note that the `conda package <https://anaconda.org/conda-forge/mppp>`__ for mp++ is named ``mppp`` rather than ``mp++``)
 
 Please refer to the `conda documentation <https://conda.io/docs/>`__ for instructions on how to setup and manage
 your conda installation.
@@ -109,6 +111,8 @@ if both MPFR and quadmath support are enabled, the compilation command on a mode
 
 Including mp++ in your project via CMake
 ----------------------------------------
+
+.. versionadded:: 0.2
 
 As a part of the mp++ installation, a group of CMake files is installed into ``CMAKE_INSTALL_PREFIX/lib/cmake/mp++``.
 This bundle, which is known in the CMake lingo as a `config-file package <https://cmake.org/cmake/help/v3.3/manual/cmake-packages.7.html>`__,

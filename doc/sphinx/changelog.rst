@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Implement the bitwise logic operators for :cpp:class:`~mppp::integer` (`#86 <https://github.com/bluescarni/mppp/pull/86>`__).
+
 - Initial implementation of the :ref:`pybind11 integration utilities <tutorial_pybind11>` (`#81 <https://github.com/bluescarni/mppp/pull/81>`__).
 
 - Implement the ``frexp()`` primitive for :cpp:class:`~mppp::real128` (`#81 <https://github.com/bluescarni/mppp/pull/81>`__).
