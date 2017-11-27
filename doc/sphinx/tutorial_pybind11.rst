@@ -60,7 +60,7 @@ Let's take a look at an example of a pybind11 module enabling automatic translat
     PYBIND11_MODULE(pybind11_test_01, m)
     {
         // Init the pybind11 integration for this module.
-        mppp_pybind11::init(m);
+        mppp_pybind11::init();
 
         // Expose a few functions testing the automatic translation of mp++ objects.
         // -------------------------------------------------------------------------
@@ -159,6 +159,25 @@ mpf('1.2999999999999999999999999999994')
 Note that, due to the fact that ``mpf`` arguments can be converted both to :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::real`,
 overloads with :cpp:class:`~mppp::real128` arguments should be exposed **before** overloads with :cpp:class:`~mppp::real` arguments
 (otherwise, the :cpp:class:`~mppp::real` overload will always be preferred).
+
+.. note::
+
+    There's an important caveat to keep in mind when translating to/from :cpp:class:`~mppp::real128`. The IEEE 754 quadruple precision
+    format, implemented by :cpp:class:`~mppp::real128`, has a limited exponent range. For instance, the value :math:`2^{-30000}` becomes
+    simply zero in quadruple precision, but, in mpmath, it doesn't:
+
+    >>> mp.prec = 113
+    >>> mpf(2)**-30000
+    mpf('1.25930254358409145729153078521520406e-9031')
+
+    This happens because mpmath features a much larger (practically unlimited) range for the value of the exponent.
+    As a consequence, a conversion from ``mpf`` to :cpp:class:`~mppp::real128` will **not** preserve the exact value if the absolute value of the
+    exponent is too large:
+
+    >>> p.test_real128_conversion(mpf(2)**-30000)
+    mpf('0.0')
+    >>> p.test_real128_conversion(mpf(2)**30000)
+    mpf('+inf')
 
 Finally, we can verify that the conversion between mp++ and Python works also when containers are involved:
 

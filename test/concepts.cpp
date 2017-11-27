@@ -31,6 +31,12 @@ void check_dispatch(const T &s)
 
 TEST_CASE("concepts")
 {
+    REQUIRE(is_supported_integral<int>::value);
+    REQUIRE(!is_supported_integral<int &>::value);
+    REQUIRE(!is_supported_integral<float>::value);
+    REQUIRE(!is_supported_integral<double>::value);
+    REQUIRE(!is_supported_integral<double &>::value);
+    REQUIRE(!is_supported_integral<void>::value);
     REQUIRE(is_string_type<char *>::value);
     REQUIRE(is_string_type<const char *>::value);
     REQUIRE(is_string_type<char[]>::value);
