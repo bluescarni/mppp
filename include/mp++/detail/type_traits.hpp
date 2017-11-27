@@ -119,9 +119,6 @@ template <bool B, typename T = void>
 using enable_if_t = std::enable_if_t<B, T>;
 
 template <typename T>
-using make_unsigned_t = std::make_unsigned_t<T>;
-
-template <typename T>
 using remove_cv_t = std::remove_cv_t<T>;
 
 template <typename T>
@@ -131,9 +128,6 @@ using remove_extent_t = std::remove_extent_t<T>;
 
 template <bool B, typename T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
-
-template <typename T>
-using make_unsigned_t = typename std::make_unsigned<T>::type;
 
 template <typename T>
 using remove_cv_t = typename std::remove_cv<T>::type;
@@ -188,6 +182,26 @@ struct is_unsigned : std::integral_constant<bool, disjunction<std::is_unsigned<T
 #endif
                                                               >::value> {
 };
+
+template <typename T, typename = void>
+struct make_unsigned {
+    using type = typename std::make_unsigned<T>::type;
+};
+
+#if defined(MPPP_HAVE_GCC_INT128)
+
+// NOTE: make_unsigned is supposed to preserve cv qualifiers, hence the non-trivial implementation.
+template <typename T>
+struct make_unsigned<T, enable_if_t<disjunction<std::is_same<remove_cv_t<T>, __uint128_t>,
+                                                std::is_same<remove_cv_t<T>, __int128_t>>::value>> {
+    using tmp_type = typename std::conditional<std::is_const<T>::value, const __uint128_t, __uint128_t>::type;
+    using type = typename std::conditional<std::is_volatile<T>::value, volatile tmp_type, tmp_type>::type;
+};
+
+#endif
+
+template <typename T>
+using make_unsigned_t = typename make_unsigned<T>::type;
 }
 }
 

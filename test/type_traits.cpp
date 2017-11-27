@@ -35,6 +35,14 @@ TEST_CASE("type traits")
     REQUIRE(is_unsigned<unsigned>::value);
     REQUIRE(is_unsigned<const unsigned>::value);
     REQUIRE(!is_unsigned<const unsigned &>::value);
+    REQUIRE((std::is_same<unsigned, make_unsigned_t<int>>::value));
+    REQUIRE((std::is_same<unsigned, make_unsigned_t<unsigned>>::value));
+    REQUIRE((std::is_same<const unsigned, make_unsigned_t<const int>>::value));
+    REQUIRE((std::is_same<const unsigned, make_unsigned_t<const unsigned>>::value));
+    REQUIRE((std::is_same<volatile unsigned, make_unsigned_t<volatile int>>::value));
+    REQUIRE((std::is_same<volatile unsigned, make_unsigned_t<volatile unsigned>>::value));
+    REQUIRE((std::is_same<const volatile unsigned, make_unsigned_t<volatile const int>>::value));
+    REQUIRE((std::is_same<const volatile unsigned, make_unsigned_t<volatile const unsigned>>::value));
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(is_integral<__int128_t>::value);
     REQUIRE(is_integral<__uint128_t>::value);
@@ -53,5 +61,13 @@ TEST_CASE("type traits")
     REQUIRE(is_unsigned<__uint128_t>::value);
     REQUIRE(is_unsigned<const __uint128_t>::value);
     REQUIRE(!is_unsigned<__uint128_t &&>::value);
+    REQUIRE((std::is_same<__uint128_t, make_unsigned_t<__int128_t>>::value));
+    REQUIRE((std::is_same<__uint128_t, make_unsigned_t<__uint128_t>>::value));
+    REQUIRE((std::is_same<const __uint128_t, make_unsigned_t<const __int128_t>>::value));
+    REQUIRE((std::is_same<const __uint128_t, make_unsigned_t<const __uint128_t>>::value));
+    REQUIRE((std::is_same<volatile __uint128_t, make_unsigned_t<volatile __int128_t>>::value));
+    REQUIRE((std::is_same<volatile __uint128_t, make_unsigned_t<volatile __uint128_t>>::value));
+    REQUIRE((std::is_same<const volatile __uint128_t, make_unsigned_t<volatile const __int128_t>>::value));
+    REQUIRE((std::is_same<const volatile __uint128_t, make_unsigned_t<volatile const __uint128_t>>::value));
 #endif
 }
