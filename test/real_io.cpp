@@ -10,6 +10,7 @@
 
 #include <limits>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real.hpp>
@@ -66,7 +67,7 @@ struct int_io_tester {
     template <typename T>
     void operator()(const T &) const
     {
-        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
         auto prec_dist = get_int_dist(::mpfr_prec_t(real_prec_min()), ::mpfr_prec_t(200));
         auto base_dist = get_int_dist(2, 62);
         for (auto i = 0; i < ntrials; ++i) {

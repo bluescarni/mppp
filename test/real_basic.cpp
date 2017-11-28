@@ -108,16 +108,14 @@ TEST_CASE("real default prec")
                           + std::to_string(real_prec_min()) + " and " + std::to_string(real_prec_max());
         });
     }
-    if (real_prec_max() < std::numeric_limits<::mpfr_prec_t>::max()) {
-        REQUIRE_THROWS_PREDICATE(real_set_default_prec(std::numeric_limits<::mpfr_prec_t>::max()),
-                                 std::invalid_argument, [](const std::invalid_argument &ex) {
-                                     return ex.what()
-                                            == "Cannot set the default precision to "
-                                                   + std::to_string(std::numeric_limits<::mpfr_prec_t>::max())
-                                                   + ": the value must be either zero or between "
-                                                   + std::to_string(real_prec_min()) + " and "
-                                                   + std::to_string(real_prec_max());
-                                 });
+    if (real_prec_max() < nl_max<::mpfr_prec_t>()) {
+        REQUIRE_THROWS_PREDICATE(
+            real_set_default_prec(nl_max<::mpfr_prec_t>()), std::invalid_argument, [](const std::invalid_argument &ex) {
+                return ex.what()
+                       == "Cannot set the default precision to " + std::to_string(nl_max<::mpfr_prec_t>())
+                              + ": the value must be either zero or between " + std::to_string(real_prec_min())
+                              + " and " + std::to_string(real_prec_max());
+            });
     }
     REQUIRE(real_get_default_prec() == 0);
 }
@@ -138,7 +136,7 @@ struct int_ctor_tester {
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
         real_reset_default_prec();
-        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
         for (int i = 0; i < ntrials; ++i) {
             auto n = int_dist(rng);
             REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(), real{std::to_string(n), 10, nl_digits<T>()}.get_mpfr_t()));
@@ -235,17 +233,14 @@ TEST_CASE("real constructors")
                           + std::to_string(real_prec_min());
         });
     }
-    if (real_prec_max() < std::numeric_limits<::mpfr_prec_t>::max()) {
-        REQUIRE_THROWS_PREDICATE((real{real{4}, std::numeric_limits<::mpfr_prec_t>::max()}), std::invalid_argument,
-                                 [](const std::invalid_argument &ex) {
-                                     return ex.what()
-                                            == "Cannot init a real with a precision of "
-                                                   + std::to_string(std::numeric_limits<::mpfr_prec_t>::max())
-                                                   + ": the maximum allowed precision is "
-                                                   + std::to_string(real_prec_max())
-                                                   + ", the minimum allowed precision is "
-                                                   + std::to_string(real_prec_min());
-                                 });
+    if (real_prec_max() < nl_max<::mpfr_prec_t>()) {
+        REQUIRE_THROWS_PREDICATE(
+            (real{real{4}, nl_max<::mpfr_prec_t>()}), std::invalid_argument, [](const std::invalid_argument &ex) {
+                return ex.what()
+                       == "Cannot init a real with a precision of " + std::to_string(nl_max<::mpfr_prec_t>())
+                              + ": the maximum allowed precision is " + std::to_string(real_prec_max())
+                              + ", the minimum allowed precision is " + std::to_string(real_prec_min());
+            });
     }
     // Move constructor.
     real r7{real{123}};
@@ -644,7 +639,7 @@ struct int_ass_tester {
         REQUIRE(r.get_prec() == 200);
         REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{"43", 10, 100}.get_mpfr_t()));
         real_reset_default_prec();
-        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
         for (int i = 0; i < ntrials; ++i) {
             auto n = int_dist(rng);
             r = n;
@@ -1229,7 +1224,7 @@ struct int_conv_tester {
         REQUIRE(r0.get(rop));
         REQUIRE(get(rop, r0));
         REQUIRE(rop == T(42));
-        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
         for (int i = 0; i < ntrials; ++i) {
             const auto tmp = int_dist(rng);
             REQUIRE(static_cast<T>(real{tmp}) == tmp);
@@ -1238,25 +1233,23 @@ struct int_conv_tester {
             REQUIRE(rop == tmp);
         }
         rop = T(0);
-        REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{std::numeric_limits<T>::max()} + 1}), std::overflow_error,
+        REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{nl_max<T>()} + 1}), std::overflow_error,
                                  [](const std::overflow_error &ex) {
                                      return ex.what()
-                                            == "Conversion of the real "
-                                                   + real{int_t{std::numeric_limits<T>::max()} + 1}.to_string()
+                                            == "Conversion of the real " + real{int_t{nl_max<T>()} + 1}.to_string()
                                                    + " to the type " + typeid(T).name() + " results in overflow";
                                  });
-        REQUIRE((!real{int_t{std::numeric_limits<T>::max()} + 1}.get(rop)));
-        REQUIRE(!get(rop, real{int_t{std::numeric_limits<T>::max()} + 1}));
+        REQUIRE((!real{int_t{nl_max<T>()} + 1}.get(rop)));
+        REQUIRE(!get(rop, real{int_t{nl_max<T>()} + 1}));
         REQUIRE(rop == T(0));
-        REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{std::numeric_limits<T>::min()} - 1}), std::overflow_error,
+        REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{nl_min<T>()} - 1}), std::overflow_error,
                                  [](const std::overflow_error &ex) {
                                      return ex.what()
-                                            == "Conversion of the real "
-                                                   + real{int_t{std::numeric_limits<T>::min()} - 1}.to_string()
+                                            == "Conversion of the real " + real{int_t{nl_min<T>()} - 1}.to_string()
                                                    + " to the type " + typeid(T).name() + " results in overflow";
                                  });
-        REQUIRE((!real{int_t{std::numeric_limits<T>::min()} - 1}.get(rop)));
-        REQUIRE(!get(rop, real{int_t{std::numeric_limits<T>::min()} - 1}));
+        REQUIRE((!real{int_t{nl_min<T>()} - 1}.get(rop)));
+        REQUIRE(!get(rop, real{int_t{nl_min<T>()} - 1}));
         REQUIRE(rop == T(0));
         REQUIRE_THROWS_PREDICATE(
             static_cast<T>(real{"inf", 10, 100}), std::domain_error, [](const std::domain_error &ex) {

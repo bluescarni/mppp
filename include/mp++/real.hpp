@@ -182,7 +182,7 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
-    static_assert(nl_digits<T>() < std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
+    static_assert(nl_digits<T>() < nl_max<::mpfr_prec_t>(), "Overflow error.");
     // NOTE: for signed integers, include the sign bit as well.
     return static_cast<::mpfr_prec_t>(nl_digits<T>()) + is_signed<T>::value;
 }
@@ -202,7 +202,7 @@ inline ::mpfr_prec_t dig2mpfr_prec()
 template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
-    static_assert(nl_digits<T>() <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
+    static_assert(nl_digits<T>() <= nl_max<::mpfr_prec_t>(), "Overflow error.");
     return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(nl_digits<T>()) : dig2mpfr_prec<T>();
 }
 
@@ -213,7 +213,7 @@ inline ::mpfr_prec_t real_deduce_precision(const integer<SSize> &n)
     const auto ls = n.size();
     // Check that ls * GMP_NUMB_BITS is representable by mpfr_prec_t.
     // LCOV_EXCL_START
-    if (mppp_unlikely(ls > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
+    if (mppp_unlikely(ls > static_cast<make_unsigned_t<::mpfr_prec_t>>(nl_max<::mpfr_prec_t>())
                                / unsigned(GMP_NUMB_BITS))) {
         throw std::overflow_error("The deduced precision for a real from an integer is too large");
     }
@@ -231,11 +231,10 @@ inline ::mpfr_prec_t real_deduce_precision(const rational<SSize> &q)
     // LCOV_EXCL_START
     if (mppp_unlikely(
             // Overflow in total size.
-            (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
+            (n_size > nl_max<decltype(q.get_num().size())>() - d_size)
             // Check that tot_size * GMP_NUMB_BITS is representable by mpfr_prec_t.
             || ((n_size + d_size)
-                > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
-                      / unsigned(GMP_NUMB_BITS)))) {
+                > static_cast<make_unsigned_t<::mpfr_prec_t>>(nl_max<::mpfr_prec_t>()) / unsigned(GMP_NUMB_BITS)))) {
         throw std::overflow_error("The deduced precision for a real from a rational is too large");
     }
     // LCOV_EXCL_STOP
@@ -788,7 +787,7 @@ private:
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
         dispatch_integral_init(p, n);
-        if (n <= std::numeric_limits<unsigned long>::max()) {
+        if (n <= nl_max<unsigned long>()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
             // NOTE: here and elsewhere let's use a 2-limb integer, in the hope
@@ -800,7 +799,7 @@ private:
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
         dispatch_integral_init(p, n);
-        if (n <= std::numeric_limits<long>::max() && n >= std::numeric_limits<long>::min()) {
+        if (n <= nl_max<long>() && n >= nl_min<long>()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
@@ -1229,7 +1228,7 @@ private:
     void dispatch_assignment(const T &n)
     {
         dispatch_integral_ass_prec<SetPrec>(n);
-        if (n <= std::numeric_limits<unsigned long>::max()) {
+        if (n <= nl_max<unsigned long>()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
@@ -1239,7 +1238,7 @@ private:
     void dispatch_assignment(const T &n)
     {
         dispatch_integral_ass_prec<SetPrec>(n);
-        if (n <= std::numeric_limits<long>::max() && n >= std::numeric_limits<long>::min()) {
+        if (n <= nl_max<long>() && n >= nl_min<long>()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
@@ -1913,12 +1912,12 @@ private:
             ::mpfr_clear_erangeflag();
             // If the value is positive, and the target type has a range greater than unsigned long,
             // we will attempt the conversion again via integer.
-            if (std::numeric_limits<T>::max() > std::numeric_limits<unsigned long>::max() && sgn() > 0) {
+            if (nl_max<T>() > nl_max<unsigned long>() && sgn() > 0) {
                 return mppp::get(rop, static_cast<integer<2>>(*this));
             }
             return false;
         }
-        if (candidate <= std::numeric_limits<T>::max()) {
+        if (candidate <= nl_max<T>()) {
             rop = static_cast<T>(candidate);
             return true;
         }
@@ -1957,13 +1956,12 @@ private:
             ::mpfr_clear_erangeflag();
             // If the target type has a range greater than long,
             // we will attempt the conversion again via integer.
-            if (std::numeric_limits<T>::min() < std::numeric_limits<long>::min()
-                && std::numeric_limits<T>::max() > std::numeric_limits<long>::max()) {
+            if (nl_min<T>() < nl_min<long>() && nl_max<T>() > nl_max<long>()) {
                 return mppp::get(rop, static_cast<integer<2>>(*this));
             }
             return false;
         }
-        if (candidate >= std::numeric_limits<T>::min() && candidate <= std::numeric_limits<T>::max()) {
+        if (candidate >= nl_min<T>() && candidate <= nl_max<T>()) {
             rop = static_cast<T>(candidate);
             return true;
         }

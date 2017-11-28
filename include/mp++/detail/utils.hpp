@@ -96,8 +96,7 @@ constexpr make_unsigned_t<T> nint_abs(T n)
     // int, and I am *not* 100% sure in this case the technique still works. Written like this, the cast
     // is never to a type narrower than "unsigned".
     return static_cast<uT>(
-        -static_cast<typename std::conditional<(std::numeric_limits<uT>::max() <= std::numeric_limits<unsigned>::max()),
-                                               unsigned, uT>::type>(n));
+        -static_cast<typename std::conditional<(nl_max<uT>() <= nl_max<unsigned>()), unsigned, uT>::type>(n));
 }
 
 // constexpr max/min implementations with copy semantics.
@@ -127,8 +126,8 @@ inline
     static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
     static_assert(is_integral<U>::value && is_unsigned<U>::value, "Invalid type.");
     // Cache a couple of quantities.
-    constexpr auto Tmax = static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max());
-    constexpr auto Tmin_abs = nint_abs(std::numeric_limits<T>::min());
+    constexpr auto Tmax = static_cast<make_unsigned_t<T>>(nl_max<T>());
+    constexpr auto Tmin_abs = nint_abs(nl_min<T>());
     if (mppp_likely(n <= c_min(Tmax, Tmin_abs))) {
         // Optimise the case in which n fits both Tmax and Tmin_abs. This means
         // we can convert and negate safely.
@@ -188,7 +187,7 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_unsigned<T>, is_unsigned<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
-    return n <= std::numeric_limits<T>::max()
+    return n <= nl_max<T>()
                ? static_cast<T>(n)
                : throw std::overflow_error(
                      "Error in the safe conversion between unsigned integral types: the input value "
@@ -199,7 +198,7 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_signed<T>, is_signed<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
-    return (n <= std::numeric_limits<T>::max() && n >= std::numeric_limits<T>::min())
+    return (n <= nl_max<T>() && n >= nl_min<T>())
                ? static_cast<T>(n)
                : throw std::overflow_error(
                      "Error in the safe conversion between signed integral types: the input value " + std::to_string(n)
@@ -210,7 +209,7 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_unsigned<T>, is_signed<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
-    return (n >= U(0) && static_cast<make_unsigned_t<U>>(n) <= std::numeric_limits<T>::max())
+    return (n >= U(0) && static_cast<make_unsigned_t<U>>(n) <= nl_max<T>())
                ? static_cast<T>(n)
                : throw std::overflow_error("Error in the safe conversion from a signed integral type to an unsigned "
                                            "integral type: the input value "
@@ -222,7 +221,7 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_signed<T>, is_unsigned<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
-    return n <= static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max())
+    return n <= static_cast<make_unsigned_t<T>>(nl_max<T>())
                ? static_cast<T>(n)
                : throw std::overflow_error("Error in the safe conversion from an unsigned integral type to a signed "
                                            "integral type: the input value "
