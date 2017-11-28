@@ -413,14 +413,14 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
 // This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
 // If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
 // little helper in order to avoid compiler warnings.
-template <typename T, enable_if_t<(GMP_NUMB_BITS < nl_digits<T>()), int> = 0>
+template <typename T, enable_if_t<(GMP_NUMB_BITS < nl_constants<T>::digits), int> = 0>
 inline void u_checked_rshift(T &n)
 {
     static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
     n >>= GMP_NUMB_BITS;
 }
 
-template <typename T, enable_if_t<(GMP_NUMB_BITS >= nl_digits<T>()), int> = 0>
+template <typename T, enable_if_t<(GMP_NUMB_BITS >= nl_constants<T>::digits), int> = 0>
 inline void u_checked_rshift(T &)
 {
     static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
@@ -1967,7 +1967,7 @@ private:
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
     // Implementation of the conversion to unsigned types which fit in a limb.
-    template <typename T, bool Sign, enable_if_t<(nl_digits<T>() <= GMP_NUMB_BITS), int> = 0>
+    template <typename T, bool Sign, enable_if_t<(nl_constants<T>::digits <= GMP_NUMB_BITS), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
@@ -1986,7 +1986,7 @@ private:
         return std::make_pair(true, static_cast<T>(ptr[0] & GMP_NUMB_MASK));
     }
     // Implementation of the conversion to unsigned types which do not fit in a limb.
-    template <typename T, bool Sign, enable_if_t<(nl_digits<T>() > GMP_NUMB_BITS), int> = 0>
+    template <typename T, bool Sign, enable_if_t<(nl_constants<T>::digits > GMP_NUMB_BITS), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");

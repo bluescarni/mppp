@@ -263,6 +263,13 @@ constexpr __int128_t nl_min<__int128_t>()
 }
 
 #endif
+
+// Need this little wrapper because MSVC is unhappy with constexpr
+// functions in SFINAE.
+template <typename T>
+struct nl_constants {
+    static constexpr int digits = nl_digits<T>();
+};
 }
 }
 
