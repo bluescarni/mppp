@@ -227,3 +227,63 @@ TEST_CASE("uint_sint_safe_cast")
 {
     tuple_for_each(uint_types{}, uint_sint_safe_cast_tester{});
 }
+
+#if defined(MPPP_HAVE_GCC_INT128)
+
+TEST_CASE("int128 to_string")
+{
+    REQUIRE(to_string(__uint128_t(0)) == "0");
+    REQUIRE(to_string(__uint128_t(1)) == "1");
+    REQUIRE(to_string(__uint128_t(7)) == "7");
+    REQUIRE(to_string(__uint128_t(9)) == "9");
+    REQUIRE(to_string(__uint128_t(10)) == "10");
+    REQUIRE(to_string(__uint128_t(11)) == "11");
+    REQUIRE(to_string(__uint128_t(12)) == "12");
+    REQUIRE(to_string(__uint128_t(19)) == "19");
+    REQUIRE(to_string(__uint128_t(909)) == "909");
+    REQUIRE(to_string(__uint128_t(910)) == "910");
+    REQUIRE(to_string(__uint128_t(911)) == "911");
+    REQUIRE(to_string(__uint128_t(999)) == "999");
+    REQUIRE(to_string(__uint128_t(1000)) == "1000");
+    REQUIRE(to_string(__uint128_t(9999)) == "9999");
+    REQUIRE(to_string(__uint128_t(10000)) == "10000");
+    REQUIRE(to_string(__uint128_t(18446744073709551615ull)) == "18446744073709551615");
+    REQUIRE(to_string(nl_max<__uint128_t>()) == "340282366920938463463374607431768211455");
+    REQUIRE(to_string(__int128_t(0)) == "0");
+    REQUIRE(to_string(__int128_t(1)) == "1");
+    REQUIRE(to_string(__int128_t(7)) == "7");
+    REQUIRE(to_string(__int128_t(9)) == "9");
+    REQUIRE(to_string(__int128_t(10)) == "10");
+    REQUIRE(to_string(__int128_t(11)) == "11");
+    REQUIRE(to_string(__int128_t(12)) == "12");
+    REQUIRE(to_string(__int128_t(19)) == "19");
+    REQUIRE(to_string(__int128_t(909)) == "909");
+    REQUIRE(to_string(__int128_t(910)) == "910");
+    REQUIRE(to_string(__int128_t(911)) == "911");
+    REQUIRE(to_string(__int128_t(999)) == "999");
+    REQUIRE(to_string(__int128_t(1000)) == "1000");
+    REQUIRE(to_string(__int128_t(9999)) == "9999");
+    REQUIRE(to_string(__int128_t(10000)) == "10000");
+    REQUIRE(to_string(__int128_t(-1)) == "-1");
+    REQUIRE(to_string(__int128_t(-7)) == "-7");
+    REQUIRE(to_string(__int128_t(-9)) == "-9");
+    REQUIRE(to_string(__int128_t(-10)) == "-10");
+    REQUIRE(to_string(__int128_t(-11)) == "-11");
+    REQUIRE(to_string(__int128_t(-12)) == "-12");
+    REQUIRE(to_string(__int128_t(-19)) == "-19");
+    REQUIRE(to_string(__int128_t(-909)) == "-909");
+    REQUIRE(to_string(__int128_t(-910)) == "-910");
+    REQUIRE(to_string(__int128_t(-911)) == "-911");
+    REQUIRE(to_string(__int128_t(-999)) == "-999");
+    REQUIRE(to_string(__int128_t(-1000)) == "-1000");
+    REQUIRE(to_string(__int128_t(-9999)) == "-9999");
+    REQUIRE(to_string(__int128_t(-10000)) == "-10000");
+    REQUIRE(to_string(__int128_t(18446744073709551615ull)) == "18446744073709551615");
+    REQUIRE(to_string(-__int128_t(18446744073709551615ull)) == "-18446744073709551615");
+    REQUIRE(to_string(nl_max<__int128_t>()) == "170141183460469231731687303715884105727");
+    REQUIRE(to_string(nl_max<__int128_t>() - 25) == "170141183460469231731687303715884105702");
+    REQUIRE(to_string(nl_min<__int128_t>()) == "-170141183460469231731687303715884105728");
+    REQUIRE(to_string(nl_min<__int128_t>() + 25) == "-170141183460469231731687303715884105703");
+}
+
+#endif
