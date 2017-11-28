@@ -11,6 +11,7 @@
 
 #include <mp++/config.hpp>
 
+#include <limits>
 #include <mp++/detail/type_traits.hpp>
 
 using namespace mppp;
@@ -43,6 +44,9 @@ TEST_CASE("type traits")
     REQUIRE((std::is_same<volatile unsigned, make_unsigned_t<volatile unsigned>>::value));
     REQUIRE((std::is_same<const volatile unsigned, make_unsigned_t<volatile const int>>::value));
     REQUIRE((std::is_same<const volatile unsigned, make_unsigned_t<volatile const unsigned>>::value));
+    REQUIRE(std::numeric_limits<int>::digits == nl_digits<int>());
+    REQUIRE(std::numeric_limits<int>::max() == nl_max<int>());
+    REQUIRE(std::numeric_limits<int>::min() == nl_min<int>());
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(is_integral<__int128_t>::value);
     REQUIRE(is_integral<__uint128_t>::value);
@@ -69,5 +73,11 @@ TEST_CASE("type traits")
     REQUIRE((std::is_same<volatile __uint128_t, make_unsigned_t<volatile __uint128_t>>::value));
     REQUIRE((std::is_same<const volatile __uint128_t, make_unsigned_t<volatile const __int128_t>>::value));
     REQUIRE((std::is_same<const volatile __uint128_t, make_unsigned_t<volatile const __uint128_t>>::value));
+    REQUIRE(128 == nl_digits<__uint128_t>());
+    REQUIRE(~__uint128_t(0) == nl_max<__uint128_t>());
+    REQUIRE(0u == nl_min<__uint128_t>());
+    REQUIRE(127 == nl_digits<__int128_t>());
+    REQUIRE(__int128_t(18446744073709551615ull) + (__int128_t(9223372036854775807ull) << 64) == nl_max<__int128_t>());
+    REQUIRE(static_cast<__int128_t>(__uint128_t(1) << 127) == nl_min<__int128_t>());
 #endif
 }

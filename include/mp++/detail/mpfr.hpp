@@ -122,11 +122,9 @@ struct mpfr_raii {
 using smart_mpfr_str = std::unique_ptr<char, void (*)(char *)>;
 
 // A couple of sanity checks when constructing temporary mpfrs/mpfs from long double.
-static_assert(std::numeric_limits<long double>::max_digits10 < std::numeric_limits<int>::max() / 4, "Overflow error.");
-static_assert(std::numeric_limits<long double>::max_digits10 * 4 < std::numeric_limits<::mpfr_prec_t>::max(),
-              "Overflow error.");
-static_assert(std::numeric_limits<long double>::max_digits10 * 4 < std::numeric_limits<::mp_bitcnt_t>::max(),
-              "Overflow error.");
+static_assert(std::numeric_limits<long double>::max_digits10 < nl_max<int>() / 4, "Overflow error.");
+static_assert(std::numeric_limits<long double>::max_digits10 * 4 < nl_max<::mpfr_prec_t>(), "Overflow error.");
+static_assert(std::numeric_limits<long double>::max_digits10 * 4 < nl_max<::mp_bitcnt_t>(), "Overflow error.");
 static_assert(real_prec_check(static_cast<::mpfr_prec_t>(std::numeric_limits<long double>::max_digits10 * 4)),
               "The precision required to represent long double is outside the MPFR min/max precision bounds.");
 
