@@ -9,8 +9,15 @@
 #ifndef MPPP_DETAIL_UTILS_HPP
 #define MPPP_DETAIL_UTILS_HPP
 
+#include <mp++/config.hpp>
+
+#if MPPP_CPLUSPLUS < 201402L
+#include <algorithm>
+#endif
 #include <cassert>
+#if MPPP_CPLUSPLUS >= 201402L
 #include <iterator>
+#endif
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -18,7 +25,6 @@
 #include <typeinfo>
 #include <utility>
 
-#include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
 
 namespace mppp
@@ -266,11 +272,17 @@ inline std::string to_string(__uint128_t n)
 {
     char output[40];
     auto o = to_string_impl(output, n);
+#if MPPP_CPLUSPLUS >= 201402L
     // Now build the string by reading backwards. When reverse iterators are created,
     // the original iterator is decreased by one. Hence, we can build the begin directly
     // from o (which points 1 past the last written char), and the end from output + 1
     // (so that it will point to the terminator).
     return std::string(std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1));
+#else
+    // In C++11, we reverse output and then create the string.
+    std::reverse(output, o);
+    return std::string(output, o);
+#endif
 }
 
 inline std::string to_string(__int128_t n)
@@ -282,7 +294,12 @@ inline std::string to_string(__int128_t n)
     if (neg) {
         *(o++) = '-';
     }
+#if MPPP_CPLUSPLUS >= 201402L
     return std::string(std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1));
+#else
+    std::reverse(output, o);
+    return std::string(output, o);
+#endif
 }
 
 #endif
