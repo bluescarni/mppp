@@ -390,9 +390,9 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
     assert((l & GMP_NUMB_MASK) != 0u);
 #if defined(__clang__) || defined(__GNUC__)
     // Implementation using GCC/clang builtins.
-    // NOTE: here we need std::numeric_limits<::mp_limb_t>::digits (instead of GMP_NUMB_BITS) because
+    // NOTE: here we need nl_digits<::mp_limb_t>() (instead of GMP_NUMB_BITS) because
     // builtin_clz() counts zeroes also in the nail bits.
-    return (unsigned(std::numeric_limits<::mp_limb_t>::digits) - builtin_clz(l & GMP_NUMB_MASK));
+    return (unsigned(nl_digits<::mp_limb_t>()) - builtin_clz(l & GMP_NUMB_MASK));
 #elif defined(_MSC_VER)
     // Implementation using MSVC's intrinsics.
     unsigned long index;
@@ -413,14 +413,14 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
 // This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
 // If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
 // little helper in order to avoid compiler warnings.
-template <typename T, enable_if_t<(GMP_NUMB_BITS < std::numeric_limits<T>::digits), int> = 0>
+template <typename T, enable_if_t<(GMP_NUMB_BITS < nl_digits<T>()), int> = 0>
 inline void u_checked_rshift(T &n)
 {
     static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
     n >>= GMP_NUMB_BITS;
 }
 
-template <typename T, enable_if_t<(GMP_NUMB_BITS >= std::numeric_limits<T>::digits), int> = 0>
+template <typename T, enable_if_t<(GMP_NUMB_BITS >= nl_digits<T>()), int> = 0>
 inline void u_checked_rshift(T &)
 {
     static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
@@ -435,10 +435,9 @@ struct limb_array_t_ {
     // We want only unsigned ints.
     static_assert(is_integral<T>::value && is_unsigned<T>::value, "Type error.");
     // Overflow check.
-    static_assert(unsigned(std::numeric_limits<T>::digits) <= std::numeric_limits<::mp_bitcnt_t>::max(),
-                  "Overflow error.");
+    static_assert(unsigned(nl_digits<T>()) <= std::numeric_limits<::mp_bitcnt_t>::max(), "Overflow error.");
     // The max number of GMP limbs needed to represent an instance of T.
-    constexpr static std::size_t size = nbits_to_nlimbs(static_cast<::mp_bitcnt_t>(std::numeric_limits<T>::digits));
+    constexpr static std::size_t size = nbits_to_nlimbs(static_cast<::mp_bitcnt_t>(nl_digits<T>()));
     // Overflow check.
     static_assert(size <= std::numeric_limits<std::size_t>::max(), "Overflow error.");
     // The type definition.
@@ -1968,7 +1967,7 @@ private:
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
     // Implementation of the conversion to unsigned types which fit in a limb.
-    template <typename T, bool Sign, enable_if_t<(std::numeric_limits<T>::digits <= GMP_NUMB_BITS), int> = 0>
+    template <typename T, bool Sign, enable_if_t<(nl_digits<T>() <= GMP_NUMB_BITS), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
@@ -1987,7 +1986,7 @@ private:
         return std::make_pair(true, static_cast<T>(ptr[0] & GMP_NUMB_MASK));
     }
     // Implementation of the conversion to unsigned types which do not fit in a limb.
-    template <typename T, bool Sign, enable_if_t<(std::numeric_limits<T>::digits > GMP_NUMB_BITS), int> = 0>
+    template <typename T, bool Sign, enable_if_t<(nl_digits<T>() > GMP_NUMB_BITS), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
         static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
@@ -1999,7 +1998,7 @@ private:
         // Init the retval with the first limb. This is safe as T has more bits than the limb type.
         auto retval = static_cast<T>(ptr[0] & GMP_NUMB_MASK);
         // Add the other limbs, if any.
-        constexpr unsigned u_bits = std::numeric_limits<T>::digits;
+        constexpr unsigned u_bits = nl_digits<T>();
         unsigned shift(GMP_NUMB_BITS);
         for (std::size_t i = 1u; i < asize; ++i, shift += unsigned(GMP_NUMB_BITS)) {
             if (shift >= u_bits) {
@@ -3353,11 +3352,10 @@ inline namespace detail
 // rather redundant on any conceivable architecture.
 using integer_have_dlimb_mul = std::integral_constant<bool,
 #if (defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64)) || (defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64))
-                                                      !GMP_NAIL_BITS && std::numeric_limits<::mp_limb_t>::digits == 64
+                                                      !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
 #elif GMP_NUMB_BITS == 32
-                                                      !GMP_NAIL_BITS
-                                                          && std::numeric_limits<std::uint_least64_t>::digits == 64
-                                                          && std::numeric_limits<::mp_limb_t>::digits == 32
+                                                      !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
+                                                          && nl_digits<::mp_limb_t>() == 32
 #else
                                                       false
 #endif
@@ -4141,11 +4139,10 @@ inline namespace detail
 // MSVC currently does not provide any primitive for 128bit division.
 using integer_have_dlimb_div = std::integral_constant<bool,
 #if defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64)
-                                                      !GMP_NAIL_BITS && std::numeric_limits<::mp_limb_t>::digits == 64
+                                                      !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
 #elif GMP_NUMB_BITS == 32
-                                                      !GMP_NAIL_BITS
-                                                          && std::numeric_limits<std::uint_least64_t>::digits == 64
-                                                          && std::numeric_limits<::mp_limb_t>::digits == 32
+                                                      !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
+                                                          && nl_digits<::mp_limb_t>() == 32
 #else
                                                       false
 #endif

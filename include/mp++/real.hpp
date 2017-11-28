@@ -182,9 +182,9 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
-    static_assert(std::numeric_limits<T>::digits < std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
+    static_assert(nl_digits<T>() < std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
     // NOTE: for signed integers, include the sign bit as well.
-    return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits) + is_signed<T>::value;
+    return static_cast<::mpfr_prec_t>(nl_digits<T>()) + is_signed<T>::value;
 }
 
 // Utility function to determine the number of base-2 digits of the significand
@@ -196,16 +196,14 @@ inline ::mpfr_prec_t dig2mpfr_prec()
     // NOTE: just do a raw cast for the time being, it's not like we have ways of testing
     // this in any case. In the future we could consider switching to a compile-time implementation
     // of the integral log2, and do everything as compile-time integral computations.
-    return static_cast<::mpfr_prec_t>(
-        std::ceil(std::numeric_limits<T>::digits * std::log2(std::numeric_limits<T>::radix)));
+    return static_cast<::mpfr_prec_t>(std::ceil(nl_digits<T>() * std::log2(std::numeric_limits<T>::radix)));
 }
 
 template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
-    static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-    return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
-                                              : dig2mpfr_prec<T>();
+    static_assert(nl_digits<T>() <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
+    return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(nl_digits<T>()) : dig2mpfr_prec<T>();
 }
 
 template <std::size_t SSize>
