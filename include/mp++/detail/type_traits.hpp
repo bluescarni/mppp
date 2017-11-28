@@ -11,6 +11,7 @@
 
 #include <mp++/config.hpp>
 
+#include <limits>
 #include <type_traits>
 
 namespace mppp
@@ -183,6 +184,7 @@ struct is_unsigned : std::integral_constant<bool, disjunction<std::is_unsigned<T
                                                               >::value> {
 };
 
+// make_unsigned machinery,
 template <typename T, typename = void>
 struct make_unsigned {
     using type = typename std::make_unsigned<T>::type;
@@ -202,6 +204,65 @@ struct make_unsigned<T, enable_if_t<disjunction<std::is_same<remove_cv_t<T>, __u
 
 template <typename T>
 using make_unsigned_t = typename make_unsigned<T>::type;
+
+// Various numeric_limits utils.
+template <typename T>
+constexpr int nl_digits()
+{
+    return std::numeric_limits<T>::digits;
+}
+
+template <typename T>
+constexpr T nl_min()
+{
+    return std::numeric_limits<T>::min();
+}
+
+template <typename T>
+constexpr T nl_max()
+{
+    return std::numeric_limits<T>::max();
+}
+
+#if defined(MPPP_HAVE_GCC_INT128)
+
+template <>
+constexpr int nl_digits<__uint128_t>()
+{
+    return 128;
+}
+
+template <>
+constexpr int nl_digits<__int128_t>()
+{
+    return 127;
+}
+
+template <>
+constexpr __uint128_t nl_max<__uint128_t>()
+{
+    return ~__uint128_t(0);
+}
+
+template <>
+constexpr __uint128_t nl_min<__uint128_t>()
+{
+    return 0;
+}
+
+template <>
+constexpr __int128_t nl_max<__int128_t>()
+{
+    return (((__int128_t(1) << 126) - 1) << 1) + 1;
+}
+
+template <>
+constexpr __int128_t nl_min<__int128_t>()
+{
+    return -nl_max<__int128_t>() - 1;
+}
+
+#endif
 }
 }
 
