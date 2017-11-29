@@ -76,6 +76,8 @@ struct int_ctor_tester {
             using integer = integer<S::value>;
             REQUIRE((std::is_constructible<integer, Int>::value));
             REQUIRE(lex_cast(Int(0)) == lex_cast(integer{Int(0)}));
+            REQUIRE(lex_cast(Int(42)) == lex_cast(integer{Int(42)}));
+            REQUIRE(lex_cast(Int(-42)) == lex_cast(integer{Int(-42)}));
             auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
             REQUIRE(lex_cast(min) == lex_cast(integer{min}));
             REQUIRE(lex_cast(max) == lex_cast(integer{max}));
@@ -138,6 +140,10 @@ struct int_ass_tester {
             REQUIRE(n0 == min);
             n0 = max;
             REQUIRE(n0 == max);
+            n0 = Int(42);
+            REQUIRE(n0 == Int(42));
+            n0 = Int(-42);
+            REQUIRE(n0 == Int(-42));
             std::atomic<bool> fail(false);
             auto f = [&fail](unsigned n) {
                 integral_minmax_dist<Int> dist;

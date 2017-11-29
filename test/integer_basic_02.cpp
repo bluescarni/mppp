@@ -538,6 +538,8 @@ struct int_convert_tester {
             auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
             REQUIRE(roundtrip_conversion<integer>(min));
             REQUIRE(roundtrip_conversion<integer>(max));
+            REQUIRE(roundtrip_conversion<integer>(Int(42)));
+            REQUIRE(roundtrip_conversion<integer>(Int(-42)));
             REQUIRE(roundtrip_conversion<integer>(min + Int(1)));
             REQUIRE(roundtrip_conversion<integer>(max - Int(1)));
             REQUIRE(roundtrip_conversion<integer>(min + Int(2)));
