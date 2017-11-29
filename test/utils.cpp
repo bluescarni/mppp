@@ -12,7 +12,6 @@
 #include <string>
 #include <tuple>
 #include <type_traits>
-#include <typeinfo>
 
 #include "test_utils.hpp"
 
@@ -49,13 +48,13 @@ struct uint_uint_safe_cast_tester {
                     return std::string(oe.what())
                            == "Error in the safe conversion between unsigned integral types: the input value "
                                   + std::to_string(T(nl_max<U>()) + 1u)
-                                  + " does not fit in the range of the target type " + typeid(U).name();
+                                  + " does not fit in the range of the target type " + type_string<U>();
                 });
             REQUIRE_THROWS_PREDICATE(safe_cast<U>(nl_max<T>()), std::overflow_error, [](const std::overflow_error &oe) {
                 return std::string(oe.what())
                        == "Error in the safe conversion between unsigned integral types: the input value "
                               + std::to_string(nl_max<T>()) + " does not fit in the range of the target type "
-                              + typeid(U).name();
+                              + type_string<U>();
             });
         }
     };
@@ -97,26 +96,26 @@ struct sint_sint_safe_cast_tester {
                     return std::string(oe.what())
                            == "Error in the safe conversion between signed integral types: the input value "
                                   + std::to_string(T(nl_max<U>()) + 1)
-                                  + " does not fit in the range of the target type " + typeid(U).name();
+                                  + " does not fit in the range of the target type " + type_string<U>();
                 });
             REQUIRE_THROWS_PREDICATE(
                 safe_cast<U>(T(T(nl_min<U>()) - 1)), std::overflow_error, [](const std::overflow_error &oe) {
                     return std::string(oe.what())
                            == "Error in the safe conversion between signed integral types: the input value "
                                   + std::to_string(T(nl_min<U>()) - 1)
-                                  + " does not fit in the range of the target type " + typeid(U).name();
+                                  + " does not fit in the range of the target type " + type_string<U>();
                 });
             REQUIRE_THROWS_PREDICATE(safe_cast<U>(nl_max<T>()), std::overflow_error, [](const std::overflow_error &oe) {
                 return std::string(oe.what())
                        == "Error in the safe conversion between signed integral types: the input value "
                               + std::to_string(nl_max<T>()) + " does not fit in the range of the target type "
-                              + typeid(U).name();
+                              + type_string<U>();
             });
             REQUIRE_THROWS_PREDICATE(safe_cast<U>(nl_min<T>()), std::overflow_error, [](const std::overflow_error &oe) {
                 return std::string(oe.what())
                        == "Error in the safe conversion between signed integral types: the input value "
                               + std::to_string(nl_min<T>()) + " does not fit in the range of the target type "
-                              + typeid(U).name();
+                              + type_string<U>();
             });
         }
     };
@@ -146,7 +145,7 @@ struct sint_uint_safe_cast_tester {
                        == "Error in the safe conversion from a signed integral type to an unsigned integral type: the "
                           "input value "
                               + std::to_string(S(-1)) + " does not fit in the range of the target type "
-                              + typeid(U).name();
+                              + type_string<U>();
             });
             if (uS(nl_max<S>()) > nl_max<U>()) {
                 REQUIRE(safe_cast<U>(S(nl_max<U>())) == nl_max<U>());
@@ -156,7 +155,7 @@ struct sint_uint_safe_cast_tester {
                                == "Error in the safe conversion from a signed integral type to an "
                                   "unsigned integral type: the input value "
                                       + std::to_string(S(S(nl_max<U>()) + 1))
-                                      + " does not fit in the range of the target type " + typeid(U).name();
+                                      + " does not fit in the range of the target type " + type_string<U>();
                     });
                 REQUIRE_THROWS_PREDICATE(
                     safe_cast<U>(nl_max<S>()), std::overflow_error, [](const std::overflow_error &oe) {
@@ -164,7 +163,7 @@ struct sint_uint_safe_cast_tester {
                                == "Error in the safe conversion from a signed integral type to an "
                                   "unsigned integral type: the input value "
                                       + std::to_string(nl_max<S>()) + " does not fit in the range of the target type "
-                                      + typeid(U).name();
+                                      + type_string<U>();
                     });
             } else {
                 REQUIRE(safe_cast<U>(nl_max<S>()) == uS(nl_max<S>()));
@@ -201,7 +200,7 @@ struct uint_sint_safe_cast_tester {
                                == "Error in the safe conversion from an unsigned integral type to a "
                                   "signed integral type: the input value "
                                       + std::to_string(U(U(nl_max<S>()) + 1))
-                                      + " does not fit in the range of the target type " + typeid(S).name();
+                                      + " does not fit in the range of the target type " + type_string<S>();
                     });
                 REQUIRE_THROWS_PREDICATE(
                     safe_cast<S>(nl_max<U>()), std::overflow_error, [](const std::overflow_error &oe) {
@@ -209,7 +208,7 @@ struct uint_sint_safe_cast_tester {
                                == "Error in the safe conversion from an unsigned integral type to a "
                                   "signed integral type: the input value "
                                       + std::to_string(nl_max<U>()) + " does not fit in the range of the target type "
-                                      + typeid(S).name();
+                                      + type_string<S>();
                     });
             } else {
                 REQUIRE(uS(safe_cast<S>(nl_max<U>())) == nl_max<U>());

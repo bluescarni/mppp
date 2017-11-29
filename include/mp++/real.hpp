@@ -30,7 +30,6 @@
 #endif
 #include <tuple>
 #include <type_traits>
-#include <typeinfo>
 #include <utility>
 #include <vector>
 
@@ -1895,7 +1894,7 @@ private:
     template <typename T>
     [[noreturn]] void raise_overflow_error() const
     {
-        throw std::overflow_error("Conversion of the real " + to_string() + " to the type " + typeid(T).name()
+        throw std::overflow_error("Conversion of the real " + to_string() + " to the type " + type_string<T>()
                                   + " results in overflow");
     }
     // Unsigned integrals, excluding bool.
