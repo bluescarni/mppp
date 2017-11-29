@@ -101,13 +101,14 @@ struct is_integer<mppp::integer<SSize>> {
     static const bool value = true;
 };
 
-template <typename T, typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, int>::type = 0>
+template <typename T, typename std::enable_if<mppp::is_integral<T>::value && mppp::is_signed<T>::value, int>::type = 0>
 inline long long lex_cast_tr(T n)
 {
     return static_cast<long long>(n);
 }
 
-template <typename T, typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, int>::type = 0>
+template <typename T,
+          typename std::enable_if<mppp::is_integral<T>::value && mppp::is_unsigned<T>::value, int>::type = 0>
 inline unsigned long long lex_cast_tr(T n)
 {
     return static_cast<unsigned long long>(n);

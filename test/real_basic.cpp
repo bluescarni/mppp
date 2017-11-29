@@ -27,6 +27,7 @@
 
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
@@ -71,11 +72,10 @@ template <typename T, typename std::enable_if<std::is_same<char, T>::value || st
                                                   || std::is_same<unsigned char, T>::value,
                                               int>::type
                       = 0>
-static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
+static inline std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>
 get_int_dist(T min, T max)
 {
-    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>(min,
-                                                                                                                   max);
+    return std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>(min, max);
 }
 
 // Base-10 string representation at full precision for a float.
@@ -108,16 +108,14 @@ TEST_CASE("real default prec")
                           + std::to_string(real_prec_min()) + " and " + std::to_string(real_prec_max());
         });
     }
-    if (real_prec_max() < std::numeric_limits<::mpfr_prec_t>::max()) {
-        REQUIRE_THROWS_PREDICATE(real_set_default_prec(std::numeric_limits<::mpfr_prec_t>::max()),
-                                 std::invalid_argument, [](const std::invalid_argument &ex) {
-                                     return ex.what()
-                                            == "Cannot set the default precision to "
-                                                   + std::to_string(std::numeric_limits<::mpfr_prec_t>::max())
-                                                   + ": the value must be either zero or between "
-                                                   + std::to_string(real_prec_min()) + " and "
-                                                   + std::to_string(real_prec_max());
-                                 });
+    if (real_prec_max() < nl_max<::mpfr_prec_t>()) {
+        REQUIRE_THROWS_PREDICATE(
+            real_set_default_prec(nl_max<::mpfr_prec_t>()), std::invalid_argument, [](const std::invalid_argument &ex) {
+                return ex.what()
+                       == "Cannot set the default precision to " + std::to_string(nl_max<::mpfr_prec_t>())
+                              + ": the value must be either zero or between " + std::to_string(real_prec_min())
+                              + " and " + std::to_string(real_prec_max());
+            });
     }
     REQUIRE(real_get_default_prec() == 0);
 }
@@ -129,7 +127,7 @@ struct int_ctor_tester {
         real_reset_default_prec();
         REQUIRE(real{T(0)}.zero_p());
         REQUIRE(!real{T(0)}.signbit());
-        REQUIRE(real{T(0)}.get_prec() == std::numeric_limits<T>::digits + std::is_signed<T>::value);
+        REQUIRE(real{T(0)}.get_prec() == nl_digits<T>() + is_signed<T>::value);
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
         real_set_default_prec(101);
@@ -138,13 +136,12 @@ struct int_ctor_tester {
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
         real_reset_default_prec();
-        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
         for (int i = 0; i < ntrials; ++i) {
             auto n = int_dist(rng);
-            REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(),
-                                   real{std::to_string(n), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
-            REQUIRE(::mpfr_equal_p(real{n, std::numeric_limits<T>::digits + 100}.get_mpfr_t(),
-                                   real{std::to_string(n), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(), real{std::to_string(n), 10, nl_digits<T>()}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(real{n, nl_digits<T>() + 100}.get_mpfr_t(),
+                                   real{std::to_string(n), 10, nl_digits<T>()}.get_mpfr_t()));
             real_set_default_prec(100);
             REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(), real{std::to_string(n), 10, 0}.get_mpfr_t()));
             real_reset_default_prec();
@@ -159,7 +156,7 @@ struct fp_ctor_tester {
         real_reset_default_prec();
         REQUIRE(real{T(0)}.zero_p());
         if (std::numeric_limits<T>::radix == 2) {
-            REQUIRE(real{T(0)}.get_prec() == std::numeric_limits<T>::digits);
+            REQUIRE(real{T(0)}.get_prec() == nl_digits<T>());
         }
         if (std::numeric_limits<T>::is_iec559) {
             REQUIRE(!real{T(0)}.signbit());
@@ -185,13 +182,11 @@ struct fp_ctor_tester {
         std::uniform_real_distribution<T> dist(-T(100), T(100));
         for (int i = 0; i < ntrials; ++i) {
             auto x = dist(rng);
-            REQUIRE(
-                ::mpfr_equal_p(real{x}.get_mpfr_t(), real{f2str(x), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
-            REQUIRE(::mpfr_equal_p(real{x, std::numeric_limits<T>::digits + 100}.get_mpfr_t(),
-                                   real{f2str(x), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
-            real_set_default_prec(c_max(100, std::numeric_limits<T>::digits));
-            REQUIRE(
-                ::mpfr_equal_p(real{x}.get_mpfr_t(), real{f2str(x), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(real{x}.get_mpfr_t(), real{f2str(x), 10, nl_digits<T>()}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(real{x, nl_digits<T>() + 100}.get_mpfr_t(),
+                                   real{f2str(x), 10, nl_digits<T>()}.get_mpfr_t()));
+            real_set_default_prec(c_max(100, nl_digits<T>()));
+            REQUIRE(::mpfr_equal_p(real{x}.get_mpfr_t(), real{f2str(x), 10, nl_digits<T>()}.get_mpfr_t()));
             real_reset_default_prec();
         }
     }
@@ -225,7 +220,7 @@ TEST_CASE("real constructors")
     real r5{real{4}, 512};
     REQUIRE(::mpfr_equal_p(r5.get_mpfr_t(), real{4}.get_mpfr_t()));
     REQUIRE(r5.get_prec() == 512);
-    if (std::numeric_limits<double>::radix == 2 && std::numeric_limits<double>::digits > 12) {
+    if (std::numeric_limits<double>::radix == 2 && nl_digits<double>() > 12) {
         real r6{real{1.3}, 12};
         REQUIRE(!::mpfr_equal_p(r6.get_mpfr_t(), real{1.3}.get_mpfr_t()));
         REQUIRE(r6.get_prec() == 12);
@@ -238,17 +233,14 @@ TEST_CASE("real constructors")
                           + std::to_string(real_prec_min());
         });
     }
-    if (real_prec_max() < std::numeric_limits<::mpfr_prec_t>::max()) {
-        REQUIRE_THROWS_PREDICATE((real{real{4}, std::numeric_limits<::mpfr_prec_t>::max()}), std::invalid_argument,
-                                 [](const std::invalid_argument &ex) {
-                                     return ex.what()
-                                            == "Cannot init a real with a precision of "
-                                                   + std::to_string(std::numeric_limits<::mpfr_prec_t>::max())
-                                                   + ": the maximum allowed precision is "
-                                                   + std::to_string(real_prec_max())
-                                                   + ", the minimum allowed precision is "
-                                                   + std::to_string(real_prec_min());
-                                 });
+    if (real_prec_max() < nl_max<::mpfr_prec_t>()) {
+        REQUIRE_THROWS_PREDICATE(
+            (real{real{4}, nl_max<::mpfr_prec_t>()}), std::invalid_argument, [](const std::invalid_argument &ex) {
+                return ex.what()
+                       == "Cannot init a real with a precision of " + std::to_string(nl_max<::mpfr_prec_t>())
+                              + ": the maximum allowed precision is " + std::to_string(real_prec_max())
+                              + ", the minimum allowed precision is " + std::to_string(real_prec_min());
+            });
     }
     // Move constructor.
     real r7{real{123}};
@@ -434,9 +426,9 @@ TEST_CASE("real constructors")
     tuple_for_each(fp_types{}, fp_ctor_tester{});
     // Special handling of bool.
     REQUIRE(real{false}.zero_p());
-    REQUIRE(real{false}.get_prec() == c_max(::mpfr_prec_t(std::numeric_limits<bool>::digits), real_prec_min()));
+    REQUIRE(real{false}.get_prec() == c_max(::mpfr_prec_t(nl_digits<bool>()), real_prec_min()));
     REQUIRE(::mpfr_cmp_ui(real{true}.get_mpfr_t(), 1ul) == 0);
-    REQUIRE(real{true}.get_prec() == c_max(::mpfr_prec_t(std::numeric_limits<bool>::digits), real_prec_min()));
+    REQUIRE(real{true}.get_prec() == c_max(::mpfr_prec_t(nl_digits<bool>()), real_prec_min()));
     REQUIRE((real{false, ::mpfr_prec_t(128)}.zero_p()));
     REQUIRE((real{false, ::mpfr_prec_t(128)}.get_prec() == 128));
     REQUIRE(::mpfr_cmp_ui((real{true, ::mpfr_prec_t(128)}).get_mpfr_t(), 1ul) == 0);
@@ -635,11 +627,11 @@ struct int_ass_tester {
         real r{12};
         r.set_prec(123);
         r = T(0);
-        REQUIRE(r.get_prec() == std::numeric_limits<T>::digits + std::is_signed<T>::value);
+        REQUIRE(r.get_prec() == nl_digits<T>() + is_signed<T>::value);
         REQUIRE(r.zero_p());
         r.set_prec(123);
         r = T(42);
-        REQUIRE(r.get_prec() == std::numeric_limits<T>::digits + std::is_signed<T>::value);
+        REQUIRE(r.get_prec() == nl_digits<T>() + is_signed<T>::value);
         REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{"42", 10, 100}.get_mpfr_t()));
         real_set_default_prec(200);
         r.set_prec(123);
@@ -647,12 +639,11 @@ struct int_ass_tester {
         REQUIRE(r.get_prec() == 200);
         REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{"43", 10, 100}.get_mpfr_t()));
         real_reset_default_prec();
-        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
         for (int i = 0; i < ntrials; ++i) {
             auto n = int_dist(rng);
             r = n;
-            REQUIRE(::mpfr_equal_p(r.get_mpfr_t(),
-                                   real{std::to_string(n), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{std::to_string(n), 10, nl_digits<T>()}.get_mpfr_t()));
         }
     }
 };
@@ -667,7 +658,7 @@ struct fp_ass_tester {
         r = T(0);
         REQUIRE(r.zero_p());
         if (std::numeric_limits<T>::radix == 2) {
-            REQUIRE(r.get_prec() == std::numeric_limits<T>::digits);
+            REQUIRE(r.get_prec() == nl_digits<T>());
         }
         if (std::numeric_limits<T>::is_iec559) {
             REQUIRE(!r.signbit());
@@ -695,7 +686,7 @@ struct fp_ass_tester {
         for (int i = 0; i < ntrials; ++i) {
             auto x = dist(rng);
             r = x;
-            REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{f2str(x), 10, std::numeric_limits<T>::digits}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{f2str(x), 10, nl_digits<T>()}.get_mpfr_t()));
         }
     }
 };
@@ -742,10 +733,10 @@ TEST_CASE("real assignment")
     real r7;
     r7 = false;
     REQUIRE(r7.zero_p());
-    REQUIRE(r7.get_prec() == c_max(::mpfr_prec_t(std::numeric_limits<bool>::digits), real_prec_min()));
+    REQUIRE(r7.get_prec() == c_max(::mpfr_prec_t(nl_digits<bool>()), real_prec_min()));
     r7 = true;
     REQUIRE(::mpfr_cmp_ui(r7.get_mpfr_t(), 1ul) == 0);
-    REQUIRE(r7.get_prec() == c_max(::mpfr_prec_t(std::numeric_limits<bool>::digits), real_prec_min()));
+    REQUIRE(r7.get_prec() == c_max(::mpfr_prec_t(nl_digits<bool>()), real_prec_min()));
     real_set_default_prec(101);
     r7 = false;
     REQUIRE(r7.zero_p());
@@ -1233,7 +1224,7 @@ struct int_conv_tester {
         REQUIRE(r0.get(rop));
         REQUIRE(get(rop, r0));
         REQUIRE(rop == T(42));
-        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
         for (int i = 0; i < ntrials; ++i) {
             const auto tmp = int_dist(rng);
             REQUIRE(static_cast<T>(real{tmp}) == tmp);
@@ -1242,25 +1233,23 @@ struct int_conv_tester {
             REQUIRE(rop == tmp);
         }
         rop = T(0);
-        REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{std::numeric_limits<T>::max()} + 1}), std::overflow_error,
+        REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{nl_max<T>()} + 1}), std::overflow_error,
                                  [](const std::overflow_error &ex) {
                                      return ex.what()
-                                            == "Conversion of the real "
-                                                   + real{int_t{std::numeric_limits<T>::max()} + 1}.to_string()
+                                            == "Conversion of the real " + real{int_t{nl_max<T>()} + 1}.to_string()
                                                    + " to the type " + typeid(T).name() + " results in overflow";
                                  });
-        REQUIRE((!real{int_t{std::numeric_limits<T>::max()} + 1}.get(rop)));
-        REQUIRE(!get(rop, real{int_t{std::numeric_limits<T>::max()} + 1}));
+        REQUIRE((!real{int_t{nl_max<T>()} + 1}.get(rop)));
+        REQUIRE(!get(rop, real{int_t{nl_max<T>()} + 1}));
         REQUIRE(rop == T(0));
-        REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{std::numeric_limits<T>::min()} - 1}), std::overflow_error,
+        REQUIRE_THROWS_PREDICATE(static_cast<T>(real{int_t{nl_min<T>()} - 1}), std::overflow_error,
                                  [](const std::overflow_error &ex) {
                                      return ex.what()
-                                            == "Conversion of the real "
-                                                   + real{int_t{std::numeric_limits<T>::min()} - 1}.to_string()
+                                            == "Conversion of the real " + real{int_t{nl_min<T>()} - 1}.to_string()
                                                    + " to the type " + typeid(T).name() + " results in overflow";
                                  });
-        REQUIRE((!real{int_t{std::numeric_limits<T>::min()} - 1}.get(rop)));
-        REQUIRE(!get(rop, real{int_t{std::numeric_limits<T>::min()} - 1}));
+        REQUIRE((!real{int_t{nl_min<T>()} - 1}.get(rop)));
+        REQUIRE(!get(rop, real{int_t{nl_min<T>()} - 1}));
         REQUIRE(rop == T(0));
         REQUIRE_THROWS_PREDICATE(
             static_cast<T>(real{"inf", 10, 100}), std::domain_error, [](const std::domain_error &ex) {

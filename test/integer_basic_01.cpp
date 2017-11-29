@@ -6,6 +6,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 
 #include <atomic>
@@ -76,11 +77,10 @@ template <typename T, typename std::enable_if<std::is_same<char, T>::value || st
                                                   || std::is_same<unsigned char, T>::value,
                                               int>::type
                       = 0>
-static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
+static inline std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>
 get_int_dist(T min, T max)
 {
-    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>(min,
-                                                                                                                   max);
+    return std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>(min, max);
 }
 
 struct int_ctor_tester {
@@ -92,7 +92,7 @@ struct int_ctor_tester {
             using integer = integer<S::value>;
             REQUIRE((std::is_constructible<integer, Int>::value));
             REQUIRE(lex_cast(Int(0)) == lex_cast(integer{Int(0)}));
-            auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
+            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
             REQUIRE(lex_cast(min) == lex_cast(integer{min}));
             REQUIRE(lex_cast(max) == lex_cast(integer{max}));
             std::atomic<bool> fail(false);
@@ -155,7 +155,7 @@ struct int_ass_tester {
             n0 = Int(0);
             REQUIRE(n0 == 0);
             REQUIRE(n0.is_static());
-            auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
+            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
             n0 = min;
             REQUIRE(n0 == min);
             n0 = max;
@@ -485,8 +485,7 @@ struct mpz_copy_ctor_tester {
         // Random testing.
         std::atomic<bool> fail(false);
         auto f = [&fail](unsigned n) {
-            std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
-                                                     std::numeric_limits<long>::max());
+            std::uniform_int_distribution<long> dist(nl_min<long>(), nl_max<long>());
             std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
             for (auto i = 0; i < ntries; ++i) {
                 mpz_raii mpz;
@@ -539,8 +538,7 @@ struct mpz_move_ctor_tester {
         // Random testing.
         std::atomic<bool> fail(false);
         auto f = [&fail](unsigned n) {
-            std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
-                                                     std::numeric_limits<long>::max());
+            std::uniform_int_distribution<long> dist(nl_min<long>(), nl_max<long>());
             std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
             for (auto i = 0; i < ntries; ++i) {
                 ::mpz_t m1;

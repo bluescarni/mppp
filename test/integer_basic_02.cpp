@@ -6,6 +6,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 
 #include <atomic>
@@ -76,11 +77,10 @@ template <typename T, typename std::enable_if<std::is_same<char, T>::value || st
                                                   || std::is_same<unsigned char, T>::value,
                                               int>::type
                       = 0>
-static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
+static inline std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>
 get_int_dist(T min, T max)
 {
-    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>(min,
-                                                                                                                   max);
+    return std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>(min, max);
 }
 
 struct nbits_ctor_tester {
@@ -226,8 +226,7 @@ struct mpz_copy_ass_tester {
         // Random testing.
         std::atomic<bool> fail(false);
         auto f = [&fail](unsigned u) {
-            std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
-                                                     std::numeric_limits<long>::max());
+            std::uniform_int_distribution<long> dist(nl_min<long>(), nl_max<long>());
             std::uniform_int_distribution<int> sdist(0, 1);
             std::mt19937 eng(static_cast<std::mt19937::result_type>(u + mt_rng_seed));
             for (auto i = 0; i < ntries; ++i) {
@@ -290,8 +289,7 @@ struct mpz_move_ass_tester {
         // Random testing.
         std::atomic<bool> fail(false);
         auto f = [&fail](unsigned u) {
-            std::uniform_int_distribution<long> dist(std::numeric_limits<long>::min(),
-                                                     std::numeric_limits<long>::max());
+            std::uniform_int_distribution<long> dist(nl_min<long>(), nl_max<long>());
             std::uniform_int_distribution<int> sdist(0, 1);
             std::mt19937 eng(static_cast<std::mt19937::result_type>(u + mt_rng_seed));
             for (auto i = 0; i < ntries; ++i) {
@@ -553,7 +551,7 @@ struct int_convert_tester {
             using integer = integer<S::value>;
             REQUIRE((is_convertible<integer, Int>::value));
             REQUIRE(roundtrip_conversion<integer>(0));
-            auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
+            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
             REQUIRE(roundtrip_conversion<integer>(min));
             REQUIRE(roundtrip_conversion<integer>(max));
             REQUIRE(roundtrip_conversion<integer>(min + Int(1)));

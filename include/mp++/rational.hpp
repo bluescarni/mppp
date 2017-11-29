@@ -720,8 +720,7 @@ private:
         return std::make_pair(true, m_num.m_int.m_st._mp_size != 0);
     }
     // Conversion to integral types other than bool.
-    template <typename T,
-              enable_if_t<conjunction<std::is_integral<T>, negation<std::is_same<bool, T>>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, negation<std::is_same<bool, T>>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
         return static_cast<int_t>(*this).template dispatch_conversion<T>();

@@ -6,13 +6,13 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
 
 #include <cstdint>
 #include <gmp.h>
-#include <limits>
 #include <quadmath.h>
 #include <random>
 #include <stdexcept>
@@ -38,8 +38,8 @@ static int ntries = 1000;
 
 static std::mt19937 rng;
 
-static constexpr auto delta64 = std::numeric_limits<std::uint_least64_t>::digits - 64;
-static constexpr auto delta49 = std::numeric_limits<std::uint_least64_t>::digits - 49;
+static constexpr auto delta64 = nl_digits<std::uint_least64_t>() - 64;
+static constexpr auto delta49 = nl_digits<std::uint_least64_t>() - 49;
 
 TEST_CASE("real128 constructors")
 {

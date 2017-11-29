@@ -179,12 +179,12 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 #if !defined(MPPP_DOXYGEN_INVOKED)
 
 // Helpers to deduce the precision when constructing/assigning a real via another type.
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
-    static_assert(std::numeric_limits<T>::digits < std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
+    static_assert(nl_digits<T>() < nl_max<::mpfr_prec_t>(), "Overflow error.");
     // NOTE: for signed integers, include the sign bit as well.
-    return static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits) + std::is_signed<T>::value;
+    return static_cast<::mpfr_prec_t>(nl_digits<T>()) + is_signed<T>::value;
 }
 
 // Utility function to determine the number of base-2 digits of the significand
@@ -196,16 +196,14 @@ inline ::mpfr_prec_t dig2mpfr_prec()
     // NOTE: just do a raw cast for the time being, it's not like we have ways of testing
     // this in any case. In the future we could consider switching to a compile-time implementation
     // of the integral log2, and do everything as compile-time integral computations.
-    return static_cast<::mpfr_prec_t>(
-        std::ceil(std::numeric_limits<T>::digits * std::log2(std::numeric_limits<T>::radix)));
+    return static_cast<::mpfr_prec_t>(std::ceil(nl_digits<T>() * std::log2(std::numeric_limits<T>::radix)));
 }
 
 template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
 inline ::mpfr_prec_t real_deduce_precision(const T &)
 {
-    static_assert(std::numeric_limits<T>::digits <= std::numeric_limits<::mpfr_prec_t>::max(), "Overflow error.");
-    return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(std::numeric_limits<T>::digits)
-                                              : dig2mpfr_prec<T>();
+    static_assert(nl_digits<T>() <= nl_max<::mpfr_prec_t>(), "Overflow error.");
+    return std::numeric_limits<T>::radix == 2 ? static_cast<::mpfr_prec_t>(nl_digits<T>()) : dig2mpfr_prec<T>();
 }
 
 template <std::size_t SSize>
@@ -215,7 +213,7 @@ inline ::mpfr_prec_t real_deduce_precision(const integer<SSize> &n)
     const auto ls = n.size();
     // Check that ls * GMP_NUMB_BITS is representable by mpfr_prec_t.
     // LCOV_EXCL_START
-    if (mppp_unlikely(ls > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
+    if (mppp_unlikely(ls > static_cast<make_unsigned_t<::mpfr_prec_t>>(nl_max<::mpfr_prec_t>())
                                / unsigned(GMP_NUMB_BITS))) {
         throw std::overflow_error("The deduced precision for a real from an integer is too large");
     }
@@ -233,11 +231,10 @@ inline ::mpfr_prec_t real_deduce_precision(const rational<SSize> &q)
     // LCOV_EXCL_START
     if (mppp_unlikely(
             // Overflow in total size.
-            (n_size > std::numeric_limits<decltype(q.get_num().size())>::max() - d_size)
+            (n_size > nl_max<decltype(q.get_num().size())>() - d_size)
             // Check that tot_size * GMP_NUMB_BITS is representable by mpfr_prec_t.
             || ((n_size + d_size)
-                > static_cast<make_unsigned_t<::mpfr_prec_t>>(std::numeric_limits<::mpfr_prec_t>::max())
-                      / unsigned(GMP_NUMB_BITS)))) {
+                > static_cast<make_unsigned_t<::mpfr_prec_t>>(nl_max<::mpfr_prec_t>()) / unsigned(GMP_NUMB_BITS)))) {
         throw std::overflow_error("The deduced precision for a real from a rational is too large");
     }
     // LCOV_EXCL_STOP
@@ -786,11 +783,11 @@ private:
         dispatch_integral_init(p, b);
         ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
         dispatch_integral_init(p, n);
-        if (n <= std::numeric_limits<unsigned long>::max()) {
+        if (n <= nl_max<unsigned long>()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
             // NOTE: here and elsewhere let's use a 2-limb integer, in the hope
@@ -798,11 +795,11 @@ private:
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
         dispatch_integral_init(p, n);
-        if (n <= std::numeric_limits<long>::max() && n >= std::numeric_limits<long>::min()) {
+        if (n <= nl_max<long>() && n >= nl_min<long>()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
@@ -1227,23 +1224,21 @@ private:
         dispatch_integral_ass_prec<SetPrec>(b);
         ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
-    template <bool SetPrec, typename T,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <bool SetPrec, typename T, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
     void dispatch_assignment(const T &n)
     {
         dispatch_integral_ass_prec<SetPrec>(n);
-        if (n <= std::numeric_limits<unsigned long>::max()) {
+        if (n <= nl_max<unsigned long>()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
-    template <bool SetPrec, typename T,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <bool SetPrec, typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     void dispatch_assignment(const T &n)
     {
         dispatch_integral_ass_prec<SetPrec>(n);
-        if (n <= std::numeric_limits<long>::max() && n >= std::numeric_limits<long>::min()) {
+        if (n <= nl_max<long>() && n >= nl_min<long>()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
@@ -1917,20 +1912,19 @@ private:
             ::mpfr_clear_erangeflag();
             // If the value is positive, and the target type has a range greater than unsigned long,
             // we will attempt the conversion again via integer.
-            if (std::numeric_limits<T>::max() > std::numeric_limits<unsigned long>::max() && sgn() > 0) {
+            if (nl_max<T>() > nl_max<unsigned long>() && sgn() > 0) {
                 return mppp::get(rop, static_cast<integer<2>>(*this));
             }
             return false;
         }
-        if (candidate <= std::numeric_limits<T>::max()) {
+        if (candidate <= nl_max<T>()) {
             rop = static_cast<T>(candidate);
             return true;
         }
         return false;
     }
     template <typename T,
-              enable_if_t<conjunction<negation<std::is_same<bool, T>>, std::is_integral<T>, std::is_unsigned<T>>::value,
-                          int> = 0>
+              enable_if_t<conjunction<negation<std::is_same<bool, T>>, is_integral<T>, is_unsigned<T>>::value, int> = 0>
     T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
@@ -1962,19 +1956,18 @@ private:
             ::mpfr_clear_erangeflag();
             // If the target type has a range greater than long,
             // we will attempt the conversion again via integer.
-            if (std::numeric_limits<T>::min() < std::numeric_limits<long>::min()
-                && std::numeric_limits<T>::max() > std::numeric_limits<long>::max()) {
+            if (nl_min<T>() < nl_min<long>() && nl_max<T>() > nl_max<long>()) {
                 return mppp::get(rop, static_cast<integer<2>>(*this));
             }
             return false;
         }
-        if (candidate >= std::numeric_limits<T>::min() && candidate <= std::numeric_limits<T>::max()) {
+        if (candidate >= nl_min<T>() && candidate <= nl_max<T>()) {
             rop = static_cast<T>(candidate);
             return true;
         }
         return false;
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
@@ -2114,7 +2107,7 @@ private:
         b = !zero_p();
         return true;
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
     bool dispatch_get(T &n) const
     {
         if (!number_p()) {
@@ -2122,7 +2115,7 @@ private:
         }
         return uint_conversion(n);
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     bool dispatch_get(T &n) const
     {
         if (!number_p()) {

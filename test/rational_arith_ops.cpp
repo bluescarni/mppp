@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <utility>
 
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
@@ -126,9 +127,9 @@ struct add_tester {
             REQUIRE((std::is_same<int &, decltype(n += rational{-4})>::value));
             n += rational{-5, 2};
             REQUIRE((lex_cast(n) == "-1"));
-            n = std::numeric_limits<int>::max();
+            n = nl_max<int>();
             REQUIRE_THROWS_AS(n += rational{1}, std::overflow_error);
-            n = std::numeric_limits<int>::min();
+            n = nl_min<int>();
             REQUIRE_THROWS_AS(n += rational{-1}, std::overflow_error);
         }
         {
@@ -268,9 +269,9 @@ struct sub_tester {
             REQUIRE((std::is_same<int &, decltype(n -= rational{-4})>::value));
             n -= rational{-5, 2};
             REQUIRE((lex_cast(n) == "11"));
-            n = std::numeric_limits<int>::max();
+            n = nl_max<int>();
             REQUIRE_THROWS_AS(n -= rational{-1}, std::overflow_error);
-            n = std::numeric_limits<int>::min();
+            n = nl_min<int>();
             REQUIRE_THROWS_AS(n -= rational{1}, std::overflow_error);
         }
         {
@@ -413,9 +414,9 @@ struct mul_tester {
             REQUIRE((std::is_same<int &, decltype(n *= rational{-4})>::value));
             n *= rational{-5, 2};
             REQUIRE((lex_cast(n) == "15"));
-            n = std::numeric_limits<int>::max();
+            n = nl_max<int>();
             REQUIRE_THROWS_AS(n *= rational{2}, std::overflow_error);
-            n = std::numeric_limits<int>::min();
+            n = nl_min<int>();
             REQUIRE_THROWS_AS(n *= rational{2}, std::overflow_error);
         }
         {
@@ -591,9 +592,9 @@ struct div_tester {
             REQUIRE((std::is_same<int &, decltype(n /= rational{-4})>::value));
             n /= rational{-5, 2};
             REQUIRE((lex_cast(n) == "1"));
-            n = std::numeric_limits<int>::max();
+            n = nl_max<int>();
             REQUIRE_THROWS_AS(n /= (rational{1, 2}), std::overflow_error);
-            n = std::numeric_limits<int>::min();
+            n = nl_min<int>();
             REQUIRE_THROWS_AS(n /= (rational{1, 2}), std::overflow_error);
         }
         {

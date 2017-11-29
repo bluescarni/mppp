@@ -75,13 +75,9 @@
 // Checked iterators functionality.
 #include <iterator>
 
-#elif defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
+#elif defined(MPPP_HAVE_GCC_INT128)
 
-// NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
-// http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
-#if defined(__SIZEOF_INT128__)
 #define MPPP_UINT128 __uint128_t
-#endif
 
 #endif
 
@@ -119,8 +115,7 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
                   // The mpn functions accept sizes as ::mp_size_t, but we generally represent sizes as mpz_size_t.
                   // We need then to make sure we can always cast safely mpz_size_t to ::mp_size_t. Inspection
                   // of the gmp.h header seems to indicate that mpz_size_t is never larger than ::mp_size_t.
-                  std::numeric_limits<mpz_size_t>::min() >= std::numeric_limits<::mp_size_t>::min()
-                  && std::numeric_limits<mpz_size_t>::max() <= std::numeric_limits<::mp_size_t>::max(),
+                  nl_min<mpz_size_t>() >= nl_min<::mp_size_t>() && nl_max<mpz_size_t>() <= nl_max<::mp_size_t>(),
               "Invalid mpz_t struct layout and/or GMP types.");
 
 #if MPPP_CPLUSPLUS >= 201703L
@@ -203,8 +198,7 @@ inline bool mpz_init_from_cache_impl(mpz_struct_t &rop, std::size_t nlimbs)
     auto &mpzc = get_mpz_alloc_cache();
     if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
         // LCOV_EXCL_START
-        if (mppp_unlikely(nlimbs
-                          > static_cast<make_unsigned_t<mpz_alloc_t>>(std::numeric_limits<mpz_alloc_t>::max()))) {
+        if (mppp_unlikely(nlimbs > static_cast<make_unsigned_t<mpz_alloc_t>>(nl_max<mpz_alloc_t>()))) {
             std::abort();
         }
         // LCOV_EXCL_STOP
@@ -228,7 +222,7 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
 #endif
         // LCOV_EXCL_START
         // A bit of horrid overflow checking.
-        if (mppp_unlikely(nlimbs > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
+        if (mppp_unlikely(nlimbs > nl_max<std::size_t>() / unsigned(GMP_NUMB_BITS))) {
             // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
             // to do anything else, as long as GMP does not provide error recovery.
             std::abort();
@@ -236,7 +230,7 @@ inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
         // LCOV_EXCL_STOP
         const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
         // LCOV_EXCL_START
-        if (mppp_unlikely(nbits > std::numeric_limits<::mp_bitcnt_t>::max())) {
+        if (mppp_unlikely(nbits > nl_max<::mp_bitcnt_t>())) {
             std::abort();
         }
         // LCOV_EXCL_STOP
@@ -303,7 +297,7 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
     assert(base >= 2 && base <= 62);
     const auto size_base = ::mpz_sizeinbase(mpz, base);
     // LCOV_EXCL_START
-    if (mppp_unlikely(size_base > std::numeric_limits<std::size_t>::max() - 2u)) {
+    if (mppp_unlikely(size_base > nl_max<std::size_t>() - 2u)) {
         throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
     }
     // LCOV_EXCL_STOP
@@ -313,7 +307,7 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
     // we resize up.
     // Overflow check.
     // LCOV_EXCL_START
-    if (mppp_unlikely(total_size > std::numeric_limits<std::vector<char>::size_type>::max())) {
+    if (mppp_unlikely(total_size > nl_max<std::vector<char>::size_type>())) {
         throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
     }
     // LCOV_EXCL_STOP
@@ -394,9 +388,9 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
     assert((l & GMP_NUMB_MASK) != 0u);
 #if defined(__clang__) || defined(__GNUC__)
     // Implementation using GCC/clang builtins.
-    // NOTE: here we need std::numeric_limits<::mp_limb_t>::digits (instead of GMP_NUMB_BITS) because
+    // NOTE: here we need nl_digits<::mp_limb_t>() (instead of GMP_NUMB_BITS) because
     // builtin_clz() counts zeroes also in the nail bits.
-    return (unsigned(std::numeric_limits<::mp_limb_t>::digits) - builtin_clz(l & GMP_NUMB_MASK));
+    return (unsigned(nl_digits<::mp_limb_t>()) - builtin_clz(l & GMP_NUMB_MASK));
 #elif defined(_MSC_VER)
     // Implementation using MSVC's intrinsics.
     unsigned long index;
@@ -417,17 +411,17 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
 // This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
 // If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
 // little helper in order to avoid compiler warnings.
-template <typename T, enable_if_t<(GMP_NUMB_BITS < std::numeric_limits<T>::digits), int> = 0>
+template <typename T, enable_if_t<(GMP_NUMB_BITS < nl_constants<T>::digits), int> = 0>
 inline void u_checked_rshift(T &n)
 {
-    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
     n >>= GMP_NUMB_BITS;
 }
 
-template <typename T, enable_if_t<(GMP_NUMB_BITS >= std::numeric_limits<T>::digits), int> = 0>
+template <typename T, enable_if_t<(GMP_NUMB_BITS >= nl_constants<T>::digits), int> = 0>
 inline void u_checked_rshift(T &)
 {
-    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
     assert(false);
 }
 
@@ -437,14 +431,13 @@ inline void u_checked_rshift(T &)
 template <typename T>
 struct limb_array_t_ {
     // We want only unsigned ints.
-    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Type error.");
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Type error.");
     // Overflow check.
-    static_assert(unsigned(std::numeric_limits<T>::digits) <= std::numeric_limits<::mp_bitcnt_t>::max(),
-                  "Overflow error.");
+    static_assert(unsigned(nl_digits<T>()) <= nl_max<::mp_bitcnt_t>(), "Overflow error.");
     // The max number of GMP limbs needed to represent an instance of T.
-    constexpr static std::size_t size = nbits_to_nlimbs(static_cast<::mp_bitcnt_t>(std::numeric_limits<T>::digits));
+    constexpr static std::size_t size = nbits_to_nlimbs(static_cast<::mp_bitcnt_t>(nl_digits<T>()));
     // Overflow check.
-    static_assert(size <= std::numeric_limits<std::size_t>::max(), "Overflow error.");
+    static_assert(size <= nl_max<std::size_t>(), "Overflow error.");
     // The type definition.
     using type = std::array<::mp_limb_t, static_cast<std::size_t>(size)>;
 };
@@ -458,7 +451,7 @@ using limb_array_t = typename limb_array_t_<T>::type;
 template <typename T>
 inline std::size_t uint_to_limb_array(limb_array_t<T> &rop, T n)
 {
-    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
     assert(n > GMP_NUMB_MAX);
     // We can assign the first two limbs directly, as we know n > GMP_NUMB_MAX.
     rop[0] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
@@ -703,8 +696,7 @@ union integer_union {
     }
     // Construction from unsigned ints. The Neg flag will negate the integer after construction, it is for use in
     // the constructor from signed ints.
-    template <typename T, bool Neg = false,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <typename T, bool Neg = false, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
         if (n <= GMP_NUMB_MAX) {
@@ -723,7 +715,7 @@ union integer_union {
         }
     }
     // Construction from signed ints.
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     void dispatch_generic_ctor(T n)
     {
         if (n >= T(0)) {
@@ -1551,8 +1543,7 @@ public:
 
 private:
     // Implementation of the assignment from unsigned C++ integral.
-    template <typename T, bool Neg = false,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <typename T, bool Neg = false, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
     void dispatch_assignment(T n)
     {
         const auto s = is_static();
@@ -1627,7 +1618,7 @@ private:
         }
     }
     // Assignment from signed integral: take its abs() and negate if necessary, as usual.
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     void dispatch_assignment(T n)
     {
         if (n >= T(0)) {
@@ -1974,10 +1965,10 @@ private:
         return std::make_pair(true, m_int.m_st._mp_size != 0);
     }
     // Implementation of the conversion to unsigned types which fit in a limb.
-    template <typename T, bool Sign, enable_if_t<(std::numeric_limits<T>::digits <= GMP_NUMB_BITS), int> = 0>
+    template <typename T, bool Sign, enable_if_t<(nl_constants<T>::digits <= GMP_NUMB_BITS), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
-        static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+        static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
         if ((Sign && m_int.m_st._mp_size != 1) || (!Sign && m_int.m_st._mp_size != -1)) {
             // If the asize is not 1, the conversion will fail.
@@ -1985,7 +1976,7 @@ private:
         }
         // Get the pointer to the limbs.
         const ::mp_limb_t *ptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
-        if ((ptr[0] & GMP_NUMB_MASK) > std::numeric_limits<T>::max()) {
+        if ((ptr[0] & GMP_NUMB_MASK) > nl_max<T>()) {
             // The only limb has a value which exceeds the limit of T.
             return std::make_pair(false, T(0));
         }
@@ -1993,10 +1984,10 @@ private:
         return std::make_pair(true, static_cast<T>(ptr[0] & GMP_NUMB_MASK));
     }
     // Implementation of the conversion to unsigned types which do not fit in a limb.
-    template <typename T, bool Sign, enable_if_t<(std::numeric_limits<T>::digits > GMP_NUMB_BITS), int> = 0>
+    template <typename T, bool Sign, enable_if_t<(nl_constants<T>::digits > GMP_NUMB_BITS), int> = 0>
     std::pair<bool, T> convert_to_unsigned() const
     {
-        static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value, "Invalid type.");
+        static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
         assert((Sign && m_int.m_st._mp_size > 0) || (!Sign && m_int.m_st._mp_size < 0));
         const auto asize = Sign ? static_cast<std::size_t>(m_int.m_st._mp_size)
                                 : static_cast<std::size_t>(nint_abs(m_int.m_st._mp_size));
@@ -2005,7 +1996,7 @@ private:
         // Init the retval with the first limb. This is safe as T has more bits than the limb type.
         auto retval = static_cast<T>(ptr[0] & GMP_NUMB_MASK);
         // Add the other limbs, if any.
-        constexpr unsigned u_bits = std::numeric_limits<T>::digits;
+        constexpr unsigned u_bits = nl_digits<T>();
         unsigned shift(GMP_NUMB_BITS);
         for (std::size_t i = 1u; i < asize; ++i, shift += unsigned(GMP_NUMB_BITS)) {
             if (shift >= u_bits) {
@@ -2030,8 +2021,7 @@ private:
     }
     // Conversion to unsigned ints, excluding bool.
     template <typename T,
-              enable_if_t<conjunction<std::is_integral<T>, std::is_unsigned<T>, negation<std::is_same<bool, T>>>::value,
-                          int> = 0>
+              enable_if_t<conjunction<is_integral<T>, is_unsigned<T>, negation<std::is_same<bool, T>>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
@@ -2056,18 +2046,17 @@ private:
     // chokes on constexpr functions in a SFINAE context.
     template <typename T>
     struct sconv_is_small {
-        static const bool value = c_max(static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max()),
-                                        nint_abs(std::numeric_limits<T>::min()))
-                                  <= GMP_NUMB_MAX;
+        static const bool value
+            = c_max(static_cast<make_unsigned_t<T>>(nl_max<T>()), nint_abs(nl_min<T>())) <= GMP_NUMB_MAX;
     };
     // Overload if the all the absolute values of T fit into a limb.
     template <typename T, enable_if_t<sconv_is_small<T>::value, int> = 0>
     std::pair<bool, T> convert_to_signed() const
     {
-        static_assert(std::is_integral<T>::value && std::is_signed<T>::value, "Invalid type.");
+        static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
         assert(size());
         // Cache for convenience.
-        constexpr auto Tmax = static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max());
+        constexpr auto Tmax = static_cast<make_unsigned_t<T>>(nl_max<T>());
         if (m_int.m_st._mp_size != 1 && m_int.m_st._mp_size != -1) {
             // this consists of more than 1 limb, the conversion is not possible.
             return std::make_pair(false, T(0));
@@ -2092,7 +2081,7 @@ private:
     std::pair<bool, T> convert_to_signed() const
     {
         // Cache for convenience.
-        constexpr auto Tmax = static_cast<make_unsigned_t<T>>(std::numeric_limits<T>::max());
+        constexpr auto Tmax = static_cast<make_unsigned_t<T>>(nl_max<T>());
         // Branch out depending on the sign of this.
         if (m_int.m_st._mp_size > 0) {
             // Attempt conversion to the unsigned counterpart.
@@ -2115,7 +2104,7 @@ private:
             return std::make_pair(false, T(0));
         }
     }
-    template <typename T, enable_if_t<conjunction<std::is_integral<T>, std::is_signed<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
         // Handle zero.
@@ -2280,7 +2269,7 @@ public:
         }
         const ::mp_limb_t *lptr = is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d;
         // LCOV_EXCL_START
-        if (mppp_unlikely(ls > std::numeric_limits<std::size_t>::max() / unsigned(GMP_NUMB_BITS))) {
+        if (mppp_unlikely(ls > nl_max<std::size_t>() / unsigned(GMP_NUMB_BITS))) {
             throw std::overflow_error("Overflow in the computation of the number of bits required to represent an "
                                       "integer - the limb size is "
                                       + std::to_string(ls));
@@ -3250,7 +3239,7 @@ template <std::size_t SSize>
 inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
 {
     // LCOV_EXCL_START
-    if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MAX) {
+    if (nl_max<unsigned long>() > GMP_NUMB_MAX) {
         // For the optimised version below to kick in we need to be sure we can safely convert
         // unsigned long to an ::mp_limb_t, modulo nail bits. This because in the optimised version
         // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an
@@ -3293,7 +3282,7 @@ template <std::size_t SSize>
 inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
 {
     // LCOV_EXCL_START
-    if (std::numeric_limits<unsigned long>::max() > GMP_NUMB_MASK) {
+    if (nl_max<unsigned long>() > GMP_NUMB_MASK) {
         sub(rop, op1, integer<SSize>{op2});
         return rop;
     }
@@ -3360,11 +3349,10 @@ inline namespace detail
 // rather redundant on any conceivable architecture.
 using integer_have_dlimb_mul = std::integral_constant<bool,
 #if (defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64)) || (defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64))
-                                                      !GMP_NAIL_BITS && std::numeric_limits<::mp_limb_t>::digits == 64
+                                                      !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
 #elif GMP_NUMB_BITS == 32
-                                                      !GMP_NAIL_BITS
-                                                          && std::numeric_limits<std::uint_least64_t>::digits == 64
-                                                          && std::numeric_limits<::mp_limb_t>::digits == 32
+                                                      !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
+                                                          && nl_digits<::mp_limb_t>() == 32
 #else
                                                       false
 #endif
@@ -3883,7 +3871,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
     // Check if we can represent it first.
     // NOTE: use >= because we may need to increase by 1 new_asize at the end, as a size hint.
     // LCOV_EXCL_START
-    if (mppp_unlikely(ls >= std::numeric_limits<std::size_t>::max() - static_cast<std::size_t>(asize))) {
+    if (mppp_unlikely(ls >= nl_max<std::size_t>() - static_cast<std::size_t>(asize))) {
         // NOTE: don't think this can be hit on any setup currently.
         throw std::overflow_error("A left bitshift value of " + std::to_string(s) + " is too large");
     }
@@ -3982,7 +3970,7 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
         sign = -1;
     }
     // Too much shift, this can never work on a nonzero value.
-    static_assert(unsigned(GMP_NUMB_BITS) <= std::numeric_limits<unsigned>::max() / 2u, "Overflow error.");
+    static_assert(unsigned(GMP_NUMB_BITS) <= nl_max<unsigned>() / 2u, "Overflow error.");
     if (mppp_unlikely(s >= 2u * unsigned(GMP_NUMB_BITS))) {
         // NOTE: this is the generic formula to estimate the final size.
         // NOTE: paranoia static assert to make sure there's no chance of overflowing.
@@ -4148,11 +4136,10 @@ inline namespace detail
 // MSVC currently does not provide any primitive for 128bit division.
 using integer_have_dlimb_div = std::integral_constant<bool,
 #if defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64)
-                                                      !GMP_NAIL_BITS && std::numeric_limits<::mp_limb_t>::digits == 64
+                                                      !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
 #elif GMP_NUMB_BITS == 32
-                                                      !GMP_NAIL_BITS
-                                                          && std::numeric_limits<std::uint_least64_t>::digits == 64
-                                                          && std::numeric_limits<::mp_limb_t>::digits == 32
+                                                      !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
+                                                          && nl_digits<::mp_limb_t>() == 32
 #else
                                                       false
 #endif
@@ -4649,7 +4636,7 @@ inline void static_tdiv_q_2exp(static_int<2> &rop, const static_int<2> &n, ::mp_
         sign = -1;
     }
     // If shift is too large, zero the result and return.
-    static_assert(unsigned(GMP_NUMB_BITS) <= std::numeric_limits<unsigned>::max() / 2u, "Overflow error.");
+    static_assert(unsigned(GMP_NUMB_BITS) <= nl_max<unsigned>() / 2u, "Overflow error.");
     if (s >= 2u * unsigned(GMP_NUMB_BITS)) {
         rop._mp_size = 0;
         rop.m_limbs[0u] = 0u;
@@ -5976,14 +5963,14 @@ inline namespace detail
 {
 
 // These helpers are used here and in pow() as well.
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline unsigned long integer_exp_to_ulong(const T &exp)
 {
 #if !defined(__INTEL_COMPILER)
     assert(exp >= T(0));
 #endif
     // NOTE: make_unsigned_t<T> is T if T is already unsigned.
-    if (mppp_unlikely(static_cast<make_unsigned_t<T>>(exp) > std::numeric_limits<unsigned long>::max())) {
+    if (mppp_unlikely(static_cast<make_unsigned_t<T>>(exp) > nl_max<unsigned long>())) {
         throw std::overflow_error("Cannot convert the integral value " + std::to_string(exp)
                                   + " to unsigned long: the value is too large.");
     }
@@ -6032,7 +6019,7 @@ inline integer<SSize> binomial_impl(const integer<SSize> &n, const T &k)
     return integer<SSize>{};
 }
 
-template <typename T, std::size_t SSize, enable_if_t<std::is_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_integral<T>::value, int> = 0>
 inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 {
     return binomial_impl(integer<SSize>{n}, k);
@@ -6180,7 +6167,7 @@ inline namespace detail
 {
 
 // Various helpers for the implementation of pow().
-template <typename T, enable_if_t<std::is_integral<T>::value, int> = 0>
+template <typename T, enable_if_t<is_integral<T>::value, int> = 0>
 inline bool integer_exp_is_odd(const T &exp)
 {
     return (exp % T(2)) != T(0);
@@ -6195,7 +6182,7 @@ inline bool integer_exp_is_odd(const integer<SSize> &exp)
 // Implementation of pow().
 // integer -- integral overload.
 template <typename T, std::size_t SSize,
-          enable_if_t<disjunction<std::is_same<T, integer<SSize>>, std::is_integral<T>>::value, int> = 0>
+          enable_if_t<disjunction<std::is_same<T, integer<SSize>>, is_integral<T>>::value, int> = 0>
 inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
 {
     integer<SSize> rop;
@@ -6223,7 +6210,7 @@ inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
 }
 
 // C++ integral -- integer overload.
-template <typename T, std::size_t SSize, enable_if_t<std::is_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_integral<T>::value, int> = 0>
 inline integer<SSize> pow_impl(const T &base, const integer<SSize> &exp)
 {
     return pow_impl(integer<SSize>{base}, exp);

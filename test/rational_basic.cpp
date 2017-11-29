@@ -6,6 +6,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
@@ -69,11 +70,10 @@ template <typename T, typename std::enable_if<std::is_same<char, T>::value || st
                                                   || std::is_same<unsigned char, T>::value,
                                               int>::type
                       = 0>
-static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
+static inline std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>
 get_int_dist(T min, T max)
 {
-    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>(min,
-                                                                                                                   max);
+    return std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>(min, max);
 }
 
 struct int_ctor_tester {
@@ -87,7 +87,7 @@ struct int_ctor_tester {
             REQUIRE((std::is_constructible<rational, Int &&>::value));
             REQUIRE((std::is_constructible<rational, const Int &>::value));
             REQUIRE(lex_cast(Int(0)) == lex_cast(rational{Int(0)}));
-            auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
+            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
             REQUIRE(lex_cast(min) == lex_cast(rational{min}));
             REQUIRE(lex_cast(max) == lex_cast(rational{max}));
             std::atomic<bool> fail(false);
@@ -1009,7 +1009,7 @@ struct int_convert_tester {
             using integer = typename rational::int_t;
             REQUIRE((is_convertible<rational, Int>::value));
             REQUIRE(roundtrip_conversion<rational>(0));
-            auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
+            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
             REQUIRE(roundtrip_conversion<rational>(min));
             REQUIRE(roundtrip_conversion<rational>(max));
             REQUIRE(roundtrip_conversion<rational>(min + Int(1)));
