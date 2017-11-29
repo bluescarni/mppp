@@ -1206,10 +1206,10 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
  *    auto res4 = n1 / 2.f; // res4 is a float
  *    auto res5 = 12. / n1; // res5 is a double
  *
- * The modulo operator ``%`` accepts only :cpp:class:`~mppp::integer` and :cpp:concept:`~mppp::CppInteroperable`
- * integral types as arguments,
- * and it always returns :cpp:class:`~mppp::integer` as result. The bit shifting operators ``<<`` and ``>>`` accept
- * only :cpp:concept:`~mppp::CppInteroperable` integral types as shift arguments, and they always return
+ * The modulo operator ``%`` and the bitwise logic operators accept only :cpp:class:`~mppp::integer`
+ * and :cpp:concept:`~mppp::CppIntegralInteroperable` types as arguments,
+ * and they always return :cpp:class:`~mppp::integer` as result. The bit shifting operators ``<<`` and ``>>`` accept
+ * only :cpp:concept:`~mppp::CppIntegralInteroperable` types as shift arguments, and they always return
  * :cpp:class:`~mppp::integer` as result.
  *
  * The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote the arguments to a common type
