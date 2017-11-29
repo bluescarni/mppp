@@ -732,7 +732,7 @@ union integer_union {
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
-                                    + std::to_string(x));
+                                    + mppp::to_string(x));
         }
         MPPP_MAYBE_TLS mpz_raii tmp;
         ::mpz_set_d(&tmp.m_mpz, static_cast<double>(x));
@@ -744,7 +744,7 @@ union integer_union {
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot construct an integer from the non-finite floating-point value "
-                                    + std::to_string(x));
+                                    + mppp::to_string(x));
         }
         // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
@@ -766,14 +766,14 @@ union integer_union {
     {
         if (mppp_unlikely(base != 0 && (base < 2 || base > 62))) {
             throw std::invalid_argument(
-                "In the constructor of integer from string, a base of " + std::to_string(base)
+                "In the constructor of integer from string, a base of " + mppp::to_string(base)
                 + " was specified, but the only valid values are 0 and any value in the [2,62] range");
         }
         MPPP_MAYBE_TLS mpz_raii mpz;
         if (mppp_unlikely(::mpz_set_str(&mpz.m_mpz, s, base))) {
             if (base) {
                 throw std::invalid_argument(std::string("The string '") + s + "' is not a valid integer in base "
-                                            + std::to_string(base));
+                                            + mppp::to_string(base));
             } else {
                 throw std::invalid_argument(std::string("The string '") + s
                                             + "' is not a valid integer in any supported base");
@@ -1648,7 +1648,7 @@ private:
     void dispatch_assignment(T x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
-            throw std::domain_error("Cannot assign the non-finite floating-point value " + std::to_string(x)
+            throw std::domain_error("Cannot assign the non-finite floating-point value " + mppp::to_string(x)
                                     + " to an integer");
         }
         MPPP_MAYBE_TLS mpz_raii tmp;
@@ -1660,7 +1660,7 @@ private:
     void dispatch_assignment(long double x)
     {
         if (mppp_unlikely(!std::isfinite(x))) {
-            throw std::domain_error("Cannot assign the non-finite floating-point value " + std::to_string(x)
+            throw std::domain_error("Cannot assign the non-finite floating-point value " + mppp::to_string(x)
                                     + " to an integer");
         }
         // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
@@ -1950,7 +1950,7 @@ public:
         if (mppp_unlikely(base < 2 || base > 62)) {
             throw std::invalid_argument("Invalid base for string conversion: the base must be between "
                                         "2 and 62, but a value of "
-                                        + std::to_string(base) + " was provided instead");
+                                        + mppp::to_string(base) + " was provided instead");
         }
         return mpz_to_str(get_mpz_view(), base);
     }
@@ -2272,7 +2272,7 @@ public:
         if (mppp_unlikely(ls > nl_max<std::size_t>() / unsigned(GMP_NUMB_BITS))) {
             throw std::overflow_error("Overflow in the computation of the number of bits required to represent an "
                                       "integer - the limb size is "
-                                      + std::to_string(ls));
+                                      + mppp::to_string(ls));
         }
         // LCOV_EXCL_STOP
         // Index of the most significant limb.
@@ -2387,7 +2387,7 @@ public:
     {
         if (mppp_unlikely(reps < 1)) {
             throw std::invalid_argument("The number of primality tests must be at least 1, but a value of "
-                                        + std::to_string(reps) + " was provided instead");
+                                        + mppp::to_string(reps) + " was provided instead");
         }
         if (mppp_unlikely(sgn() < 0)) {
             throw std::invalid_argument("Cannot run primality tests on the negative number " + to_string());
@@ -3873,7 +3873,7 @@ inline std::size_t static_mul_2exp(static_int<SSize> &rop, const static_int<SSiz
     // LCOV_EXCL_START
     if (mppp_unlikely(ls >= nl_max<std::size_t>() - static_cast<std::size_t>(asize))) {
         // NOTE: don't think this can be hit on any setup currently.
-        throw std::overflow_error("A left bitshift value of " + std::to_string(s) + " is too large");
+        throw std::overflow_error("A left bitshift value of " + mppp::to_string(s) + " is too large");
     }
     // LCOV_EXCL_STOP
     const std::size_t new_asize = static_cast<std::size_t>(asize) + ls;
@@ -5914,9 +5914,9 @@ inline integer<SSize> &fac_ui(integer<SSize> &rop, unsigned long n)
     constexpr auto max_fac = 1000000ull;
     if (mppp_unlikely(n > max_fac)) {
         throw std::invalid_argument(
-            "The value " + std::to_string(n)
+            "The value " + mppp::to_string(n)
             + " is too large to be used as input for the factorial function (the maximum allowed value is "
-            + std::to_string(max_fac) + ")");
+            + mppp::to_string(max_fac) + ")");
     }
     // NOTE: let's get through a static temporary and then assign it to the rop,
     // so that rop will be static/dynamic according to the size of tmp.
@@ -5971,7 +5971,7 @@ inline unsigned long integer_exp_to_ulong(const T &exp)
 #endif
     // NOTE: make_unsigned_t<T> is T if T is already unsigned.
     if (mppp_unlikely(static_cast<make_unsigned_t<T>>(exp) > nl_max<unsigned long>())) {
-        throw std::overflow_error("Cannot convert the integral value " + std::to_string(exp)
+        throw std::overflow_error("Cannot convert the integral value " + mppp::to_string(exp)
                                   + " to unsigned long: the value is too large.");
     }
     return static_cast<unsigned long>(exp);
@@ -6190,7 +6190,7 @@ inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
         pow_ui(rop, base, integer_exp_to_ulong(exp));
     } else if (mppp_unlikely(is_zero(base))) {
         // 0**-n is a division by zero.
-        throw zero_division_error("Cannot raise zero to the negative power " + to_string(exp));
+        throw zero_division_error("Cannot raise zero to the negative power " + mppp::to_string(exp));
     } else if (base.is_one()) {
         // 1**n == 1.
         rop = 1;

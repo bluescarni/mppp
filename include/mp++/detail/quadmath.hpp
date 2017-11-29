@@ -18,6 +18,7 @@
 #include <string>
 
 #include <mp++/config.hpp>
+#include <mp++/detail/utils.hpp>
 
 namespace mppp
 {
@@ -70,12 +71,12 @@ inline void float128_stream(std::ostream &os, const __float128 &x)
     const auto n = ::quadmath_snprintf(buf, sizeof(buf), "%.35Qe", x);
     // LCOV_EXCL_START
     if (mppp_unlikely(n < 0)) {
-        throw std::runtime_error("A call to quadmath_snprintf() failed: a negative exit status of " + std::to_string(n)
+        throw std::runtime_error("A call to quadmath_snprintf() failed: a negative exit status of " + to_string(n)
                                  + " was returned");
     }
     if (mppp_unlikely(unsigned(n) >= sizeof(buf))) {
-        throw std::runtime_error("A call to quadmath_snprintf() failed: the exit status " + std::to_string(n)
-                                 + " is not less than the size of the internal buffer " + std::to_string(sizeof(buf)));
+        throw std::runtime_error("A call to quadmath_snprintf() failed: the exit status " + to_string(n)
+                                 + " is not less than the size of the internal buffer " + to_string(sizeof(buf)));
     }
     // LCOV_EXCL_STOP
     os << &buf[0];
