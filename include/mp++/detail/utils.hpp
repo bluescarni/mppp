@@ -281,7 +281,9 @@ inline std::string to_string(__uint128_t n)
 #else
     // In C++11, we reverse output and then create the string.
     std::reverse(output, o);
-    return std::string(output, o);
+    // NOTE: decrease by one as we don't want to init the string
+    // with a terminator.
+    return std::string(output, o - 1);
 #endif
 }
 
@@ -298,7 +300,7 @@ inline std::string to_string(__int128_t n)
     return std::string(std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1));
 #else
     std::reverse(output, o);
-    return std::string(output, o);
+    return std::string(output, o - 1);
 #endif
 }
 
