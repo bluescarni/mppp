@@ -228,7 +228,7 @@ TEST_CASE("uint_sint_safe_cast")
     tuple_for_each(uint_types{}, uint_sint_safe_cast_tester{});
 }
 
-#if defined(MPPP_HAVE_GCC_INT128)
+#if defined(MPPP_HAVE_GCC_INT128) && !(defined(_MSC_VER) && defined(__clang__))
 
 TEST_CASE("int128 to_string")
 {
