@@ -185,7 +185,7 @@ inline
     const auto retval = unsigned_to_nsigned<T>(n);
     return retval.first ? retval.second
                         : throw std::overflow_error(
-                              "Error while trying to negate the unsigned integral value " + std::to_string(n)
+                              "Error while trying to negate the unsigned integral value " + to_string(n)
                               + ": the result does not fit in the range of the target type " + typeid(T).name());
 }
 
@@ -195,11 +195,10 @@ template <typename T, typename U,
           enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_unsigned<T>, is_unsigned<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
-    return n <= nl_max<T>()
-               ? static_cast<T>(n)
-               : throw std::overflow_error(
-                     "Error in the safe conversion between unsigned integral types: the input value "
-                     + std::to_string(n) + " does not fit in the range of the target type " + typeid(T).name());
+    return n <= nl_max<T>() ? static_cast<T>(n)
+                            : throw std::overflow_error(
+                                  "Error in the safe conversion between unsigned integral types: the input value "
+                                  + to_string(n) + " does not fit in the range of the target type " + typeid(T).name());
 }
 
 template <typename T, typename U,
@@ -209,7 +208,7 @@ constexpr T safe_cast(const U &n)
     return (n <= nl_max<T>() && n >= nl_min<T>())
                ? static_cast<T>(n)
                : throw std::overflow_error(
-                     "Error in the safe conversion between signed integral types: the input value " + std::to_string(n)
+                     "Error in the safe conversion between signed integral types: the input value " + to_string(n)
                      + " does not fit in the range of the target type " + typeid(T).name());
 }
 
@@ -221,7 +220,7 @@ constexpr T safe_cast(const U &n)
                ? static_cast<T>(n)
                : throw std::overflow_error("Error in the safe conversion from a signed integral type to an unsigned "
                                            "integral type: the input value "
-                                           + std::to_string(n) + " does not fit in the range of the target type "
+                                           + to_string(n) + " does not fit in the range of the target type "
                                            + typeid(T).name());
 }
 
@@ -233,7 +232,7 @@ constexpr T safe_cast(const U &n)
                ? static_cast<T>(n)
                : throw std::overflow_error("Error in the safe conversion from an unsigned integral type to a signed "
                                            "integral type: the input value "
-                                           + std::to_string(n) + " does not fit in the range of the target type "
+                                           + to_string(n) + " does not fit in the range of the target type "
                                            + typeid(T).name());
 }
 

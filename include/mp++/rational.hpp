@@ -260,7 +260,7 @@ private:
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
-                                    + std::to_string(x));
+                                    + mppp::to_string(x));
         }
         MPPP_MAYBE_TLS mpq_raii q;
         ::mpq_set_d(&q.m_mpq, static_cast<double>(x));
@@ -272,7 +272,7 @@ private:
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
-                                    + std::to_string(x));
+                                    + mppp::to_string(x));
         }
         // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;

@@ -97,7 +97,7 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
     constexpr char all_chars[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     // Check the base.
     if (mppp_unlikely(base < 2 || base > 62)) {
-        throw std::invalid_argument("Cannot convert a real to a string in base " + std::to_string(base)
+        throw std::invalid_argument("Cannot convert a real to a string in base " + mppp::to_string(base)
                                     + ": the base must be in the [2,62] range");
     }
     // Special values first.
@@ -387,9 +387,9 @@ inline mpfr_prec_t real_get_default_prec()
 inline void real_set_default_prec(::mpfr_prec_t p)
 {
     if (mppp_unlikely(p && !real_prec_check(p))) {
-        throw std::invalid_argument("Cannot set the default precision to " + std::to_string(p)
-                                    + ": the value must be either zero or between " + std::to_string(real_prec_min())
-                                    + " and " + std::to_string(real_prec_max()));
+        throw std::invalid_argument("Cannot set the default precision to " + mppp::to_string(p)
+                                    + ": the value must be either zero or between " + mppp::to_string(real_prec_min())
+                                    + " and " + mppp::to_string(real_prec_max()));
     }
     real_constants<>::default_prec.store(p, std::memory_order_relaxed);
 }
@@ -586,9 +586,9 @@ class real
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
     {
         if (mppp_unlikely(!real_prec_check(p))) {
-            throw std::invalid_argument("Cannot init a real with a precision of " + std::to_string(p)
-                                        + ": the maximum allowed precision is " + std::to_string(real_prec_max())
-                                        + ", the minimum allowed precision is " + std::to_string(real_prec_min()));
+            throw std::invalid_argument("Cannot init a real with a precision of " + mppp::to_string(p)
+                                        + ": the maximum allowed precision is " + mppp::to_string(real_prec_max())
+                                        + ", the minimum allowed precision is " + mppp::to_string(real_prec_min()));
         }
         return p;
     }
@@ -940,7 +940,7 @@ private:
     void construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
     {
         if (mppp_unlikely(base && (base < 2 || base > 62))) {
-            throw std::invalid_argument("Cannot construct a real from a string in base " + std::to_string(base)
+            throw std::invalid_argument("Cannot construct a real from a string in base " + mppp::to_string(base)
                                         + ": the base must either be zero or in the [2,62] range");
         }
         const ::mpfr_prec_t prec = p ? check_init_prec(p) : real_get_default_prec();
@@ -953,7 +953,7 @@ private:
         if (mppp_unlikely(ret == -1)) {
             ::mpfr_clear(&m_mpfr);
             throw std::invalid_argument(std::string{"The string '"} + s + "' does not represent a valid real in base "
-                                        + std::to_string(base));
+                                        + mppp::to_string(base));
         }
     }
     explicit real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
@@ -1308,7 +1308,7 @@ private:
     void string_assignment_impl(const char *s, int base)
     {
         if (mppp_unlikely(base && (base < 2 || base > 62))) {
-            throw std::invalid_argument("Cannot assign a real from a string in base " + std::to_string(base)
+            throw std::invalid_argument("Cannot assign a real from a string in base " + mppp::to_string(base)
                                         + ": the base must either be zero or in the [2,62] range");
         }
         const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
@@ -1316,7 +1316,7 @@ private:
             ::mpfr_set_nan(&m_mpfr);
             throw std::invalid_argument(std::string{"The string '"} + s
                                         + "' cannot be interpreted as a floating-point value in base "
-                                        + std::to_string(base));
+                                        + mppp::to_string(base));
         }
     }
     // Dispatching for string assignment.
@@ -1758,9 +1758,9 @@ private:
     static ::mpfr_prec_t check_set_prec(::mpfr_prec_t p)
     {
         if (mppp_unlikely(!real_prec_check(p))) {
-            throw std::invalid_argument("Cannot set the precision of a real to the value " + std::to_string(p)
-                                        + ": the maximum allowed precision is " + std::to_string(real_prec_max())
-                                        + ", the minimum allowed precision is " + std::to_string(real_prec_min()));
+            throw std::invalid_argument("Cannot set the precision of a real to the value " + mppp::to_string(p)
+                                        + ": the maximum allowed precision is " + mppp::to_string(real_prec_max())
+                                        + ", the minimum allowed precision is " + mppp::to_string(real_prec_min()));
         }
         return p;
     }
@@ -3533,9 +3533,10 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
     ::mpfr_prec_t prec;
     if (p) {
         if (mppp_unlikely(!real_prec_check(p))) {
-            throw std::invalid_argument("Cannot init a real constant with a precision of " + std::to_string(p)
+            throw std::invalid_argument("Cannot init a real constant with a precision of " + mppp::to_string(p)
                                         + ": the value must be either zero or between "
-                                        + std::to_string(real_prec_min()) + " and " + std::to_string(real_prec_max()));
+                                        + mppp::to_string(real_prec_min()) + " and "
+                                        + mppp::to_string(real_prec_max()));
         }
         prec = p;
     } else {
