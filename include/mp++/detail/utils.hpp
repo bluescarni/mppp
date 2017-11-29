@@ -15,6 +15,7 @@
 #include <algorithm>
 #endif
 #include <cassert>
+#include <cstddef>
 #if MPPP_CPLUSPLUS >= 201402L
 #include <iterator>
 #endif
@@ -251,21 +252,22 @@ inline char *to_string_impl(char (&output)[N], __uint128_t n)
                                "87888990919293949596979899";
     static_assert(sizeof(d2_text) == 201u, "Invalid size.");
     // Place the terminator.
-    auto o = output;
-    *(o++) = '\0';
+    std::size_t idx = 0;
+    output[idx++] = '\0';
     // Reduce n iteratively by a factor of 100, and print the remainder at each iteration.
     auto r = static_cast<unsigned>(n % 100u);
-    for (; n >= 100u; n = n / 100u, r = static_cast<unsigned>(n % 100u), o += 2) {
-        o[0] = d2_text[r * 2u + 1u];
-        o[1] = d2_text[r * 2u];
+    for (; n >= 100u; n = n / 100u, r = static_cast<unsigned>(n % 100u)) {
+        output[idx++] = d2_text[r * 2u + 1u];
+        output[idx++] = d2_text[r * 2u];
     }
     // Write the last two digits, skipping the second one if the current
     // remainder is not at least 10.
-    *(o++) = d2_text[r * 2u + 1u];
+    output[idx++] = d2_text[r * 2u + 1u];
     if (r >= 10u) {
-        *(o++) = d2_text[r * 2u];
+        output[idx++] = d2_text[r * 2u];
     }
-    return o;
+    assert(idx <= 40u);
+    return output + idx;
 }
 
 inline std::string to_string(__uint128_t n)
