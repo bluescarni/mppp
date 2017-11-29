@@ -238,25 +238,6 @@ constexpr T safe_cast(const U &n)
 
 #if defined(MPPP_HAVE_GCC_INT128)
 
-#if defined(_MSC_VER) && defined(__clang__)
-
-// NOTE: clang-cl supports the types, but it does not support the arithmetic operations
-// used in the implementation of string conversion below. See, for instance,
-// https://svn.boost.org/trac10/ticket/11833?replyto=description
-// It's certainly possible in the future to provide alternative implementations of these
-// that don't require 128-bit modulo, etc.
-inline std::string to_string(__uint128_t)
-{
-    return "<string conversion of 128-bit integers not available on this platform>";
-}
-
-inline std::string to_string(__int128_t)
-{
-    return "<string conversion of 128-bit integers not available on this platform>";
-}
-
-#else
-
 // Implementation of to_string() for 128bit integers.
 template <std::size_t N>
 inline char *to_string_impl(char (&output)[N], __uint128_t n)
@@ -323,8 +304,6 @@ inline std::string to_string(__int128_t n)
     return std::string(output, o - 1);
 #endif
 }
-
-#endif
 
 #endif
 

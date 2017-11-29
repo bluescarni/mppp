@@ -99,7 +99,8 @@
 // Detect if the compiler supports GCC-style 128-bit integers.
 // NOTE: we can check int128 on GCC/clang with __SIZEOF_INT128__ apparently:
 // http://stackoverflow.com/questions/21886985/what-gcc-versions-support-the-int128-intrinsic-type
-#if (defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__SIZEOF_INT128__)
+// NOTE: clang-cl supports the type but not all the arithmetic operations on them. Let's disable it for now.
+#if ((defined(__clang__) && !defined(_MSC_VER)) || defined(__GNUC__) || defined(__INTEL_COMPILER)) && defined(__SIZEOF_INT128__)
 
 #define MPPP_HAVE_GCC_INT128
 
