@@ -228,10 +228,14 @@ TEST_CASE("uint_sint_safe_cast")
     tuple_for_each(uint_types{}, uint_sint_safe_cast_tester{});
 }
 
-#if defined(MPPP_HAVE_GCC_INT128) && !(defined(_MSC_VER) && defined(__clang__))
+#if defined(MPPP_HAVE_GCC_INT128)
 
 TEST_CASE("int128 to_string")
 {
+#if defined(_MSC_VER) && defined(__clang__)
+    REQUIRE(to_string(__uint128_t(0)) == "<string conversion of 128-bit integers not available on this platform>");
+    REQUIRE(to_string(__int128_t(0)) == "<string conversion of 128-bit integers not available on this platform>");
+#else
     REQUIRE(to_string(__uint128_t(0)) == "0");
     REQUIRE(to_string(__uint128_t(1)) == "1");
     REQUIRE(to_string(__uint128_t(7)) == "7");
@@ -284,6 +288,7 @@ TEST_CASE("int128 to_string")
     REQUIRE(to_string(nl_max<__int128_t>() - 25) == "170141183460469231731687303715884105702");
     REQUIRE(to_string(nl_min<__int128_t>()) == "-170141183460469231731687303715884105728");
     REQUIRE(to_string(nl_min<__int128_t>() + 25) == "-170141183460469231731687303715884105703");
+#endif
 }
 
 #endif

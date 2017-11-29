@@ -246,12 +246,12 @@ constexpr T safe_cast(const U &n)
 // https://svn.boost.org/trac10/ticket/11833?replyto=description
 // It's certainly possible in the future to provide alternative implementations of these
 // that don't require 128-bit modulo, etc.
-inline std::string to_string(__uint128_t n)
+inline std::string to_string(__uint128_t)
 {
     return "<string conversion of 128-bit integers not available on this platform>";
 }
 
-inline std::string to_string(__int128_t n)
+inline std::string to_string(__int128_t)
 {
     return "<string conversion of 128-bit integers not available on this platform>";
 }
