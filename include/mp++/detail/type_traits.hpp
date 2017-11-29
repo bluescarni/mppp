@@ -186,7 +186,7 @@ struct is_unsigned : std::integral_constant<bool, disjunction<std::is_unsigned<T
 
 // make_unsigned machinery,
 template <typename T, typename = void>
-struct make_unsigned {
+struct make_unsigned_impl {
     using type = typename std::make_unsigned<T>::type;
 };
 
@@ -194,8 +194,8 @@ struct make_unsigned {
 
 // NOTE: make_unsigned is supposed to preserve cv qualifiers, hence the non-trivial implementation.
 template <typename T>
-struct make_unsigned<T, enable_if_t<disjunction<std::is_same<remove_cv_t<T>, __uint128_t>,
-                                                std::is_same<remove_cv_t<T>, __int128_t>>::value>> {
+struct make_unsigned_impl<T, enable_if_t<disjunction<std::is_same<remove_cv_t<T>, __uint128_t>,
+                                                     std::is_same<remove_cv_t<T>, __int128_t>>::value>> {
     using tmp_type = typename std::conditional<std::is_const<T>::value, const __uint128_t, __uint128_t>::type;
     using type = typename std::conditional<std::is_volatile<T>::value, volatile tmp_type, tmp_type>::type;
 };
@@ -203,7 +203,7 @@ struct make_unsigned<T, enable_if_t<disjunction<std::is_same<remove_cv_t<T>, __u
 #endif
 
 template <typename T>
-using make_unsigned_t = typename make_unsigned<T>::type;
+using make_unsigned_t = typename make_unsigned_impl<T>::type;
 
 // Various numeric_limits utils.
 template <typename T>

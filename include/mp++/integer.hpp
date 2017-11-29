@@ -197,7 +197,7 @@ inline bool mpz_init_from_cache_impl(mpz_struct_t &rop, std::size_t nlimbs)
     auto &mpzc = get_mpz_alloc_cache();
     if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
         // LCOV_EXCL_START
-        if (mppp_unlikely(nlimbs > static_cast<make_unsigned_t<mpz_alloc_t>>(nl_max<mpz_alloc_t>()))) {
+        if (mppp_unlikely(nlimbs > make_unsigned(nl_max<mpz_alloc_t>()))) {
             std::abort();
         }
         // LCOV_EXCL_STOP
@@ -270,7 +270,7 @@ inline void mpz_clear_wrap(mpz_struct_t &m)
 {
 #if defined(MPPP_HAVE_THREAD_LOCAL)
     auto &mpzc = get_mpz_alloc_cache();
-    const auto ualloc = static_cast<make_unsigned_t<mpz_alloc_t>>(m._mp_alloc);
+    const auto ualloc = make_unsigned(m._mp_alloc);
     if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
         const auto idx = ualloc - 1u;
         mpzc.caches[idx][mpzc.sizes[idx]] = m._mp_d;
@@ -719,7 +719,7 @@ union integer_union {
     {
         if (n >= T(0)) {
             // Positive value, just cast to unsigned.
-            dispatch_generic_ctor(static_cast<make_unsigned_t<T>>(n));
+            dispatch_generic_ctor(make_unsigned(n));
         } else {
             // Negative value, use its abs.
             dispatch_generic_ctor<make_unsigned_t<T>, true>(nint_abs(n));
@@ -1622,7 +1622,7 @@ private:
     {
         if (n >= T(0)) {
             // Positive value, just cast to unsigned.
-            dispatch_assignment(static_cast<make_unsigned_t<T>>(n));
+            dispatch_assignment(make_unsigned(n));
         } else {
             // Negative value, use its abs.
             dispatch_assignment<make_unsigned_t<T>, true>(nint_abs(n));
@@ -2045,8 +2045,7 @@ private:
     // chokes on constexpr functions in a SFINAE context.
     template <typename T>
     struct sconv_is_small {
-        static const bool value
-            = c_max(static_cast<make_unsigned_t<T>>(nl_max<T>()), nint_abs(nl_min<T>())) <= GMP_NUMB_MAX;
+        static const bool value = c_max(make_unsigned(nl_max<T>()), nint_abs(nl_min<T>())) <= GMP_NUMB_MAX;
     };
     // Overload if the all the absolute values of T fit into a limb.
     template <typename T, enable_if_t<sconv_is_small<T>::value, int> = 0>
@@ -2055,7 +2054,7 @@ private:
         static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
         assert(size());
         // Cache for convenience.
-        constexpr auto Tmax = static_cast<make_unsigned_t<T>>(nl_max<T>());
+        constexpr auto Tmax = make_unsigned(nl_max<T>());
         if (m_int.m_st._mp_size != 1 && m_int.m_st._mp_size != -1) {
             // this consists of more than 1 limb, the conversion is not possible.
             return std::make_pair(false, T(0));
@@ -2080,7 +2079,7 @@ private:
     std::pair<bool, T> convert_to_signed() const
     {
         // Cache for convenience.
-        constexpr auto Tmax = static_cast<make_unsigned_t<T>>(nl_max<T>());
+        constexpr auto Tmax = make_unsigned(nl_max<T>());
         // Branch out depending on the sign of this.
         if (m_int.m_st._mp_size > 0) {
             // Attempt conversion to the unsigned counterpart.
@@ -5969,6 +5968,8 @@ inline unsigned long integer_exp_to_ulong(const T &exp)
     assert(exp >= T(0));
 #endif
     // NOTE: make_unsigned_t<T> is T if T is already unsigned.
+    // Don't use the make_unsigned() helper, as exp might be
+    // unsigned already.
     if (mppp_unlikely(static_cast<make_unsigned_t<T>>(exp) > nl_max<unsigned long>())) {
         throw std::overflow_error("Cannot convert the integral value " + mppp::to_string(exp)
                                   + " to unsigned long: the value is too large.");

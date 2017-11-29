@@ -212,8 +212,7 @@ inline ::mpfr_prec_t real_deduce_precision(const integer<SSize> &n)
     const auto ls = n.size();
     // Check that ls * GMP_NUMB_BITS is representable by mpfr_prec_t.
     // LCOV_EXCL_START
-    if (mppp_unlikely(ls > static_cast<make_unsigned_t<::mpfr_prec_t>>(nl_max<::mpfr_prec_t>())
-                               / unsigned(GMP_NUMB_BITS))) {
+    if (mppp_unlikely(ls > make_unsigned(nl_max<::mpfr_prec_t>()) / unsigned(GMP_NUMB_BITS))) {
         throw std::overflow_error("The deduced precision for a real from an integer is too large");
     }
     // LCOV_EXCL_STOP
@@ -232,8 +231,7 @@ inline ::mpfr_prec_t real_deduce_precision(const rational<SSize> &q)
             // Overflow in total size.
             (n_size > nl_max<decltype(q.get_num().size())>() - d_size)
             // Check that tot_size * GMP_NUMB_BITS is representable by mpfr_prec_t.
-            || ((n_size + d_size)
-                > static_cast<make_unsigned_t<::mpfr_prec_t>>(nl_max<::mpfr_prec_t>()) / unsigned(GMP_NUMB_BITS)))) {
+            || ((n_size + d_size) > make_unsigned(nl_max<::mpfr_prec_t>()) / unsigned(GMP_NUMB_BITS)))) {
         throw std::overflow_error("The deduced precision for a real from a rational is too large");
     }
     // LCOV_EXCL_STOP
@@ -1855,7 +1853,7 @@ private:
         rop._get_den().set_one();
         if (exp2 >= ::mpfr_exp_t(0)) {
             // The output value will be an integer.
-            rop._get_num() <<= static_cast<make_unsigned_t<::mpfr_exp_t>>(exp2);
+            rop._get_num() <<= make_unsigned(exp2);
         } else {
             // The output value will be a rational. Canonicalisation will be needed.
             rop._get_den() <<= nint_abs(exp2);
