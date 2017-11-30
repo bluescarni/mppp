@@ -8,12 +8,11 @@
 
 #include <algorithm>
 #include <fstream>
-#include <gmp.h>
 #include <iostream>
 #include <mp++/mp++.hpp>
 #include <random>
 #include <string>
-#include <utility>
+#include <tuple>
 #include <vector>
 
 #include "simple_timer.hpp"
@@ -43,23 +42,23 @@ using fmpzxx = flint::fmpzxx;
 
 static std::mt19937 rng;
 
-using integer_t = integer<2>;
-static const std::string name = "integer2_dot_product_unsigned";
+using integer_t = integer<1>;
+static const std::string name = "integer1_vec_div_signed";
 
 constexpr auto size = 30000000ul;
 
 template <typename T>
-static inline std::pair<std::vector<T>, std::vector<T>> get_init_vectors(double &init_time)
+static inline std::tuple<std::vector<T>, std::vector<T>, std::vector<T>> get_init_vectors(double &init_time)
 {
-    rng.seed(0);
-    std::uniform_int_distribution<unsigned> dist(1u, 7u);
+    rng.seed(1);
+    std::uniform_int_distribution<int> dist(1, 10), sign(0, 1);
     simple_timer st;
-    std::vector<T> v1(size), v2(size);
-    std::generate(v1.begin(), v1.end(), [&dist]() { return static_cast<T>(T(dist(rng)) << (GMP_NUMB_BITS / 2)); });
-    std::generate(v2.begin(), v2.end(), [&dist]() { return static_cast<T>(T(dist(rng)) << (GMP_NUMB_BITS / 2)); });
+    std::vector<T> v1(size), v2(size), v3(size);
+    std::generate(v1.begin(), v1.end(), [&dist, &sign]() { return T(dist(rng) * dist(rng) * (sign(rng) ? 1 : -1)); });
+    std::generate(v2.begin(), v2.end(), [&dist, &sign]() { return T(dist(rng) * (sign(rng) ? 1 : -1)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
-    return std::make_pair(std::move(v1), std::move(v2));
+    return std::make_tuple(std::move(v1), std::move(v2), std::move(v3));
 }
 
 int main()
@@ -80,9 +79,10 @@ int main()
         s += "['mp++','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            integer_t ret(0);
+            integer_t ret(0), r;
             for (auto i = 0ul; i < size; ++i) {
-                addmul(ret, p.first[i], p.second[i]);
+                tdiv_qr(std::get<2>(p)[i], r, std::get<0>(p)[i], std::get<1>(p)[i]);
+                ret += std::get<2>(p)[i];
             }
             std::cout << ret << '\n';
             s += "['mp++','arithmetic'," + std::to_string(st2.elapsed()) + "],";
@@ -102,7 +102,8 @@ int main()
             simple_timer st2;
             cpp_int ret(0);
             for (auto i = 0ul; i < size; ++i) {
-                ret += p.first[i] * p.second[i];
+                std::get<2>(p)[i] = std::get<0>(p)[i] / std::get<1>(p)[i];
+                ret += std::get<2>(p)[i];
             }
             std::cout << ret << '\n';
             s += "['Boost (cpp_int)','arithmetic'," + std::to_string(st2.elapsed()) + "],";
@@ -119,9 +120,11 @@ int main()
         s += "['Boost (mpz_int)','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            mpz_int ret(0);
+            mpz_int ret(0), r;
             for (auto i = 0ul; i < size; ++i) {
-                ::mpz_addmul(ret.backend().data(), p.first[i].backend().data(), p.second[i].backend().data());
+                ::mpz_tdiv_qr(std::get<2>(p)[i].backend().data(), r.backend().data(),
+                              std::get<0>(p)[i].backend().data(), std::get<1>(p)[i].backend().data());
+                ::mpz_add(ret.backend().data(), ret.backend().data(), std::get<2>(p)[i].backend().data());
             }
             std::cout << ret << '\n';
             s += "['Boost (mpz_int)','arithmetic'," + std::to_string(st2.elapsed()) + "],";
@@ -140,9 +143,11 @@ int main()
         s += "['FLINT','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            fmpzxx ret(0);
+            fmpzxx ret(0), r;
             for (auto i = 0ul; i < size; ++i) {
-                ::fmpz_addmul(ret._data().inner, p.first[i]._data().inner, p.second[i]._data().inner);
+                ::fmpz_tdiv_qr(std::get<2>(p)[i]._data().inner, r._data().inner, std::get<0>(p)[i]._data().inner,
+                               std::get<1>(p)[i]._data().inner);
+                ::fmpz_add(ret._data().inner, ret._data().inner, std::get<2>(p)[i]._data().inner);
             }
             std::cout << ret << '\n';
             s += "['FLINT','arithmetic'," + std::to_string(st2.elapsed()) + "],";
