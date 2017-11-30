@@ -122,6 +122,7 @@ struct add_tester {
         REQUIRE((lex_cast(retval) == "12"));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
+        retval = 12;
         retval += __uint128_t{6};
         REQUIRE((retval == 18));
         retval += __int128_t{-6};
@@ -303,6 +304,7 @@ struct sub_tester {
         REQUIRE((lex_cast(retval) == "-10"));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
+        retval = -10;
         retval -= __uint128_t{6};
         REQUIRE((retval == -16));
         retval -= __int128_t{-6};
@@ -485,6 +487,7 @@ struct mul_tester {
         REQUIRE((lex_cast(retval) == "-1312"));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
+        retval = -1312;
         retval *= __uint128_t{2};
         REQUIRE((retval == -2624));
         retval *= __int128_t{-1};
@@ -626,6 +629,7 @@ struct div_tester {
         REQUIRE((lex_cast(retval) == lex_cast(integer{10. / -3.5 / -1.5l})));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
+        retval = 1;
         retval /= __uint128_t{1};
         REQUIRE((retval == 1));
         retval /= __int128_t{-1};
