@@ -1074,6 +1074,11 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 //   Probably better to wait for benchmarks before moving.
 // - performance improvements for arithmetic with C++ integrals? (e.g., use add_ui() and similar rather than cting
 //   temporary).
+// - regarding division, we should consider implementing additional variations:
+//   - division without remainder,
+//   - division considering only the abs value,
+//   - division knowing that the divisor is positive (for use in rational when canonicalising).
+//   Hopefully this helps closing the gap with FLINT regarding division.
 
 // NOTE: bits to keep in mind:
 // - the use of GMP_NUMB_MASK we make is not necessary currently, because the GMP API at the present time
@@ -2878,7 +2883,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // op1 is not smaller than op2.
             tmp = data1[0] - data2[0];
             // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
-            rop._mp_size = sign1 * static_cast<int>(tmp != 0u);
+            rop._mp_size = sign1 * static_cast<int>(data1[0] != data2[0]);
             rdata[0] = tmp;
         } else {
             // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
@@ -4233,7 +4238,7 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
     const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK),
                       r_ = (op1.m_limbs[0] & GMP_NUMB_MASK) % (op2.m_limbs[0] & GMP_NUMB_MASK);
     // Write q.
-    q._mp_size = sign1 * sign2 * (q_ != 0u);
+    q._mp_size = sign1 * sign2 * (op1.m_limbs[0] >= op2.m_limbs[0]);
     // NOTE: there should be no need here to mask.
     q.m_limbs[0] = q_;
     // Write r.
