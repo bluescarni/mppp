@@ -33,7 +33,7 @@ using namespace mppp;
 using namespace mppp_bench;
 
 #if defined(MPPP_BENCHMARK_BOOST)
-using cpp_int = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_off>;
+using cpp_int = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>, boost::multiprecision::et_on>;
 using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, boost::multiprecision::et_off>;
 #endif
 
@@ -184,8 +184,9 @@ int main()
          "ha=\"center\", fontsize=9)\n"
          "    legend(loc='upper right')\n"
          "    g.fig.suptitle('"
-         + name + "')\n"
-                  "    g.savefig('"
+         + name
+         + "')\n"
+           "    g.savefig('"
          + name + ".png', bbox_inches='tight', dpi=150)\n";
     std::ofstream of(name + ".py", std::ios_base::trunc);
     of << s;

@@ -17,13 +17,13 @@ In addition to mp++, the following libraries are used in the benchmarks:
 * the `FLINT <http://flintlib.org/>`__ library. This library provides a data type called ``fmpz_t`` which, similarly to
   mp++, provides a small-value optimisation on top of GMP.
 
-The benchmark results were last updated on **20170909**, using the following package versions:
+The benchmark results were last updated on **20171130**, using the following package versions:
 
 * GCC 7.2,
-* mp++ 0.5,
+* mp++ 0.6,
 * GMP 6.1.2,
 * MPFR 3.1.5,
-* Boost 1.63.0,
+* Boost 1.65.0,
 * FLINT 2.5.2.
 
 Integer benchmarks
@@ -109,6 +109,8 @@ This setup is the signed version of the :ref:`previous benchmark <integer2_dot_p
 As explained earlier, arithmetic with mixed positive and negative values is more expensive than arithmetic with only
 non-negative values.
 
+.. _integer_vec_mul:
+
 Vector multiplication
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -135,8 +137,7 @@ is less than :math:`2^{64}`. mp++ integers with 1 limb of static size are employ
    :align: center
 
 This time mp++ is more than 5 times faster than GMP in the arithmetic portion of the benchmark, while still maintaining
-a performance advantage over ``cpp_int`` and FLINT. The performance of ``cpp_int`` might be hurt by its relatively large
-memory footprint (32 bytes vs mp++'s 16 and FLINT's 8).
+a performance advantage over ``cpp_int`` and FLINT.
 
 1-limb signed integers
 ........................
@@ -171,6 +172,63 @@ The benchmark shows again that mp++'s specialised arithmetic functions deliver s
 This setup is the signed version of the :ref:`previous benchmark <integer2_vec_mul_unsigned>`.
 
 .. figure:: _static/integer2_vec_mul_signed.png
+   :scale: 50%
+   :align: center
+
+Vector division
+^^^^^^^^^^^^^^^
+
+This benchmark is the division analogue of the :ref:`vector multiplication benchmark <integer_vec_mul>`: the element-wise
+division of two randomly-generated vectors of size :math:`3\times 10^7` is stored in a third vector, and a the sum
+of all the value in the third vector is computed.
+
+.. _integer1_vec_div_unsigned:
+
+1-limb unsigned integers
+........................
+
+In this setup, the integer vectors are initialised with small *non-negative* values.
+mp++ integers with 1 limb of static size are employed.
+
+.. figure:: _static/integer1_vec_div_unsigned.png
+   :scale: 50%
+   :align: center
+
+mp++ and FLINT perform well on this test, and they are about 5 times faster than GMP.
+
+1-limb signed integers
+........................
+
+In this setup, the vectors are initialised with both positive *and* negative values.
+
+.. figure:: _static/integer1_vec_div_signed.png
+   :scale: 50%
+   :align: center
+
+Here we can see FLINT pulling ahead of mp++. Thanks to the way
+small signed integers are represented in FLINT, branching based on the signs
+of the operands can be avoided. Coupled to the fact that there's no need to do overflow checking during division,
+FLINT's implementation has a distinct performance advantage in this specific test.
+
+.. _integer2_vec_div_unsigned:
+
+2-limb unsigned integers
+........................
+
+This setup is the 2-limb version of the :ref:`1-limb unsigned benchmark <integer1_vec_div_unsigned>`:
+the vectors are initialised with larger non-negative values, and
+mp++ integers with 2 limbs of static size are now employed.
+
+.. figure:: _static/integer2_vec_div_unsigned.png
+   :scale: 50%
+   :align: center
+
+2-limb signed integers
+........................
+
+This setup is the signed version of the :ref:`previous benchmark <integer2_vec_div_unsigned>`.
+
+.. figure:: _static/integer2_vec_div_signed.png
    :scale: 50%
    :align: center
 
