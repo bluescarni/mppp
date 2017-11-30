@@ -22,6 +22,10 @@ New
 Changes
 ~~~~~~~
 
+- Add division benchmarks for :cpp:class:`~mppp::integer` (`#91 <https://github.com/bluescarni/mppp/pull/91>`__).
+
+- A few performance tweaks for :cpp:class:`~mppp::integer` (`#91 <https://github.com/bluescarni/mppp/pull/91>`__).
+
 - Simplifications in the bit shifting primitives for :cpp:class:`~mppp::integer` (`#85 <https://github.com/bluescarni/mppp/pull/85>`__).
 
 - Split an :cpp:class:`~mppp::integer` test in two parts to curb memory usage during compilation (`#80 <https://github.com/bluescarni/mppp/pull/80>`__).
