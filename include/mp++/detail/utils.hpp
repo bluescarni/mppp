@@ -110,6 +110,14 @@ inline std::string to_string(const T &x)
     return x.to_string();
 }
 
+#if defined(MPPP_HAVE_GCC_INT128)
+
+// Fwd-declare these so they are visible below.
+std::string to_string(__uint128_t);
+std::string to_string(__int128_t);
+
+#endif
+
 // Compute the absolute value of a negative integer, returning the result as an instance
 // of the corresponding unsigned type. Requires T to be a signed integral type and n
 // to be negative.
