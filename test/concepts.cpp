@@ -37,6 +37,12 @@ TEST_CASE("concepts")
     REQUIRE(!is_supported_integral<double>::value);
     REQUIRE(!is_supported_integral<double &>::value);
     REQUIRE(!is_supported_integral<void>::value);
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE(is_supported_integral<__int128_t>::value);
+    REQUIRE(is_supported_integral<__uint128_t>::value);
+    REQUIRE(!is_supported_integral<__uint128_t &>::value);
+    REQUIRE(!is_supported_integral<const __int128_t>::value);
+#endif
     REQUIRE(is_string_type<char *>::value);
     REQUIRE(is_string_type<const char *>::value);
     REQUIRE(is_string_type<char[]>::value);

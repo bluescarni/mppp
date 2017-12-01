@@ -23,6 +23,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <mp++/config.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 
 #include "test_utils.hpp"
@@ -88,6 +90,15 @@ struct add_tester {
         REQUIRE((std::is_same<decltype(n1 + 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l + n2), long double>::value));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((n1 + __uint128_t{4} == 5));
+        REQUIRE((__uint128_t{4} + n1 == 5));
+        REQUIRE((n1 + __int128_t{-4} == -3));
+        REQUIRE((__int128_t{-4} + n1 == -3));
+        REQUIRE(n1 + nl_max<__uint128_t>() == integer{to_string(nl_max<__uint128_t>())} + 1);
+        REQUIRE(n1 + nl_max<__int128_t>() == integer{to_string(nl_max<__int128_t>())} + 1);
+        REQUIRE(-n1 + nl_min<__int128_t>() == integer{to_string(nl_min<__int128_t>())} - 1);
+#endif
         // In-place add.
         integer retval{1};
         retval += n1;
@@ -109,6 +120,13 @@ struct add_tester {
 #if defined(MPPP_WITH_MPFR)
         retval += -1.5l;
         REQUIRE((lex_cast(retval) == "12"));
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        retval = 12;
+        retval += __uint128_t{6};
+        REQUIRE((retval == 18));
+        retval += __int128_t{-6};
+        REQUIRE((retval == 12));
 #endif
         if (std::numeric_limits<double>::is_iec559) {
             retval = 1;
@@ -140,6 +158,14 @@ struct add_tester {
             dl += integer{1};
             REQUIRE(dl == std::numeric_limits<double>::infinity());
         }
+#if defined(MPPP_HAVE_GCC_INT128)
+        __int128_t n128{-7};
+        n128 += integer{5};
+        REQUIRE((n128 == -2));
+        __uint128_t un128{6};
+        un128 += integer{5};
+        REQUIRE((un128 == 11));
+#endif
         // Increment ops.
         retval = integer{0};
         REQUIRE((lex_cast(++retval) == "1"));
@@ -185,7 +211,6 @@ struct add_tester {
         REQUIRE((!is_addable_inplace<const integer, int>::value));
         REQUIRE((!is_addable_inplace<std::string, integer>::value));
         REQUIRE((!is_addable_inplace<const int, integer>::value));
-
         // In-place add with self.
         retval = -5;
         retval += retval;
@@ -247,6 +272,15 @@ struct sub_tester {
         REQUIRE((std::is_same<decltype(n1 - 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l - n2), long double>::value));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((n1 - __uint128_t{4} == -3));
+        REQUIRE((__uint128_t{4} - n1 == 3));
+        REQUIRE((n1 - __int128_t{-4} == 5));
+        REQUIRE((__int128_t{-4} - n1 == -5));
+        REQUIRE(-n1 - nl_max<__uint128_t>() == -integer{to_string(nl_max<__uint128_t>())} - 1);
+        REQUIRE(-n1 - nl_max<__int128_t>() == -integer{to_string(nl_max<__int128_t>())} - 1);
+        REQUIRE(-n1 - nl_min<__int128_t>() == -integer{to_string(nl_min<__int128_t>())} - 1);
+#endif
         // In-place sub.
         integer retval{1};
         retval -= n1;
@@ -268,6 +302,13 @@ struct sub_tester {
 #if defined(MPPP_WITH_MPFR)
         retval -= -1.5l;
         REQUIRE((lex_cast(retval) == "-10"));
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        retval = -10;
+        retval -= __uint128_t{6};
+        REQUIRE((retval == -16));
+        retval -= __int128_t{-6};
+        REQUIRE((retval == -10));
 #endif
         if (std::numeric_limits<double>::is_iec559) {
             retval = 1;
@@ -298,6 +339,14 @@ struct sub_tester {
             dl -= integer{1};
             REQUIRE(dl == std::numeric_limits<double>::infinity());
         }
+#if defined(MPPP_HAVE_GCC_INT128)
+        __int128_t n128{-7};
+        n128 -= integer{5};
+        REQUIRE((n128 == -12));
+        __uint128_t un128{6};
+        un128 -= integer{5};
+        REQUIRE((un128 == 1));
+#endif
         // Decrement ops.
         retval = integer{0};
         REQUIRE((lex_cast(--retval) == "-1"));
@@ -346,7 +395,6 @@ struct sub_tester {
         REQUIRE((!is_subtractable_inplace<const integer, int>::value));
         REQUIRE((!is_subtractable_inplace<std::string, integer>::value));
         REQUIRE((!is_subtractable_inplace<const int, integer>::value));
-
         // In-place sub with self.
         retval = -5;
         retval -= retval;
@@ -407,6 +455,15 @@ struct mul_tester {
         REQUIRE((std::is_same<decltype(n1 * 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l * n2), long double>::value));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((n1 * __uint128_t{4} == 4));
+        REQUIRE((__uint128_t{4} * n1 == 4));
+        REQUIRE((n1 * __int128_t{-4} == -4));
+        REQUIRE((__int128_t{-4} * n1 == -4));
+        REQUIRE(integer{2} * nl_max<__uint128_t>() == 2 * integer{to_string(nl_max<__uint128_t>())});
+        REQUIRE(integer{2} * nl_max<__int128_t>() == 2 * integer{to_string(nl_max<__int128_t>())});
+        REQUIRE(integer{2} * nl_min<__int128_t>() == 2 * integer{to_string(nl_min<__int128_t>())});
+#endif
         // In-place mul.
         integer retval{1};
         retval *= n1;
@@ -428,6 +485,13 @@ struct mul_tester {
 #if defined(MPPP_WITH_MPFR)
         retval *= -1.5l;
         REQUIRE((lex_cast(retval) == "-1312"));
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        retval = -1312;
+        retval *= __uint128_t{2};
+        REQUIRE((retval == -2624));
+        retval *= __int128_t{-1};
+        REQUIRE((retval == 2624));
 #endif
         if (std::numeric_limits<double>::is_iec559) {
             retval = 1;
@@ -458,6 +522,14 @@ struct mul_tester {
             dl *= integer{2};
             REQUIRE(dl == std::numeric_limits<double>::infinity());
         }
+#if defined(MPPP_HAVE_GCC_INT128)
+        __int128_t n128{-7};
+        n128 *= integer{5};
+        REQUIRE((n128 == -35));
+        __uint128_t un128{6};
+        un128 *= integer{5};
+        REQUIRE((un128 == 30));
+#endif
         // Type traits.
         REQUIRE((!is_multipliable<integer, std::string>::value));
         REQUIRE((!is_multipliable<std::string, integer>::value));
@@ -465,7 +537,6 @@ struct mul_tester {
         REQUIRE((!is_multipliable_inplace<const integer, int>::value));
         REQUIRE((!is_multipliable_inplace<std::string, integer>::value));
         REQUIRE((!is_multipliable_inplace<const int, integer>::value));
-
         // In-place mul with self.
         retval = -5;
         retval *= retval;
@@ -526,6 +597,12 @@ struct div_tester {
         REQUIRE((std::is_same<decltype(n1 / 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l / n2), long double>::value));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((n1 / __uint128_t{4} == 1));
+        REQUIRE((__uint128_t{4} / n2 == -2));
+        REQUIRE((n1 / __int128_t{-4} == -1));
+        REQUIRE((__int128_t{-4} / n1 == -1));
+#endif
         // In-place div.
         integer retval{2};
         retval /= n1;
@@ -551,6 +628,13 @@ struct div_tester {
         retval /= -1.5l;
         REQUIRE((lex_cast(retval) == lex_cast(integer{10. / -3.5 / -1.5l})));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        retval = 1;
+        retval /= __uint128_t{1};
+        REQUIRE((retval == 1));
+        retval /= __int128_t{-1};
+        REQUIRE((retval == -1));
+#endif
         // In-place with interop on the lhs.
         short nl = 12;
         nl /= integer{3};
@@ -572,6 +656,14 @@ struct div_tester {
             dl /= integer{2};
             REQUIRE(dl == std::numeric_limits<double>::infinity());
         }
+#if defined(MPPP_HAVE_GCC_INT128)
+        __int128_t n128{-7};
+        n128 /= integer{5};
+        REQUIRE((n128 == -1));
+        __uint128_t un128{6};
+        un128 /= integer{3};
+        REQUIRE((un128 == 2));
+#endif
         // Error checking.
         REQUIRE_THROWS_PREDICATE(integer{1} / integer{0}, zero_division_error, [](const zero_division_error &ex) {
             return std::string(ex.what()) == "Integer division by zero";
@@ -588,6 +680,20 @@ struct div_tester {
         REQUIRE_THROWS_PREDICATE(retval /= 0, zero_division_error, [](const zero_division_error &ex) {
             return std::string(ex.what()) == "Integer division by zero";
         });
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE_THROWS_PREDICATE(integer{1} / __uint128_t{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(integer{1} / __int128_t{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(retval /= __uint128_t{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(retval /= __int128_t{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+#endif
         if (std::numeric_limits<double>::is_iec559) {
             REQUIRE((integer{4} / 0. == std::numeric_limits<double>::infinity()));
             REQUIRE((integer{-4} / 0. == -std::numeric_limits<double>::infinity()));
@@ -665,6 +771,17 @@ struct shift_tester {
         REQUIRE((lex_cast(ret >>= 1ul) == "-8"));
         REQUIRE((lex_cast(ret >>= short(1)) == "-4"));
         REQUIRE((lex_cast(ret >> 128) == "0"));
+#if defined(MPPP_HAVE_GCC_INT128)
+        ret = 5;
+        REQUIRE((ret << __uint128_t{1}) == 10);
+        REQUIRE((ret << __int128_t{2}) == 20);
+        REQUIRE((ret <<= __uint128_t{1}) == 10);
+        REQUIRE((ret <<= __int128_t{2}) == 40);
+        REQUIRE((ret >> __uint128_t{1}) == 20);
+        REQUIRE((ret >> __int128_t{2}) == 10);
+        REQUIRE((ret >>= __uint128_t{1}) == 20);
+        REQUIRE((ret >>= __int128_t{2}) == 5);
+#endif
         // Error handling.
         REQUIRE_THROWS_AS(ret << -1, std::overflow_error);
         REQUIRE_THROWS_AS(ret <<= -2, std::overflow_error);
@@ -683,6 +800,18 @@ struct shift_tester {
             REQUIRE_THROWS_AS(ret >> std::numeric_limits<long long>::max(), std::overflow_error);
             REQUIRE_THROWS_AS(ret >>= std::numeric_limits<long long>::max(), std::overflow_error);
         }
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE_THROWS_AS(ret << __int128_t{-1}, std::overflow_error);
+        REQUIRE_THROWS_AS(ret <<= __int128_t{-1}, std::overflow_error);
+        REQUIRE_THROWS_AS(ret >> __int128_t{-1}, std::overflow_error);
+        REQUIRE_THROWS_AS(ret >>= __int128_t{-1}, std::overflow_error);
+        if (nl_max<__uint128_t>() > nl_max<::mp_bitcnt_t>()) {
+            REQUIRE_THROWS_AS(ret << nl_max<__uint128_t>(), std::overflow_error);
+            REQUIRE_THROWS_AS(ret <<= nl_max<__uint128_t>(), std::overflow_error);
+            REQUIRE_THROWS_AS(ret >> nl_max<__uint128_t>(), std::overflow_error);
+            REQUIRE_THROWS_AS(ret >>= nl_max<__uint128_t>(), std::overflow_error);
+        }
+#endif
         // Type traits.
         REQUIRE((!is_lshiftable<integer, double>::value));
         REQUIRE((!is_lshiftable<integer, integer>::value));
@@ -751,6 +880,12 @@ struct mod_tester {
         REQUIRE((lex_cast(n1 % 3u) == "1"));
         REQUIRE((lex_cast(3u % n2) == "1"));
         REQUIRE((lex_cast(0u % n2) == "0"));
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((n1 % __uint128_t{3} == 1));
+        REQUIRE((__uint128_t{3} % integer{-2} == 1));
+        REQUIRE((n1 % __int128_t{-3} == 1));
+        REQUIRE((__int128_t{-3} % n2 == -1));
+#endif
         // In-place mod.
         integer retval{-2};
         retval %= n1;
@@ -769,6 +904,12 @@ struct mod_tester {
         retval = -19;
         retval %= 7ull;
         REQUIRE((lex_cast(retval) == "-5"));
+#if defined(MPPP_HAVE_GCC_INT128)
+        retval %= __uint128_t{3};
+        REQUIRE((retval == -2));
+        retval %= __int128_t{2};
+        REQUIRE((retval == 0));
+#endif
         // CppInteroperable on the left.
         int n = 3;
         n %= integer{2};
@@ -776,6 +917,14 @@ struct mod_tester {
         n = -3;
         n %= integer{2};
         REQUIRE(n == -1);
+#if defined(MPPP_HAVE_GCC_INT128)
+        __int128_t n128{-7};
+        n128 %= integer{4};
+        REQUIRE((n128 == -3));
+        __uint128_t un128{6};
+        un128 %= integer{5};
+        REQUIRE((un128 == 1));
+#endif
         // Error checking.
         REQUIRE_THROWS_PREDICATE(integer{1} % integer{0}, zero_division_error, [](const zero_division_error &ex) {
             return std::string(ex.what()) == "Integer division by zero";
@@ -792,6 +941,20 @@ struct mod_tester {
         REQUIRE_THROWS_PREDICATE(retval %= 0, zero_division_error, [](const zero_division_error &ex) {
             return std::string(ex.what()) == "Integer division by zero";
         });
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE_THROWS_PREDICATE(integer{1} % __uint128_t{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(integer{1} % __int128_t{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(retval %= __uint128_t{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+        REQUIRE_THROWS_PREDICATE(retval %= __int128_t{0}, zero_division_error, [](const zero_division_error &ex) {
+            return std::string(ex.what()) == "Integer division by zero";
+        });
+#endif
         REQUIRE((!is_modable<integer, std::string>::value));
         REQUIRE((!is_modable<integer, double>::value));
         REQUIRE((!is_modable<std::string, integer>::value));
@@ -801,7 +964,6 @@ struct mod_tester {
         REQUIRE((!is_modable_inplace<const int, integer>::value));
         REQUIRE((!is_modable<int, integer>::value));
         REQUIRE((!is_modable_inplace<int, integer>::value));
-
         // In-place mod with self.
         retval = 5;
         retval %= retval;
@@ -847,6 +1009,16 @@ struct rel_tester {
         REQUIRE(-3.l != n2);
         REQUIRE(n2 != -3.l);
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(integer{1} == __uint128_t{1});
+        REQUIRE(__uint128_t{1} == integer{1});
+        REQUIRE(integer{-1} == __int128_t{-1});
+        REQUIRE(__int128_t{-1} == integer{-1});
+        REQUIRE(integer{0} != __uint128_t{1});
+        REQUIRE(__uint128_t{0} != integer{1});
+        REQUIRE(integer{-1} != __int128_t{1});
+        REQUIRE(__int128_t{1} != integer{-1});
+#endif
 
         REQUIRE(n2 < n1);
         REQUIRE(n2 < 0);
@@ -861,6 +1033,12 @@ struct rel_tester {
         REQUIRE(n2 < 0.l);
         REQUIRE(-3.l < n2);
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(integer{2} < __uint128_t{3});
+        REQUIRE(__uint128_t{2} < integer{3});
+        REQUIRE(integer{-2} < __int128_t{-1});
+        REQUIRE(__int128_t{-2} < integer{-1});
+#endif
 
         REQUIRE(n1 > n2);
         REQUIRE(0 > n2);
@@ -874,6 +1052,12 @@ struct rel_tester {
 #if defined(MPPP_WITH_MPFR)
         REQUIRE(0.l > n2);
         REQUIRE(n2 > -3.l);
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(integer{2} > __uint128_t{1});
+        REQUIRE(__uint128_t{2} > integer{1});
+        REQUIRE(integer{0} > __int128_t{-1});
+        REQUIRE(__int128_t{0} > integer{-1});
 #endif
 
         REQUIRE(n2 <= n1);
@@ -901,6 +1085,12 @@ struct rel_tester {
         REQUIRE(-2.l <= n2);
         REQUIRE(n2 <= -2.l);
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(integer{2} <= __uint128_t{3});
+        REQUIRE(__uint128_t{2} <= integer{2});
+        REQUIRE(integer{-2} <= __int128_t{-1});
+        REQUIRE(__int128_t{-2} <= integer{-2});
+#endif
 
         REQUIRE(n1 >= n2);
         REQUIRE(n1 >= n1);
@@ -926,6 +1116,12 @@ struct rel_tester {
         REQUIRE(n2 >= -3.l);
         REQUIRE(-2.l >= n2);
         REQUIRE(n2 >= -2.l);
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(integer{2} >= __uint128_t{1});
+        REQUIRE(__uint128_t{2} >= integer{2});
+        REQUIRE(integer{0} >= __int128_t{-1});
+        REQUIRE(__int128_t{0} >= integer{0});
 #endif
     }
 };

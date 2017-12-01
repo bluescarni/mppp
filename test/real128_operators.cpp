@@ -6,6 +6,13 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#if defined(__clang__) || defined(__GNUC__)
+
+#pragma GCC diagnostic ignored "-Wconversion"
+
+#endif
+
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
@@ -146,6 +153,16 @@ TEST_CASE("real128 plus")
     constexpr auto z4 = test_constexpr_incr();
     REQUIRE((z4.m_value == 2));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr auto q1 = real128{1} + __int128_t{2};
+    REQUIRE(q1 == 3);
+    constexpr auto q2 = __int128_t{2} + real128{1};
+    REQUIRE(q2 == 3);
+    constexpr auto q3 = real128{1} + __uint128_t{2};
+    REQUIRE(q3 == 3);
+    constexpr auto q4 = __uint128_t{2} + real128{1};
+    REQUIRE(q4 == 3);
+#endif
     REQUIRE(((-real128{}).m_value == 0));
     REQUIRE((-real128{}).signbit());
     REQUIRE(((-real128{123}).m_value == -123));
@@ -171,6 +188,16 @@ TEST_CASE("real128 plus")
     constexpr auto z6 = test_constexpr_decr();
     REQUIRE((z6.m_value == -2));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr auto s1 = real128{1} - __int128_t{2};
+    REQUIRE(s1 == -1);
+    constexpr auto s2 = __int128_t{2} - real128{1};
+    REQUIRE(s2 == 1);
+    constexpr auto s3 = real128{1} - __uint128_t{2};
+    REQUIRE(s3 == -1);
+    constexpr auto s4 = __uint128_t{2} - real128{1};
+    REQUIRE(s4 == 1);
+#endif
     REQUIRE(((x * 3).m_value == 15));
     REQUIRE(((x * 2.).m_value == 10));
     REQUIRE(((-3 * x).m_value == -15));
@@ -183,6 +210,16 @@ TEST_CASE("real128 plus")
     REQUIRE(((int_t{3} * -x).m_value == -15));
     REQUIRE(((x * rat_t{3, 2}).m_value == real128{"7.5"}.m_value));
     REQUIRE(((rat_t{3, 2} * x).m_value == real128{"7.5"}.m_value));
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr auto t1 = real128{1} * __int128_t{2};
+    REQUIRE(t1 == 2);
+    constexpr auto t2 = __int128_t{2} * real128{1};
+    REQUIRE(t2 == 2);
+    constexpr auto t3 = real128{1} * __uint128_t{2};
+    REQUIRE(t3 == 2);
+    constexpr auto t4 = __uint128_t{2} * real128{1};
+    REQUIRE(t4 == 2);
+#endif
     x = 12;
     REQUIRE(((x / 3).m_value == 4));
     REQUIRE(((x / 2.).m_value == 6));
@@ -196,6 +233,16 @@ TEST_CASE("real128 plus")
     REQUIRE(((int_t{3} / -x).m_value == -real128{".25"}.m_value));
     REQUIRE(((x / rat_t{3, 2}).m_value == 8));
     REQUIRE(((rat_t{3, 2} / x).m_value == real128{".125"}.m_value));
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr auto u1 = real128{4} / __int128_t{2};
+    REQUIRE(u1 == 2);
+    constexpr auto u2 = __int128_t{2} / real128{1};
+    REQUIRE(u2 == 2);
+    constexpr auto u3 = real128{4} / __uint128_t{2};
+    REQUIRE(u3 == 2);
+    constexpr auto u4 = __uint128_t{2} / real128{1};
+    REQUIRE(u4 == 2);
+#endif
     // In-place.
     x = -1;
     x += real128{-2};
@@ -225,6 +272,21 @@ TEST_CASE("real128 plus")
     constexpr real128 z11 = test_constexpr_ipa();
     REQUIRE(z11 == 0);
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    {
+        real128 z11a;
+        z11a += __int128_t{5};
+        REQUIRE(z11a == 5);
+        z11a += __uint128_t{5};
+        REQUIRE(z11a == 10);
+        __int128_t n128 = 0;
+        n128 += real128{4};
+        REQUIRE(n128 == 4);
+        __uint128_t un128 = 0;
+        un128 += real128{4};
+        REQUIRE(un128 == 4);
+    }
+#endif
     x = -1;
     x -= real128{-2};
     REQUIRE(x == 1);
@@ -252,6 +314,21 @@ TEST_CASE("real128 plus")
 #if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     constexpr real128 z12 = test_constexpr_ips();
     REQUIRE(z12 == 8);
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    {
+        real128 z11a;
+        z11a -= __int128_t{5};
+        REQUIRE(z11a == -5);
+        z11a -= __uint128_t{5};
+        REQUIRE(z11a == -10);
+        __int128_t n128 = 0;
+        n128 -= real128{4};
+        REQUIRE(n128 == -4);
+        __uint128_t un128 = 6;
+        un128 -= real128{4};
+        REQUIRE(un128 == 2);
+    }
 #endif
     x = -1;
     x *= real128{-2};
@@ -281,6 +358,21 @@ TEST_CASE("real128 plus")
     constexpr real128 z13 = test_constexpr_ipm();
     REQUIRE(z13 == -24);
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    {
+        real128 z11a{1};
+        z11a *= __int128_t{5};
+        REQUIRE(z11a == 5);
+        z11a *= __uint128_t{5};
+        REQUIRE(z11a == 25);
+        __int128_t n128 = 1;
+        n128 *= real128{4};
+        REQUIRE(n128 == 4);
+        __uint128_t un128 = 1;
+        un128 *= real128{4};
+        REQUIRE(un128 == 4);
+    }
+#endif
     x = 12;
     x /= real128{-2};
     REQUIRE(x == -6);
@@ -308,5 +400,20 @@ TEST_CASE("real128 plus")
 #if defined(MPPP_ENABLE_CONSTEXPR_TESTS)
     constexpr real128 z14 = test_constexpr_ipd();
     REQUIRE(z14 == -3);
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    {
+        real128 z11a{20};
+        z11a /= __int128_t{5};
+        REQUIRE(z11a == 4);
+        z11a /= __uint128_t{2};
+        REQUIRE(z11a == 2);
+        __int128_t n128 = 6;
+        n128 /= real128{2};
+        REQUIRE(n128 == 3);
+        __uint128_t un128 = 8;
+        un128 /= real128{4};
+        REQUIRE(un128 == 2);
+    }
 #endif
 }

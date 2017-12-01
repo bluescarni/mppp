@@ -323,6 +323,34 @@ TEST_CASE("real binary add")
     REQUIRE((real128{10} + real{1, 200}).get_prec() == 200);
     real_reset_default_prec();
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE((real{1, 10} + __int128_t{10} == real{11}));
+    REQUIRE((real{1, 10} + __int128_t{10}).get_prec() == 128);
+    REQUIRE((__int128_t{10} + real{1, 10} == real{11}));
+    REQUIRE((__int128_t{10} + real{1, 10}).get_prec() == 128);
+    REQUIRE((real{1, 10} + __uint128_t{10} == real{11}));
+    REQUIRE((real{1, 10} + __uint128_t{10}).get_prec() == 128);
+    REQUIRE((__uint128_t{10} + real{1, 10} == real{11}));
+    REQUIRE((__uint128_t{10} + real{1, 10}).get_prec() == 128);
+    REQUIRE((real{1, 200} + __int128_t{10} == real{11}));
+    REQUIRE((real{1, 200} + __int128_t{10}).get_prec() == 200);
+    REQUIRE((__int128_t{10} + real{1, 200} == real{11}));
+    REQUIRE((__int128_t{10} + real{1, 200}).get_prec() == 200);
+    REQUIRE((real{1, 200} + __uint128_t{10} == real{11}));
+    REQUIRE((real{1, 200} + __uint128_t{10}).get_prec() == 200);
+    REQUIRE((__uint128_t{10} + real{1, 200} == real{11}));
+    REQUIRE((__uint128_t{10} + real{1, 200}).get_prec() == 200);
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} + __int128_t{10} == real{11}));
+    REQUIRE((real{1, 10} + __int128_t{10}).get_prec() == 12);
+    REQUIRE((__int128_t{10} + real{1, 10} == real{11}));
+    REQUIRE((__int128_t{10} + real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 10} + __uint128_t{10} == real{11}));
+    REQUIRE((real{1, 10} + __uint128_t{10}).get_prec() == 12);
+    REQUIRE((__uint128_t{10} + real{1, 10} == real{11}));
+    REQUIRE((__uint128_t{10} + real{1, 10}).get_prec() == 12);
+    real_reset_default_prec();
+#endif
 }
 
 TEST_CASE("real left in-place add")
@@ -464,6 +492,22 @@ TEST_CASE("real left in-place add")
     r0 = real{};
     r0 += real128{123};
     REQUIRE((r0 == real{real128{123}, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    r0 = real{};
+    REQUIRE((r0 += __int128_t{10}) == real{10});
+    REQUIRE(r0.get_prec() == 128);
+    r0 = real{};
+    REQUIRE((r0 += __uint128_t{10}) == real{10});
+    REQUIRE(r0.get_prec() == 128);
+    real_set_default_prec(5);
+    r0 = real{};
+    REQUIRE((r0 += __int128_t{10}) == real{10});
+    REQUIRE(r0.get_prec() == 5);
+    r0 = real{};
+    REQUIRE((r0 += __uint128_t{10}) == real{10});
     REQUIRE(r0.get_prec() == 5);
     real_reset_default_prec();
 #endif
@@ -618,6 +662,16 @@ TEST_CASE("real right in-place add")
         x = real128_max();
         x += real{real128_max()};
         REQUIRE(isinf(x));
+    }
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    {
+        __int128_t n128 = 5;
+        n128 += real{2};
+        REQUIRE(n128 == 7);
+        __int128_t un128 = 5;
+        un128 += real{2};
+        REQUIRE(un128 == 7);
     }
 #endif
 }
@@ -914,6 +968,34 @@ TEST_CASE("real binary sub")
     REQUIRE((real128{10} - real{1, 200}).get_prec() == 200);
     real_reset_default_prec();
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE((real{1, 10} - __int128_t{10} == real{-9}));
+    REQUIRE((real{1, 10} - __int128_t{10}).get_prec() == 128);
+    REQUIRE((__int128_t{10} - real{1, 10} == real{9}));
+    REQUIRE((__int128_t{10} - real{1, 10}).get_prec() == 128);
+    REQUIRE((real{1, 10} - __uint128_t{10} == real{-9}));
+    REQUIRE((real{1, 10} - __uint128_t{10}).get_prec() == 128);
+    REQUIRE((__uint128_t{10} - real{1, 10} == real{9}));
+    REQUIRE((__uint128_t{10} - real{1, 10}).get_prec() == 128);
+    REQUIRE((real{1, 200} - __int128_t{10} == real{-9}));
+    REQUIRE((real{1, 200} - __int128_t{10}).get_prec() == 200);
+    REQUIRE((__int128_t{10} - real{1, 200} == real{9}));
+    REQUIRE((__int128_t{10} - real{1, 200}).get_prec() == 200);
+    REQUIRE((real{1, 200} - __uint128_t{10} == real{-9}));
+    REQUIRE((real{1, 200} - __uint128_t{10}).get_prec() == 200);
+    REQUIRE((__uint128_t{10} - real{1, 200} == real{9}));
+    REQUIRE((__uint128_t{10} - real{1, 200}).get_prec() == 200);
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} - __int128_t{10} == real{-9}));
+    REQUIRE((real{1, 10} - __int128_t{10}).get_prec() == 12);
+    REQUIRE((__int128_t{10} - real{1, 10} == real{9}));
+    REQUIRE((__int128_t{10} - real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 10} - __uint128_t{10} == real{-9}));
+    REQUIRE((real{1, 10} - __uint128_t{10}).get_prec() == 12);
+    REQUIRE((__uint128_t{10} - real{1, 10} == real{9}));
+    REQUIRE((__uint128_t{10} - real{1, 10}).get_prec() == 12);
+    real_reset_default_prec();
+#endif
 }
 
 TEST_CASE("real left in-place sub")
@@ -1055,6 +1137,22 @@ TEST_CASE("real left in-place sub")
     r0 = real{};
     r0 -= real128{123};
     REQUIRE((r0 == real{-real128{123}, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    r0 = real{};
+    REQUIRE((r0 -= __int128_t{10}) == real{-10});
+    REQUIRE(r0.get_prec() == 128);
+    r0 = real{};
+    REQUIRE((r0 -= __uint128_t{10}) == real{-10});
+    REQUIRE(r0.get_prec() == 128);
+    real_set_default_prec(5);
+    r0 = real{};
+    REQUIRE((r0 -= __int128_t{10}) == real{-10});
+    REQUIRE(r0.get_prec() == 5);
+    r0 = real{};
+    REQUIRE((r0 -= __uint128_t{10}) == real{-10});
     REQUIRE(r0.get_prec() == 5);
     real_reset_default_prec();
 #endif
@@ -1209,6 +1307,16 @@ TEST_CASE("real right in-place sub")
         x = -real128_max();
         x -= real{real128_max()};
         REQUIRE(isinf(x));
+    }
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    {
+        __int128_t n128 = 5;
+        n128 -= real{2};
+        REQUIRE(n128 == 3);
+        __int128_t un128 = 5;
+        un128 -= real{2};
+        REQUIRE(un128 == 3);
     }
 #endif
 }
@@ -1489,6 +1597,34 @@ TEST_CASE("real binary mul")
     REQUIRE((real128{10} * real{1, 200}).get_prec() == 200);
     real_reset_default_prec();
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE((real{1, 10} * __int128_t{10} == real{10}));
+    REQUIRE((real{1, 10} * __int128_t{10}).get_prec() == 128);
+    REQUIRE((__int128_t{10} * real{1, 10} == real{10}));
+    REQUIRE((__int128_t{10} * real{1, 10}).get_prec() == 128);
+    REQUIRE((real{1, 10} * __uint128_t{10} == real{10}));
+    REQUIRE((real{1, 10} * __uint128_t{10}).get_prec() == 128);
+    REQUIRE((__uint128_t{10} * real{1, 10} == real{10}));
+    REQUIRE((__uint128_t{10} * real{1, 10}).get_prec() == 128);
+    REQUIRE((real{1, 200} * __int128_t{10} == real{10}));
+    REQUIRE((real{1, 200} * __int128_t{10}).get_prec() == 200);
+    REQUIRE((__int128_t{10} * real{1, 200} == real{10}));
+    REQUIRE((__int128_t{10} * real{1, 200}).get_prec() == 200);
+    REQUIRE((real{1, 200} * __uint128_t{10} == real{10}));
+    REQUIRE((real{1, 200} * __uint128_t{10}).get_prec() == 200);
+    REQUIRE((__uint128_t{10} * real{1, 200} == real{10}));
+    REQUIRE((__uint128_t{10} * real{1, 200}).get_prec() == 200);
+    real_set_default_prec(12);
+    REQUIRE((real{1, 10} * __int128_t{10} == real{10}));
+    REQUIRE((real{1, 10} * __int128_t{10}).get_prec() == 12);
+    REQUIRE((__int128_t{10} * real{1, 10} == real{10}));
+    REQUIRE((__int128_t{10} * real{1, 10}).get_prec() == 12);
+    REQUIRE((real{1, 10} * __uint128_t{10} == real{10}));
+    REQUIRE((real{1, 10} * __uint128_t{10}).get_prec() == 12);
+    REQUIRE((__uint128_t{10} * real{1, 10} == real{10}));
+    REQUIRE((__uint128_t{10} * real{1, 10}).get_prec() == 12);
+    real_reset_default_prec();
+#endif
 }
 
 TEST_CASE("real left in-place mul")
@@ -1630,6 +1766,22 @@ TEST_CASE("real left in-place mul")
     r0 = real{1};
     r0 *= real128{123};
     REQUIRE((r0 == real{real128{123}, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    r0 = real{-1};
+    REQUIRE((r0 *= __int128_t{10}) == real{-10});
+    REQUIRE(r0.get_prec() == 128);
+    r0 = real{-1};
+    REQUIRE((r0 *= __uint128_t{10}) == real{-10});
+    REQUIRE(r0.get_prec() == 128);
+    real_set_default_prec(5);
+    r0 = real{-1};
+    REQUIRE((r0 *= __int128_t{10}) == real{-10});
+    REQUIRE(r0.get_prec() == 5);
+    r0 = real{-1};
+    REQUIRE((r0 *= __uint128_t{10}) == real{-10});
     REQUIRE(r0.get_prec() == 5);
     real_reset_default_prec();
 #endif
@@ -1785,6 +1937,16 @@ TEST_CASE("real right in-place mul")
         x = real128_max();
         x *= real{real128_max()};
         REQUIRE(isinf(x));
+    }
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    {
+        __int128_t n128 = 5;
+        n128 *= real{2};
+        REQUIRE(n128 == 10);
+        __int128_t un128 = 5;
+        un128 *= real{2};
+        REQUIRE(un128 == 10);
     }
 #endif
 }
@@ -2065,6 +2227,34 @@ TEST_CASE("real binary div")
     REQUIRE((real128{10} / real{1, 200}).get_prec() == 200);
     real_reset_default_prec();
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE((real{5, 10} / __int128_t{10} == real{1} / 2));
+    REQUIRE((real{1, 10} / __int128_t{10}).get_prec() == 128);
+    REQUIRE((__int128_t{10} / real{2, 10} == real{5}));
+    REQUIRE((__int128_t{10} / real{2, 10}).get_prec() == 128);
+    REQUIRE((real{5, 10} / __uint128_t{10} == real{1} / 2));
+    REQUIRE((real{1, 10} / __uint128_t{10}).get_prec() == 128);
+    REQUIRE((__uint128_t{10} / real{2, 10} == real{5}));
+    REQUIRE((__uint128_t{10} / real{1, 10}).get_prec() == 128);
+    REQUIRE((real{5, 200} / __int128_t{10} == real{1} / 2));
+    REQUIRE((real{1, 200} / __int128_t{10}).get_prec() == 200);
+    REQUIRE((__int128_t{10} / real{5, 200} == real{2}));
+    REQUIRE((__int128_t{10} / real{1, 200}).get_prec() == 200);
+    REQUIRE((real{5, 200} / __uint128_t{10} == real{1} / 2));
+    REQUIRE((real{1, 200} / __uint128_t{10}).get_prec() == 200);
+    REQUIRE((__uint128_t{10} / real{2, 200} == real{5}));
+    REQUIRE((__uint128_t{10} / real{1, 200}).get_prec() == 200);
+    real_set_default_prec(12);
+    REQUIRE((real{5, 10} / __int128_t{10} == real{1} / 2));
+    REQUIRE((real{1, 10} / __int128_t{10}).get_prec() == 12);
+    REQUIRE((__int128_t{10} / real{5, 10} == real{2}));
+    REQUIRE((__int128_t{10} / real{1, 10}).get_prec() == 12);
+    REQUIRE((real{5, 10} / __uint128_t{10} == real{1} / 2));
+    REQUIRE((real{1, 10} / __uint128_t{10}).get_prec() == 12);
+    REQUIRE((__uint128_t{10} / real{5, 10} == real{2}));
+    REQUIRE((__uint128_t{10} / real{1, 10}).get_prec() == 12);
+    real_reset_default_prec();
+#endif
 }
 
 TEST_CASE("real left in-place div")
@@ -2205,6 +2395,22 @@ TEST_CASE("real left in-place div")
     r0 = real{1};
     r0 /= real128{123};
     REQUIRE((r0 == 1 / real{real128{123}, 5}));
+    REQUIRE(r0.get_prec() == 5);
+    real_reset_default_prec();
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    r0 = real{-1};
+    REQUIRE((r0 /= __int128_t{2}) == real{1} / real{-2});
+    REQUIRE(r0.get_prec() == 128);
+    r0 = real{-1};
+    REQUIRE((r0 /= __uint128_t{2}) == 1 / real{-2});
+    REQUIRE(r0.get_prec() == 128);
+    real_set_default_prec(5);
+    r0 = real{-1};
+    REQUIRE((r0 /= __int128_t{2}) == 1 / real{-2});
+    REQUIRE(r0.get_prec() == 5);
+    r0 = real{-1};
+    REQUIRE((r0 /= __uint128_t{2}) == 1 / real{-2});
     REQUIRE(r0.get_prec() == 5);
     real_reset_default_prec();
 #endif
@@ -2351,6 +2557,16 @@ TEST_CASE("real right in-place div")
         REQUIRE(x == 1);
     }
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    {
+        __int128_t n128 = 5;
+        n128 /= real{2};
+        REQUIRE(n128 == 2);
+        __int128_t un128 = 6;
+        un128 /= real{2};
+        REQUIRE(un128 == 3);
+    }
+#endif
 }
 
 TEST_CASE("real eqineq")
@@ -2422,6 +2638,16 @@ TEST_CASE("real eqineq")
     REQUIRE((real{"nan", 5} != real128{1ul}));
     REQUIRE((real128{1l} != real{"nan", 5}));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE(real{-1} == __int128_t{-1});
+    REQUIRE(__int128_t{-1} == real{-1});
+    REQUIRE(real{2} == __uint128_t{2});
+    REQUIRE(__uint128_t{2} == real{2});
+    REQUIRE(real{-1} != __int128_t{-2});
+    REQUIRE(__int128_t{-1} != real{-2});
+    REQUIRE(real{2} != __uint128_t{3});
+    REQUIRE(__uint128_t{2} != real{3});
+#endif
 }
 
 TEST_CASE("real lt")
@@ -2459,6 +2685,12 @@ TEST_CASE("real lt")
     REQUIRE(!(real{"inf", 64} < real128{45}));
     REQUIRE(!(real{"nan", 5} < real128{1}));
     REQUIRE(!(real128{1} < real{"nan", 5}));
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE(real{-2} < __int128_t{-1});
+    REQUIRE(__int128_t{-2} < real{-1});
+    REQUIRE(real{2} < __uint128_t{3});
+    REQUIRE(__uint128_t{2} < real{3});
 #endif
 }
 
@@ -2498,6 +2730,12 @@ TEST_CASE("real lte")
     REQUIRE(!(real{"nan", 5} <= real128{1}));
     REQUIRE(!(real128{1} <= real{"nan", 5}));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE(real{-2} <= __int128_t{-1});
+    REQUIRE(__int128_t{-2} <= real{-2});
+    REQUIRE(real{2} <= __uint128_t{3});
+    REQUIRE(__uint128_t{3} <= real{3});
+#endif
 }
 
 TEST_CASE("real gt")
@@ -2536,6 +2774,12 @@ TEST_CASE("real gt")
     REQUIRE(!(real{"nan", 5} > real128{1}));
     REQUIRE(!(real128{1} > real{"nan", 5}));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE(real{2} > __int128_t{-1});
+    REQUIRE(__int128_t{2} > real{-1});
+    REQUIRE(real{5} > __uint128_t{3});
+    REQUIRE(__uint128_t{5} > real{2});
+#endif
 }
 
 TEST_CASE("real gte")
@@ -2573,6 +2817,12 @@ TEST_CASE("real gte")
     REQUIRE((real{"inf", 64} >= real128{45}));
     REQUIRE(!(real{"nan", 5} >= real128{1}));
     REQUIRE(!(real128{1} >= real{"nan", 5}));
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE(real{2} >= __int128_t{-1});
+    REQUIRE(__int128_t{2} >= real{2});
+    REQUIRE(real{5} >= __uint128_t{3});
+    REQUIRE(__uint128_t{5} >= real{5});
 #endif
 }
 

@@ -6,8 +6,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/detail/type_traits.hpp>
-#include <mp++/integer.hpp>
+#include <mp++/config.hpp>
 
 #include <atomic>
 #include <cmath>
@@ -15,6 +14,8 @@
 #include <gmp.h>
 #include <iostream>
 #include <limits>
+#include <mp++/detail/type_traits.hpp>
+#include <mp++/integer.hpp>
 #include <random>
 #include <sstream>
 #include <stdexcept>
@@ -38,7 +39,12 @@ using namespace mppp;
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
-                             unsigned long, long long, unsigned long long>;
+                             unsigned long, long long, unsigned long long
+#if defined(MPPP_HAVE_GCC_INT128)
+                             ,
+                             __uint128_t, __int128_t
+#endif
+                             >;
 
 using fp_types = std::tuple<float, double
 #if defined(MPPP_WITH_MPFR)
@@ -61,28 +67,6 @@ static std::mt19937 rng;
 struct no_const {
 };
 
-// NOTE: char types are not supported in uniform_int_distribution by the standard.
-// Use a small wrapper to get an int distribution instead, with the min max limits
-// from the char type. We will be casting back when using the distribution.
-template <typename T, typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                || std::is_same<unsigned char, T>::value),
-                                              int>::type
-                      = 0>
-static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
-{
-    return std::uniform_int_distribution<T>(min, max);
-}
-
-template <typename T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                  || std::is_same<unsigned char, T>::value,
-                                              int>::type
-                      = 0>
-static inline std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>
-get_int_dist(T min, T max)
-{
-    return std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>(min, max);
-}
-
 struct int_ctor_tester {
     template <typename S>
     struct runner {
@@ -92,18 +76,14 @@ struct int_ctor_tester {
             using integer = integer<S::value>;
             REQUIRE((std::is_constructible<integer, Int>::value));
             REQUIRE(lex_cast(Int(0)) == lex_cast(integer{Int(0)}));
+            REQUIRE(lex_cast(Int(42)) == lex_cast(integer{Int(42)}));
+            REQUIRE(lex_cast(Int(-42)) == lex_cast(integer{Int(-42)}));
             auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
             REQUIRE(lex_cast(min) == lex_cast(integer{min}));
             REQUIRE(lex_cast(max) == lex_cast(integer{max}));
             std::atomic<bool> fail(false);
-            auto f = [&fail
-// NOTE: MSVC requires capturing of these constexpr variables.
-#if defined(_MSC_VER) && !defined(__clang__)
-                      ,
-                      min, max
-#endif
-            ](unsigned n) {
-                auto dist = get_int_dist(min, max);
+            auto f = [&fail](unsigned n) {
+                integral_minmax_dist<Int> dist;
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
                     auto tmp = static_cast<Int>(dist(eng));
@@ -160,15 +140,13 @@ struct int_ass_tester {
             REQUIRE(n0 == min);
             n0 = max;
             REQUIRE(n0 == max);
+            n0 = Int(42);
+            REQUIRE(n0 == Int(42));
+            n0 = Int(-42);
+            REQUIRE(n0 == Int(-42));
             std::atomic<bool> fail(false);
-            auto f = [&fail
-// NOTE: MSVC requires capturing of these constexpr variables.
-#if defined(_MSC_VER) && !defined(__clang__)
-                      ,
-                      min, max
-#endif
-            ](unsigned n) {
-                auto dist = get_int_dist(min, max);
+            auto f = [&fail](unsigned n) {
+                integral_minmax_dist<Int> dist;
                 std::uniform_int_distribution<int> sdist(0, 1);
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {

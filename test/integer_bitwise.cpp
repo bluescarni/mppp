@@ -14,6 +14,7 @@
 #include <tuple>
 #include <type_traits>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 
 #include "test_utils.hpp"
@@ -456,6 +457,23 @@ struct ior_tester {
         REQUIRE(tmp_int == -5);
         REQUIRE((std::is_same<integer &, decltype(n1 |= -5)>::value));
         REQUIRE((std::is_same<int &, decltype(tmp_int |= integer{-5})>::value));
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((integer{25} | __int128_t{-5}) == -5);
+        REQUIRE((__int128_t{25} | integer{-5}) == -5);
+        REQUIRE((integer{} | __uint128_t{0}) == 0);
+        REQUIRE((__uint128_t{0} | integer{}) == 0);
+        n1 = 25;
+        n1 |= __int128_t{-5};
+        REQUIRE(n1 == -5);
+        n1 |= __uint128_t{6};
+        REQUIRE(n1 == -1);
+        __int128_t n128{25};
+        n128 |= integer{-5};
+        REQUIRE(n128 == -5);
+        __uint128_t un128{25};
+        un128 |= 5;
+        REQUIRE(un128 == 29);
+#endif
     }
 };
 
@@ -1226,6 +1244,23 @@ struct and_tester {
         REQUIRE(tmp_int == 24);
         REQUIRE((std::is_same<integer &, decltype(n1 &= -5)>::value));
         REQUIRE((std::is_same<int &, decltype(tmp_int &= integer{-5})>::value));
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((integer{25} & __int128_t{-5}) == 25);
+        REQUIRE((__int128_t{25} & integer{-5}) == 25);
+        REQUIRE((integer{} & __uint128_t{0}) == 0);
+        REQUIRE((__uint128_t{0} & integer{}) == 0);
+        n1 = 25;
+        n1 &= __int128_t{-5};
+        REQUIRE(n1 == 25);
+        n1 &= __uint128_t{6};
+        REQUIRE(n1 == 0);
+        __int128_t n128{25};
+        n128 &= integer{-5};
+        REQUIRE(n128 == 25);
+        __uint128_t un128{25};
+        un128 &= 5;
+        REQUIRE(un128 == 1);
+#endif
     }
 };
 
@@ -1752,6 +1787,23 @@ struct xor_tester {
         REQUIRE(tmp_int == -29);
         REQUIRE((std::is_same<integer &, decltype(n1 ^= -5)>::value));
         REQUIRE((std::is_same<int &, decltype(tmp_int ^= integer{-5})>::value));
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((integer{25} ^ __int128_t{-5}) == -30);
+        REQUIRE((__int128_t{25} ^ integer{-5}) == -30);
+        REQUIRE((integer{} ^ __uint128_t{0}) == 0);
+        REQUIRE((__uint128_t{0} ^ integer{}) == 0);
+        n1 = 25;
+        n1 ^= __int128_t{-5};
+        REQUIRE(n1 == -30);
+        n1 ^= __uint128_t{6};
+        REQUIRE(n1 == -28);
+        __int128_t n128{25};
+        n128 ^= integer{-5};
+        REQUIRE(n128 == -30);
+        __uint128_t un128{25};
+        un128 ^= 5;
+        REQUIRE(un128 == 28);
+#endif
     }
 };
 

@@ -58,6 +58,44 @@ constexpr bool is_zero(const T &n)
     return n == T(0);
 }
 
+// Small helper to convert the non-negative signed integer n
+// into its unsigned counterpart.
+template <typename T>
+constexpr make_unsigned_t<T> make_unsigned(T n)
+{
+    static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
+#if MPPP_CPLUSPLUS >= 201703L
+    assert(n >= T(0));
+#endif
+    return static_cast<make_unsigned_t<T>>(n);
+}
+
+// A small wrapper around typeid(), currently. In the future
+// we could add a demangler here.
+template <typename T>
+inline std::string type_string()
+{
+    return typeid(T).name();
+}
+
+#if defined(MPPP_HAVE_GCC_INT128) && defined(__apple_build_version__)
+
+// NOTE: testing indicates that on OSX the typeid machinery for the 128-bit types
+// is not implemented correctly. Provide a custom implementation as a workaround.
+template <>
+inline std::string type_string<__uint128_t>()
+{
+    return "__uint128_t";
+}
+
+template <>
+inline std::string type_string<__int128_t>()
+{
+    return "__int128_t";
+}
+
+#endif
+
 // Generic string conversion utility - will use std::to_string() for arithmetic types,
 // x.to_string() otherwise.
 template <typename T, enable_if_t<std::is_arithmetic<T>::value, int> = 0>
@@ -71,6 +109,14 @@ inline std::string to_string(const T &x)
 {
     return x.to_string();
 }
+
+#if defined(MPPP_HAVE_GCC_INT128)
+
+// Fwd-declare these so they are visible below.
+std::string to_string(__uint128_t);
+std::string to_string(__int128_t);
+
+#endif
 
 // Compute the absolute value of a negative integer, returning the result as an instance
 // of the corresponding unsigned type. Requires T to be a signed integral type and n
@@ -134,7 +180,7 @@ inline
     static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type.");
     static_assert(is_integral<U>::value && is_unsigned<U>::value, "Invalid type.");
     // Cache a couple of quantities.
-    constexpr auto Tmax = static_cast<make_unsigned_t<T>>(nl_max<T>());
+    constexpr auto Tmax = make_unsigned(nl_max<T>());
     constexpr auto Tmin_abs = nint_abs(nl_min<T>());
     if (mppp_likely(n <= c_min(Tmax, Tmin_abs))) {
         // Optimise the case in which n fits both Tmax and Tmin_abs. This means
@@ -160,8 +206,8 @@ inline
     // we cannot directly convert n to T. The idea then is to init retval to -Tmax
     // and then to subtract from it Tmax as many times as needed.
     auto retval = static_cast<T>(-static_cast<T>(Tmax));
-    const auto q = static_cast<make_unsigned_t<T>>(n / Tmax), r = static_cast<make_unsigned_t<T>>(n % Tmax);
-    for (make_unsigned_t<T> i = 0; i < q - 1u; ++i) {
+    const auto q = static_cast<U>(n / Tmax), r = static_cast<U>(n % Tmax);
+    for (U i = 0; i < q - 1u; ++i) {
         // LCOV_EXCL_START
         // NOTE: this is never hit on current archs, as Tmax differs from Tmin_abs
         // by just 1: we will use only the remainder r.
@@ -186,7 +232,7 @@ inline
     return retval.first ? retval.second
                         : throw std::overflow_error(
                               "Error while trying to negate the unsigned integral value " + to_string(n)
-                              + ": the result does not fit in the range of the target type " + typeid(T).name());
+                              + ": the result does not fit in the range of the target type " + type_string<T>());
 }
 
 // Safe casting functionality between integral types. It will throw if the conversion overflows the range
@@ -198,7 +244,7 @@ constexpr T safe_cast(const U &n)
     return n <= nl_max<T>() ? static_cast<T>(n)
                             : throw std::overflow_error(
                                   "Error in the safe conversion between unsigned integral types: the input value "
-                                  + to_string(n) + " does not fit in the range of the target type " + typeid(T).name());
+                                  + to_string(n) + " does not fit in the range of the target type " + type_string<T>());
 }
 
 template <typename T, typename U,
@@ -209,53 +255,34 @@ constexpr T safe_cast(const U &n)
                ? static_cast<T>(n)
                : throw std::overflow_error(
                      "Error in the safe conversion between signed integral types: the input value " + to_string(n)
-                     + " does not fit in the range of the target type " + typeid(T).name());
+                     + " does not fit in the range of the target type " + type_string<T>());
 }
 
 template <typename T, typename U,
           enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_unsigned<T>, is_signed<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
-    return (n >= U(0) && static_cast<make_unsigned_t<U>>(n) <= nl_max<T>())
+    return (n >= U(0) && make_unsigned(n) <= nl_max<T>())
                ? static_cast<T>(n)
                : throw std::overflow_error("Error in the safe conversion from a signed integral type to an unsigned "
                                            "integral type: the input value "
                                            + to_string(n) + " does not fit in the range of the target type "
-                                           + typeid(T).name());
+                                           + type_string<T>());
 }
 
 template <typename T, typename U,
           enable_if_t<conjunction<is_integral<T>, is_integral<U>, is_signed<T>, is_unsigned<U>>::value, int> = 0>
 constexpr T safe_cast(const U &n)
 {
-    return n <= static_cast<make_unsigned_t<T>>(nl_max<T>())
+    return n <= make_unsigned(nl_max<T>())
                ? static_cast<T>(n)
                : throw std::overflow_error("Error in the safe conversion from an unsigned integral type to a signed "
                                            "integral type: the input value "
                                            + to_string(n) + " does not fit in the range of the target type "
-                                           + typeid(T).name());
+                                           + type_string<T>());
 }
 
 #if defined(MPPP_HAVE_GCC_INT128)
-
-#if defined(_MSC_VER) && defined(__clang__)
-
-// NOTE: clang-cl supports the types, but it does not support the arithmetic operations
-// used in the implementation of string conversion below. See, for instance,
-// https://svn.boost.org/trac10/ticket/11833?replyto=description
-// It's certainly possible in the future to provide alternative implementations of these
-// that don't require 128-bit modulo, etc.
-inline std::string to_string(__uint128_t)
-{
-    return "<string conversion of 128-bit integers not available on this platform>";
-}
-
-inline std::string to_string(__int128_t)
-{
-    return "<string conversion of 128-bit integers not available on this platform>";
-}
-
-#else
 
 // Implementation of to_string() for 128bit integers.
 template <std::size_t N>
@@ -301,9 +328,7 @@ inline std::string to_string(__uint128_t n)
 #else
     // In C++11, we reverse output and then create the string.
     std::reverse(output, o);
-    // NOTE: decrease by one as we don't want to init the string
-    // with a terminator.
-    return std::string(output, o - 1);
+    return std::string(output);
 #endif
 }
 
@@ -320,11 +345,9 @@ inline std::string to_string(__int128_t n)
     return std::string(std::make_reverse_iterator(o), std::make_reverse_iterator(output + 1));
 #else
     std::reverse(output, o);
-    return std::string(output, o - 1);
+    return std::string(output);
 #endif
 }
-
-#endif
 
 #endif
 

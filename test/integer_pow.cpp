@@ -15,6 +15,7 @@
 #include <tuple>
 #include <type_traits>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 
 #include "test_utils.hpp"
@@ -187,6 +188,12 @@ struct pow_tester {
 #if defined(MPPP_WITH_MPFR)
         REQUIRE(pow(integer{2}, 4.5l) == std::pow(2.l, 4.5l));
         REQUIRE(pow(4.5l, integer{-2}) == std::pow(4.5l, -2.l));
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(pow(integer{2}, __int128_t{4}) == 16);
+        REQUIRE(pow(__int128_t{4}, integer{2}) == 16);
+        REQUIRE(pow(integer{2}, __uint128_t{4}) == 16);
+        REQUIRE(pow(__uint128_t{4}, integer{2}) == 16);
 #endif
     }
 };

@@ -32,7 +32,12 @@ using is_supported_integral
     = disjunction<std::is_same<T, bool>, std::is_same<T, char>, std::is_same<T, signed char>,
                   std::is_same<T, unsigned char>, std::is_same<T, short>, std::is_same<T, unsigned short>,
                   std::is_same<T, int>, std::is_same<T, unsigned>, std::is_same<T, long>,
-                  std::is_same<T, unsigned long>, std::is_same<T, long long>, std::is_same<T, unsigned long long>>;
+                  std::is_same<T, unsigned long>, std::is_same<T, long long>, std::is_same<T, unsigned long long>
+#if defined(MPPP_HAVE_GCC_INT128)
+                  ,
+                  std::is_same<T, __int128_t>, std::is_same<T, __uint128_t>
+#endif
+                  >;
 
 // Type trait to check if T is a supported floating-point type.
 template <typename T>
