@@ -6,9 +6,16 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#if defined(__clang__) || defined(__GNUC__)
+
+#pragma GCC diagnostic ignored "-Wconversion"
+
+#endif
+
 #include <quadmath.h>
 #include <type_traits>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
@@ -51,4 +58,10 @@ TEST_CASE("real128 pow")
     REQUIRE((pow(rat_t{2}, real128{-3}).m_value == real128{".125"}.m_value));
     REQUIRE((abs(pow(real128{2}, rat_t{1, 2}) - real128_sqrt2()).m_value < 1E-30));
     REQUIRE((pow(rat_t{1, 2}, real128{2}).m_value == real128{".25"}.m_value));
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE(pow(real128{5}, __int128_t{2}) == 25);
+    REQUIRE(pow(__int128_t{2}, real128{5}) == 32);
+    REQUIRE(pow(real128{5}, __uint128_t{2}) == 25);
+    REQUIRE(pow(__uint128_t{2}, real128{5}) == 32);
+#endif
 }

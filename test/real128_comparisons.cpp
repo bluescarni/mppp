@@ -6,6 +6,12 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#if defined(__clang__) || defined(__GNUC__)
+
+#pragma GCC diagnostic ignored "-Wconversion"
+
+#endif
+
 #include <algorithm>
 #include <initializer_list>
 #include <random>
@@ -94,6 +100,24 @@ TEST_CASE("real128 equality")
     REQUIRE(real128_equal_to(-real128_nan(), real128_nan()));
     REQUIRE(!real128_equal_to(real128{-1}, real128_nan()));
     REQUIRE(!real128_equal_to(real128_nan(), real128{-1}));
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr bool d1 = real128{1} == __int128_t{1};
+    REQUIRE(d1);
+    constexpr bool d2 = __int128_t{1} == real128{1};
+    REQUIRE(d2);
+    constexpr bool d3 = real128{1} == __uint128_t{1};
+    REQUIRE(d3);
+    constexpr bool d4 = __uint128_t{1} == real128{1};
+    REQUIRE(d4);
+    constexpr bool e1 = real128{2} != __int128_t{1};
+    REQUIRE(e1);
+    constexpr bool e2 = __int128_t{2} != real128{1};
+    REQUIRE(e2);
+    constexpr bool e3 = real128{2} != __uint128_t{1};
+    REQUIRE(e3);
+    constexpr bool e4 = __uint128_t{2} != real128{1};
+    REQUIRE(e4);
+#endif
 }
 
 template <typename T, typename U>
@@ -154,6 +178,16 @@ TEST_CASE("real128 lt")
     REQUIRE(!real128_lt(real128_nan(), real128{-1}));
     REQUIRE(!real128_lt(real128_nan(), real128{100}));
     REQUIRE(!real128_lt(real128_nan(), real128_inf()));
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr bool d1 = real128{1} < __int128_t{1};
+    REQUIRE(!d1);
+    constexpr bool d2 = __int128_t{1} < real128{1};
+    REQUIRE(!d2);
+    constexpr bool d3 = real128{1} < __uint128_t{1};
+    REQUIRE(!d3);
+    constexpr bool d4 = __uint128_t{1} < real128{1};
+    REQUIRE(!d4);
+#endif
 }
 
 template <typename T, typename U>
@@ -193,6 +227,16 @@ TEST_CASE("real128 lte")
     REQUIRE(!(-real128_nan() <= -real128_nan()));
     REQUIRE(!(3 <= real128_nan()));
     REQUIRE(!(real128_nan() <= 3));
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr bool d1 = real128{1} <= __int128_t{1};
+    REQUIRE(d1);
+    constexpr bool d2 = __int128_t{0} <= real128{1};
+    REQUIRE(d2);
+    constexpr bool d3 = real128{1} <= __uint128_t{1};
+    REQUIRE(d3);
+    constexpr bool d4 = __uint128_t{0} <= real128{1};
+    REQUIRE(d4);
+#endif
 }
 
 template <typename T, typename U>
@@ -253,6 +297,16 @@ TEST_CASE("real128 gt")
     REQUIRE(real128_gt(real128_nan(), real128{-1}));
     REQUIRE(real128_gt(real128_nan(), real128{100}));
     REQUIRE(real128_gt(real128_nan(), real128_inf()));
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr bool d1 = real128{1} > __int128_t{1};
+    REQUIRE(!d1);
+    constexpr bool d2 = __int128_t{1} > real128{1};
+    REQUIRE(!d2);
+    constexpr bool d3 = real128{1} > __uint128_t{1};
+    REQUIRE(!d3);
+    constexpr bool d4 = __uint128_t{1} > real128{1};
+    REQUIRE(!d4);
+#endif
 }
 
 template <typename T, typename U>
@@ -292,6 +346,16 @@ TEST_CASE("real128 gte")
     REQUIRE(!(-real128_nan() >= -real128_nan()));
     REQUIRE(!(3 >= real128_nan()));
     REQUIRE(!(real128_nan() >= 3));
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr bool d1 = real128{1} >= __int128_t{1};
+    REQUIRE(d1);
+    constexpr bool d2 = __int128_t{0} >= real128{1};
+    REQUIRE(!d2);
+    constexpr bool d3 = real128{1} >= __uint128_t{1};
+    REQUIRE(d3);
+    constexpr bool d4 = __uint128_t{2} >= real128{1};
+    REQUIRE(d4);
+#endif
 }
 
 TEST_CASE("real128 sort")
