@@ -31,6 +31,9 @@ Common concepts
    ``long double`` is also included, but only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled
    (see the :ref:`installation instructions <installation>`).
 
+   The GCC-style extended 128-bit integral types ``__int128_t`` and ``__uint128_t`` are included as well, if supported
+   on the current platform/compiler combination.
+
 .. cpp:concept:: template <typename T> mppp::CppIntegralInteroperable
 
    This concept is satisfied if ``T`` is an integral :cpp:concept:`~mppp::CppInteroperable` type.
