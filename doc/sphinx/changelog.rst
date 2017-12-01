@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Implement support for ``__int128_t``/``__uint128_t`` (`#90 <https://github.com/bluescarni/mppp/pull/90>`__).
+
 - Implement the bitwise logic operators for :cpp:class:`~mppp::integer` (`#86 <https://github.com/bluescarni/mppp/pull/86>`__).
 
 - Initial implementation of the :ref:`pybind11 integration utilities <tutorial_pybind11>` (`#81 <https://github.com/bluescarni/mppp/pull/81>`__).
