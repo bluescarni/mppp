@@ -195,4 +195,18 @@ TEST_CASE("real pow")
     REQUIRE(pow(real128{3}, real{2, 5}).get_prec() == 10);
     real_reset_default_prec();
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE(pow(r0, __int128_t{2}) == real{9});
+    REQUIRE(pow(r0, __uint128_t{2}) == real{9});
+    REQUIRE(pow(__int128_t{3}, r1) == real{9});
+    REQUIRE(pow(__uint128_t{3}, r1) == real{9});
+    REQUIRE(pow(real{3}, __int128_t{2}).get_prec() == 128);
+    REQUIRE(pow(__uint128_t{3}, real{2}).get_prec() == 128);
+    real_set_default_prec(10);
+    REQUIRE(pow(real{3, 5}, __int128_t{2}) == real{9});
+    REQUIRE(pow(real{3, 5}, __int128_t{2}).get_prec() == 10);
+    REQUIRE(pow(__uint128_t{3}, real{2, 5}) == real{9});
+    REQUIRE(pow(__uint128_t{3}, real{2, 5}).get_prec() == 10);
+    real_reset_default_prec();
+#endif
 }

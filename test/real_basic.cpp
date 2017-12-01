@@ -48,34 +48,17 @@ static std::mt19937 rng;
 static const int ntrials = 1000;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
-                             unsigned long, long long, unsigned long long>;
+                             unsigned long, long long, unsigned long long
+#if defined(MPPP_HAVE_GCC_INT128)
+                             ,
+                             __int128_t, __uint128_t
+#endif
+                             >;
 
 using fp_types = std::tuple<float, double, long double>;
 
 using int_t = integer<1>;
 using rat_t = rational<1>;
-
-// NOTE: char types are not supported in uniform_int_distribution by the standard.
-// Use a small wrapper to get an int distribution instead, with the min max limits
-// from the char type. We will be casting back when using the distribution.
-template <typename T, typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                || std::is_same<unsigned char, T>::value),
-                                              int>::type
-                      = 0>
-static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
-{
-    return std::uniform_int_distribution<T>(min, max);
-}
-
-template <typename T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                  || std::is_same<unsigned char, T>::value,
-                                              int>::type
-                      = 0>
-static inline std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>
-get_int_dist(T min, T max)
-{
-    return std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>(min, max);
-}
 
 // Base-10 string representation at full precision for a float.
 template <typename T>
@@ -98,22 +81,22 @@ TEST_CASE("real default prec")
     REQUIRE_THROWS_PREDICATE(real_set_default_prec(-1), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == "Cannot set the default precision to -1: the value must be either zero or between "
-                      + std::to_string(real_prec_min()) + " and " + std::to_string(real_prec_max());
+                      + to_string(real_prec_min()) + " and " + to_string(real_prec_max());
     });
     if (real_prec_min() > 1) {
         REQUIRE_THROWS_PREDICATE(real_set_default_prec(1), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == "Cannot set the default precision to 1: the value must be either zero or between "
-                          + std::to_string(real_prec_min()) + " and " + std::to_string(real_prec_max());
+                          + to_string(real_prec_min()) + " and " + to_string(real_prec_max());
         });
     }
     if (real_prec_max() < nl_max<::mpfr_prec_t>()) {
         REQUIRE_THROWS_PREDICATE(
             real_set_default_prec(nl_max<::mpfr_prec_t>()), std::invalid_argument, [](const std::invalid_argument &ex) {
                 return ex.what()
-                       == "Cannot set the default precision to " + std::to_string(nl_max<::mpfr_prec_t>())
-                              + ": the value must be either zero or between " + std::to_string(real_prec_min())
-                              + " and " + std::to_string(real_prec_max());
+                       == "Cannot set the default precision to " + to_string(nl_max<::mpfr_prec_t>())
+                              + ": the value must be either zero or between " + to_string(real_prec_min()) + " and "
+                              + to_string(real_prec_max());
             });
     }
     REQUIRE(real_get_default_prec() == 0);
@@ -135,14 +118,14 @@ struct int_ctor_tester {
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
         real_reset_default_prec();
-        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
+        auto int_dist = integral_minmax_dist<T>{};
         for (int i = 0; i < ntrials; ++i) {
             auto n = int_dist(rng);
-            REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(), real{std::to_string(n), 10, nl_digits<T>()}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(), real{to_string(n), 10, nl_digits<T>()}.get_mpfr_t()));
             REQUIRE(::mpfr_equal_p(real{n, nl_digits<T>() + 100}.get_mpfr_t(),
-                                   real{std::to_string(n), 10, nl_digits<T>()}.get_mpfr_t()));
+                                   real{to_string(n), 10, nl_digits<T>()}.get_mpfr_t()));
             real_set_default_prec(100);
-            REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(), real{std::to_string(n), 10, 0}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(real{n}.get_mpfr_t(), real{to_string(n), 10, 0}.get_mpfr_t()));
             real_reset_default_prec();
         }
     }
@@ -228,17 +211,17 @@ TEST_CASE("real constructors")
         REQUIRE_THROWS_PREDICATE((real{real{4}, 1}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == "Cannot init a real with a precision of 1: the maximum allowed precision is "
-                          + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                          + std::to_string(real_prec_min());
+                          + to_string(real_prec_max()) + ", the minimum allowed precision is "
+                          + to_string(real_prec_min());
         });
     }
     if (real_prec_max() < nl_max<::mpfr_prec_t>()) {
         REQUIRE_THROWS_PREDICATE(
             (real{real{4}, nl_max<::mpfr_prec_t>()}), std::invalid_argument, [](const std::invalid_argument &ex) {
                 return ex.what()
-                       == "Cannot init a real with a precision of " + std::to_string(nl_max<::mpfr_prec_t>())
-                              + ": the maximum allowed precision is " + std::to_string(real_prec_max())
-                              + ", the minimum allowed precision is " + std::to_string(real_prec_min());
+                       == "Cannot init a real with a precision of " + to_string(nl_max<::mpfr_prec_t>())
+                              + ": the maximum allowed precision is " + to_string(real_prec_max())
+                              + ", the minimum allowed precision is " + to_string(real_prec_min());
             });
     }
     // Move constructor.
@@ -367,8 +350,7 @@ TEST_CASE("real constructors")
     REQUIRE_THROWS_PREDICATE((real{"123", 10, -100}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == "Cannot init a real with a precision of -100: the maximum allowed precision is "
-                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                      + std::to_string(real_prec_min());
+                      + to_string(real_prec_max()) + ", the minimum allowed precision is " + to_string(real_prec_min());
     });
     REQUIRE_THROWS_PREDICATE((real{"hell-o", 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what() == std::string("The string 'hell-o' does not represent a valid real in base 10");
@@ -377,8 +359,8 @@ TEST_CASE("real constructors")
         (real{std::string{"123"}, 10, -100}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == "Cannot init a real with a precision of -100: the maximum allowed precision is "
-                          + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                          + std::to_string(real_prec_min());
+                          + to_string(real_prec_max()) + ", the minimum allowed precision is "
+                          + to_string(real_prec_min());
         });
     REQUIRE_THROWS_PREDICATE(
         (real{std::string{"hell-o"}, 10, 100}), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -602,14 +584,12 @@ TEST_CASE("real kind constructors")
     REQUIRE_THROWS_PREDICATE((real{real_kind::nan, 0, -1}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == "Cannot init a real with a precision of -1: the maximum allowed precision is "
-                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                      + std::to_string(real_prec_min());
+                      + to_string(real_prec_max()) + ", the minimum allowed precision is " + to_string(real_prec_min());
     });
     REQUIRE_THROWS_PREDICATE((real{real_kind::nan, -100}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == "Cannot init a real with a precision of -100: the maximum allowed precision is "
-                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                      + std::to_string(real_prec_min());
+                      + to_string(real_prec_max()) + ", the minimum allowed precision is " + to_string(real_prec_min());
     });
     REQUIRE_THROWS_PREDICATE((real{real_kind::nan}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
@@ -638,11 +618,11 @@ struct int_ass_tester {
         REQUIRE(r.get_prec() == 200);
         REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{"43", 10, 100}.get_mpfr_t()));
         real_reset_default_prec();
-        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
+        auto int_dist = integral_minmax_dist<T>{};
         for (int i = 0; i < ntrials; ++i) {
             auto n = int_dist(rng);
             r = n;
-            REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{std::to_string(n), 10, nl_digits<T>()}.get_mpfr_t()));
+            REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{to_string(n), 10, nl_digits<T>()}.get_mpfr_t()));
         }
     }
 };
@@ -1223,7 +1203,7 @@ struct int_conv_tester {
         REQUIRE(r0.get(rop));
         REQUIRE(get(rop, r0));
         REQUIRE(rop == T(42));
-        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
+        auto int_dist = integral_minmax_dist<T>{};
         for (int i = 0; i < ntrials; ++i) {
             const auto tmp = int_dist(rng);
             REQUIRE(static_cast<T>(real{tmp}) == tmp);
@@ -1253,7 +1233,7 @@ struct int_conv_tester {
         REQUIRE_THROWS_PREDICATE(
             static_cast<T>(real{"inf", 10, 100}), std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
-                       == (std::is_unsigned<T>::value
+                       == (is_unsigned<T>::value
                                ? std::string{"Cannot convert a non-finite real to a C++ unsigned integral type"}
                                : std::string{"Cannot convert a non-finite real to a C++ signed integral type"});
             });
@@ -1263,7 +1243,7 @@ struct int_conv_tester {
         REQUIRE_THROWS_PREDICATE(
             static_cast<T>(real{"-inf", 10, 100}), std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
-                       == (std::is_unsigned<T>::value
+                       == (is_unsigned<T>::value
                                ? std::string{"Cannot convert a non-finite real to a C++ unsigned integral type"}
                                : std::string{"Cannot convert a non-finite real to a C++ signed integral type"});
             });
@@ -1273,7 +1253,7 @@ struct int_conv_tester {
         REQUIRE_THROWS_PREDICATE(
             static_cast<T>(real{"nan", 10, 100}), std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
-                       == (std::is_unsigned<T>::value
+                       == (is_unsigned<T>::value
                                ? std::string{"Cannot convert a non-finite real to a C++ unsigned integral type"}
                                : std::string{"Cannot convert a non-finite real to a C++ signed integral type"});
             });
@@ -1557,14 +1537,12 @@ TEST_CASE("real set prec")
     REQUIRE_THROWS_PREDICATE(r.set_prec(-1), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == "Cannot set the precision of a real to the value -1: the maximum allowed precision is "
-                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                      + std::to_string(real_prec_min());
+                      + to_string(real_prec_max()) + ", the minimum allowed precision is " + to_string(real_prec_min());
     });
     REQUIRE_THROWS_PREDICATE(set_prec(r, 0), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == "Cannot set the precision of a real to the value 0: the maximum allowed precision is "
-                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                      + std::to_string(real_prec_min());
+                      + to_string(real_prec_max()) + ", the minimum allowed precision is " + to_string(real_prec_min());
     });
     REQUIRE(r.zero_p());
     r = 123;
@@ -1577,14 +1555,12 @@ TEST_CASE("real set prec")
     REQUIRE_THROWS_PREDICATE(r.prec_round(-1), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == "Cannot set the precision of a real to the value -1: the maximum allowed precision is "
-                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                      + std::to_string(real_prec_min());
+                      + to_string(real_prec_max()) + ", the minimum allowed precision is " + to_string(real_prec_min());
     });
     REQUIRE_THROWS_PREDICATE(prec_round(r, 0), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == "Cannot set the precision of a real to the value 0: the maximum allowed precision is "
-                      + std::to_string(real_prec_max()) + ", the minimum allowed precision is "
-                      + std::to_string(real_prec_min());
+                      + to_string(real_prec_max()) + ", the minimum allowed precision is " + to_string(real_prec_min());
     });
     REQUIRE(get_prec(r) == 74);
     REQUIRE(::mpfr_equal_p(r.get_mpfr_t(), real{123}.get_mpfr_t()));

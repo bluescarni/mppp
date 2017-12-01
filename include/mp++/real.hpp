@@ -780,7 +780,7 @@ private:
         dispatch_integral_init(p, b);
         ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
-    template <typename T, enable_if_t<conjunction<is_integral<T>, std::is_unsigned<T>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
         dispatch_integral_init(p, n);
