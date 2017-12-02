@@ -16,6 +16,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <mp++/config.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
@@ -78,6 +80,12 @@ struct add_tester {
         REQUIRE((4.l + rational{3} == 7.l));
         REQUIRE((std::is_same<long double, decltype(integer{4} + 3.l)>::value));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((rational{3} + __int128_t{4} == 7));
+        REQUIRE((__int128_t{4} + rational{3} == 7));
+        REQUIRE((rational{3} + __uint128_t{4} == 7));
+        REQUIRE((__uint128_t{4} + rational{3} == 7));
+#endif
         REQUIRE((!is_addable<rational, std::string>::value));
         REQUIRE((!is_addable<std::string, rational>::value));
 
@@ -109,6 +117,13 @@ struct add_tester {
         retval += 2.l;
         REQUIRE((lex_cast(retval) == "15/2"));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        retval = 1;
+        retval += __int128_t{-5};
+        REQUIRE(retval == -4);
+        retval += __uint128_t{3};
+        REQUIRE(retval == -1);
+#endif
 
         // Interop on the left.
         {
@@ -126,9 +141,9 @@ struct add_tester {
             REQUIRE((std::is_same<int &, decltype(n += rational{-4})>::value));
             n += rational{-5, 2};
             REQUIRE((lex_cast(n) == "-1"));
-            n = std::numeric_limits<int>::max();
+            n = nl_max<int>();
             REQUIRE_THROWS_AS(n += rational{1}, std::overflow_error);
-            n = std::numeric_limits<int>::min();
+            n = nl_min<int>();
             REQUIRE_THROWS_AS(n += rational{-1}, std::overflow_error);
         }
         {
@@ -157,6 +172,16 @@ struct add_tester {
                 x += rational{-5, 2};
                 REQUIRE((std::abs(-1.5l - x) < 1E-8l));
             }
+        }
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        {
+            __int128_t n128 = -6;
+            n128 += rational{-5};
+            REQUIRE(n128 == -11);
+            __uint128_t un128 = 6;
+            un128 += rational{1};
+            REQUIRE(un128 == 7);
         }
 #endif
         REQUIRE((!is_addable_inplace<rational, std::string>::value));
@@ -220,6 +245,12 @@ struct sub_tester {
         REQUIRE((4.l - rational{3} == 1.l));
         REQUIRE((std::is_same<long double, decltype(integer{4} - 3.l)>::value));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((rational{3} - __int128_t{4} == -1));
+        REQUIRE((__int128_t{4} - rational{3} == 1));
+        REQUIRE((rational{3} - __uint128_t{4} == -1));
+        REQUIRE((__uint128_t{4} - rational{3} == 1));
+#endif
         REQUIRE((!is_subtractable<rational, std::string>::value));
         REQUIRE((!is_subtractable<std::string, rational>::value));
 
@@ -251,6 +282,13 @@ struct sub_tester {
         retval -= 2.l;
         REQUIRE((lex_cast(retval) == "-13/2"));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        retval = 1;
+        retval -= __int128_t{-5};
+        REQUIRE(retval == 6);
+        retval -= __uint128_t{3};
+        REQUIRE(retval == 3);
+#endif
 
         // Interop on the left.
         {
@@ -268,9 +306,9 @@ struct sub_tester {
             REQUIRE((std::is_same<int &, decltype(n -= rational{-4})>::value));
             n -= rational{-5, 2};
             REQUIRE((lex_cast(n) == "11"));
-            n = std::numeric_limits<int>::max();
+            n = nl_max<int>();
             REQUIRE_THROWS_AS(n -= rational{-1}, std::overflow_error);
-            n = std::numeric_limits<int>::min();
+            n = nl_min<int>();
             REQUIRE_THROWS_AS(n -= rational{1}, std::overflow_error);
         }
         {
@@ -299,6 +337,16 @@ struct sub_tester {
                 x -= rational{-5, 2};
                 REQUIRE((std::abs(23.l / 2 - x) < 1E-8l));
             }
+        }
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        {
+            __int128_t n128 = -6;
+            n128 -= rational{-5};
+            REQUIRE(n128 == -1);
+            __uint128_t un128 = 6;
+            un128 -= rational{1};
+            REQUIRE(un128 == 5);
         }
 #endif
         REQUIRE((!is_subtractable_inplace<rational, std::string>::value));
@@ -361,6 +409,12 @@ struct mul_tester {
         REQUIRE((4.l * rational{3} == 12.l));
         REQUIRE((std::is_same<long double, decltype(integer{4} * 3.l)>::value));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((rational{3} * __int128_t{4} == 12));
+        REQUIRE((__int128_t{4} * rational{3} == 12));
+        REQUIRE((rational{3} * __uint128_t{4} == 12));
+        REQUIRE((__uint128_t{4} * rational{3} == 12));
+#endif
         REQUIRE((!is_multipliable<rational, std::string>::value));
         REQUIRE((!is_multipliable<std::string, rational>::value));
 
@@ -396,6 +450,13 @@ struct mul_tester {
         retval *= 2.l;
         REQUIRE((lex_cast(retval) == "-48"));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        retval = 1;
+        retval *= __int128_t{-5};
+        REQUIRE(retval == -5);
+        retval *= __uint128_t{3};
+        REQUIRE(retval == -15);
+#endif
 
         // Interop on the left.
         {
@@ -413,9 +474,9 @@ struct mul_tester {
             REQUIRE((std::is_same<int &, decltype(n *= rational{-4})>::value));
             n *= rational{-5, 2};
             REQUIRE((lex_cast(n) == "15"));
-            n = std::numeric_limits<int>::max();
+            n = nl_max<int>();
             REQUIRE_THROWS_AS(n *= rational{2}, std::overflow_error);
-            n = std::numeric_limits<int>::min();
+            n = nl_min<int>();
             REQUIRE_THROWS_AS(n *= rational{2}, std::overflow_error);
         }
         {
@@ -444,6 +505,16 @@ struct mul_tester {
                 x *= rational{-5, 2};
                 REQUIRE((std::abs(125. / 4 - x) < 1E-8));
             }
+        }
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        {
+            __int128_t n128 = -6;
+            n128 *= rational{-5};
+            REQUIRE(n128 == 30);
+            __uint128_t un128 = 6;
+            un128 *= rational{2};
+            REQUIRE(un128 == 12);
         }
 #endif
         REQUIRE((!is_multipliable_inplace<rational, std::string>::value));
@@ -529,6 +600,12 @@ struct div_tester {
         REQUIRE((std::abs(4.l / rational{3} - 4.l / 3) < 1E-8));
         REQUIRE((std::is_same<long double, decltype(integer{4} / 3.l)>::value));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE((rational{3} / __int128_t{4} == rational{3, 4}));
+        REQUIRE((__int128_t{4} / rational{3} == rational{4, 3}));
+        REQUIRE((rational{3} / __uint128_t{4} == rational{3, 4}));
+        REQUIRE((__uint128_t{4} / rational{3} == rational{4, 3}));
+#endif
         REQUIRE((!is_divisible<rational, std::string>::value));
         REQUIRE((!is_divisible<std::string, rational>::value));
 
@@ -573,6 +650,13 @@ struct div_tester {
         retval /= -1.l;
         REQUIRE((lex_cast(retval) == "-3"));
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        retval = 1;
+        retval /= __int128_t{-5};
+        REQUIRE(retval == rational{-1, 5});
+        retval /= __uint128_t{3};
+        REQUIRE(retval == rational{1} / -15);
+#endif
         retval = -3;
 
         // Interop on the left.
@@ -591,9 +675,9 @@ struct div_tester {
             REQUIRE((std::is_same<int &, decltype(n /= rational{-4})>::value));
             n /= rational{-5, 2};
             REQUIRE((lex_cast(n) == "1"));
-            n = std::numeric_limits<int>::max();
+            n = nl_max<int>();
             REQUIRE_THROWS_AS(n /= (rational{1, 2}), std::overflow_error);
-            n = std::numeric_limits<int>::min();
+            n = nl_min<int>();
             REQUIRE_THROWS_AS(n /= (rational{1, 2}), std::overflow_error);
         }
         {
@@ -620,6 +704,16 @@ struct div_tester {
                 x /= rational{-5, 2};
                 REQUIRE((std::abs(4.l / 5 - x) < 1E-8));
             }
+        }
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        {
+            __int128_t n128 = -6;
+            n128 /= rational{-5};
+            REQUIRE(n128 == 1);
+            __uint128_t un128 = 6;
+            un128 /= rational{2};
+            REQUIRE(un128 == 3);
         }
 #endif
         REQUIRE((!is_divisible_inplace<rational, std::string>::value));
@@ -673,6 +767,16 @@ struct rel_tester {
         REQUIRE(-3.l != n2);
         REQUIRE(n2 != -3.l);
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(__int128_t{2} == rational{2});
+        REQUIRE(rational{2} == __int128_t{2});
+        REQUIRE(__uint128_t{2} == rational{2});
+        REQUIRE(rational{2} == __uint128_t{2});
+        REQUIRE(__int128_t{3} != rational{2});
+        REQUIRE(rational{3} != __int128_t{2});
+        REQUIRE(__uint128_t{3} != rational{2});
+        REQUIRE(rational{3} != __uint128_t{2});
+#endif
 
         REQUIRE(n2 < n1);
         REQUIRE(n2 < 0);
@@ -689,6 +793,12 @@ struct rel_tester {
         REQUIRE(n2 < 0.l);
         REQUIRE(-3.l < n2);
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(__int128_t{2} < rational{4});
+        REQUIRE(rational{2} < __int128_t{3});
+        REQUIRE(__uint128_t{2} < rational{4});
+        REQUIRE(rational{2} < __uint128_t{3});
+#endif
 
         REQUIRE(n1 > n2);
         REQUIRE(0 > n2);
@@ -704,6 +814,12 @@ struct rel_tester {
 #if defined(MPPP_WITH_MPFR)
         REQUIRE(0.l > n2);
         REQUIRE(n2 > -3.l);
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(__int128_t{6} > rational{4});
+        REQUIRE(rational{7} > __int128_t{3});
+        REQUIRE(__uint128_t{5} > rational{4});
+        REQUIRE(rational{34} > __uint128_t{3});
 #endif
 
         REQUIRE(n2 <= n1);
@@ -733,6 +849,12 @@ struct rel_tester {
         REQUIRE(-2.l <= n2);
         REQUIRE(n2 <= -2.l);
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(__int128_t{2} <= rational{4});
+        REQUIRE(rational{2} <= __int128_t{2});
+        REQUIRE(__uint128_t{2} <= rational{4});
+        REQUIRE(rational{2} <= __uint128_t{2});
+#endif
 
         REQUIRE(n1 >= n2);
         REQUIRE(n1 >= n1);
@@ -760,6 +882,12 @@ struct rel_tester {
         REQUIRE(n2 >= -3.l);
         REQUIRE(-2.l >= n2);
         REQUIRE(n2 >= -2.l);
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(__int128_t{5} >= rational{4});
+        REQUIRE(rational{2} >= __int128_t{2});
+        REQUIRE(__uint128_t{8} >= rational{4});
+        REQUIRE(rational{2} >= __uint128_t{2});
 #endif
     }
 };

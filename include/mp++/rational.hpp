@@ -260,7 +260,7 @@ private:
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
-                                    + std::to_string(x));
+                                    + mppp::to_string(x));
         }
         MPPP_MAYBE_TLS mpq_raii q;
         ::mpq_set_d(&q.m_mpq, static_cast<double>(x));
@@ -272,7 +272,7 @@ private:
     {
         if (mppp_unlikely(!std::isfinite(x))) {
             throw std::domain_error("Cannot construct a rational from the non-finite floating-point value "
-                                    + std::to_string(x));
+                                    + mppp::to_string(x));
         }
         // NOTE: static checks for overflows and for the precision value are done in mpfr.hpp.
         constexpr int d2 = std::numeric_limits<long double>::max_digits10 * 4;
@@ -720,8 +720,7 @@ private:
         return std::make_pair(true, m_num.m_int.m_st._mp_size != 0);
     }
     // Conversion to integral types other than bool.
-    template <typename T,
-              enable_if_t<conjunction<std::is_integral<T>, negation<std::is_same<bool, T>>>::value, int> = 0>
+    template <typename T, enable_if_t<conjunction<is_integral<T>, negation<std::is_same<bool, T>>>::value, int> = 0>
     std::pair<bool, T> dispatch_conversion() const
     {
         return static_cast<int_t>(*this).template dispatch_conversion<T>();
@@ -772,7 +771,7 @@ public:
     {
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
-            throw std::overflow_error("Conversion of the rational " + to_string() + " to the type " + typeid(T).name()
+            throw std::overflow_error("Conversion of the rational " + to_string() + " to the type " + type_string<T>()
                                       + " results in overflow");
         }
         return std::move(retval.second);

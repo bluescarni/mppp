@@ -8,7 +8,7 @@
 
 #include <mp++/config.hpp>
 
-#include <limits>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/real.hpp>
 
 #include <type_traits>
@@ -36,7 +36,7 @@ TEST_CASE("real neg")
     real r1{123};
     neg(r0, r1);
     REQUIRE(r0 == real{-123});
-    REQUIRE(r0.get_prec() == std::numeric_limits<int>::digits + 1);
+    REQUIRE(r0.get_prec() == nl_digits<int>() + 1);
 }
 
 TEST_CASE("real abs")
@@ -57,5 +57,5 @@ TEST_CASE("real abs")
     real r1{-123};
     abs(r0, r1);
     REQUIRE(r0 == real{123});
-    REQUIRE(r0.get_prec() == std::numeric_limits<int>::digits + 1);
+    REQUIRE(r0.get_prec() == nl_digits<int>() + 1);
 }

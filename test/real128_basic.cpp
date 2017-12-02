@@ -6,13 +6,20 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#if defined(__clang__) || defined(__GNUC__)
+
+#pragma GCC diagnostic ignored "-Wconversion"
+
+#endif
+
+#include <mp++/config.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
 
 #include <cstdint>
 #include <gmp.h>
-#include <limits>
 #include <quadmath.h>
 #include <random>
 #include <stdexcept>
@@ -38,8 +45,8 @@ static int ntries = 1000;
 
 static std::mt19937 rng;
 
-static constexpr auto delta64 = std::numeric_limits<std::uint_least64_t>::digits - 64;
-static constexpr auto delta49 = std::numeric_limits<std::uint_least64_t>::digits - 49;
+static constexpr auto delta64 = nl_digits<std::uint_least64_t>() - 64;
+static constexpr auto delta49 = nl_digits<std::uint_least64_t>() - 49;
 
 TEST_CASE("real128 constructors")
 {
@@ -71,6 +78,18 @@ TEST_CASE("real128 constructors")
 #if !defined(__clang__) && defined(MPPP_WITH_MPFR)
     real128 r8a{1.5l};
     REQUIRE((r8a.m_value == 1.5l));
+#endif
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr real128 r8b{__int128_t{5}};
+    REQUIRE(r8b == 5);
+    constexpr real128 r8c{__uint128_t{5}};
+    REQUIRE(r8c == 5);
+    real128 r8d;
+    r8d = __int128_t{5};
+    REQUIRE(r8d == 5);
+    real128 r8e;
+    r8e = __uint128_t{5};
+    REQUIRE(r8e == 5);
 #endif
     REQUIRE((!std::is_constructible<real128, std::vector<int>>::value));
     // Construction from integer.
@@ -233,6 +252,12 @@ TEST_CASE("real128 conversions")
     REQUIRE(static_cast<float>(re) == -123.f);
     REQUIRE(static_cast<double>(re) == -123.);
     REQUIRE((static_cast<__float128>(re) == re.m_value));
+#if defined(MPPP_HAVE_GCC_INT128)
+    constexpr __int128_t n128 = static_cast<__int128_t>(real128{4});
+    REQUIRE(n128 == 4);
+    constexpr __uint128_t un128 = static_cast<__uint128_t>(real128{4});
+    REQUIRE(un128 == 4);
+#endif
     // Constexpr checking.
     constexpr int nc = static_cast<int>(real128{12});
     REQUIRE(nc == 12);

@@ -14,6 +14,7 @@
 #include <tuple>
 #include <type_traits>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 
 #include "test_utils.hpp"
@@ -123,6 +124,12 @@ struct binomial_tester {
         REQUIRE(binomial(int_type{10}, -1) == 0);
         REQUIRE(binomial(int_type{-3}, -3) == 1);
         REQUIRE(binomial(int_type{-1}, -1) == 1);
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(binomial(int_type{-3}, __int128_t{-4}) == -3);
+        REQUIRE(binomial(__int128_t{-5}, int_type{4}) == 70);
+        REQUIRE(binomial(int_type{5}, __uint128_t{3}) == 10);
+        REQUIRE(binomial(__uint128_t{1}, int_type{1}) == 1);
+#endif
     }
 };
 

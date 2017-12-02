@@ -10,6 +10,7 @@
 
 #include <limits>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real.hpp>
@@ -56,18 +57,17 @@ template <typename T, typename std::enable_if<std::is_same<char, T>::value || st
                                                   || std::is_same<unsigned char, T>::value,
                                               int>::type
                       = 0>
-static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
+static inline std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>
 get_int_dist(T min, T max)
 {
-    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>(min,
-                                                                                                                   max);
+    return std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>(min, max);
 }
 
 struct int_io_tester {
     template <typename T>
     void operator()(const T &) const
     {
-        auto int_dist = get_int_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
         auto prec_dist = get_int_dist(::mpfr_prec_t(real_prec_min()), ::mpfr_prec_t(200));
         auto base_dist = get_int_dist(2, 62);
         for (auto i = 0; i < ntrials; ++i) {

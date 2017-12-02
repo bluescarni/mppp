@@ -81,8 +81,6 @@ ADD_MPPP_TESTCASE(rational_neg)
 ADD_MPPP_TESTCASE(rational_pow)
 ADD_MPPP_TESTCASE(rational_rel)
 
-ADD_MPPP_TESTCASE(utils)
-
 if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_arith)
   ADD_MPPP_TESTCASE(real128_basic)
@@ -118,3 +116,6 @@ endif()
 if(MPPP_TEST_PYBIND11)
   add_subdirectory(pybind11)
 endif()
+
+ADD_MPPP_TESTCASE(utils)
+ADD_MPPP_TESTCASE(type_traits)

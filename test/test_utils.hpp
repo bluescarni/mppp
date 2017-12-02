@@ -14,6 +14,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <gmp.h>
 #include <initializer_list>
 #include <limits>
@@ -101,13 +102,14 @@ struct is_integer<mppp::integer<SSize>> {
     static const bool value = true;
 };
 
-template <typename T, typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, int>::type = 0>
+template <typename T, typename std::enable_if<mppp::is_integral<T>::value && mppp::is_signed<T>::value, int>::type = 0>
 inline long long lex_cast_tr(T n)
 {
     return static_cast<long long>(n);
 }
 
-template <typename T, typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, int>::type = 0>
+template <typename T,
+          typename std::enable_if<mppp::is_integral<T>::value && mppp::is_unsigned<T>::value, int>::type = 0>
 inline unsigned long long lex_cast_tr(T n)
 {
     return static_cast<unsigned long long>(n);
@@ -151,6 +153,20 @@ inline std::string lex_cast(const mppp::mpq_raii &m)
 {
     return mppp::rational<1>(&m.m_mpq).to_string();
 }
+
+#if defined(MPPP_HAVE_GCC_INT128)
+
+inline std::string lex_cast(__uint128_t n)
+{
+    return mppp::to_string(n);
+}
+
+inline std::string lex_cast(__int128_t n)
+{
+    return mppp::to_string(n);
+}
+
+#endif
 
 // Set mpz to random value with n limbs. Top limb is divided by div.
 inline void random_integer(mppp::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
@@ -213,6 +229,60 @@ inline void max_integer(mppp::mpz_raii &m, unsigned n)
         ::mpz_add(&m.m_mpz, &m.m_mpz, &tmp.m_mpz);
     }
 }
+
+// Uniform int distribution wrapper, from min to max value for type T.
+template <typename T, typename = void>
+struct integral_minmax_dist {
+    integral_minmax_dist() : m_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max()) {}
+    template <typename E>
+    T operator()(E &e)
+    {
+        return m_dist(e);
+    }
+    std::uniform_int_distribution<T> m_dist;
+};
+
+// NOTE: char types are not supported in uniform_int_distribution by the standard.
+// Use a small wrapper to get an int distribution instead, with the min max limits
+// from the char type. We will be casting back when using the distribution.
+template <typename T>
+struct integral_minmax_dist<T,
+                            typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                                                    || std::is_same<unsigned char, T>::value>::type> {
+    using type = typename std::conditional<std::is_signed<T>::value, int, unsigned>::type;
+    integral_minmax_dist() : m_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max()) {}
+    template <typename E>
+    T operator()(E &e)
+    {
+        return static_cast<T>(m_dist(e));
+    }
+    std::uniform_int_distribution<type> m_dist;
+};
+
+#if defined(MPPP_HAVE_GCC_INT128)
+
+template <>
+struct integral_minmax_dist<__uint128_t, void> {
+    integral_minmax_dist() : m_dist(0u, static_cast<std::uint_least64_t>(__uint128_t(-1) >> 64)) {}
+    template <typename E>
+    __uint128_t operator()(E &e)
+    {
+        return m_dist(e) + (__uint128_t(m_dist(e)) << 64);
+    }
+    std::uniform_int_distribution<std::uint_least64_t> m_dist;
+};
+
+template <>
+struct integral_minmax_dist<__int128_t, void> : integral_minmax_dist<__uint128_t, void> {
+    using integral_minmax_dist<__uint128_t, void>::integral_minmax_dist;
+    template <typename E>
+    __int128_t operator()(E &e)
+    {
+        return static_cast<__int128_t>(static_cast<integral_minmax_dist<__uint128_t, void> *>(this)->operator()(e));
+    }
+};
+
+#endif
 }
 
 // A macro for checking that an expression throws a specific exception object satisfying a predicate.

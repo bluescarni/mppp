@@ -6,6 +6,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
@@ -43,7 +45,12 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
                          std::integral_constant<std::size_t, 10>>;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
-                             unsigned long, long long, unsigned long long>;
+                             unsigned long, long long, unsigned long long
+#if defined(MPPP_HAVE_GCC_INT128)
+                             ,
+                             __int128_t, __uint128_t
+#endif
+                             >;
 
 struct no_const {
 };
@@ -52,29 +59,6 @@ struct no_const {
 // finishes, this value gets bumped up by N, so that the next time a multithreaded test which uses rng
 // is launched it will be inited with a different seed.
 static std::mt19937::result_type mt_rng_seed(0u);
-
-// NOTE: char types are not supported in uniform_int_distribution by the standard.
-// Use a small wrapper to get an int distribution instead, with the min max limits
-// from the char type. We will be casting back when using the distribution.
-template <typename T, typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                || std::is_same<unsigned char, T>::value),
-                                              int>::type
-                      = 0>
-static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
-{
-    return std::uniform_int_distribution<T>(min, max);
-}
-
-template <typename T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                  || std::is_same<unsigned char, T>::value,
-                                              int>::type
-                      = 0>
-static inline std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>
-get_int_dist(T min, T max)
-{
-    return std::uniform_int_distribution<typename std::conditional<std::is_signed<T>::value, int, unsigned>::type>(min,
-                                                                                                                   max);
-}
 
 struct int_ctor_tester {
     template <typename S>
@@ -87,17 +71,12 @@ struct int_ctor_tester {
             REQUIRE((std::is_constructible<rational, Int &&>::value));
             REQUIRE((std::is_constructible<rational, const Int &>::value));
             REQUIRE(lex_cast(Int(0)) == lex_cast(rational{Int(0)}));
-            auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
+            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
             REQUIRE(lex_cast(min) == lex_cast(rational{min}));
             REQUIRE(lex_cast(max) == lex_cast(rational{max}));
             std::atomic<bool> fail(false);
-            auto f = [&fail
-#if defined(_MSC_VER) && !defined(__clang__)
-                      ,
-                      min, max
-#endif
-            ](unsigned n) {
-                auto dist = get_int_dist(min, max);
+            auto f = [&fail](unsigned n) {
+                auto dist = integral_minmax_dist<Int>{};
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
                     auto tmp = static_cast<Int>(dist(eng));
@@ -960,6 +939,12 @@ struct gen_ass_tester {
             REQUIRE(lex_cast(q) == "-9/2");
         }
 #endif
+#if defined(MPPP_HAVE_GCC_INT128)
+        q = __int128{-42};
+        REQUIRE(q == -42);
+        q = __uint128_t{84};
+        REQUIRE(q == 84);
+#endif
     }
 };
 
@@ -1009,7 +994,7 @@ struct int_convert_tester {
             using integer = typename rational::int_t;
             REQUIRE((is_convertible<rational, Int>::value));
             REQUIRE(roundtrip_conversion<rational>(0));
-            auto constexpr min = std::numeric_limits<Int>::min(), max = std::numeric_limits<Int>::max();
+            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
             REQUIRE(roundtrip_conversion<rational>(min));
             REQUIRE(roundtrip_conversion<rational>(max));
             REQUIRE(roundtrip_conversion<rational>(min + Int(1)));

@@ -9,6 +9,9 @@
 #ifndef MPPP_DETAIL_TYPE_TRAITS_HPP
 #define MPPP_DETAIL_TYPE_TRAITS_HPP
 
+#include <mp++/config.hpp>
+
+#include <limits>
 #include <type_traits>
 
 namespace mppp
@@ -117,9 +120,6 @@ template <bool B, typename T = void>
 using enable_if_t = std::enable_if_t<B, T>;
 
 template <typename T>
-using make_unsigned_t = std::make_unsigned_t<T>;
-
-template <typename T>
 using remove_cv_t = std::remove_cv_t<T>;
 
 template <typename T>
@@ -129,9 +129,6 @@ using remove_extent_t = std::remove_extent_t<T>;
 
 template <bool B, typename T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
-
-template <typename T>
-using make_unsigned_t = typename std::make_unsigned<T>::type;
 
 template <typename T>
 using remove_cv_t = typename std::remove_cv<T>::type;
@@ -151,6 +148,128 @@ using uncvref_t = remove_cv_t<unref_t<T>>;
 // Detect non-const rvalue references.
 template <typename T>
 using is_ncrvr = conjunction<std::is_rvalue_reference<T>, negation<std::is_const<unref_t<T>>>>;
+
+// Provide internal implementation of some std type traits,
+// we will augment them with non-standard types defined
+// on some compilers.
+template <typename T>
+struct is_integral
+    : std::integral_constant<
+          bool, disjunction<std::is_integral<T>
+#if defined(MPPP_HAVE_GCC_INT128)
+                            ,
+                            // NOTE: for many of these type traits, the result must hold regardless
+                            // of the cv qualifications of T. Hence, we remove them.
+                            // http://eel.is/c++draft/meta.unary.cat
+                            std::is_same<remove_cv_t<T>, __int128_t>, std::is_same<remove_cv_t<T>, __uint128_t>
+#endif
+                            >::value> {
+};
+
+template <typename T>
+struct is_signed : std::integral_constant<bool, disjunction<std::is_signed<T>
+#if defined(MPPP_HAVE_GCC_INT128)
+                                                            ,
+                                                            std::is_same<remove_cv_t<T>, __int128_t>
+#endif
+                                                            >::value> {
+};
+
+template <typename T>
+struct is_unsigned : std::integral_constant<bool, disjunction<std::is_unsigned<T>
+#if defined(MPPP_HAVE_GCC_INT128)
+                                                              ,
+                                                              std::is_same<remove_cv_t<T>, __uint128_t>
+#endif
+                                                              >::value> {
+};
+
+// make_unsigned machinery,
+template <typename T, typename = void>
+struct make_unsigned_impl {
+    using type = typename std::make_unsigned<T>::type;
+};
+
+#if defined(MPPP_HAVE_GCC_INT128)
+
+// NOTE: make_unsigned is supposed to preserve cv qualifiers, hence the non-trivial implementation.
+template <typename T>
+struct make_unsigned_impl<T, enable_if_t<disjunction<std::is_same<remove_cv_t<T>, __uint128_t>,
+                                                     std::is_same<remove_cv_t<T>, __int128_t>>::value>> {
+    using tmp_type = typename std::conditional<std::is_const<T>::value, const __uint128_t, __uint128_t>::type;
+    using type = typename std::conditional<std::is_volatile<T>::value, volatile tmp_type, tmp_type>::type;
+};
+
+#endif
+
+template <typename T>
+using make_unsigned_t = typename make_unsigned_impl<T>::type;
+
+// Various numeric_limits utils.
+template <typename T>
+constexpr int nl_digits()
+{
+    return std::numeric_limits<T>::digits;
+}
+
+template <typename T>
+constexpr T nl_min()
+{
+    return std::numeric_limits<T>::min();
+}
+
+template <typename T>
+constexpr T nl_max()
+{
+    return std::numeric_limits<T>::max();
+}
+
+#if defined(MPPP_HAVE_GCC_INT128)
+
+template <>
+constexpr int nl_digits<__uint128_t>()
+{
+    return 128;
+}
+
+template <>
+constexpr int nl_digits<__int128_t>()
+{
+    return 127;
+}
+
+template <>
+constexpr __uint128_t nl_max<__uint128_t>()
+{
+    return ~__uint128_t(0);
+}
+
+template <>
+constexpr __uint128_t nl_min<__uint128_t>()
+{
+    return 0;
+}
+
+template <>
+constexpr __int128_t nl_max<__int128_t>()
+{
+    return (((__int128_t(1) << 126) - 1) << 1) + 1;
+}
+
+template <>
+constexpr __int128_t nl_min<__int128_t>()
+{
+    return -nl_max<__int128_t>() - 1;
+}
+
+#endif
+
+// Need this little wrapper because MSVC is unhappy with constexpr
+// functions in SFINAE.
+template <typename T>
+struct nl_constants {
+    static constexpr int digits = nl_digits<T>();
+};
 }
 }
 

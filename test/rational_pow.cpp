@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <utility>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
@@ -174,6 +175,13 @@ struct pow_tester {
         REQUIRE((pow(rational{1}, static_cast<signed char>(-1)) == rational{1}));
         REQUIRE((pow(1, rational{3, 4}) == rational{1}));
         REQUIRE((pow(1, rational{-3, 4}) == rational{1}));
+
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(pow(rational{2, 3}, __int128_t{2}) == rational{4, 9});
+        REQUIRE(pow(rational{2, 3}, __uint128_t{2}) == rational{4, 9});
+        REQUIRE(pow(__int128_t{2}, rational{3}) == 8);
+        REQUIRE(pow(__uint128_t{2}, rational{3}) == 8);
+#endif
     }
 };
 
