@@ -177,9 +177,9 @@ In this setup, the vectors are initialised with both positive *and* negative val
    :scale: 50%
    :align: center
 
-Here we can see FLINT pulling ahead of mp++. Thanks to the way
-small signed integers are represented in FLINT, branching based on the signs
-of the operands can be avoided. Coupled to the fact that there's no need to do overflow checking during division,
+Here we can see FLINT pulling ahead of mp++. FLINT uses a signed integer representation for small values
+that allows to avoid branching based on the signs of the operands.
+Coupled to the fact that there's no need to do overflow checking during division,
 FLINT's implementation has a distinct performance advantage in this specific test.
 
 .. _integer2_vec_div_unsigned:

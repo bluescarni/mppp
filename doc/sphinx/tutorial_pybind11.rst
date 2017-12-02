@@ -1,7 +1,7 @@
 .. _tutorial_pybind11:
 
-Integration with pybind11
-=========================
+Extra: integration with pybind11
+================================
 
 .. warning::
 
