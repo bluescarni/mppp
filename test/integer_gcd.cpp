@@ -38,6 +38,8 @@ struct gcd_tester {
         // Start with zeroes.
         mpz_raii m1, m2, m3;
         integer n1, n2, n3;
+        REQUIRE(gcd(n2, n3) == 0);
+        REQUIRE(gcd(n1, n2, n3) == 0);
         ::mpz_set_si(&m3.m_mpz, 1);
         n3 = integer(1);
         ::mpz_gcd(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
