@@ -117,8 +117,8 @@ Including mp++ in your project via CMake
 As a part of the mp++ installation, a group of CMake files is installed into ``CMAKE_INSTALL_PREFIX/lib/cmake/mp++``.
 This bundle, which is known in the CMake lingo as a `config-file package <https://cmake.org/cmake/help/v3.3/manual/cmake-packages.7.html>`__,
 facilitates the detection and use of mp++ from other CMake-based projects. mp++'s config-file package, once loaded, provides
-an imported target called ``Mp++::mp++`` which encapsulate all the information necessary to use mp++. That is, linking to
-``Mp++::mp++`` ensures that mp++'s include directories are added to the include path of the compiler, and that the libraries
+an imported target called ``mp++::mp++`` which encapsulates all the information necessary to use mp++. That is, linking to
+``mp++::mp++`` ensures that mp++'s include directories are added to the include path of the compiler, and that the libraries
 on which mp++ depends (e.g., GMP) are brought into the link chain.
 
 For instance, a ``CMakeLists.txt`` file for the simple ``main.cpp`` program presented earlier may look like this:
@@ -132,14 +132,14 @@ For instance, a ``CMakeLists.txt`` file for the simple ``main.cpp`` program pres
    project(sample_project)
 
    # Look for an installation of mp++ in the system.
-   find_package(Mp++ REQUIRED)
+   find_package(mp++ REQUIRED)
 
-   # Create an executable, and link it to the Mp++::mp++ imported target.
+   # Create an executable, and link it to the mp++::mp++ imported target.
    # This ensures that, in the compilation of 'main', mp++'s include
    # dirs are added to the include path of the compiler and that mp++'s
    # dependencies (e.g., GMP) are transitively linked to 'main'.
    add_executable(main main.cpp)
-   target_link_libraries(main Mp++::mp++)
+   target_link_libraries(main mp++::mp++)
 
    # This line indicates to your compiler
    # that C++11 is needed for the compilation.
