@@ -5845,7 +5845,7 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
 
 /// GCD (ternary version).
 /**
- * This function will set \p rop to the GCD of \p op1 and \p op2. The result is always positive.
+ * This function will set \p rop to the GCD of \p op1 and \p op2. The result is always nonnegative.
  * If both operands are zero, zero is returned.
  *
  * @param rop the return value.
