@@ -23,6 +23,9 @@
 #include <iostream>
 #include <limits>
 #include <new>
+#if MPPP_CPLUSPLUS >= 201703L
+#include <numeric>
+#endif
 #include <stdexcept>
 #include <string>
 #if MPPP_CPLUSPLUS >= 201703L
@@ -5800,6 +5803,16 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
     if (asize2 < 0) {
         asize2 = -asize2;
     }
+#if MPPP_CPLUSPLUS >= 201703L
+    if (asize1 == 1 && asize2 == 1) {
+        // NOTE: once we have 1/2 limbs specialisations, we could consider taking
+        // this branch for asize <= 1, and set the output size to g != 0 as usual.
+        // We'll need to compare it to a custom binary GCD anyway...
+        rop._mp_size = 1;
+        rop.m_limbs[0] = std::gcd(op1.m_limbs[0] & GMP_NUMB_MASK, op2.m_limbs[0] & GMP_NUMB_MASK);
+        return;
+    }
+#endif
     // Handle zeroes.
     if (!asize1) {
         // NOTE: we want the result to be positive, and to copy only the set limbs.

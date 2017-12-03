@@ -24,6 +24,8 @@ New
 Changes
 ~~~~~~~
 
+- Take advantage of ``std::gcd()`` on C++17 (`#92 <https://github.com/bluescarni/mppp/pull/92>`__).
+
 - Update the benchmark results for :cpp:class:`~mppp::integer` (`#91 <https://github.com/bluescarni/mppp/pull/91>`__).
 
 - Add division benchmarks for :cpp:class:`~mppp::integer` (`#91 <https://github.com/bluescarni/mppp/pull/91>`__).
