@@ -3,7 +3,7 @@
 API overview
 ============
 
-The mp++ API operates on two broad levels:
+Generally speaking, the mp++ API operates on two levels:
 
 * a low-level API closely following the APIs of the multiprecision libraries
   on top of which mp++ is built,
@@ -55,10 +55,9 @@ In this example, we are computing the sum of the integral values held in a vecto
 at each step of the iteration a new temporary :cpp:class:`~mppp::integer` is constructed by the expression ``sum1 + n``, and
 this temporary value is then move-assigned to ``sum1``. When using the ``add()`` function, the creation of the temporary is
 avoided altogether as the result of the addition is written directly into the accumulator ``sum2``. Thus, the first version
-of the loop will necessarily be less efficient than the second one.
-
-In this case, we can recover optimal performance while maintaining a nice syntax by replacing the binary operator with
-an in-place operator:
+of the loop will necessarily be less efficient than the second one. Note that, in this specific case, we can recover optimal
+performance while maintaining a nice syntax by replacing the binary operator with an in-place operator (which will avoid the
+creation of unnecessary temporaries):
 
 .. code-block:: c++
 
@@ -66,8 +65,6 @@ an in-place operator:
    for (const auto &n: v) {
      sum1 += n; // In-place addition operator.
    }
-
-This will avoid the creation of needless temporaries.
 
 Let's see another example:
 
@@ -94,7 +91,32 @@ Here we are computing the GCD of the integers stored in the vector ``v``. mp++ p
   and third parameters.
 
 Like in the previous example, the ternary overload avoids the creation and subsequent assignment of a temporary value, and will thus perform
-more efficiently.
+better. The binary GCD overload, on the other hand, is easier to use (no need to prepare a return value beforehand) and closer
+to a functional style. The presence of binary and ternary overloads for the same functionality is not restricted to :cpp:func:`~mppp::gcd()`,
+but it's a common feature for many of mp++'s binary functions and operators.
+
+For unary functions and operators, there's an additional degree of freedom in the API. Unary functions in mp++ are often provided with the
+following set of overloads:
+
+* an in-place nullary member function,
+* a functional-style unary free function,
+* a GMP-style binary free function.
+
+For a concrete example, let's take a look at different ways of computing the absolute value of an integer:
+
+.. code-block:: c++
+
+   int_t n1{-5};
+   n1.abs();              // In-place nullary member function.
+   assert(n1 == 5);
+
+   int_t n2{-5};
+   auto n2_abs = abs(n2); // Unary free function.
+   assert(n2_abs == 5);
+
+   int_t n3{-5}, n3_abs;
+   abs(n3_abs, n3);       // GMP-style binary free function.
+   assert(n3_abs == 5);
 
 .. rubric:: Footnotes
 
