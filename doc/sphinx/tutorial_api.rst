@@ -5,18 +5,17 @@ API overview
 
 The mp++ API operates on two broad levels:
 
-* a low-level, performance-focused API mimicking the APIs of the multiprecision libraries
+* a low-level API closely following the APIs of the multiprecision libraries
   on top of which mp++ is built,
-* a high-level API focused on consistency and user-friendliness.
+* a higher-level API more focused on consistency and user-friendliness.
 
-The low-level API should be preferred when maximum performance is required, whereas for a more
-"casual" use of the library the high-level API should provide a better user experience with
-adequate performance.
+The intent is to provide users with the flexibility of switching between low-level primitives
+(e.g., when performance is critical) and higher-level, more readable and user-friendly code.
 
 To give an idea of the type of tradeoffs involved in the choice between low-level and high-level
 API, consider the simple task of adding two multiprecision integers ``a`` and ``b``. This can be accomplished
 either via the overloaded binary operator for :cpp:class:`~mppp::integer`, or via the
-lower-level ``add()`` function:
+lower-level ``add()`` primitive:
 
 .. code-block:: c++
 
@@ -25,12 +24,12 @@ lower-level ``add()`` function:
    auto c1 = a + b; // Binary operator.
 
    int_t c2;
-   add(c2, a, b);   // Low-level add() function.
+   add(c2, a, b);   // Low-level add() primitive.
 
    assert(c1 == c2);
 
 Similarly to the ``mpz_add()`` function from the GMP API, mp++'s ``add()`` is a ternary function taking as first
-parameter the return value, and as second and third parameters the operands. Although the end result is identical,
+parameter the return value (by reference), and as second and third parameters the operands. Although the end result is identical,
 there is a fundamental difference in terms of the number of operations performed by the two approaches: the binary
 operator returns a new value, which is then used to move-initialise ``c1`` [#f1]_, while the ``add()`` function writes
 the result of the addition *directly* into an existing value. While, in practice, the difference might not
@@ -69,6 +68,33 @@ an in-place operator:
    }
 
 This will avoid the creation of needless temporaries.
+
+Let's see another example:
+
+.. code-block:: c++
+
+   std::vector<int_t> v = {...};
+
+   int_t gcd1;
+   for (const auto &n: v) {
+     gcd1 = gcd(gcd1, n); // Binary gcd() function.
+   }
+
+   int_t gcd2;
+   for (const auto &n: v) {
+     gcd(gcd2, gcd2, n);  // Ternary gcd() function.
+   }
+
+   assert(gcd1 == gcd2);
+
+Here we are computing the GCD of the integers stored in the vector ``v``. mp++ provides two overloads for the :cpp:func:`~mppp::gcd()` function:
+
+* a binary overload, taking as input the two operands, and returning their GCD,
+* a ternary overload, taking the return value as first parameter and the two operands as second
+  and third parameters.
+
+Like in the previous example, the ternary overload avoids the creation and subsequent assignment of a temporary value, and will thus perform
+more efficiently.
 
 .. rubric:: Footnotes
 
