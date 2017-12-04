@@ -99,10 +99,10 @@ For unary functions and operators, there's an additional degree of freedom in th
 following set of overloads:
 
 * an in-place nullary member function,
-* a functional-style unary free function,
-* a GMP-style binary free function.
+* a functional-style unary function,
+* a GMP-style binary function.
 
-For a concrete example, let's take a look at different ways of computing the absolute value of an integer:
+As a concrete example, let's take a look at different ways of computing the absolute value of an integer:
 
 .. code-block:: c++
 
@@ -111,12 +111,16 @@ For a concrete example, let's take a look at different ways of computing the abs
    assert(n1 == 5);
 
    int_t n2{-5};
-   auto n2_abs = abs(n2); // Unary free function.
+   auto n2_abs = abs(n2); // Unary function.
    assert(n2_abs == 5);
 
    int_t n3{-5}, n3_abs;
-   abs(n3_abs, n3);       // GMP-style binary free function.
+   abs(n3_abs, n3);       // GMP-style binary function.
    assert(n3_abs == 5);
+
+The :cpp:func:`mppp::integer::abs()` member function computes and stores the absolute value directly into the calling object.
+The unary function (much like ``std::abs()``) takes as input an integer and returns its absolute value. The GMP-style
+binary ``abs()`` function stores into the first argument the absolute value of the second argument.
 
 .. rubric:: Footnotes
 
