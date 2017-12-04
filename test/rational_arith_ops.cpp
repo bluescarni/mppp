@@ -896,3 +896,34 @@ TEST_CASE("rel")
 {
     tuple_for_each(sizes{}, rel_tester{});
 }
+
+struct incdec_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using rational = rational<S::value>;
+        rational q;
+        REQUIRE(++q == 1);
+        REQUIRE(q++ == 1);
+        REQUIRE(q == 2);
+        REQUIRE(--q == 1);
+        REQUIRE(q-- == 1);
+        REQUIRE(q == 0);
+        REQUIRE(--q == -1);
+        q = rational{-23, 7};
+        REQUIRE(++q == rational{-16, 7});
+        REQUIRE(q++ == rational{-16, 7});
+        REQUIRE(++q == rational{-2, 7});
+        REQUIRE(++q == rational{5, 7});
+        REQUIRE(--q == rational{-2, 7});
+        REQUIRE(--q == rational{-9, 7});
+        REQUIRE(--q == rational{-16, 7});
+        REQUIRE(q-- == rational{-16, 7});
+        REQUIRE(q == rational{-23, 7});
+    }
+};
+
+TEST_CASE("incdec")
+{
+    tuple_for_each(sizes{}, incdec_tester{});
+}
