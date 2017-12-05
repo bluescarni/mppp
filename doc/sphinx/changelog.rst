@@ -9,7 +9,7 @@ New
 
 - Implement additional ``get()`` conversion functions for :cpp:class:`~mppp::real128` (`#96 <https://github.com/bluescarni/mppp/pull/96>`__).
 
-- Implement increment and decrement operators for :cpp:class:`~mppp::rational` (`#95 <https://github.com/bluescarni/mppp/pull/95>`__).
+- Implement the increment and decrement operators for :cpp:class:`~mppp::rational` (`#95 <https://github.com/bluescarni/mppp/pull/95>`__).
 
 - Implement support for ``__int128_t`` and ``__uint128_t`` (`#90 <https://github.com/bluescarni/mppp/pull/90>`__).
 
@@ -27,6 +27,8 @@ New
 
 Changes
 ~~~~~~~
+
+- Various additions to the tutorial (`#97 <https://github.com/bluescarni/mppp/pull/97>`__).
 
 - **BREAKING**: the imported target created by the installation process has been renamed from ``Mp++`` to ``mp++``
   (`#94 <https://github.com/bluescarni/mppp/pull/94>`__).
@@ -53,6 +55,8 @@ Changes
 
 Fix
 ~~~
+
+- Fix :cpp:class:`~mppp::integer` warnings in release mode (`#97 <https://github.com/bluescarni/mppp/pull/97>`__).
 
 - Various internal cleanups in :cpp:class:`~mppp::integer` (`#80 <https://github.com/bluescarni/mppp/pull/80>`__,
   `#85 <https://github.com/bluescarni/mppp/pull/85>`__, `#86 <https://github.com/bluescarni/mppp/pull/86>`__).

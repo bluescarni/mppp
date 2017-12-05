@@ -8,7 +8,7 @@
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mppp/badges/version.svg)](https://anaconda.org/conda-forge/mppp)
 [![DOI](https://zenodo.org/badge/66504757.svg)](https://doi.org/10.5281/zenodo.1043579)
 
-mp++ is a C++11 header-only library for multiprecision arithmetic, currently supporting arbitrary-precision integers,
+mp++ is a C++11 library for multiprecision arithmetic, currently supporting arbitrary-precision integers,
 rationals and floats, and quadruple-precision floats.
 
 Based on well-known libraries such as [GMP](http://www.gmplib.org), [MPFR](http://www.mpfr.org), and others,

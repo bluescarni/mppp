@@ -2861,6 +2861,8 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 1> &)
 {
+    (void)asize1;
+    (void)asize2;
     auto rdata = rop.m_limbs.data();
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
     // NOTE: both asizes have to be 0 or 1 here.
