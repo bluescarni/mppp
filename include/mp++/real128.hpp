@@ -729,6 +729,36 @@ public:
         }
         return retval;
     }
+        /// Conversion method to interoperable C++ types.
+        /**
+         * \rststar
+         * This method will cast the :cpp:member:`~mppp::real128::m_value` member to the
+         * :cpp:concept:`~mppp::Real128CppInteroperable` type T, and assign the result
+         * to ``rop``.
+         *
+         * .. note::
+         *    This method is provided for consistency with other getter methods,
+         *    and it does not offer any additional functionality over the plain
+         *    conversion operator.
+         *
+         * .. note::
+         *
+         *   This method is marked as ``constexpr`` only if at least C++14 is being used.
+         * \endrststar
+         *
+         * @param rop the variable which will store the result of the conversion.
+         *
+         * @return always ``true``.
+         */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <Real128CppInteroperable T>
+#else
+    template <typename T, real128_cpp_interoperable_enabler<T> = 0>
+#endif
+    MPPP_CONSTEXPR_14 bool get(T &rop) const
+    {
+        return rop = static_cast<T>(m_value), true;
+    }
         /// Conversion method to mp++ types.
         /**
          * \rststar
@@ -979,6 +1009,38 @@ public:
 /** @defgroup real128_conversion real128_conversion
  *  @{
  */
+
+/// Conversion function to C++ types for \link mppp::real128 real128\endlink.
+/**
+ * \rststar
+ * This function will convert the input :cpp:class:`~mppp::real128` ``x`` to a
+ * :cpp:concept:`~mppp::Real128CppInteroperable` type, storing the result of the conversion into ``rop``.
+ * The conversion is always successful.
+ *
+ * .. note::
+ *    This function is provided for consistency with other getter functions,
+ *    and it does not offer any additional functionality over the plain
+ *    conversion operator.
+ *
+ * .. note::
+ *
+ *   This function is marked as ``constexpr`` only if at least C++14 is being used.
+ * \endrststar
+ *
+ * @param rop the variable which will store the result of the conversion.
+ * @param x the input \link mppp::real128 real128\endlink.
+ *
+ * @return always ``true``.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline MPPP_CONSTEXPR_14 bool get(Real128CppInteroperable &rop, const real128 &x)
+#else
+template <typename T, real128_cpp_interoperable_enabler<T> = 0>
+inline MPPP_CONSTEXPR_14 bool get(T &rop, const real128 &x)
+#endif
+{
+    return x.get(rop);
+}
 
 /// Conversion function to mp++ types for \link mppp::real128 real128\endlink.
 /**
