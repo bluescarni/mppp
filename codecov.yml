@@ -1,6 +1,6 @@
 coverage:
   ignore:
-  - "test/.*"
+  - "test/**/*"
   - "include/mp.*/extra"
 
 comment: off
