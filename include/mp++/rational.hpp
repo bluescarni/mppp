@@ -281,6 +281,8 @@ private:
         MPPP_MAYBE_TLS mpq_raii mpq;
         // NOTE: we go through an mpfr->mpf->mpq conversion chain as
         // mpfr_get_q() does not exist.
+        // NOTE: probably coming in MPFR 4:
+        // https://lists.gforge.inria.fr/pipermail/mpfr-commits/2017-June/011186.html
         ::mpfr_set_ld(&mpfr.m_mpfr, x, MPFR_RNDN);
         ::mpfr_get_f(&mpf.m_mpf, &mpfr.m_mpfr, MPFR_RNDN);
         ::mpq_set_f(&mpq.m_mpq, &mpf.m_mpf);
@@ -294,17 +296,17 @@ private:
     }
 
 public:
-/// Generic constructor.
-/**
- * \rststar
- * This constructor will initialize a rational with the value ``x``. The construction will fail if ``x``
- * is a non-finite floating-point value.
- * \endrststar
- *
- * @param x the value that will be used to initialize \p this.
- *
- * @throws std::domain_error if \p x is a non-finite floating-point value.
- */
+    /// Generic constructor.
+    /**
+     * \rststar
+     * This constructor will initialize a rational with the value ``x``. The construction will fail if ``x``
+     * is a non-finite floating-point value.
+     * \endrststar
+     *
+     * @param x the value that will be used to initialize \p this.
+     *
+     * @throws std::domain_error if \p x is a non-finite floating-point value.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     explicit rational(RationalCvrInteroperable<SSize> &&x)
 #else
@@ -1808,6 +1810,37 @@ inline T &operator+=(T &rop, const U &op)
     return rop;
 }
 
+/// Prefix increment for \link mppp::rational rational\endlink.
+/**
+ * This operator will increment \p q by one.
+ *
+ * @param q the \link mppp::rational rational\endlink that will be increased.
+ *
+ * @return a reference to \p q after the increment.
+ */
+template <std::size_t SSize>
+inline rational<SSize> &operator++(rational<SSize> &q)
+{
+    add(q._get_num(), q._get_num(), q.get_den());
+    return q;
+}
+
+/// Suffix increment for \link mppp::rational rational\endlink.
+/**
+ * This operator will increment \p q by one and return a copy of \p q as it was before the increment.
+ *
+ * @param q the \link mppp::rational rational\endlink that will be increased.
+ *
+ * @return a copy of \p q before the increment.
+ */
+template <std::size_t SSize>
+inline rational<SSize> operator++(rational<SSize> &q, int)
+{
+    auto retval(q);
+    ++q;
+    return retval;
+}
+
 /// Negated copy.
 /**
  * @param q the rational that will be negated.
@@ -1963,6 +1996,37 @@ inline T &operator-=(T &rop, const U &op)
 {
     dispatch_in_place_sub(rop, op);
     return rop;
+}
+
+/// Prefix decrement for \link mppp::rational rational\endlink.
+/**
+ * This operator will decrement \p q by one.
+ *
+ * @param q the \link mppp::rational rational\endlink that will be decreased.
+ *
+ * @return a reference to \p q after the decrement.
+ */
+template <std::size_t SSize>
+inline rational<SSize> &operator--(rational<SSize> &q)
+{
+    sub(q._get_num(), q._get_num(), q.get_den());
+    return q;
+}
+
+/// Suffix decrement for \link mppp::rational rational\endlink.
+/**
+ * This operator will decrement \p q by one and return a copy of \p q as it was before the decrement.
+ *
+ * @param q the \link mppp::rational rational\endlink that will be decreased.
+ *
+ * @return a copy of \p q before the decrement.
+ */
+template <std::size_t SSize>
+inline rational<SSize> operator--(rational<SSize> &q, int)
+{
+    auto retval(q);
+    --q;
+    return retval;
 }
 
 inline namespace detail

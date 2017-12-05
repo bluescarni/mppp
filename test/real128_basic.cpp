@@ -20,6 +20,7 @@
 
 #include <cstdint>
 #include <gmp.h>
+#include <limits>
 #include <quadmath.h>
 #include <random>
 #include <stdexcept>
@@ -414,6 +415,33 @@ TEST_CASE("real128 conversions")
     REQUIRE(real128{"-3.40917866435610111081769936359662259e-4957"}.get(rrop));
     REQUIRE(get(rrop, real128{"-3.40917866435610111081769936359662259e-4957"}));
     REQUIRE((rrop == rat_t{-32135, int_t{1} << 16480ul}));
+    // Small tests for getters with C++ rop.
+    int int_rop;
+    REQUIRE(real128{123}.get(int_rop));
+    REQUIRE(int_rop == 123);
+    REQUIRE(get(int_rop, real128{-123}));
+    REQUIRE(int_rop == -123);
+    REQUIRE(real128{123.456}.get(int_rop));
+    REQUIRE(int_rop == 123);
+    REQUIRE(get(int_rop, real128{-123.456}));
+    REQUIRE(int_rop == -123);
+    if (std::numeric_limits<double>::radix == 2) {
+        double d_rop;
+        REQUIRE(real128{123.456}.get(d_rop));
+        REQUIRE(d_rop == 123.456);
+        REQUIRE(get(d_rop, real128{-123.456}));
+        REQUIRE(d_rop == -123.456);
+    }
+#if defined(MPPP_HAVE_GCC_INT128)
+    __int128_t n128_rop;
+    REQUIRE(real128{123.456}.get(n128_rop));
+    REQUIRE(n128_rop == 123);
+    REQUIRE(get(n128_rop, real128{-123.456}));
+    REQUIRE(n128_rop == -123);
+    __uint128_t un128_rop;
+    REQUIRE(real128{123.456}.get(un128_rop));
+    REQUIRE(un128_rop == 123);
+#endif
 }
 
 TEST_CASE("real128 frexp")
