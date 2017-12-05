@@ -119,4 +119,23 @@ mp++'s multiprecision classes:
 
    rat_t q{1, 2};
    assert(+q == q);
-   assert(-q = rat_t{-1, 2});
+   assert(-q == rat_t{-1, 2});
+
+In addition to the common arithmetic operators, all of mp++'s multiprecision classes support the relational
+operators :math:`=`, :math:`\neq`, :math:`>`, :math:`\geq`, :math:`<` and :math:`\leq`. Any combination
+of multiprecision and numerical C++ types is supported:
+
+.. code-block:: c++
+
+   assert(int_t{42} == 42);
+   assert(3 != rat_t{1, 3});
+   assert(0.9 < int_t{1});
+   assert(real128{15} <= int_t{15});
+   assert(real{"inf"} > rat_t{123, 456});
+   assert(int_t{4} >= rat_t{16, 4});
+
+The comparison operators treat NaN values in the standard way: comparing NaN to any other value returns always
+``false``, apart from the :math:`\neq` operator which always returns ``true`` when NaN is involved. For the floating-point multiprecision
+classes, custom comparison functions with special NaN handling are also available (e.g., :cpp:func:`~mppp::real_lt()`,
+:cpp:func:`~mppp::real128_equal_to()`, etc.). These functions can be used as replacements for the comparison operators
+in facilities of the standard library such as ``std::sort()``, ``std::set``, etc.
