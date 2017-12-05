@@ -9,7 +9,9 @@ New
 
 - Implement additional ``get()`` conversion functions for :cpp:class:`~mppp::real128` (`#96 <https://github.com/bluescarni/mppp/pull/96>`__).
 
-- Implement support for ``__int128_t``/``__uint128_t`` (`#90 <https://github.com/bluescarni/mppp/pull/90>`__).
+- Implement increment and decrement operators for :cpp:class:`~mppp::rational` (`#95 <https://github.com/bluescarni/mppp/pull/95>`__).
+
+- Implement support for ``__int128_t`` and ``__uint128_t`` (`#90 <https://github.com/bluescarni/mppp/pull/90>`__).
 
 - Implement the bitwise logic operators for :cpp:class:`~mppp::integer` (`#86 <https://github.com/bluescarni/mppp/pull/86>`__).
 
