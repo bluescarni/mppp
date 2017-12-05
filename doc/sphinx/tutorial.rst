@@ -16,4 +16,9 @@ on to the full :ref:`C++ reference <reference>`.
    tutorial_numtower.rst
    tutorial_commonops.rst
    tutorial_api.rst
+   tutorial_integer.rst
+   tutorial_rational.rst
+   tutorial_real128.rst
+   tutorial_real.rst
+   tutorial_lib_interface.rst
    tutorial_pybind11.rst
