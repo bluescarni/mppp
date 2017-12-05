@@ -1,11 +1,13 @@
+.. _tutorial_numtower:
+
 The numerical tower and type coercion
 =====================================
 
-Before proceeding to show how mp++'s classes can be used to perform actual computations,
-it is useful to introduce the hierarchy on top of which mp++'s type coercion
+Before proceeding to show how mp++'s classes can be used to perform arithmetic computations,
+it is useful to introduce first the hierarchy on top of which mp++'s type coercion
 is built.
 
-In a broad sense, mp++'s aims to extend C++'s type hierarchy with multiprecision
+In a broad sense, mp++ aims to extend C++'s type hierarchy with multiprecision
 numerical types. In C++, when numerical operands of different types are involved
 in an arithmetic operation, all operands are converted (or *coerced*) into a
 common type determined from the types of the operands. The converted operands

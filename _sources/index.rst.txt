@@ -6,7 +6,7 @@
 Welcome to mp++'s documentation!
 ================================
 
-mp++ is a C++11 header-only library for multiprecision arithmetic, currently supporting arbitrary-precision integers,
+mp++ is a C++11 library for multiprecision arithmetic, currently supporting arbitrary-precision integers,
 rationals and floats, and quadruple-precision floats.
 
 Based on well-known libraries such as `GMP <http://www.gmplib.org>`__, `MPFR <http://www.mpfr.org>`__, and others,

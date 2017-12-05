@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Common operators &#8212; mp++ 0.6 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API overview" href="tutorial_api.html" />
+    <link rel="prev" title="The numerical tower and type coercion" href="tutorial_numtower.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          mp++</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.6</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Common operators</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="tutorial_numtower.html" title="Previous Chapter: The numerical tower and type coercion"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; The numerical...</span>
+    </a>
+  </li>
+  <li>
+    <a href="tutorial_api.html" title="Next Chapter: API overview"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">API overview &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/tutorial_commonops.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="common-operators">
+<span id="tutorial-commonops"></span><h1>Common operators<a class="headerlink" href="#common-operators" title="Permalink to this headline">¶</a></h1>
+<p>After having explained how mp++’s <a class="reference internal" href="tutorial_numtower.html#tutorial-numtower"><span class="std std-ref">type coercion</span></a> works, we can now move on to
+describe how mp++’s classes can be used to perform mathematical computations.</p>
+<p>All of mp++’s multiprecision classes support the four basic arithmetic operations (<span class="math">\(+\)</span>, <span class="math">\(-\)</span>,
+<span class="math">\(\times\)</span> and <span class="math">\(\div\)</span>) via overloaded binary operators:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">r1</span> <span class="o">=</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">4</span><span class="p">}</span> <span class="o">+</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">3</span><span class="p">};</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r1</span> <span class="o">==</span> <span class="mi">7</span><span class="p">);</span>
+
+<span class="k">auto</span> <span class="n">r2</span> <span class="o">=</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">}</span> <span class="o">-</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r2</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">});</span>
+
+<span class="k">auto</span> <span class="n">r3</span> <span class="o">=</span> <span class="n">real128</span><span class="p">{</span><span class="mi">5</span><span class="p">}</span> <span class="o">*</span> <span class="n">real128</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r3</span> <span class="o">==</span> <span class="mf">10.</span><span class="p">);</span>
+
+<span class="k">auto</span> <span class="n">r4</span> <span class="o">=</span> <span class="n">real</span><span class="p">{</span><span class="mi">5</span><span class="p">}</span> <span class="o">/</span> <span class="n">real</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r4</span> <span class="o">==</span> <span class="mf">2.5</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>It is of course possible to mix operands of different types, and the type of the result will be determined
+by the <a class="reference internal" href="tutorial_numtower.html#tutorial-numtower"><span class="std std-ref">type coercion rules</span></a> explained earlier:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">r1</span> <span class="o">=</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">4</span><span class="p">}</span> <span class="o">+</span> <span class="mi">3</span><span class="p">;</span>        <span class="c1">// r1 will be of type int_t.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r1</span> <span class="o">==</span> <span class="mi">7</span><span class="p">);</span>
+
+<span class="k">auto</span> <span class="n">r2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.75</span> <span class="o">+</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span> <span class="c1">// r2 will be of type double.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r2</span> <span class="o">==</span> <span class="o">-</span><span class="mf">.25</span><span class="p">);</span>
+
+<span class="k">auto</span> <span class="n">r3</span> <span class="o">=</span> <span class="n">real128</span><span class="p">{</span><span class="mi">5</span><span class="p">}</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>      <span class="c1">// r3 will be of type real128.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r3</span> <span class="o">==</span> <span class="mf">10.</span><span class="p">);</span>
+
+<span class="k">auto</span> <span class="n">r4</span> <span class="o">=</span> <span class="n">real</span><span class="p">{</span><span class="mi">5</span><span class="p">}</span> <span class="o">/</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>  <span class="c1">// r4 will be of type real.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r4</span> <span class="o">==</span> <span class="mf">2.5</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The behaviour of the division operator varies depending on the types involved. If only
+integral types are involved, division truncates, and division by zero throws
+a <a class="reference internal" href="exceptions.html#_CPPv2N4mppp19zero_division_errorE" title="mppp::zero_division_error"><code class="xref cpp cpp-class docutils literal"><span class="pre">zero_division_error</span></code></a> exception:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">r1</span> <span class="o">=</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">5</span><span class="p">}</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// Integral division truncates.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r1</span> <span class="o">==</span> <span class="mi">2</span><span class="p">);</span>
+
+<span class="n">int_t</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">/</span> <span class="mi">0</span><span class="p">;</span>           <span class="c1">// This will throw a zero_division_error exception.</span>
+</pre></div>
+</div>
+<p>If floating-point types are involved, division by zero is allowed and results in infinity:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">r1</span> <span class="o">=</span> <span class="n">real128</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">/</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// Floating-point division by zero generates an infinity.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">isinf</span><span class="p">(</span><span class="n">r1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Rational division is always exact, unless the divisor is zero:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="n">r1</span> <span class="o">=</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">3</span><span class="p">}</span> <span class="o">/</span> <span class="mi">4</span><span class="p">;</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r1</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">});</span>
+
+<span class="n">rat_t</span><span class="p">{</span><span class="mi">2</span><span class="p">}</span> <span class="o">/</span> <span class="mi">0</span><span class="p">;</span>              <span class="c1">// This will throw a zero_division_error exception.</span>
+</pre></div>
+</div>
+<p>The in-place versions of the binary operators are available as well. Given a binary operator, its
+corresponding in-place counterpart behaves as a binary operation followed by assignment:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">r1</span><span class="p">{</span><span class="mi">4</span><span class="p">};</span>
+<span class="n">r1</span> <span class="o">+=</span> <span class="mi">5</span><span class="p">;</span>                    <span class="c1">// Equivalent to: r1 = r1 + 5</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r1</span> <span class="o">==</span> <span class="mi">9</span><span class="p">);</span>
+
+<span class="n">rat_t</span> <span class="n">r2</span><span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">};</span>
+<span class="n">r2</span> <span class="o">-=</span> <span class="mf">1.5</span><span class="p">;</span>                  <span class="c1">// Equivalent to: r2 = r2 - 1.5</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r2</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">});</span>
+
+<span class="n">real128</span> <span class="n">r3</span><span class="p">{</span><span class="mi">5</span><span class="p">};</span>
+<span class="n">r3</span> <span class="o">*=</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>          <span class="c1">// Equivalent to: r3 = r3 * rat_t{1, 2}</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r3</span> <span class="o">==</span> <span class="mf">2.5</span><span class="p">);</span>
+
+<span class="n">real</span> <span class="n">r4</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span>
+<span class="n">r4</span> <span class="o">/=</span> <span class="n">real128</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>           <span class="c1">// Equivalent to: r4 = r4 / real128{0}</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">isinf</span><span class="p">(</span><span class="n">r4</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>It is also possible to use fundamental C++ types on the left-hand side of in-place operators:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="n">n</span> <span class="o">+=</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">5</span><span class="p">};</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">10</span><span class="p">);</span>
+
+<span class="n">n</span> <span class="o">-=</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">}</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">9</span><span class="p">);</span>
+
+<span class="kt">double</span> <span class="n">x</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">;</span>
+<span class="n">x</span> <span class="o">*=</span> <span class="n">real128</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="mf">3.</span><span class="p">);</span>
+
+<span class="n">x</span> <span class="o">/=</span> <span class="n">real</span><span class="p">{</span><span class="mi">3</span><span class="p">};</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="mf">1.</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The identity, negation, pre/post increment/decrement operators are also supported for all of
+mp++’s multiprecision classes:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">;</span>
+<span class="n">assert</span><span class="p">(</span><span class="o">++</span><span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">n</span><span class="o">++</span><span class="p">;</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="o">--</span><span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">n</span><span class="o">--</span><span class="p">;</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span>
+
+<span class="n">rat_t</span> <span class="n">q</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span>
+<span class="n">assert</span><span class="p">(</span><span class="o">+</span><span class="n">q</span> <span class="o">==</span> <span class="n">q</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="o">-</span><span class="n">q</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>In addition to the common arithmetic operators, all of mp++’s multiprecision classes support the relational
+operators <span class="math">\(=\)</span>, <span class="math">\(\neq\)</span>, <span class="math">\(&gt;\)</span>, <span class="math">\(\geq\)</span>, <span class="math">\(&lt;\)</span> and <span class="math">\(\leq\)</span>. Any combination
+of multiprecision and numerical C++ types is supported:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">}</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="mi">3</span> <span class="o">!=</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">});</span>
+<span class="n">assert</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">&lt;</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">1</span><span class="p">});</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">real128</span><span class="p">{</span><span class="mi">15</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">15</span><span class="p">});</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;inf&quot;</span><span class="p">}</span> <span class="o">&gt;</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">123</span><span class="p">,</span> <span class="mi">456</span><span class="p">});</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">int_t</span><span class="p">{</span><span class="mi">4</span><span class="p">}</span> <span class="o">&gt;=</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>The comparison operators treat NaN values in the standard way: comparing NaN to any other value returns always
+<code class="docutils literal"><span class="pre">false</span></code>, apart from the <span class="math">\(\neq\)</span> operator which always returns <code class="docutils literal"><span class="pre">true</span></code> when NaN is involved. For the floating-point multiprecision
+classes, custom comparison functions with special NaN handling are also available (e.g., <a class="reference internal" href="real.html#_CPPv2N4mppp7real_ltERK4realRK4real" title="mppp::real_lt"><code class="xref cpp cpp-func docutils literal"><span class="pre">real_lt()</span></code></a>,
+<a class="reference internal" href="real128.html#_CPPv2N4mppp16real128_equal_toERK7real128RK7real128" title="mppp::real128_equal_to"><code class="xref cpp cpp-func docutils literal"><span class="pre">real128_equal_to()</span></code></a>, etc.). These functions can be used as replacements for the comparison operators
+in facilities of the standard library such as <code class="docutils literal"><span class="pre">std::sort()</span></code>, <code class="docutils literal"><span class="pre">std::set</span></code>, etc.</p>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

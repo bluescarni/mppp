@@ -164,7 +164,7 @@
 <h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Implement additional <code class="docutils literal"><span class="pre">get()</span></code> conversion functions for <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/96">#96</a>).</li>
-<li>Implement increment and decrement operators for <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/95">#95</a>).</li>
+<li>Implement the increment and decrement operators for <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/95">#95</a>).</li>
 <li>Implement support for <code class="docutils literal"><span class="pre">__int128_t</span></code> and <code class="docutils literal"><span class="pre">__uint128_t</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/90">#90</a>).</li>
 <li>Implement the bitwise logic operators for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/86">#86</a>).</li>
 <li>Initial implementation of the <a class="reference internal" href="tutorial_pybind11.html#tutorial-pybind11"><span class="std std-ref">pybind11 integration utilities</span></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/81">#81</a>).</li>
@@ -177,6 +177,7 @@
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Various additions to the tutorial (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/97">#97</a>).</li>
 <li><strong>BREAKING</strong>: the imported target created by the installation process has been renamed from <code class="docutils literal"><span class="pre">Mp++</span></code> to <code class="docutils literal"><span class="pre">mp++</span></code>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/94">#94</a>).</li>
 <li>Take advantage of <code class="docutils literal"><span class="pre">std::gcd()</span></code> on C++17 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/93">#93</a>).</li>
@@ -194,6 +195,7 @@
 <div class="section" id="fix">
 <h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Fix <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> warnings in release mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/97">#97</a>).</li>
 <li>Various internal cleanups in <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/80">#80</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/85">#85</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/86">#86</a>).</li>
 <li>Small fixes regarding the use of GMP type aliases in <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/73">#73</a>).</li>

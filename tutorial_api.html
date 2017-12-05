@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>API overview &#8212; mp++ 0.6 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Integer tutorial" href="tutorial_integer.html" />
+    <link rel="prev" title="Common operators" href="tutorial_commonops.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          mp++</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.6</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">API overview</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="tutorial_commonops.html" title="Previous Chapter: Common operators"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Common operators</span>
+    </a>
+  </li>
+  <li>
+    <a href="tutorial_integer.html" title="Next Chapter: Integer tutorial"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Integer tutorial &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/tutorial_api.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="api-overview">
+<span id="tutorial-api"></span><h1>API overview<a class="headerlink" href="#api-overview" title="Permalink to this headline">¶</a></h1>
+<p>In addition to the <a class="reference internal" href="tutorial_commonops.html#tutorial-commonops"><span class="std std-ref">common arithmetical and relational operators</span></a> introduced
+earlier, mp++’s API provides a rich set of functions.
+Generally speaking, the mp++ API operates on two levels:</p>
+<ul class="simple">
+<li>a low-level API closely following the APIs of the multiprecision libraries
+on top of which mp++ is built,</li>
+<li>a higher-level API more focused on consistency and user-friendliness.</li>
+</ul>
+<p>The intent is to provide users with the flexibility of switching between low-level primitives
+(e.g., when performance is critical) and higher-level, more readable and user-friendly code.</p>
+<p>To give an idea of the type of tradeoffs involved in the choice between low-level and high-level
+API, consider the simple task of adding two multiprecision integers <code class="docutils literal"><span class="pre">a</span></code> and <code class="docutils literal"><span class="pre">b</span></code>. This can be accomplished
+either via the overloaded binary operator for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> (as seen in the previous section), or via the
+lower-level <code class="docutils literal"><span class="pre">add()</span></code> primitive:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">2</span><span class="p">},</span> <span class="n">b</span><span class="p">{</span><span class="mi">4</span><span class="p">};</span>
+
+<span class="k">auto</span> <span class="n">c1</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span> <span class="c1">// Binary operator.</span>
+
+<span class="n">int_t</span> <span class="n">c2</span><span class="p">;</span>
+<span class="n">add</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>   <span class="c1">// Low-level add() primitive.</span>
+
+<span class="n">assert</span><span class="p">(</span><span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Similarly to the <code class="docutils literal"><span class="pre">mpz_add()</span></code> function from the GMP API, mp++’s <code class="docutils literal"><span class="pre">add()</span></code> is a ternary function taking as first
+parameter the return value (by reference), and as second and third parameters the operands. Although the end result is identical,
+there is a fundamental difference in terms of the number of operations performed by the two approaches: the binary
+operator returns a new value, which is then used to move-initialise <code class="docutils literal"><span class="pre">c1</span></code> <a class="footnote-reference" href="#f1" id="id1">[1]</a>, while the <code class="docutils literal"><span class="pre">add()</span></code> function writes
+the result of the addition <em>directly</em> into an existing value. While, in practice, the difference might not
+matter in the simple example above, it will start to matter in less trivial cases:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int_t</span><span class="o">&gt;</span> <span class="n">v</span> <span class="o">=</span> <span class="p">{...};</span>
+
+<span class="n">int_t</span> <span class="n">sum1</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">sum1</span> <span class="o">=</span> <span class="n">sum1</span> <span class="o">+</span> <span class="n">n</span><span class="p">;</span>    <span class="c1">// Binary operator.</span>
+<span class="p">}</span>
+
+<span class="n">int_t</span> <span class="n">sum2</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">add</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="n">sum2</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span> <span class="c1">// Low-level add() function.</span>
+<span class="p">}</span>
+
+<span class="n">assert</span><span class="p">(</span><span class="n">sum1</span> <span class="o">==</span> <span class="n">sum2</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In this example, we are computing the sum of the integral values held in a vector <code class="docutils literal"><span class="pre">v</span></code>. When using the binary operator,
+at each step of the iteration a new temporary <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> is constructed by the expression <code class="docutils literal"><span class="pre">sum1</span> <span class="pre">+</span> <span class="pre">n</span></code>, and
+this temporary value is then move-assigned to <code class="docutils literal"><span class="pre">sum1</span></code>. When using the <code class="docutils literal"><span class="pre">add()</span></code> function, the creation of the temporary is
+avoided altogether as the result of the addition is written directly into the accumulator <code class="docutils literal"><span class="pre">sum2</span></code>. Thus, the first version
+of the loop will necessarily be less efficient than the second one. Note that, in this specific case, we can recover optimal
+performance while maintaining a nice syntax by replacing the binary operator with an in-place operator (which will avoid the
+creation of unnecessary temporaries):</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">sum1</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">sum1</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span> <span class="c1">// In-place addition operator.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Let’s see another example:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">int_t</span><span class="o">&gt;</span> <span class="n">v</span> <span class="o">=</span> <span class="p">{...};</span>
+
+<span class="n">int_t</span> <span class="n">gcd1</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">gcd1</span> <span class="o">=</span> <span class="n">gcd</span><span class="p">(</span><span class="n">gcd1</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span> <span class="c1">// Binary gcd() function.</span>
+<span class="p">}</span>
+
+<span class="n">int_t</span> <span class="n">gcd2</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="k">auto</span> <span class="o">&amp;</span><span class="nl">n</span><span class="p">:</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">gcd</span><span class="p">(</span><span class="n">gcd2</span><span class="p">,</span> <span class="n">gcd2</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>  <span class="c1">// Ternary gcd() function.</span>
+<span class="p">}</span>
+
+<span class="n">assert</span><span class="p">(</span><span class="n">gcd1</span> <span class="o">==</span> <span class="n">gcd2</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Here we are computing the GCD of the integers stored in the vector <code class="docutils literal"><span class="pre">v</span></code>. mp++ provides two overloads for the <a class="reference internal" href="integer.html#_CPPv2N4mppp3gcdER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::gcd"><code class="xref cpp cpp-func docutils literal"><span class="pre">gcd()</span></code></a> function:</p>
+<ul class="simple">
+<li>a binary overload, taking as input the two operands, and returning their GCD,</li>
+<li>a ternary overload, taking the return value as first parameter and the two operands as second
+and third parameters.</li>
+</ul>
+<p>Like in the previous example, the ternary overload avoids the creation and subsequent assignment of a temporary value, and will thus perform
+better. The binary GCD overload, on the other hand, is easier to use (no need to prepare a return value beforehand) and closer
+to a functional style. The presence of binary and ternary overloads for the same functionality is not restricted to <a class="reference internal" href="integer.html#_CPPv2N4mppp3gcdER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::gcd"><code class="xref cpp cpp-func docutils literal"><span class="pre">gcd()</span></code></a>,
+but it’s a common feature for many of mp++’s binary functions and operators.</p>
+<p>For unary functions and operators, there’s an additional degree of freedom in the API. Unary functions in mp++ are often provided with the
+following set of overloads:</p>
+<ul class="simple">
+<li>an in-place nullary member function,</li>
+<li>a functional-style unary function,</li>
+<li>a GMP-style binary function.</li>
+</ul>
+<p>As a concrete example, let’s take a look at different ways of computing the absolute value of an integer:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="o">-</span><span class="mi">5</span><span class="p">};</span>
+<span class="n">n1</span><span class="p">.</span><span class="n">abs</span><span class="p">();</span>              <span class="c1">// In-place nullary member function.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
+
+<span class="n">int_t</span> <span class="n">n2</span><span class="p">{</span><span class="o">-</span><span class="mi">5</span><span class="p">};</span>
+<span class="k">auto</span> <span class="n">n2_abs</span> <span class="o">=</span> <span class="n">abs</span><span class="p">(</span><span class="n">n2</span><span class="p">);</span> <span class="c1">// Unary function.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n2_abs</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
+
+<span class="n">int_t</span> <span class="n">n3</span><span class="p">{</span><span class="o">-</span><span class="mi">5</span><span class="p">},</span> <span class="n">n3_abs</span><span class="p">;</span>
+<span class="n">abs</span><span class="p">(</span><span class="n">n3_abs</span><span class="p">,</span> <span class="n">n3</span><span class="p">);</span>       <span class="c1">// GMP-style binary function.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n3_abs</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer3absEv" title="mppp::integer::abs"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::abs()</span></code></a> member function computes and stores the absolute value directly into the calling object.
+The unary function (much like <code class="docutils literal"><span class="pre">std::abs()</span></code>) takes as input an integer and returns its absolute value. The GMP-style
+binary <code class="docutils literal"><span class="pre">abs()</span></code> function stores into the first argument the absolute value of the second argument.</p>
+<p>The nullary member function overload is provided to cater to the common use case in which a value is mutated in-place
+through a unary operation (e.g., <code class="docutils literal"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">abs(n)</span></code>). Since the nullary member function overloads return a reference
+to the calling object, they can be chained to perform a sequence of in-place operations on the same value:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="o">-</span><span class="mi">16</span><span class="p">};</span>
+<span class="n">n1</span><span class="p">.</span><span class="n">abs</span><span class="p">().</span><span class="n">sqrt</span><span class="p">().</span><span class="n">neg</span><span class="p">();</span> <span class="c1">// Equivalent to: n1 = neg(sqrt(abs(n1)))</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>
+</pre></div>
+</div>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="f1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Of course, copy elision in this specific case will most likely eliminate any move operation. But, for the sake
+of argument, let’s pretend that it will not :)</td></tr>
+</tbody>
+</table>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

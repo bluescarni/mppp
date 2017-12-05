@@ -32,7 +32,7 @@ Common concepts
    (see the :ref:`installation instructions <installation>`).
 
    The GCC-style extended 128-bit integral types ``__int128_t`` and ``__uint128_t`` are included as well, if supported
-   on the current platform/compiler combination.
+   on the current platform/compiler combination (see also the :c:macro:`MPPP_HAVE_GCC_INT128` definition).
 
 .. cpp:concept:: template <typename T> mppp::CppIntegralInteroperable
 

@@ -182,7 +182,7 @@ path, etc.). The available configuration options are:</p>
 </ul>
 <p>Note that the <code class="docutils literal"><span class="pre">MPPP_WITH_QUADMATH</span></code> option, at this time, is available only using GCC (all the supported versions) and Clang
 (since version 3.9). When using Clang, it is still necessary to link to the quadmath library from GCC.</p>
-<p>Since mp++ is a header-only library, there’s no compilation step (unless the tests or the benchmarks are being built),
+<p>Since mp++ is a header-only library (although with compiled dependencies), there’s no compilation step, unless the tests or the benchmarks are being built,
 and the installation of mp++ via <code class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></code> or similar will just configure and copy the headers to your <code class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></code>,
 in the <code class="docutils literal"><span class="pre">include</span></code> subdirectory.</p>
 </div>
