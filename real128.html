@@ -558,6 +558,38 @@ if successful, is exact.</p>
 
 <dl class="function">
 <dt>
+<em class="property">template </em>&lt;Real128CppInteroperable <em>T</em>&gt;</dt>
+<dt id="_CPPv2NK4mppp7real1283getER1T">
+<span id="mppp::real128::get__TRCCE"></span><span class="target" id="classmppp_1_1real128_1ab66a66dc8a641b9ad1e72b8193707b45"></span><em class="property">constexpr</em> bool <code class="descname">get</code><span class="sig-paren">(</span>T &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp7real1283getER1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Conversion method to interoperable C++ types. </p>
+<p><p>This method will cast the <a class="reference internal" href="#_CPPv2N4mppp7real1287m_valueE" title="mppp::real128::m_value"><code class="xref cpp cpp-member docutils literal"><span class="pre">m_value</span></code></a> member to the
+<a class="reference internal" href="#_CPPv2I0EN4mppp23Real128CppInteroperableE" title="mppp::Real128CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">Real128CppInteroperable</span></code></a> type T, and assign the result
+to <code class="docutils literal"><span class="pre">rop</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method is provided for consistency with other getter methods,
+and it does not offer any additional functionality over the plain
+conversion operator.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method is marked as <code class="docutils literal"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>always <code class="docutils literal"><span class="pre">true</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the variable which will store the result of the conversion.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
 <em class="property">template </em>&lt;Real128MpppInteroperable <em>T</em>&gt;</dt>
 <dt id="_CPPv2NK4mppp7real1283getER1T">
 <span id="mppp::real128::get__TRC"></span><span class="target" id="classmppp_1_1real128_1a017db7a7551dd285578f31ff851166aa"></span>bool <code class="descname">get</code><span class="sig-paren">(</span>T &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp7real1283getER1T" title="Permalink to this definition">¶</a><br /></dt>
@@ -891,6 +923,37 @@ involving <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mpp
 <span id="real128-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="conversion">
 <span id="real128-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="_CPPv2N4mppp3getER23Real128CppInteroperableRK7real128">
+<span id="mppp::get__Real128CppInteroperableR.real128CRCE"></span><span class="target" id="group__real128__conversion_1ga9d722dcfdef741cf2491148fb0f1c67d"></span><em class="property">constexpr</em> bool <code class="descclassname">mppp::</code><code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I0EN4mppp23Real128CppInteroperableE" title="mppp::Real128CppInteroperable">Real128CppInteroperable</a> &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3getER23Real128CppInteroperableRK7real128" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Conversion function to C++ types for <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a>. </p>
+<p><p>This function will convert the input <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> <code class="docutils literal"><span class="pre">x</span></code> to a
+<a class="reference internal" href="#_CPPv2I0EN4mppp23Real128CppInteroperableE" title="mppp::Real128CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">Real128CppInteroperable</span></code></a> type, storing the result of the conversion into <code class="docutils literal"><span class="pre">rop</span></code>.
+The conversion is always successful.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function is provided for consistency with other getter functions,
+and it does not offer any additional functionality over the plain
+conversion operator.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function is marked as <code class="docutils literal"><span class="pre">constexpr</span></code> only if at least C++14 is being used.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>always <code class="docutils literal"><span class="pre">true</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the variable which will store the result of the conversion. </li>
+<li><code class="docutils literal"><span class="pre">x</span></code>: the input <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a>.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="_CPPv2N4mppp3getER24Real128MpppInteroperableRK7real128">
 <span id="mppp::get__Real128MpppInteroperableR.real128CR"></span><span class="target" id="group__real128__conversion_1gafd741393a82d90e68291f7f3de8791d0"></span>bool <code class="descclassname">mppp::</code><code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I0EN4mppp24Real128MpppInteroperableE" title="mppp::Real128MpppInteroperable">Real128MpppInteroperable</a> &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3getER24Real128MpppInteroperableRK7real128" title="Permalink to this definition">¶</a><br /></dt>
