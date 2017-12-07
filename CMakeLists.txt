@@ -1,6 +1,6 @@
 cmake_policy(SET CMP0048 NEW)
 
-project(mp++ VERSION 0.6 LANGUAGES CXX C)
+project(mp++ VERSION 0.7 LANGUAGES CXX C)
 
 cmake_minimum_required(VERSION 3.3.0)
 
