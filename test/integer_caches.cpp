@@ -6,6 +6,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <atomic>
 #include <cstddef>
 #include <random>
 #include <thread>
@@ -34,8 +35,17 @@ struct cache_tester {
     inline void operator()(const S &) const
     {
         using integer = integer<S::value>;
+        std::atomic<bool> flag{true};
         // Run a variety of tests with operands with x number of limbs.
-        auto random_xy = [](unsigned x) {
+        auto random_xy = [&flag](unsigned x) {
+            auto checker = [&flag]() {
+                const auto &mpzc = get_mpz_alloc_cache();
+                for (auto s : mpzc.sizes) {
+                    if (s) {
+                        flag.store(false);
+                    }
+                }
+            };
             std::mt19937 rng;
             rng.seed(x);
             std::uniform_int_distribution<int> sdist(0, 1);
@@ -54,6 +64,7 @@ struct cache_tester {
             }
             v_int.resize(0);
             free_integer_caches();
+            checker();
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
                 v_int.emplace_back(&tmp.m_mpz);
@@ -67,6 +78,7 @@ struct cache_tester {
             }
             v_int.resize(0);
             free_integer_caches();
+            checker();
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
                 v_int.emplace_back(&tmp.m_mpz);
