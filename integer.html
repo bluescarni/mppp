@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Multiprecision integers &#8212; mp++ 0.6 documentation</title>
+    <title>Multiprecision integers &#8212; mp++ 0.7 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.6',
+        VERSION:     '0.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -47,7 +47,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           mp++</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.6</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -2235,6 +2235,20 @@ the <a class="reference internal" href="#_CPPv2NK4mppp7integer9to_stringEi" titl
 </dd>
 </dl>
 </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp19free_integer_cachesEv">
+<span id="mppp::free_integer_caches"></span><span class="target" id="group__integer__other_1gab670ae9b1c69d237a47f5e4272e29d6d"></span>void <code class="descclassname">mppp::</code><code class="descname">free_integer_caches</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp19free_integer_cachesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Free the <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> caches. </p>
+<p><p>On some platforms, <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> manages thread-local caches
+to speed-up the allocation/deallocation of small objects. These caches are automatically
+freed on program shutdown or when a thread exits. In certain situations, however,
+it may be desirable to manually free the memory in use by the caches before
+the program’s end or a thread’s exit. This function does exactly that.</p>
+<p>On platforms where thread local storage is not supported, this funcion will be a no-op.</p>
+<p>It is safe to call this function concurrently from different threads.</p>
+ </p>
 </dd></dl>
 
 </div>

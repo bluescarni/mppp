@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Changelog &#8212; mp++ 0.6 documentation</title>
+    <title>Changelog &#8212; mp++ 0.7 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.6',
+        VERSION:     '0.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -46,7 +46,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           mp++</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.6</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -81,34 +81,38 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
-<li><a class="reference internal" href="#id1">0.6 (2017-12-05)</a><ul>
+<li><a class="reference internal" href="#unreleased">0.7 (unreleased)</a><ul>
 <li><a class="reference internal" href="#new">New</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">0.6 (2017-12-05)</a><ul>
+<li><a class="reference internal" href="#id2">New</a></li>
 <li><a class="reference internal" href="#changes">Changes</a></li>
 <li><a class="reference internal" href="#fix">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id2">0.5 (2017-11-07)</a><ul>
-<li><a class="reference internal" href="#id3">New</a></li>
-<li><a class="reference internal" href="#id4">Changes</a></li>
-<li><a class="reference internal" href="#id5">Fix</a></li>
+<li><a class="reference internal" href="#id3">0.5 (2017-11-07)</a><ul>
+<li><a class="reference internal" href="#id4">New</a></li>
+<li><a class="reference internal" href="#id5">Changes</a></li>
+<li><a class="reference internal" href="#id6">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id6">0.4 (2017-07-29)</a><ul>
-<li><a class="reference internal" href="#id7">New</a></li>
-<li><a class="reference internal" href="#id8">Changes</a></li>
-<li><a class="reference internal" href="#id9">Fix</a></li>
+<li><a class="reference internal" href="#id7">0.4 (2017-07-29)</a><ul>
+<li><a class="reference internal" href="#id8">New</a></li>
+<li><a class="reference internal" href="#id9">Changes</a></li>
+<li><a class="reference internal" href="#id10">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id10">0.3 (2017-06-12)</a><ul>
-<li><a class="reference internal" href="#id11">New</a></li>
-<li><a class="reference internal" href="#id12">Changes</a></li>
-<li><a class="reference internal" href="#id13">Fix</a></li>
+<li><a class="reference internal" href="#id11">0.3 (2017-06-12)</a><ul>
+<li><a class="reference internal" href="#id12">New</a></li>
+<li><a class="reference internal" href="#id13">Changes</a></li>
+<li><a class="reference internal" href="#id14">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id14">0.2 (2017-05-09)</a><ul>
-<li><a class="reference internal" href="#id15">New</a></li>
-<li><a class="reference internal" href="#id16">Changes</a></li>
-<li><a class="reference internal" href="#id17">Fix</a></li>
+<li><a class="reference internal" href="#id15">0.2 (2017-05-09)</a><ul>
+<li><a class="reference internal" href="#id16">New</a></li>
+<li><a class="reference internal" href="#id17">Changes</a></li>
+<li><a class="reference internal" href="#id18">Fix</a></li>
 </ul>
 </li>
 </ul>
@@ -158,10 +162,20 @@
       
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2>0.6 (2017-12-05)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="unreleased">
+<h2>0.7 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="new">
 <h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Implement the <a class="reference internal" href="integer.html#_CPPv2N4mppp19free_integer_cachesEv" title="mppp::free_integer_caches"><code class="xref cpp cpp-func docutils literal"><span class="pre">free_integer_caches()</span></code></a> function to manually free the caches used internally by
+<a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/98">#98</a>).</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>0.6 (2017-12-05)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>New<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Implement additional <code class="docutils literal"><span class="pre">get()</span></code> conversion functions for <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/96">#96</a>).</li>
 <li>Implement the increment and decrement operators for <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/95">#95</a>).</li>
@@ -202,10 +216,10 @@
 </ul>
 </div>
 </div>
-<div class="section" id="id2">
-<h2>0.5 (2017-11-07)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id3">
-<h3>New<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<h2>0.5 (2017-11-07)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h3>New<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Implement the <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/40">#40</a>).</li>
 <li>Add non-throwing GMP-style conversion functions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/59">#59</a>,
@@ -223,8 +237,8 @@ and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" ti
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>).</li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h3>Changes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>Changes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Use the sphinx bootstrap theme for the html documentation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/71">#71</a>).</li>
 <li>Various simplifications in the <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> API (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/66">#66</a>).</li>
@@ -253,8 +267,8 @@ and the exception raised by the bit shifting operators is not any more
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/32">#32</a>).</li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h3>Fix<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h3>Fix<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixes/improvements in the support for <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/50">#50</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/54">#54</a>).</li>
@@ -270,10 +284,10 @@ and the exception raised by the bit shifting operators is not any more
 </ul>
 </div>
 </div>
-<div class="section" id="id6">
-<h2>0.4 (2017-07-29)<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id7">
-<h3>New<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<h2>0.4 (2017-07-29)<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h3>New<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Implement the constructors from a range of characters and from <code class="docutils literal"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
 and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
@@ -281,8 +295,8 @@ and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" ti
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/19">#19</a>).</li>
 </ul>
 </div>
-<div class="section" id="id8">
-<h3>Changes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id9">
+<h3>Changes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Expand CI to include GCC 7 in C++17 mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/27">#27</a>).</li>
 <li>Improve testing coverage (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
@@ -297,8 +311,8 @@ in the implementation of basic arithmetic for the 1/2-limb specialisations (<a c
 <li>Performance improvements for <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer5nbitsEv" title="mppp::integer::nbits"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::nbits()</span></code></a> on GCC and clang (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/17">#17</a>).</li>
 </ul>
 </div>
-<div class="section" id="id9">
-<h3>Fix<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id10">
+<h3>Fix<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fix a build failure on older GMP versions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
 <li>Fix a build system bug when building the benchmarks with older CMake versions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
@@ -306,10 +320,10 @@ in the implementation of basic arithmetic for the 1/2-limb specialisations (<a c
 </ul>
 </div>
 </div>
-<div class="section" id="id10">
-<h2>0.3 (2017-06-12)<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id11">
-<h3>New<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<h2>0.3 (2017-06-12)<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id12">
+<h3>New<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Implement the multiprecision <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/14">#14</a>).</li>
 <li>Implement fast assignment functions to zero and plus/minus one for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</li>
@@ -319,23 +333,23 @@ in the implementation of basic arithmetic for the 1/2-limb specialisations (<a c
 in order to avoid the creation of a temporary.</li>
 </ul>
 </div>
-<div class="section" id="id12">
-<h3>Changes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id13">
+<h3>Changes<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Performance improvements for the copy/move assignment operators of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</li>
 </ul>
 </div>
-<div class="section" id="id13">
-<h3>Fix<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id14">
+<h3>Fix<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Various small documentation fixes.</li>
 </ul>
 </div>
 </div>
-<div class="section" id="id14">
-<h2>0.2 (2017-05-09)<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id15">
-<h3>New<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<h2>0.2 (2017-05-09)<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id16">
+<h3>New<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Provide a CMake config-file package as part of the install process.</li>
 <li>Implement the missing in-place modulo operator with C++ integrals
@@ -352,8 +366,8 @@ coefficient.</li>
 <li>Add a static member to <code class="docutils literal"><span class="pre">integer</span></code> storing the static size.</li>
 </ul>
 </div>
-<div class="section" id="id16">
-<h3>Changes<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id17">
+<h3>Changes<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Split out the library in multiple files.</li>
 <li>Rename the <code class="docutils literal"><span class="pre">mp_integer</span></code> class to <code class="docutils literal"><span class="pre">integer</span></code>.</li>
@@ -365,8 +379,8 @@ coefficient.</li>
 <li>Remove the custom namespace option.</li>
 </ul>
 </div>
-<div class="section" id="id17">
-<h3>Fix<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id18">
+<h3>Fix<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fix operators example in the documentation.</li>
 </ul>
