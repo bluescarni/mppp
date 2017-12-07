@@ -151,8 +151,8 @@ Vector division
 ^^^^^^^^^^^^^^^
 
 This benchmark is the division analogue of the :ref:`vector multiplication benchmark <integer_vec_mul>`: the element-wise
-division of two randomly-generated vectors of size :math:`3\times 10^7` is stored in a third vector, and a the sum
-of all the value in the third vector is computed.
+division of two randomly-generated vectors of size :math:`3\times 10^7` is stored in a third vector, and the sum
+of all the values in the third vector is computed.
 
 .. _integer1_vec_div_unsigned:
 
