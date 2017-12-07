@@ -49,12 +49,24 @@
 
 #endif
 
-// thread_local configuration.
-#if defined(__apple_build_version__) || defined(__MINGW32__) || defined(__INTEL_COMPILER)
+// thread_local configuration:
+// - on clang/osx, this seems to be supported since xcode 8:
+//   https://stackoverflow.com/questions/28094794/why-does-apple-clang-disallow-c11-thread-local-when-official-clang-supports
+//   Note that additional conditions might be needed for iOS, if we ever come
+//   to that... Regarding the versioning, it seems the clang version macros are set
+//   to the xcode version:
+//   https://stackoverflow.com/questions/19387043/how-can-i-reliably-detect-the-version-of-clang-at-preprocessing-time
+//   xcode 8.x is appleclang 8.y:
+//   https://en.wikipedia.org/wiki/Xcode#8.x_series
+// - at least some MinGW versions have a buggy thread_local implementation. This is shown by testing,
+//   and reported in a bunch of places as well:
+//   https://sourceforge.net/p/mingw-w64/bugs/445/
+//   https://github.com/Alexpux/MINGW-packages/issues/2519
+// - at least some early versions of the Intel compiler have a buggy implementation. This
+//   came out from testing, but it might be fixed now..
 
-// - Apple clang does not support the thread_local keyword until very recent versions.
-// - Testing shows that at least some MinGW versions have buggy thread_local implementations.
-// - Also on Intel the thread_local keyword looks buggy.
+#if (defined(__apple_build_version__) && __clang_major__ < 8) || defined(__MINGW32__) || defined(__INTEL_COMPILER)
+
 #define MPPP_MAYBE_TLS
 
 #else
