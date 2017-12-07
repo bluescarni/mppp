@@ -14,6 +14,7 @@
 #include <type_traits>
 #include <vector>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 
 #include "test_utils.hpp"
@@ -39,12 +40,14 @@ struct cache_tester {
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&flag](unsigned x) {
             auto checker = [&flag]() {
+#if defined(MPPP_HAVE_THREAD_LOCAL)
                 const auto &mpzc = get_mpz_alloc_cache();
                 for (auto s : mpzc.sizes) {
                     if (s) {
                         flag.store(false);
                     }
                 }
+#endif
             };
             std::mt19937 rng;
             rng.seed(x);
@@ -64,6 +67,8 @@ struct cache_tester {
             }
             v_int.resize(0);
             free_integer_caches();
+            free_integer_caches();
+            free_integer_caches();
             checker();
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
@@ -78,6 +83,8 @@ struct cache_tester {
             }
             v_int.resize(0);
             free_integer_caches();
+            free_integer_caches();
+            free_integer_caches();
             checker();
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
@@ -90,6 +97,9 @@ struct cache_tester {
                     v_int.back().promote();
                 }
             }
+            free_integer_caches();
+            free_integer_caches();
+            free_integer_caches();
         };
 
         std::thread t0(random_xy, 0);
