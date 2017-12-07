@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.7 (unreleased)
+----------------
+
+New
+~~~
+
+- Implement the :cpp:func:`~mppp::free_integer_caches()` function to manually free the caches used internally by
+  :cpp:class:`~mppp::integer` (`#98 <https://github.com/bluescarni/mppp/pull/98>`__).
+
 0.6 (2017-12-05)
 ----------------
 

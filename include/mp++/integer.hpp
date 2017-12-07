@@ -166,19 +166,29 @@ struct mpz_alloc_cache {
     std::array<std::size_t, max_size> sizes;
     // NOTE: use round brackets init for the usual GCC 4.8 workaround.
     constexpr mpz_alloc_cache() : caches(), sizes() {}
-    ~mpz_alloc_cache()
+    // Clear the cache, deallocating all the data in the arrays.
+    void clear() noexcept
     {
 #if !defined(NDEBUG)
         std::cout << "Cleaning up the mpz alloc cache." << std::endl;
 #endif
+        // Get the GMP free() function.
         void (*ffp)(void *, std::size_t) = nullptr;
         ::mp_get_memory_functions(nullptr, nullptr, &ffp);
         assert(ffp != nullptr);
         for (std::size_t i = 0; i < max_size; ++i) {
+            // Free all the limbs arrays allocated for this size.
             for (std::size_t j = 0; j < sizes[i]; ++j) {
                 ffp(static_cast<void *>(caches[i][j]), i + 1u);
             }
+            // Reset the number of limbs array present in this
+            // cache entry.
+            sizes[i] = 0u;
         }
+    }
+    ~mpz_alloc_cache()
+    {
+        clear();
     }
 };
 
@@ -6446,6 +6456,27 @@ inline std::size_t hash(const integer<SSize> &n)
         retval ^= (ptr[i] & GMP_NUMB_MASK) + std::size_t(0x9e3779b9) + (retval << 6) + (retval >> 2);
     }
     return retval;
+}
+
+/// Free the \link mppp::integer integer\endlink caches.
+/**
+ * \rststar
+ * On some platforms, :cpp:class:`~mppp::integer` manages thread-local caches
+ * to speed-up the allocation/deallocation of small objects. These caches are automatically
+ * freed on program shutdown or when a thread exits. In certain situations, however,
+ * it may be desirable to manually free the memory in use by the caches before
+ * the program's end or a thread's exit. This function does exactly that.
+ *
+ * On platforms where thread local storage is not supported, this funcion will be a no-op.
+ *
+ * It is safe to call this function concurrently from different threads.
+ * \endrststar
+ */
+inline void free_integer_caches()
+{
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+    get_mpz_alloc_cache().clear();
+#endif
 }
 
 /** @} */
