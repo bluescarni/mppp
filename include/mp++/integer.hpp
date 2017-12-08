@@ -14,6 +14,9 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+// NOTE: this comes from the std::abs() include mess:
+// http://en.cppreference.com/w/cpp/numeric/math/abs
+#include <cinttypes>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -502,6 +505,15 @@ inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
     return static_cast<mpz_size_t>(((lo != 0u) | (hi != 0u)) * ((hi != 0u) + 1));
 }
 
+// Branchless sign function for C++ integrals:
+// https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
+template <typename T>
+constexpr int integral_sign(T n)
+{
+    static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type: this function requires signed integrals in input.");
+    return (T(0) < n) - (n < T(0));
+}
+
 // The static integer class.
 template <std::size_t SSize>
 struct static_int {
@@ -649,7 +661,7 @@ struct static_int {
     // Size in limbs (absolute value of the _mp_size member).
     mpz_size_t abs_size() const
     {
-        return _mp_size >= 0 ? _mp_size : -_mp_size;
+        return std::abs(_mp_size);
     }
     // NOTE: the retval here can be used only in read-only mode, otherwise
     // we will have UB due to the const_cast use.
@@ -2305,11 +2317,7 @@ public:
     int sgn() const
     {
         // NOTE: size is part of the common initial sequence.
-        if (m_int.m_st._mp_size != 0) {
-            return m_int.m_st._mp_size > 0 ? 1 : -1;
-        } else {
-            return 0;
-        }
+        return integral_sign(m_int.m_st._mp_size);
     }
     /// Get an \p mpz_t view.
     /**
@@ -2890,7 +2898,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
             // op1 is not smaller than op2.
             tmp = data1[0] - data2[0];
             // asize is either 1 or 0 (0 iff abs(op1) == abs(op2)).
-            rop._mp_size = sign1 * static_cast<int>(data1[0] != data2[0]);
+            rop._mp_size = sign1 * (data1[0] != data2[0]);
             rdata[0] = tmp;
         } else {
             // NOTE: this has to be one, as data2[0] and data1[0] cannot be equal.
@@ -2957,7 +2965,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
         // - if sign1 == 0, size is zero,
         // - if sign1 == +-1, then the size is either +-1 or +-2: asize is 2 if the result
         //   has a nonzero 2nd limb, otherwise asize is 1.
-        rop._mp_size = sign1 * (static_cast<int>(hi2 != 0u) + 1);
+        rop._mp_size = sign1 * ((hi2 != 0u) + 1);
         rdata[0] = lo;
         rdata[1] = hi2;
     } else {
@@ -4347,16 +4355,9 @@ template <std::size_t SSize>
 inline void static_div(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
                        const static_int<SSize> &op2)
 {
-    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
-    int sign1 = asize1 != 0, sign2 = asize2 != 0;
-    if (asize1 < 0) {
-        asize1 = -asize1;
-        sign1 = -1;
-    }
-    if (asize2 < 0) {
-        asize2 = -asize2;
-        sign2 = -1;
-    }
+    const auto s1(op1._mp_size), s2(op2._mp_size);
+    const mpz_size_t asize1 = std::abs(s1), asize2 = std::abs(s2);
+    const int sign1 = integral_sign(s1), sign2 = integral_sign(s2);
     static_div_impl(q, r, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
     if (integer_static_div_algo<static_int<SSize>>::value == 0) {
         // If we used the mpn functions, zero the unused limbs on top (if necessary).
