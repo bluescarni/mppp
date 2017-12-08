@@ -77,10 +77,6 @@
 // Checked iterators functionality.
 #include <iterator>
 
-#elif defined(MPPP_HAVE_GCC_INT128)
-
-#define MPPP_UINT128 __uint128_t
-
 #endif
 
 namespace mppp
@@ -3364,7 +3360,8 @@ inline namespace detail
 // NOTE: here we are checking that GMP_NUMB_BITS is the same as the limits ::digits property, which is probably
 // rather redundant on any conceivable architecture.
 using integer_have_dlimb_mul = std::integral_constant<bool,
-#if (defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64)) || (defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64))
+#if (defined(_MSC_VER) && defined(_WIN64) && (GMP_NUMB_BITS == 64))                                                    \
+    || (defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64))
                                                       !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
 #elif GMP_NUMB_BITS == 32
                                                       !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
@@ -3451,11 +3448,11 @@ inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
     return ::UnsignedMultiply128(op1, op2, hi);
 }
 
-#elif defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+#elif defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
 
 inline ::mp_limb_t dlimb_mul(::mp_limb_t op1, ::mp_limb_t op2, ::mp_limb_t *hi)
 {
-    using dlimb_t = MPPP_UINT128;
+    using dlimb_t = __uint128_t;
     const dlimb_t res = dlimb_t(op1) * op2;
     *hi = static_cast<::mp_limb_t>(res >> 64);
     return static_cast<::mp_limb_t>(res);
@@ -4151,7 +4148,7 @@ inline namespace detail
 // - we are on a 64bit build and we have the 128bit int type available (plus usual constraints).
 // MSVC currently does not provide any primitive for 128bit division.
 using integer_have_dlimb_div = std::integral_constant<bool,
-#if defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64)
+#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64)
                                                       !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
 #elif GMP_NUMB_BITS == 32
                                                       !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
@@ -4259,12 +4256,12 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
     r.m_limbs[0] = r_;
 }
 
-#if defined(MPPP_UINT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
 inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                       ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
                       ::mp_limb_t *MPPP_RESTRICT r2)
 {
-    using dlimb_t = MPPP_UINT128;
+    using dlimb_t = __uint128_t;
     const auto op1 = op11 + (dlimb_t(op12) << 64);
     const auto op2 = op21 + (dlimb_t(op22) << 64);
     const auto q = op1 / op2, r = op1 % op2;
@@ -4278,7 +4275,7 @@ inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp
 inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                       ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
-    using dlimb_t = MPPP_UINT128;
+    using dlimb_t = __uint128_t;
     const auto op1 = op11 + (dlimb_t(op12) << 64);
     const auto op2 = op21 + (dlimb_t(op22) << 64);
     const auto q = op1 / op2;
@@ -7774,12 +7771,6 @@ struct hash<mppp::integer<SSize>> {
 #if defined(_MSC_VER)
 
 #pragma warning(pop)
-
-#endif
-
-#if defined(MPPP_UINT128)
-
-#undef MPPP_UINT128
 
 #endif
 
