@@ -10,6 +10,12 @@ New
 - Implement the :cpp:func:`~mppp::free_integer_caches()` function to manually free the caches used internally by
   :cpp:class:`~mppp::integer` (`#98 <https://github.com/bluescarni/mppp/pull/98>`__).
 
+Changes
+~~~~~~~
+
+- Improve the detection of the availability of the ``thread_local`` keyword on recent Xcode versions 
+  (`#99 <https://github.com/bluescarni/mppp/pull/99>`__).
+
 0.6 (2017-12-05)
 ----------------
 
