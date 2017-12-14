@@ -175,6 +175,14 @@ Gamma functions
 .. doxygengroup:: real_gamma
    :content-only:
 
+.. _real_intrem:
+
+Integer and remainder related functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. doxygengroup:: real_intrem
+   :content-only:
+
 .. _real_io:
 
 Input/Output

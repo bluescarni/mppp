@@ -302,11 +302,11 @@ template <typename T>
 std::atomic<::mpfr_prec_t> real_constants<T>::default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
 
 // Fwd declare for friendship.
-template <typename F, typename Arg0, typename... Args>
-real &mpfr_nary_op(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
+template <bool, typename F, typename Arg0, typename... Args>
+real &mpfr_nary_op_impl(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
 
-template <typename F, typename Arg0, typename... Args>
-real mpfr_nary_op_return(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
+template <bool, typename F, typename Arg0, typename... Args>
+real mpfr_nary_op_return_impl(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
 
 template <typename F>
 real real_constant(const F &, ::mpfr_prec_t);
@@ -318,6 +318,10 @@ inline void real_lgamma_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t)
     int signp;
     ::mpfr_lgamma(rop, &signp, op, MPFR_RNDN);
 }
+
+// A small helper to check the input of the trunc() overloads,
+// only fwd declaration (implementation below).
+void check_real_trunc_arg(const real &);
 }
 
 // Fwd declare swap.
@@ -572,10 +576,10 @@ class real
 {
 #if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends, for accessing the non-checking prec setting funcs.
-    template <typename F, typename Arg0, typename... Args>
-    friend real &detail::mpfr_nary_op(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
-    template <typename F, typename Arg0, typename... Args>
-    friend real detail::mpfr_nary_op_return(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
+    template <bool, typename F, typename Arg0, typename... Args>
+    friend real &detail::mpfr_nary_op_impl(::mpfr_prec_t, const F &, real &, Arg0 &&, Args &&...);
+    template <bool, typename F, typename Arg0, typename... Args>
+    friend real detail::mpfr_nary_op_return_impl(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
     template <typename F>
     friend real detail::real_constant(const F &, ::mpfr_prec_t);
 #endif
@@ -2252,10 +2256,45 @@ public:
         real_lgamma_wrapper(&m_mpfr, &m_mpfr, MPFR_RNDN);
         return *this;
     }
+    /// Check if the value is an integer.
+    /**
+     * @return ``true`` if ``this`` represents an integer value, ``false`` otherwise.
+     */
+    bool integer_p() const
+    {
+        return ::mpfr_integer_p(&m_mpfr) != 0;
+    }
+    /// In-place truncation.
+    /**
+     * This method will set ``this`` to its truncated counterpart. The precision of ``this``
+     * will not be altered.
+     *
+     * @return a reference to ``this``.
+     *
+     * @throws std::domain_error if ``this`` represents a NaN value.
+     */
+    real &trunc()
+    {
+        check_real_trunc_arg(*this);
+        ::mpfr_trunc(&m_mpfr, &m_mpfr);
+        return *this;
+    }
 
 private:
     mpfr_struct_t m_mpfr;
 };
+
+inline namespace detail
+{
+
+// Implementation of the trunc() argument checker.
+inline void check_real_trunc_arg(const real &r)
+{
+    if (mppp_unlikely(r.nan_p())) {
+        throw std::domain_error("Cannot truncate a NaN value");
+    }
+}
+}
 
 template <typename T, typename U>
 using are_real_op_types
@@ -2580,12 +2619,44 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
 }
 
+#if MPPP_CPLUSPLUS >= 201703L
+
+// A small wrapper to call an MPFR function f with arguments args. If Rnd is true,
+// the rounding mode MPFR_RNDN will be appended at the end of the function arguments list.
+template <bool Rnd, typename F, typename... Args>
+inline void mpfr_nary_func_wrapper(const F &f, Args &&... args)
+{
+    if constexpr (Rnd) {
+        f(std::forward<Args>(args)..., MPFR_RNDN);
+    } else {
+        f(std::forward<Args>(args)...);
+    }
+}
+
+#else
+
+template <bool Rnd, typename F, typename... Args, enable_if_t<Rnd == true, int> = 0>
+inline void mpfr_nary_func_wrapper(const F &f, Args &&... args)
+{
+    f(std::forward<Args>(args)..., MPFR_RNDN);
+}
+
+template <bool Rnd, typename F, typename... Args, enable_if_t<Rnd == false, int> = 0>
+inline void mpfr_nary_func_wrapper(const F &f, Args &&... args)
+{
+    f(std::forward<Args>(args)...);
+}
+
+#endif
+
 // Apply the MPFR n-ary function F with return value rop and real arguments (arg0, args...).
 // The precision of rop will be set to the maximum of the precision among the arguments,
 // but not less than min_prec.
 // Resources may be stolen from one of the arguments, if possible.
-template <typename F, typename Arg0, typename... Args>
-inline real &mpfr_nary_op(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&arg0, Args &&... args)
+// The Rnd flag controls whether to add the rounding mode (MPFR_RNDN) at the end
+// of the function arguments list or not.
+template <bool Rnd, typename F, typename Arg0, typename... Args>
+inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&arg0, Args &&... args)
 {
     // This pair contains:
     // - a pointer to the largest-precision real from which we can steal resources (may be nullptr),
@@ -2600,14 +2671,14 @@ inline real &mpfr_nary_op(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&
     if (p.second == r_prec) {
         // The largest precision among the operands and the precision of the return value
         // match. No need to steal, just execute the function.
-        f(rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+        mpfr_nary_func_wrapper<Rnd>(f, rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
     } else {
         if (r_prec > p.second) {
             // The precision of the return value is larger than the largest precision
             // among the operands. We can reset its precision destructively
             // because we know it does not overlap with any operand.
             rop.set_prec_impl<false>(p.second);
-            f(rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+            mpfr_nary_func_wrapper<Rnd>(f, rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
         } else if (!p.first || p.first->get_prec() != p.second) {
             // This covers 2 cases:
             // - the precision of the return value is smaller than the largest precision
@@ -2622,16 +2693,30 @@ inline real &mpfr_nary_op(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&
             // NOTE: we assume all the precs in the operands are valid, so we will not need
             // to check them.
             rop.prec_round_impl<false>(p.second);
-            f(rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+            mpfr_nary_func_wrapper<Rnd>(f, rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
         } else {
             // The precision of the return value is smaller than the largest precision among the operands,
             // and we have a candidate for stealing with enough precision: we will use it as return
             // value and then swap out the result to rop.
-            f(p.first->_get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+            mpfr_nary_func_wrapper<Rnd>(f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
             swap(*p.first, rop);
         }
     }
     return rop;
+}
+
+// The two overloads that will actually be used in the code: one adds the rounding mode
+// as final argument, the other does not.
+template <typename F, typename Arg0, typename... Args>
+inline real &mpfr_nary_op(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&arg0, Args &&... args)
+{
+    return mpfr_nary_op_impl<true>(min_prec, f, rop, std::forward<Arg0>(arg0), std::forward<Args>(args)...);
+}
+
+template <typename F, typename Arg0, typename... Args>
+inline real &mpfr_nary_op_nornd(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&arg0, Args &&... args)
+{
+    return mpfr_nary_op_impl<false>(min_prec, f, rop, std::forward<Arg0>(arg0), std::forward<Args>(args)...);
 }
 
 // Invoke an MPFR function with arguments (arg0, args...), and store the result
@@ -2640,22 +2725,38 @@ inline real &mpfr_nary_op(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&
 // arguments are rvalue references and their precision is large enough. As usual,
 // the precision of the return value will be the max precision among the operands,
 // but not less than min_prec.
-template <typename F, typename Arg0, typename... Args>
-inline real mpfr_nary_op_return(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&... args)
+// The Rnd flag controls whether to add the rounding mode (MPFR_RNDN) at the end
+// of the function arguments list or not.
+template <bool Rnd, typename F, typename Arg0, typename... Args>
+inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&... args)
 {
     auto p = mpfr_nary_op_init_pair(min_prec, std::forward<Arg0>(arg0));
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
     if (p.first && p.first->get_prec() == p.second) {
         // There's at least one arg we can steal from, and its precision is large enough
         // to contain the result. Use it.
-        f(p.first->_get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+        mpfr_nary_func_wrapper<Rnd>(f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
         return std::move(*p.first);
     }
     // Either we cannot steal from any arg, or the candidate(s) do not have enough precision.
     // Init a new value and use it instead.
     real retval{real::ptag{}, p.second, true};
-    f(retval._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()..., MPFR_RNDN);
+    mpfr_nary_func_wrapper<Rnd>(f, retval._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
     return retval;
+}
+
+// The two overloads that will actually be used in the code: one adds the rounding mode
+// as final argument, the other does not.
+template <typename F, typename Arg0, typename... Args>
+inline real mpfr_nary_op_return(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&... args)
+{
+    return mpfr_nary_op_return_impl<true>(min_prec, f, std::forward<Arg0>(arg0), std::forward<Args>(args)...);
+}
+
+template <typename F, typename Arg0, typename... Args>
+inline real mpfr_nary_op_return_nornd(::mpfr_prec_t min_prec, const F &f, Arg0 &&arg0, Args &&... args)
+{
+    return mpfr_nary_op_return_impl<false>(min_prec, f, std::forward<Arg0>(arg0), std::forward<Args>(args)...);
 }
 
 #endif
@@ -3589,6 +3690,70 @@ inline real &real_pi(real &rop)
 {
     ::mpfr_const_pi(rop._get_mpfr_t(), MPFR_RNDN);
     return rop;
+}
+
+/** @} */
+
+/** @defgroup real_intrem real_intrem
+ *  @{
+ */
+
+/// Detect if a \link mppp::real real\endlink is an integer.
+/**
+ * @param r the input \link mppp::real real\endlink.
+ *
+ * @return ``true`` if ``r`` represents an integral value, ``false`` otherwise.
+ */
+inline bool integer_p(const real &r)
+{
+    return r.integer_p();
+}
+
+/// Binary \link mppp::real real\endlink truncation.
+/**
+ * This function will truncate ``op`` and store the result
+ * into ``rop``. The precision of the result will be equal to the precision
+ * of ``op``.
+ *
+ * @param rop the return value.
+ * @param op the operand.
+ *
+ * @return a reference to \p rop.
+ *
+ * @throws std::domain_error if ``op`` is NaN.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real &trunc(real &rop, CvrReal &&op)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real &trunc(real &rop, T &&op)
+#endif
+{
+    check_real_trunc_arg(op);
+    return mpfr_nary_op_nornd(0, ::mpfr_trunc, rop, std::forward<decltype(op)>(op));
+}
+
+/// Unary \link mppp::real real\endlink truncation.
+/**
+ * This function will return the truncated counterpart of ``r``.
+ * The precision of the result will be equal to the precision
+ * of ``r``.
+ *
+ * @param r the operand.
+ *
+ * @return the truncated counterpart of ``r``.
+ *
+ * @throws std::domain_error if ``r`` is NaN.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+inline real trunc(CvrReal &&r)
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+inline real trunc(T &&r)
+#endif
+{
+    check_real_trunc_arg(r);
+    return mpfr_nary_op_return_nornd(0, ::mpfr_trunc, std::forward<decltype(r)>(r));
 }
 
 /** @} */
