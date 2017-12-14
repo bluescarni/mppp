@@ -96,6 +96,7 @@
 <li><a class="reference internal" href="#trigonometry">Trigonometry</a></li>
 <li><a class="reference internal" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
 <li><a class="reference internal" href="#gamma-functions">Gamma functions</a></li>
+<li><a class="reference internal" href="#integer-and-remainder-related-functions">Integer and remainder related functions</a></li>
 <li><a class="reference internal" href="#input-output">Input/Output</a></li>
 </ul>
 </li>
@@ -1334,6 +1335,34 @@ to produce exactly the original value when used in one of the constructors from 
 </p>
 </dd></dl>
 
+<dl class="function">
+<dt id="_CPPv2NK4mppp4real9integer_pEv">
+<span id="mppp::real::integer_pC"></span><span class="target" id="classmppp_1_1real_1a8a599d00c0bb20eefd5998d402c50de0"></span>bool <code class="descname">integer_p</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp4real9integer_pEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Check if the value is an integer. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">this</span></code> represents an integer value, <code class="docutils literal"><span class="pre">false</span></code> otherwise. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp4real5truncEv">
+<span id="mppp::real::trunc"></span><span class="target" id="classmppp_1_1real_1accf5cc1b4eb5afa535037f2e5677a20f"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">trunc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp4real5truncEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place truncation. </p>
+<p>This method will set <code class="docutils literal"><span class="pre">this</span></code> to its truncated counterpart. The precision of <code class="docutils literal"><span class="pre">this</span></code> will not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>.</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">this</span></code> represents a NaN value. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -2507,6 +2536,70 @@ operand to be converted.</p>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">r</span></code>: the operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="section" id="integer-and-remainder-related-functions">
+<span id="real-intrem"></span><h3>Integer and remainder related functions<a class="headerlink" href="#integer-and-remainder-related-functions" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="_CPPv2N4mppp9integer_pERK4real">
+<span id="mppp::integer_p__realCR"></span><span class="target" id="group__real__intrem_1gab58ab34ae0d971ae9074fa9ad1ac29b5"></span>bool <code class="descclassname">mppp::</code><code class="descname">integer_p</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp9integer_pERK4real" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Detect if a <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> is an integer. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">r</span></code> represents an integral value, <code class="docutils literal"><span class="pre">false</span></code> otherwise. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">r</span></code>: the input <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp5truncER4realRR7CvrReal">
+<span id="mppp::trunc__realR.CvrRealRR"></span><span class="target" id="group__real__intrem_1gabeda7ba0b3c20c385dc32ebebb26bc17"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">trunc</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv2I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp5truncER4realRR7CvrReal" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> truncation. </p>
+<p>This function will truncate <code class="docutils literal"><span class="pre">op</span></code> and store the result into <code class="docutils literal"><span class="pre">rop</span></code>. The precision of the result will be equal to the precision of <code class="docutils literal"><span class="pre">op</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal"><span class="pre">op</span></code>: the operand.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">op</span></code> is NaN. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp5truncERR7CvrReal">
+<span id="mppp::trunc__CvrRealRR"></span><span class="target" id="group__real__intrem_1ga3bf995baa8bcf8f06d5f71342452f2cf"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">trunc</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp5truncERR7CvrReal" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Unary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> truncation. </p>
+<p>This function will return the truncated counterpart of <code class="docutils literal"><span class="pre">r</span></code>. The precision of the result will be equal to the precision of <code class="docutils literal"><span class="pre">r</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the truncated counterpart of <code class="docutils literal"><span class="pre">r</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">r</span></code>: the operand.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal"><span class="pre">r</span></code> is NaN. </li>
 </ul>
 </dd>
 </dl>
