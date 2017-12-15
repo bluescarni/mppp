@@ -4568,11 +4568,12 @@ inline namespace detail
 {
 
 // mpn implementation.
-template <std::size_t SSize>
+template <bool Gcd, std::size_t SSize>
 inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
                                  mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                  const std::integral_constant<int, 0> &)
 {
+    assert(!Gcd || sign2 == 1);
     if (asize1 == 0) {
         // Special casing if the numerator is zero (the mpn functions do not work with zero operands).
         q._mp_size = 0;
@@ -4589,7 +4590,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
         while (q._mp_size && !(q.m_limbs[static_cast<std::size_t>(q._mp_size - 1)] & GMP_NUMB_MASK)) {
             --q._mp_size;
         }
-        if (sign1 != sign2) {
+        if (sign1 != (Gcd ? 1 : sign2)) {
             q._mp_size = -q._mp_size;
         }
         return;
@@ -4611,26 +4612,28 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
 }
 
 // 1-limb optimisation.
-template <std::size_t SSize>
+template <bool Gcd, std::size_t SSize>
 inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
                                  mpz_size_t, mpz_size_t, int sign1, int sign2, const std::integral_constant<int, 1> &)
 {
+    assert(!Gcd || sign2 == 1);
     const ::mp_limb_t n = op1.m_limbs[0] & GMP_NUMB_MASK, d = op2.m_limbs[0] & GMP_NUMB_MASK, q_ = n / d;
     // Write q.
-    q._mp_size = sign1 * sign2 * (n >= d);
+    q._mp_size = sign1 * (Gcd ? 1 : sign2) * (n >= d);
     q.m_limbs[0] = q_;
 }
 
 // 2-limbs optimisation.
-template <std::size_t SSize>
+template <bool Gcd, std::size_t SSize>
 inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
                                  mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                                  const std::integral_constant<int, 2> &)
 {
+    assert(!Gcd || sign2 == 1);
     if (asize1 < 2 && asize2 < 2) {
         // 1-limb optimisation.
         const ::mp_limb_t n = op1.m_limbs[0], d = op2.m_limbs[0], q_ = n / d;
-        q._mp_size = sign1 * sign2 * (n >= d);
+        q._mp_size = sign1 * (Gcd ? 1 : sign2) * (n >= d);
         q.m_limbs[0] = q_;
         q.m_limbs[1] = 0u;
         return;
@@ -4638,7 +4641,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
     // General case.
     ::mp_limb_t q1, q2;
     dlimb_tdiv_q(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
-    q._mp_size = sign1 * sign2 * size_from_lohi(q1, q2);
+    q._mp_size = sign1 * (Gcd ? 1 : sign2) * size_from_lohi(q1, q2);
     q.m_limbs[0] = q1;
     q.m_limbs[1] = q2;
 }
@@ -4646,19 +4649,15 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
 template <std::size_t SSize>
 inline void static_divexact(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
-    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
-    int sign1 = asize1 != 0, sign2 = asize2 != 0;
-    if (asize1 < 0) {
-        asize1 = -asize1;
-        sign1 = -1;
-    }
-    if (asize2 < 0) {
-        asize2 = -asize2;
-        sign2 = -1;
-    }
+    const auto s1(op1._mp_size), s2(op2._mp_size);
+    const mpz_size_t asize1 = std::abs(s1), asize2 = std::abs(s2);
+    const int sign1 = integral_sign(s1), sign2 = integral_sign(s2);
+    // NOTE: op2 divides exactly op1, so either op1 is zero or the absolute size
+    // of op1 must not be smaller than op2's.
     assert(asize1 == 0 || asize2 <= asize1);
     // NOTE: use integer_static_div_algo for the algorithm selection.
-    static_divexact_impl(q, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
+    static_divexact_impl<false>(q, op1, op2, asize1, asize2, sign1, sign2,
+                                integer_static_div_algo<static_int<SSize>>{});
     if (integer_static_div_algo<static_int<SSize>>::value == 0) {
         // If we used the mpn functions, zero the unused limbs on top (if necessary).
         // NOTE: as usual, potential of mpn use on optimised size.
@@ -4721,6 +4720,51 @@ inline integer<SSize> divexact(const integer<SSize> &n, const integer<SSize> &d)
     integer<SSize> retval;
     divexact(retval, n, d);
     return retval;
+}
+
+inline namespace detail
+{
+
+template <std::size_t SSize>
+inline void static_divexact_gcd(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    const auto s1(op1._mp_size);
+    const mpz_size_t asize1 = std::abs(s1), asize2 = op2._mp_size;
+    const int sign1 = integral_sign(s1);
+    // NOTE: op2 divides exactly op1, so either op1 is zero or the absolute size
+    // of op1 must not be smaller than op2's.
+    assert(asize1 == 0 || asize2 <= asize1);
+    assert(asize2 > 0);
+    // NOTE: use integer_static_div_algo for the algorithm selection.
+    static_divexact_impl<true>(q, op1, op2, asize1, asize2, sign1, 1, integer_static_div_algo<static_int<SSize>>{});
+    if (integer_static_div_algo<static_int<SSize>>::value == 0) {
+        // If we used the mpn functions, zero the unused limbs on top (if necessary).
+        // NOTE: as usual, potential of mpn use on optimised size.
+        q.zero_unused_limbs();
+    }
+}
+}
+
+template <std::size_t SSize>
+inline integer<SSize> &divexact_gcd(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
+{
+    assert(d.sgn() > 0);
+    const bool sr = rop.is_static(), s1 = n.is_static(), s2 = d.is_static();
+    if (mppp_likely(s1 && s2)) {
+        if (!sr) {
+            rop.set_zero();
+        }
+        static_divexact_gcd(rop._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
+        // Division can never fail.
+        return rop;
+    }
+    if (sr) {
+        rop._get_union().promote();
+    }
+    // NOTE: there's no public mpz_divexact_gcd() function in GMP, just use
+    // mpz_divexact() directly.
+    ::mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    return rop;
 }
 
 inline namespace detail
