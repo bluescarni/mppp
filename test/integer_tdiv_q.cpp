@@ -43,6 +43,7 @@ struct tdiv_q_tester {
         ::mpz_set_ui(&m3.m_mpz, 12);
         ::mpz_set_ui(&m4.m_mpz, 5);
         tdiv_q(n1, n3, n4);
+        REQUIRE(std::is_same<integer &, decltype(tdiv_q(n1, n3, n4))>::value);
         ::mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         n3 = integer(-12);

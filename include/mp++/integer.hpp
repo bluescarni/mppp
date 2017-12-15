@@ -4538,10 +4538,12 @@ inline void static_tdiv_q(static_int<SSize> &q, const static_int<SSize> &op1, co
  * @param n the dividend.
  * @param d the divisor.
  *
+ * @return a reference to ``q``.
+ *
  * @throws zero_division_error if \p d is zero.
  */
 template <std::size_t SSize>
-inline void tdiv_q(integer<SSize> &q, const integer<SSize> &n, const integer<SSize> &d)
+inline integer<SSize> &tdiv_q(integer<SSize> &q, const integer<SSize> &n, const integer<SSize> &d)
 {
     if (mppp_unlikely(d.sgn() == 0)) {
         throw zero_division_error("Integer division by zero");
@@ -4553,12 +4555,13 @@ inline void tdiv_q(integer<SSize> &q, const integer<SSize> &n, const integer<SSi
         }
         static_tdiv_q(q._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
         // Division can never fail.
-        return;
+        return q;
     }
     if (sq) {
         q._get_union().promote();
     }
     ::mpz_tdiv_q(&q._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+    return q;
 }
 
 inline namespace detail
