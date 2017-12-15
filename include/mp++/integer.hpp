@@ -7070,24 +7070,24 @@ inline namespace detail
 template <std::size_t SSize>
 inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, const integer<SSize> &op2)
 {
-    integer<SSize> retval, r;
-    tdiv_qr(retval, r, op1, op2);
+    integer<SSize> retval;
+    tdiv_q(retval, op1, op2);
     return retval;
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, T n)
 {
-    integer<SSize> retval, r;
-    tdiv_qr(retval, r, op1, integer<SSize>{n});
+    integer<SSize> retval;
+    tdiv_q(retval, op1, integer<SSize>{n});
     return retval;
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_div(T n, const integer<SSize> &op2)
 {
-    integer<SSize> retval, r;
-    tdiv_qr(retval, r, integer<SSize>{n}, op2);
+    integer<SSize> retval;
+    tdiv_q(retval, integer<SSize>{n}, op2);
     return retval;
 }
 
@@ -7107,15 +7107,13 @@ inline T dispatch_binary_div(T x, const integer<SSize> &op2)
 template <std::size_t SSize>
 inline void dispatch_in_place_div(integer<SSize> &retval, const integer<SSize> &n)
 {
-    integer<SSize> r;
-    tdiv_qr(retval, r, retval, n);
+    tdiv_q(retval, retval, n);
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
 inline void dispatch_in_place_div(integer<SSize> &retval, const T &n)
 {
-    integer<SSize> r;
-    tdiv_qr(retval, r, retval, integer<SSize>{n});
+    tdiv_q(retval, retval, integer<SSize>{n});
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>

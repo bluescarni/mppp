@@ -783,9 +783,7 @@ private:
     // int_t getter.
     bool dispatch_get(int_t &rop) const
     {
-        MPPP_MAYBE_TLS int_t r;
-        tdiv_qr(rop, r, m_num, m_den);
-        return true;
+        return tdiv_q(rop, m_num, m_den), true;
     }
     // The other getters.
     template <typename T>
