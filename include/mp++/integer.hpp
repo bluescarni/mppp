@@ -510,7 +510,8 @@ inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
 template <typename T>
 constexpr int integral_sign(T n)
 {
-    static_assert(is_integral<T>::value && is_signed<T>::value, "Invalid type: this function requires signed integrals in input.");
+    static_assert(is_integral<T>::value && is_signed<T>::value,
+                  "Invalid type: this function requires signed integrals in input.");
     return (T(0) < n) - (n < T(0));
 }
 
@@ -4177,9 +4178,9 @@ using integer_static_div_algo
 
 // mpn implementation.
 template <std::size_t SSize>
-inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
-                            const static_int<SSize> &op2, mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
-                            const std::integral_constant<int, 0> &)
+inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                                const static_int<SSize> &op2, mpz_size_t asize1, mpz_size_t asize2, int sign1,
+                                int sign2, const std::integral_constant<int, 0> &)
 {
     // First we check if the divisor is larger than the dividend (in abs limb size), as the mpn function
     // requires asize1 >= asize2.
@@ -4205,13 +4206,14 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
         copy_limbs_no(data2, data2 + asize2, op2_alt.data());
         data2 = op2_alt.data();
     }
+#if !defined(NDEBUG)
     // Small helper function to verify that all pointers are distinct. Used exclusively for debugging purposes.
     auto distinct_op = [&q, &r, data1, data2]() -> bool {
         const ::mp_limb_t *ptrs[] = {q.m_limbs.data(), r.m_limbs.data(), data1, data2};
         std::sort(ptrs, ptrs + 4, std::less<const ::mp_limb_t *>());
         return std::unique(ptrs, ptrs + 4) == (ptrs + 4);
     };
-    (void)distinct_op;
+#endif
     assert(distinct_op());
     // Proceed to the division.
     if (asize2 == 1) {
@@ -4243,18 +4245,17 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
 
 // 1-limb optimisation.
 template <std::size_t SSize>
-inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
-                            const static_int<SSize> &op2, mpz_size_t, mpz_size_t, int sign1, int sign2,
-                            const std::integral_constant<int, 1> &)
+inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                                const static_int<SSize> &op2, mpz_size_t, mpz_size_t, int sign1, int sign2,
+                                const std::integral_constant<int, 1> &)
 {
     // NOTE: here we have to use GMP_NUMB_MASK because if s_size is 1 this implementation is *always*
     // called, even if we have nail bits (whereas the optimisation for other operations currently kicks in
     // only without nail bits). Thus, we need to discard from m_limbs[0] the nail bits before doing the
     // division.
-    const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK),
-                      r_ = (op1.m_limbs[0] & GMP_NUMB_MASK) % (op2.m_limbs[0] & GMP_NUMB_MASK);
+    const ::mp_limb_t n = op1.m_limbs[0] & GMP_NUMB_MASK, d = op2.m_limbs[0] & GMP_NUMB_MASK, q_ = n / d, r_ = n % d;
     // Write q.
-    q._mp_size = sign1 * sign2 * (op1.m_limbs[0] >= op2.m_limbs[0]);
+    q._mp_size = sign1 * sign2 * (n >= d);
     // NOTE: there should be no need here to mask.
     q.m_limbs[0] = q_;
     // Write r.
@@ -4265,9 +4266,9 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
 }
 
 #if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
-inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                      ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
-                      ::mp_limb_t *MPPP_RESTRICT r2)
+inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
+                          ::mp_limb_t *MPPP_RESTRICT r2)
 {
     using dlimb_t = __uint128_t;
     const auto op1 = op11 + (dlimb_t(op12) << 64);
@@ -4280,8 +4281,8 @@ inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp
 }
 
 // Without remainder.
-inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                      ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
+inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                         ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
     using dlimb_t = __uint128_t;
     const auto op1 = op11 + (dlimb_t(op12) << 64);
@@ -4293,9 +4294,9 @@ inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp
 
 #elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
 
-inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                      ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
-                      ::mp_limb_t *MPPP_RESTRICT r2)
+inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
+                          ::mp_limb_t *MPPP_RESTRICT r2)
 {
     using dlimb_t = std::uint_least64_t;
     const auto op1 = op11 + (dlimb_t(op12) << 32);
@@ -4307,8 +4308,8 @@ inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp
     *r2 = static_cast<::mp_limb_t>(r >> 32);
 }
 
-inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                      ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
+inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                         ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
     using dlimb_t = std::uint_least64_t;
     const auto op1 = op11 + (dlimb_t(op12) << 32);
@@ -4322,16 +4323,16 @@ inline void dlimb_div(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp
 
 // 2-limbs optimisation.
 template <std::size_t SSize>
-inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
-                            const static_int<SSize> &op2, mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
-                            const std::integral_constant<int, 2> &)
+inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                                const static_int<SSize> &op2, mpz_size_t asize1, mpz_size_t asize2, int sign1,
+                                int sign2, const std::integral_constant<int, 2> &)
 {
     if (asize1 < 2 && asize2 < 2) {
         // NOTE: testing indicates that it pays off to optimize the case in which the operands have
         // fewer than 2 limbs. This a slightly modified version of the 1-limb division from above,
         // without the need to mask as this function is called only if there are no nail bits.
-        const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0], r_ = op1.m_limbs[0] % op2.m_limbs[0];
-        q._mp_size = sign1 * sign2 * (q_ != 0u);
+        const ::mp_limb_t n = op1.m_limbs[0], d = op2.m_limbs[0], q_ = n / d, r_ = n % d;
+        q._mp_size = sign1 * sign2 * (n >= d);
         q.m_limbs[0] = q_;
         q.m_limbs[1] = 0u;
         r._mp_size = sign1 * (r_ != 0u);
@@ -4341,24 +4342,24 @@ inline void static_div_impl(static_int<SSize> &q, static_int<SSize> &r, const st
     }
     // Perform the division.
     ::mp_limb_t q1, q2, r1, r2;
-    dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2, &r1, &r2);
+    dlimb_tdiv_qr(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2, &r1, &r2);
     // Write out.
-    q._mp_size = sign1 * sign2 * (q2 ? 2 : (q1 ? 1 : 0));
+    q._mp_size = sign1 * sign2 * size_from_lohi(q1, q2);
     q.m_limbs[0] = q1;
     q.m_limbs[1] = q2;
-    r._mp_size = sign1 * (r2 ? 2 : (r1 ? 1 : 0));
+    r._mp_size = sign1 * size_from_lohi(r1, r2);
     r.m_limbs[0] = r1;
     r.m_limbs[1] = r2;
 }
 
 template <std::size_t SSize>
-inline void static_div(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
-                       const static_int<SSize> &op2)
+inline void static_tdiv_qr(static_int<SSize> &q, static_int<SSize> &r, const static_int<SSize> &op1,
+                           const static_int<SSize> &op2)
 {
     const auto s1(op1._mp_size), s2(op2._mp_size);
     const mpz_size_t asize1 = std::abs(s1), asize2 = std::abs(s2);
     const int sign1 = integral_sign(s1), sign2 = integral_sign(s2);
-    static_div_impl(q, r, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
+    static_tdiv_qr_impl(q, r, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
     if (integer_static_div_algo<static_int<SSize>>::value == 0) {
         // If we used the mpn functions, zero the unused limbs on top (if necessary).
         // NOTE: as usual, potential of mpn use on optimised size.
@@ -4366,8 +4367,193 @@ inline void static_div(static_int<SSize> &q, static_int<SSize> &r, const static_
         r.zero_unused_limbs();
     }
 }
+}
 
-// Exact division.
+/// Ternary truncated division with remainder.
+/**
+ * This function will set \p q to the truncated quotient <tt>n / d</tt> and \p r to
+ * <tt>n % d</tt>. The remainder \p r has the same sign as \p n. \p q and \p r must be two distinct objects.
+ *
+ * @param q the quotient.
+ * @param r the remainder.
+ * @param n the dividend.
+ * @param d the divisor.
+ *
+ * @throws std::invalid_argument if \p q and \p r are the same object.
+ * @throws zero_division_error if \p d is zero.
+ */
+template <std::size_t SSize>
+inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &n, const integer<SSize> &d)
+{
+    if (mppp_unlikely(&q == &r)) {
+        throw std::invalid_argument("When performing a division with remainder, the quotient 'q' and the "
+                                    "remainder 'r' must be distinct objects");
+    }
+    if (mppp_unlikely(d.sgn() == 0)) {
+        throw zero_division_error("Integer division by zero");
+    }
+    const bool sq = q.is_static(), sr = r.is_static(), s1 = n.is_static(), s2 = d.is_static();
+    if (mppp_likely(s1 && s2)) {
+        if (!sq) {
+            q.set_zero();
+        }
+        if (!sr) {
+            r.set_zero();
+        }
+        static_tdiv_qr(q._get_union().g_st(), r._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
+        // Division can never fail.
+        return;
+    }
+    if (sq) {
+        q._get_union().promote();
+    }
+    if (sr) {
+        r._get_union().promote();
+    }
+    ::mpz_tdiv_qr(&q._get_union().g_dy(), &r._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+}
+
+inline namespace detail
+{
+
+// mpn implementation.
+template <std::size_t SSize>
+inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                               mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                               const std::integral_constant<int, 0> &)
+{
+    // First we check if the divisor is larger than the dividend (in abs limb size), as the mpn function
+    // requires asize1 >= asize2.
+    if (asize2 > asize1) {
+        // Zero out q.
+        q._mp_size = 0;
+        return;
+    }
+    // NOTE: we checked outside that the divisor is not zero, and now asize1 >= asize2. Hence,
+    // both operands are nonzero.
+    // We need to take care of potentially overlapping arguments. op1 could overlap with q, and op2
+    // could overlap with op1 or q.
+    std::array<::mp_limb_t, SSize> op1_alt, op2_alt;
+    const ::mp_limb_t *data1 = op1.m_limbs.data();
+    const ::mp_limb_t *data2 = op2.m_limbs.data();
+    if (&op1 == &q) {
+        copy_limbs_no(data1, data1 + asize1, op1_alt.data());
+        data1 = op1_alt.data();
+    }
+    if (&op2 == &q || &op1 == &op2) {
+        copy_limbs_no(data2, data2 + asize2, op2_alt.data());
+        data2 = op2_alt.data();
+    }
+#if !defined(NDEBUG)
+    // Small helper function to verify that all pointers are distinct. Used exclusively for debugging purposes.
+    auto distinct_op = [&q, data1, data2]() -> bool {
+        const ::mp_limb_t *ptrs[] = {q.m_limbs.data(), data1, data2};
+        std::sort(ptrs, ptrs + 3, std::less<const ::mp_limb_t *>());
+        return std::unique(ptrs, ptrs + 3) == (ptrs + 3);
+    };
+#endif
+    assert(distinct_op());
+    // Proceed to the division.
+    if (asize2 == 1) {
+        // Optimization when the divisor has 1 limb.
+        ::mpn_divrem_1(q.m_limbs.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2[0]);
+    } else {
+        std::array<::mp_limb_t, SSize> r_unused;
+        // General implementation.
+        ::mpn_tdiv_qr(q.m_limbs.data(), r_unused.data(), ::mp_size_t(0), data1, static_cast<::mp_size_t>(asize1), data2,
+                      static_cast<::mp_size_t>(asize2));
+    }
+    // Complete the quotient: compute size and sign.
+    q._mp_size = asize1 - asize2 + 1;
+    while (q._mp_size && !(q.m_limbs[static_cast<std::size_t>(q._mp_size - 1)] & GMP_NUMB_MASK)) {
+        --q._mp_size;
+    }
+    if (sign1 != sign2) {
+        q._mp_size = -q._mp_size;
+    }
+}
+
+// 1-limb optimisation.
+template <std::size_t SSize>
+inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                               mpz_size_t, mpz_size_t, int sign1, int sign2, const std::integral_constant<int, 1> &)
+{
+    // NOTE: here we have to use GMP_NUMB_MASK because if s_size is 1 this implementation is *always*
+    // called, even if we have nail bits (whereas the optimisation for other operations currently kicks in
+    // only without nail bits). Thus, we need to discard from m_limbs[0] the nail bits before doing the
+    // division.
+    const ::mp_limb_t n = op1.m_limbs[0] & GMP_NUMB_MASK, d = op2.m_limbs[0] & GMP_NUMB_MASK, q_ = n / d;
+    // Write q.
+    q._mp_size = sign1 * sign2 * (n >= d);
+    // NOTE: there should be no need here to mask.
+    q.m_limbs[0] = q_;
+}
+
+// 2-limbs optimisation.
+template <std::size_t SSize>
+inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                               mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
+                               const std::integral_constant<int, 2> &)
+{
+    if (asize1 < 2 && asize2 < 2) {
+        // NOTE: testing indicates that it pays off to optimize the case in which the operands have
+        // fewer than 2 limbs. This a slightly modified version of the 1-limb division from above,
+        // without the need to mask as this function is called only if there are no nail bits.
+        const ::mp_limb_t n = op1.m_limbs[0], d = op2.m_limbs[0], q_ = n / d;
+        q._mp_size = sign1 * sign2 * (n >= d);
+        q.m_limbs[0] = q_;
+        q.m_limbs[1] = 0u;
+        return;
+    }
+    // Perform the division.
+    ::mp_limb_t q1, q2;
+    dlimb_tdiv_q(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
+    // Write out.
+    q._mp_size = sign1 * sign2 * size_from_lohi(q1, q2);
+    q.m_limbs[0] = q1;
+    q.m_limbs[1] = q2;
+}
+
+template <std::size_t SSize>
+inline void static_tdiv_q(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    const auto s1(op1._mp_size), s2(op2._mp_size);
+    const mpz_size_t asize1 = std::abs(s1), asize2 = std::abs(s2);
+    const int sign1 = integral_sign(s1), sign2 = integral_sign(s2);
+    // NOTE: use the same algorithm dispatching as in the division with remainder.
+    static_tdiv_q_impl(q, op1, op2, asize1, asize2, sign1, sign2, integer_static_div_algo<static_int<SSize>>{});
+    if (integer_static_div_algo<static_int<SSize>>::value == 0) {
+        // If we used the mpn functions, zero the unused limbs on top (if necessary).
+        // NOTE: as usual, potential of mpn use on optimised size.
+        q.zero_unused_limbs();
+    }
+}
+}
+
+template <std::size_t SSize>
+inline void tdiv_q(integer<SSize> &q, const integer<SSize> &n, const integer<SSize> &d)
+{
+    if (mppp_unlikely(d.sgn() == 0)) {
+        throw zero_division_error("Integer division by zero");
+    }
+    const bool sq = q.is_static(), s1 = n.is_static(), s2 = d.is_static();
+    if (mppp_likely(s1 && s2)) {
+        if (!sq) {
+            q.set_zero();
+        }
+        static_tdiv_q(q._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
+        // Division can never fail.
+        return;
+    }
+    if (sq) {
+        q._get_union().promote();
+    }
+    ::mpz_tdiv_q(&q._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
+}
+
+inline namespace detail
+{
+
 // mpn implementation.
 template <std::size_t SSize>
 inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
@@ -4416,9 +4602,9 @@ template <std::size_t SSize>
 inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
                                  mpz_size_t, mpz_size_t, int sign1, int sign2, const std::integral_constant<int, 1> &)
 {
-    const ::mp_limb_t q_ = (op1.m_limbs[0] & GMP_NUMB_MASK) / (op2.m_limbs[0] & GMP_NUMB_MASK);
+    const ::mp_limb_t n = op1.m_limbs[0] & GMP_NUMB_MASK, d = op2.m_limbs[0] & GMP_NUMB_MASK, q_ = n / d;
     // Write q.
-    q._mp_size = sign1 * sign2 * (q_ != 0u);
+    q._mp_size = sign1 * sign2 * (n >= d);
     q.m_limbs[0] = q_;
 }
 
@@ -4430,16 +4616,16 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
 {
     if (asize1 < 2 && asize2 < 2) {
         // 1-limb optimisation.
-        const ::mp_limb_t q_ = op1.m_limbs[0] / op2.m_limbs[0];
-        q._mp_size = sign1 * sign2 * (q_ != 0u);
+        const ::mp_limb_t n = op1.m_limbs[0], d = op2.m_limbs[0], q_ = n / d;
+        q._mp_size = sign1 * sign2 * (n >= d);
         q.m_limbs[0] = q_;
         q.m_limbs[1] = 0u;
         return;
     }
     // General case.
     ::mp_limb_t q1, q2;
-    dlimb_div(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
-    q._mp_size = sign1 * sign2 * (q2 ? 2 : (q1 ? 1 : 0));
+    dlimb_tdiv_q(op1.m_limbs[0], op1.m_limbs[1], op2.m_limbs[0], op2.m_limbs[1], &q1, &q2);
+    q._mp_size = sign1 * sign2 * size_from_lohi(q1, q2);
     q.m_limbs[0] = q1;
     q.m_limbs[1] = q2;
 }
@@ -4466,50 +4652,6 @@ inline void static_divexact(static_int<SSize> &q, const static_int<SSize> &op1, 
         q.zero_unused_limbs();
     }
 }
-}
-
-/// Ternary truncated division.
-/**
- * This function will set \p q to the truncated quotient <tt>n / d</tt> and \p r to
- * <tt>n % d</tt>. The remainder \p r has the same sign as \p n. \p q and \p r must be two distinct objects.
- *
- * @param q the quotient.
- * @param r the remainder.
- * @param n the dividend.
- * @param d the divisor.
- *
- * @throws std::invalid_argument if \p q and \p r are the same object.
- * @throws zero_division_error if \p d is zero.
- */
-template <std::size_t SSize>
-inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &n, const integer<SSize> &d)
-{
-    if (mppp_unlikely(&q == &r)) {
-        throw std::invalid_argument("When performing a division with remainder, the quotient 'q' and the "
-                                    "remainder 'r' must be distinct objects");
-    }
-    if (mppp_unlikely(d.sgn() == 0)) {
-        throw zero_division_error("Integer division by zero");
-    }
-    const bool sq = q.is_static(), sr = r.is_static(), s1 = n.is_static(), s2 = d.is_static();
-    if (mppp_likely(s1 && s2)) {
-        if (!sq) {
-            q.set_zero();
-        }
-        if (!sr) {
-            r.set_zero();
-        }
-        static_div(q._get_union().g_st(), r._get_union().g_st(), n._get_union().g_st(), d._get_union().g_st());
-        // Division can never fail.
-        return;
-    }
-    if (sq) {
-        q._get_union().promote();
-    }
-    if (sr) {
-        r._get_union().promote();
-    }
-    ::mpz_tdiv_qr(&q._get_union().g_dy(), &r._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
 }
 
 /// Exact division (ternary version).
