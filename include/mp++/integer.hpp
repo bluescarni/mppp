@@ -4530,6 +4530,16 @@ inline void static_tdiv_q(static_int<SSize> &q, const static_int<SSize> &op1, co
 }
 }
 
+/// Ternary truncated division without remainder.
+/**
+ * This function will set \p q to the truncated quotient <tt>n / d</tt>.
+ *
+ * @param q the quotient.
+ * @param n the dividend.
+ * @param d the divisor.
+ *
+ * @throws zero_division_error if \p d is zero.
+ */
 template <std::size_t SSize>
 inline void tdiv_q(integer<SSize> &q, const integer<SSize> &n, const integer<SSize> &d)
 {
