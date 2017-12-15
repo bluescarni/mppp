@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Implement the :cpp:func:`mppp::real::trunc()` and  :cpp:func:`mppp::real::integer_p()` primitives
+  (`#102 <https://github.com/bluescarni/mppp/pull/102>`__).
+
 - Implement the :cpp:func:`~mppp::free_integer_caches()` function to manually free the caches used internally by
   :cpp:class:`~mppp::integer` (`#98 <https://github.com/bluescarni/mppp/pull/98>`__).
 
