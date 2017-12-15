@@ -4745,6 +4745,22 @@ inline void static_divexact_gcd(static_int<SSize> &q, const static_int<SSize> &o
 }
 }
 
+/// Exact division with positive divisor (ternary version).
+/**
+ * This function will set \p rop to the quotient of \p n and \p d.
+ *
+ * \rststar
+ * .. warning::
+ *
+ *    If ``d`` does not divide ``n`` exactly, or if ``d`` is not strictly positive, the behaviour will be undefined.
+ * \endrststar
+ *
+ * @param rop the return value.
+ * @param n the dividend.
+ * @param d the divisor.
+ *
+ * @return a reference to \p rop.
+ */
 template <std::size_t SSize>
 inline integer<SSize> &divexact_gcd(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -4765,6 +4781,27 @@ inline integer<SSize> &divexact_gcd(integer<SSize> &rop, const integer<SSize> &n
     // mpz_divexact() directly.
     ::mpz_divexact(&rop._get_union().g_dy(), n.get_mpz_view(), d.get_mpz_view());
     return rop;
+}
+
+/// Exact division with positive divisor (binary version).
+/**
+ * \rststar
+ * .. warning::
+ *
+ *    If ``d`` does not divide ``n`` exactly, or if ``d`` is not strictly positive, the behaviour will be undefined.
+ * \endrststar
+ *
+ * @param n the dividend.
+ * @param d the divisor.
+ *
+ * @return the quotient of \p n and \p d.
+ */
+template <std::size_t SSize>
+inline integer<SSize> divexact_gcd(const integer<SSize> &n, const integer<SSize> &d)
+{
+    integer<SSize> retval;
+    divexact_gcd(retval, n, d);
+    return retval;
 }
 
 inline namespace detail
