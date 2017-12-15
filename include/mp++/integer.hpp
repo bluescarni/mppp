@@ -495,14 +495,15 @@ inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
     assert(check_no_nails(lo) && check_no_nails(hi));
     // NOTE: this contraption ensures the correct result. The possibilities for hi/lo
     // nonzero are:
-    // hi | lo | asize
-    // ---------------
-    //  1 |  1 |     2
-    //  1 |  0 |     2
-    //  0 |  1 |     1
-    //  0 |  0 |     0
-    // Use '|' instead of '||' as we don't need to short circuit on this.
-    return static_cast<mpz_size_t>(((lo != 0u) | (hi != 0u)) * ((hi != 0u) + 1));
+    // hi | lo | asize | idx
+    // ---------------------
+    //  1 |  1 |     2 |   3
+    //  1 |  0 |     2 |   2
+    //  0 |  1 |     1 |   1
+    //  0 |  0 |     0 |   0
+    constexpr std::int_least8_t table[] = {0, 1, 2, 2};
+    const auto idx = (lo != 0u) + ((hi != 0u) << 1);
+    return static_cast<mpz_size_t>(table[idx]);
 }
 
 // Branchless sign function for C++ integrals:
