@@ -4568,6 +4568,7 @@ inline namespace detail
 {
 
 // mpn implementation.
+// NOTE: the Gcd flag specifies whether the divisor op2 is a strictly positive quantity.
 template <bool Gcd, std::size_t SSize>
 inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &op1, const static_int<SSize> &op2,
                                  mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,

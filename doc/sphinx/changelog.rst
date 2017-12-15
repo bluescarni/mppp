@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Implement division without remainder (``tdiv_q()``) and exact division with positive divisor (``divexact_gcd()``)
+  for :cpp:class:`~mppp::integer` (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
+
 - Implement the :cpp:func:`mppp::real::trunc()` and  :cpp:func:`mppp::real::integer_p()` primitives
   (`#102 <https://github.com/bluescarni/mppp/pull/102>`__).
 
@@ -15,6 +18,8 @@ New
 
 Changes
 ~~~~~~~
+
+- Various performance improvements for :cpp:class:`~mppp::integer` division (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
 
 - Improve the detection of the availability of the ``thread_local`` keyword on recent Xcode versions 
   (`#99 <https://github.com/bluescarni/mppp/pull/99>`__).
