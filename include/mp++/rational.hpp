@@ -191,8 +191,6 @@ mpq_struct_t get_mpq_view(const rational<SSize> &);
  * \endrststar
  */
 // NOTEs:
-// - GMP has a divexact_gcd() function that, I believe, shaves off some complexity in terms of branching
-//   etc. Consider implementing it.
 // - not clear if the NewRop flag helps at all. Needs to be benchmarked. If it does, its usage could
 //   be expanded in mul/div.
 // - we might be paying a perf penalty for dynamic storage values due to the lack of pre-allocation for
@@ -910,8 +908,8 @@ public:
         // This can be zero only if both num and den are zero.
         assert(!g.is_zero());
         if (!g.is_one()) {
-            divexact(m_num, m_num, g);
-            divexact(m_den, m_den, g);
+            divexact_gcd(m_num, m_num, g);
+            divexact_gcd(m_den, m_den, g);
         }
         // Fix mismatch in signs.
         fix_den_sign(*this);
@@ -1219,8 +1217,8 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
             mul(rop._get_den(), op1.get_den(), op2.get_den());
         } else {
             // Eliminate common factors between the dens.
-            auto t = divexact(op2.get_den(), g);
-            auto tmp2 = divexact(op1.get_den(), g);
+            auto t = divexact_gcd(op2.get_den(), g);
+            auto tmp2 = divexact_gcd(op1.get_den(), g);
 
             // Compute the numerator (will be t).
             auto tmp1 = op1.get_num() * t;
@@ -1235,9 +1233,9 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
                 mul(rop._get_den(), op2.get_den(), tmp2);
             } else {
                 // Assign numerator, reduced by the new gcd.
-                divexact(rop._get_num(), t, g);
+                divexact_gcd(rop._get_num(), t, g);
                 // Reduced version of the second den.
-                divexact(tmp1, op2.get_den(), g);
+                divexact_gcd(tmp1, op2.get_den(), g);
                 // Assign final den: tmp1 x the reduced den1.
                 mul(rop._get_den(), tmp1, tmp2);
             }
@@ -1358,9 +1356,9 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
             rop._get_den() = op2.get_den();
         } else {
             // NOTE: after this line, all dens are tainted.
-            divexact(rop._get_den(), op2.get_den(), g);
+            divexact_gcd(rop._get_den(), op2.get_den(), g);
             // Re-use g.
-            divexact(g, op1.get_num(), g);
+            divexact_gcd(g, op1.get_num(), g);
             mul(rop._get_num(), op2.get_num(), g);
         }
     } else if (u2) {
@@ -1370,8 +1368,8 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
             mul(rop._get_num(), op1.get_num(), op2.get_num());
             rop._get_den() = op1.get_den();
         } else {
-            divexact(rop._get_den(), op1.get_den(), g);
-            divexact(g, op2.get_num(), g);
+            divexact_gcd(rop._get_den(), op1.get_den(), g);
+            divexact_gcd(g, op2.get_num(), g);
             mul(rop._get_num(), op1.get_num(), g);
         }
     } else {
@@ -1382,14 +1380,14 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
         const auto g1 = gcd(op1.get_num(), op2.get_den());
         const auto g2 = gcd(op1.get_den(), op2.get_num());
         // Remove common factors from the nums.
-        auto tmp1 = divexact(op1.get_num(), g1);
-        auto tmp2 = divexact(op2.get_num(), g2);
+        auto tmp1 = divexact_gcd(op1.get_num(), g1);
+        auto tmp2 = divexact_gcd(op2.get_num(), g2);
         // Compute rop's numerator.
         // NOTE: after this line, all nums are tainted.
         mul(rop._get_num(), tmp1, tmp2);
         // Remove common factors from the dens.
-        divexact(tmp1, op2.get_den(), g1);
-        divexact(tmp2, op1.get_den(), g2);
+        divexact_gcd(tmp1, op2.get_den(), g1);
+        divexact_gcd(tmp2, op1.get_den(), g2);
         // Compute rop's denominator.
         mul(rop._get_den(), tmp1, tmp2);
     }
@@ -1459,8 +1457,8 @@ inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, co
             // NOTE: op2 not tainted, as it's separate from rop.
             rop._get_den() = op2.get_num();
         } else {
-            divexact(rop._get_num(), op1.get_num(), g);
-            divexact(rop._get_den(), op2.get_num(), g);
+            divexact_gcd(rop._get_num(), op1.get_num(), g);
+            divexact_gcd(rop._get_den(), op2.get_num(), g);
         }
     } else if (u1) {
         // Same idea as in the mul().
@@ -1474,8 +1472,8 @@ inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, co
             // NOTE: dens tainted after this, apart from op2's
             // as we have established earlier that rop and op2
             // are distinct.
-            divexact(rop._get_den(), op2.get_num(), g);
-            divexact(g, op1.get_num(), g);
+            divexact_gcd(rop._get_den(), op2.get_num(), g);
+            divexact_gcd(g, op1.get_num(), g);
             mul(rop._get_num(), op2.get_den(), g);
         }
     } else if (u2) {
@@ -1484,8 +1482,8 @@ inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, co
             rop._get_num() = op1.get_num();
             mul(rop._get_den(), op1.get_den(), op2.get_num());
         } else {
-            divexact(rop._get_num(), op1.get_num(), g);
-            divexact(g, op2.get_num(), g);
+            divexact_gcd(rop._get_num(), op1.get_num(), g);
+            divexact_gcd(g, op2.get_num(), g);
             mul(rop._get_den(), op1.get_den(), g);
         }
     } else {
@@ -1494,13 +1492,13 @@ inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, co
         const auto g1 = gcd(op1.get_num(), op2.get_num());
         const auto g2 = gcd(op1.get_den(), op2.get_den());
         // Remove common factors.
-        auto tmp1 = divexact(op1.get_num(), g1);
-        auto tmp2 = divexact(op2.get_den(), g2);
+        auto tmp1 = divexact_gcd(op1.get_num(), g1);
+        auto tmp2 = divexact_gcd(op2.get_den(), g2);
         // Compute the numerator.
         mul(rop._get_num(), tmp1, tmp2);
         // Remove common factors.
-        divexact(tmp1, op2.get_num(), g1);
-        divexact(tmp2, op1.get_den(), g2);
+        divexact_gcd(tmp1, op2.get_num(), g1);
+        divexact_gcd(tmp2, op1.get_den(), g2);
         // Denominator.
         mul(rop._get_den(), tmp1, tmp2);
     }
@@ -2053,9 +2051,9 @@ inline rational<SSize> dispatch_binary_mul(const rational<SSize> &op1, const int
             retval._get_den() = op1.get_den();
         } else {
             // Set the den first. Dens tainted after this.
-            divexact(retval._get_den(), op1.get_den(), g);
+            divexact_gcd(retval._get_den(), op1.get_den(), g);
             // Re-use the g variable as tmp storage.
-            divexact(g, op2, g);
+            divexact_gcd(g, op2, g);
             mul(retval._get_num(), op1.get_num(), g);
         }
     }
@@ -2140,9 +2138,9 @@ inline void dispatch_in_place_mul(rational<SSize> &retval, const integer<SSize> 
             mul(retval._get_num(), retval.get_num(), n);
         } else {
             // Set the den first. Dens tainted after this.
-            divexact(retval._get_den(), retval.get_den(), g);
+            divexact_gcd(retval._get_den(), retval.get_den(), g);
             // Re-use the g variable as tmp storage.
-            divexact(g, n, g);
+            divexact_gcd(g, n, g);
             mul(retval._get_num(), retval.get_num(), g);
         }
     }
@@ -2214,8 +2212,8 @@ inline rational<SSize> dispatch_binary_div(const rational<SSize> &op1, const int
             retval._get_num() = op1.get_num();
             retval._get_den() = op2;
         } else {
-            divexact(retval._get_num(), op1.get_num(), g);
-            divexact(retval._get_den(), op2, g);
+            divexact_gcd(retval._get_num(), op1.get_num(), g);
+            divexact_gcd(retval._get_den(), op2, g);
         }
     } else {
         if (g.is_one()) {
@@ -2223,9 +2221,9 @@ inline rational<SSize> dispatch_binary_div(const rational<SSize> &op1, const int
             mul(retval._get_den(), op1.get_den(), op2);
         } else {
             // Set the num first.
-            divexact(retval._get_num(), op1.get_num(), g);
+            divexact_gcd(retval._get_num(), op1.get_num(), g);
             // Re-use the g variable as tmp storage.
-            divexact(g, op2, g);
+            divexact_gcd(g, op2, g);
             mul(retval._get_den(), op1.get_den(), g);
         }
     }
@@ -2248,16 +2246,16 @@ inline rational<SSize> dispatch_binary_div(const integer<SSize> &op1, const rati
             retval._get_num() = op1;
             retval._get_den() = op2.get_num();
         } else {
-            divexact(retval._get_num(), op1, g);
-            divexact(retval._get_den(), op2.get_num(), g);
+            divexact_gcd(retval._get_num(), op1, g);
+            divexact_gcd(retval._get_den(), op2.get_num(), g);
         }
     } else {
         if (g.is_one()) {
             mul(retval._get_num(), op1, op2.get_den());
             retval._get_den() = op2.get_num();
         } else {
-            divexact(retval._get_den(), op2.get_num(), g);
-            divexact(g, op1, g);
+            divexact_gcd(retval._get_den(), op2.get_num(), g);
+            divexact_gcd(g, op1, g);
             mul(retval._get_num(), op2.get_den(), g);
         }
     }
@@ -2337,17 +2335,17 @@ inline void dispatch_in_place_div(rational<SSize> &retval, const integer<SSize> 
         if (g.is_one()) {
             retval._get_den() = n;
         } else {
-            divexact(retval._get_num(), retval.get_num(), g);
-            divexact(retval._get_den(), n, g);
+            divexact_gcd(retval._get_num(), retval.get_num(), g);
+            divexact_gcd(retval._get_den(), n, g);
         }
     } else {
         if (g.is_one()) {
             mul(retval._get_den(), retval.get_den(), n);
         } else {
             // Set the num first.
-            divexact(retval._get_num(), retval.get_num(), g);
+            divexact_gcd(retval._get_num(), retval.get_num(), g);
             // Re-use the g variable as tmp storage.
-            divexact(g, n, g);
+            divexact_gcd(g, n, g);
             mul(retval._get_den(), retval.get_den(), g);
         }
     }
