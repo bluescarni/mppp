@@ -7,11 +7,21 @@ Changelog
 New
 ~~~
 
+- Add left bit shift benchmarks for :cpp:class:`~mppp::integer` (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
+
+- Implement division without remainder (``tdiv_q()``) and exact division with positive divisor (``divexact_gcd()``)
+  for :cpp:class:`~mppp::integer` (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
+
+- Implement the ``trunc()`` and  ``integer_p()`` primitives for :cpp:class:`~mppp::real`
+  (`#102 <https://github.com/bluescarni/mppp/pull/102>`__).
+
 - Implement the :cpp:func:`~mppp::free_integer_caches()` function to manually free the caches used internally by
   :cpp:class:`~mppp::integer` (`#98 <https://github.com/bluescarni/mppp/pull/98>`__).
 
 Changes
 ~~~~~~~
+
+- Various performance improvements for :cpp:class:`~mppp::integer` division (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
 
 - Improve the detection of the availability of the ``thread_local`` keyword on recent Xcode versions 
   (`#99 <https://github.com/bluescarni/mppp/pull/99>`__).
