@@ -1510,7 +1510,7 @@ not be altered.</p>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp7tdiv_qrER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE">
 <span id="mppp::tdiv_qr__integer:SSize:R.integer:SSize:R.integer:SSize:CR.integer:SSize:CR"></span><span class="target" id="group__integer__division_1gaa77bf1148a002b559a4c4e05e941bf3a"></span>void <code class="descclassname">mppp::</code><code class="descname">tdiv_qr</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>q</em>, <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>r</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7tdiv_qrER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Ternary truncated division. </p>
+<dd><p>Ternary truncated division with remainder. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">q</span></code> to the truncated quotient <code class="docutils literal"><span class="pre">n</span> <span class="pre">/</span> <span class="pre">d</span></code> and <code class="docutils literal"><span class="pre">r</span></code> to <code class="docutils literal"><span class="pre">n</span> <span class="pre">%</span> <span class="pre">d</span></code>. The remainder <code class="docutils literal"><span class="pre">r</span></code> has the same sign as <code class="docutils literal"><span class="pre">n</span></code>. <code class="docutils literal"><span class="pre">q</span></code> and <code class="docutils literal"><span class="pre">r</span></code> must be two distinct objects.</p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
@@ -1524,6 +1524,32 @@ not be altered.</p>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">std::invalid_argument</span></code>: if <code class="docutils literal"><span class="pre">q</span></code> and <code class="docutils literal"><span class="pre">r</span></code> are the same object. </li>
+<li><code class="docutils literal"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal"><span class="pre">d</span></code> is zero. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp6tdiv_qER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE">
+<span id="mppp::tdiv_q__integer:SSize:R.integer:SSize:CR.integer:SSize:CR"></span><span class="target" id="group__integer__division_1ga943d4abb844679d75c51b9109998fd84"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">tdiv_q</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>q</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6tdiv_qER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Ternary truncated division without remainder. </p>
+<p>This function will set <code class="docutils literal"><span class="pre">q</span></code> to the truncated quotient <code class="docutils literal"><span class="pre">n</span> <span class="pre">/</span> <span class="pre">d</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">q</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">q</span></code>: the quotient. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: the dividend. </li>
+<li><code class="docutils literal"><span class="pre">d</span></code>: the divisor.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal"><span class="pre">d</span></code> is zero. </li>
 </ul>
 </dd>
@@ -1566,6 +1592,56 @@ not be altered.</p>
 <p><div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">If <code class="docutils literal"><span class="pre">d</span></code> does not divide <code class="docutils literal"><span class="pre">n</span></code> exactly, the behaviour will be undefined.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the quotient of <code class="docutils literal"><span class="pre">n</span></code> and <code class="docutils literal"><span class="pre">d</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the dividend. </li>
+<li><code class="docutils literal"><span class="pre">d</span></code>: the divisor.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp12divexact_gcdER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE">
+<span id="mppp::divexact_gcd__integer:SSize:R.integer:SSize:CR.integer:SSize:CR"></span><span class="target" id="group__integer__division_1ga549944acc8edd0a49480fa27a4cebd24"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">divexact_gcd</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp12divexact_gcdER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Exact division with positive divisor (ternary version). </p>
+<p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to the quotient of <code class="docutils literal"><span class="pre">n</span></code> and <code class="docutils literal"><span class="pre">d</span></code>.</p>
+<p><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If <code class="docutils literal"><span class="pre">d</span></code> does not divide <code class="docutils literal"><span class="pre">n</span></code> exactly, or if <code class="docutils literal"><span class="pre">d</span></code> is not strictly positive, the behaviour will be undefined.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: the dividend. </li>
+<li><code class="docutils literal"><span class="pre">d</span></code>: the divisor.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp12divexact_gcdERK7integerI5SSizeERK7integerI5SSizeE">
+<span id="mppp::divexact_gcd__integer:SSize:CR.integer:SSize:CR"></span><span class="target" id="group__integer__division_1ga6561a5d1338f325af206177f810873e9"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">divexact_gcd</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp12divexact_gcdERK7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Exact division with positive divisor (binary version). </p>
+<p><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If <code class="docutils literal"><span class="pre">d</span></code> does not divide <code class="docutils literal"><span class="pre">n</span></code> exactly, or if <code class="docutils literal"><span class="pre">d</span></code> is not strictly positive, the behaviour will be undefined.</p>
 </div>
 </p>
 <p><dl class="docutils">

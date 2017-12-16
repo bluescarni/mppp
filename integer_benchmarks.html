@@ -110,6 +110,13 @@
 <li><a class="reference internal" href="#id14">2-limb signed integers</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#left-bit-shift">Left bit shift</a><ul>
+<li><a class="reference internal" href="#id15">1-limb unsigned integers</a></li>
+<li><a class="reference internal" href="#id16">1-limb signed integers</a></li>
+<li><a class="reference internal" href="#id17">2-limb unsigned integers</a></li>
+<li><a class="reference internal" href="#id18">2-limb signed integers</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -343,6 +350,44 @@ mp++ integers with 2 limbs of static size are employed.</p>
 mp++ integers with 2 limbs of static size are employed.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer2_sort_signed.png"><img alt="_images/integer2_sort_signed.png" src="_images/integer2_sort_signed.png" style="width: 610.0px; height: 407.0px;" /></a>
+</div>
+</div>
+</div>
+<div class="section" id="left-bit-shift">
+<h2>Left bit shift<a class="headerlink" href="#left-bit-shift" title="Permalink to this headline">¶</a></h2>
+<p>This benchmark consists of the element-wise left bit shifting of a randomly-generated vector of <span class="math">\(3\times 10^7\)</span> integers.</p>
+<div class="section" id="id15">
+<h3>1-limb unsigned integers<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<p>In this setup, the integer vector is initialised with small <em>non-negative</em> values, which are then left bit shifted
+by a small random amount (so that the result always fits into a machine word). mp++ integers with 1 limb of static size are employed.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer1_vec_lshift_unsigned.png"><img alt="_images/integer1_vec_lshift_unsigned.png" src="_images/integer1_vec_lshift_unsigned.png" style="width: 609.5px; height: 407.0px;" /></a>
+</div>
+</div>
+<div class="section" id="id16">
+<h3>1-limb signed integers<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<p>In this setup, the integer vector is initialised with small positive <em>and</em> negative values, which are then left bit shifted
+by a small random amount (so that the result always fits into a machine word). mp++ integers with 1 limb of static size are employed.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer1_vec_lshift_signed.png"><img alt="_images/integer1_vec_lshift_signed.png" src="_images/integer1_vec_lshift_signed.png" style="width: 610.0px; height: 407.0px;" /></a>
+</div>
+</div>
+<div class="section" id="id17">
+<h3>2-limb unsigned integers<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<p>In this setup, the integer vector is initialised with <em>non-negative</em> values in the <span class="math">\(\left[2^{64},2^{128}\right)\)</span> range,
+which are then left bit shifted by a small random amount (so that the result always fits into 2 machine words). mp++ integers
+with 2 limbs of static size are employed.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer2_vec_lshift_unsigned.png"><img alt="_images/integer2_vec_lshift_unsigned.png" src="_images/integer2_vec_lshift_unsigned.png" style="width: 610.0px; height: 407.0px;" /></a>
+</div>
+</div>
+<div class="section" id="id18">
+<h3>2-limb signed integers<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<p>In this setup, the integer vector is initialised with positive <em>and</em> negative values in the <span class="math">\(\left(-2^{128},2^{128}\right)\)</span> range,
+which are then left bit shifted by a small random amount (so that the result always fits into 2 machine words). mp++ integers
+with 2 limbs of static size are employed.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer2_vec_lshift_signed.png"><img alt="_images/integer2_vec_lshift_signed.png" src="_images/integer2_vec_lshift_signed.png" style="width: 610.0px; height: 407.0px;" /></a>
 </div>
 </div>
 </div>
