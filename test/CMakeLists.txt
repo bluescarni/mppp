@@ -47,6 +47,7 @@ if(NOT MINGW)
   # some tests up more or compile without debug info on the CI.
   ADD_MPPP_TESTCASE(integer_basic_01)
   ADD_MPPP_TESTCASE(integer_basic_02)
+  ADD_MPPP_TESTCASE(integer_basic_03)
 endif()
 ADD_MPPP_TESTCASE(integer_bin)
 ADD_MPPP_TESTCASE(integer_bitwise)
