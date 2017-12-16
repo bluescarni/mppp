@@ -3982,16 +3982,16 @@ inline std::size_t static_mul_2exp(static_int<1> &rop, const static_int<1> &n, s
 // 2-limb optimisation.
 inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, std::size_t s)
 {
-    mpz_size_t asize = n._mp_size;
+    // NOTE: it looks like in this function abs + integral sign are a definite
+    // win in all cases, possibly because there's enough work to do in the function
+    // to make any branching advantage (in case of only unsigned operands)
+    // to be negligible.
+    const mpz_size_t asize = std::abs(n._mp_size);
     if (s == 0u || asize == 0) {
         rop = n;
         return 0u;
     }
-    int sign = 1;
-    if (asize < 0) {
-        asize = -asize;
-        sign = -1;
-    }
+    const int sign = integral_sign(n._mp_size);
     // Too much shift, this can never work on a nonzero value.
     static_assert(unsigned(GMP_NUMB_BITS) <= nl_max<unsigned>() / 2u, "Overflow error.");
     if (mppp_unlikely(s >= 2u * unsigned(GMP_NUMB_BITS))) {
