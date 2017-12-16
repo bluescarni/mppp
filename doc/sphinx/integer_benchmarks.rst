@@ -250,3 +250,50 @@ mp++ integers with 2 limbs of static size are employed.
 .. figure:: _static/integer2_sort_signed.png
    :scale: 50%
    :align: center
+
+Left bit shift
+^^^^^^^^^^^^^^
+
+This benchmark consists of the element-wise left bit shifting of a randomly-generated vector of :math:`3\times 10^7` integers.
+
+1-limb unsigned integers
+........................
+
+In this setup, the integer vector is initialised with small *non-negative* values, which are then left bit shifted 
+by a small random amount (so that the result always fits into a machine word). mp++ integers with 1 limb of static size are employed.
+
+.. figure:: _static/integer1_vec_lshift_unsigned.png
+   :scale: 50%
+   :align: center
+
+1-limb signed integers
+........................
+
+In this setup, the integer vector is initialised with small positive *and* negative values, which are then left bit shifted 
+by a small random amount (so that the result always fits into a machine word). mp++ integers with 1 limb of static size are employed.
+
+.. figure:: _static/integer1_vec_lshift_signed.png
+   :scale: 50%
+   :align: center
+
+2-limb unsigned integers
+........................
+
+In this setup, the integer vector is initialised with *non-negative* values in the :math:`\left[2^{64},2^{128}\right)` range,
+which are then left bit shifted by a small random amount (so that the result always fits into 2 machine words). mp++ integers
+with 2 limbs of static size are employed.
+
+.. figure:: _static/integer2_vec_lshift_unsigned.png
+   :scale: 50%
+   :align: center
+
+2-limb signed integers
+........................
+
+In this setup, the integer vector is initialised with positive *and* negative values in the :math:`\left(-2^{128},2^{128}\right)` range,
+which are then left bit shifted by a small random amount (so that the result always fits into 2 machine words). mp++ integers
+with 2 limbs of static size are employed.
+
+.. figure:: _static/integer2_vec_lshift_signed.png
+   :scale: 50%
+   :align: center
