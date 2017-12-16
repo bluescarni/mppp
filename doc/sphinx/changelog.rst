@@ -7,10 +7,12 @@ Changelog
 New
 ~~~
 
+- Add left bit shift benchmarks for :cpp:class:`~mppp::integer` (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
+
 - Implement division without remainder (``tdiv_q()``) and exact division with positive divisor (``divexact_gcd()``)
   for :cpp:class:`~mppp::integer` (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
 
-- Implement the :cpp:func:`mppp::real::trunc()` and  :cpp:func:`mppp::real::integer_p()` primitives
+- Implement the ``trunc()`` and  ``integer_p()`` primitives for :cpp:class:`~mppp::real`
   (`#102 <https://github.com/bluescarni/mppp/pull/102>`__).
 
 - Implement the :cpp:func:`~mppp::free_integer_caches()` function to manually free the caches used internally by
