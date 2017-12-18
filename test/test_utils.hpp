@@ -246,10 +246,15 @@ struct integral_minmax_dist {
 // Use a small wrapper to get an int distribution instead, with the min max limits
 // from the char type. We will be casting back when using the distribution.
 template <typename T>
-struct integral_minmax_dist<T,
-                            typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                    || std::is_same<unsigned char, T>::value>::type> {
-    using type = typename std::conditional<std::is_signed<T>::value, int, unsigned>::type;
+struct integral_minmax_dist<
+    T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                               || std::is_same<unsigned char, T>::value || std::is_same<wchar_t, T>::value>::type> {
+    // Just gonna assume long/ulong can represent wchar_t here.
+    using type = typename std::conditional<std::is_signed<T>::value, long, unsigned long>::type;
+    static_assert(!std::is_same<T, wchar_t>::value
+                      || (std::numeric_limits<T>::max() <= std::numeric_limits<type>::max()
+                          && std::numeric_limits<T>::min() >= std::numeric_limits<type>::min()),
+                  "Invalid range for wchar_t.");
     integral_minmax_dist() : m_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max()) {}
     template <typename E>
     T operator()(E &e)
