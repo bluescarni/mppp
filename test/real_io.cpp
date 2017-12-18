@@ -30,7 +30,7 @@ using namespace mppp;
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
-                             unsigned long, long long, unsigned long long>;
+                             unsigned long, long long, unsigned long long, wchar_t>;
 
 using fp_types = std::tuple<float, double, long double>;
 

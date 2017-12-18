@@ -72,6 +72,8 @@ struct add_tester {
         REQUIRE((lex_cast(short(4) + n2) == "2"));
         REQUIRE((lex_cast(n1 + 4) == "5"));
         REQUIRE((lex_cast(4 + n2) == "2"));
+        REQUIRE((lex_cast(n1 + wchar_t{4}) == "5"));
+        REQUIRE((lex_cast(wchar_t{4} + n2) == "2"));
         REQUIRE((std::is_same<decltype(n1 + 4), integer>::value));
         REQUIRE((std::is_same<decltype(4 + n2), integer>::value));
         REQUIRE((lex_cast(n1 + 4u) == "5"));
@@ -254,6 +256,8 @@ struct sub_tester {
         REQUIRE((lex_cast(short(4) - n2) == "6"));
         REQUIRE((lex_cast(n1 - 4) == "-3"));
         REQUIRE((lex_cast(4 - n2) == "6"));
+        REQUIRE((lex_cast(n1 - wchar_t{4}) == "-3"));
+        REQUIRE((lex_cast(wchar_t{4} - n2) == "6"));
         REQUIRE((std::is_same<decltype(n1 - 4), integer>::value));
         REQUIRE((std::is_same<decltype(4 - n2), integer>::value));
         REQUIRE((lex_cast(n1 - 4u) == "-3"));
@@ -437,6 +441,8 @@ struct mul_tester {
         REQUIRE((lex_cast(short(4) * n2) == "-8"));
         REQUIRE((lex_cast(n1 * 4) == "4"));
         REQUIRE((lex_cast(4 * n2) == "-8"));
+        REQUIRE((lex_cast(n1 * wchar_t{4}) == "4"));
+        REQUIRE((lex_cast(wchar_t{4} * n2) == "-8"));
         REQUIRE((std::is_same<decltype(n1 * 4), integer>::value));
         REQUIRE((std::is_same<decltype(4 * n2), integer>::value));
         REQUIRE((lex_cast(n1 * 4u) == "4"));
@@ -579,6 +585,8 @@ struct div_tester {
         REQUIRE((lex_cast(short(4) / n2) == "-2"));
         REQUIRE((lex_cast(n1 / 4) == "1"));
         REQUIRE((lex_cast(4 / n2) == "-2"));
+        REQUIRE((lex_cast(n1 / wchar_t{4}) == "1"));
+        REQUIRE((lex_cast(wchar_t{4} / n2) == "-2"));
         REQUIRE((std::is_same<decltype(n1 / 4), integer>::value));
         REQUIRE((std::is_same<decltype(4 / n2), integer>::value));
         REQUIRE((lex_cast(n1 / 4u) == "1"));
@@ -760,6 +768,7 @@ struct shift_tester {
         REQUIRE((lex_cast(ret << short(2)) == "0"));
         ret = 1;
         REQUIRE((lex_cast(ret << 1) == "2"));
+        REQUIRE((lex_cast(ret << wchar_t{1}) == "2"));
         REQUIRE((lex_cast(ret << 2ll) == "4"));
         ret.neg();
         REQUIRE((lex_cast(ret << 3ull) == "-8"));
@@ -768,6 +777,7 @@ struct shift_tester {
         REQUIRE((lex_cast(ret <<= static_cast<signed char>(0)) == "-16"));
         REQUIRE((lex_cast(ret >> 0) == "-16"));
         REQUIRE((lex_cast(ret >> 1) == "-8"));
+        REQUIRE((lex_cast(ret >> wchar_t{1}) == "-8"));
         REQUIRE((lex_cast(ret >>= 1ul) == "-8"));
         REQUIRE((lex_cast(ret >>= short(1)) == "-4"));
         REQUIRE((lex_cast(ret >> 128) == "0"));
@@ -867,6 +877,8 @@ struct mod_tester {
         REQUIRE((std::is_same<decltype(n1 % n2), integer>::value));
         REQUIRE((lex_cast(n1 % char(3)) == "1"));
         REQUIRE((lex_cast(char(3) % n2) == "1"));
+        REQUIRE((lex_cast(n1 % wchar_t(3)) == "1"));
+        REQUIRE((lex_cast(wchar_t(3) % n2) == "1"));
         REQUIRE((std::is_same<decltype(n1 % char(4)), integer>::value));
         REQUIRE((std::is_same<decltype(char(4) % n2), integer>::value));
         REQUIRE((lex_cast(-n1 % static_cast<unsigned char>(3)) == "-1"));
@@ -990,6 +1002,8 @@ struct rel_tester {
         REQUIRE(0 == integer{});
         REQUIRE(n1 == 4);
         REQUIRE(4u == n1);
+        REQUIRE(n1 == wchar_t{4});
+        REQUIRE(wchar_t{4} == n1);
         REQUIRE(n1 != 3);
         REQUIRE(static_cast<signed char>(-3) != n1);
         REQUIRE(4ull == n1);
@@ -1008,6 +1022,8 @@ struct rel_tester {
         REQUIRE(n2 == -2.l);
         REQUIRE(-3.l != n2);
         REQUIRE(n2 != -3.l);
+        REQUIRE(wchar_t{3} != n2);
+        REQUIRE(n2 != wchar_t{3});
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
         REQUIRE(integer{1} == __uint128_t{1});
@@ -1024,6 +1040,8 @@ struct rel_tester {
         REQUIRE(n2 < 0);
         REQUIRE(-3 < n2);
         REQUIRE(n2 < 0u);
+        REQUIRE(n2 < wchar_t{0});
+        REQUIRE(wchar_t{0} < n1);
         REQUIRE(-3ll < n2);
         REQUIRE(n2 < 0.f);
         REQUIRE(-3.f < n2);
@@ -1042,6 +1060,8 @@ struct rel_tester {
 
         REQUIRE(n1 > n2);
         REQUIRE(0 > n2);
+        REQUIRE(wchar_t{0} > n2);
+        REQUIRE(n1 > wchar_t{0});
         REQUIRE(n2 > -3);
         REQUIRE(0u > n2);
         REQUIRE(n2 > -3ll);
@@ -1065,6 +1085,8 @@ struct rel_tester {
         REQUIRE(integer{} <= integer{});
         REQUIRE(integer{} <= 0);
         REQUIRE(0 <= integer{});
+        REQUIRE(wchar_t{0} <= integer{});
+        REQUIRE(integer{} <= wchar_t{0});
         REQUIRE(-2 <= n2);
         REQUIRE(n2 <= -2);
         REQUIRE(n2 <= 0);
@@ -1096,7 +1118,9 @@ struct rel_tester {
         REQUIRE(n1 >= n1);
         REQUIRE(integer{} >= integer{});
         REQUIRE(integer{} >= 0);
+        REQUIRE(integer{} >= wchar_t{0});
         REQUIRE(0 >= integer{});
+        REQUIRE(wchar_t{0} >= integer{});
         REQUIRE(-2 >= n2);
         REQUIRE(n2 >= -2);
         REQUIRE(0 >= n2);

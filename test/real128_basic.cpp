@@ -59,10 +59,11 @@ TEST_CASE("real128 constructors")
     real128 r2{r};
     REQUIRE((r2.m_value == 12));
     // Do some constexpr checks as well.
-    constexpr real128 rc2{12}, rc3{rc2}, rc4{real128{5}}, rc5{__float128(45)};
+    constexpr real128 rc2{12}, rc3{rc2}, rc4{real128{5}}, rc5{__float128(45)}, rc6{wchar_t{4}};
     REQUIRE((rc3.m_value == 12));
     REQUIRE((rc4.m_value == 5));
     REQUIRE((rc5.m_value == 45));
+    REQUIRE((rc6.m_value == 4));
     real128 r3{std::move(r)};
     REQUIRE((r3.m_value == 12));
     REQUIRE((r.m_value == 12));
@@ -76,6 +77,8 @@ TEST_CASE("real128 constructors")
     REQUIRE((r7.m_value == -0.5));
     real128 r8{1.5f};
     REQUIRE((r8.m_value == 1.5f));
+    r8 = wchar_t{6};
+    REQUIRE(r8 == 6);
 #if !defined(__clang__) && defined(MPPP_WITH_MPFR)
     real128 r8a{1.5l};
     REQUIRE((r8a.m_value == 1.5l));
@@ -262,6 +265,8 @@ TEST_CASE("real128 conversions")
     // Constexpr checking.
     constexpr int nc = static_cast<int>(real128{12});
     REQUIRE(nc == 12);
+    constexpr auto ncw = static_cast<wchar_t>(real128{12});
+    REQUIRE(ncw == 12);
     constexpr __float128 fc = static_cast<__float128>(real128{-120});
     REQUIRE((fc == -120));
     // Conversion to integer.

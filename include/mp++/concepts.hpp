@@ -27,26 +27,26 @@ inline namespace detail
 {
 
 // Type trait to check if T is a supported integral type.
+// NOTE: mppp::is_integral, for consistency with std::is_integral, will be true also for cv qualified
+// integral types. is_supported_integral, however, is used in contexts where the cv qualifications
+// matter, and we want this type trait not to be satisfied by integral types which are, e.g.,
+// const qualified.
 template <typename T>
-using is_supported_integral
-    = disjunction<std::is_same<T, bool>, std::is_same<T, char>, std::is_same<T, signed char>,
-                  std::is_same<T, unsigned char>, std::is_same<T, short>, std::is_same<T, unsigned short>,
-                  std::is_same<T, int>, std::is_same<T, unsigned>, std::is_same<T, long>,
-                  std::is_same<T, unsigned long>, std::is_same<T, long long>, std::is_same<T, unsigned long long>
-#if defined(MPPP_HAVE_GCC_INT128)
-                  ,
-                  std::is_same<T, __int128_t>, std::is_same<T, __uint128_t>
-#endif
-                  >;
+using is_supported_integral = conjunction<is_integral<T>, std::is_same<remove_cv_t<T>, T>>;
 
 // Type trait to check if T is a supported floating-point type.
 template <typename T>
-using is_supported_float = disjunction<std::is_same<T, float>, std::is_same<T, double>
-#if defined(MPPP_WITH_MPFR)
-                                       ,
-                                       std::is_same<T, long double>
+struct is_supported_float : conjunction<std::is_floating_point<T>, std::is_same<remove_cv_t<T>, T>> {
+};
+
+#if !defined(MPPP_WITH_MPFR)
+
+// Without MPFR, we don't support long double.
+template <>
+struct is_supported_float<long double> : std::false_type {
+};
+
 #endif
-                                       >;
 
 template <typename T>
 using is_cpp_interoperable = disjunction<is_supported_integral<T>, is_supported_float<T>>;

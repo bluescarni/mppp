@@ -39,7 +39,7 @@ using namespace mppp;
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
-                             unsigned long, long long, unsigned long long
+                             unsigned long, long long, unsigned long long, wchar_t
 #if defined(MPPP_HAVE_GCC_INT128)
                              ,
                              __uint128_t, __int128_t
@@ -113,7 +113,6 @@ struct copy_move_tester {
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
-        REQUIRE((!std::is_assignable<integer, const wchar_t &>::value));
         integer n;
         REQUIRE(n.is_static());
         n = 123;
@@ -631,7 +630,6 @@ struct int_convert_tester {
         REQUIRE(roundtrip_conversion<integer>(true));
         REQUIRE(roundtrip_conversion<integer>(false));
         // Extra.
-        REQUIRE((!is_convertible<integer, wchar_t>::value));
         REQUIRE((!is_convertible<integer, no_conv>::value));
     }
 };

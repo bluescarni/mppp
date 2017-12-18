@@ -48,7 +48,7 @@ static std::mt19937 rng;
 static const int ntrials = 1000;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
-                             unsigned long, long long, unsigned long long
+                             unsigned long, long long, unsigned long long, wchar_t
 #if defined(MPPP_HAVE_GCC_INT128)
                              ,
                              __int128_t, __uint128_t
