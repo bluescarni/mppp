@@ -185,6 +185,26 @@ struct make_unsigned_impl {
     using type = typename std::make_unsigned<T>::type;
 };
 
+// NOTE: before GCC 4.9.1 the specialisation of std::make_unsigned for wchar_t
+// is broken. See the bugreport here:
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?format=multiple&id=60326
+// It seems bits are also missing for char16_t and char32_t, but apparently
+// not in relation to make_unsigned (only make_signed, which we don't use
+// so far). This workaround is lifted directly from the commit cited
+// in the bugreport.
+#if __GNUC__ == 4 && (__GNUC_MINOR__ < 9 || (__GNUC_MINOR__ == 9 && __GNUC_PATCHLEVEL__ < 1))
+
+#if defined(_GLIBCXX_USE_WCHAR_T) && !defined(__WCHAR_UNSIGNED__)
+
+template <>
+struct make_unsigned_impl<wchar_t, void> {
+    using type = typename make_unsigned_impl<__WCHAR_TYPE__>::type;
+};
+
+#endif
+
+#endif
+
 #if defined(MPPP_HAVE_GCC_INT128)
 
 // NOTE: make_unsigned is supposed to preserve cv qualifiers, hence the non-trivial implementation.

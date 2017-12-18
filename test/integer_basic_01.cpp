@@ -39,7 +39,7 @@ using namespace mppp;
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
-                             unsigned long, long long, unsigned long long /*, wchar_t*/
+                             unsigned long, long long, unsigned long long, wchar_t
 #if defined(MPPP_HAVE_GCC_INT128)
                              ,
                              __uint128_t, __int128_t
