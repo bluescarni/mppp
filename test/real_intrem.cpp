@@ -65,17 +65,27 @@ TEST_CASE("real trunc")
     r0 = -1.9999;
     REQUIRE(r0.trunc() == -1);
     // The binary function.
+    real tmp{45.67, 50};
     r0.set_prec(4);
-    trunc(r0, real{45.67, 50});
+    auto tmp_ptr = r0.get_mpfr_t()->_mpfr_d;
+    trunc(r0, std::move(tmp));
     REQUIRE(r0 == 45);
     REQUIRE(get_prec(r0) == 50);
+    REQUIRE(tmp.get_mpfr_t()->_mpfr_d == tmp_ptr);
     r0.set_prec(4);
+    tmp = real{-49.99, 50};
     trunc(r0, real{-49.99, 50});
     REQUIRE(r0 == -49);
     REQUIRE(get_prec(r0) == 50);
     // The unary function.
     r0.set_prec(4);
-    r0 = trunc(real{45.67, 50});
+    tmp = real{45.67, 50};
+    r0 = trunc(std::move(tmp));
+    REQUIRE(r0 == 45);
+    REQUIRE(get_prec(r0) == 50);
+    REQUIRE(tmp.get_mpfr_t()->_mpfr_d == nullptr);
+    tmp = real{45.67, 50};
+    r0 = trunc(tmp);
     REQUIRE(r0 == 45);
     REQUIRE(get_prec(r0) == 50);
     r0.set_prec(4);
