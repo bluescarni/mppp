@@ -65,6 +65,8 @@ struct add_tester {
         REQUIRE((lex_cast(integer{4} + rational{-3, 2}) == "5/2"));
         REQUIRE((lex_cast(rational{3} + 4) == "7"));
         REQUIRE((lex_cast(4ul + rational{3}) == "7"));
+        REQUIRE((lex_cast(rational{3} + wchar_t{4}) == "7"));
+        REQUIRE((lex_cast(wchar_t{4} + rational{3}) == "7"));
         REQUIRE((std::is_same<rational, decltype(3 + rational{3})>::value));
         REQUIRE((std::is_same<rational, decltype(rational{3} + 3)>::value));
         REQUIRE((lex_cast(rational{-3, 2} + static_cast<signed char>(4)) == "5/2"));
@@ -230,6 +232,8 @@ struct sub_tester {
         REQUIRE((lex_cast(integer{4} - rational{-3, 2}) == "11/2"));
         REQUIRE((lex_cast(rational{3} - 4) == "-1"));
         REQUIRE((lex_cast(4ul - rational{3}) == "1"));
+        REQUIRE((lex_cast(rational{3} - wchar_t{4}) == "-1"));
+        REQUIRE((lex_cast(wchar_t{4} - rational{3}) == "1"));
         REQUIRE((std::is_same<rational, decltype(3 - rational{3})>::value));
         REQUIRE((std::is_same<rational, decltype(rational{3} - 3)>::value));
         REQUIRE((lex_cast(rational{-3, 2} - static_cast<signed char>(4)) == "-11/2"));
@@ -394,6 +398,8 @@ struct mul_tester {
         REQUIRE((lex_cast(integer{4} * rational{-3, 2}) == "-6"));
         REQUIRE((lex_cast(rational{3} * 4) == "12"));
         REQUIRE((lex_cast(4ul * rational{3}) == "12"));
+        REQUIRE((lex_cast(rational{3} * wchar_t{4}) == "12"));
+        REQUIRE((lex_cast(wchar_t{4} * rational{3}) == "12"));
         REQUIRE((std::is_same<rational, decltype(3 * rational{3})>::value));
         REQUIRE((std::is_same<rational, decltype(rational{3} * 3)>::value));
         REQUIRE((lex_cast(rational{-3, 2} * static_cast<signed char>(4)) == "-6"));
@@ -574,6 +580,8 @@ struct div_tester {
         REQUIRE((lex_cast(rational{-3, 2} / integer{4}) == "-3/8"));
         REQUIRE((lex_cast(integer{4} / rational{-3, 2}) == "-8/3"));
         REQUIRE((lex_cast(rational{3} / 4) == "3/4"));
+        REQUIRE((lex_cast(rational{3} / wchar_t{4}) == "3/4"));
+        REQUIRE((lex_cast(wchar_t{3} / rational{4}) == "3/4"));
         REQUIRE_THROWS_PREDICATE(rational{3} / 0, zero_division_error, [](const zero_division_error &zde) {
             return std::string(zde.what()) == "Zero divisor in rational division";
         });
@@ -744,11 +752,15 @@ struct rel_tester {
         REQUIRE(rational{} == rational{});
         REQUIRE(rational{} == 0);
         REQUIRE(0 == rational{});
+        REQUIRE(wchar_t{0} == rational{});
         REQUIRE(n1 == 4);
+        REQUIRE(n1 == wchar_t{4});
         REQUIRE(n1 == integer{4});
         REQUIRE(integer{4} == n1);
         REQUIRE(4u == n1);
         REQUIRE(n1 != 3);
+        REQUIRE(n1 != wchar_t{3});
+        REQUIRE(wchar_t{3} != n1);
         REQUIRE(static_cast<signed char>(-3) != n1);
         REQUIRE(4ull == n1);
         REQUIRE(-2 == n2);
@@ -780,6 +792,8 @@ struct rel_tester {
 
         REQUIRE(n2 < n1);
         REQUIRE(n2 < 0);
+        REQUIRE(n2 < wchar_t{0});
+        REQUIRE(wchar_t{0} < n1);
         REQUIRE(n2 < integer{0});
         REQUIRE(integer{-100} < n2);
         REQUIRE(-3 < n2);
@@ -802,6 +816,8 @@ struct rel_tester {
 
         REQUIRE(n1 > n2);
         REQUIRE(0 > n2);
+        REQUIRE(wchar_t{0} > n2);
+        REQUIRE(n1 > wchar_t{0});
         REQUIRE(integer{0} > n2);
         REQUIRE(n2 > integer{-150});
         REQUIRE(n2 > -3);
@@ -826,6 +842,8 @@ struct rel_tester {
         REQUIRE(n1 <= n1);
         REQUIRE(rational{} <= rational{});
         REQUIRE(rational{} <= 0);
+        REQUIRE(rational{} <= wchar_t{0});
+        REQUIRE(wchar_t{0} <= rational{});
         REQUIRE(0 <= rational{});
         REQUIRE(rational{} <= integer{0});
         REQUIRE(integer{0} <= rational{});
@@ -860,6 +878,8 @@ struct rel_tester {
         REQUIRE(n1 >= n1);
         REQUIRE(rational{} >= rational{});
         REQUIRE(rational{} >= 0);
+        REQUIRE(rational{} >= wchar_t{0});
+        REQUIRE(wchar_t{0} >= rational{});
         REQUIRE(0 >= rational{});
         REQUIRE(rational{} >= integer{0});
         REQUIRE(integer{0} >= rational{});

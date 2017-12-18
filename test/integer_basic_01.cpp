@@ -39,7 +39,7 @@ using namespace mppp;
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
-                             unsigned long, long long, unsigned long long
+                             unsigned long, long long, unsigned long long, wchar_t
 #if defined(MPPP_HAVE_GCC_INT128)
                              ,
                              __uint128_t, __int128_t
@@ -112,7 +112,6 @@ struct int_ctor_tester {
         REQUIRE((std::is_constructible<integer, bool>::value));
         REQUIRE((lex_cast(integer{false}) == "0"));
         REQUIRE((lex_cast(integer{true}) == "1"));
-        REQUIRE((!std::is_constructible<integer, wchar_t>::value));
         REQUIRE((!std::is_constructible<integer, no_const>::value));
         std::cout << "n static limbs: " << S::value << ", size: " << sizeof(integer) << '\n';
     }
@@ -187,7 +186,6 @@ struct int_ass_tester {
         n0 = true;
         REQUIRE(n0 == 1);
         REQUIRE(n0.is_static());
-        REQUIRE((!std::is_assignable<integer &, wchar_t>::value));
         REQUIRE((!std::is_assignable<integer &, no_const>::value));
     }
 };
