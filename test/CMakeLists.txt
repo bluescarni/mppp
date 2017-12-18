@@ -39,7 +39,8 @@ ADD_MPPP_TESTCASE(concepts)
 ADD_MPPP_TESTCASE(integer_abs)
 ADD_MPPP_TESTCASE(integer_addsub_ui)
 ADD_MPPP_TESTCASE(integer_arith)
-ADD_MPPP_TESTCASE(integer_arith_ops)
+ADD_MPPP_TESTCASE(integer_arith_ops_01)
+ADD_MPPP_TESTCASE(integer_arith_ops_02)
 if(NOT MINGW)
   # At the moment this test results in a linking error in conjunction
   # with catch. Needs to be investigated.

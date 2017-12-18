@@ -188,6 +188,7 @@ struct make_unsigned_impl {
 // NOTE: before GCC 4.9.1 the specialisation of std::make_unsigned for wchar_t
 // is broken. See the bugreport here:
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?format=multiple&id=60326
+//
 // It seems bits are also missing for char16_t and char32_t, but apparently
 // not in relation to make_unsigned (only make_signed, which we don't use
 // so far). This workaround is lifted directly from the commit cited
