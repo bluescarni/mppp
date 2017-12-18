@@ -72,8 +72,10 @@ TEST_CASE("real binary add")
     // Integrals.
     REQUIRE((real{1, 10} + 10 == real{11}));
     REQUIRE((real{1, 10} + 10).get_prec() == nl_digits<int>() + 1);
+    REQUIRE((real{1, 10} + wchar_t{10} == real{11}));
     REQUIRE((10 + real{1, 10} == real{11}));
     REQUIRE((10 + real{1, 10}).get_prec() == nl_digits<int>() + 1);
+    REQUIRE((wchar_t{10} + real{1, 10} == real{11}));
     REQUIRE((real{1, 100} + 10 == real{11}));
     REQUIRE((real{1, 100} + 10).get_prec() == std::max(100, nl_digits<int>() + 1));
     REQUIRE((10 + real{1, 100} == real{11}));
@@ -716,8 +718,10 @@ TEST_CASE("real binary sub")
     REQUIRE((real{1, 20} - real{2, 10}).get_prec() == 20);
     // Integrals.
     REQUIRE((real{1, 10} - 10 == real{-9}));
+    REQUIRE((real{1, 10} - wchar_t{10} == real{-9}));
     REQUIRE((real{1, 10} - 10).get_prec() == nl_digits<int>() + 1);
     REQUIRE((10 - real{1, 10} == real{9}));
+    REQUIRE((wchar_t{10} - real{1, 10} == real{9}));
     REQUIRE((10 - real{1, 10}).get_prec() == nl_digits<int>() + 1);
     REQUIRE((real{1, 100} - 10 == real{-9}));
     REQUIRE((real{1, 100} - 10).get_prec() == std::max(100, nl_digits<int>() + 1));
@@ -1345,8 +1349,10 @@ TEST_CASE("real binary mul")
     REQUIRE((real{1, 20} * real{2, 10}).get_prec() == 20);
     // Integrals.
     REQUIRE((real{1, 10} * 10 == real{10}));
+    REQUIRE((real{1, 10} * wchar_t{10} == real{10}));
     REQUIRE((real{1, 10} * 10).get_prec() == nl_digits<int>() + 1);
     REQUIRE((10 * real{1, 10} == real{10}));
+    REQUIRE((wchar_t{10} * real{1, 10} == real{10}));
     REQUIRE((10 * real{1, 10}).get_prec() == nl_digits<int>() + 1);
     REQUIRE((real{1, 100} * 10 == real{10}));
     REQUIRE((real{1, 100} * 10).get_prec() == std::max(100, nl_digits<int>() + 1));
@@ -1975,8 +1981,10 @@ TEST_CASE("real binary div")
     REQUIRE((real{1, 20} / real{2, 10}).get_prec() == 20);
     // Integrals.
     REQUIRE((real{5, 10} / 10 == real{".5", 10}));
+    REQUIRE((real{5, 10} / wchar_t{10} == real{".5", 10}));
     REQUIRE((real{5, 10} / 10).get_prec() == nl_digits<int>() + 1);
     REQUIRE((10 / real{1, 10} == real{10}));
+    REQUIRE((wchar_t{10} / real{1, 10} == real{10}));
     REQUIRE((10 / real{1, 10}).get_prec() == nl_digits<int>() + 1);
     REQUIRE((real{5, 100} / 10 == real{".5", 10}));
     REQUIRE((real{5, 100} / 10).get_prec() == std::max(100, nl_digits<int>() + 1));
@@ -2591,10 +2599,14 @@ TEST_CASE("real eqineq")
     REQUIRE((real{"nan", 6} != real{"nan", 5}));
     // Integrals.
     REQUIRE(!(real{} != 0));
+    REQUIRE(!(real{} != wchar_t{0}));
     REQUIRE(1u == real{1});
+    REQUIRE(wchar_t{1} == real{1});
     REQUIRE(!(1ll != real{1}));
+    REQUIRE(!(wchar_t{1} != real{1}));
     REQUIRE(!(real{2} == 1ull));
     REQUIRE(2 != real{1});
+    REQUIRE(wchar_t{2} != real{1});
     REQUIRE(!(real{"inf", 64} == 45));
     REQUIRE((real{"inf", 64} != 45l));
     REQUIRE(!(real{"nan", 5} == 1));
@@ -2663,7 +2675,9 @@ TEST_CASE("real lt")
     REQUIRE(!(real{"nan", 6} < real{"nan", 5}));
     // Integrals.
     REQUIRE((1u < real{2}));
+    REQUIRE((wchar_t{1} < real{2}));
     REQUIRE(!(real{2} < 1ull));
+    REQUIRE(!(real{2} < wchar_t{1}));
     REQUIRE(!(real{"inf", 64} < 45));
     REQUIRE(!(real{"nan", 5} < 1));
     REQUIRE(!(1 < real{"nan", 5}));
@@ -2707,7 +2721,9 @@ TEST_CASE("real lte")
     REQUIRE(!(real{"nan", 6} <= real{"nan", 5}));
     // Integrals.
     REQUIRE((1u <= real{2}));
+    REQUIRE((wchar_t{1} <= real{2}));
     REQUIRE(!(real{2} <= 1ull));
+    REQUIRE(!(real{2} <= wchar_t{1}));
     REQUIRE(!(real{"inf", 64} <= 45));
     REQUIRE(!(real{"nan", 5} <= 1));
     REQUIRE(!(1 <= real{"nan", 5}));
@@ -2751,7 +2767,9 @@ TEST_CASE("real gt")
     REQUIRE(!(real{"nan", 6} > real{"nan", 5}));
     // Integrals.
     REQUIRE(!(1u > real{2}));
+    REQUIRE(!(wchar_t{1} > real{2}));
     REQUIRE((real{2} > 1ull));
+    REQUIRE((real{2} > wchar_t{1}));
     REQUIRE((real{"inf", 64} > 45));
     REQUIRE(!(real{"nan", 5} > 1));
     REQUIRE(!(1 > real{"nan", 5}));
@@ -2795,7 +2813,9 @@ TEST_CASE("real gte")
     REQUIRE(!(real{"nan", 6} >= real{"nan", 5}));
     // Integrals.
     REQUIRE(!(1u >= real{2}));
+    REQUIRE(!(wchar_t{1} >= real{2}));
     REQUIRE((real{2} >= 1ull));
+    REQUIRE((real{2} >= wchar_t{1}));
     REQUIRE((real{"inf", 64} >= 45));
     REQUIRE(!(real{"nan", 5} >= 1));
     REQUIRE(!(1 >= real{"nan", 5}));

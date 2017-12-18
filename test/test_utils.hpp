@@ -92,16 +92,6 @@ void tuple_for_each(Tuple &&t, const F &f)
 inline namespace impl
 {
 
-template <typename T>
-struct is_integer {
-    static const bool value = false;
-};
-
-template <std::size_t SSize>
-struct is_integer<mppp::integer<SSize>> {
-    static const bool value = true;
-};
-
 template <typename T, typename std::enable_if<mppp::is_integral<T>::value && mppp::is_signed<T>::value, int>::type = 0>
 inline long long lex_cast_tr(T n)
 {
@@ -115,10 +105,10 @@ inline unsigned long long lex_cast_tr(T n)
     return static_cast<unsigned long long>(n);
 }
 
-template <typename T, typename std::enable_if<is_integer<T>::value, int>::type = 0>
-inline std::string lex_cast_tr(const T &x)
+template <std::size_t SSize>
+inline std::string lex_cast_tr(const mppp::integer<SSize> &n)
 {
-    return x.to_string();
+    return n.to_string();
 }
 
 template <std::size_t SSize>
@@ -246,10 +236,15 @@ struct integral_minmax_dist {
 // Use a small wrapper to get an int distribution instead, with the min max limits
 // from the char type. We will be casting back when using the distribution.
 template <typename T>
-struct integral_minmax_dist<T,
-                            typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                    || std::is_same<unsigned char, T>::value>::type> {
-    using type = typename std::conditional<std::is_signed<T>::value, int, unsigned>::type;
+struct integral_minmax_dist<
+    T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
+                               || std::is_same<unsigned char, T>::value || std::is_same<wchar_t, T>::value>::type> {
+    // Just gonna assume long/ulong can represent wchar_t here.
+    using type = typename std::conditional<std::is_signed<T>::value, long, unsigned long>::type;
+    static_assert(!std::is_same<T, wchar_t>::value
+                      || (std::numeric_limits<T>::max() <= std::numeric_limits<type>::max()
+                          && std::numeric_limits<T>::min() >= std::numeric_limits<type>::min()),
+                  "Invalid range for wchar_t.");
     integral_minmax_dist() : m_dist(std::numeric_limits<T>::min(), std::numeric_limits<T>::max()) {}
     template <typename E>
     T operator()(E &e)

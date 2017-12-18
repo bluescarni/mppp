@@ -30,7 +30,7 @@ using namespace mppp;
 using namespace mppp_test;
 
 using int_types = std::tuple<char, signed char, unsigned char, short, unsigned short, int, unsigned, long,
-                             unsigned long, long long, unsigned long long>;
+                             unsigned long, long long, unsigned long long, wchar_t>;
 
 using fp_types = std::tuple<float, double, long double>;
 
@@ -41,35 +41,13 @@ static std::mt19937 rng;
 
 static const int ntrials = 1000;
 
-// NOTE: char types are not supported in uniform_int_distribution by the standard.
-// Use a small wrapper to get an int distribution instead, with the min max limits
-// from the char type. We will be casting back when using the distribution.
-template <typename T, typename std::enable_if<!(std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                || std::is_same<unsigned char, T>::value),
-                                              int>::type
-                      = 0>
-static inline std::uniform_int_distribution<T> get_int_dist(T min, T max)
-{
-    return std::uniform_int_distribution<T>(min, max);
-}
-
-template <typename T, typename std::enable_if<std::is_same<char, T>::value || std::is_same<signed char, T>::value
-                                                  || std::is_same<unsigned char, T>::value,
-                                              int>::type
-                      = 0>
-static inline std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>
-get_int_dist(T min, T max)
-{
-    return std::uniform_int_distribution<typename std::conditional<is_signed<T>::value, int, unsigned>::type>(min, max);
-}
-
 struct int_io_tester {
     template <typename T>
     void operator()(const T &) const
     {
-        auto int_dist = get_int_dist(nl_min<T>(), nl_max<T>());
-        auto prec_dist = get_int_dist(::mpfr_prec_t(real_prec_min()), ::mpfr_prec_t(200));
-        auto base_dist = get_int_dist(2, 62);
+        integral_minmax_dist<T> int_dist;
+        std::uniform_int_distribution<::mpfr_prec_t> prec_dist(::mpfr_prec_t(real_prec_min()), ::mpfr_prec_t(200));
+        std::uniform_int_distribution<int> base_dist(2, 62);
         for (auto i = 0; i < ntrials; ++i) {
             const auto tmp = int_dist(rng);
             const auto prec = prec_dist(rng);
@@ -86,8 +64,8 @@ struct fp_io_tester {
     void operator()(const T &) const
     {
         auto dist = std::uniform_real_distribution<T>(T(-100), T(100));
-        auto prec_dist = get_int_dist(::mpfr_prec_t(real_prec_min()), ::mpfr_prec_t(200));
-        auto base_dist = get_int_dist(2, 62);
+        std::uniform_int_distribution<::mpfr_prec_t> prec_dist(::mpfr_prec_t(real_prec_min()), ::mpfr_prec_t(200));
+        std::uniform_int_distribution<int> base_dist(2, 62);
         for (auto i = 0; i < ntrials; ++i) {
             const auto tmp = dist(rng);
             const auto prec = prec_dist(rng);

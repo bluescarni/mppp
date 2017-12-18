@@ -98,7 +98,7 @@ static constexpr real128 test_constexpr_ipd()
 
 #endif
 
-TEST_CASE("real128 plus")
+TEST_CASE("real128 ops")
 {
     real128 x;
     REQUIRE((std::is_same<decltype(+x), real128>::value));
@@ -134,8 +134,10 @@ TEST_CASE("real128 plus")
     REQUIRE((z1.m_value == 59));
     REQUIRE((z1a.m_value == 59));
     REQUIRE(((x + 3).m_value == -2));
+    REQUIRE(((x + wchar_t{3}).m_value == -2));
     REQUIRE(((x + 2.).m_value == -3));
     REQUIRE(((3 + x).m_value == -2));
+    REQUIRE(((wchar_t{3} + x).m_value == -2));
     REQUIRE(((2. + x).m_value == -3));
     constexpr auto z2 = real128{56} + 3;
     REQUIRE((z2.m_value == 59));
@@ -169,8 +171,10 @@ TEST_CASE("real128 plus")
     REQUIRE(((-real128{-123}).m_value == 123));
     constexpr auto z5 = -real128{-45};
     REQUIRE(((x - 3).m_value == 4));
+    REQUIRE(((x - wchar_t{3}).m_value == 4));
     REQUIRE(((x - 2.).m_value == 5));
     REQUIRE(((3 - x).m_value == -4));
+    REQUIRE(((wchar_t{3} - x).m_value == -4));
     REQUIRE(((2. - x).m_value == -5));
     constexpr auto z5a = real128{56} - 3;
     REQUIRE((z5a.m_value == 53));
@@ -199,8 +203,10 @@ TEST_CASE("real128 plus")
     REQUIRE(s4 == 1);
 #endif
     REQUIRE(((x * 3).m_value == 15));
+    REQUIRE(((x * wchar_t{3}).m_value == 15));
     REQUIRE(((x * 2.).m_value == 10));
     REQUIRE(((-3 * x).m_value == -15));
+    REQUIRE(((wchar_t{3} * x).m_value == 15));
     REQUIRE(((2. * x).m_value == 10));
     constexpr auto z7 = real128{56} * 3;
     REQUIRE((z7.m_value == 168));
@@ -222,9 +228,11 @@ TEST_CASE("real128 plus")
 #endif
     x = 12;
     REQUIRE(((x / 3).m_value == 4));
+    REQUIRE(((x / wchar_t{3}).m_value == 4));
     REQUIRE(((x / 2.).m_value == 6));
     REQUIRE(((-6 / x).m_value == real128{"-.5"}.m_value));
     REQUIRE(((3. / x).m_value == real128{".25"}.m_value));
+    REQUIRE(((wchar_t{3} / x).m_value == real128{".25"}.m_value));
     constexpr auto z9 = real128{56} / 2;
     REQUIRE((z9.m_value == 28));
     constexpr auto z10 = 3.f / -real128{12};

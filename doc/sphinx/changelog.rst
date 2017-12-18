@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Extend the :cpp:concept:`~mppp::CppInteroperable` concept to include all C++ integral types
+  (`#104 <https://github.com/bluescarni/mppp/pull/104>`__).
+
 - Add left bit shift benchmarks for :cpp:class:`~mppp::integer` (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
 
 - Implement division without remainder (``tdiv_q()``) and exact division with positive divisor (``divexact_gcd()``)
