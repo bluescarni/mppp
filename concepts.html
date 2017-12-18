@@ -147,14 +147,9 @@ will be subject to breaking changes, and they should not be regarded as part of 
 <dt id="_CPPv2I0EN4mppp16CppInteroperableE">
 template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">CppInteroperable</code><a class="headerlink" href="#_CPPv2I0EN4mppp16CppInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied by any C++ fundamental type with which the multiprecision classes (such as <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>,
-<a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>, etc.) can interoperate. The full list of types satisfying this concept is:</p>
+<a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>, etc.) can interoperate. The full list of types satisfying this concept includes:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">bool</span></code>,</li>
-<li><code class="docutils literal"><span class="pre">char</span></code>, <code class="docutils literal"><span class="pre">signed</span> <span class="pre">char</span></code> and <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">char</span></code>,</li>
-<li><code class="docutils literal"><span class="pre">short</span></code> and <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">short</span></code>,</li>
-<li><code class="docutils literal"><span class="pre">int</span></code> and <code class="docutils literal"><span class="pre">unsigned</span></code>,</li>
-<li><code class="docutils literal"><span class="pre">long</span></code> and <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span></code>,</li>
-<li><code class="docutils literal"><span class="pre">long</span> <span class="pre">long</span></code> and <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span> <span class="pre">long</span></code>,</li>
+<li>all the fundamental C++ integral types,</li>
 <li><code class="docutils literal"><span class="pre">float</span></code> and <code class="docutils literal"><span class="pre">double</span></code>.</li>
 </ul>
 <p><code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> is also included, but only if mp++ was configured with the <code class="docutils literal"><span class="pre">MPPP_WITH_MPFR</span></code> option enabled
