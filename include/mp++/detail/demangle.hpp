@@ -24,7 +24,10 @@
 
 #include <mutex>
 
+// clang-format off
+#include <Windows.h>
 #include <Dbghelp.h>
+// clang-format on
 
 #endif
 
