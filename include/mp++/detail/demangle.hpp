@@ -20,6 +20,12 @@
 #include <cxxabi.h>
 #include <memory>
 
+#elif defined(_MSC_VER)
+
+#include <mutex>
+
+#include <Dbghelp.h>
+
 #endif
 
 namespace mppp
@@ -38,9 +44,25 @@ inline std::string demangle(const char *s)
     // that in case of failure the pointer will be set to null:
     // https://gcc.gnu.org/onlinedocs/libstdc++/libstdc++-html-USERS-4.3/a01696.html
     return res.get() ? std::string(res.get()) : std::string(s);
+#elif defined(_MSC_VER)
+    // NOTE: the Windows function for demangling is not thread safe, we will have
+    // to protect it with a mutex.
+    // https://msdn.microsoft.com/ru-ru/library/windows/desktop/ms681400(v=vs.85).aspx
+    // Local static init is thread safe in C++11.
+    static std::mutex mut;
+    char undecorated_name[1024];
+    ::DWORD ret;
+    {
+        std::lock_guard<std::mutex> lock{mut};
+        ret = ::UnDecorateSymbolName(s, undecorated_name, sizeof(undecorated_name), UNDNAME_COMPLETE);
+    }
+    if (ret) {
+        // Nonzero retval means success.
+        return std::string(undecorated_name);
+    }
+    // Otherwise, return the mangled name.
+    return std::string(s);
 #else
-    // TODO demangling for other platforms. E.g.,
-    // http://stackoverflow.com/questions/13777681/demangling-in-msvc
     return std::string(s);
 #endif
 }
