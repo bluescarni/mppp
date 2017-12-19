@@ -1,22 +1,9 @@
-# Locate the DbgHelp library for MSVC.
+# Create an imported target for the DbgHelp library in MSVC.
+# NOTE: the library is supposed to be always available in Windows:
+# https://stackoverflow.com/questions/1619754/is-dbghelp-dll-built-in-to-windows-can-i-rely-on-it-being-there
+# So we don't bother about locating the include path or the library, just link
+# it directly.
 
-if(DbgHelp_INCLUDE_DIR AND DbgHelp_LIBRARY)
-    # Already in cache, be silent
-    set(DbgHelp_FIND_QUIETLY TRUE)
-endif()
-
-find_path(DbgHelp_INCLUDE_DIR NAMES Dbghelp.h)
-find_library(DbgHelp_LIBRARY NAMES dbghelp)
-
-include(FindPackageHandleStandardArgs)
-
-find_package_handle_standard_args(DbgHelp DEFAULT_MSG DbgHelp_INCLUDE_DIR DbgHelp_LIBRARY)
-
-mark_as_advanced(DbgHelp_INCLUDE_DIR DbgHelp_LIBRARY)
-
-# NOTE: this has been adapted from CMake's FindPNG.cmake.
-if(DbgHelp_FOUND AND NOT TARGET DbgHelp::DbgHelp)
-    add_library(DbgHelp::DbgHelp UNKNOWN IMPORTED)
-    set_target_properties(DbgHelp::DbgHelp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${DbgHelp_INCLUDE_DIR}"
-        IMPORTED_LINK_INTERFACE_LANGUAGES "C" IMPORTED_LOCATION "${DbgHelp_LIBRARY}")
-endif()
+add_library(DbgHelp::DbgHelp UNKNOWN IMPORTED)
+set_target_properties(DbgHelp::DbgHelp PROPERTIES
+    IMPORTED_LINK_INTERFACE_LANGUAGES "C" IMPORTED_LOCATION "dbghelp.lib")
