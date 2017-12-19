@@ -5,5 +5,4 @@
 # it directly.
 
 add_library(DbgHelp::DbgHelp UNKNOWN IMPORTED)
-set_target_properties(DbgHelp::DbgHelp PROPERTIES
-    IMPORTED_LINK_INTERFACE_LANGUAGES "C" IMPORTED_LOCATION "dbghelp.lib")
+set_target_properties(DbgHelp::DbgHelp PROPERTIES INTERFACE_LINK_LIBRARIES "dbghelp.lib")
