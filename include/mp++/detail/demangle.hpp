@@ -22,6 +22,10 @@
 
 #elif defined(_MSC_VER)
 
+// Disable some warnings for MSVC.
+#pragma warning(push)
+#pragma warning(disable : 4091)
+
 #include <mutex>
 
 // clang-format off
@@ -91,5 +95,11 @@ inline std::string demangle()
 }
 }
 }
+
+#if defined(_MSC_VER)
+
+#pragma warning(pop)
+
+#endif
 
 #endif
