@@ -3002,6 +3002,9 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
+    // NOTE: according to the benchmarks, for some reason branching here seems to be better than
+    // using abs()/integral_sign(). It's not clear if it's a codegen issue, an effect of the way
+    // the benchmarks are written, or something else. Let's keep an eye on it for the time being.
     // NOTE: effectively negate op2 if we are subtracting.
     mpz_size_t asize1 = op1._mp_size, asize2 = AddOrSub ? op2._mp_size : -op2._mp_size;
     int sign1 = asize1 != 0, sign2 = asize2 != 0;
@@ -3548,6 +3551,9 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
 template <std::size_t SSize>
 inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
+    // NOTE: according to the benchmarks, for some reason branching here seems to be better than
+    // using abs()/integral_sign(). It's not clear if it's a codegen issue, an effect of the way
+    // the benchmarks are written, or something else. Let's keep an eye on it for the time being.
     // Cache a few quantities, detect signs.
     mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
     int sign1 = asize1 != 0, sign2 = asize2 != 0;
