@@ -3784,21 +3784,12 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
 template <bool AddOrSub, std::size_t SSize>
 inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
-    // NOTE: negate op2 in case we are doing a submul.
-    mpz_size_t asizer = rop._mp_size, asize1 = op1._mp_size, asize2 = AddOrSub ? op2._mp_size : -op2._mp_size;
-    int signr = asizer != 0, sign1 = asize1 != 0, sign2 = asize2 != 0;
-    if (asizer < 0) {
-        asizer = -asizer;
-        signr = -1;
-    }
-    if (asize1 < 0) {
-        asize1 = -asize1;
-        sign1 = -1;
-    }
-    if (asize2 < 0) {
-        asize2 = -asize2;
-        sign2 = -1;
-    }
+    // NOTE: according to the benchmarks, it seems a clear win here to use abs/integral_sign instead
+    // of branching: there's about a ~10% penalty in the unsigned case, but ~20% faster for the signed case.
+    const mpz_size_t asizer = std::abs(rop._mp_size), asize1 = std::abs(op1._mp_size), asize2 = std::abs(op2._mp_size);
+    const int signr = integral_sign(rop._mp_size), sign1 = integral_sign(op1._mp_size),
+              // NOTE: negate op2 in case we are doing a submul.
+        sign2 = AddOrSub ? integral_sign(op2._mp_size) : -integral_sign(op2._mp_size);
     const std::size_t retval = static_addmul_impl(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
                                                   integer_static_addmul_algo<static_int<SSize>>{});
     if (integer_static_addmul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
