@@ -3002,6 +3002,9 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
+    // NOTE: according to the benchmarks, for some reason branching here seems to be better than
+    // using abs()/integral_sign(). It's not clear if it's a codegen issue, an effect of the way
+    // the benchmarks are written, or something else. Let's keep an eye on it for the time being.
     // NOTE: effectively negate op2 if we are subtracting.
     mpz_size_t asize1 = op1._mp_size, asize2 = AddOrSub ? op2._mp_size : -op2._mp_size;
     int sign1 = asize1 != 0, sign2 = asize2 != 0;
@@ -3548,6 +3551,9 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
 template <std::size_t SSize>
 inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
+    // NOTE: according to the benchmarks, for some reason branching here seems to be better than
+    // using abs()/integral_sign(). It's not clear if it's a codegen issue, an effect of the way
+    // the benchmarks are written, or something else. Let's keep an eye on it for the time being.
     // Cache a few quantities, detect signs.
     mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
     int sign1 = asize1 != 0, sign2 = asize2 != 0;
@@ -3784,21 +3790,12 @@ inline std::size_t static_addmul_impl(static_int<SSize> &rop, const static_int<S
 template <bool AddOrSub, std::size_t SSize>
 inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
-    // NOTE: negate op2 in case we are doing a submul.
-    mpz_size_t asizer = rop._mp_size, asize1 = op1._mp_size, asize2 = AddOrSub ? op2._mp_size : -op2._mp_size;
-    int signr = asizer != 0, sign1 = asize1 != 0, sign2 = asize2 != 0;
-    if (asizer < 0) {
-        asizer = -asizer;
-        signr = -1;
-    }
-    if (asize1 < 0) {
-        asize1 = -asize1;
-        sign1 = -1;
-    }
-    if (asize2 < 0) {
-        asize2 = -asize2;
-        sign2 = -1;
-    }
+    // NOTE: according to the benchmarks, it seems a clear win here to use abs/integral_sign instead
+    // of branching: there's about a ~10% penalty in the unsigned case, but ~20% faster for the signed case.
+    const mpz_size_t asizer = std::abs(rop._mp_size), asize1 = std::abs(op1._mp_size), asize2 = std::abs(op2._mp_size);
+    const int signr = integral_sign(rop._mp_size), sign1 = integral_sign(op1._mp_size),
+              // NOTE: negate op2 in case we are doing a submul.
+        sign2 = AddOrSub ? integral_sign(op2._mp_size) : -integral_sign(op2._mp_size);
     const std::size_t retval = static_addmul_impl(rop, op1, op2, asizer, asize1, asize2, signr, sign1, sign2,
                                                   integer_static_addmul_algo<static_int<SSize>>{});
     if (integer_static_addmul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
@@ -3982,16 +3979,16 @@ inline std::size_t static_mul_2exp(static_int<1> &rop, const static_int<1> &n, s
 // 2-limb optimisation.
 inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, std::size_t s)
 {
-    mpz_size_t asize = n._mp_size;
+    // NOTE: it looks like in this function abs + integral sign are a definite
+    // win in all cases, possibly because there's enough work to do in the function
+    // to make any branching advantage (in case of only unsigned operands)
+    // to be negligible.
+    const mpz_size_t asize = std::abs(n._mp_size);
     if (s == 0u || asize == 0) {
         rop = n;
         return 0u;
     }
-    int sign = 1;
-    if (asize < 0) {
-        asize = -asize;
-        sign = -1;
-    }
+    const int sign = integral_sign(n._mp_size);
     // Too much shift, this can never work on a nonzero value.
     static_assert(unsigned(GMP_NUMB_BITS) <= nl_max<unsigned>() / 2u, "Overflow error.");
     if (mppp_unlikely(s >= 2u * unsigned(GMP_NUMB_BITS))) {

@@ -24,7 +24,10 @@ New
 Changes
 ~~~~~~~
 
-- Various performance improvements for :cpp:class:`~mppp::integer` division (`#103 <https://github.com/bluescarni/mppp/pull/103>`__).
+- Add an internal demangling utility to improve the quality of the error messages (`#105 <https://github.com/bluescarni/mppp/pull/105>`__).
+
+- Various performance improvements for :cpp:class:`~mppp::integer` division, fused multiply-add and left bit shift
+  (`#103 <https://github.com/bluescarni/mppp/pull/103>`__, `#106 <https://github.com/bluescarni/mppp/pull/106>`__).
 
 - Improve the detection of the availability of the ``thread_local`` keyword on recent Xcode versions 
   (`#99 <https://github.com/bluescarni/mppp/pull/99>`__).
