@@ -15,7 +15,7 @@ if(NOT DbgHelp_LIBRARY)
 endif()
 
 if(DbgHelp_USE_DIRECTLY)
-    message(STATUS "dbghelp.lib will be included and linked directly.")
+    message(STATUS "dbghelp.lib will be linked directly.")
 endif()
 
 find_package_handle_standard_args(DbgHelp DEFAULT_MSG DbgHelp_LIBRARY)
@@ -32,8 +32,7 @@ if(DbgHelp_FOUND AND NOT TARGET DbgHelp::DbgHelp)
     else()
         # Otherwise, we proceed as usual.
         add_library(DbgHelp::DbgHelp UNKNOWN IMPORTED)
-        set_target_properties(DbgHelp::DbgHelp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${DbgHelp_INCLUDE_DIR}"
-            IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+        set_target_properties(DbgHelp::DbgHelp PROPERTIES IMPORTED_LINK_INTERFACE_LANGUAGES "C"
             IMPORTED_LOCATION "${DbgHelp_LIBRARY}")
     endif()
 endif()

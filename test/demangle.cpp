@@ -11,6 +11,7 @@
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <string>
+#include <thread>
 #include <vector>
 
 #define CATCH_CONFIG_MAIN
@@ -30,4 +31,27 @@ TEST_CASE("demangle")
     std::cout << demangle<__int128_t>() << '\n';
     std::cout << demangle<__uint128_t>() << '\n';
 #endif
+
+    // Couple of multithreaded tests.
+    auto t_func = []() -> std::string {
+        std::string tmp;
+        for (auto i = 0; i < 100; ++i) {
+            tmp += demangle<std::vector<std::vector<float>>>();
+        }
+        return tmp;
+    };
+
+    std::thread t1(t_func);
+    std::thread t2(t_func);
+    std::thread t3(t_func);
+    std::thread t4(t_func);
+    std::thread t5(t_func);
+    std::thread t6(t_func);
+
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+    t5.join();
+    t6.join();
 }
