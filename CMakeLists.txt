@@ -88,6 +88,12 @@ target_include_directories(mp++ INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
+# Depend on DbgHelp on MSVC, for the demangling support.
+if(YACMA_COMPILER_IS_MSVC)
+    find_package(DbgHelp REQUIRED)
+    target_link_libraries(mp++ INTERFACE DbgHelp::DbgHelp)
+endif()
+
 # Configure config.hpp.
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in" "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" @ONLY)
 
@@ -109,7 +115,10 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" DESTINATION "lib/cmake/mp++")
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMPFR.cmake"
-	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindQuadmath.cmake" DESTINATION "lib/cmake/mp++")
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindQuadmath.cmake" DESTINATION "lib/cmake/mp++")
+if(YACMA_COMPILER_IS_MSVC)
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindDbgHelp.cmake" DESTINATION "lib/cmake/mp++")
+endif()
 install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION lib/cmake/mp++)
 # Take care of versioning.
 include(CMakePackageConfigHelpers)

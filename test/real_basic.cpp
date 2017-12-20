@@ -1216,7 +1216,7 @@ struct int_conv_tester {
                                  [](const std::overflow_error &ex) {
                                      return ex.what()
                                             == "Conversion of the real " + real{int_t{nl_max<T>()} + 1}.to_string()
-                                                   + " to the type " + type_string<T>() + " results in overflow";
+                                                   + " to the type '" + type_string<T>() + "' results in overflow";
                                  });
         REQUIRE((!real{int_t{nl_max<T>()} + 1}.get(rop)));
         REQUIRE(!get(rop, real{int_t{nl_max<T>()} + 1}));
@@ -1225,7 +1225,7 @@ struct int_conv_tester {
                                  [](const std::overflow_error &ex) {
                                      return ex.what()
                                             == "Conversion of the real " + real{int_t{nl_min<T>()} - 1}.to_string()
-                                                   + " to the type " + type_string<T>() + " results in overflow";
+                                                   + " to the type '" + type_string<T>() + "' results in overflow";
                                  });
         REQUIRE((!real{int_t{nl_min<T>()} - 1}.get(rop)));
         REQUIRE(!get(rop, real{int_t{nl_min<T>()} - 1}));

@@ -2216,8 +2216,8 @@ public:
     {
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
-            throw std::overflow_error("Conversion of the integer " + to_string() + " to the type " + type_string<T>()
-                                      + " results in overflow");
+            throw std::overflow_error("Conversion of the integer " + to_string() + " to the type '" + type_string<T>()
+                                      + "' results in overflow");
         }
         return std::move(retval.second);
     }

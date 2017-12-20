@@ -74,7 +74,8 @@ ADD_MPPP_TESTCASE(integer_view)
 
 ADD_MPPP_TESTCASE(rational_abs)
 ADD_MPPP_TESTCASE(rational_arith)
-ADD_MPPP_TESTCASE(rational_arith_ops)
+ADD_MPPP_TESTCASE(rational_arith_ops_01)
+ADD_MPPP_TESTCASE(rational_arith_ops_02)
 if(NOT MINGW)
     # NOTE: same as above.
     ADD_MPPP_TESTCASE(rational_basic)
@@ -123,5 +124,6 @@ if(MPPP_TEST_PYBIND11)
   add_subdirectory(pybind11)
 endif()
 
+ADD_MPPP_TESTCASE(demangle)
 ADD_MPPP_TESTCASE(utils)
 ADD_MPPP_TESTCASE(type_traits)
