@@ -24,7 +24,7 @@ will fall back to GMP's ``mpn_`` functions.
 
 mp++ has the following dependencies:
 
-* the `GMP <http://www.gmplib.org>`__ library, **mandatory** (GMP 5 and later versions are supported,
+* the `GMP <https://gmplib.org/>`__ library, **mandatory** (GMP 5 and later versions are supported,
   the `MPIR <http://mpir.org/>`__ fork of GMP can also be used);
 * the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support for the ``long double`` type (MPFR 3 or a later version is required);
@@ -34,7 +34,7 @@ mp++ has the following dependencies:
 * the `Boost <http://www.boost.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*, currently used
   only in the benchmarking suite.
 
-Additionally, `CMake <http://www.cmake.org/>`__ is the build system used by mp++ and it must also be available when
+Additionally, `CMake <https://cmake.org/>`__ is the build system used by mp++ and it must also be available when
 installing from source (the minimum required version is 3.3).
 
 Installation from source
@@ -62,7 +62,7 @@ Installation via conda
 .. versionadded:: 0.2
 
 mp++ is available in the `conda <https://conda.io/docs/>`__ package manager from the
-`conda-forge <https://conda-forge.github.io/>`__ channel. Packages for Linux 64-bit, Windows 32/64-bit
+`conda-forge <https://conda-forge.org/>`__ channel. Packages for Linux 64-bit, Windows 32/64-bit
 and OSX 64-bit are available. In order to install mp++ via conda, you just need to add ``conda-forge`` to the channels:
 
 .. code-block:: bash

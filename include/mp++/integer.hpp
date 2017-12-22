@@ -6251,7 +6251,7 @@ inline integer<SSize> binomial_impl(const integer<SSize> &n, const T &k)
         return bin_ui(n, integer_exp_to_ulong(k));
     }
     // This is the case k < 0, handled according to:
-    // http://arxiv.org/abs/1105.3689/
+    // https://arxiv.org/abs/1105.3689/
     if (n.sgn() >= 0) {
         // n >= 0, k < 0.
         return integer<SSize>{};
@@ -6291,7 +6291,7 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
  *
  * .. seealso::
  *
- *    http://arxiv.org/abs/1105.3689/
+ *    https://arxiv.org/abs/1105.3689/
  *
  * \endrststar
  *
