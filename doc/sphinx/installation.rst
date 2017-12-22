@@ -26,6 +26,8 @@ mp++ has the following dependencies:
 
 * the `GMP <https://gmplib.org/>`__ library, **mandatory** (GMP 5 and later versions are supported,
   the `MPIR <http://mpir.org/>`__ fork of GMP can also be used);
+* on Windows only, the `Debug Help <https://msdn.microsoft.com/en-us/library/windows/desktop/ms679309(v=vs.85).aspx>`__ library,
+  **mandatory** (used to enable more informative error messages). The ``DbgHelp`` library is typically included in the operating system;
 * the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support for the ``long double`` type (MPFR 3 or a later version is required);
 * the `quadmath library <https://gcc.gnu.org/onlinedocs/libquadmath/>`__ from GCC, *optional*, used
@@ -100,7 +102,7 @@ If mp++ is installed in a standard prefix, on a typical GNU/Linux system you can
    $ g++ -std=c++11 main.cpp -lgmp
 
 .. note::
-   The ``-std=c++11`` flag is not necessary if your GCC version is recent enough.
+   The ``-std=c++11`` flag is not necessary if your GCC version is recent enough (i.e., for GCC 6 and later).
 
 If you installed mp++ with optional features enabled, you will need to link the required libraries as well. For instance,
 if both MPFR and quadmath support are enabled, the compilation command on a modern GNU/Linux system will be something like:
@@ -108,6 +110,17 @@ if both MPFR and quadmath support are enabled, the compilation command on a mode
 .. code-block:: console
 
    $ g++ -std=c++11 main.cpp -lquadmath -lmpfr -lgmp
+
+The full list of libraries that need to be linked when using mp++ is the following:
+
+* the GMP library (or the MPIR fork), always required (``-lgmp`` on most Unix-like systems);
+* on Windows only, the ``DbgHelp`` library, always required;
+* the MPFR library, required only if mp++ was configured with the ``MPPP_WITH_MPFR`` option (``-lmpfr`` on most Unix-like systems);
+* the quadmath library, required only if mp++ was configured with the ``MPPP_WITH_QUADMATH`` option (``-lquadmath`` with GCC,
+  with clang it might be necessary to provide the full path to the library).
+
+If you are using CMake, it's highly recommended to make use of the config-file package provided with mp++ rather
+than locating and linking manually the required dependencies (see the next section).
 
 Including mp++ in your project via CMake
 ----------------------------------------
