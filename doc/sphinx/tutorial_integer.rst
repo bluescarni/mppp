@@ -45,4 +45,5 @@ Among the features specific to :cpp:class:`~mppp::integer` we find:
 * hashing utilities (including a specialisation of ``std::hash``, so that it is possible to use
   :cpp:class:`~mppp::integer` in standard unordered containers out of the box).
 
-Many of these features available in multiple overloads, and both as free and member functions.
+Many of these features are available in multiple overloads, often both as free and member functions, and they are documented
+in detail in the :ref:`integer reference <integer_reference>`.
