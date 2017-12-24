@@ -17,7 +17,7 @@ In addition to mp++, the following libraries are used in the benchmarks:
 * the `FLINT <http://flintlib.org/>`__ library. This library provides a data type called ``fmpz_t`` which, similarly to
   mp++, provides a small-value optimisation on top of GMP.
 
-The benchmark results were last updated on **20171216**, using the following package versions:
+The benchmark results were last updated on **20171224**, using the following package versions:
 
 * GCC 7.2,
 * mp++ 0.7,

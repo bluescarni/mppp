@@ -89,7 +89,7 @@
 <li><a class="reference internal" href="#id2">2-limb signed integers</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#vector-multiplication">Vector multiplication</a><ul>
+<li><a class="reference internal" href="#vector-multiply-add">Vector multiply-add</a><ul>
 <li><a class="reference internal" href="#integer1-vec-mul-unsigned">1-limb unsigned integers</a></li>
 <li><a class="reference internal" href="#id4">1-limb signed integers</a></li>
 <li><a class="reference internal" href="#integer2-vec-mul-unsigned">2-limb unsigned integers</a></li>
@@ -171,12 +171,12 @@
 <p>For each benchmarked library, the timings in the bar charts are split into three parts:</p>
 <ul class="simple">
 <li>the <code class="docutils literal"><span class="pre">init</span></code> bar, which accounts for the time needed for the initialisation of the benchmark data,</li>
-<li>the <code class="docutils literal"><span class="pre">arithmetic</span></code> bar, which represents the time needed to actually perform the operation being benchmarked,</li>
+<li>the <code class="docutils literal"><span class="pre">operation</span></code> bar, which represents the time needed to actually perform the operation being benchmarked,</li>
 <li>the <code class="docutils literal"><span class="pre">total</span></code> bar, which represents the total runtime of the benchmark.</li>
 </ul>
 <p>The intent is to provide a breakdown which measures both the performance of the operation
 being benchmarked and the effect of the small value optimisation implemented in mp++ (the latter
-tends to show up in the initialisation phase of the benchmarks, which usually involves
+tends to have a noticeable impact in the initialisation phase of the benchmarks, which usually involves
 the creation of a large number of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects).</p>
 <div class="section" id="dot-product">
 <span id="integer-dot-product"></span><h2>Dot product<a class="headerlink" href="#dot-product" title="Permalink to this headline">¶</a></h2>
@@ -194,7 +194,7 @@ is less than <span class="math">\(2^{64}\)</span>. mp++ integers with 1 limb of 
 integer types. This is due to the fact that the GMP API always uses dynamically-allocated memory, even for small values.
 The other integer types all employ a small-value optimisation, and thus avoid the performance cost of heap allocation.</p>
 <p>In this particular benchmark, mp++ is about 3 times faster than GMP (as measured via the <code class="docutils literal"><span class="pre">mpz_int</span></code> wrapper)
-in the arithmetic portion of the benchmark. mp++ is also faster than <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT, albeit by a smaller margin.</p>
+in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark. mp++ is also faster than <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT, albeit by a smaller margin.</p>
 </div>
 <div class="section" id="limb-signed-integers">
 <h3>1-limb signed integers<a class="headerlink" href="#limb-signed-integers" title="Permalink to this headline">¶</a></h3>
@@ -204,7 +204,7 @@ are initialised with both positive <em>and</em> negative values.</p>
 <a class="reference internal image-reference" href="_images/integer1_dot_product_signed.png"><img alt="_images/integer1_dot_product_signed.png" src="_images/integer1_dot_product_signed.png" style="width: 610.0px; height: 407.0px;" /></a>
 </div>
 <p>The presence of both positive and negative values has a noticeable performance impact with respect to the previous test
-for all libraries, both during the initialisation of the vectors and in the arithmetic part of the benchmark.
+for all libraries, both during the initialisation of the vectors and in the <code class="docutils literal"><span class="pre">operation</span></code> part of the benchmark.
 This is due to the fact that sign handling in multiprecision computations is typically implemented
 with branches, and when positive and negative values are equally likely the effectiveness of the CPU’s branch predictor
 is much reduced.</p>
@@ -230,24 +230,21 @@ mp++ integers with 2 limbs of static size are now employed.</p>
 non-negative values.</p>
 </div>
 </div>
-<div class="section" id="vector-multiplication">
-<span id="integer-vec-mul"></span><h2>Vector multiplication<a class="headerlink" href="#vector-multiplication" title="Permalink to this headline">¶</a></h2>
-<p>This benchmark is very similar to the <a class="reference internal" href="#integer-dot-product"><span class="std std-ref">dot product benchmark</span></a>, with one crucial difference:
-instead of accumulating the dot product of two randomly-generated vectors of size <span class="math">\(3\times 10^7\)</span> into a scalar
-value, the element-wise product of the two vectors is stored in a third vector, and the final
-dot product is computed as the sum of the values in this third vector.</p>
-<p>This allows to measure the efficiency
+<div class="section" id="vector-multiply-add">
+<span id="integer-vec-mul"></span><h2>Vector multiply-add<a class="headerlink" href="#vector-multiply-add" title="Permalink to this headline">¶</a></h2>
+<p>In this benchmark, we first compute the element-wise multiplication of two random vectors of size <span class="math">\(3\times 10^7\)</span>,
+followed by the addition to another random vector of the same size. This workload allows to measure the efficiency
 of the multiplication and addition operations (whereas in the dot product benchmark the multiply-add primitives were
-employed), and it also increases the pressure on the memory subsystem (due to the need to write the elements’ products
-into a vector rather than accumulating them directly into a scalar).</p>
+employed), and it also increases the pressure on the memory subsystem (due to the need to write into large vectors
+instead of accumulating the result into a single scalar).</p>
 <div class="section" id="integer1-vec-mul-unsigned">
 <span id="id3"></span><h3>1-limb unsigned integers<a class="headerlink" href="#integer1-vec-mul-unsigned" title="Permalink to this headline">¶</a></h3>
-<p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values, and the final result
-is less than <span class="math">\(2^{64}\)</span>. mp++ integers with 1 limb of static size are employed.</p>
+<p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values.
+mp++ integers with 1 limb of static size are employed.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer1_vec_mul_unsigned.png"><img alt="_images/integer1_vec_mul_unsigned.png" src="_images/integer1_vec_mul_unsigned.png" style="width: 610.0px; height: 407.0px;" /></a>
 </div>
-<p>This time mp++ is more than 5 times faster than GMP in the arithmetic portion of the benchmark, while still maintaining
+<p>This time mp++ is more than 5 times faster than GMP in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark, while still maintaining
 a performance advantage over <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT.</p>
 </div>
 <div class="section" id="id4">
@@ -262,7 +259,7 @@ to the <a class="reference internal" href="#integer1-vec-mul-unsigned"><span cla
 <div class="section" id="integer2-vec-mul-unsigned">
 <span id="id5"></span><h3>2-limb unsigned integers<a class="headerlink" href="#integer2-vec-mul-unsigned" title="Permalink to this headline">¶</a></h3>
 <p>This setup is the 2-limb version of the <a class="reference internal" href="#integer1-vec-mul-unsigned"><span class="std std-ref">1-limb unsigned benchmark</span></a>:
-the vectors are initialised with larger non-negative values, the final result is less than <span class="math">\(2^{128}\)</span>, and
+the vectors are initialised with larger non-negative values, and
 mp++ integers with 2 limbs of static size are now employed.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer2_vec_mul_unsigned.png"><img alt="_images/integer2_vec_mul_unsigned.png" src="_images/integer2_vec_mul_unsigned.png" style="width: 610.0px; height: 407.0px;" /></a>
@@ -279,9 +276,8 @@ mp++ integers with 2 limbs of static size are now employed.</p>
 </div>
 <div class="section" id="vector-division">
 <h2>Vector division<a class="headerlink" href="#vector-division" title="Permalink to this headline">¶</a></h2>
-<p>This benchmark is the division analogue of the <a class="reference internal" href="#integer-vec-mul"><span class="std std-ref">vector multiplication benchmark</span></a>: the element-wise
-division of two randomly-generated vectors of size <span class="math">\(3\times 10^7\)</span> is stored in a third vector, and the sum
-of all the values in the third vector is computed.</p>
+<p>In this benchmark we compute the element-wise division with remainder of two randomly-generated vectors of
+size <span class="math">\(3\times 10^7\)</span>, followed by the sum of all the values in the quotient vector.</p>
 <div class="section" id="integer1-vec-div-unsigned">
 <span id="id7"></span><h3>1-limb unsigned integers<a class="headerlink" href="#integer1-vec-div-unsigned" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values.
