@@ -1,21 +1,25 @@
 Integer benchmarks
 ------------------
 
+For each benchmarked library, the timings in the bar charts are split into three parts:
+
+* the ``init`` bar, which accounts for the time needed for the initialisation of the benchmark data,
+* the ``arithmetic`` bar, which represents the time needed to actually perform the operation being benchmarked,
+* the ``total`` bar, which represents the total runtime of the benchmark.
+
+The intent is to provide a breakdown which measures both the performance of the operation
+being benchmarked and the effect of the small value optimisation implemented in mp++ (the latter
+tends to show up in the initialisation phase of the benchmarks, which usually involves
+the creation of a large number of :cpp:class:`~mppp::integer` objects).
+
 .. _integer_dot_product:
 
 Dot product
 ^^^^^^^^^^^
 
 This benchmark measures the time needed to compute the dot product of two integer vectors of size
-:math:`3\times 10^7` containing randomly-generated values. For each benchmarked library, the timings
-are split into three bars:
-
-* the ``init`` bar, which accounts for the time needed to initialise the vectors of integers,
-* the ``arithmetic`` bar, which represents the time needed to perform the dot product,
-* the ``total`` bar, which represents the total runtime of the benchmark.
-
-The multiply-add primitives of each library are used for the accumulation of the dot product. The benchmark
-is run in a variety of different setups.
+:math:`3\times 10^7` containing randomly-generated values. The multiply-add primitives of each library
+are used for the accumulation of the dot product. The benchmark is run in a variety of different setups.
 
 .. _integer1_dot_product_unsigned:
 

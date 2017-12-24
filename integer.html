@@ -150,7 +150,7 @@
     <div class="col-md-12 content">
       
   <div class="section" id="multiprecision-integers">
-<h1>Multiprecision integers<a class="headerlink" href="#multiprecision-integers" title="Permalink to this headline">¶</a></h1>
+<span id="integer-reference"></span><h1>Multiprecision integers<a class="headerlink" href="#multiprecision-integers" title="Permalink to this headline">¶</a></h1>
 <p><em>#include &lt;mp++/integer.hpp&gt;</em></p>
 <div class="section" id="the-integer-class">
 <h2>The <code class="docutils literal"><span class="pre">integer</span></code> class<a class="headerlink" href="#the-integer-class" title="Permalink to this headline">¶</a></h2>
@@ -164,7 +164,7 @@
 a small value optimisation: integers whose size is up to <code class="docutils literal"><span class="pre">SSize</span></code> limbs are stored directly in the storage
 occupied by the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> object, without resorting to dynamic memory allocation. The value of
 <code class="docutils literal"><span class="pre">SSize</span></code> must be at least 1 and less than an implementation-defined upper limit. On most modern architectures,
-a limb contains either 32 or 64 bits of data. Thus, for instance, is <code class="docutils literal"><span class="pre">SSize</span></code> is set to 2 on a 64-bit system,
+a limb contains either 32 or 64 bits of data. Thus, for instance, if <code class="docutils literal"><span class="pre">SSize</span></code> is set to 2 on a 64-bit system,
 the small value optimisation will be employed for all integral values less than <span class="math">\(2^{64 \times 2} = 2^{128}\)</span>.</p>
 <p>When the value of an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> is stored directly within the object, the <em>storage type</em> of the
 integer is said to be <em>static</em>. When the limb size of the integer exceeds the maximum value <code class="docutils literal"><span class="pre">SSize</span></code>, the storage
@@ -2017,7 +2017,7 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 The implementation can handle positive and negative values for both the top and the bottom argument.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference external" href="http://arxiv.org/abs/1105.3689/">http://arxiv.org/abs/1105.3689/</a></p>
+<p class="last"><a class="reference external" href="https://arxiv.org/abs/1105.3689/">https://arxiv.org/abs/1105.3689/</a></p>
 </div>
 </p>
 <p><dl class="docutils">

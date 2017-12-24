@@ -27,7 +27,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Reference" href="reference.html" />
-    <link rel="prev" title="Interfacing with the lower-level libraries" href="tutorial_lib_interface.html" />
+    <link rel="prev" title="Multiprecision float tutorial" href="tutorial_real.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -91,7 +91,7 @@
               
                 
   <li>
-    <a href="tutorial_lib_interface.html" title="Previous Chapter: Interfacing with the lower-level libraries"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Interfacing w...</span>
+    <a href="tutorial_real.html" title="Previous Chapter: Multiprecision float tutorial"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Multiprecisio...</span>
     </a>
   </li>
   <li>
@@ -142,18 +142,21 @@ subject to API changes in future versions.</p>
 <p><em>#include &lt;mp++/extra/pybind11.hpp&gt;</em></p>
 <p>The <code class="docutils literal"><span class="pre">mp++/extra/pybind11.hpp</span></code> header provides facilities to seamlessly translate
 mp++ multiprecision objects to/from Python in <a class="reference external" href="https://github.com/pybind/pybind11">pybind11</a>
-modules. The functionality currently includes a single function in the <code class="docutils literal"><span class="pre">mppp_pybind11</span></code> namespace.</p>
+modules. pybind11 is a C++11 library that, similarly to the older
+<a class="reference external" href="http://www.boost.org/doc/libs/1_66_0/libs/python/doc/html/index.html">Boost.Python</a> library,
+allows to use C++ functions and classes from Python.</p>
+<p>The API for the pybind11 integration currently includes a single function in the <code class="docutils literal"><span class="pre">mppp_pybind11</span></code> namespace:</p>
 <dl class="function">
 <dt id="_CPPv2N13mppp_pybind114initEv">
 <span id="mppp_pybind11::init"></span><span class="target" id="pybind11_8hpp_1a227e4e3e2a5b5da704f1907627e3de04"></span>void <code class="descclassname">mppp_pybind11::</code><code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N13mppp_pybind114initEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Initialisation function for the pybind11 integration. </p>
-<p>This function should be called right after the <code class="docutils literal"><span class="pre">PYBIND11_MODULE()</span></code> invocation. </p>
+<p>This function should be called in the definition of a pybind11 extension module, right after the <code class="docutils literal"><span class="pre">PYBIND11_MODULE()</span></code> invocation. </p>
 </dd></dl>
 
-<p>Including the <code class="docutils literal"><span class="pre">mp++/extra/pybind11.hpp</span></code> header and invoking the <a class="reference internal" href="#_CPPv2N13mppp_pybind114initEv" title="mppp_pybind11::init"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp_pybind11::init()</span></code></a>
-function will register <a class="reference external" href="http://pybind11.readthedocs.io/en/master/advanced/cast/custom.html">custom type casters</a>
+<p>Including the <code class="docutils literal"><span class="pre">mp++/extra/pybind11.hpp</span></code> header and invoking the <a class="reference internal" href="#_CPPv2N13mppp_pybind114initEv" title="mppp_pybind11::init"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp_pybind11::init()</span></code></a> function will register
+<a class="reference external" href="http://pybind11.readthedocs.io/en/master/advanced/cast/custom.html">custom type casters</a>
 that will automatically translate to/from Python mp++ objects used as arguments and return values in
-functions exposed from C++ in pybind11 modules. The translation rules are the following:</p>
+functions exposed from C++. The translation rules are the following:</p>
 <ul class="simple">
 <li><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects are converted to/from Python integers,</li>
 <li><a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> objects are converted to/from Python <a class="reference external" href="https://docs.python.org/3.6/library/fractions.html">fractions</a>,</li>

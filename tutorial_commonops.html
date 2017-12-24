@@ -234,6 +234,24 @@ mp++’s multiprecision classes:</p>
 <span class="n">assert</span><span class="p">(</span><span class="o">-</span><span class="n">q</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">});</span>
 </pre></div>
 </div>
+<p>All of mp++’s multiprecision classes are contextually convertible to <code class="docutils literal"><span class="pre">bool</span></code>, following the usual rule
+that nonzero values convert to <code class="docutils literal"><span class="pre">true</span></code> and zero values convert to <code class="docutils literal"><span class="pre">false</span></code>:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mi">3</span><span class="p">};</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;n is nonzero!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">rat_t</span> <span class="n">q</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">q</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;q is zero!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">real</span> <span class="n">r</span><span class="p">{</span><span class="mf">1.23</span><span class="p">};</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!!</span><span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;r is nonzero!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <p>In addition to the common arithmetic operators, all of mp++’s multiprecision classes support the relational
 operators <span class="math">\(=\)</span>, <span class="math">\(\neq\)</span>, <span class="math">\(&gt;\)</span>, <span class="math">\(\geq\)</span>, <span class="math">\(&lt;\)</span> and <span class="math">\(\leq\)</span>. Any combination
 of multiprecision and numerical C++ types is supported:</p>

@@ -81,7 +81,10 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Integer tutorial</a></li>
+<li><a class="reference internal" href="#">Integer tutorial</a><ul>
+<li><a class="reference internal" href="#interacting-with-the-gmp-api">Interacting with the GMP API</a></li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -131,7 +134,115 @@
       
   <div class="section" id="integer-tutorial">
 <span id="tutorial-integer"></span><h1>Integer tutorial<a class="headerlink" href="#integer-tutorial" title="Permalink to this headline">¶</a></h1>
-<p>TBD</p>
+<p><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> was the first class implemented in mp++, and as a result it is currently
+the most featureful and optimised among mp++’s multiprecision classes.</p>
+<p>One of the first things that can be noticed about <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> is that the class is parametrised over
+an integral value <code class="docutils literal"><span class="pre">SSize</span></code>, called the <em>static size</em>. This compile-time constant represents the number of <em>limbs</em> that will be
+stored directly within an <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> object before resorting to dynamic memory allocation.
+A limb is the part of a multiprecision integer that fits in a single word-sized unsigned integral type:
+in the same way an integral value in base 10 is represented as a sequence of digits in the <span class="math">\(\left[0,9\right]\)</span> range,
+an <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> object is represented internally by an array of 32-bit or 64-bit
+unsigned C++ integral values. Thus, for instance, if <code class="docutils literal"><span class="pre">SSize</span></code> is set to 2 on a 64-bit system,
+<a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> is able to represent values in the <span class="math">\(\left(-2^{128},2^{128}\right)\)</span> range
+without resorting to dynamic memory allocation. In general, an <code class="docutils literal"><span class="pre">SSize</span></code> value of 1 is a good default choice for many
+use cases.</p>
+<p>In addition to the <a class="reference internal" href="tutorial_commonops.html#tutorial-commonops"><span class="std std-ref">common operators</span></a> available for all of mp++’s multiprecision classes,
+<a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> supports the following additional operators:</p>
+<ul class="simple">
+<li>the modulo operator <code class="docutils literal"><span class="pre">%</span></code>, which computes the remainder of integer division,</li>
+<li>the bitshifting operators <code class="docutils literal"><span class="pre">&lt;&lt;</span></code> and <code class="docutils literal"><span class="pre">&gt;&gt;</span></code>,</li>
+<li>the bitwise logical operators <code class="docutils literal"><span class="pre">~</span></code>, <code class="docutils literal"><span class="pre">&amp;</span></code>, <code class="docutils literal"><span class="pre">|</span></code> and <code class="docutils literal"><span class="pre">^</span></code>.</li>
+</ul>
+<p>In addition to the binary versions of these operators, the in-place versions are also available. Lower level ternary
+primitives (e.g., <a class="reference internal" href="integer.html#_CPPv2N4mppp8mul_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="mppp::mul_2exp"><code class="xref cpp cpp-func docutils literal"><span class="pre">mul_2exp()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv2N4mppp11tdiv_q_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="mppp::tdiv_q_2exp"><code class="xref cpp cpp-func docutils literal"><span class="pre">tdiv_q_2exp()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv2N4mppp11bitwise_iorER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::bitwise_ior"><code class="xref cpp cpp-func docutils literal"><span class="pre">bitwise_ior()</span></code></a>, etc.)
+are also provided for those situations in which it is desirable to pass the return value as a function
+parameter, rather than creating a new return value (as explained earlier in the <a class="reference internal" href="tutorial_api.html#tutorial-api"><span class="std std-ref">API overview</span></a>).
+For consistency with C++11, the <code class="docutils literal"><span class="pre">%</span></code> operator returns a remainder with the same sign as the dividend. The bit-shifting
+operators <code class="docutils literal"><span class="pre">&lt;&lt;</span></code> and <code class="docutils literal"><span class="pre">&gt;&gt;</span></code> correspond respectively to multiplication and division by a power of 2. The bitwise logical
+operators behave as-if <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> used a two’s complement representation (even if internally
+a sign-magnitude representation is used instead).</p>
+<p>Among the features specific to <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> we find:</p>
+<ul class="simple">
+<li>specialised arithmetic primitives (fused multiply-add/sub, addition/subtraction with C++ unsigned
+integrals, …),</li>
+<li>functionality related to prime numbers (<a class="reference internal" href="integer.html#_CPPv2N4mppp14probab_prime_pERK7integerI5SSizeEi" title="mppp::probab_prime_p"><code class="xref cpp cpp-func docutils literal"><span class="pre">probab_prime_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv2N4mppp9nextprimeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::nextprime"><code class="xref cpp cpp-func docutils literal"><span class="pre">nextprime()</span></code></a>, …),</li>
+<li>parity detection (<a class="reference internal" href="integer.html#_CPPv2N4mppp6even_pERK7integerI5SSizeE" title="mppp::even_p"><code class="xref cpp cpp-func docutils literal"><span class="pre">even_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv2N4mppp5odd_pERK7integerI5SSizeE" title="mppp::odd_p"><code class="xref cpp cpp-func docutils literal"><span class="pre">odd_p()</span></code></a>),</li>
+<li>several additional <a class="reference internal" href="integer.html#integer-division"><span class="std std-ref">division functions</span></a>,</li>
+<li><a class="reference internal" href="integer.html#integer-ntheory"><span class="std std-ref">number-theoretic functions</span></a> (GCD, factorial, binomial coefficient, …),</li>
+<li>integer <a class="reference internal" href="integer.html#integer-roots"><span class="std std-ref">roots</span></a> and <a class="reference internal" href="integer.html#integer-exponentiation"><span class="std std-ref">exponentiation</span></a>,</li>
+<li>hashing (including a specialisation of <code class="docutils literal"><span class="pre">std::hash</span></code>, so that it is possible to use
+<a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> in standard unordered containers out of the box),</li>
+<li>various utility functions specific to <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects (detect size in bits/limbs,
+detect and/or promote/demote storage type, …).</li>
+</ul>
+<p>Many of these features, which are documented in detail in the <a class="reference internal" href="integer.html#integer-reference"><span class="std std-ref">integer reference</span></a>, are available
+in multiple overloads, often both as free and member functions.</p>
+<div class="section" id="interacting-with-the-gmp-api">
+<h2>Interacting with the GMP API<a class="headerlink" href="#interacting-with-the-gmp-api" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> provides a variety of ways for interfacing with the <a class="reference external" href="https://gmplib.org/">GMP</a> library.
+There are a few reasons why one would want to use <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> in conjunction with the GMP API, such as:</p>
+<ul class="simple">
+<li>the necessity of using functions from the GMP API which have not (yet) been wrapped by mp++,</li>
+<li>passing data from/to mp++ to/from another GMP-based multiprecision library.</li>
+</ul>
+<p>To start with, <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> is constructible and assignable from <code class="docutils literal"><span class="pre">mpz_t</span></code> objects:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
+<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span> <span class="c1">// Init an mpz_t with the value -4.</span>
+
+<span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="n">m</span><span class="p">};</span>             <span class="c1">// Init an int_t from the mpz_t.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>        <span class="c1">// Verify that the value is correct.</span>
+
+<span class="n">int_t</span> <span class="n">n2</span><span class="p">;</span>
+<span class="n">n2</span> <span class="o">=</span> <span class="n">m</span><span class="p">;</span>                  <span class="c1">// Assign the mpz_t to another int_t.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">n2</span> <span class="o">==</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>        <span class="c1">// Verify that the value is correct.</span>
+
+<span class="n">mpz_clear</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>           <span class="c1">// Clear the mpz_t.</span>
+</pre></div>
+</div>
+<p>Second, it is possible to get a reference to an <code class="docutils literal"><span class="pre">mpz_t</span></code> from an <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+via the <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_t()</span></code></a> member function. This member function will
+first switch the calling <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> to dynamic storage (if the calling
+<a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> is not already employing dynamic storage), and it will then return
+a raw non-owning pointer which can be used both as a const and mutable parameter in the GMP API.
+For example:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">b</span><span class="p">;</span>
+<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>                   <span class="c1">// Init an mpz_t with the value -4.</span>
+
+<span class="n">int_t</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>                            <span class="c1">// Init two integers.</span>
+
+<span class="n">mpz_add</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">get_mpz_t</span><span class="p">(),</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">.</span><span class="n">get_mpz_t</span><span class="p">());</span> <span class="c1">// Compute b + c via the GMP API, storing the result in a.</span>
+
+<span class="n">assert</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>                          <span class="c1">// Verify that the result is correct.</span>
+
+<span class="n">mpz_clear</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>                             <span class="c1">// Clear the mpz_t.</span>
+</pre></div>
+</div>
+<p>It is important to emphasise that <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_t()</span></code></a> forces the use of dynamic storage,
+thus incurring in a potential performance hit. If only const access is needed, a better alternative to
+<a class="reference internal" href="integer.html#_CPPv2N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_t()</span></code></a> is the <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_view()</span></code></a> member function.
+<a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_view()</span></code></a> returns a read-only view of
+the calling <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> which is implicitly convertible to a <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code>, and which can thus be
+used as a non-mutable function parameter in the GMP API. The creation of the read-only view is lightweight,
+and, crucially, it does not force the use of dynamic storage in the calling <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.
+We can slightly modify to previous example to use a read-only view as the third parameter in the <code class="docutils literal"><span class="pre">mpz_add()</span></code> call,
+and verify that the creation of the read-only view did not trigger a promotion from static to dynamic storage:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">b</span><span class="p">;</span>
+<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>                      <span class="c1">// Init an mpz_t with the value -4.</span>
+
+<span class="n">int_t</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>                               <span class="c1">// Init two integers.</span>
+
+<span class="n">mpz_add</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">get_mpz_t</span><span class="p">(),</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">.</span><span class="n">get_mpz_view</span><span class="p">());</span> <span class="c1">// Compute b + c via the GMP API, storing the result in a.</span>
+
+<span class="n">assert</span><span class="p">(</span><span class="n">a</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>                             <span class="c1">// Verify that the result is correct.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">is_static</span><span class="p">());</span>                       <span class="c1">// Verify that c is still using static storage.</span>
+
+<span class="n">mpz_clear</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>                                <span class="c1">// Clear the mpz_t.</span>
+</pre></div>
+</div>
+<p>It must be noted that both <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_t()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_view()</span></code></a>
+have to be used carefully, as they return non-owning objects which can easily lead to dangling pointers or references.
+The documentation of the two functions explains in detail some of the potential pitfalls that users need to be aware of.</p>
+</div>
 </div>
 
 

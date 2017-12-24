@@ -168,18 +168,21 @@
       
   <div class="section" id="integer-benchmarks">
 <h1>Integer benchmarks<a class="headerlink" href="#integer-benchmarks" title="Permalink to this headline">¶</a></h1>
+<p>For each benchmarked library, the timings in the bar charts are split into three parts:</p>
+<ul class="simple">
+<li>the <code class="docutils literal"><span class="pre">init</span></code> bar, which accounts for the time needed for the initialisation of the benchmark data,</li>
+<li>the <code class="docutils literal"><span class="pre">arithmetic</span></code> bar, which represents the time needed to actually perform the operation being benchmarked,</li>
+<li>the <code class="docutils literal"><span class="pre">total</span></code> bar, which represents the total runtime of the benchmark.</li>
+</ul>
+<p>The intent is to provide a breakdown which measures both the performance of the operation
+being benchmarked and the effect of the small value optimisation implemented in mp++ (the latter
+tends to show up in the initialisation phase of the benchmarks, which usually involves
+the creation of a large number of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects).</p>
 <div class="section" id="dot-product">
 <span id="integer-dot-product"></span><h2>Dot product<a class="headerlink" href="#dot-product" title="Permalink to this headline">¶</a></h2>
 <p>This benchmark measures the time needed to compute the dot product of two integer vectors of size
-<span class="math">\(3\times 10^7\)</span> containing randomly-generated values. For each benchmarked library, the timings
-are split into three bars:</p>
-<ul class="simple">
-<li>the <code class="docutils literal"><span class="pre">init</span></code> bar, which accounts for the time needed to initialise the vectors of integers,</li>
-<li>the <code class="docutils literal"><span class="pre">arithmetic</span></code> bar, which represents the time needed to perform the dot product,</li>
-<li>the <code class="docutils literal"><span class="pre">total</span></code> bar, which represents the total runtime of the benchmark.</li>
-</ul>
-<p>The multiply-add primitives of each library are used for the accumulation of the dot product. The benchmark
-is run in a variety of different setups.</p>
+<span class="math">\(3\times 10^7\)</span> containing randomly-generated values. The multiply-add primitives of each library
+are used for the accumulation of the dot product. The benchmark is run in a variety of different setups.</p>
 <div class="section" id="limb-unsigned-integers">
 <span id="integer1-dot-product-unsigned"></span><h3>1-limb unsigned integers<a class="headerlink" href="#limb-unsigned-integers" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values, and the final dot product

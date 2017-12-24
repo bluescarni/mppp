@@ -14,14 +14,18 @@ Extra: integration with pybind11
 
 The ``mp++/extra/pybind11.hpp`` header provides facilities to seamlessly translate
 mp++ multiprecision objects to/from Python in `pybind11 <https://github.com/pybind/pybind11>`__
-modules. The functionality currently includes a single function in the ``mppp_pybind11`` namespace.
+modules. pybind11 is a C++11 library that, similarly to the older
+`Boost.Python <http://www.boost.org/doc/libs/1_66_0/libs/python/doc/html/index.html>`__ library,
+allows to use C++ functions and classes from Python.
+
+The API for the pybind11 integration currently includes a single function in the ``mppp_pybind11`` namespace:
 
 .. doxygenfunction:: mppp_pybind11::init()
 
-Including the ``mp++/extra/pybind11.hpp`` header and invoking the :cpp:func:`mppp_pybind11::init()`
-function will register `custom type casters <http://pybind11.readthedocs.io/en/master/advanced/cast/custom.html>`__
+Including the ``mp++/extra/pybind11.hpp`` header and invoking the :cpp:func:`mppp_pybind11::init()` function will register
+`custom type casters <http://pybind11.readthedocs.io/en/master/advanced/cast/custom.html>`__
 that will automatically translate to/from Python mp++ objects used as arguments and return values in
-functions exposed from C++ in pybind11 modules. The translation rules are the following:
+functions exposed from C++. The translation rules are the following:
 
 * :cpp:class:`~mppp::integer` objects are converted to/from Python integers,
 * :cpp:class:`~mppp::rational` objects are converted to/from Python `fractions <https://docs.python.org/3.6/library/fractions.html>`__,

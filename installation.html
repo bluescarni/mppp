@@ -157,8 +157,10 @@ architectures) for the implementation of fast integer arithmetics. If such funct
 will fall back to GMP’s <code class="docutils literal"><span class="pre">mpn_</span></code> functions.</p>
 <p>mp++ has the following dependencies:</p>
 <ul class="simple">
-<li>the <a class="reference external" href="http://www.gmplib.org">GMP</a> library, <strong>mandatory</strong> (GMP 5 and later versions are supported,
+<li>the <a class="reference external" href="https://gmplib.org/">GMP</a> library, <strong>mandatory</strong> (GMP 5 and later versions are supported,
 the <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP can also be used);</li>
+<li>on Windows only, the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms679309(v=vs.85).aspx">Debug Help</a> library,
+<strong>mandatory</strong> (used to enable more informative error messages). The <code class="docutils literal"><span class="pre">DbgHelp</span></code> library is typically included in the operating system;</li>
 <li>the <a class="reference external" href="http://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library, <em>optional</em>, used in the implementation
 of the <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> class and for providing support for the <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> type (MPFR 3 or a later version is required);</li>
 <li>the <a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/">quadmath library</a> from GCC, <em>optional</em>, used
@@ -167,7 +169,7 @@ is part of GCC and it does not need to be installed separately);</li>
 <li>the <a class="reference external" href="http://www.boost.org/">Boost</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a> libraries, <em>optional</em>, currently used
 only in the benchmarking suite.</li>
 </ul>
-<p>Additionally, <a class="reference external" href="http://www.cmake.org/">CMake</a> is the build system used by mp++ and it must also be available when
+<p>Additionally, <a class="reference external" href="https://cmake.org/">CMake</a> is the build system used by mp++ and it must also be available when
 installing from source (the minimum required version is 3.3).</p>
 <div class="section" id="installation-from-source">
 <h2>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this headline">¶</a></h2>
@@ -192,7 +194,7 @@ in the <code class="docutils literal"><span class="pre">include</span></code> su
 <p><span class="versionmodified">New in version 0.2.</span></p>
 </div>
 <p>mp++ is available in the <a class="reference external" href="https://conda.io/docs/">conda</a> package manager from the
-<a class="reference external" href="https://conda-forge.github.io/">conda-forge</a> channel. Packages for Linux 64-bit, Windows 32/64-bit
+<a class="reference external" href="https://conda-forge.org/">conda-forge</a> channel. Packages for Linux 64-bit, Windows 32/64-bit
 and OSX 64-bit are available. In order to install mp++ via conda, you just need to add <code class="docutils literal"><span class="pre">conda-forge</span></code> to the channels:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>conda config --add channels conda-forge
 conda install mppp
@@ -223,13 +225,23 @@ your conda installation.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The <code class="docutils literal"><span class="pre">-std=c++11</span></code> flag is not necessary if your GCC version is recent enough.</p>
+<p class="last">The <code class="docutils literal"><span class="pre">-std=c++11</span></code> flag is not necessary if your GCC version is recent enough (i.e., for GCC 6 and later).</p>
 </div>
 <p>If you installed mp++ with optional features enabled, you will need to link the required libraries as well. For instance,
 if both MPFR and quadmath support are enabled, the compilation command on a modern GNU/Linux system will be something like:</p>
 <div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 main.cpp -lquadmath -lmpfr -lgmp
 </pre></div>
 </div>
+<p>The full list of libraries that need to be linked when using mp++ is the following:</p>
+<ul class="simple">
+<li>the GMP library (or the MPIR fork), always required (<code class="docutils literal"><span class="pre">-lgmp</span></code> on most Unix-like systems);</li>
+<li>on Windows only, the <code class="docutils literal"><span class="pre">DbgHelp</span></code> library, always required;</li>
+<li>the MPFR library, required only if mp++ was configured with the <code class="docutils literal"><span class="pre">MPPP_WITH_MPFR</span></code> option (<code class="docutils literal"><span class="pre">-lmpfr</span></code> on most Unix-like systems);</li>
+<li>the quadmath library, required only if mp++ was configured with the <code class="docutils literal"><span class="pre">MPPP_WITH_QUADMATH</span></code> option (<code class="docutils literal"><span class="pre">-lquadmath</span></code> with GCC,
+with clang it might be necessary to provide the full path to the library).</li>
+</ul>
+<p>If you are using CMake, it’s highly recommended to make use of the config-file package provided with mp++ rather
+than locating and linking manually the required dependencies (see the next section).</p>
 </div>
 <div class="section" id="including-mp-in-your-project-via-cmake">
 <h2>Including mp++ in your project via CMake<a class="headerlink" href="#including-mp-in-your-project-via-cmake" title="Permalink to this headline">¶</a></h2>
