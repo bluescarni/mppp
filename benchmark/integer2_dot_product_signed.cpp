@@ -89,8 +89,8 @@ int main()
                 addmul(ret, p.first[i], p.second[i]);
             }
             std::cout << ret << '\n';
-            s += "['mp++','arithmetic'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nArithmetic runtime: ";
+            s += "['mp++','operation'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nOperation runtime: ";
         }
         s += "['mp++','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
@@ -109,8 +109,8 @@ int main()
                 ret += p.first[i] * p.second[i];
             }
             std::cout << ret << '\n';
-            s += "['Boost (cpp_int)','arithmetic'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nArithmetic runtime: ";
+            s += "['Boost (cpp_int)','operation'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nOperation runtime: ";
         }
         s += "['Boost (cpp_int)','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
@@ -128,8 +128,8 @@ int main()
                 ::mpz_addmul(ret.backend().data(), p.first[i].backend().data(), p.second[i].backend().data());
             }
             std::cout << ret << '\n';
-            s += "['Boost (mpz_int)','arithmetic'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nArithmetic runtime: ";
+            s += "['Boost (mpz_int)','operation'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nOperation runtime: ";
         }
         s += "['Boost (mpz_int)','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
@@ -149,8 +149,8 @@ int main()
                 ::fmpz_addmul(ret._data().inner, p.first[i]._data().inner, p.second[i]._data().inner);
             }
             std::cout << ret << '\n';
-            s += "['FLINT','arithmetic'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nArithmetic runtime: ";
+            s += "['FLINT','operation'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nOperation runtime: ";
         }
         s += "['FLINT','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
