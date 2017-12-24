@@ -20,5 +20,4 @@ on to the full :ref:`C++ reference <reference>`.
    tutorial_rational.rst
    tutorial_real128.rst
    tutorial_real.rst
-   tutorial_lib_interface.rst
    tutorial_pybind11.rst

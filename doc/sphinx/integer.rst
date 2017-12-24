@@ -1,3 +1,5 @@
+.. _integer_reference:
+
 Multiprecision integers
 =======================
 

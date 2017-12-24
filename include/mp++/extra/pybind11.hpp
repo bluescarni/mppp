@@ -110,7 +110,8 @@ inline void cleanup()
 
 /// Initialisation function for the pybind11 integration.
 /**
- * This function should be called right after the ``PYBIND11_MODULE()`` invocation.
+ * This function should be called in the definition of a pybind11 extension module, right after the
+ * ``PYBIND11_MODULE()`` invocation.
  */
 inline void init()
 {

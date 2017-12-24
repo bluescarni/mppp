@@ -102,7 +102,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     fi
     cd ../sphinx;
     pip install --user sphinx breathe requests[security] sphinx-bootstrap-theme
-    export SPHINX_OUTPUT=`make html 2>&1 >/dev/null`;
+    export SPHINX_OUTPUT=`make html linkcheck 2>&1 >/dev/null`;
     if [[ "${SPHINX_OUTPUT}" != "" ]]; then
         echo "Sphinx encountered some problem:";
         echo "${SPHINX_OUTPUT}";

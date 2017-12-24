@@ -123,6 +123,26 @@ mp++'s multiprecision classes:
    assert(+q == q);
    assert(-q == rat_t{-1, 2});
 
+All of mp++'s multiprecision classes are contextually convertible to ``bool``, following the usual rule
+that nonzero values convert to ``true`` and zero values convert to ``false``:
+
+.. code-block:: c++
+
+   int_t n{3};
+   if (n) {
+      std::cout << "n is nonzero!\n";
+   }
+
+   rat_t q{0};
+   if (!q) {
+      std::cout << "q is zero!\n";
+   }
+
+   real r{1.23};
+   if (!!r) {
+      std::cout << "r is nonzero!\n";
+   }
+
 In addition to the common arithmetic operators, all of mp++'s multiprecision classes support the relational
 operators :math:`=`, :math:`\neq`, :math:`>`, :math:`\geq`, :math:`<` and :math:`\leq`. Any combination
 of multiprecision and numerical C++ types is supported:
