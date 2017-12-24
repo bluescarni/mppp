@@ -3002,20 +3002,10 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
-    // NOTE: according to the benchmarks, for some reason branching here seems to be better than
-    // using abs()/integral_sign(). It's not clear if it's a codegen issue, an effect of the way
-    // the benchmarks are written, or something else. Let's keep an eye on it for the time being.
-    // NOTE: effectively negate op2 if we are subtracting.
-    mpz_size_t asize1 = op1._mp_size, asize2 = AddOrSub ? op2._mp_size : -op2._mp_size;
-    int sign1 = asize1 != 0, sign2 = asize2 != 0;
-    if (asize1 < 0) {
-        asize1 = -asize1;
-        sign1 = -1;
-    }
-    if (asize2 < 0) {
-        asize2 = -asize2;
-        sign2 = -1;
-    }
+    const mpz_size_t asize1 = std::abs(op1._mp_size), asize2 = std::abs(op2._mp_size);
+    const int sign1 = integral_sign(op1._mp_size),
+              // NOTE: effectively negate op2 if we are subtracting.
+        sign2 = AddOrSub ? integral_sign(op2._mp_size) : -integral_sign(op2._mp_size);
     const bool retval
         = static_add_impl(rop, op1, op2, asize1, asize2, sign1, sign2, integer_static_add_algo<static_int<SSize>>{});
     if (integer_static_add_algo<static_int<SSize>>::value == 0 && retval) {
@@ -3551,20 +3541,9 @@ inline std::size_t static_mul_impl(static_int<SSize> &rop, const static_int<SSiz
 template <std::size_t SSize>
 inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
-    // NOTE: according to the benchmarks, for some reason branching here seems to be better than
-    // using abs()/integral_sign(). It's not clear if it's a codegen issue, an effect of the way
-    // the benchmarks are written, or something else. Let's keep an eye on it for the time being.
     // Cache a few quantities, detect signs.
-    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
-    int sign1 = asize1 != 0, sign2 = asize2 != 0;
-    if (asize1 < 0) {
-        asize1 = -asize1;
-        sign1 = -1;
-    }
-    if (asize2 < 0) {
-        asize2 = -asize2;
-        sign2 = -1;
-    }
+    const mpz_size_t asize1 = std::abs(op1._mp_size), asize2 = std::abs(op2._mp_size);
+    const int sign1 = integral_sign(op1._mp_size), sign2 = integral_sign(op2._mp_size);
     const std::size_t retval
         = static_mul_impl(rop, op1, op2, asize1, asize2, sign1, sign2, integer_static_mul_algo<static_int<SSize>>{});
     if (integer_static_mul_algo<static_int<SSize>>::value == 0 && retval == 0u) {
