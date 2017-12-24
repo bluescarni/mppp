@@ -48,17 +48,19 @@ static const std::string name = "integer1_vec_mul_signed";
 constexpr auto size = 30000000ul;
 
 template <typename T>
-static inline std::tuple<std::vector<T>, std::vector<T>, std::vector<T>> get_init_vectors(double &init_time)
+static inline std::tuple<std::vector<T>, std::vector<T>, std::vector<T>, std::vector<T>>
+get_init_vectors(double &init_time)
 {
     rng.seed(1);
     std::uniform_int_distribution<int> dist(1, 10), sign(0, 1);
     simple_timer st;
-    std::vector<T> v1(size), v2(size), v3(size);
+    std::vector<T> v1(size), v2(size), v3(size), v4(size);
     std::generate(v1.begin(), v1.end(), [&dist, &sign]() { return T(dist(rng) * (sign(rng) ? 1 : -1)); });
     std::generate(v2.begin(), v2.end(), [&dist, &sign]() { return T(dist(rng) * (sign(rng) ? 1 : -1)); });
+    std::generate(v3.begin(), v3.end(), [&dist, &sign]() { return T(dist(rng) * (sign(rng) ? 1 : -1)); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
-    return std::make_tuple(std::move(v1), std::move(v2), std::move(v3));
+    return std::make_tuple(std::move(v1), std::move(v2), std::move(v3), std::move(v4));
 }
 
 int main()
@@ -79,14 +81,13 @@ int main()
         s += "['mp++','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            integer_t ret(0);
             for (auto i = 0ul; i < size; ++i) {
-                mul(std::get<2>(p)[i], std::get<0>(p)[i], std::get<1>(p)[i]);
+                mul(std::get<3>(p)[i], std::get<0>(p)[i], std::get<1>(p)[i]);
             }
             for (auto i = 0ul; i < size; ++i) {
-                add(ret, ret, std::get<2>(p)[i]);
+                add(std::get<3>(p)[i], std::get<2>(p)[i], std::get<3>(p)[i]);
             }
-            std::cout << ret << '\n';
+            std::cout << std::get<3>(p)[size - 1u] << '\n';
             s += "['mp++','arithmetic'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nArithmetic runtime: ";
         }
@@ -102,14 +103,13 @@ int main()
         s += "['Boost (cpp_int)','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            cpp_int ret(0);
             for (auto i = 0ul; i < size; ++i) {
-                std::get<2>(p)[i] = std::get<0>(p)[i] * std::get<1>(p)[i];
+                std::get<3>(p)[i] = std::get<0>(p)[i] * std::get<1>(p)[i];
             }
             for (auto i = 0ul; i < size; ++i) {
-                ret += std::get<2>(p)[i];
+                std::get<3>(p)[i] += std::get<2>(p)[i];
             }
-            std::cout << ret << '\n';
+            std::cout << std::get<3>(p)[size - 1u] << '\n';
             s += "['Boost (cpp_int)','arithmetic'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nArithmetic runtime: ";
         }
@@ -124,15 +124,15 @@ int main()
         s += "['Boost (mpz_int)','init'," + std::to_string(init_time) + "],";
         {
             simple_timer st2;
-            mpz_int ret(0);
             for (auto i = 0ul; i < size; ++i) {
-                ::mpz_mul(std::get<2>(p)[i].backend().data(), std::get<0>(p)[i].backend().data(),
+                ::mpz_mul(std::get<3>(p)[i].backend().data(), std::get<0>(p)[i].backend().data(),
                           std::get<1>(p)[i].backend().data());
             }
             for (auto i = 0ul; i < size; ++i) {
-                ::mpz_add(ret.backend().data(), ret.backend().data(), std::get<2>(p)[i].backend().data());
+                ::mpz_add(std::get<3>(p)[i].backend().data(), std::get<2>(p)[i].backend().data(),
+                          std::get<3>(p)[i].backend().data());
             }
-            std::cout << ret << '\n';
+            std::cout << std::get<3>(p)[size - 1u] << '\n';
             s += "['Boost (mpz_int)','arithmetic'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nArithmetic runtime: ";
         }
@@ -151,13 +151,14 @@ int main()
             simple_timer st2;
             fmpzxx ret(0);
             for (auto i = 0ul; i < size; ++i) {
-                ::fmpz_mul(std::get<2>(p)[i]._data().inner, std::get<0>(p)[i]._data().inner,
+                ::fmpz_mul(std::get<3>(p)[i]._data().inner, std::get<0>(p)[i]._data().inner,
                            std::get<1>(p)[i]._data().inner);
             }
             for (auto i = 0ul; i < size; ++i) {
-                ::fmpz_add(ret._data().inner, ret._data().inner, std::get<2>(p)[i]._data().inner);
+                ::fmpz_add(std::get<3>(p)[i]._data().inner, std::get<2>(p)[i]._data().inner,
+                           std::get<3>(p)[i]._data().inner);
             }
-            std::cout << ret << '\n';
+            std::cout << std::get<3>(p)[size - 1u] << '\n';
             s += "['FLINT','arithmetic'," + std::to_string(st2.elapsed()) + "],";
             std::cout << "\nArithmetic runtime: ";
         }
