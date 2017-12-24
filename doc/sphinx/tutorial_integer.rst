@@ -9,12 +9,12 @@ the most featureful and optimised among mp++'s multiprecision classes.
 One of the first things that can be noticed about :cpp:class:`~mppp::integer` is that the class is parametrised over
 an integral value ``SSize``, called the *static size*. This compile-time constant represents the number of *limbs* that will be
 stored directly within an :cpp:class:`~mppp::integer` object before resorting to dynamic memory allocation.
-A limb, in turn, is the part of a multiprecision integer that fits in a single word-sized unsigned integral type:
+A limb is the part of a multiprecision integer that fits in a single word-sized unsigned integral type:
 in the same way an integral value in base 10 is represented as a sequence of digits in the :math:`\left[0,9\right]` range,
 an :cpp:class:`~mppp::integer` object is represented internally by an array of 32-bit or 64-bit
 unsigned C++ integral values. Thus, for instance, if ``SSize`` is set to 2 on a 64-bit system,
 :cpp:class:`~mppp::integer` is able to represent values in the :math:`\left(-2^{128},2^{128}\right)` range
-without resorting to dynamic memory allocation. In general, an ``SSize`` value of 1 is a good default choice for most
+without resorting to dynamic memory allocation. In general, an ``SSize`` value of 1 is a good default choice for many
 use cases.
 
 In addition to the :ref:`common operators <tutorial_commonops>` available for all of mp++'s multiprecision classes,
@@ -25,7 +25,8 @@ In addition to the :ref:`common operators <tutorial_commonops>` available for al
 * the bitwise logical operators ``~``, ``&``, ``|`` and ``^``.
 
 In addition to the binary versions of these operators, the in-place versions are also available. Lower level ternary
-primitives are also provided for those situations in which it is desirable to pass the return value as a function
+primitives (e.g., :cpp:func:`~mppp::mul_2exp()`, :cpp:func:`~mppp::tdiv_q_2exp()`, :cpp:func:`~mppp::bitwise_ior()`, etc.)
+are also provided for those situations in which it is desirable to pass the return value as a function
 parameter, rather than creating a new return value (as explained earlier in the :ref:`API overview <tutorial_api>`).
 For consistency with C++11, the ``%`` operator returns a remainder with the same sign as the dividend. The bit-shifting
 operators ``<<`` and ``>>`` correspond respectively to multiplication and division by a power of 2. The bitwise logical
