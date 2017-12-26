@@ -396,15 +396,6 @@ TEST_CASE("limb array constructor")
     tuple_for_each(sizes{}, limb_array_ctor_tester{});
 }
 
-#if defined(_MSC_VER)
-
-// Silence the annoying checked iterators warnings
-// when using std::copy().
-#pragma warning(push)
-#pragma warning(disable : 4996)
-
-#endif
-
 struct binary_s11n_tester {
     template <typename S>
     void operator()(const S &) const
@@ -417,7 +408,7 @@ struct binary_s11n_tester {
         buffer.resize(n1.binary_size());
         n1.binary_save(buffer.data());
         mpz_size_t size = -1;
-        std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), reinterpret_cast<char *>(&size));
+        std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), make_uai(reinterpret_cast<char *>(&size)));
         REQUIRE(size == 0);
         n2.binary_load(buffer.data());
         REQUIRE(n2 == 0);
@@ -425,7 +416,7 @@ struct binary_s11n_tester {
         n1.promote();
         n1.binary_save(buffer.data());
         size = -1;
-        std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), reinterpret_cast<char *>(&size));
+        std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), make_uai(reinterpret_cast<char *>(&size)));
         REQUIRE(size == 0);
         n2.promote();
         n2.binary_load(buffer.data());
@@ -505,8 +496,10 @@ struct binary_s11n_tester {
         size = 1;
         buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
         ::mp_limb_t l = 0;
-        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size), buffer.data());
-        std::copy(reinterpret_cast<char *>(&l), reinterpret_cast<char *>(&l) + sizeof(l), buffer.data() + sizeof(size));
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
+                  make_uai(buffer.data()));
+        std::copy(reinterpret_cast<char *>(&l), reinterpret_cast<char *>(&l) + sizeof(l),
+                  make_uai(buffer.data() + sizeof(size)));
         REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
             return std::string(e.what())
                    == "Invalid data detected in the binary deserialisation of an integer: the most "
@@ -519,10 +512,11 @@ struct binary_s11n_tester {
         size = static_cast<mpz_size_t>(S::value + 1u);
         buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
         std::array<::mp_limb_t, S::value + 1u> sbuffer{};
-        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size), buffer.data());
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
+                  make_uai(buffer.data()));
         std::copy(reinterpret_cast<char *>(sbuffer.data()),
                   reinterpret_cast<char *>(sbuffer.data()) + sizeof(::mp_limb_t) * unsigned(size),
-                  buffer.data() + sizeof(size));
+                  make_uai(buffer.data() + sizeof(size)));
         REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
             return std::string(e.what())
                    == "Invalid data detected in the binary deserialisation of an integer: the most "
@@ -536,8 +530,10 @@ struct binary_s11n_tester {
         size = 1;
         buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
         l = 0;
-        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size), buffer.data());
-        std::copy(reinterpret_cast<char *>(&l), reinterpret_cast<char *>(&l) + sizeof(l), buffer.data() + sizeof(size));
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
+                  make_uai(buffer.data()));
+        std::copy(reinterpret_cast<char *>(&l), reinterpret_cast<char *>(&l) + sizeof(l),
+                  make_uai(buffer.data() + sizeof(size)));
         REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
             return std::string(e.what())
                    == "Invalid data detected in the binary deserialisation of an integer: the most "
@@ -551,10 +547,11 @@ struct binary_s11n_tester {
         size = static_cast<mpz_size_t>(S::value + 1u);
         buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
         sbuffer = std::array<::mp_limb_t, S::value + 1u>{};
-        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size), buffer.data());
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
+                  make_uai(buffer.data()));
         std::copy(reinterpret_cast<char *>(sbuffer.data()),
                   reinterpret_cast<char *>(sbuffer.data()) + sizeof(::mp_limb_t) * unsigned(size),
-                  buffer.data() + sizeof(size));
+                  make_uai(buffer.data() + sizeof(size)));
         REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
             return std::string(e.what())
                    == "Invalid data detected in the binary deserialisation of an integer: the most "
@@ -568,9 +565,3 @@ TEST_CASE("binary s11n")
 {
     tuple_for_each(sizes{}, binary_s11n_tester{});
 }
-
-#if defined(_MSC_VER)
-
-#pragma warning(pop)
-
-#endif

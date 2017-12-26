@@ -516,6 +516,26 @@ constexpr int integral_sign(T n)
     return (T(0) < n) - (n < T(0));
 }
 
+// Small utility to selectively disable checked iterators warnings
+// in MSVC. See:
+// https://msdn.microsoft.com/en-us/library/dn217887.aspx
+// On compilers other than MSVC, this just returns the input value.
+template <typename T>
+inline auto make_uai(T *ptr) ->
+#if defined(_MSC_VER)
+    decltype(stdext::make_unchecked_array_iterator(ptr))
+#else
+    decltype(ptr)
+#endif
+{
+    return
+#if defined(_MSC_VER)
+        stdext::make_unchecked_array_iterator(ptr);
+#else
+        ptr;
+#endif
+}
+
 // The static integer class.
 template <std::size_t SSize>
 struct static_int {
@@ -2543,15 +2563,6 @@ private:
     static const char binary_size_errmsg[];
 
 public:
-#if defined(_MSC_VER)
-
-// Silence the annoying checked iterators warnings
-// when using std::copy().
-#pragma warning(push)
-#pragma warning(disable : 4996)
-
-#endif
-
     std::size_t binary_size() const
     {
         const auto asize = size();
@@ -2573,15 +2584,15 @@ public:
         }
         // LCOV_EXCL_STOP
         auto ptr = reinterpret_cast<const char *>(&size);
-        std::copy(ptr, ptr + sizeof(size), dest);
+        std::copy(ptr, ptr + sizeof(size), make_uai(dest));
         ptr = reinterpret_cast<const char *>(is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d);
-        std::copy(ptr, ptr + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize), dest + sizeof(size));
+        std::copy(ptr, ptr + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize), make_uai(dest + sizeof(size)));
     }
     void binary_load(const char *src)
     {
         // Load the signed size first.
         mpz_size_t size;
-        std::copy(src, src + sizeof(size), reinterpret_cast<char *>(&size));
+        std::copy(src, src + sizeof(size), make_uai(reinterpret_cast<char *>(&size)));
         // Compute asize and check for overflow.
         const auto asize = size >= 0 ? make_unsigned(size) : nint_abs(size);
         // LCOV_EXCL_START
@@ -2618,7 +2629,7 @@ public:
             m_int.g_st()._mp_size = size;
             // Copy over the data from the source.
             std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
-                      reinterpret_cast<char *>(m_int.g_st().m_limbs.data()));
+                      make_uai(reinterpret_cast<char *>(m_int.g_st().m_limbs.data())));
             // Clear the upper limbs, if needed.
             m_int.g_st().zero_upper_limbs(static_cast<std::size_t>(asize));
             // Check the deserialised value.
@@ -2635,7 +2646,7 @@ public:
             m_int.g_dy()._mp_size = size;
             // Copy over the data from the source.
             std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
-                      reinterpret_cast<char *>(m_int.g_dy()._mp_d));
+                      make_uai(reinterpret_cast<char *>(m_int.g_dy()._mp_d)));
             // Check the deserialised value.
             dynamic_check();
         } else if (!s && asize <= SSize) {
@@ -2648,7 +2659,7 @@ public:
             m_int.g_st()._mp_size = size;
             // Copy over the data from the source.
             std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
-                      reinterpret_cast<char *>(m_int.g_st().m_limbs.data()));
+                      make_uai(reinterpret_cast<char *>(m_int.g_st().m_limbs.data())));
             // NOTE: no need to clear the upper limbs: they were already zeroed out
             // by the default constructor of static_int.
             // Check the deserialised value.
@@ -2669,16 +2680,11 @@ public:
             m_int.g_dy()._mp_size = size;
             // Copy over the data from the source.
             std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
-                      reinterpret_cast<char *>(m_int.g_dy()._mp_d));
+                      make_uai(reinterpret_cast<char *>(m_int.g_dy()._mp_d)));
             // Check the deserialised value.
             dynamic_check();
         }
     }
-#if defined(_MSC_VER)
-
-#pragma warning(pop)
-
-#endif
 
 private:
     integer_union<SSize> m_int;
@@ -7583,13 +7589,7 @@ inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
     const ::mp_limb_t *ptr_b = b.is_static() ? b._get_union().g_st().m_limbs.data() : b._get_union().g_dy()._mp_d;
     auto limb_cmp
         = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
-#if defined(_MSC_VER)
-    return std::equal(stdext::make_checked_array_iterator(ptr_a, asize),
-                      stdext::make_checked_array_iterator(ptr_a, asize, asize),
-                      stdext::make_checked_array_iterator(ptr_b, asize), limb_cmp);
-#else
-    return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
-#endif
+    return std::equal(ptr_a, ptr_a + asize, make_uai(ptr_b), limb_cmp);
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
