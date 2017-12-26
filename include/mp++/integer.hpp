@@ -1607,7 +1607,10 @@ private:
                 // There's not enough space for the new integer. We'll clear the existing
                 // mpz_t (but not destory it), and re-init with the necessary number of limbs.
                 mpz_clear_wrap(m_int.g_dy());
-                mpz_init_nlimbs(m_int.g_dy(), size);
+                // NOTE: do not use g_dy() here, as in principle mpz_clear() could touch
+                // the _mp_alloc member in unpredictable ways, and then g_dy() would assert
+                // out in debug builds.
+                mpz_init_nlimbs(m_int.m_dy, size);
             }
             // Assign the new size.
             m_int.g_dy()._mp_size = new_mpz_size;
