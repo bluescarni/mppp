@@ -2543,6 +2543,15 @@ private:
     static const char binary_size_errmsg[];
 
 public:
+#if defined(_MSC_VER)
+
+// Silence the annoying checked iterators warnings
+// when using std::copy().
+#pragma warning(push)
+#pragma warning(disable : 4996)
+
+#endif
+
     std::size_t binary_size() const
     {
         const auto asize = size();
@@ -2557,7 +2566,7 @@ public:
     void binary_save(char *dest) const
     {
         const mpz_size_t size = m_int.m_st._mp_size;
-        const auto asize = size >= 0 ? make_unsigned(size) : nint_abs(size);
+        const auto asize = this->size();
         // LCOV_EXCL_START
         if (mppp_unlikely(asize > std::numeric_limits<std::size_t>::max() / sizeof(::mp_limb_t))) {
             throw std::overflow_error(binary_size_errmsg);
@@ -2592,6 +2601,7 @@ public:
             }
         };
         auto static_check = [this, asize, &err_msg]() {
+            // NOTE: here we need to check that asize is nonzero.
             if (mppp_unlikely(asize
                               && !(this->m_int.g_st().m_limbs[static_cast<std::size_t>(asize - 1u)] & GMP_NUMB_MASK))) {
                 // Reset this to zero before throwing.
@@ -2664,6 +2674,11 @@ public:
             dynamic_check();
         }
     }
+#if defined(_MSC_VER)
+
+#pragma warning(pop)
+
+#endif
 
 private:
     integer_union<SSize> m_int;

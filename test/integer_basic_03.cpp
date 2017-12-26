@@ -6,13 +6,6 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#if defined(_MSC_VER)
-
-// Silence the checked iterators warnings on MSVC.
-#define _SCL_SECURE_NO_WARNINGS
-
-#endif
-
 #include <mp++/config.hpp>
 
 #include <algorithm>
@@ -403,6 +396,15 @@ TEST_CASE("limb array constructor")
     tuple_for_each(sizes{}, limb_array_ctor_tester{});
 }
 
+#if defined(_MSC_VER)
+
+// Silence the annoying checked iterators warnings
+// when using std::copy().
+#pragma warning(push)
+#pragma warning(disable : 4996)
+
+#endif
+
 struct binary_s11n_tester {
     template <typename S>
     void operator()(const S &) const
@@ -566,3 +568,9 @@ TEST_CASE("binary s11n")
 {
     tuple_for_each(sizes{}, binary_s11n_tester{});
 }
+
+#if defined(_MSC_VER)
+
+#pragma warning(pop)
+
+#endif
