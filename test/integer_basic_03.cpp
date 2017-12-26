@@ -8,6 +8,8 @@
 
 #include <mp++/config.hpp>
 
+#include <algorithm>
+#include <array>
 #include <atomic>
 #include <cmath>
 #include <cstddef>
@@ -27,6 +29,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include "test_utils.hpp"
 
@@ -391,4 +394,168 @@ struct limb_array_ctor_tester {
 TEST_CASE("limb array constructor")
 {
     tuple_for_each(sizes{}, limb_array_ctor_tester{});
+}
+
+struct binary_s11n_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        std::vector<char> buffer;
+        // A few tests with zero value.
+        integer n1, n2;
+        REQUIRE(n1.binary_size() == sizeof(mpz_size_t));
+        buffer.resize(n1.binary_size());
+        n1.binary_save(buffer.data());
+        mpz_size_t size = -1;
+        std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), reinterpret_cast<char *>(&size));
+        REQUIRE(size == 0);
+        n2.binary_load(buffer.data());
+        REQUIRE(n2 == 0);
+        REQUIRE(n2.is_static());
+        n1.promote();
+        n1.binary_save(buffer.data());
+        size = -1;
+        std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), reinterpret_cast<char *>(&size));
+        REQUIRE(size == 0);
+        n2.promote();
+        n2.binary_load(buffer.data());
+        REQUIRE(n2 == 0);
+        REQUIRE(n2.is_static());
+        mpz_raii tmp;
+        std::uniform_int_distribution<int> sdist(0, 1);
+        // Run a variety of tests with operands with x and y number of limbs.
+        auto random_xy = [&](unsigned x, unsigned y) {
+            for (int i = 0; i < ntries; ++i) {
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset every once in a while.
+                    n1 = integer{};
+                }
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset every once in a while.
+                    n2 = integer{};
+                }
+                // Create two random integers with x and y limbs.
+                random_integer(tmp, x, rng);
+                n1 = &tmp.m_mpz;
+                random_integer(tmp, y, rng);
+                n2 = &tmp.m_mpz;
+                // Negate and/or promote randomly.
+                if (sdist(rng)) {
+                    n1.neg();
+                }
+                if (sdist(rng)) {
+                    n2.neg();
+                }
+                if (n1.is_static() && sdist(rng)) {
+                    n1.promote();
+                }
+                if (n2.is_static() && sdist(rng)) {
+                    n2.promote();
+                }
+                // Save n1 into the buffer, load the buffer into n2.
+                // Then check we get the same data back.
+                buffer.resize(n1.binary_size());
+                n1.binary_save(buffer.data());
+                n2.binary_load(buffer.data());
+                REQUIRE(n1 == n2);
+            }
+        };
+
+        random_xy(1, 0);
+        random_xy(0, 1);
+        random_xy(1, 1);
+
+        random_xy(0, 2);
+        random_xy(1, 2);
+        random_xy(2, 0);
+        random_xy(2, 1);
+        random_xy(2, 2);
+
+        random_xy(0, 3);
+        random_xy(1, 3);
+        random_xy(2, 3);
+        random_xy(3, 0);
+        random_xy(3, 1);
+        random_xy(3, 2);
+        random_xy(3, 3);
+
+        random_xy(0, 4);
+        random_xy(1, 4);
+        random_xy(2, 4);
+        random_xy(3, 4);
+        random_xy(4, 0);
+        random_xy(4, 1);
+        random_xy(4, 2);
+        random_xy(4, 3);
+        random_xy(4, 4);
+
+        // Error checking.
+        // Load into a static int a static value with topmost limb 0.
+        n1 = integer{-1};
+        size = 1;
+        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        ::mp_limb_t l = 0;
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size), buffer.data());
+        std::copy(reinterpret_cast<char *>(&l), reinterpret_cast<char *>(&l) + sizeof(l), buffer.data() + sizeof(size));
+        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
+            return std::string(e.what())
+                   == "Invalid data detected in the binary deserialisation of an integer: the most "
+                      "significant limb of the value cannot be zero";
+        });
+        REQUIRE(n1 == 0);
+
+        // Load into a static int a dynamic value with topmost limb 0.
+        n1 = integer{-1};
+        size = static_cast<mpz_size_t>(S::value + 1u);
+        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        std::array<::mp_limb_t, S::value + 1u> sbuffer{};
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size), buffer.data());
+        std::copy(reinterpret_cast<char *>(sbuffer.data()),
+                  reinterpret_cast<char *>(sbuffer.data()) + sizeof(::mp_limb_t) * unsigned(size),
+                  buffer.data() + sizeof(size));
+        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
+            return std::string(e.what())
+                   == "Invalid data detected in the binary deserialisation of an integer: the most "
+                      "significant limb of the value cannot be zero";
+        });
+        REQUIRE(n1 == 0);
+
+        // Load into a dynamic int a static value with topmost limb 0.
+        n1 = integer{-1};
+        n1.promote();
+        size = 1;
+        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        l = 0;
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size), buffer.data());
+        std::copy(reinterpret_cast<char *>(&l), reinterpret_cast<char *>(&l) + sizeof(l), buffer.data() + sizeof(size));
+        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
+            return std::string(e.what())
+                   == "Invalid data detected in the binary deserialisation of an integer: the most "
+                      "significant limb of the value cannot be zero";
+        });
+        REQUIRE(n1 == 0);
+
+        // Load into a dynamic int a dynamic value with topmost limb 0.
+        n1 = integer{-1};
+        n1.promote();
+        size = static_cast<mpz_size_t>(S::value + 1u);
+        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        sbuffer = std::array<::mp_limb_t, S::value + 1u>{};
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size), buffer.data());
+        std::copy(reinterpret_cast<char *>(sbuffer.data()),
+                  reinterpret_cast<char *>(sbuffer.data()) + sizeof(::mp_limb_t) * unsigned(size),
+                  buffer.data() + sizeof(size));
+        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
+            return std::string(e.what())
+                   == "Invalid data detected in the binary deserialisation of an integer: the most "
+                      "significant limb of the value cannot be zero";
+        });
+        REQUIRE(n1 == 0);
+    }
+};
+
+TEST_CASE("binary s11n")
+{
+    tuple_for_each(sizes{}, binary_s11n_tester{});
 }

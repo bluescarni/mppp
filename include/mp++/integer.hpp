@@ -2539,6 +2539,132 @@ public:
     }
 
 private:
+    static constexpr char binary_size_errmsg[] = "Overflow in the computation of the binary size of an integer";
+
+public:
+    std::size_t binary_size() const
+    {
+        const auto asize = size();
+        // LCOV_EXCL_START
+        if (mppp_unlikely(asize > (std::numeric_limits<std::size_t>::max() - sizeof(m_int.m_st._mp_size))
+                                      / sizeof(::mp_limb_t))) {
+            throw std::overflow_error(binary_size_errmsg);
+        }
+        // LCOV_EXCL_STOP
+        return static_cast<std::size_t>(sizeof(m_int.m_st._mp_size) + asize * sizeof(::mp_limb_t));
+    }
+    void binary_save(char *dest) const
+    {
+        const mpz_size_t size = m_int.m_st._mp_size;
+        const auto asize = size >= 0 ? make_unsigned(size) : nint_abs(size);
+        // LCOV_EXCL_START
+        if (mppp_unlikely(asize > std::numeric_limits<std::size_t>::max() / sizeof(::mp_limb_t))) {
+            throw std::overflow_error(binary_size_errmsg);
+        }
+        // LCOV_EXCL_STOP
+        auto ptr = reinterpret_cast<const char *>(&size);
+        std::copy(ptr, ptr + sizeof(size), dest);
+        ptr = reinterpret_cast<const char *>(is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d);
+        std::copy(ptr, ptr + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize), dest + sizeof(size));
+    }
+    void binary_load(const char *src)
+    {
+        // Load the signed size first.
+        mpz_size_t size;
+        std::copy(src, src + sizeof(size), reinterpret_cast<char *>(&size));
+        // Compute asize and check for overflow.
+        const auto asize = size >= 0 ? make_unsigned(size) : nint_abs(size);
+        // LCOV_EXCL_START
+        if (mppp_unlikely(asize > std::numeric_limits<std::size_t>::max() / sizeof(::mp_limb_t))) {
+            throw std::overflow_error(binary_size_errmsg);
+        }
+        // LCOV_EXCL_STOP
+        // Two small helpers to check that, in the deserialised value, the most significant limb is not zero.
+        constexpr char err_msg[] = "Invalid data detected in the binary deserialisation of an integer: the most "
+                                   "significant limb of the value cannot be zero";
+        auto dynamic_check = [this, asize, &err_msg]() {
+            // NOTE: here we are sure that asize is nonzero, as we end up in dynamic storage iff asize > SSize.
+            if (mppp_unlikely(!(this->m_int.g_dy()._mp_d[static_cast<std::size_t>(asize - 1u)] & GMP_NUMB_MASK))) {
+                // Reset to zero before throwing.
+                this->m_int.g_dy()._mp_size = 0;
+                throw std::runtime_error(err_msg);
+            }
+        };
+        auto static_check = [this, asize, &err_msg]() {
+            if (mppp_unlikely(asize
+                              && !(this->m_int.g_st().m_limbs[static_cast<std::size_t>(asize - 1u)] & GMP_NUMB_MASK))) {
+                // Reset this to zero before throwing.
+                this->m_int.g_st()._mp_size = 0;
+                this->m_int.g_st().zero_upper_limbs(0);
+                throw std::runtime_error(err_msg);
+            }
+        };
+        // Detect current storage.
+        const bool s = is_static();
+        if (s && asize <= SSize) {
+            // this is static, the contents of src fit into static storage.
+            // Set the size.
+            m_int.g_st()._mp_size = size;
+            // Copy over the data from the source.
+            std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+                      reinterpret_cast<char *>(m_int.g_st().m_limbs.data()));
+            // Clear the upper limbs, if needed.
+            m_int.g_st().zero_upper_limbs(static_cast<std::size_t>(asize));
+            // Check the deserialised value.
+            static_check();
+        } else if (s && asize > SSize) {
+            // this is static, the contents of src do not fit into static storage.
+            // Destroy static storage.
+            m_int.g_st().~s_storage();
+            // Construct the dynamic struct.
+            ::new (static_cast<void *>(&m_int.m_dy)) d_storage;
+            // Init the mpz. This will set the value to zero.
+            mpz_init_nlimbs(m_int.m_dy, static_cast<std::size_t>(asize));
+            // Set the size.
+            m_int.g_dy()._mp_size = size;
+            // Copy over the data from the source.
+            std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+                      reinterpret_cast<char *>(m_int.g_dy()._mp_d));
+            // Check the deserialised value.
+            dynamic_check();
+        } else if (!s && asize <= SSize) {
+            // this is dynamic, src contains a static integer.
+            // Destroy the dynamic this.
+            m_int.destroy_dynamic();
+            // Def construct the static integer. This will set everything to zero.
+            ::new (static_cast<void *>(&m_int.m_st)) s_storage();
+            // Set the size.
+            m_int.g_st()._mp_size = size;
+            // Copy over the data from the source.
+            std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+                      reinterpret_cast<char *>(m_int.g_st().m_limbs.data()));
+            // NOTE: no need to clear the upper limbs: they were already zeroed out
+            // by the default constructor of static_int.
+            // Check the deserialised value.
+            static_check();
+        } else {
+            // this is dynamic, src contains a dynamic integer.
+            // If this does not have enough storage, we need to allocate.
+            if (get_mpz_size(&m_int.g_dy()) < asize) {
+                // Clear, but do not destroy, the dynamic storage.
+                mpz_clear_wrap(m_int.g_dy());
+                // Re-init to zero with the necessary size.
+                // NOTE: do not use g_dy() here, as in principle mpz_clear() could touch
+                // the _mp_alloc member in unpredictable ways, and then g_dy() would assert
+                // out in debug builds.
+                mpz_init_nlimbs(m_int.m_dy, static_cast<std::size_t>(asize));
+            }
+            // Set the size.
+            m_int.g_dy()._mp_size = size;
+            // Copy over the data from the source.
+            std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+                      reinterpret_cast<char *>(m_int.g_dy()._mp_d));
+            // Check the deserialised value.
+            dynamic_check();
+        }
+    }
+
+private:
     integer_union<SSize> m_int;
 };
 
@@ -2550,6 +2676,9 @@ private:
 
 template <std::size_t SSize>
 constexpr std::size_t integer<SSize>::ssize;
+
+template <std::size_t SSize>
+constexpr char integer<SSize>::binary_size_errmsg[];
 
 #endif
 
