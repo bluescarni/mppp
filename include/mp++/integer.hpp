@@ -7589,7 +7589,9 @@ inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
     const ::mp_limb_t *ptr_b = b.is_static() ? b._get_union().g_st().m_limbs.data() : b._get_union().g_dy()._mp_d;
     auto limb_cmp
         = [](const ::mp_limb_t &l1, const ::mp_limb_t &l2) { return (l1 & GMP_NUMB_MASK) == (l2 & GMP_NUMB_MASK); };
-    return std::equal(ptr_a, ptr_a + asize, ptr_b, limb_cmp);
+    // NOTE: cannot understand why, but MSVC wants a checked iterator as 3rd
+    // parameter here.
+    return std::equal(ptr_a, ptr_a + asize, make_uai(ptr_b), limb_cmp);
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
