@@ -2539,7 +2539,8 @@ public:
     }
 
 private:
-    static constexpr char binary_size_errmsg[] = "Overflow in the computation of the binary size of an integer";
+    // NOTE: this needs to be const instead of constexpr due to an MSVC bug.
+    static const char binary_size_errmsg[];
 
 public:
     std::size_t binary_size() const
@@ -2677,10 +2678,10 @@ private:
 template <std::size_t SSize>
 constexpr std::size_t integer<SSize>::ssize;
 
-template <std::size_t SSize>
-constexpr char integer<SSize>::binary_size_errmsg[];
-
 #endif
+
+template <std::size_t SSize>
+const char integer<SSize>::binary_size_errmsg[] = "Overflow in the computation of the binary size of an integer";
 
 /** @defgroup integer_assignment integer_assignment
  *  @{
