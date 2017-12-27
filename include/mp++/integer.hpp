@@ -2588,13 +2588,39 @@ public:
         ptr = reinterpret_cast<const char *>(is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d);
         std::copy(ptr, ptr + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize), make_uai(dest + sizeof(size)));
     }
-    void binary_load(const char *src)
+    void binary_save(std::vector<char> &dest) const
     {
-        // Load the signed size first.
+        const auto bs = binary_size();
+        if (dest.size() < bs) {
+            dest.resize(safe_cast<decltype(dest.size())>(bs));
+        }
+        binary_save(dest.data());
+    }
+    template <std::size_t S>
+    void binary_save(std::array<char, S> &dest) const
+    {
+        const auto bs = binary_size();
+        if (mppp_unlikely(S < bs)) {
+            throw std::invalid_argument(
+                "Cannot serialise an integer in binary format to a std::array: the size of the array ("
+                + std::to_string(S) + ") is less than the size required for serialisation (" + std::to_string(bs)
+                + ")");
+        }
+        binary_save(dest.data());
+    }
+
+private:
+    // Read the size and asize of a serialised integer stored in a buffer
+    // starting at src.
+    static std::pair<mpz_size_t, make_unsigned_t<mpz_size_t>> bl_read_size_asize(const char *src)
+    {
         mpz_size_t size;
         std::copy(src, src + sizeof(size), make_uai(reinterpret_cast<char *>(&size)));
-        // Compute asize and check for overflow.
-        const auto asize = size >= 0 ? make_unsigned(size) : nint_abs(size);
+        return std::make_pair(size, size >= 0 ? make_unsigned(size) : nint_abs(size));
+    }
+    void binary_load_impl(const char *src, const mpz_size_t &size, const make_unsigned_t<mpz_size_t> &asize)
+    {
+        // Check for overflow in asize.
         // LCOV_EXCL_START
         if (mppp_unlikely(asize > std::numeric_limits<std::size_t>::max() / sizeof(::mp_limb_t))) {
             throw std::overflow_error(binary_size_errmsg);
@@ -2608,7 +2634,7 @@ public:
             if (mppp_unlikely(!(this->m_int.g_dy()._mp_d[static_cast<std::size_t>(asize - 1u)] & GMP_NUMB_MASK))) {
                 // Reset to zero before throwing.
                 this->m_int.g_dy()._mp_size = 0;
-                throw std::runtime_error(err_msg);
+                throw std::invalid_argument(err_msg);
             }
         };
         auto static_check = [this, asize, &err_msg]() {
@@ -2618,7 +2644,7 @@ public:
                 // Reset this to zero before throwing.
                 this->m_int.g_st()._mp_size = 0;
                 this->m_int.g_st().zero_upper_limbs(0);
-                throw std::runtime_error(err_msg);
+                throw std::invalid_argument(err_msg);
             }
         };
         // Detect current storage.
@@ -2684,6 +2710,63 @@ public:
             // Check the deserialised value.
             dynamic_check();
         }
+    }
+
+public:
+    void binary_load(const char *src)
+    {
+#if MPPP_CPLUSPLUS >= 201703L
+        const auto[size, asize] = bl_read_size_asize(src);
+#else
+        mpz_size_t size;
+        make_unsigned_t<mpz_size_t> asize;
+        std::tie(size, asize) = bl_read_size_asize(src);
+#endif
+        binary_load_impl(src, size, asize);
+    }
+
+private:
+    // Deserialisation from vector-like type.
+    template <typename Vector>
+    void binary_load_vector(const Vector &src, const char *name)
+    {
+        // Verify we can at least read the size out of src.
+        if (mppp_unlikely(src.size() < sizeof(mpz_size_t))) {
+            throw std::invalid_argument(std::string("Invalid vector size in the deserialisation of an integer via a ")
+                                        + name + ": the " + name + " size must be at least "
+                                        + std::to_string(sizeof(mpz_size_t)) + " bytes, but it is only "
+                                        + std::to_string(src.size()) + " bytes");
+        }
+        // Size in bytes of the limbs portion of the data.
+        const auto lsize = src.size() - sizeof(mpz_size_t);
+#if MPPP_CPLUSPLUS >= 201703L
+        const auto[size, asize] = bl_read_size_asize(src.data());
+#else
+        mpz_size_t size;
+        make_unsigned_t<mpz_size_t> asize;
+        std::tie(size, asize) = bl_read_size_asize(src.data());
+#endif
+        // The number of entire limbs stored in the vector must be at least the integer
+        // limb size stored at the beginning of the vector.
+        if (mppp_unlikely(lsize / sizeof(::mp_limb_t) < asize)) {
+            throw std::invalid_argument(
+                std::string("Invalid vector size in the deserialisation of an integer via a ") + name
+                + ": the number of limbs stored in the " + name + " (" + std::to_string(lsize / sizeof(::mp_limb_t))
+                + ") is less than the integer size in limbs stored in the header of the vector ("
+                + std::to_string(asize) + ")");
+        }
+        binary_load_impl(src.data(), size, asize);
+    }
+
+public:
+    void binary_load(const std::vector<char> &src)
+    {
+        binary_load_vector(src, "std::vector");
+    }
+    template <std::size_t S>
+    void binary_load(const std::array<char, S> &src)
+    {
+        binary_load_vector(src, "std::array");
     }
 
 private:
@@ -6784,6 +6867,80 @@ inline std::istream &operator>>(std::istream &is, integer<SSize> &n)
     std::getline(is, tmp_str);
     n = tmp_str;
     return is;
+}
+
+/** @} */
+
+/** @defgroup integer_s11n integer_s11n
+ *  @{
+ */
+
+template <std::size_t SSize>
+inline std::size_t binary_size(const integer<SSize> &n)
+{
+    return n.binary_size();
+}
+
+inline namespace impl
+{
+
+// Detector for the presence of binary_save().
+// NOTE: we use declval<T>() (rather than declval<T &>()) because T will be the result
+// of perfect forwarding.
+template <typename T, typename Integer>
+using integer_binary_save_t = decltype(std::declval<const Integer &>().binary_save(std::declval<T>()));
+
+template <typename T, std::size_t SSize>
+using has_integer_binary_save = is_detected<integer_binary_save_t, T, integer<SSize>>;
+
+// Detector for the presence of binary_load().
+// NOTE: we use declval<T>() (rather than declval<T &>()) because T will be the result
+// of perfect forwarding.
+template <typename T, typename Integer>
+using integer_binary_load_t = decltype(std::declval<Integer &>().binary_load(std::declval<T>()));
+
+template <typename T, std::size_t SSize>
+using has_integer_binary_load = is_detected<integer_binary_load_t, T, integer<SSize>>;
+}
+
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
+template <typename T, std::size_t SSize>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerBinarySaveDest = has_integer_binary_save<T, SSize>::value;
+#else
+using integer_binary_save_enabler = enable_if_t<has_integer_binary_save<T, SSize>::value, int>;
+#endif
+
+template <typename T, std::size_t SSize>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerBinaryLoadSrc = has_integer_binary_load<T, SSize>::value;
+#else
+using integer_binary_load_enabler = enable_if_t<has_integer_binary_load<T, SSize>::value, int>;
+#endif
+
+#endif
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline void binary_save(const integer<SSize> &n, IntegerBinarySaveDest<SSize> &&dest)
+#else
+template <std::size_t SSize, typename T, integer_binary_save_enabler<T &&, SSize> = 0>
+inline void binary_save(const integer<SSize> &n, T &&dest)
+#endif
+{
+    n.binary_save(std::forward<decltype(dest)>(dest));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline void binary_load(integer<SSize> &n, IntegerBinaryLoadSrc<SSize> &&src)
+#else
+template <std::size_t SSize, typename T, integer_binary_load_enabler<T &&, SSize> = 0>
+inline void binary_load(integer<SSize> &n, T &&src)
+#endif
+{
+    n.binary_load(std::forward<decltype(src)>(src));
 }
 
 /** @} */
