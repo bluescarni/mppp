@@ -2332,6 +2332,9 @@ public:
      */
     std::size_t size() const
     {
+        // NOTE: the idea here is that, regardless of what mpz_size_t is exactly, the
+        // asize of an integer represents ultimately the size of a limb array, and as such
+        // it has to be representable by std::size_t.
         return (m_int.m_st._mp_size) >= 0 ? static_cast<std::size_t>(m_int.m_st._mp_size)
                                           : static_cast<std::size_t>(nint_abs(m_int.m_st._mp_size));
     }
