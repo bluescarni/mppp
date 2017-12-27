@@ -500,8 +500,8 @@ struct binary_s11n_tester {
                   make_uai(buffer.data()));
         std::copy(reinterpret_cast<char *>(&l), reinterpret_cast<char *>(&l) + sizeof(l),
                   make_uai(buffer.data() + sizeof(size)));
-        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
-            return std::string(e.what())
+        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &ex) {
+            return std::string(ex.what())
                    == "Invalid data detected in the binary deserialisation of an integer: the most "
                       "significant limb of the value cannot be zero";
         });
@@ -517,8 +517,8 @@ struct binary_s11n_tester {
         std::copy(reinterpret_cast<char *>(sbuffer.data()),
                   reinterpret_cast<char *>(sbuffer.data()) + sizeof(::mp_limb_t) * unsigned(size),
                   make_uai(buffer.data() + sizeof(size)));
-        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
-            return std::string(e.what())
+        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &ex) {
+            return std::string(ex.what())
                    == "Invalid data detected in the binary deserialisation of an integer: the most "
                       "significant limb of the value cannot be zero";
         });
@@ -534,8 +534,8 @@ struct binary_s11n_tester {
                   make_uai(buffer.data()));
         std::copy(reinterpret_cast<char *>(&l), reinterpret_cast<char *>(&l) + sizeof(l),
                   make_uai(buffer.data() + sizeof(size)));
-        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
-            return std::string(e.what())
+        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &ex) {
+            return std::string(ex.what())
                    == "Invalid data detected in the binary deserialisation of an integer: the most "
                       "significant limb of the value cannot be zero";
         });
@@ -552,8 +552,8 @@ struct binary_s11n_tester {
         std::copy(reinterpret_cast<char *>(sbuffer.data()),
                   reinterpret_cast<char *>(sbuffer.data()) + sizeof(::mp_limb_t) * unsigned(size),
                   make_uai(buffer.data() + sizeof(size)));
-        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &e) {
-            return std::string(e.what())
+        REQUIRE_THROWS_PREDICATE(n1.binary_load(buffer.data()), std::runtime_error, [](const std::runtime_error &ex) {
+            return std::string(ex.what())
                    == "Invalid data detected in the binary deserialisation of an integer: the most "
                       "significant limb of the value cannot be zero";
         });
