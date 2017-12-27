@@ -34,6 +34,7 @@
 #if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -2566,41 +2567,141 @@ private:
     static const char binary_size_errmsg[];
 
 public:
+    /// Size of the serialised binary representation.
+    /**
+     * \rststar
+     * This method will return a value representing the number of bytes necessary
+     * to serialise ``this`` into a memory buffer in binary format via one of the available
+     * :cpp:func:`~mppp::integer::binary_save()` overloads. The returned value
+     * is platform-dependent.
+     * \endrststar
+     *
+     * @return the number of bytes needed for the binary serialisation of ``this``.
+     *
+     * @throws std::overflow_error if the size in limbs of ``this`` is larger than an
+     * implementation-defined limit.
+     */
     std::size_t binary_size() const
     {
         const auto asize = size();
         // LCOV_EXCL_START
-        if (mppp_unlikely(asize > (std::numeric_limits<std::size_t>::max() - sizeof(m_int.m_st._mp_size))
-                                      / sizeof(::mp_limb_t))) {
+        // Here we have the very theoretical situation in which we run into possible overflow,
+        // as the limb array and the size member are distinct objects and thus although individually
+        // their size must fit in size_t, together they could exceed it.
+        if (mppp_unlikely(asize
+                          > (std::numeric_limits<std::size_t>::max() - sizeof(mpz_size_t)) / sizeof(::mp_limb_t))) {
             throw std::overflow_error(binary_size_errmsg);
         }
         // LCOV_EXCL_STOP
-        return static_cast<std::size_t>(sizeof(m_int.m_st._mp_size) + asize * sizeof(::mp_limb_t));
+        return sizeof(mpz_size_t) + asize * sizeof(::mp_limb_t);
     }
-    void binary_save(char *dest) const
+
+private:
+    void binary_save_impl(char *dest, std::size_t bs) const
     {
-        const mpz_size_t size = m_int.m_st._mp_size;
-        const auto asize = this->size();
-        // LCOV_EXCL_START
-        if (mppp_unlikely(asize > std::numeric_limits<std::size_t>::max() / sizeof(::mp_limb_t))) {
-            throw std::overflow_error(binary_size_errmsg);
-        }
-        // LCOV_EXCL_STOP
-        auto ptr = reinterpret_cast<const char *>(&size);
-        std::copy(ptr, ptr + sizeof(size), make_uai(dest));
+        assert(bs == binary_size());
+        auto ptr = reinterpret_cast<const char *>(&m_int.m_st._mp_size);
+        std::copy(ptr, ptr + sizeof(mpz_size_t), make_uai(dest));
         ptr = reinterpret_cast<const char *>(is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d);
-        std::copy(ptr, ptr + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize), make_uai(dest + sizeof(size)));
+        std::copy(ptr, ptr + (bs - sizeof(mpz_size_t)), make_uai(dest + sizeof(mpz_size_t)));
     }
-    void binary_save(std::vector<char> &dest) const
+
+public:
+    /// Serialise into a memory buffer.
+    /**
+     * \rststar
+     * This method will write into ``dest`` a binary representation of ``this``. The serialised
+     * representation produced by this method can be read back with one of the
+     * :cpp:func:`~mppp::integer::binary_load()` overloads.
+     *
+     * ``dest`` must point to a memory area whose size is at least equal to the value returned
+     * by :cpp:func:`~mppp::integer::binary_size()`, otherwise the behaviour will be undefined.
+     * ``dest`` does not have any special alignment requirements.
+     *
+     * .. warning::
+     *
+     *    The binary representation produced by this method is compiler, platform and architecture
+     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+     *    it should not be used as an exchange format or for long-term data storage.
+     * \endrststar
+     *
+     * @param dest a pointer to a memory buffer into which the serialised representation of ``this``
+     * will be written.
+     *
+     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size()).
+     *
+     * @throws unspecified any exception thrown by binary_size().
+     */
+    std::size_t binary_save(char *dest) const
+    {
+        const auto bs = binary_size();
+        binary_save_impl(dest, bs);
+        return bs;
+    }
+    /// Serialise into a ``std::vector<char>``.
+    /**
+     * \rststar
+     * This method will write into ``dest`` a binary representation of ``this``. The serialised
+     * representation produced by this method can be read back with one of the
+     * :cpp:func:`~mppp::integer::binary_load()` overloads.
+     *
+     * The size of ``dest`` must be at least equal to the value returned by
+     * :cpp:func:`~mppp::integer::binary_size()`. If that is not the case, ``dest`` will be resized
+     * to :cpp:func:`~mppp::integer::binary_size()`.
+     *
+     * .. warning::
+     *
+     *    The binary representation produced by this method is compiler, platform and architecture
+     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+     *    it should not be used as an exchange format or for long-term data storage.
+     * \endrststar
+     *
+     * @param dest a vector that will hold the serialised representation of ``this``.
+     *
+     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size()).
+     *
+     * @throws std::overflow_error if the binary size of ``this`` is larger than an
+     * implementation-defined limit.
+     * @throws unspecified any exception thrown by binary_size(), or by memory errors in
+     * standard containers.
+     */
+    std::size_t binary_save(std::vector<char> &dest) const
     {
         const auto bs = binary_size();
         if (dest.size() < bs) {
             dest.resize(safe_cast<decltype(dest.size())>(bs));
         }
-        binary_save(dest.data());
+        binary_save_impl(dest.data(), bs);
+        return bs;
     }
+    /// Serialise into a ``std::array<char>``.
+    /**
+     * \rststar
+     * This method will write into ``dest`` a binary representation of ``this``. The serialised
+     * representation produced by this method can be read back with one of the
+     * :cpp:func:`~mppp::integer::binary_load()` overloads.
+     *
+     * The size of ``dest`` must be at least equal to the value returned by
+     * :cpp:func:`~mppp::integer::binary_size()`. If that is not the case, an error will
+     * be raised.
+     *
+     * .. warning::
+     *
+     *    The binary representation produced by this method is compiler, platform and architecture
+     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+     *    it should not be used as an exchange format or for long-term data storage.
+     * \endrststar
+     *
+     * @param dest an array that will hold the serialised representation of ``this``.
+     *
+     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size()).
+     *
+     * @throws std::invalid_argument if the size of ``dest`` is smaller than the output
+     * of binary_size().
+     * @throws unspecified any exception thrown by binary_size().
+     */
     template <std::size_t S>
-    void binary_save(std::array<char, S> &dest) const
+    std::size_t binary_save(std::array<char, S> &dest) const
     {
         const auto bs = binary_size();
         if (mppp_unlikely(S < bs)) {
@@ -2609,7 +2710,8 @@ public:
                 + std::to_string(S) + ") is less than the size required for serialisation (" + std::to_string(bs)
                 + ")");
         }
-        binary_save(dest.data());
+        binary_save_impl(dest.data(), bs);
+        return bs;
     }
 
 private:
@@ -2618,7 +2720,9 @@ private:
     static std::pair<mpz_size_t, make_unsigned_t<mpz_size_t>> bl_read_size_asize(const char *src)
     {
         mpz_size_t size;
-        std::copy(src, src + sizeof(size), make_uai(reinterpret_cast<char *>(&size)));
+        std::copy(src, src + sizeof(mpz_size_t), make_uai(reinterpret_cast<char *>(&size)));
+        // NOTE: we don't use std::size_t here for the asize as we don't have any assurance
+        // that a value in the std::size_t range was written into the buffer.
         return std::make_pair(size, size >= 0 ? make_unsigned(size) : nint_abs(size));
     }
     void binary_load_impl(const char *src, const mpz_size_t &size, const make_unsigned_t<mpz_size_t> &asize)
@@ -2633,7 +2737,8 @@ private:
         constexpr char err_msg[] = "Invalid data detected in the binary deserialisation of an integer: the most "
                                    "significant limb of the value cannot be zero";
         auto dynamic_check = [this, asize, &err_msg]() {
-            // NOTE: here we are sure that asize is nonzero, as we end up in dynamic storage iff asize > SSize.
+            // NOTE: here we are sure that asize is nonzero, as we end up in dynamic storage iff asize > SSize,
+            // and SSize is at least 1.
             if (mppp_unlikely(!(this->m_int.g_dy()._mp_d[static_cast<std::size_t>(asize - 1u)] & GMP_NUMB_MASK))) {
                 // Reset to zero before throwing.
                 this->m_int.g_dy()._mp_size = 0;
@@ -2657,7 +2762,8 @@ private:
             // Set the size.
             m_int.g_st()._mp_size = size;
             // Copy over the data from the source.
-            std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+            std::copy(src + sizeof(mpz_size_t),
+                      src + sizeof(mpz_size_t) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
                       make_uai(reinterpret_cast<char *>(m_int.g_st().m_limbs.data())));
             // Clear the upper limbs, if needed.
             m_int.g_st().zero_upper_limbs(static_cast<std::size_t>(asize));
@@ -2674,7 +2780,8 @@ private:
             // Set the size.
             m_int.g_dy()._mp_size = size;
             // Copy over the data from the source.
-            std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+            std::copy(src + sizeof(mpz_size_t),
+                      src + sizeof(mpz_size_t) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
                       make_uai(reinterpret_cast<char *>(m_int.g_dy()._mp_d)));
             // Check the deserialised value.
             dynamic_check();
@@ -2687,7 +2794,8 @@ private:
             // Set the size.
             m_int.g_st()._mp_size = size;
             // Copy over the data from the source.
-            std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+            std::copy(src + sizeof(mpz_size_t),
+                      src + sizeof(mpz_size_t) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
                       make_uai(reinterpret_cast<char *>(m_int.g_st().m_limbs.data())));
             // NOTE: no need to clear the upper limbs: they were already zeroed out
             // by the default constructor of static_int.
@@ -2708,15 +2816,49 @@ private:
             // Set the size.
             m_int.g_dy()._mp_size = size;
             // Copy over the data from the source.
-            std::copy(src + sizeof(size), src + sizeof(size) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+            std::copy(src + sizeof(mpz_size_t),
+                      src + sizeof(mpz_size_t) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
                       make_uai(reinterpret_cast<char *>(m_int.g_dy()._mp_d)));
             // Check the deserialised value.
             dynamic_check();
         }
     }
+    // Small helper to determine how many bytes have been read after
+    // the successful deserialisation of an integer with abs size asize.
+    // NOTE: since we deserialised the integer from a contiguous buffer, the
+    // total number of bytes read has to be representable by std::size_t (unlike
+    // in binary_size(), where we do have to check for overflow).
+    static std::size_t read_bytes(const make_unsigned_t<mpz_size_t> &asize)
+    {
+        return static_cast<std::size_t>(sizeof(mpz_size_t) + asize * sizeof(::mp_limb_t));
+    }
 
 public:
-    void binary_load(const char *src)
+    /// Load a value from a memory buffer.
+    /**
+     * \rststar
+     * This method will load into ``this`` the content of the memory buffer starting
+     * at ``src``, which must contain the serialised representation of an :cpp:class:`~mppp::integer`
+     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
+     *
+     * ``dest`` does not have any special alignment requirements.
+     *
+     * .. warning::
+     *
+     *    Although this method performs a few consistency checks on the data in ``src``,
+     *    it cannot ensure complete safety against maliciously crafted data. Users are
+     *    advised to use this method only with trusted data.
+     * \endrststar
+     *
+     * @param src the source memory buffer.
+     *
+     * @return the number of bytes read from ``src``.
+     *
+     * @throws std::overflow_error if the computation of the size of the serialised value leads
+     * to overflow.
+     * @throws std::invalid_argument if invalid data is detected in ``src``.
+     */
+    std::size_t binary_load(const char *src)
     {
 #if MPPP_CPLUSPLUS >= 201703L
         const auto[size, asize] = bl_read_size_asize(src);
@@ -2726,12 +2868,13 @@ public:
         std::tie(size, asize) = bl_read_size_asize(src);
 #endif
         binary_load_impl(src, size, asize);
+        return read_bytes(asize);
     }
 
 private:
     // Deserialisation from vector-like type.
     template <typename Vector>
-    void binary_load_vector(const Vector &src, const char *name)
+    std::size_t binary_load_vector(const Vector &src, const char *name)
     {
         // Verify we can at least read the size out of src.
         if (mppp_unlikely(src.size() < sizeof(mpz_size_t))) {
@@ -2759,17 +2902,72 @@ private:
                 + std::to_string(asize) + ")");
         }
         binary_load_impl(src.data(), size, asize);
+        return read_bytes(asize);
     }
 
 public:
-    void binary_load(const std::vector<char> &src)
+    /// Load a value from a ``std::vector<char>``.
+    /**
+     * \rststar
+     * This method will load into ``this`` the content of ``src``,
+     * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
+     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
+     *
+     * The serialised representation of the :cpp:class:`~mppp::integer` must start at
+     * the beginning of ``src``, but it can end before the end of ``src``. Data
+     * past the end of the serialised representation of the :cpp:class:`~mppp::integer`
+     * will be ignored.
+     *
+     * .. warning::
+     *
+     *    Although this method performs a few consistency checks on the data in ``src``,
+     *    it cannot ensure complete safety against maliciously crafted data. Users are
+     *    advised to use this method only with trusted data.
+     * \endrststar
+     *
+     * @param src the source ``std::vector<char>``.
+     *
+     * @return the number of bytes read from ``src``.
+     *
+     * @throws std::overflow_error if the computation of the size of the serialised value leads
+     * to overflow.
+     * @throws std::invalid_argument if invalid data is detected in ``src``.
+     */
+    std::size_t binary_load(const std::vector<char> &src)
     {
-        binary_load_vector(src, "std::vector");
+        return binary_load_vector(src, "std::vector");
     }
+    /// Load a value from a ``std::array<char>``.
+    /**
+     * \rststar
+     * This method will load into ``this`` the content of ``src``,
+     * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
+     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
+     *
+     * The serialised representation of the :cpp:class:`~mppp::integer` must start at
+     * the beginning of ``src``, but it can end before the end of ``src``. Data
+     * past the end of the serialised representation of the :cpp:class:`~mppp::integer`
+     * will be ignored.
+     *
+     * .. warning::
+     *
+     *    Although this method performs a few consistency checks on the data in ``src``,
+     *    it cannot ensure complete safety against maliciously crafted data. Users are
+     *    advised to use this method only with trusted data.
+     * \endrststar
+     *
+     * @param src the source ``std::array<char>``.
+     *
+     * @return the number of bytes read from ``src``.
+     *
+     * @throws std::overflow_error if the computation of the size of the serialised value leads
+     * to overflow.
+     * @throws std::invalid_argument if invalid data is detected in ``src``.
+     */
     template <std::size_t S>
-    void binary_load(const std::array<char, S> &src)
+    std::size_t binary_load(const std::array<char, S> &src)
     {
-        binary_load_vector(src, "std::array");
+        return binary_load_vector(src, "std::array");
     }
 
 private:
@@ -6878,6 +7076,19 @@ inline std::istream &operator>>(std::istream &is, integer<SSize> &n)
  *  @{
  */
 
+/// Binary size of an \link mppp::integer integer\endlink.
+/**
+ * \rststar
+ * This function is the free function equivalent of the
+ * :cpp:func:`mppp::integer::binary_size()` method.
+ * \endrststar
+ *
+ * @param n the target \link mppp::integer integer\endlink.
+ *
+ * @return the output of mppp::integer::binary_size() called on ``n``.
+ *
+ * @throws unspecified any exception thrown by mppp::integer::binary_size().
+ */
 template <std::size_t SSize>
 inline std::size_t binary_size(const integer<SSize> &n)
 {
@@ -6924,26 +7135,58 @@ using integer_binary_load_enabler = enable_if_t<has_integer_binary_load<T, SSize
 
 #endif
 
+/// Save an \link mppp::integer integer\endlink in binary format.
+/**
+ * \rststar
+ * This function is the free function equivalent of all the
+ * :cpp:func:`mppp::integer::binary_save()` overloads.
+ * \endrststar
+ *
+ * @param n the target \link mppp::integer integer\endlink.
+ * @param dest the object into which the binary representation of ``n`` will
+ * be written.
+ *
+ * @return the output of the invoked mppp::integer::binary_save() overload called on ``n``
+ * with ``dest`` as argument.
+ *
+ * @throws unspecified any exception thrown by the invoked mppp::integer::binary_save() overload.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline void binary_save(const integer<SSize> &n, IntegerBinarySaveDest<SSize> &&dest)
+inline std::size_t binary_save(const integer<SSize> &n, IntegerBinarySaveDest<SSize> &&dest)
 #else
 template <std::size_t SSize, typename T, integer_binary_save_enabler<T &&, SSize> = 0>
-inline void binary_save(const integer<SSize> &n, T &&dest)
+inline std::size_t binary_save(const integer<SSize> &n, T &&dest)
 #endif
 {
-    n.binary_save(std::forward<decltype(dest)>(dest));
+    return n.binary_save(std::forward<decltype(dest)>(dest));
 }
 
+/// Load an \link mppp::integer integer\endlink in binary format.
+/**
+ * \rststar
+ * This function is the free function equivalent of all the
+ * :cpp:func:`mppp::integer::binary_load()` overloads.
+ * \endrststar
+ *
+ * @param n the target \link mppp::integer integer\endlink.
+ * @param src the object containing the \link mppp::integer integer\endlink binary
+ * representation that will be loaded into ``n``.
+ *
+ * @return the output of the invoked mppp::integer::binary_load() overload called on ``n``
+ * with ``src`` as argument.
+ *
+ * @throws unspecified any exception thrown by the invoked mppp::integer::binary_load() overload.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline void binary_load(integer<SSize> &n, IntegerBinaryLoadSrc<SSize> &&src)
+inline std::size_t binary_load(integer<SSize> &n, IntegerBinaryLoadSrc<SSize> &&src)
 #else
 template <std::size_t SSize, typename T, integer_binary_load_enabler<T &&, SSize> = 0>
-inline void binary_load(integer<SSize> &n, T &&src)
+inline std::size_t binary_load(integer<SSize> &n, T &&src)
 #endif
 {
-    n.binary_load(std::forward<decltype(src)>(src));
+    return n.binary_load(std::forward<decltype(src)>(src));
 }
 
 /** @} */

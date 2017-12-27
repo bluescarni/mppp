@@ -406,20 +406,20 @@ struct binary_s11n_tester {
         integer n1, n2, n3, n4;
         REQUIRE(n1.binary_size() == sizeof(mpz_size_t));
         buffer.resize(n1.binary_size());
-        n1.binary_save(buffer.data());
+        REQUIRE(n1.binary_save(buffer.data()) == n1.binary_size());
         mpz_size_t size = -1;
         std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), make_uai(reinterpret_cast<char *>(&size)));
         REQUIRE(size == 0);
-        n2.binary_load(buffer.data());
+        REQUIRE(n2.binary_load(buffer.data()) == n1.binary_size());
         REQUIRE(n2 == 0);
         REQUIRE(n2.is_static());
         n1.promote();
-        n1.binary_save(buffer.data());
+        REQUIRE(n1.binary_save(buffer.data()) == n1.binary_size());
         size = -1;
         std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), make_uai(reinterpret_cast<char *>(&size)));
         REQUIRE(size == 0);
         n2.promote();
-        n2.binary_load(buffer.data());
+        REQUIRE(n2.binary_load(buffer.data()) == n1.binary_size());
         REQUIRE(n2 == 0);
         REQUIRE(n2.is_static());
         mpz_raii tmp;
@@ -468,16 +468,16 @@ struct binary_s11n_tester {
                 // Save n1 into the buffer, load the buffer into n2.
                 // Then check we get the same data back.
                 buffer.resize(n1.binary_size());
-                binary_save(n1, buffer.data());
-                binary_load(n2, buffer.data());
+                REQUIRE(binary_save(n1, buffer.data()) == n1.binary_size());
+                REQUIRE(binary_load(n2, buffer.data()) == n1.binary_size());
                 REQUIRE(n1 == n2);
                 // Test the std vector interface as well.
-                binary_save(n1, vbuffer);
-                binary_load(n3, vbuffer);
+                REQUIRE(binary_save(n1, vbuffer) == n1.binary_size());
+                REQUIRE(binary_load(n3, vbuffer) == n1.binary_size());
                 REQUIRE(n1 == n3);
                 // std::array interface.
-                binary_save(n1, sb);
-                binary_load(n4, sb);
+                REQUIRE(binary_save(n1, sb) == n1.binary_size());
+                REQUIRE(binary_load(n4, sb) == n1.binary_size());
                 REQUIRE(n1 == n4);
             }
         };
