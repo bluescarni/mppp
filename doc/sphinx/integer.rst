@@ -63,14 +63,14 @@ Concepts
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerBinarySaveDest
 
    This concept is satisfied if ``T`` is a type into which the serialised binary representation of an
-   :cpp:class:`~mppp::integer` with static size ``SSize`` can be written. In other words, the concept is satisfied if ``T``
-   can be used as the argument in one of the :cpp:func:`mppp::integer::binary_save()` overloads.
+   :cpp:class:`~mppp::integer` with static size ``SSize`` can be written. In other words, the concept is satisfied if
+   an object of type ``T`` can be passed as an argument to one of the :cpp:func:`mppp::integer::binary_save()` overloads.
 
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerBinaryLoadSrc
 
    This concept is satisfied if ``T`` is a type from which the serialised binary representation of an
-   :cpp:class:`~mppp::integer` with static size ``SSize`` can be loaded. In other words, the concept is satisfied if ``T``
-   can be used as the argument in one of the :cpp:func:`mppp::integer::binary_load()` overloads.
+   :cpp:class:`~mppp::integer` with static size ``SSize`` can be loaded. In other words, the concept is satisfied if
+   an object of type ``T`` can be passed as an argument to one of the :cpp:func:`mppp::integer::binary_load()` overloads.
 
 .. _integer_functions:
 
