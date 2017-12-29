@@ -482,7 +482,7 @@ enum class real_kind { nan = MPFR_NAN_KIND, inf = MPFR_INF_KIND, zero = MPFR_ZER
  * :cpp:class:`~mppp::real` with a precision of 32 bits. This behaviour can be altered either by specifying explicitly
  * the desired precision value, or by setting a global default precision via :cpp:func:`~mppp::real_set_default_prec()`.
  *
- * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
+ * This class has the look and feel of a C++ builtin type: it can interact with all of C++'s integral and
  * floating-point primitive types, :cpp:class:`~mppp::integer`, :cpp:class:`~mppp::rational` and
  * :cpp:class:`~mppp::real128` (see the :cpp:concept:`~mppp::RealInteroperable` concept), and it provides overloaded
  * :ref:`operators <real_operators>`. Differently from the builtin types, however, this class does not allow any
@@ -2283,6 +2283,9 @@ public:
 private:
     mpfr_struct_t m_mpfr;
 };
+
+// Double check that real is a standard layout class.
+static_assert(std::is_standard_layout<real>::value, "real is not a standard layout class.");
 
 inline namespace detail
 {
