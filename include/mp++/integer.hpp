@@ -2682,8 +2682,8 @@ public:
      * :cpp:func:`~mppp::integer::binary_load()` overloads.
      *
      * The size of ``dest`` must be at least equal to the value returned by
-     * :cpp:func:`~mppp::integer::binary_size()`. If that is not the case, an error will
-     * be raised.
+     * :cpp:func:`~mppp::integer::binary_size()`. If that is not the case, no data
+     * will be written to ``dest`` and zero will be returned.
      *
      * .. warning::
      *
@@ -2694,21 +2694,17 @@ public:
      *
      * @param dest an array that will hold the serialised representation of ``this``.
      *
-     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size()).
+     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size() if ``dest``
+     * provides enough storage to store ``this``, zero otherwise).
      *
-     * @throws std::invalid_argument if the size of ``dest`` is smaller than the output
-     * of binary_size().
      * @throws unspecified any exception thrown by binary_size().
      */
     template <std::size_t S>
     std::size_t binary_save(std::array<char, S> &dest) const
     {
         const auto bs = binary_size();
-        if (mppp_unlikely(S < bs)) {
-            throw std::invalid_argument(
-                "Cannot serialise an integer in binary format to a std::array: the size of the array ("
-                + std::to_string(S) + ") is less than the size required for serialisation (" + std::to_string(bs)
-                + ")");
+        if (bs > S) {
+            return 0;
         }
         binary_save_impl(dest.data(), bs);
         return bs;

@@ -585,14 +585,7 @@ struct binary_s11n_tester {
 
         // Test errors in the vector and array interfaces.
         std::array<char, 0> zero_arr;
-        REQUIRE_THROWS_PREDICATE(binary_save(n1, zero_arr), std::invalid_argument,
-                                 [&n1](const std::invalid_argument &ex) {
-                                     return std::string(ex.what())
-                                            == "Cannot serialise an integer in binary format to a std::array: the size "
-                                               "of the array (0) is less "
-                                               "than the size required for serialisation ("
-                                                   + std::to_string(n1.binary_size()) + ")";
-                                 });
+        REQUIRE(binary_save(n1, zero_arr) == 0u);
         std::vector<char> zero_vec;
         REQUIRE_THROWS_PREDICATE(binary_load(n1, zero_arr), std::invalid_argument, [](const std::invalid_argument &ex) {
             return std::string(ex.what())
