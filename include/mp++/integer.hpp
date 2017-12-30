@@ -2711,6 +2711,30 @@ public:
     }
 
 private:
+    // Error message in case of invalid data during binary deserialisation.
+    static const char bl_data_errmsg[];
+    // A couple of helpers to check a deserialised integer.
+    void bl_dynamic_check(const make_unsigned_t<mpz_size_t> &asize)
+    {
+        // NOTE: here we are sure that asize is nonzero, as we end up in dynamic storage iff asize > SSize,
+        // and SSize is at least 1.
+        assert(asize > 0u);
+        if (mppp_unlikely(!(m_int.g_dy()._mp_d[static_cast<std::size_t>(asize - 1u)] & GMP_NUMB_MASK))) {
+            // Reset to zero before throwing.
+            m_int.g_dy()._mp_size = 0;
+            throw std::invalid_argument(bl_data_errmsg);
+        }
+    }
+    void bl_static_check(const make_unsigned_t<mpz_size_t> &asize)
+    {
+        // NOTE: here we need to check that asize is nonzero.
+        if (mppp_unlikely(asize && !(m_int.g_st().m_limbs[static_cast<std::size_t>(asize - 1u)] & GMP_NUMB_MASK))) {
+            // Reset this to zero before throwing.
+            m_int.g_st()._mp_size = 0;
+            m_int.g_st().zero_upper_limbs(0);
+            throw std::invalid_argument(bl_data_errmsg);
+        }
+    }
     // Read the size and asize of a serialised integer stored in a buffer
     // starting at src.
     static std::pair<mpz_size_t, make_unsigned_t<mpz_size_t>> bl_read_size_asize(const char *src)
@@ -2721,6 +2745,7 @@ private:
         // that a value in the std::size_t range was written into the buffer.
         return std::make_pair(size, size >= 0 ? make_unsigned(size) : nint_abs(size));
     }
+    // Low level implementation of binary load.
     void binary_load_impl(const char *src, const mpz_size_t &size, const make_unsigned_t<mpz_size_t> &asize)
     {
         // Check for overflow in asize.
@@ -2729,28 +2754,6 @@ private:
             throw std::overflow_error(binary_size_errmsg);
         }
         // LCOV_EXCL_STOP
-        // Two small helpers to check that, in the deserialised value, the most significant limb is not zero.
-        constexpr char err_msg[] = "Invalid data detected in the binary deserialisation of an integer: the most "
-                                   "significant limb of the value cannot be zero";
-        auto dynamic_check = [this, asize, &err_msg]() {
-            // NOTE: here we are sure that asize is nonzero, as we end up in dynamic storage iff asize > SSize,
-            // and SSize is at least 1.
-            if (mppp_unlikely(!(this->m_int.g_dy()._mp_d[static_cast<std::size_t>(asize - 1u)] & GMP_NUMB_MASK))) {
-                // Reset to zero before throwing.
-                this->m_int.g_dy()._mp_size = 0;
-                throw std::invalid_argument(err_msg);
-            }
-        };
-        auto static_check = [this, asize, &err_msg]() {
-            // NOTE: here we need to check that asize is nonzero.
-            if (mppp_unlikely(asize
-                              && !(this->m_int.g_st().m_limbs[static_cast<std::size_t>(asize - 1u)] & GMP_NUMB_MASK))) {
-                // Reset this to zero before throwing.
-                this->m_int.g_st()._mp_size = 0;
-                this->m_int.g_st().zero_upper_limbs(0);
-                throw std::invalid_argument(err_msg);
-            }
-        };
         // Detect current storage.
         const bool s = is_static();
         if (s && asize <= SSize) {
@@ -2764,7 +2767,7 @@ private:
             // Clear the upper limbs, if needed.
             m_int.g_st().zero_upper_limbs(static_cast<std::size_t>(asize));
             // Check the deserialised value.
-            static_check();
+            bl_static_check(asize);
         } else if (s && asize > SSize) {
             // this is static, the contents of src do not fit into static storage.
             // Destroy static storage.
@@ -2780,7 +2783,7 @@ private:
                       src + sizeof(mpz_size_t) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
                       make_uai(reinterpret_cast<char *>(m_int.g_dy()._mp_d)));
             // Check the deserialised value.
-            dynamic_check();
+            bl_dynamic_check(asize);
         } else if (!s && asize <= SSize) {
             // this is dynamic, src contains a static integer.
             // Destroy the dynamic this.
@@ -2796,7 +2799,7 @@ private:
             // NOTE: no need to clear the upper limbs: they were already zeroed out
             // by the default constructor of static_int.
             // Check the deserialised value.
-            static_check();
+            bl_static_check(asize);
         } else {
             // this is dynamic, src contains a dynamic integer.
             // If this does not have enough storage, we need to allocate.
@@ -2816,7 +2819,7 @@ private:
                       src + sizeof(mpz_size_t) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
                       make_uai(reinterpret_cast<char *>(m_int.g_dy()._mp_d)));
             // Check the deserialised value.
-            dynamic_check();
+            bl_dynamic_check(asize);
         }
     }
     // Small helper to determine how many bytes have been read after
@@ -2983,6 +2986,11 @@ constexpr std::size_t integer<SSize>::ssize;
 
 template <std::size_t SSize>
 const char integer<SSize>::binary_size_errmsg[] = "Overflow in the computation of the binary size of an integer";
+
+template <std::size_t SSize>
+const char integer<SSize>::bl_data_errmsg[]
+    = "Invalid data detected in the binary deserialisation of an integer: the most "
+      "significant limb of the value cannot be zero";
 
 /** @defgroup integer_assignment integer_assignment
  *  @{
