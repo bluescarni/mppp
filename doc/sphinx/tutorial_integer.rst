@@ -56,7 +56,7 @@ Interacting with the GMP API
 :cpp:class:`~mppp::integer` provides a variety of ways for interfacing with the `GMP <https://gmplib.org/>`__ library.
 There are a few reasons why one would want to use :cpp:class:`~mppp::integer` in conjunction with the GMP API, such as:
 
-* the necessity of using functions from the GMP API which have not (yet) been wrapped by mp++,
+* the necessity of using functions from the GMP API which have not (yet) been wrapped/implemented by mp++,
 * passing data from/to mp++ to/from another GMP-based multiprecision library.
 
 To start with, :cpp:class:`~mppp::integer` is constructible and assignable from ``mpz_t`` objects:
@@ -64,7 +64,7 @@ To start with, :cpp:class:`~mppp::integer` is constructible and assignable from 
 .. code-block:: c++
 
    mpz_t m;
-   mpz_init_set_si(m, -4); // Init an mpz_t with the value -4.
+   mpz_init_set_si(m, -4);  // Init an mpz_t with the value -4.
 
    int_t n1{m};             // Init an int_t from the mpz_t.
    assert(n1 == -4);        // Verify that the value is correct.
@@ -73,7 +73,7 @@ To start with, :cpp:class:`~mppp::integer` is constructible and assignable from 
    n2 = m;                  // Assign the mpz_t to another int_t.
    assert(n2 == -4);        // Verify that the value is correct.
 
-   mpz_clear(m);           // Clear the mpz_t.
+   mpz_clear(m);            // Clear the mpz_t.
 
 Second, it is possible to get a reference to an ``mpz_t`` from an :cpp:class:`~mppp::integer`
 via the :cpp:func:`~mppp::integer::get_mpz_t()` member function. This member function will
