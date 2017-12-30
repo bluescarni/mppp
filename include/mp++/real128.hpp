@@ -1006,6 +1006,9 @@ public:
     __float128 m_value;
 };
 
+// Double check that real128 is a standard layout class.
+static_assert(std::is_standard_layout<real128>::value, "real128 is not a standard layout class.");
+
 /** @defgroup real128_conversion real128_conversion
  *  @{
  */
