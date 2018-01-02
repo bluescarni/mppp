@@ -120,5 +120,30 @@ and verify that the creation of the read-only view did not trigger a promotion f
    mpz_clear(b);                                // Clear the mpz_t.
 
 It must be noted that both :cpp:func:`~mppp::integer::get_mpz_t()` and :cpp:func:`~mppp::integer::get_mpz_view()`
-have to be used carefully, as they return non-owning objects which can easily lead to dangling pointers or references.
+have to be used carefully, as they return non-owning objects which can easily lead to dangling pointers or references, if misused.
 The documentation of the two functions explains in detail some of the potential pitfalls that users need to be aware of.
+
+Serialisation
+-------------
+
+.. versionadded:: 0.7
+
+mp++ provides a simple :ref:`API for the (de)serialisation <integer_s11n>` of :cpp:class:`~mppp::integer` objects
+into/from memory buffers and C++ streams. Possible uses of the serialisation API include persistence (e.g.,
+saving/loading :cpp:class:`~mppp::integer` values to/from a file), the transmission of :cpp:class:`~mppp::integer` objects over
+the network (e.g., in distributed computing applications), inter-process communication, etc. The API consists of two main
+functions, :cpp:func:`mppp::integer::binary_save()` and :cpp:func:`mppp::integer::binary_load()` (plus their
+free-function overloads).
+
+Let's see a few examples of the serialisation API in action:
+
+.. code-block:: c++
+
+   int_t a{42}, b;
+   char buffer[1024];     // Provide ample storage for serialisation.
+
+   a.binary_save(buffer); // Serialise a into the buffer.
+
+   b.binary_load(buffer); // Deserialise the content of the buffer into b.
+
+   assert(b == a);        // Check that the original value is recovered.
