@@ -2354,7 +2354,7 @@ public:
      * This method will return an object of an unspecified type \p mpz_view which is implicitly convertible
      * to a const pointer to an \p mpz_t struct (and which can thus be used as a <tt>const mpz_t</tt>
      * parameter in GMP functions). In addition to the implicit conversion operator, the <tt>const mpz_t</tt>
-     * object can also be retrieved via the <tt>get()</tt> method of the \p mpz_view class.
+     * object can also be retrieved via the <tt>%get()</tt> method of the \p mpz_view class.
      * The view provides a read-only GMP-compatible representation of the integer stored in \p this.
      *
      * \rststar
