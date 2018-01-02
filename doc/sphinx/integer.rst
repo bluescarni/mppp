@@ -168,6 +168,8 @@ Input/Output
 Serialisation
 ~~~~~~~~~~~~~
 
+.. versionadded:: 0.7
+
 .. doxygengroup:: integer_s11n
    :content-only:
 

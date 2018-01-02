@@ -408,6 +408,9 @@ struct binary_s11n_tester {
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
+        // MSVC (apart from clang-cl) has troubles with the detection idiom,
+        // let's hope they fix SFINAE eventually.
+#if !defined(_MSC_VER) || (defined(_MSC_VER) && defined(__clang__))
         REQUIRE(!is_detected<binary_save_t, integer, std::vector<char>>::value);
         REQUIRE(!is_detected<binary_save_t, integer, std::vector<char> &&>::value);
         REQUIRE(is_detected<binary_save_t, integer, std::vector<char> &>::value);
@@ -423,6 +426,7 @@ struct binary_s11n_tester {
         REQUIRE(is_detected<binary_load_t, integer, const std::vector<char>>::value);
         REQUIRE(is_detected<binary_load_t, integer, const std::vector<char> &>::value);
         REQUIRE(!is_detected<binary_load_t, const integer, std::vector<char>>::value);
+#endif
         std::vector<char> buffer;
         std::stringstream ss;
         auto clear_ss = [&ss]() {
