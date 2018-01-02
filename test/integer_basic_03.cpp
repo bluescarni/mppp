@@ -14,6 +14,7 @@
 #include <cmath>
 #include <cstddef>
 #include <gmp.h>
+#include <ios>
 #include <iostream>
 #include <limits>
 #include <mp++/detail/type_traits.hpp>
@@ -396,25 +397,61 @@ TEST_CASE("limb array constructor")
     tuple_for_each(sizes{}, limb_array_ctor_tester{});
 }
 
+template <typename I, typename Dest>
+using binary_save_t = decltype(binary_save(std::declval<const I &>(), std::declval<Dest>()));
+
+template <typename I, typename Dest>
+using binary_load_t = decltype(binary_load(std::declval<I &>(), std::declval<Dest>()));
+
 struct binary_s11n_tester {
     template <typename S>
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
+        REQUIRE(!is_detected<binary_save_t, integer, std::vector<char>>::value);
+        REQUIRE(!is_detected<binary_save_t, integer, std::vector<char> &&>::value);
+        REQUIRE(is_detected<binary_save_t, integer, std::vector<char> &>::value);
+        REQUIRE(!is_detected<binary_save_t, integer, const std::vector<char>>::value);
+        REQUIRE(!is_detected<binary_save_t, integer, const std::vector<char> &>::value);
+        REQUIRE(is_detected<binary_save_t, integer, char *>::value);
+        REQUIRE(is_detected<binary_save_t, integer, char *&&>::value);
+        REQUIRE(is_detected<binary_save_t, integer, char *&>::value);
+        REQUIRE(is_detected<binary_save_t, integer, char *const &>::value);
+        REQUIRE(!is_detected<binary_save_t, integer, const char *>::value);
+        REQUIRE(is_detected<binary_load_t, integer, std::vector<char>>::value);
+        REQUIRE(is_detected<binary_load_t, integer, std::vector<char> &&>::value);
+        REQUIRE(is_detected<binary_load_t, integer, const std::vector<char>>::value);
+        REQUIRE(is_detected<binary_load_t, integer, const std::vector<char> &>::value);
+        REQUIRE(!is_detected<binary_load_t, const integer, std::vector<char>>::value);
         std::vector<char> buffer;
+        std::stringstream ss;
+        auto clear_ss = [&ss]() {
+            ss.clear();
+            ss.str("");
+        };
         // A few tests with zero value.
-        integer n1, n2, n3, n4;
+        integer n1, n2, n3, n4, n5;
         REQUIRE(n1.binary_size() == sizeof(mpz_size_t));
         buffer.resize(n1.binary_size());
         REQUIRE(n1.binary_save(buffer.data()) == n1.binary_size());
+        REQUIRE(n1.binary_save(ss) == n1.binary_size());
+        REQUIRE(ss.good());
         mpz_size_t size = -1;
         std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), make_uai(reinterpret_cast<char *>(&size)));
         REQUIRE(size == 0);
         REQUIRE(n2.binary_load(buffer.data()) == n1.binary_size());
         REQUIRE(n2 == 0);
         REQUIRE(n2.is_static());
+        n5 = 1;
+        REQUIRE(n5.binary_load(ss) == n1.binary_size());
+        REQUIRE(ss.good());
+        REQUIRE(n5 == 0);
+        REQUIRE(n5.is_static());
+        clear_ss();
         n1.promote();
         REQUIRE(n1.binary_save(buffer.data()) == n1.binary_size());
+        REQUIRE(n1.binary_save(ss) == n1.binary_size());
+        REQUIRE(ss.good());
         size = -1;
         std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), make_uai(reinterpret_cast<char *>(&size)));
         REQUIRE(size == 0);
@@ -422,6 +459,13 @@ struct binary_s11n_tester {
         REQUIRE(n2.binary_load(buffer.data()) == n1.binary_size());
         REQUIRE(n2 == 0);
         REQUIRE(n2.is_static());
+        n5 = 1;
+        n5.promote();
+        REQUIRE(n5.binary_load(ss) == n1.binary_size());
+        REQUIRE(ss.good());
+        REQUIRE(n5 == 0);
+        REQUIRE(n5.is_static());
+        clear_ss();
         mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Buffers based on std::vector and std::array.
@@ -461,9 +505,10 @@ struct binary_s11n_tester {
                 if (n2.is_static() && sdist(rng)) {
                     n2.promote();
                 }
-                // Copy over n2 to n3 and n4.
+                // Copy over n2 to n3, n4 and n5.
                 n3 = n2;
                 n4 = n2;
+                n5 = n2;
                 REQUIRE(n1.binary_size() == binary_size(n1));
                 // Save n1 into the buffer, load the buffer into n2.
                 // Then check we get the same data back.
@@ -471,14 +516,23 @@ struct binary_s11n_tester {
                 REQUIRE(binary_save(n1, buffer.data()) == n1.binary_size());
                 REQUIRE(binary_load(n2, buffer.data()) == n1.binary_size());
                 REQUIRE(n1 == n2);
+                REQUIRE(n2.is_static() == (n1.size() <= S::value));
                 // Test the std vector interface as well.
                 REQUIRE(binary_save(n1, vbuffer) == n1.binary_size());
                 REQUIRE(binary_load(n3, vbuffer) == n1.binary_size());
                 REQUIRE(n1 == n3);
+                REQUIRE(n3.is_static() == (n1.size() <= S::value));
                 // std::array interface.
                 REQUIRE(binary_save(n1, sb) == n1.binary_size());
                 REQUIRE(binary_load(n4, sb) == n1.binary_size());
                 REQUIRE(n1 == n4);
+                REQUIRE(n4.is_static() == (n1.size() <= S::value));
+                // Stream interface.
+                REQUIRE(binary_save(n1, ss) == n1.binary_size());
+                REQUIRE(binary_load(n5, ss) == n1.binary_size());
+                REQUIRE(n1 == n5);
+                REQUIRE(n5.is_static() == (n1.size() <= S::value));
+                clear_ss();
             }
         };
 
@@ -621,6 +675,20 @@ struct binary_s11n_tester {
                                                "std::vector: the number of limbs stored in the std::vector (2) is less "
                                                "than the integer size in limbs stored in the header of the vector (3)";
                                  });
+
+        // Test errors in the stream interface.
+        clear_ss();
+        n1 = 4;
+        REQUIRE(binary_load(n1, ss) == 0u);
+        REQUIRE(n1 == 4);
+        clear_ss();
+        size = 1;
+        ss.write(reinterpret_cast<const char *>(&size), sizeof(mpz_size_t));
+        REQUIRE(binary_load(n1, ss) == 0u);
+        REQUIRE(n1 == 4);
+        clear_ss();
+        ss.setstate(std::ios_base::failbit);
+        REQUIRE(binary_save(n1, ss) == 0u);
     }
 };
 

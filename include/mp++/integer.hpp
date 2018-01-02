@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <functional>
 #include <initializer_list>
+#include <ios>
 #include <iostream>
 #include <limits>
 #include <new>
@@ -1387,7 +1388,7 @@ public:
     /// Constructor from an array of limbs.
     /**
      * \rststar
-     * This constructor will initialise ``this`` with the contents of the array
+     * This constructor will initialise ``this`` with the content of the array
      * sized ``size`` starting at ``p``. The array is expected to contain
      * the limbs of the desired value for ``this``, ordered from the least significant
      * to the most significant.
@@ -2709,6 +2710,54 @@ public:
         binary_save_impl(dest.data(), bs);
         return bs;
     }
+    /// Serialise into a ``std::ostream``.
+    /**
+     * \rststar
+     * This method will write into the output stream ``dest`` a binary representation of ``this``, starting from the
+     * current stream position. The serialised representation produced by this method can be read back with one of the
+     * :cpp:func:`~mppp::integer::binary_load()` overloads.
+     *
+     * If the serialisation is successful (that is, no stream error state is ever detected in ``dest`` after write
+     * operations), then the binary size of ``this`` (that is, the number of bytes written into ``dest``) will be
+     * returned. Otherwise, zero will be returned. Note that a return value of zero does not necessarily imply that no
+     * bytes were written into ``dest``, just that an error occurred at some point during the serialisation process.
+     *
+     * .. warning::
+     *
+     *    The binary representation produced by this method is compiler, platform and architecture
+     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+     *    it should not be used as an exchange format or for long-term data storage.
+     * \endrststar
+     *
+     * @param dest the destination stream.
+     *
+     * @return the output of binary_size() if the serialisation was successful, zero otherwise.
+     *
+     * @throws std::overflow_error in case of internal overflows.
+     * @throws unspecified any exception thrown by binary_size(), or by the public interface
+     * of ``std::ostream``.
+     */
+    std::size_t binary_save(std::ostream &dest) const
+    {
+        const auto bs = binary_size();
+        // NOTE: there does not seem to be a reliable way of detecting how many bytes
+        // are actually written via write(). See the question here and especially the comments:
+        // https://stackoverflow.com/questions/14238572/how-many-bytes-actually-written-by-ostreamwrite
+        // Seems almost like tellp() would work, but if an error occurs in the stream, then
+        // it returns unconditionally -1, so it is not very useful for our purposes.
+        // Thus, we will just return 0 on failure, and the full binary size otherwise.
+        //
+        // Write the raw data to stream.
+        dest.write(reinterpret_cast<const char *>(&m_int.m_st._mp_size),
+                   safe_cast<std::streamsize>(sizeof(mpz_size_t)));
+        if (!dest.good()) {
+            // !dest.good() means that the last write operation failed. Bail out now.
+            return 0;
+        }
+        dest.write(reinterpret_cast<const char *>(is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d),
+                   safe_cast<std::streamsize>(bs - sizeof(mpz_size_t)));
+        return dest.good() ? bs : 0u;
+    }
 
 private:
     // Error message in case of invalid data during binary deserialisation.
@@ -2745,7 +2794,8 @@ private:
         // that a value in the std::size_t range was written into the buffer.
         return std::make_pair(size, size >= 0 ? make_unsigned(size) : nint_abs(size));
     }
-    // Low level implementation of binary load.
+    // Low level implementation of binary load. src must point to the start of the serialised
+    // limb array.
     void binary_load_impl(const char *src, const mpz_size_t &size, const make_unsigned_t<mpz_size_t> &asize)
     {
         // Check for overflow in asize.
@@ -2757,19 +2807,18 @@ private:
         // Detect current storage.
         const bool s = is_static();
         if (s && asize <= SSize) {
-            // this is static, the contents of src fit into static storage.
+            // this is static, the content of src fit into static storage.
             // Set the size.
             m_int.g_st()._mp_size = size;
             // Copy over the data from the source.
-            std::copy(src + sizeof(mpz_size_t),
-                      src + sizeof(mpz_size_t) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+            std::copy(src, src + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
                       make_uai(reinterpret_cast<char *>(m_int.g_st().m_limbs.data())));
             // Clear the upper limbs, if needed.
             m_int.g_st().zero_upper_limbs(static_cast<std::size_t>(asize));
             // Check the deserialised value.
             bl_static_check(asize);
         } else if (s && asize > SSize) {
-            // this is static, the contents of src do not fit into static storage.
+            // this is static, the content of src do not fit into static storage.
             // Destroy static storage.
             m_int.g_st().~s_storage();
             // Construct the dynamic struct.
@@ -2779,8 +2828,7 @@ private:
             // Set the size.
             m_int.g_dy()._mp_size = size;
             // Copy over the data from the source.
-            std::copy(src + sizeof(mpz_size_t),
-                      src + sizeof(mpz_size_t) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+            std::copy(src, src + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
                       make_uai(reinterpret_cast<char *>(m_int.g_dy()._mp_d)));
             // Check the deserialised value.
             bl_dynamic_check(asize);
@@ -2793,8 +2841,7 @@ private:
             // Set the size.
             m_int.g_st()._mp_size = size;
             // Copy over the data from the source.
-            std::copy(src + sizeof(mpz_size_t),
-                      src + sizeof(mpz_size_t) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+            std::copy(src, src + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
                       make_uai(reinterpret_cast<char *>(m_int.g_st().m_limbs.data())));
             // NOTE: no need to clear the upper limbs: they were already zeroed out
             // by the default constructor of static_int.
@@ -2815,8 +2862,7 @@ private:
             // Set the size.
             m_int.g_dy()._mp_size = size;
             // Copy over the data from the source.
-            std::copy(src + sizeof(mpz_size_t),
-                      src + sizeof(mpz_size_t) + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
+            std::copy(src, src + static_cast<std::size_t>(sizeof(::mp_limb_t) * asize),
                       make_uai(reinterpret_cast<char *>(m_int.g_dy()._mp_d)));
             // Check the deserialised value.
             bl_dynamic_check(asize);
@@ -2866,7 +2912,7 @@ public:
         make_unsigned_t<mpz_size_t> asize;
         std::tie(size, asize) = bl_read_size_asize(src);
 #endif
-        binary_load_impl(src, size, asize);
+        binary_load_impl(src + sizeof(mpz_size_t), size, asize);
         return read_bytes(asize);
     }
 
@@ -2900,7 +2946,7 @@ private:
                 + ") is less than the integer size in limbs stored in the header of the vector ("
                 + std::to_string(asize) + ")");
         }
-        binary_load_impl(src.data(), size, asize);
+        binary_load_impl(src.data() + sizeof(mpz_size_t), size, asize);
         return read_bytes(asize);
     }
 
@@ -2967,6 +3013,82 @@ public:
     std::size_t binary_load(const std::array<char, S> &src)
     {
         return binary_load_vector(src, "std::array");
+    }
+    /// Load a value from a ``std::istream``.
+    /**
+     * \rststar
+     * This method will load into ``this`` the content of ``src``,
+     * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
+     * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
+     *
+     * The serialised representation of the :cpp:class:`~mppp::integer` must start at
+     * the current position of ``src``, but ``src`` can contain other data before and after
+     * the serialised :cpp:class:`~mppp::integer` value. Data
+     * past the end of the serialised representation of the :cpp:class:`~mppp::integer`
+     * will be ignored. If a stream error state is detected at any point of the deserialisation
+     * process after a read operation, zero will be returned and ``this`` will not have been modified.
+     * Note that a return value of zero does not necessarily imply that no
+     * bytes were read from ``src``, just that an error occurred at some point during the serialisation process.
+     *
+     * .. warning::
+     *
+     *    Although this method performs a few consistency checks on the data in ``src``,
+     *    it cannot ensure complete safety against maliciously crafted data. Users are
+     *    advised to use this method only with trusted data.
+     * \endrststar
+     *
+     * @param src the source ``std::istream``.
+     *
+     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after deserialisation
+     * into ``this`` has successfully completed), or zero if a stream error occurs.
+     *
+     * @throws std::overflow_error in case of internal overflows.
+     * @throws std::invalid_argument if invalid data is detected in ``src``.
+     * @throws unspecified any exception thrown by memory errors in standard containers,
+     * the public interface of ``std::istream``, or binary_size().
+     */
+    std::size_t binary_load(std::istream &src)
+    {
+        // Let's start by reading size/asize.
+        mpz_size_t size;
+        src.read(reinterpret_cast<char *>(&size), safe_cast<std::streamsize>(sizeof(mpz_size_t)));
+        if (!src.good()) {
+            // Something went wrong with reading, return 0.
+            return 0;
+        }
+        // Determine asize.
+        const auto asize = size >= 0 ? make_unsigned(size) : nint_abs(size);
+        // Check for overflow.
+        // LCOV_EXCL_START
+        if (mppp_unlikely(asize > std::numeric_limits<std::size_t>::max() / sizeof(::mp_limb_t))) {
+            throw std::overflow_error("Overflow in the computation of the size in bytes of an integer being "
+                                      "deserialised via the stream interface");
+        }
+        // LCOV_EXCL_STOP
+        // Size in bytes of the limbs array.
+        const auto lsize = static_cast<std::size_t>(sizeof(::mp_limb_t) * asize);
+        // Now let's read from the stream into a local buffer.
+        // NOTE: of course here we could avoid the local buffer with a specific implementation
+        // of binary_load_impl() adapted for reading from a stream. For the first version, let's
+        // keep things simple - we can always improve the performance at a later stage
+        // if needed at all.
+        MPPP_MAYBE_TLS std::vector<char> buffer;
+        if (lsize > buffer.size()) {
+            // Enlarge the local buffer if needed.
+            buffer.resize(safe_cast<decltype(buffer.size())>(lsize));
+        }
+        src.read(buffer.data(), safe_cast<std::streamsize>(lsize));
+        if (!src.good()) {
+            // Something went wrong with reading, return 0.
+            return 0;
+        }
+        // Everything ok with the deserialisation of the integer in the local buffer.
+        // Invoke the low-level deser routine.
+        binary_load_impl(buffer.data(), size, asize);
+        // NOTE: just recompute the binary size from scratch: the function we use elsewhere,
+        // read_bytes(), assumes that all data is coming from a contiguous buffer in order to
+        // avoid an overflow check, but here we don't have this guarantee.
+        return binary_size();
     }
 
 private:
