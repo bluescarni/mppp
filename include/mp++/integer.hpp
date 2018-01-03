@@ -2897,7 +2897,8 @@ public:
      *
      * @param src the source memory buffer.
      *
-     * @return the number of bytes read from ``src``.
+     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
+     * into ``this`` has successfully completed).
      *
      * @throws std::overflow_error if the computation of the size of the serialised value leads
      * to overflow.
@@ -2972,7 +2973,8 @@ public:
      *
      * @param src the source ``std::vector<char>``.
      *
-     * @return the number of bytes read from ``src``.
+     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
+     * into ``this`` has successfully completed).
      *
      * @throws std::overflow_error if the computation of the size of the serialised value leads
      * to overflow.
@@ -3003,7 +3005,8 @@ public:
      *
      * @param src the source ``std::array<char>``.
      *
-     * @return the number of bytes read from ``src``.
+     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
+     * into ``this`` has successfully completed).
      *
      * @throws std::overflow_error if the computation of the size of the serialised value leads
      * to overflow.
@@ -3039,7 +3042,7 @@ public:
      *
      * @param src the source ``std::istream``.
      *
-     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after deserialisation
+     * @return the number of bytes read from ``src`` (that is, the output of binary_size() after the deserialisation
      * into ``this`` has successfully completed), or zero if a stream error occurs.
      *
      * @throws std::overflow_error in case of internal overflows.
