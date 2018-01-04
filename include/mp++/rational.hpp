@@ -935,7 +935,9 @@ public:
             return true;
         }
         // Num and den must be coprime.
-        return gcd(m_num, m_den).is_one();
+        MPPP_MAYBE_TLS int_t g;
+        gcd(g, m_num, m_den);
+        return g.is_one();
     }
     /// Sign.
     /**
