@@ -94,8 +94,9 @@ Let's take a look at an example of a pybind11 module enabling automatic translat
         m.def("test_unordered_map_conversion", test_unordered_map<mppp::real>);
     }
 
-Note that the exposed functions just return a copy of their input parameter.
-Now let's try to call the exposed functions from Python:
+Note that we have exposed functions which just return a copy of their input parameter.
+This will allow us to verify that the automatic translation between mp++ and Python objects
+works as intended. Now let's try to call the exposed functions from Python:
 
 >>> import pybind11_test_01 as p
 >>> from fractions import Fraction as F

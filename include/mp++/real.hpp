@@ -3078,7 +3078,7 @@ inline bool regular_p(const real &r)
 /**
  * @param r the \link mppp::real real\endlink that will be examined.
  *
- * @return a positive value if \p r is positive, zero if \p r is zero, a negative value if \p thris
+ * @return a positive value if \p r is positive, zero if \p r is zero, a negative value if \p this
  * is negative.
  *
  * @throws unspecified any exception thrown by mppp::real::sgn().

@@ -17,7 +17,7 @@ The intent is to provide users with the flexibility of switching between low-lev
 To give an idea of the type of tradeoffs involved in the choice between low-level and high-level
 API, consider the simple task of adding two multiprecision integers ``a`` and ``b``. This can be accomplished
 either via the overloaded binary operator for :cpp:class:`~mppp::integer` (as seen in the previous section), or via the
-lower-level ``add()`` primitive:
+lower-level ``add()`` primitive (which is documented in the :ref:`integer reference <integer_arithmetic>`):
 
 .. code-block:: c++
 
