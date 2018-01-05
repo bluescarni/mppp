@@ -43,5 +43,5 @@ value is less than :math:`2^{64}`. A static size of 1 is a good default choice.
 
 In this tutorial, we will **not** assume that mp++'s functions have been pulled into the global namespace: the mp++
 API is designed around `argument-dependent lookup <https://en.wikipedia.org/wiki/Argument-dependent_name_lookup>`__,
-which essentially means that you can call mp++'s functions without prepending ``mppp::`` or employing ``using``
+which means it is usually possible to call mp++'s functions without prepending ``mppp::`` or employing ``using``
 directives.

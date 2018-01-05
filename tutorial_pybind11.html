@@ -222,8 +222,9 @@ at runtime.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Note that the exposed functions just return a copy of their input parameter.
-Now let’s try to call the exposed functions from Python:</p>
+<p>Note that we have exposed functions which just return a copy of their input parameter.
+This will allow us to verify that the automatic translation between mp++ and Python objects
+works as intended. Now let’s try to call the exposed functions from Python:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pybind11_test_01</span> <span class="k">as</span> <span class="nn">p</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fractions</span> <span class="k">import</span> <span class="n">Fraction</span> <span class="k">as</span> <span class="n">F</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_int1_conversion</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
@@ -339,7 +340,7 @@ exponent is too large:</p>
       
     </p>
     <p>
-        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+        &copy; Copyright 2016-2018, Francesco Biscani.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
     </p>
   </div>

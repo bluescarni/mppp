@@ -83,6 +83,7 @@
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">Integer tutorial</a><ul>
 <li><a class="reference internal" href="#interacting-with-the-gmp-api">Interacting with the GMP API</a></li>
+<li><a class="reference internal" href="#serialisation">Serialisation</a></li>
 </ul>
 </li>
 </ul>
@@ -182,12 +183,12 @@ in multiple overloads, often both as free and member functions.</p>
 <p><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> provides a variety of ways for interfacing with the <a class="reference external" href="https://gmplib.org/">GMP</a> library.
 There are a few reasons why one would want to use <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> in conjunction with the GMP API, such as:</p>
 <ul class="simple">
-<li>the necessity of using functions from the GMP API which have not (yet) been wrapped by mp++,</li>
+<li>the necessity of using functions from the GMP API which have not (yet) been wrapped/implemented by mp++,</li>
 <li>passing data from/to mp++ to/from another GMP-based multiprecision library.</li>
 </ul>
 <p>To start with, <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> is constructible and assignable from <code class="docutils literal"><span class="pre">mpz_t</span></code> objects:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
-<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span> <span class="c1">// Init an mpz_t with the value -4.</span>
+<span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>  <span class="c1">// Init an mpz_t with the value -4.</span>
 
 <span class="n">int_t</span> <span class="n">n1</span><span class="p">{</span><span class="n">m</span><span class="p">};</span>             <span class="c1">// Init an int_t from the mpz_t.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>        <span class="c1">// Verify that the value is correct.</span>
@@ -196,7 +197,7 @@ There are a few reasons why one would want to use <a class="reference internal" 
 <span class="n">n2</span> <span class="o">=</span> <span class="n">m</span><span class="p">;</span>                  <span class="c1">// Assign the mpz_t to another int_t.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n2</span> <span class="o">==</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>        <span class="c1">// Verify that the value is correct.</span>
 
-<span class="n">mpz_clear</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>           <span class="c1">// Clear the mpz_t.</span>
+<span class="n">mpz_clear</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>            <span class="c1">// Clear the mpz_t.</span>
 </pre></div>
 </div>
 <p>Second, it is possible to get a reference to an <code class="docutils literal"><span class="pre">mpz_t</span></code> from an <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
@@ -240,8 +241,91 @@ and verify that the creation of the read-only view did not trigger a promotion f
 </pre></div>
 </div>
 <p>It must be noted that both <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_t()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_view()</span></code></a>
-have to be used carefully, as they return non-owning objects which can easily lead to dangling pointers or references.
+have to be used carefully, as they return non-owning objects which can easily lead to dangling pointers or references, if misused.
 The documentation of the two functions explains in detail some of the potential pitfalls that users need to be aware of.</p>
+</div>
+<div class="section" id="serialisation">
+<h2>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.7.</span></p>
+</div>
+<p>mp++ provides a simple <a class="reference internal" href="integer.html#integer-s11n"><span class="std std-ref">API for the (de)serialisation</span></a> of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects
+into/from memory buffers and C++ streams. Possible uses of the serialisation API include persistence (e.g.,
+saving/loading <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> values to/from a file), the transmission of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects over
+the network (e.g., in distributed computing applications), inter-process communication, etc. The API consists of two main
+overloaded functions, <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::binary_save()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::binary_load()</span></code></a> (plus their
+free-function counterparts).</p>
+<p>Let’s see a few examples of the serialisation API in action:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">42</span><span class="p">},</span> <span class="n">b</span><span class="p">;</span>
+<span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>     <span class="c1">// Provide ample storage for serialisation.</span>
+
+<span class="n">a</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span> <span class="c1">// Serialise a into the buffer.</span>
+
+<span class="n">b</span><span class="p">.</span><span class="n">binary_load</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span> <span class="c1">// Deserialise the content of the buffer into b.</span>
+
+<span class="n">assert</span><span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">a</span><span class="p">);</span>        <span class="c1">// Check that the original value is recovered.</span>
+</pre></div>
+</div>
+<p>Here we are serialising the value <code class="docutils literal"><span class="pre">a</span></code> into a <code class="docutils literal"><span class="pre">char</span></code> buffer of size 1024. In this case
+we know that, since the original value is small, a buffer of 1024 bytes will provide more than enough
+space to store the serialised representation of <code class="docutils literal"><span class="pre">a</span></code>. The content of the buffer is then read
+back into the <code class="docutils literal"><span class="pre">b</span></code> variable, and we verify that <code class="docutils literal"><span class="pre">b</span></code>’s value is indeed equal to the
+value of <code class="docutils literal"><span class="pre">a</span></code>.</p>
+<p>Additional overloads are available for the save/load functions, targeting <code class="docutils literal"><span class="pre">std::vector&lt;char&gt;</span></code>, <code class="docutils literal"><span class="pre">std::array&lt;char&gt;</span></code>
+and C++ streams. The <code class="docutils literal"><span class="pre">std::vector&lt;char&gt;</span></code> <code class="docutils literal"><span class="pre">binary_save()</span></code> overload takes care of enlarging the target vector
+as much as needed to store the serialised <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">42</span><span class="p">},</span> <span class="n">b</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">buffer</span><span class="p">;</span>   <span class="c1">// An initially-empty vector buffer.</span>
+
+<span class="n">a</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span>      <span class="c1">// Serialise a into the buffer.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">buffer</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// Check that the buffer was resized.</span>
+
+<span class="n">b</span><span class="p">.</span><span class="n">binary_load</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span>      <span class="c1">// Deserialise the content of the buffer into b.</span>
+
+<span class="n">assert</span><span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">a</span><span class="p">);</span>             <span class="c1">// Check that the original value is recovered.</span>
+</pre></div>
+</div>
+<p>Both <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::binary_save()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::binary_load()</span></code></a> retun a <code class="docutils literal"><span class="pre">std::size_t</span></code> value
+representing the number of bytes written/read during (de)serialisation, or zero if an error occurred. A return value
+of zero can occur, for instance, when serialising into a <code class="docutils literal"><span class="pre">std::array&lt;char&gt;</span></code> with insufficient storage:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">42</span><span class="p">},</span> <span class="n">b</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">char</span><span class="p">,</span> <span class="mi">1</span><span class="o">&gt;</span> <span class="n">buffer_small</span><span class="p">;</span>       <span class="c1">// A std::array&lt;char&gt; with insufficient storage.</span>
+
+<span class="k">auto</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">buffer_small</span><span class="p">);</span> <span class="c1">// Try to serialise a into the small buffer.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">ret</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span>                       <span class="c1">// Verify that an error occurred.</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">char</span><span class="p">,</span> <span class="mi">1024</span><span class="o">&gt;</span> <span class="n">buffer_large</span><span class="p">;</span>    <span class="c1">// A std::array&lt;char&gt; with ample storage.</span>
+
+<span class="n">ret</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">buffer_large</span><span class="p">);</span>      <span class="c1">// Serialise a into the large buffer.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">);</span>                       <span class="c1">// Check that no error occurred.</span>
+
+<span class="n">b</span><span class="p">.</span><span class="n">binary_load</span><span class="p">(</span><span class="n">buffer_large</span><span class="p">);</span>            <span class="c1">// Deserialise the content of the buffer into b.</span>
+
+<span class="n">assert</span><span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">a</span><span class="p">);</span>                         <span class="c1">// Check that the original value is recovered.</span>
+</pre></div>
+</div>
+<p>The amount of bytes of storage necessary to serialise an <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> can always be computed via
+the <a class="reference internal" href="integer.html#_CPPv2NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::binary_size()</span></code></a> function.</p>
+<p>Overloads for C++ streams work in a (hopefully) unsurprising fashion:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">42</span><span class="p">},</span> <span class="n">b</span><span class="p">;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">stringstream</span> <span class="n">ss</span><span class="p">;</span> <span class="c1">// Let&#39;s use a string stream for this example.</span>
+
+<span class="n">a</span><span class="p">.</span><span class="n">binary_save</span><span class="p">(</span><span class="n">ss</span><span class="p">);</span>    <span class="c1">// Serialise a into the stream.</span>
+
+<span class="n">b</span><span class="p">.</span><span class="n">binary_load</span><span class="p">(</span><span class="n">ss</span><span class="p">);</span>    <span class="c1">// Deserialise the content of the stream into b.</span>
+
+<span class="n">assert</span><span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">a</span><span class="p">);</span>       <span class="c1">// Check that the original value is recovered.</span>
+</pre></div>
+</div>
+<p>A couple of important points about the serialisation API need to be emphasised:</p>
+<ul class="simple">
+<li>although mp++ does run some consistency checks during deserialisation, the API is not built to protect
+against maliciously-crafted data. Users are thus advised not to load data from untrusted sources;</li>
+<li>the current binary serialisation format is compiler, platform and architecture specific, it is not portable
+and it might be subject to changes in future versions of mp++. Users are thus advised not to use
+the binary serialisation format for long-term persistence or as a data exchange format: for such
+purposes, it is better to use the string representation of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects.</li>
+</ul>
 </div>
 </div>
 
@@ -257,7 +341,7 @@ The documentation of the two functions explains in detail some of the potential 
       
     </p>
     <p>
-        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+        &copy; Copyright 2016-2018, Francesco Biscani.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
     </p>
   </div>

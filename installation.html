@@ -143,8 +143,8 @@ on the following setups:</p>
 <ul class="simple">
 <li>GCC 4.8 and later versions on GNU/Linux 32/64-bit,</li>
 <li>Clang 3.8 and later versions on GNU/Linux 64-bit,</li>
-<li>MSVC 2015 on Windows 32/64-bit,</li>
-<li>Clang 4 on Windows 32/64-bit (with the <code class="docutils literal"><span class="pre">clang-cl</span></code> driver for MSVC),</li>
+<li>MSVC 2015 and later versions on Windows 32/64-bit,</li>
+<li>Clang 4 and later versions on Windows 32/64-bit (with the <code class="docutils literal"><span class="pre">clang-cl</span></code> driver for MSVC),</li>
 <li>MinGW GCC 6 on Windows 64-bit,</li>
 <li>Clang on OSX 64-bit (Xcode 6.4 and later),</li>
 <li>Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).</li>
@@ -232,6 +232,12 @@ if both MPFR and quadmath support are enabled, the compilation command on a mode
 <div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 main.cpp -lquadmath -lmpfr -lgmp
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Unless the definition <code class="docutils literal"><span class="pre">NDEBUG</span></code> is activated at compile time, mp++ runs extensive
+internal debug checks at runtime which carry a large performance penalty. Users are advised
+to always define <code class="docutils literal"><span class="pre">NDEBUG</span></code> when compiling code using mp++ in <code class="docutils literal"><span class="pre">Release</span></code> builds.</p>
+</div>
 <p>The full list of libraries that need to be linked when using mp++ is the following:</p>
 <ul class="simple">
 <li>the GMP library (or the MPIR fork), always required (<code class="docutils literal"><span class="pre">-lgmp</span></code> on most Unix-like systems);</li>
@@ -292,7 +298,7 @@ on which mp++ depends (e.g., GMP) are brought into the link chain.</p>
       
     </p>
     <p>
-        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+        &copy; Copyright 2016-2018, Francesco Biscani.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
     </p>
   </div>

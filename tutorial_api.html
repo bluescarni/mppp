@@ -144,7 +144,7 @@ on top of which mp++ is built,</li>
 <p>To give an idea of the type of tradeoffs involved in the choice between low-level and high-level
 API, consider the simple task of adding two multiprecision integers <code class="docutils literal"><span class="pre">a</span></code> and <code class="docutils literal"><span class="pre">b</span></code>. This can be accomplished
 either via the overloaded binary operator for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> (as seen in the previous section), or via the
-lower-level <code class="docutils literal"><span class="pre">add()</span></code> primitive:</p>
+lower-level <code class="docutils literal"><span class="pre">add()</span></code> primitive (which is documented in the <a class="reference internal" href="integer.html#integer-arithmetic"><span class="std std-ref">integer reference</span></a>):</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">2</span><span class="p">},</span> <span class="n">b</span><span class="p">{</span><span class="mi">4</span><span class="p">};</span>
 
 <span class="k">auto</span> <span class="n">c1</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span> <span class="c1">// Binary operator.</span>
@@ -269,7 +269,7 @@ of argument, let’s pretend that it will not :)</td></tr>
       
     </p>
     <p>
-        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+        &copy; Copyright 2016-2018, Francesco Biscani.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
     </p>
   </div>

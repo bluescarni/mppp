@@ -7,6 +7,10 @@ Changelog
 New
 ~~~
 
+- Implement the initial version of the binary serialisation API (`#110 <https://github.com/bluescarni/mppp/pull/110>`__).
+
+- Add builds based on MSVC 2017 in Appveyor (`#110 <https://github.com/bluescarni/mppp/pull/110>`__).
+
 - Extend the :cpp:concept:`~mppp::CppInteroperable` concept to include all C++ integral types
   (`#104 <https://github.com/bluescarni/mppp/pull/104>`__).
 
@@ -23,6 +27,8 @@ New
 
 Changes
 ~~~~~~~
+
+- Update copyright date (`#110 <https://github.com/bluescarni/mppp/pull/110>`__).
 
 - Various updates to the documentation and to the benchmarks (`#107 <https://github.com/bluescarni/mppp/pull/107>`__,
   `#108 <https://github.com/bluescarni/mppp/pull/108>`__).

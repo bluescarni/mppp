@@ -96,6 +96,7 @@
 <li><a class="reference internal" href="#exponentiation">Exponentiation</a></li>
 <li><a class="reference internal" href="#roots">Roots</a></li>
 <li><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li><a class="reference internal" href="#serialisation">Serialisation</a></li>
 <li><a class="reference internal" href="#other">Other</a></li>
 </ul>
 </li>
@@ -324,7 +325,7 @@ Via the GMP interfacing facilities, it is thus possible to use directly the GMP 
 <dt id="_CPPv2N4mppp7integer7integerEPK9mp_limb_tNSt6size_tE">
 <span id="mppp::integer::integer__mp_limb_tCP.std::s"></span><span class="target" id="classmppp_1_1integer_1afd53f28114a3fabff12b8cee7d5ad40d"></span><code class="descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv29mp_limb_t" title="mp_limb_t">mp_limb_t</a> *<em>p</em>, std::size_t <em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerEPK9mp_limb_tNSt6size_tE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from an array of limbs. </p>
-<p><p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> with the contents of the array
+<p><p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> with the content of the array
 sized <code class="docutils literal"><span class="pre">size</span></code> starting at <code class="docutils literal"><span class="pre">p</span></code>. The array is expected to contain
 the limbs of the desired value for <code class="docutils literal"><span class="pre">this</span></code>, ordered from the least significant
 to the most significant.</p>
@@ -868,7 +869,7 @@ method will return <code class="docutils literal"><span class="pre">true</span><
 <dt id="_CPPv2NK4mppp7integer12get_mpz_viewEv">
 <span id="mppp::integer::get_mpz_viewC"></span><span class="target" id="classmppp_1_1integer_1a83dffd90f698955df97f0c366450aa3d"></span>mpz_view <code class="descname">get_mpz_view</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp7integer12get_mpz_viewEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get an <code class="docutils literal"><span class="pre">mpz_t</span></code> view. </p>
-<p>This method will return an object of an unspecified type <code class="docutils literal"><span class="pre">mpz_view</span></code> which is implicitly convertible to a const pointer to an <code class="docutils literal"><span class="pre">mpz_t</span></code> struct (and which can thus be used as a <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> parameter in GMP functions). In addition to the implicit conversion operator, the <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> object can also be retrieved via the <code class="docutils literal"><a class="reference internal" href="#classmppp_1_1integer_1a46c6b8b25d26a696c1703694fe90748f"><span class="std std-ref"><span class="pre">get()</span></span></a></code> method of the <code class="docutils literal"><span class="pre">mpz_view</span></code> class. The view provides a read-only GMP-compatible representation of the integer stored in <code class="docutils literal"><span class="pre">this</span></code>.</p>
+<p>This method will return an object of an unspecified type <code class="docutils literal"><span class="pre">mpz_view</span></code> which is implicitly convertible to a const pointer to an <code class="docutils literal"><span class="pre">mpz_t</span></code> struct (and which can thus be used as a <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> parameter in GMP functions). In addition to the implicit conversion operator, the <code class="docutils literal"><span class="pre">const</span> <span class="pre">mpz_t</span></code> object can also be retrieved via the <code class="docutils literal"><span class="pre">get()</span></code> method of the <code class="docutils literal"><span class="pre">mpz_view</span></code> class. The view provides a read-only GMP-compatible representation of the integer stored in <code class="docutils literal"><span class="pre">this</span></code>.</p>
 <p><div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>It is important to keep in mind the following facts about the returned <code class="docutils literal"><span class="pre">mpz_view</span></code> object:</p>
@@ -1067,6 +1068,315 @@ pointer.</p>
 </p>
 </dd></dl>
 
+<dl class="function">
+<dt id="_CPPv2NK4mppp7integer11binary_sizeEv">
+<span id="mppp::integer::binary_sizeC"></span><span class="target" id="classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"></span>std::size_t <code class="descname">binary_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp7integer11binary_sizeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Size of the serialised binary representation. </p>
+<p>This method will return a value representing the number of bytes necessary
+to serialise <code class="docutils literal"><span class="pre">this</span></code> into a memory buffer in binary format via one of the available
+<a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_save()</span></code></a> overloads. The returned value
+is platform-dependent.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the number of bytes needed for the binary serialisation of <code class="docutils literal"><span class="pre">this</span></code>.</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if the size in limbs of <code class="docutils literal"><span class="pre">this</span></code> is larger than an implementation-defined limit. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NK4mppp7integer11binary_saveEPc">
+<span id="mppp::integer::binary_save__cPC"></span><span class="target" id="classmppp_1_1integer_1a0767e99492d969b31b49c9aa332b71f5"></span>std::size_t <code class="descname">binary_save</code><span class="sig-paren">(</span>char *<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Serialise into a memory buffer. </p>
+<p><p>This method will write into <code class="docutils literal"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal"><span class="pre">this</span></code>. The serialised
+representation produced by this method can be read back with one of the
+<a class="reference internal" href="#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_load()</span></code></a> overloads.</p>
+<p><code class="docutils literal"><span class="pre">dest</span></code> must point to a memory area whose size is at least equal to the value returned
+by <a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_size()</span></code></a>, otherwise the behaviour will be undefined.
+<code class="docutils literal"><span class="pre">dest</span></code> does not have any special alignment requirements.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The binary representation produced by this method is compiler, platform and architecture
+specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+it should not be used as an exchange format or for long-term data storage.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the number of bytes written into <code class="docutils literal"><span class="pre">dest</span></code> (i.e., the output of <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a>).</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">dest</span></code>: a pointer to a memory buffer into which the serialised representation of <code class="docutils literal"><span class="pre">this</span></code> will be written.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NK4mppp7integer11binary_saveERNSt6vectorIcEE">
+<span id="mppp::integer::binary_save__std::vector:c:RC"></span><span class="target" id="classmppp_1_1integer_1a65eed7538e8a00745dbdf19267cfe382"></span>std::size_t <code class="descname">binary_save</code><span class="sig-paren">(</span>std::vector&lt;char&gt; &amp;<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp7integer11binary_saveERNSt6vectorIcEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Serialise into a <code class="docutils literal"><span class="pre">std::vector&lt;char&gt;</span></code>. </p>
+<p><p>This method will write into <code class="docutils literal"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal"><span class="pre">this</span></code>. The serialised
+representation produced by this method can be read back with one of the
+<a class="reference internal" href="#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_load()</span></code></a> overloads.</p>
+<p>The size of <code class="docutils literal"><span class="pre">dest</span></code> must be at least equal to the value returned by
+<a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_size()</span></code></a>. If that is not the case, <code class="docutils literal"><span class="pre">dest</span></code> will be resized
+to <a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_size()</span></code></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The binary representation produced by this method is compiler, platform and architecture
+specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+it should not be used as an exchange format or for long-term data storage.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the number of bytes written into <code class="docutils literal"><span class="pre">dest</span></code> (i.e., the output of <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a>).</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">dest</span></code>: a vector that will hold the serialised representation of <code class="docutils literal"><span class="pre">this</span></code>.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if the binary size of <code class="docutils literal"><span class="pre">this</span></code> is larger than an implementation-defined limit. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a>, or by memory errors in standard containers. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>S</em>&gt;</dt>
+<dt id="_CPPv2NK4mppp7integer11binary_saveERNSt5arrayIc1SEE">
+<span id="mppp::integer::binary_save__std::array:c.S:RC"></span><span class="target" id="classmppp_1_1integer_1acf04450572531291313cc17270b2dbbc"></span>std::size_t <code class="descname">binary_save</code><span class="sig-paren">(</span>std::array&lt;char, S&gt; &amp;<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp7integer11binary_saveERNSt5arrayIc1SEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Serialise into a <code class="docutils literal"><span class="pre">std::array&lt;char&gt;</span></code>. </p>
+<p><p>This method will write into <code class="docutils literal"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal"><span class="pre">this</span></code>. The serialised
+representation produced by this method can be read back with one of the
+<a class="reference internal" href="#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_load()</span></code></a> overloads.</p>
+<p>The size of <code class="docutils literal"><span class="pre">dest</span></code> must be at least equal to the value returned by
+<a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_size()</span></code></a>. If that is not the case, no data
+will be written to <code class="docutils literal"><span class="pre">dest</span></code> and zero will be returned.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The binary representation produced by this method is compiler, platform and architecture
+specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+it should not be used as an exchange format or for long-term data storage.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the number of bytes written into <code class="docutils literal"><span class="pre">dest</span></code> (i.e., the output of <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a> if <code class="docutils literal"><span class="pre">dest</span></code> provides enough storage to store <code class="docutils literal"><span class="pre">this</span></code>, zero otherwise).</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">dest</span></code>: an array that will hold the serialised representation of <code class="docutils literal"><span class="pre">this</span></code>.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NK4mppp7integer11binary_saveERNSt7ostreamE">
+<span id="mppp::integer::binary_save__osRC"></span><span class="target" id="classmppp_1_1integer_1aca4a03ef6efb3524c6907f1af8b18723"></span>std::size_t <code class="descname">binary_save</code><span class="sig-paren">(</span>std::ostream &amp;<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp7integer11binary_saveERNSt7ostreamE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Serialise into a <code class="docutils literal"><span class="pre">std::ostream</span></code>. </p>
+<p><p>This method will write into the output stream <code class="docutils literal"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal"><span class="pre">this</span></code>, starting from the
+current stream position. The serialised representation produced by this method can be read back with one of the
+<a class="reference internal" href="#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_load()</span></code></a> overloads.</p>
+<p>If the serialisation is successful (that is, no stream error state is ever detected in <code class="docutils literal"><span class="pre">dest</span></code> after write
+operations), then the binary size of <code class="docutils literal"><span class="pre">this</span></code> (that is, the number of bytes written into <code class="docutils literal"><span class="pre">dest</span></code>) will be
+returned. Otherwise, zero will be returned. Note that a return value of zero does not necessarily imply that no
+bytes were written into <code class="docutils literal"><span class="pre">dest</span></code>, just that an error occurred at some point during the serialisation process.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The binary representation produced by this method is compiler, platform and architecture
+specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+it should not be used as an exchange format or for long-term data storage.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the output of <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a> if the serialisation was successful, zero otherwise.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">dest</span></code>: the destination stream.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: in case of internal overflows. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a>, or by the public interface of <code class="docutils literal"><span class="pre">std::ostream</span></code>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp7integer11binary_loadEPKc">
+<span id="mppp::integer::binary_load__cCP"></span><span class="target" id="classmppp_1_1integer_1a8d543cfca7270eac6a75ee15fdacd2e2"></span>std::size_t <code class="descname">binary_load</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer11binary_loadEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Load a value from a memory buffer. </p>
+<p><p>This method will load into <code class="docutils literal"><span class="pre">this</span></code> the content of the memory buffer starting
+at <code class="docutils literal"><span class="pre">src</span></code>, which must contain the serialised representation of an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+produced by one of the <a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_save()</span></code></a> overloads.</p>
+<p><code class="docutils literal"><span class="pre">dest</span></code> does not have any special alignment requirements.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Although this method performs a few consistency checks on the data in <code class="docutils literal"><span class="pre">src</span></code>,
+it cannot ensure complete safety against maliciously crafted data. Users are
+advised to use this method only with trusted data.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the number of bytes read from <code class="docutils literal"><span class="pre">src</span></code> (that is, the output of <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a> after the deserialisation into <code class="docutils literal"><span class="pre">this</span></code> has successfully completed).</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">src</span></code>: the source memory buffer.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if the computation of the size of the serialised value leads to overflow. </li>
+<li><code class="docutils literal"><span class="pre">std::invalid_argument</span></code>: if invalid data is detected in <code class="docutils literal"><span class="pre">src</span></code>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp7integer11binary_loadERKNSt6vectorIcEE">
+<span id="mppp::integer::binary_load__std::vector:c:CR"></span><span class="target" id="classmppp_1_1integer_1a6811e2a602d5f368a6cc5de89ebec758"></span>std::size_t <code class="descname">binary_load</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;char&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer11binary_loadERKNSt6vectorIcEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Load a value from a <code class="docutils literal"><span class="pre">std::vector&lt;char&gt;</span></code>. </p>
+<p><p>This method will load into <code class="docutils literal"><span class="pre">this</span></code> the content of <code class="docutils literal"><span class="pre">src</span></code>,
+which must contain the serialised representation of an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+produced by one of the <a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_save()</span></code></a> overloads.</p>
+<p>The serialised representation of the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> must start at
+the beginning of <code class="docutils literal"><span class="pre">src</span></code>, but it can end before the end of <code class="docutils literal"><span class="pre">src</span></code>. Data
+past the end of the serialised representation of the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+will be ignored.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Although this method performs a few consistency checks on the data in <code class="docutils literal"><span class="pre">src</span></code>,
+it cannot ensure complete safety against maliciously crafted data. Users are
+advised to use this method only with trusted data.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the number of bytes read from <code class="docutils literal"><span class="pre">src</span></code> (that is, the output of <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a> after the deserialisation into <code class="docutils literal"><span class="pre">this</span></code> has successfully completed).</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">src</span></code>: the source <code class="docutils literal"><span class="pre">std::vector&lt;char&gt;</span></code>.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if the computation of the size of the serialised value leads to overflow. </li>
+<li><code class="docutils literal"><span class="pre">std::invalid_argument</span></code>: if invalid data is detected in <code class="docutils literal"><span class="pre">src</span></code>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>S</em>&gt;</dt>
+<dt id="_CPPv2N4mppp7integer11binary_loadERKNSt5arrayIc1SEE">
+<span id="mppp::integer::binary_load__std::array:c.S:CR"></span><span class="target" id="classmppp_1_1integer_1ac9e97e1be0e2631ba378b4febf0e07da"></span>std::size_t <code class="descname">binary_load</code><span class="sig-paren">(</span><em class="property">const</em> std::array&lt;char, S&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer11binary_loadERKNSt5arrayIc1SEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Load a value from a <code class="docutils literal"><span class="pre">std::array&lt;char&gt;</span></code>. </p>
+<p><p>This method will load into <code class="docutils literal"><span class="pre">this</span></code> the content of <code class="docutils literal"><span class="pre">src</span></code>,
+which must contain the serialised representation of an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+produced by one of the <a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_save()</span></code></a> overloads.</p>
+<p>The serialised representation of the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> must start at
+the beginning of <code class="docutils literal"><span class="pre">src</span></code>, but it can end before the end of <code class="docutils literal"><span class="pre">src</span></code>. Data
+past the end of the serialised representation of the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+will be ignored.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Although this method performs a few consistency checks on the data in <code class="docutils literal"><span class="pre">src</span></code>,
+it cannot ensure complete safety against maliciously crafted data. Users are
+advised to use this method only with trusted data.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the number of bytes read from <code class="docutils literal"><span class="pre">src</span></code> (that is, the output of <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a> after the deserialisation into <code class="docutils literal"><span class="pre">this</span></code> has successfully completed).</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">src</span></code>: the source <code class="docutils literal"><span class="pre">std::array&lt;char&gt;</span></code>.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if the computation of the size of the serialised value leads to overflow. </li>
+<li><code class="docutils literal"><span class="pre">std::invalid_argument</span></code>: if invalid data is detected in <code class="docutils literal"><span class="pre">src</span></code>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N4mppp7integer11binary_loadERNSt7istreamE">
+<span id="mppp::integer::binary_load__isR"></span><span class="target" id="classmppp_1_1integer_1a4a84caebafd02284edc57bd893fe7e83"></span>std::size_t <code class="descname">binary_load</code><span class="sig-paren">(</span>std::istream &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer11binary_loadERNSt7istreamE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Load a value from a <code class="docutils literal"><span class="pre">std::istream</span></code>. </p>
+<p><p>This method will load into <code class="docutils literal"><span class="pre">this</span></code> the content of <code class="docutils literal"><span class="pre">src</span></code>,
+which must contain the serialised representation of an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+produced by one of the <a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_save()</span></code></a> overloads.</p>
+<p>The serialised representation of the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> must start at
+the current position of <code class="docutils literal"><span class="pre">src</span></code>, but <code class="docutils literal"><span class="pre">src</span></code> can contain other data before and after
+the serialised <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> value. Data
+past the end of the serialised representation of the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+will be ignored. If a stream error state is detected at any point of the deserialisation
+process after a read operation, zero will be returned and <code class="docutils literal"><span class="pre">this</span></code> will not have been modified.
+Note that a return value of zero does not necessarily imply that no
+bytes were read from <code class="docutils literal"><span class="pre">src</span></code>, just that an error occurred at some point during the serialisation process.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Although this method performs a few consistency checks on the data in <code class="docutils literal"><span class="pre">src</span></code>,
+it cannot ensure complete safety against maliciously crafted data. Users are
+advised to use this method only with trusted data.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the number of bytes read from <code class="docutils literal"><span class="pre">src</span></code> (that is, the output of <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a> after the deserialisation into <code class="docutils literal"><span class="pre">this</span></code> has successfully completed), or zero if a stream error occurs.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">src</span></code>: the source <code class="docutils literal"><span class="pre">std::istream</span></code>.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: in case of internal overflows. </li>
+<li><code class="docutils literal"><span class="pre">std::invalid_argument</span></code>: if invalid data is detected in <code class="docutils literal"><span class="pre">src</span></code>. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by memory errors in standard containers, the public interface of <code class="docutils literal"><span class="pre">std::istream</span></code>, or <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">binary_size()</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Static Attributes</p>
@@ -1141,6 +1451,22 @@ if either:</p>
 <li><code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> are both <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with the same static size <code class="docutils literal"><span class="pre">SSize</span></code>, or</li>
 <li>one type is an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and the other is a <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppIntegralInteroperable</span></code></a> type.</li>
 </ul>
+</dd></dl>
+
+<dl class="concept">
+<dt id="_CPPv2I0_NSt6size_tEEN4mppp21IntegerBinarySaveDestE">
+template&lt;typename <code class="descname">T</code>, std::size_t <code class="descclassname"></code><code class="descname">SSize</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">IntegerBinarySaveDest</code><a class="headerlink" href="#_CPPv2I0_NSt6size_tEEN4mppp21IntegerBinarySaveDestE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if <code class="docutils literal"><span class="pre">T</span></code> is a type into which the serialised binary representation of an
+<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with static size <code class="docutils literal"><span class="pre">SSize</span></code> can be written. In other words, the concept is satisfied if
+an object of type <code class="docutils literal"><span class="pre">T</span></code> can be passed as an argument to one of the <a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::binary_save()</span></code></a> overloads.</p>
+</dd></dl>
+
+<dl class="concept">
+<dt id="_CPPv2I0_NSt6size_tEEN4mppp20IntegerBinaryLoadSrcE">
+template&lt;typename <code class="descname">T</code>, std::size_t <code class="descclassname"></code><code class="descname">SSize</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">IntegerBinaryLoadSrc</code><a class="headerlink" href="#_CPPv2I0_NSt6size_tEEN4mppp20IntegerBinaryLoadSrcE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if <code class="docutils literal"><span class="pre">T</span></code> is a type from which the serialised binary representation of an
+<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with static size <code class="docutils literal"><span class="pre">SSize</span></code> can be loaded. In other words, the concept is satisfied if
+an object of type <code class="docutils literal"><span class="pre">T</span></code> can be passed as an argument to one of the <a class="reference internal" href="#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::binary_load()</span></code></a> overloads.</p>
 </dd></dl>
 
 </div>
@@ -2288,6 +2614,89 @@ the <a class="reference internal" href="#_CPPv2NK4mppp7integer9to_stringEi" titl
 </dd></dl>
 
 </div>
+<div class="section" id="serialisation">
+<span id="integer-s11n"></span><h3>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.7.</span></p>
+</div>
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp11binary_sizeERK7integerI5SSizeE">
+<span id="mppp::binary_size__integer:SSize:CR"></span><span class="target" id="group__integer__s11n_1ga8190c77652589517ca3c88a488e9dcb6"></span>std::size_t <code class="descclassname">mppp::</code><code class="descname">binary_size</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp11binary_sizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary size of an <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p>This function is the free function equivalent of the
+<a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::binary_size()</span></code></a> method.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the output of <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">mppp::integer::binary_size()</span></a> called on <code class="docutils literal"><span class="pre">n</span></code>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the target <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">mppp::integer::binary_size()</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp11binary_saveERK7integerI5SSizeERR21IntegerBinarySaveDestI5SSizeE">
+<span id="mppp::binary_save__integer:SSize:CR.IntegerBinarySaveDest:SSize:RR"></span><span class="target" id="group__integer__s11n_1gad9c4199617a8d80b672044d89ab05677"></span>std::size_t <code class="descclassname">mppp::</code><code class="descname">binary_save</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21IntegerBinarySaveDestE" title="mppp::IntegerBinarySaveDest">IntegerBinarySaveDest</a>&lt;SSize&gt; &amp;&amp;<em>dest</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp11binary_saveERK7integerI5SSizeERR21IntegerBinarySaveDestI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Save an <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> in binary format. </p>
+<p>This function is the free function equivalent of all the
+<a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::binary_save()</span></code></a> overloads.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the output of the invoked <a class="reference internal" href="#classmppp_1_1integer_1a0767e99492d969b31b49c9aa332b71f5"><span class="std std-ref">mppp::integer::binary_save()</span></a> overload called on <code class="docutils literal"><span class="pre">n</span></code> with <code class="docutils literal"><span class="pre">dest</span></code> as argument.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the target <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </li>
+<li><code class="docutils literal"><span class="pre">dest</span></code>: the object into which the binary representation of <code class="docutils literal"><span class="pre">n</span></code> will be written.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the invoked <a class="reference internal" href="#classmppp_1_1integer_1a0767e99492d969b31b49c9aa332b71f5"><span class="std std-ref">mppp::integer::binary_save()</span></a> overload. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp11binary_loadER7integerI5SSizeERR20IntegerBinaryLoadSrcI5SSizeE">
+<span id="mppp::binary_load__integer:SSize:R.IntegerBinaryLoadSrc:SSize:RR"></span><span class="target" id="group__integer__s11n_1gab4da1f4394d8986178886545af9b66b1"></span>std::size_t <code class="descclassname">mppp::</code><code class="descname">binary_load</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp20IntegerBinaryLoadSrcE" title="mppp::IntegerBinaryLoadSrc">IntegerBinaryLoadSrc</a>&lt;SSize&gt; &amp;&amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp11binary_loadER7integerI5SSizeERR20IntegerBinaryLoadSrcI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Load an <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> in binary format. </p>
+<p>This function is the free function equivalent of all the
+<a class="reference internal" href="#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::integer::binary_load()</span></code></a> overloads.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the output of the invoked <a class="reference internal" href="#classmppp_1_1integer_1a8d543cfca7270eac6a75ee15fdacd2e2"><span class="std std-ref">mppp::integer::binary_load()</span></a> overload called on <code class="docutils literal"><span class="pre">n</span></code> with <code class="docutils literal"><span class="pre">src</span></code> as argument.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">n</span></code>: the target <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </li>
+<li><code class="docutils literal"><span class="pre">src</span></code>: the object containing the <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> binary representation that will be loaded into <code class="docutils literal"><span class="pre">n</span></code>.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the invoked <a class="reference internal" href="#classmppp_1_1integer_1a8d543cfca7270eac6a75ee15fdacd2e2"><span class="std std-ref">mppp::integer::binary_load()</span></a> overload. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
 <div class="section" id="other">
 <span id="integer-other"></span><h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
@@ -3101,7 +3510,7 @@ are treated as-if they were represented using two’s complement.</p>
       
     </p>
     <p>
-        &copy; Copyright 2016-2017, Francesco Biscani.<br/>
+        &copy; Copyright 2016-2018, Francesco Biscani.<br/>
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.<br/>
     </p>
   </div>

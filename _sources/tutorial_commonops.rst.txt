@@ -153,7 +153,7 @@ of multiprecision and numerical C++ types is supported:
    assert(3 != rat_t{1, 3});
    assert(0.9 < int_t{1});
    assert(real128{15} <= int_t{15});
-   assert(real{"inf"} > rat_t{123, 456});
+   assert(real{"inf", 100} > rat_t{123, 456});
    assert(int_t{4} >= rat_t{16, 4});
 
 The comparison operators treat NaN values in the standard way: comparing NaN to any other value returns always
