@@ -28,6 +28,8 @@ New
 Changes
 ~~~~~~~
 
+- Update copyright date (`#110 <https://github.com/bluescarni/mppp/pull/110>`__).
+
 - Various updates to the documentation and to the benchmarks (`#107 <https://github.com/bluescarni/mppp/pull/107>`__,
   `#108 <https://github.com/bluescarni/mppp/pull/108>`__).
 
