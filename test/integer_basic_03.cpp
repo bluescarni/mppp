@@ -1,4 +1,4 @@
-// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -8,10 +8,13 @@
 
 #include <mp++/config.hpp>
 
+#include <algorithm>
+#include <array>
 #include <atomic>
 #include <cmath>
 #include <cstddef>
 #include <gmp.h>
+#include <ios>
 #include <iostream>
 #include <limits>
 #include <mp++/detail/type_traits.hpp>
@@ -27,6 +30,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include "test_utils.hpp"
 
@@ -391,4 +395,308 @@ struct limb_array_ctor_tester {
 TEST_CASE("limb array constructor")
 {
     tuple_for_each(sizes{}, limb_array_ctor_tester{});
+}
+
+template <typename I, typename Dest>
+using binary_save_t = decltype(binary_save(std::declval<const I &>(), std::declval<Dest>()));
+
+template <typename I, typename Dest>
+using binary_load_t = decltype(binary_load(std::declval<I &>(), std::declval<Dest>()));
+
+struct binary_s11n_tester {
+    template <typename S>
+    void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        // MSVC (apart from clang-cl) has troubles with the detection idiom,
+        // let's hope they fix SFINAE eventually.
+#if !defined(_MSC_VER) || (defined(_MSC_VER) && defined(__clang__))
+        REQUIRE(!is_detected<binary_save_t, integer, std::vector<char>>::value);
+        REQUIRE(!is_detected<binary_save_t, integer, std::vector<char> &&>::value);
+        REQUIRE(is_detected<binary_save_t, integer, std::vector<char> &>::value);
+        REQUIRE(!is_detected<binary_save_t, integer, const std::vector<char>>::value);
+        REQUIRE(!is_detected<binary_save_t, integer, const std::vector<char> &>::value);
+        REQUIRE(is_detected<binary_save_t, integer, char *>::value);
+        REQUIRE(is_detected<binary_save_t, integer, char *&&>::value);
+        REQUIRE(is_detected<binary_save_t, integer, char *&>::value);
+        REQUIRE(is_detected<binary_save_t, integer, char *const &>::value);
+        REQUIRE(!is_detected<binary_save_t, integer, const char *>::value);
+        REQUIRE(is_detected<binary_load_t, integer, std::vector<char>>::value);
+        REQUIRE(is_detected<binary_load_t, integer, std::vector<char> &&>::value);
+        REQUIRE(is_detected<binary_load_t, integer, const std::vector<char>>::value);
+        REQUIRE(is_detected<binary_load_t, integer, const std::vector<char> &>::value);
+        REQUIRE(!is_detected<binary_load_t, const integer, std::vector<char>>::value);
+#endif
+        std::vector<char> buffer;
+        std::stringstream ss;
+        auto clear_ss = [&ss]() {
+            ss.clear();
+            ss.str("");
+        };
+        // A few tests with zero value.
+        integer n1, n2, n3, n4, n5;
+        REQUIRE(n1.binary_size() == sizeof(mpz_size_t));
+        buffer.resize(n1.binary_size());
+        REQUIRE(n1.binary_save(buffer.data()) == n1.binary_size());
+        REQUIRE(n1.binary_save(ss) == n1.binary_size());
+        REQUIRE(ss.good());
+        mpz_size_t size = -1;
+        std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), make_uai(reinterpret_cast<char *>(&size)));
+        REQUIRE(size == 0);
+        REQUIRE(n2.binary_load(buffer.data()) == n1.binary_size());
+        REQUIRE(n2 == 0);
+        REQUIRE(n2.is_static());
+        n5 = 1;
+        REQUIRE(n5.binary_load(ss) == n1.binary_size());
+        REQUIRE(ss.good());
+        REQUIRE(n5 == 0);
+        REQUIRE(n5.is_static());
+        clear_ss();
+        n1.promote();
+        REQUIRE(n1.binary_save(buffer.data()) == n1.binary_size());
+        REQUIRE(n1.binary_save(ss) == n1.binary_size());
+        REQUIRE(ss.good());
+        size = -1;
+        std::copy(buffer.data(), buffer.data() + sizeof(mpz_size_t), make_uai(reinterpret_cast<char *>(&size)));
+        REQUIRE(size == 0);
+        n2.promote();
+        REQUIRE(n2.binary_load(buffer.data()) == n1.binary_size());
+        REQUIRE(n2 == 0);
+        REQUIRE(n2.is_static());
+        n5 = 1;
+        n5.promote();
+        REQUIRE(n5.binary_load(ss) == n1.binary_size());
+        REQUIRE(ss.good());
+        REQUIRE(n5 == 0);
+        REQUIRE(n5.is_static());
+        clear_ss();
+        mpz_raii tmp;
+        std::uniform_int_distribution<int> sdist(0, 1);
+        // Buffers based on std::vector and std::array.
+        std::vector<char> vbuffer;
+        // Make space for plenty of limbs.
+        std::array<char, sizeof(mpz_size_t) + sizeof(::mp_limb_t) * 100u> sb;
+        // Run a variety of tests with operands with x and y number of limbs.
+        auto random_xy = [&](unsigned x, unsigned y) {
+            for (int i = 0; i < ntries; ++i) {
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset every once in a while.
+                    n1 = integer{};
+                }
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset every once in a while.
+                    n2 = integer{};
+                }
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset every once in a while.
+                    vbuffer = std::vector<char>{};
+                }
+                // Create two random integers with x and y limbs.
+                random_integer(tmp, x, rng);
+                n1 = &tmp.m_mpz;
+                random_integer(tmp, y, rng);
+                n2 = &tmp.m_mpz;
+                // Negate and/or promote randomly.
+                if (sdist(rng)) {
+                    n1.neg();
+                }
+                if (sdist(rng)) {
+                    n2.neg();
+                }
+                if (n1.is_static() && sdist(rng)) {
+                    n1.promote();
+                }
+                if (n2.is_static() && sdist(rng)) {
+                    n2.promote();
+                }
+                // Copy over n2 to n3, n4 and n5.
+                n3 = n2;
+                n4 = n2;
+                n5 = n2;
+                REQUIRE(n1.binary_size() == binary_size(n1));
+                // Save n1 into the buffer, load the buffer into n2.
+                // Then check we get the same data back.
+                buffer.resize(n1.binary_size());
+                REQUIRE(binary_save(n1, buffer.data()) == n1.binary_size());
+                REQUIRE(binary_load(n2, buffer.data()) == n1.binary_size());
+                REQUIRE(n1 == n2);
+                REQUIRE(n2.is_static() == (n1.size() <= S::value));
+                // Test the std vector interface as well.
+                REQUIRE(binary_save(n1, vbuffer) == n1.binary_size());
+                REQUIRE(binary_load(n3, vbuffer) == n1.binary_size());
+                REQUIRE(n1 == n3);
+                REQUIRE(n3.is_static() == (n1.size() <= S::value));
+                // std::array interface.
+                REQUIRE(binary_save(n1, sb) == n1.binary_size());
+                REQUIRE(binary_load(n4, sb) == n1.binary_size());
+                REQUIRE(n1 == n4);
+                REQUIRE(n4.is_static() == (n1.size() <= S::value));
+                // Stream interface.
+                REQUIRE(binary_save(n1, ss) == n1.binary_size());
+                REQUIRE(binary_load(n5, ss) == n1.binary_size());
+                REQUIRE(n1 == n5);
+                REQUIRE(n5.is_static() == (n1.size() <= S::value));
+                clear_ss();
+            }
+        };
+
+        random_xy(1, 0);
+        random_xy(0, 1);
+        random_xy(1, 1);
+
+        random_xy(0, 2);
+        random_xy(1, 2);
+        random_xy(2, 0);
+        random_xy(2, 1);
+        random_xy(2, 2);
+
+        random_xy(0, 3);
+        random_xy(1, 3);
+        random_xy(2, 3);
+        random_xy(3, 0);
+        random_xy(3, 1);
+        random_xy(3, 2);
+        random_xy(3, 3);
+
+        random_xy(0, 4);
+        random_xy(1, 4);
+        random_xy(2, 4);
+        random_xy(3, 4);
+        random_xy(4, 0);
+        random_xy(4, 1);
+        random_xy(4, 2);
+        random_xy(4, 3);
+        random_xy(4, 4);
+
+        // Error checking.
+        // Load into a static int a static value with topmost limb 0.
+        n1 = integer{-1};
+        size = 1;
+        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        ::mp_limb_t l = 0;
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
+                  make_uai(buffer.data()));
+        std::copy(reinterpret_cast<char *>(&l), reinterpret_cast<char *>(&l) + sizeof(l),
+                  make_uai(buffer.data() + sizeof(size)));
+        REQUIRE_THROWS_PREDICATE(
+            n1.binary_load(buffer.data()), std::invalid_argument, [](const std::invalid_argument &ex) {
+                return std::string(ex.what())
+                       == "Invalid data detected in the binary deserialisation of an integer: the most "
+                          "significant limb of the value cannot be zero";
+            });
+        REQUIRE(n1 == 0);
+
+        // Load into a static int a dynamic value with topmost limb 0.
+        n1 = integer{-1};
+        size = static_cast<mpz_size_t>(S::value + 1u);
+        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        std::array<::mp_limb_t, S::value + 1u> sbuffer{};
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
+                  make_uai(buffer.data()));
+        std::copy(reinterpret_cast<char *>(sbuffer.data()),
+                  reinterpret_cast<char *>(sbuffer.data()) + sizeof(::mp_limb_t) * unsigned(size),
+                  make_uai(buffer.data() + sizeof(size)));
+        REQUIRE_THROWS_PREDICATE(
+            n1.binary_load(buffer.data()), std::invalid_argument, [](const std::invalid_argument &ex) {
+                return std::string(ex.what())
+                       == "Invalid data detected in the binary deserialisation of an integer: the most "
+                          "significant limb of the value cannot be zero";
+            });
+        REQUIRE(n1 == 0);
+
+        // Load into a dynamic int a static value with topmost limb 0.
+        n1 = integer{-1};
+        n1.promote();
+        size = 1;
+        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        l = 0;
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
+                  make_uai(buffer.data()));
+        std::copy(reinterpret_cast<char *>(&l), reinterpret_cast<char *>(&l) + sizeof(l),
+                  make_uai(buffer.data() + sizeof(size)));
+        REQUIRE_THROWS_PREDICATE(
+            n1.binary_load(buffer.data()), std::invalid_argument, [](const std::invalid_argument &ex) {
+                return std::string(ex.what())
+                       == "Invalid data detected in the binary deserialisation of an integer: the most "
+                          "significant limb of the value cannot be zero";
+            });
+        REQUIRE(n1 == 0);
+
+        // Load into a dynamic int a dynamic value with topmost limb 0.
+        n1 = integer{-1};
+        n1.promote();
+        size = static_cast<mpz_size_t>(S::value + 1u);
+        buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
+        sbuffer = std::array<::mp_limb_t, S::value + 1u>{};
+        std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
+                  make_uai(buffer.data()));
+        std::copy(reinterpret_cast<char *>(sbuffer.data()),
+                  reinterpret_cast<char *>(sbuffer.data()) + sizeof(::mp_limb_t) * unsigned(size),
+                  make_uai(buffer.data() + sizeof(size)));
+        REQUIRE_THROWS_PREDICATE(
+            n1.binary_load(buffer.data()), std::invalid_argument, [](const std::invalid_argument &ex) {
+                return std::string(ex.what())
+                       == "Invalid data detected in the binary deserialisation of an integer: the most "
+                          "significant limb of the value cannot be zero";
+            });
+        REQUIRE(n1 == 0);
+
+        // Test errors in the vector and array interfaces.
+        std::array<char, 0> zero_arr;
+        REQUIRE(binary_save(n1, zero_arr) == 0u);
+        std::vector<char> zero_vec;
+        REQUIRE_THROWS_PREDICATE(binary_load(n1, zero_arr), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return std::string(ex.what())
+                   == "Invalid vector size in the deserialisation of an integer via a std::array: the std::array "
+                      "size must be at least "
+                          + std::to_string(sizeof(mpz_size_t)) + " bytes, but it is only 0 bytes";
+        });
+        REQUIRE_THROWS_PREDICATE(binary_load(n1, zero_vec), std::invalid_argument, [](const std::invalid_argument &ex) {
+            return std::string(ex.what())
+                   == "Invalid vector size in the deserialisation of an integer via a std::vector: the std::vector "
+                      "size must be at least "
+                          + std::to_string(sizeof(mpz_size_t)) + " bytes, but it is only 0 bytes";
+        });
+        std::array<char, sizeof(mpz_size_t) + sizeof(::mp_limb_t) * 2u> small_arr;
+        const mpz_size_t tmp_size = 3;
+        std::copy(reinterpret_cast<const char *>(&tmp_size),
+                  reinterpret_cast<const char *>(&tmp_size) + sizeof(mpz_size_t), make_uai(small_arr.data()));
+        REQUIRE_THROWS_PREDICATE(binary_load(n1, small_arr), std::invalid_argument,
+                                 [](const std::invalid_argument &ex) {
+                                     return std::string(ex.what())
+                                            == "Invalid vector size in the deserialisation of an integer via a "
+                                               "std::array: the number of limbs stored in the std::array (2) is less "
+                                               "than the integer size in limbs stored in the header of the vector (3)";
+                                 });
+        std::vector<char> small_vec;
+        small_vec.resize(sizeof(mpz_size_t) + sizeof(::mp_limb_t) * 2u);
+        std::copy(reinterpret_cast<const char *>(&tmp_size),
+                  reinterpret_cast<const char *>(&tmp_size) + sizeof(mpz_size_t), make_uai(small_vec.data()));
+        REQUIRE_THROWS_PREDICATE(binary_load(n1, small_vec), std::invalid_argument,
+                                 [](const std::invalid_argument &ex) {
+                                     return std::string(ex.what())
+                                            == "Invalid vector size in the deserialisation of an integer via a "
+                                               "std::vector: the number of limbs stored in the std::vector (2) is less "
+                                               "than the integer size in limbs stored in the header of the vector (3)";
+                                 });
+
+        // Test errors in the stream interface.
+        clear_ss();
+        n1 = 4;
+        REQUIRE(binary_load(n1, ss) == 0u);
+        REQUIRE(n1 == 4);
+        clear_ss();
+        size = 1;
+        ss.write(reinterpret_cast<const char *>(&size), sizeof(mpz_size_t));
+        REQUIRE(binary_load(n1, ss) == 0u);
+        REQUIRE(n1 == 4);
+        clear_ss();
+        ss.setstate(std::ios_base::failbit);
+        REQUIRE(binary_save(n1, ss) == 0u);
+    }
+};
+
+TEST_CASE("binary s11n")
+{
+    tuple_for_each(sizes{}, binary_s11n_tester{});
 }

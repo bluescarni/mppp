@@ -1,4 +1,4 @@
-// Copyright 2016-2017 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -935,7 +935,9 @@ public:
             return true;
         }
         // Num and den must be coprime.
-        return gcd(m_num, m_den).is_one();
+        MPPP_MAYBE_TLS int_t g;
+        gcd(g, m_num, m_den);
+        return g.is_one();
     }
     /// Sign.
     /**
@@ -2686,8 +2688,13 @@ inline int cmp(const rational<SSize> &op1, const integer<SSize> &op2)
 template <std::size_t SSize>
 inline int cmp(const integer<SSize> &op1, const rational<SSize> &op2)
 {
-    // Let's just hope this is guaranteed to be a smallish number.
-    return -cmp(op2, op1);
+    // NOTE: this will clamp the return value in the [-1,1] range,
+    // so not exactly identical to the GMP return value. It's still consistent
+    // with the rest of GMP/mp++ rational comparison functions.
+    // NOTE: we don't take directly the negative because it's not clear
+    // how large the returned value could be. Like this, we prevent any
+    // possible integral overflow shenanigans.
+    return -integral_sign(cmp(op2, op1));
 }
 
 /// Sign function.

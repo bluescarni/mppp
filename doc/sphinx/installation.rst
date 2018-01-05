@@ -9,8 +9,8 @@ on the following setups:
 
 * GCC 4.8 and later versions on GNU/Linux 32/64-bit,
 * Clang 3.8 and later versions on GNU/Linux 64-bit,
-* MSVC 2015 on Windows 32/64-bit,
-* Clang 4 on Windows 32/64-bit (with the ``clang-cl`` driver for MSVC),
+* MSVC 2015 and later versions on Windows 32/64-bit,
+* Clang 4 and later versions on Windows 32/64-bit (with the ``clang-cl`` driver for MSVC),
 * MinGW GCC 6 on Windows 64-bit,
 * Clang on OSX 64-bit (Xcode 6.4 and later),
 * Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).
@@ -102,6 +102,7 @@ If mp++ is installed in a standard prefix, on a typical GNU/Linux system you can
    $ g++ -std=c++11 main.cpp -lgmp
 
 .. note::
+
    The ``-std=c++11`` flag is not necessary if your GCC version is recent enough (i.e., for GCC 6 and later).
 
 If you installed mp++ with optional features enabled, you will need to link the required libraries as well. For instance,
@@ -110,6 +111,12 @@ if both MPFR and quadmath support are enabled, the compilation command on a mode
 .. code-block:: console
 
    $ g++ -std=c++11 main.cpp -lquadmath -lmpfr -lgmp
+
+.. note::
+
+   Unless the definition ``NDEBUG`` is activated at compile time, mp++ runs extensive
+   internal debug checks at runtime which carry a large performance penalty. Users are advised
+   to always define ``NDEBUG`` when compiling code using mp++ in ``Release`` builds.
 
 The full list of libraries that need to be linked when using mp++ is the following:
 
