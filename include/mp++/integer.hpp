@@ -62,7 +62,7 @@
 // clang-format on
 
 // We use the BitScanReverse(64) intrinsic in the implementation of limb_msnb(), but
-// only if we are *not* on MSVC+clang.
+// only if we are *not* on clang-cl: there, we can use GCC-style intrinsics.
 // https://msdn.microsoft.com/en-us/library/fbxyd7zd.aspx
 #if !defined(__clang__)
 #if _WIN64
@@ -1116,11 +1116,11 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 //   Probably better to wait for benchmarks before moving.
 // - performance improvements for arithmetic with C++ integrals? (e.g., use add_ui() and similar rather than cting
 //   temporary).
-// - regarding division, we should consider implementing additional variations:
-//   - division without remainder,
-//   - division considering only the abs value,
-//   - division knowing that the divisor is positive (for use in rational when canonicalising).
-//   Hopefully this helps closing the gap with FLINT regarding division.
+// - for s11n, we could consider implementing binary_save/load overloads based on iterators. These could return
+//   the iterator at the end of the serialised representation, and maybe the original iterator if errors
+//   occurred? Probably some code could be refactored/shared with the char * interface, taking advantage
+//   of the fact that std::copy() actually returns something. Longer term, we probably should add optional
+//   support for boost.serialization, cereal, etc.
 
 // NOTE: bits to keep in mind:
 // - the use of GMP_NUMB_MASK we make is not necessary currently, because the GMP API at the present time
@@ -1288,6 +1288,11 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
  * See the documentation of :cpp:func:`~mppp::integer::get_mpz_view()` for more details about the ``mpz_view`` class.
  * Via the GMP interfacing facilities, it is thus possible to use directly the GMP C API with
  * :cpp:class:`~mppp::integer` objects whenever necessary (e.g., if a GMP function has not been wrapped yet by mp++).
+ *
+ * The :cpp:class:`~mppp::integer` class supports a simple binary serialisation API, through member functions
+ * such as :cpp:func:`~mppp::integer::binary_save()` and :cpp:func:`~mppp::integer::binary_load()`, and the corresponding
+ * :ref:`free function overloads <integer_s11n>`. Examples of usage are described in the
+ * :ref:`integer tutorial <tutorial_integer_s11n>`.
  * \endrststar
  */
 template <std::size_t SSize>
