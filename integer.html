@@ -281,6 +281,10 @@ method, which allows to use <a class="reference internal" href="#_CPPv2N4mppp7in
 <p>See the documentation of <a class="reference internal" href="#_CPPv2NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal"><span class="pre">get_mpz_view()</span></code></a> for more details about the <code class="docutils literal"><span class="pre">mpz_view</span></code> class.
 Via the GMP interfacing facilities, it is thus possible to use directly the GMP C API with
 <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects whenever necessary (e.g., if a GMP function has not been wrapped yet by mp++).</p>
+<p>The <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> class supports a simple binary serialisation API, through member functions
+such as <a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_save()</span></code></a> and <a class="reference internal" href="#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_load()</span></code></a>, and the corresponding
+<a class="reference internal" href="#integer-s11n"><span class="std std-ref">free function overloads</span></a>. Examples of usage are described in the
+<a class="reference internal" href="tutorial_integer.html#tutorial-integer-s11n"><span class="std std-ref">integer tutorial</span></a>.</p>
  </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
