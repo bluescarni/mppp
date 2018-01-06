@@ -31,8 +31,10 @@
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.mathjax', 'breathe'
+    'sphinx.ext.mathjax', 'breathe', 'sphinx.ext.intersphinx'
 ]
+
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
 
 breathe_projects = {"mp++": "../doxygen/xml"}
 breathe_default_project = "mp++"
