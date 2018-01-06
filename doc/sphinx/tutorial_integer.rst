@@ -123,6 +123,8 @@ It must be noted that both :cpp:func:`~mppp::integer::get_mpz_t()` and :cpp:func
 have to be used carefully, as they return non-owning objects which can easily lead to dangling pointers or references, if misused.
 The documentation of the two functions explains in detail some of the potential pitfalls that users need to be aware of.
 
+.. _tutorial_integer_s11n:
+
 Serialisation
 -------------
 
