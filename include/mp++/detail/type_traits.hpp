@@ -25,8 +25,7 @@ inline namespace detail
 // http://en.cppreference.com/w/cpp/types/void_t
 #if MPPP_CPLUSPLUS >= 201703L
 
-template <typename... Ts>
-using void_t = std::void_t<Ts...>;
+using std::void_t;
 
 #else
 
@@ -72,14 +71,9 @@ using detected_t = typename detector<nonesuch, void, Op, Args...>::type;
 // http://en.cppreference.com/w/cpp/types/negation
 #if MPPP_CPLUSPLUS >= 201703L
 
-template <typename... Ts>
-using conjunction = std::conjunction<Ts...>;
-
-template <typename... Ts>
-using disjunction = std::disjunction<Ts...>;
-
-template <typename T>
-using negation = std::negation<T>;
+using std::conjunction;
+using std::disjunction;
+using std::negation;
 
 #else
 
@@ -116,14 +110,9 @@ struct negation : std::integral_constant<bool, !B::value> {
 // Small helpers, like C++14.
 #if MPPP_CPLUSPLUS >= 201402L
 
-template <bool B, typename T = void>
-using enable_if_t = std::enable_if_t<B, T>;
-
-template <typename T>
-using remove_cv_t = std::remove_cv_t<T>;
-
-template <typename T>
-using remove_extent_t = std::remove_extent_t<T>;
+using std::enable_if_t;
+using std::remove_cv_t;
+using std::remove_extent_t;
 
 #else
 
