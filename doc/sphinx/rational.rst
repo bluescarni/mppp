@@ -25,10 +25,15 @@ Concepts
    This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
    satisfies :cpp:concept:`~mppp::RationalInteroperable`.
 
+.. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalIntegralInteroperable
+
+   This concept is satisfied if the type ``T`` satisfies :cpp:concept:`~mppp::RationalInteroperable`
+   and it is not a C++ floating-point type.
+
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalCvrIntegralInteroperable
 
-   This concept is satisfied if ``T`` is a :cpp:concept:`~mppp::RationalCvrInteroperable` type and it is not
-   a floating-point type (after the removal of reference and cv qualifiers).
+   This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
+   satisfies :cpp:concept:`~mppp::RationalIntegralInteroperable`.
 
 .. cpp:concept:: template <typename T, typename U> mppp::RationalOpTypes
 
@@ -71,6 +76,16 @@ Comparison
 ~~~~~~~~~~
 
 .. doxygengroup:: rational_comparison
+   :content-only:
+
+.. _rational_ntheory:
+
+Number theoretic functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 0.8
+
+.. doxygengroup:: rational_ntheory
    :content-only:
 
 .. _rational_exponentiation:

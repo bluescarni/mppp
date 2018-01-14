@@ -51,6 +51,17 @@ using rational_interoperable_enabler = enable_if_t<is_rational_interoperable<T, 
 #endif
 
 template <typename T, std::size_t SSize>
+using is_rational_integral_interoperable
+    = conjunction<is_rational_interoperable<T, SSize>, negation<std::is_floating_point<T>>>;
+
+template <typename T, std::size_t SSize>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
+#else
+using rational_integral_interoperable_enabler = enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int>;
+#endif
+
+template <typename T, std::size_t SSize>
 using is_rational_cvr_interoperable = is_rational_interoperable<uncvref_t<T>, SSize>;
 
 template <typename T, std::size_t SSize>
@@ -61,8 +72,7 @@ using rational_cvr_interoperable_enabler = enable_if_t<is_rational_cvr_interoper
 #endif
 
 template <typename T, std::size_t SSize>
-using is_rational_cvr_integral_interoperable
-    = conjunction<is_rational_cvr_interoperable<T, SSize>, negation<std::is_floating_point<uncvref_t<T>>>>;
+using is_rational_cvr_integral_interoperable = is_rational_integral_interoperable<uncvref_t<T>, SSize>;
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1139,6 +1149,13 @@ struct are_rational_op_types<T, rational<SSize>, enable_if_t<is_rational_interop
     : std::true_type {
 };
 
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RationalOpTypes = are_rational_op_types<T, U>::value;
+#else
+using rational_op_types_enabler = enable_if_t<are_rational_op_types<T, U>::value, int>;
+#endif
+
 // Implementation of binary add/sub. The NewRop flag indicates that
 // rop is a def-cted rational distinct from op1 and op2.
 template <bool AddOrSub, bool NewRop, std::size_t SSize>
@@ -1278,13 +1295,6 @@ inline bool get(T &rop, const rational<SSize> &q)
 }
 
 /** @} */
-
-template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool RationalOpTypes = are_rational_op_types<T, U>::value;
-#else
-using rational_op_types_enabler = enable_if_t<are_rational_op_types<T, U>::value, int>;
-#endif
 
 /** @defgroup rational_arithmetic rational_arithmetic
  *  @{
@@ -2743,6 +2753,81 @@ template <std::size_t SSize>
 inline bool is_zero(const rational<SSize> &q)
 {
     return q.is_zero();
+}
+
+/** @} */
+
+/** @defgroup rational_ntheory rational_ntheory
+ *  @{
+ */
+
+inline namespace detail
+{
+
+// binomial() implementation.
+// rational - integer overload.
+// NOTE: this is very simplistic and probably really slow. Need to investigate
+// better ways of doing this.
+template <std::size_t SSize>
+inline rational<SSize> rational_binomial_impl(const rational<SSize> &t, const integer<SSize> &b)
+{
+    if (t.get_den().is_one()) {
+        // If top is an integer, forward to the integer overload of binomial().
+        return rational<SSize>{binomial(t.get_num(), b)};
+    }
+    const auto b_sgn = b.sgn();
+    if (b_sgn == -1) {
+        // (rational negative-int) will always give zero.
+        return rational<SSize>{};
+    }
+    if (b_sgn == 0) {
+        // Zero at bottom results always in 1.
+        return rational<SSize>{1};
+    }
+    // Falling factorial implementation.
+    rational<SSize> tmp{t}, retval = t / b;
+    integer<SSize> i{b};
+    for (--i, --tmp; i.sgn() == 1; --i, --tmp) {
+        retval *= tmp;
+        retval /= i;
+    }
+    return retval;
+}
+
+// rational - integral overload.
+template <std::size_t SSize, typename T>
+inline rational<SSize> rational_binomial_impl(const rational<SSize> &t, const T &b)
+{
+    return rational_binomial_impl(t, integer<SSize>{b});
+}
+}
+
+/// Binomial coefficient for \link mppp::rational rational\endlink.
+/**
+ * \rststar
+ * This function will compute the binomial coefficient :math:`{x \choose y}`. If ``x``
+ * represents an integral value, the calculation is forwarded to the implementation of
+ * the binomial coefficient for :cpp:class:`~mppp::integer`. Otherwise, an implementation
+ * based on the falling factorial is employed.
+ * \endrststar
+ *
+ * @param x the top value.
+ * @param y the bottom value.
+ *
+ * @return \f$ {x \choose y} \f$.
+ *
+ * @throws unspecified any exception thrown by the implementation of
+ * the binomial coefficient for \link mppp::integer integer\endlink.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline rational<SSize> binomial(const rational<SSize> &x, const RationalIntegralInteroperable<SSize> &y)
+#else
+template <std::size_t SSize, typename T, rational_integral_interoperable_enabler<T, SSize> = 0>
+inline rational<SSize> binomial(const rational<SSize> &x, const T &y)
+#endif
+{
+    return rational_binomial_impl(x, y);
 }
 
 /** @} */

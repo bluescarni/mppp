@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.8 (unreleased)
+----------------
+
+New
+~~~
+
+- Add an implementation of the binomial coefficient for rational top arguments
+  (`#113 <https://github.com/bluescarni/mppp/pull/113>`__).
+
 0.7 (2018-01-11)
 ----------------
 
