@@ -53,7 +53,7 @@ struct binomial_tester {
         REQUIRE(binomial(rational{5, 2}, integer{2}) == rational{15, 8});
         REQUIRE(binomial(rational{-5, 2}, 2) == rational{35, 8});
         REQUIRE(binomial(rational{3, 4}, 2) == rational{-3, 32});
-        REQUIRE(binomial(rational{3, 4}, 10) == -rational{1057485, 268435456ll});
+        REQUIRE(binomial(rational{3, 4}, 10) == -rational{1057485l, 268435456ll});
         REQUIRE(binomial(rational{3, 4}, 0) == 1);
         REQUIRE(binomial(rational{3, 4}, -1) == 0);
         REQUIRE(binomial(rational{3, 4}, -2) == 0);
