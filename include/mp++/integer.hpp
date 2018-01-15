@@ -7227,7 +7227,7 @@ inline std::size_t binary_size(const integer<SSize> &n)
     return n.binary_size();
 }
 
-inline namespace impl
+inline namespace detail
 {
 
 // Detector for the presence of binary_save().
