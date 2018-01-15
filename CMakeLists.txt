@@ -1,6 +1,6 @@
 cmake_policy(SET CMP0048 NEW)
 
-project(mp++ VERSION 0.7 LANGUAGES CXX C)
+project(mp++ VERSION 0.8 LANGUAGES CXX C)
 
 cmake_minimum_required(VERSION 3.3.0)
 
@@ -123,7 +123,7 @@ install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION lib/cmake/mp++)
 # Take care of versioning.
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" VERSION ${mp++_VERSION}
-	COMPATIBILITY ExactVersion)
+	COMPATIBILITY SameMajorVersion)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATION "lib/cmake/mp++")
 
 # Installation of the header files.

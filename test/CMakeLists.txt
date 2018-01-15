@@ -80,6 +80,7 @@ if(NOT MINGW)
     # NOTE: same as above.
     ADD_MPPP_TESTCASE(rational_basic)
 endif()
+ADD_MPPP_TESTCASE(rational_binomial)
 ADD_MPPP_TESTCASE(rational_hash)
 ADD_MPPP_TESTCASE(rational_inv)
 ADD_MPPP_TESTCASE(rational_is_zero_one)
