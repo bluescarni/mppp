@@ -1,6 +1,22 @@
 Changelog
 =========
 
+0.8 (unreleased)
+----------------
+
+New
+~~~
+
+- Add an implementation of the binomial coefficient for rational top arguments
+  (`#113 <https://github.com/bluescarni/mppp/pull/113>`__).
+
+Changes
+~~~~~~~
+
+- In the CMake config-file package produced by the installation process, ensure
+  that the installed package version is considered compatible with any other version with the same
+  major version number (`#113 <https://github.com/bluescarni/mppp/pull/113>`__).
+
 0.7 (2018-01-11)
 ----------------
 

@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Multiprecision rationals &#8212; mp++ 0.7 documentation</title>
+    <title>Multiprecision rationals &#8212; mp++ 0.8 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7',
+        VERSION:     '0.8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -47,7 +47,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           mp++</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.8</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -88,6 +88,7 @@
 <li><a class="reference internal" href="#conversion">Conversion</a></li>
 <li><a class="reference internal" href="#arithmetic">Arithmetic</a></li>
 <li><a class="reference internal" href="#comparison">Comparison</a></li>
+<li><a class="reference internal" href="#number-theoretic-functions">Number theoretic functions</a></li>
 <li><a class="reference internal" href="#exponentiation">Exponentiation</a></li>
 <li><a class="reference internal" href="#input-output">Input/Output</a></li>
 <li><a class="reference internal" href="#other">Other</a></li>
@@ -901,10 +902,17 @@ satisfies <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21Rati
 </dd></dl>
 
 <dl class="concept">
+<dt id="_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE">
+template&lt;typename <code class="descname">T</code>, std::size_t <code class="descclassname"></code><code class="descname">SSize</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">RationalIntegralInteroperable</code><a class="headerlink" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if the type <code class="docutils literal"><span class="pre">T</span></code> satisfies <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalInteroperable</span></code></a>
+and it is not a C++ floating-point type.</p>
+</dd></dl>
+
+<dl class="concept">
 <dt id="_CPPv2I0_NSt6size_tEEN4mppp32RationalCvrIntegralInteroperableE">
 template&lt;typename <code class="descname">T</code>, std::size_t <code class="descclassname"></code><code class="descname">SSize</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">RationalCvrIntegralInteroperable</code><a class="headerlink" href="#_CPPv2I0_NSt6size_tEEN4mppp32RationalCvrIntegralInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied if <code class="docutils literal"><span class="pre">T</span></code> is a <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp24RationalCvrInteroperableE" title="mppp::RationalCvrInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalCvrInteroperable</span></code></a> type and it is not
-a floating-point type (after the removal of reference and cv qualifiers).</p>
+<dd><p>This concept is satisfied if the type <code class="docutils literal"><span class="pre">T</span></code>, after the removal of reference and cv qualifiers,
+satisfies <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="mppp::RationalIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalIntegralInteroperable</span></code></a>.</p>
 </dd></dl>
 
 <dl class="concept">
@@ -1294,6 +1302,40 @@ not be altered.</p>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">q</span></code>: the rational to be tested.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="section" id="number-theoretic-functions">
+<span id="rational-ntheory"></span><h3>Number theoretic functions<a class="headerlink" href="#number-theoretic-functions" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.8.</span></p>
+</div>
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp8binomialERK8rationalI5SSizeERK29RationalIntegralInteroperableI5SSizeE">
+<span id="mppp::binomial__rational:SSize:CR.RationalIntegralInteroperable:SSize:CR"></span><span class="target" id="group__rational__ntheory_1ga88b383a89dd00c8565379f6bedf8689c"></span><a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">binomial</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="mppp::RationalIntegralInteroperable">RationalIntegralInteroperable</a>&lt;SSize&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8binomialERK8rationalI5SSizeERK29RationalIntegralInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binomial coefficient for <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p>
+<p>This function will compute the binomial coefficient <span class="math">\({x \choose y}\)</span>. If <code class="docutils literal"><span class="pre">x</span></code>
+represents an integral value, the calculation is forwarded to the implementation of
+the binomial coefficient for <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>. Otherwise, an implementation
+based on the falling factorial is employed.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><span class="math">\( {x \choose y} \)</span>.</dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">x</span></code>: the top value. </li>
+<li><code class="docutils literal"><span class="pre">y</span></code>: the bottom value.</li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the implementation of the binomial coefficient for <a class="reference internal" href="integer.html#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </li>
 </ul>
 </dd>
 </dl>
