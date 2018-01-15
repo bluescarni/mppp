@@ -1290,9 +1290,9 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
  * :cpp:class:`~mppp::integer` objects whenever necessary (e.g., if a GMP function has not been wrapped yet by mp++).
  *
  * The :cpp:class:`~mppp::integer` class supports a simple binary serialisation API, through member functions
- * such as :cpp:func:`~mppp::integer::binary_save()` and :cpp:func:`~mppp::integer::binary_load()`, and the corresponding
- * :ref:`free function overloads <integer_s11n>`. Examples of usage are described in the
- * :ref:`integer tutorial <tutorial_integer_s11n>`.
+ * such as :cpp:func:`~mppp::integer::binary_save()` and :cpp:func:`~mppp::integer::binary_load()`, and the
+ * corresponding :ref:`free function overloads <integer_s11n>`. Examples of usage are described in the :ref:`integer
+ * tutorial <tutorial_integer_s11n>`.
  * \endrststar
  */
 template <std::size_t SSize>
@@ -3277,27 +3277,27 @@ struct is_integer<integer<SSize>> : std::true_type {
 }
 
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool IntegerOpTypes
-    = is_same_ssize_integer<T, U>::value
-      || (is_integer<T>::value && CppInteroperable<U>) || (is_integer<U>::value && CppInteroperable<T>);
-#else
-using integer_op_types_enabler
-    = enable_if_t<disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_cpp_interoperable<U>>,
-                              conjunction<is_integer<U>, is_cpp_interoperable<T>>>::value,
-                  int>;
-#endif
+using are_integer_op_types
+    = disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_cpp_interoperable<U>>,
+                  conjunction<is_integer<U>, is_cpp_interoperable<T>>>;
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool IntegerIntegralOpTypes
-    = is_same_ssize_integer<T, U>::value
-      || (is_integer<T>::value && CppIntegralInteroperable<U>) || (is_integer<U>::value && CppIntegralInteroperable<T>);
+concept bool IntegerOpTypes = are_integer_op_types<T, U>::value;
 #else
-using integer_integral_op_types_enabler
-    = enable_if_t<disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_supported_integral<U>>,
-                              conjunction<is_integer<U>, is_supported_integral<T>>>::value,
-                  int>;
+using integer_op_types_enabler = enable_if_t<are_integer_op_types<T, U>::value, int>;
+#endif
+
+template <typename T, typename U>
+using are_integer_integral_op_types
+    = disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_supported_integral<U>>,
+                  conjunction<is_integer<U>, is_supported_integral<T>>>;
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerIntegralOpTypes = are_integer_integral_op_types<T, U>::value;
+#else
+using integer_integral_op_types_enabler = enable_if_t<are_integer_integral_op_types<T, U>::value, int>;
 #endif
 
 /** @defgroup integer_arithmetic integer_arithmetic
