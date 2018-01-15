@@ -10,6 +10,7 @@
 #include <tuple>
 #include <type_traits>
 
+#include <mp++/config.hpp>
 #include <mp++/rational.hpp>
 
 #include "test_utils.hpp"
@@ -41,14 +42,25 @@ struct binomial_tester {
         REQUIRE(binomial(rational{5}, static_cast<signed char>(-2)) == 0);
         REQUIRE(binomial(rational{-5}, -2ll) == 0);
         REQUIRE(binomial(rational{-5}, 2ul) == 15);
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(binomial(rational{-5}, __int128_t(-2)) == 0);
+        REQUIRE(binomial(rational{-5}, __uint128_t(2)) == 15);
+#endif
         // First special case: choose(rational, neg int) is always zero.
         REQUIRE(binomial(rational{5, 2}, integer{-2}) == 0);
         REQUIRE(binomial(rational{-5, 2}, -2l) == 0);
         REQUIRE(binomial(rational{5, 2}, static_cast<short>(-2)) == 0);
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(binomial(rational{5, 2}, __int128_t(-2)) == 0);
+#endif
         // Second special case: choose(rational, 0) is always one.
         REQUIRE(binomial(rational{5, 2}, integer{0}) == 1);
         REQUIRE(binomial(rational{-5, 2}, 0l) == 1);
         REQUIRE(binomial(rational{5, 2}, static_cast<unsigned short>(0)) == 1);
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(binomial(rational{5, 2}, __int128_t(0)) == 1);
+        REQUIRE(binomial(rational{5, 2}, __uint128_t(0)) == 1);
+#endif
         // Main case.
         REQUIRE(binomial(rational{5, 2}, integer{2}) == rational{15, 8});
         REQUIRE(binomial(rational{-5, 2}, 2) == rational{35, 8});
@@ -63,6 +75,10 @@ struct binomial_tester {
         REQUIRE(binomial(rational{3, -4}, 5) == -rational{4389, 8192});
         REQUIRE(binomial(rational{3, -4}, -1) == 0);
         REQUIRE(binomial(rational{3, -4}, -5) == 0);
+#if defined(MPPP_HAVE_GCC_INT128)
+        REQUIRE(binomial(rational{3, 4}, __int128_t(10)) == -rational{1057485l, 268435456ll});
+        REQUIRE(binomial(rational{3, -4}, __uint128_t(5)) == -rational{4389, 8192});
+#endif
     }
 };
 
