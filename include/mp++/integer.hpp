@@ -3274,12 +3274,9 @@ struct is_integer : std::false_type {
 template <std::size_t SSize>
 struct is_integer<integer<SSize>> : std::true_type {
 };
-}
 
 template <typename T, typename U>
-using are_integer_op_types
-    = disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_cpp_interoperable<U>>,
-                  conjunction<is_integer<U>, is_cpp_interoperable<T>>>;
+using are_integer_op_types = is_detected<integer_common_t, T, U>;
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -3299,6 +3296,7 @@ concept bool IntegerIntegralOpTypes = are_integer_integral_op_types<T, U>::value
 #else
 using integer_integral_op_types_enabler = enable_if_t<are_integer_integral_op_types<T, U>::value, int>;
 #endif
+}
 
 /** @defgroup integer_arithmetic integer_arithmetic
  *  @{

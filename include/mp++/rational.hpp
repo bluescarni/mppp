@@ -1140,26 +1140,8 @@ template <typename T, typename U>
 using rational_common_t = typename rational_common_type<T, U>::type;
 
 // Implementation of the rational op types concept, used in various operators.
-// NOTE: this implementation differs from the one in integer.hpp because here we have
-// to know the SSize of a rational to understand if a type is interoperable with it.
-// For integer, we don't need that and we can get away easily with a simple disjunction.
-template <typename T, typename U, typename = void>
-struct are_rational_op_types : std::false_type {
-};
-
-template <std::size_t SSize>
-struct are_rational_op_types<rational<SSize>, rational<SSize>> : std::true_type {
-};
-
-template <std::size_t SSize, typename T>
-struct are_rational_op_types<rational<SSize>, T, enable_if_t<is_rational_interoperable<T, SSize>::value>>
-    : std::true_type {
-};
-
-template <typename T, std::size_t SSize>
-struct are_rational_op_types<T, rational<SSize>, enable_if_t<is_rational_interoperable<T, SSize>::value>>
-    : std::true_type {
-};
+template <typename T, typename U>
+using are_rational_op_types = is_detected<rational_common_t, T, U>;
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
