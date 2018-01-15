@@ -1291,8 +1291,8 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
  *
  * The :cpp:class:`~mppp::integer` class supports a simple binary serialisation API, through member functions
  * such as :cpp:func:`~mppp::integer::binary_save()` and :cpp:func:`~mppp::integer::binary_load()`, and the
- * corresponding :ref:`free function overloads <integer_s11n>`. Examples of usage are described in the :ref:`integer
- * tutorial <tutorial_integer_s11n>`.
+ * corresponding :ref:`free function overloads <integer_s11n>`. Examples of usage are described in the
+ * :ref:`integer tutorial <tutorial_integer_s11n>`.
  * \endrststar
  */
 template <std::size_t SSize>
