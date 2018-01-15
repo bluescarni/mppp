@@ -29,9 +29,22 @@ Common concepts
    The GCC-style extended 128-bit integral types ``__int128_t`` and ``__uint128_t`` are included as well, if supported
    on the current platform/compiler combination (see also the :c:macro:`MPPP_HAVE_GCC_INT128` definition).
 
+   A corresponding boolean type trait called ``is_cpp_interoperable`` is also available (even if the compiler does
+   not support concepts).
+
 .. cpp:concept:: template <typename T> mppp::CppIntegralInteroperable
 
    This concept is satisfied if ``T`` is an integral :cpp:concept:`~mppp::CppInteroperable` type.
+
+   A corresponding boolean type trait called ``is_cpp_integral_interoperable`` is also available (even if the compiler does
+   not support concepts).
+
+.. cpp:concept:: template <typename T> mppp::CppFloatingPointInteroperable
+
+   This concept is satisfied if ``T`` is a floating-point :cpp:concept:`~mppp::CppInteroperable` type.
+
+   A corresponding boolean type trait called ``is_cpp_floating_point_interoperable`` is also available (even if the compiler does
+   not support concepts).
 
 .. cpp:concept:: template <typename T> mppp::StringType
 

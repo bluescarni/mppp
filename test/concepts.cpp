@@ -31,18 +31,36 @@ void check_dispatch(const T &s)
 
 TEST_CASE("concepts")
 {
-    REQUIRE(is_supported_integral<int>::value);
-    REQUIRE(!is_supported_integral<int &>::value);
-    REQUIRE(!is_supported_integral<float>::value);
-    REQUIRE(!is_supported_integral<double>::value);
-    REQUIRE(!is_supported_integral<double &>::value);
-    REQUIRE(!is_supported_integral<void>::value);
+    REQUIRE(is_cpp_integral_interoperable<int>::value);
+    REQUIRE(!is_cpp_integral_interoperable<int &>::value);
+    REQUIRE(!is_cpp_integral_interoperable<float>::value);
+    REQUIRE(!is_cpp_integral_interoperable<double>::value);
+    REQUIRE(!is_cpp_integral_interoperable<double &>::value);
+    REQUIRE(!is_cpp_integral_interoperable<void>::value);
 #if defined(MPPP_HAVE_GCC_INT128)
-    REQUIRE(is_supported_integral<__int128_t>::value);
-    REQUIRE(is_supported_integral<__uint128_t>::value);
-    REQUIRE(!is_supported_integral<__uint128_t &>::value);
-    REQUIRE(!is_supported_integral<const __int128_t>::value);
+    REQUIRE(is_cpp_integral_interoperable<__int128_t>::value);
+    REQUIRE(is_cpp_integral_interoperable<__uint128_t>::value);
+    REQUIRE(!is_cpp_integral_interoperable<__uint128_t &>::value);
+    REQUIRE(!is_cpp_integral_interoperable<const __int128_t>::value);
 #endif
+    REQUIRE(is_cpp_floating_point_interoperable<float>::value);
+    REQUIRE(is_cpp_floating_point_interoperable<double>::value);
+    REQUIRE(!is_cpp_floating_point_interoperable<float &>::value);
+    REQUIRE(!is_cpp_floating_point_interoperable<const double>::value);
+    REQUIRE(!is_cpp_floating_point_interoperable<const double &>::value);
+    REQUIRE(!is_cpp_floating_point_interoperable<void>::value);
+    REQUIRE(!is_cpp_floating_point_interoperable<std::string>::value);
+#if defined(MPPP_WITH_MPFR)
+    REQUIRE(is_cpp_floating_point_interoperable<long double>::value);
+    REQUIRE(!is_cpp_floating_point_interoperable<long double &&>::value);
+#else
+    REQUIRE(!is_cpp_floating_point_interoperable<long double>::value);
+#endif
+    REQUIRE(!is_cpp_interoperable<void>::value);
+    REQUIRE(!is_cpp_interoperable<std::string>::value);
+    REQUIRE(!is_cpp_interoperable<const int>::value);
+    REQUIRE(!is_cpp_interoperable<char &&>::value);
+
     REQUIRE(is_string_type<char *>::value);
     REQUIRE(is_string_type<const char *>::value);
     REQUIRE(is_string_type<char[]>::value);
