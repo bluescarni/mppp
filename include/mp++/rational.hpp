@@ -104,6 +104,15 @@ template <std::size_t SSize>
 struct is_rational<rational<SSize>> : std::true_type {
 };
 
+// Detect rationals with the same static size.
+template <typename T, typename U>
+struct is_same_ssize_rational : std::false_type {
+};
+
+template <std::size_t SSize>
+struct is_same_ssize_rational<rational<SSize>, rational<SSize>> : std::true_type {
+};
+
 // mpq_view getter fwd declaration.
 // NOTE: the returned mpq_struct_t should always be marked as const, as we cannot modify its content
 // (due to the use of const_cast() within the mpz view machinery).
@@ -1131,6 +1140,9 @@ template <typename T, typename U>
 using rational_common_t = typename rational_common_type<T, U>::type;
 
 // Implementation of the rational op types concept, used in various operators.
+// NOTE: this implementation differs from the one in integer.hpp because here we have
+// to know the SSize of a rational to understand if a type is interoperable with it.
+// For integer, we don't need that and we can get away easily with a simple disjunction.
 template <typename T, typename U, typename = void>
 struct are_rational_op_types : std::false_type {
 };
