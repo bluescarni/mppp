@@ -6833,7 +6833,7 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 /**
  * \rststar
  * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is :cpp:class:`~mppp::integer`.
+ * The return type is always an :cpp:class:`~mppp::integer`.
  *
  * This function will compute the binomial coefficient :math:`{{n}\choose{k}}`, supporting integral input values.
  * The implementation can handle positive and negative values for both the top and the bottom argument.
@@ -6852,14 +6852,12 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
  * @throws std::overflow_error if \p k is outside an implementation-defined range.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline auto binomial(const T &n, const IntegerIntegralOpTypes<T> &k)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline integer_common_t<T, U> binomial(const T &n, const U &k)
 #endif
-    inline integer_common_t<T, U> binomial(const T &n, const U &k)
 {
     return binomial_impl(n, k);
 }
@@ -6933,7 +6931,7 @@ inline int probab_prime_p(const integer<SSize> &n, int reps = 25)
  *  @{
  */
 
-/// Ternary integer exponentiation.
+/// Ternary exponentiation for \link mppp::integer integer\endlink.
 /**
  * This function will set \p rop to <tt>base**exp</tt>.
  *
@@ -6951,7 +6949,7 @@ inline integer<SSize> &pow_ui(integer<SSize> &rop, const integer<SSize> &base, u
     return rop = &tmp.m_mpz;
 }
 
-/// Binary integer exponentiation.
+/// Binary exponentiation for \link mppp::integer integer\endlink.
 /**
  * @param base the base.
  * @param exp the exponent.
@@ -7034,16 +7032,9 @@ inline T pow_impl(const T &base, const integer<SSize> &exp)
 }
 }
 
-/// Binary exponentiation.
+/// Generic binary exponentiation for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
- *   type of the result is ``F``; otherwise,
- * * the type of the result is :cpp:class:`~mppp::integer`.
- *
  * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
  * is a floating-point value, then the result will be computed via ``std::pow()`` and it will also be a
  * floating-point value. Otherwise, the result will be an :cpp:class:`~mppp::integer`.
@@ -7060,8 +7051,13 @@ inline T pow_impl(const T &base, const integer<SSize> &exp)
  * of <tt>unsigned long</tt>.
  * @throws zero_division_error if \p base and \p exp are integrals and \p base is zero and \p exp is negative.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto pow(const T &base, const IntegerOpTypes<T> &exp)
+#else
 template <typename T, typename U>
 inline integer_common_t<T, U> pow(const T &base, const U &exp)
+#endif
 {
     return pow_impl(base, exp);
 }
@@ -7466,10 +7462,9 @@ inline integer<SSize> operator+(const integer<SSize> &n)
     return n;
 }
 
-/// Binary addition operator.
+/// Binary addition operator for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -7483,8 +7478,13 @@ inline integer<SSize> operator+(const integer<SSize> &n)
  *
  * @return <tt>op1 + op2</tt>.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator+(const T &op1, const IntegerOpTypes<T> &op2)
+#else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
+#endif
 {
     return dispatch_binary_add(op1, op2);
 }
@@ -7623,10 +7623,9 @@ integer<SSize> operator-(const integer<SSize> &n)
     return retval;
 }
 
-/// Binary subtraction operator.
+/// Binary subtraction operator for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -7640,8 +7639,13 @@ integer<SSize> operator-(const integer<SSize> &n)
  *
  * @return <tt>op1 - op2</tt>.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator-(const T &op1, const IntegerOpTypes<T> &op2)
+#else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
+#endif
 {
     return dispatch_binary_sub(op1, op2);
 }
@@ -7766,10 +7770,9 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
 }
 }
 
-/// Binary multiplication operator.
+/// Binary multiplication operator for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -7783,8 +7786,13 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
  *
  * @return <tt>op1 * op2</tt>.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator*(const T &op1, const IntegerOpTypes<T> &op2)
+#else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
+#endif
 {
     return dispatch_binary_mul(op1, op2);
 }
@@ -7923,10 +7931,9 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
 }
 }
 
-/// Binary division operator.
+/// Binary division operator for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -7942,8 +7949,13 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
  *
  * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator/(const T &n, const IntegerOpTypes<T> &d)
+#else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator/(const T &n, const U &d)
+#endif
 {
     return dispatch_binary_div(n, d);
 }
@@ -7971,11 +7983,10 @@ inline T &operator/=(T &rop, const U &op)
     return rop;
 }
 
-/// Binary modulo operator.
+/// Binary modulo operator for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is :cpp:class:`~mppp::integer`.
+ * The return type is always an :cpp:class:`~mppp::integer`.
  * \endrststar
  *
  * @param n the dividend.
@@ -7986,14 +7997,12 @@ inline T &operator/=(T &rop, const U &op)
  * @throws zero_division_error if \p d is zero.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline auto operator%(const T &n, const IntegerIntegralOpTypes<T> &d)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline integer_common_t<T, U> operator%(const T &n, const U &d)
 #endif
-    inline integer_common_t<T, U> operator%(const T &n, const U &d)
 {
     return dispatch_binary_mod(n, d);
 }
@@ -8393,8 +8402,7 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
  * This operator returns the bitwise OR of ``op1`` and ``op2``. Negative operands
  * are treated as-if they were represented using two's complement.
  *
- * The operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is :cpp:class:`~mppp::integer`.
+ * The return type is always an :cpp:class:`~mppp::integer`.
  * \endrststar
  *
  * @param op1 the first operand.
@@ -8403,14 +8411,12 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
  * @return the bitwise OR of ``op1`` and ``op2``.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline auto operator|(const T &op1, const IntegerIntegralOpTypes<T> &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline integer_common_t<T, U> operator|(const T &op1, const U &op2)
 #endif
-    inline integer_common_t<T, U> operator|(const T &op1, const U &op2)
 {
     return dispatch_operator_or(op1, op2);
 }
@@ -8491,8 +8497,7 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
  * This operator returns the bitwise AND of ``op1`` and ``op2``. Negative operands
  * are treated as-if they were represented using two's complement.
  *
- * The operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is :cpp:class:`~mppp::integer`.
+ * The return type is always an :cpp:class:`~mppp::integer`.
  * \endrststar
  *
  * @param op1 the first operand.
@@ -8501,14 +8506,12 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
  * @return the bitwise AND of ``op1`` and ``op2``.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline auto operator&(const T &op1, const IntegerIntegralOpTypes<T> &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline integer_common_t<T, U> operator&(const T &op1, const U &op2)
 #endif
-    inline integer_common_t<T, U> operator&(const T &op1, const U &op2)
 {
     return dispatch_operator_and(op1, op2);
 }
@@ -8589,8 +8592,7 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
  * This operator returns the bitwise XOR of ``op1`` and ``op2``. Negative operands
  * are treated as-if they were represented using two's complement.
  *
- * The operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is :cpp:class:`~mppp::integer`.
+ * The return type is always an :cpp:class:`~mppp::integer`.
  * \endrststar
  *
  * @param op1 the first operand.
@@ -8599,14 +8601,12 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
  * @return the bitwise XOR of ``op1`` and ``op2``.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline auto operator^(const T &op1, const IntegerIntegralOpTypes<T> &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline integer_common_t<T, U> operator^(const T &op1, const U &op2)
 #endif
-    inline integer_common_t<T, U> operator^(const T &op1, const U &op2)
 {
     return dispatch_operator_xor(op1, op2);
 }
