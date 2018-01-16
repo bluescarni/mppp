@@ -7,11 +7,17 @@ Changelog
 New
 ~~~
 
+- Expose various internal type traits in the public API (`#114 <https://github.com/bluescarni/mppp/pull/114>`__).
+
 - Add an implementation of the binomial coefficient for rational top arguments
   (`#113 <https://github.com/bluescarni/mppp/pull/113>`__).
 
 Changes
 ~~~~~~~
+
+- When C++ concepts are enabled, various functions now use automatically-deduced return types
+  to simplify the implementation and improve the generated documentation
+  (`#114 <https://github.com/bluescarni/mppp/pull/114>`__).
 
 - In the CMake config-file package produced by the installation process, ensure
   that the installed package version is considered compatible with any other version with the same
