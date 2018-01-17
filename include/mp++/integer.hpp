@@ -6832,11 +6832,10 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 /// Generic binomial coefficient.
 /**
  * \rststar
- * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is always an :cpp:class:`~mppp::integer`.
- *
  * This function will compute the binomial coefficient :math:`{{n}\choose{k}}`, supporting integral input values.
  * The implementation can handle positive and negative values for both the top and the bottom argument.
+ *
+ * The return type is always an :cpp:class:`~mppp::integer`.
  *
  * .. seealso::
  *
