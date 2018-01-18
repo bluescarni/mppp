@@ -92,6 +92,8 @@ Let's take a look at an example of a pybind11 module enabling automatic translat
         m.def("test_unordered_map_conversion", test_unordered_map<mppp::rational<1>>);
         m.def("test_unordered_map_conversion", test_unordered_map<mppp::real128>);
         m.def("test_unordered_map_conversion", test_unordered_map<mppp::real>);
+
+        m.def("test_zero_division_error", []() { return mppp::integer<1>{1} / 0; });
     }
 
 Note that we have exposed functions which just return a copy of their input parameter.
@@ -166,23 +168,27 @@ overloads with :cpp:class:`~mppp::real128` arguments should be exposed **before*
 (otherwise, the :cpp:class:`~mppp::real` overload will always be preferred).
 
 There's an important caveat to keep in mind when translating to/from :cpp:class:`~mppp::real128`. The IEEE 754 quadruple precision
-format, implemented by :cpp:class:`~mppp::real128`, has a limited exponent range. For instance, the value :math:`2^{-30000}` becomes
-simply zero in quadruple precision, but, in mpmath, it doesn't:
+format, implemented by :cpp:class:`~mppp::real128`, has a limited exponent range. The value :math:`2^{-30000}`, for instance, becomes
+simply zero in quadruple precision, and :math:`2^{30000}` becomes :math:`+\infty`:
 
 >>> mp.prec = 113
->>> mpf(2)**-30000
-mpf('1.25930254358409145729153078521520406e-9031')
-
-This happens because mpmath features a much larger (practically unlimited) range for the value of the exponent.
-As a consequence, a conversion from ``mpf`` to :cpp:class:`~mppp::real128` will **not** preserve the exact value if the absolute value of the
-exponent is too large:
-
 >>> p.test_real128_conversion(mpf(2)**-30000)
 mpf('0.0')
 >>> p.test_real128_conversion(mpf(2)**30000)
 mpf('+inf')
 
-Finally, we can verify that the conversion between mp++ and Python works also when containers are involved:
+In mpmath, however, :math:`2^{-30000}` and :math:`2^{30000}` are correctly computed to quadruple precision:
+
+>>> mpf(2)**-30000
+mpf('1.25930254358409145729153078521520406e-9031')
+>>> mpf(2)**30000
+mpf('7.94090351913296032413251784349270251e+9030')
+
+This happens because mpmath features a much larger (practically unlimited) range for the value of the exponent.
+As a consequence, a conversion from ``mpf`` to :cpp:class:`~mppp::real128` will **not** preserve the exact value if the absolute value of the
+exponent is too large.
+
+We can verify that the conversion between mp++ and Python works transparently when containers are involved:
 
 >>> p.test_vector_conversion([1, 2, 3])
 [1, 2, 3]
@@ -196,3 +202,11 @@ Finally, we can verify that the conversion between mp++ and Python works also wh
 {'a': Fraction(1, 2), 'b': Fraction(1, 3)}
 >>> p.test_unordered_map_conversion({'a': mpf(1), 'b': mpf(3)})
 {'a': mpf('1.0'), 'b': mpf('3.0')}
+
+Finally, the pybind11 integration utilities will automatically translate mp++ :ref:`exceptions <exceptions>` thrown
+from C++ code into corresponding Python exceptions. Here is an example with :cpp:class:`~mppp::zero_division_error`:
+
+>>> p.test_zero_division_error()
+Traceback (most recent call last):
+     ...
+ZeroDivisionError: Integer division by zero

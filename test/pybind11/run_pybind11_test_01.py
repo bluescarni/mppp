@@ -232,6 +232,12 @@ class Test01(unittest.TestCase):
             self.assertRaises(TypeError, lambda: p.test_unordered_map_conversion(
                 {'a': mpf(1), 'b': 2}))
 
+    def test_exceptions(self):
+        import pybind11_test_01 as p
+
+        self.assertRaises(ZeroDivisionError,
+                          lambda: p.test_zero_division_error())
+
 
 if __name__ == '__main__':
     unittest.main()
