@@ -219,6 +219,8 @@ at runtime.</p>
     <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_unordered_map_conversion&quot;</span><span class="p">,</span> <span class="n">test_unordered_map</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">rational</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;&gt;</span><span class="p">);</span>
     <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_unordered_map_conversion&quot;</span><span class="p">,</span> <span class="n">test_unordered_map</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">real128</span><span class="o">&gt;</span><span class="p">);</span>
     <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_unordered_map_conversion&quot;</span><span class="p">,</span> <span class="n">test_unordered_map</span><span class="o">&lt;</span><span class="n">mppp</span><span class="o">::</span><span class="n">real</span><span class="o">&gt;</span><span class="p">);</span>
+
+    <span class="n">m</span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="s">&quot;test_zero_division_error&quot;</span><span class="p">,</span> <span class="p">[]()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">/</span> <span class="mi">0</span><span class="p">;</span> <span class="p">});</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -292,23 +294,26 @@ A <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp:
 overloads with <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> arguments should be exposed <strong>before</strong> overloads with <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> arguments
 (otherwise, the <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> overload will always be preferred).</p>
 <p>There’s an important caveat to keep in mind when translating to/from <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>. The IEEE 754 quadruple precision
-format, implemented by <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>, has a limited exponent range. For instance, the value <span class="math">\(2^{-30000}\)</span> becomes
-simply zero in quadruple precision, but, in mpmath, it doesn’t:</p>
+format, implemented by <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>, has a limited exponent range. The value <span class="math">\(2^{-30000}\)</span>, for instance, becomes
+simply zero in quadruple precision, and <span class="math">\(2^{30000}\)</span> becomes <span class="math">\(+\infty\)</span>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">113</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**-</span><span class="mi">30000</span>
-<span class="go">mpf(&#39;1.25930254358409145729153078521520406e-9031&#39;)</span>
-</pre></div>
-</div>
-<p>This happens because mpmath features a much larger (practically unlimited) range for the value of the exponent.
-As a consequence, a conversion from <code class="docutils literal"><span class="pre">mpf</span></code> to <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> will <strong>not</strong> preserve the exact value if the absolute value of the
-exponent is too large:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real128_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**-</span><span class="mi">30000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real128_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**-</span><span class="mi">30000</span><span class="p">)</span>
 <span class="go">mpf(&#39;0.0&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real128_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">30000</span><span class="p">)</span>
 <span class="go">mpf(&#39;+inf&#39;)</span>
 </pre></div>
 </div>
-<p>Finally, we can verify that the conversion between mp++ and Python works also when containers are involved:</p>
+<p>In mpmath, however, <span class="math">\(2^{-30000}\)</span> and <span class="math">\(2^{30000}\)</span> are correctly computed to quadruple precision:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**-</span><span class="mi">30000</span>
+<span class="go">mpf(&#39;1.25930254358409145729153078521520406e-9031&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">30000</span>
+<span class="go">mpf(&#39;7.94090351913296032413251784349270251e+9030&#39;)</span>
+</pre></div>
+</div>
+<p>This happens because mpmath features a much larger (practically unlimited) range for the value of the exponent.
+As a consequence, a conversion from <code class="docutils literal"><span class="pre">mpf</span></code> to <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> will <strong>not</strong> preserve the exact value if the absolute value of the
+exponent is too large.</p>
+<p>We can verify that the conversion between mp++ and Python works transparently when containers are involved:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_vector_conversion</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 <span class="go">[1, 2, 3]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_vector_conversion</span><span class="p">([</span><span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])</span>
@@ -321,6 +326,14 @@ exponent is too large:</p>
 <span class="go">{&#39;a&#39;: Fraction(1, 2), &#39;b&#39;: Fraction(1, 3)}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_unordered_map_conversion</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">mpf</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">mpf</span><span class="p">(</span><span class="mi">3</span><span class="p">)})</span>
 <span class="go">{&#39;a&#39;: mpf(&#39;1.0&#39;), &#39;b&#39;: mpf(&#39;3.0&#39;)}</span>
+</pre></div>
+</div>
+<p>Finally, the pybind11 integration utilities will automatically translate mp++ <a class="reference internal" href="exceptions.html#exceptions"><span class="std std-ref">exceptions</span></a> thrown
+from C++ code into corresponding Python exceptions. Here is an example with <a class="reference internal" href="exceptions.html#_CPPv2N4mppp19zero_division_errorE" title="mppp::zero_division_error"><code class="xref cpp cpp-class docutils literal"><span class="pre">zero_division_error</span></code></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_zero_division_error</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+     <span class="o">...</span>
+<span class="gr">ZeroDivisionError</span>: <span class="n">Integer division by zero</span>
 </pre></div>
 </div>
 </div>
