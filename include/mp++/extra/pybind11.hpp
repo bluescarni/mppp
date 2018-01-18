@@ -440,8 +440,8 @@ struct type_caster<mppp::real128> {
             || !::PyObject_IsInstance(src.ptr(), mppp_pybind11::globals::mpf_class->ptr())) {
             return false;
         }
-        const auto prec = src.attr("context").attr("prec").cast<::mpfr_prec_t>();
-        if (prec != mppp::safe_cast<::mpfr_prec_t>(mppp::real128_sig_digits())) {
+        const auto prec = src.attr("context").attr("prec").cast<decltype(mppp::real128_sig_digits())>();
+        if (prec != mppp::real128_sig_digits()) {
             return false;
         }
         const auto mpf_tuple = src.attr("_mpf_").cast<tuple>();
@@ -483,8 +483,8 @@ struct type_caster<mppp::real128> {
         if (!mppp_pybind11::globals::mpmath) {
             throw std::runtime_error("Cannot convert a real128 to an mpf if mpmath is not available");
         }
-        const auto prec = mppp_pybind11::globals::mpmath_mp->attr("prec").cast<::mpfr_prec_t>();
-        if (prec != mppp::safe_cast<::mpfr_prec_t>(mppp::real128_sig_digits())) {
+        const auto prec = mppp_pybind11::globals::mpmath_mp->attr("prec").cast<decltype(mppp::real128_sig_digits())>();
+        if (prec != mppp::real128_sig_digits()) {
             throw std::invalid_argument(
                 "Cannot convert the real128 " + src.to_string() + " to an mpf: the precision of real128 ("
                 + std::to_string(mppp::real128_sig_digits()) + ") is different from the current mpf precision ("

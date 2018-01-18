@@ -26,6 +26,12 @@ Changes
   that the installed package version is considered compatible with any other version with the same
   major version number (`#113 <https://github.com/bluescarni/mppp/pull/113>`__).
 
+Fix
+~~~
+
+- Fix a compilation error in the pybind11 utilities when mp++ is configured with quadmath support
+  but without MPFR (`#114 <https://github.com/bluescarni/mppp/pull/114>`__).
+
 0.7 (2018-01-11)
 ----------------
 
