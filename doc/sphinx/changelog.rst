@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- The pybind11 integration utilities now automatically translate mp++ exceptions into appropriate
+  Python exceptions (`#115 <https://github.com/bluescarni/mppp/pull/115>`__).
+
 - Expose various internal type traits in the public API (`#114 <https://github.com/bluescarni/mppp/pull/114>`__).
 
 - Add an implementation of the binomial coefficient for rational top arguments
