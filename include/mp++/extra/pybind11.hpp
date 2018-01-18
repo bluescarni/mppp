@@ -37,6 +37,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <exception>
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -176,6 +177,17 @@ inline void init()
     // The fraction class.
     auto fraction_class = py::module::import("fractions").attr("Fraction");
     globals::fraction_class.reset(new py::object(std::move(fraction_class)));
+
+    // Tanslation for mp++ exceptions.
+    py::register_exception_translator([](std::exception_ptr p) {
+        try {
+            if (p) {
+                std::rethrow_exception(p);
+            }
+        } catch (const mppp::zero_division_error &e) {
+            ::PyErr_SetString(::PyExc_ZeroDivisionError, e.what());
+        }
+    });
 
     // Mark as inited.
     globals::inited = true;

@@ -97,4 +97,6 @@ PYBIND11_MODULE(pybind11_test_01, m)
 #if defined(MPPP_WITH_MPFR)
     m.def("test_unordered_map_conversion", test_unordered_map<mppp::real>);
 #endif
+
+    m.def("test_zero_division_error", []() { return mppp::integer<1>{1} / 0; });
 }
