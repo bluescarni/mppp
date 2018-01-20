@@ -82,6 +82,9 @@ Concepts
    * one type satisfies :cpp:concept:`~mppp::CvrReal` and the other type, after the removal of reference
      and cv qualifiers, satisfies :cpp:concept:`~mppp::RealInteroperable`.
 
+   A corresponding boolean type trait called ``are_real_op_types`` is also available (even if the compiler does
+   not support concepts).
+
 .. cpp:concept:: template <typename T, typename U> mppp::RealCompoundOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the

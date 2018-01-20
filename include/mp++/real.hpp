@@ -2307,8 +2307,7 @@ using are_real_op_types
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool RealOpTypes = (CvrReal<T> && CvrReal<U>) || (CvrReal<T> && RealInteroperable<uncvref_t<U>>)
-                           || (CvrReal<U> && RealInteroperable<uncvref_t<T>>);
+concept bool RealOpTypes = are_real_op_types<T, U>::value;
 #else
 using real_op_types_enabler = enable_if_t<are_real_op_types<T, U>::value, int>;
 #endif
