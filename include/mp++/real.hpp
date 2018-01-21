@@ -3337,7 +3337,7 @@ inline real dispatch_pow(const T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline real pow(T &&op1, RealOpTypes<T> &&op2)
+inline real pow(RealOpTypes<T> &&op1, T &&op2)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real pow(T &&op1, U &&op2)
@@ -3835,7 +3835,7 @@ inline real dispatch_binary_add(const T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline real operator+(T &&a, RealOpTypes<T> &&b)
+inline real operator+(RealOpTypes<T> &&a, T &&b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator+(T &&a, U &&b)
@@ -3844,7 +3844,7 @@ inline real operator+(T &&a, U &&b)
     // NOTE: we use forward + decltype here in order to accommodate the signature
     // when using concepts. It's equivalent to the usual perfect forwarding:
     // https://stackoverflow.com/questions/23321028/is-any-difference-between-stdforwardt-and-stdforwarddecltypet
-    return dispatch_binary_add(std::forward<T>(a), std::forward<decltype(b)>(b));
+    return dispatch_binary_add(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
 inline namespace detail
@@ -3952,7 +3952,7 @@ inline void dispatch_in_place_add(T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator+=(T &a, RealCompoundOpTypes<T> &&b)
+inline auto &operator+=(RealCompoundOpTypes<T> &a, T &&b)
 #else
 template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &a, U &&b)
@@ -4063,13 +4063,13 @@ inline real dispatch_binary_sub(const T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline real operator-(T &&a, RealOpTypes<T> &&b)
+inline real operator-(RealOpTypes<T> &&a, T &&b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator-(T &&a, U &&b)
 #endif
 {
-    return dispatch_binary_sub(std::forward<T>(a), std::forward<decltype(b)>(b));
+    return dispatch_binary_sub(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
 inline namespace detail
@@ -4149,7 +4149,7 @@ inline void dispatch_in_place_sub(T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator-=(T &a, RealCompoundOpTypes<T> &&b)
+inline auto &operator-=(RealCompoundOpTypes<T> &a, T &&b)
 #else
 template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &a, U &&b)
@@ -4238,13 +4238,13 @@ inline real operator--(real &x, int)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline real operator*(T &&a, RealOpTypes<T> &&b)
+inline real operator*(RealOpTypes<T> &&a, T &&b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator*(T &&a, U &&b)
 #endif
 {
-    return dispatch_binary_mul(std::forward<T>(a), std::forward<decltype(b)>(b));
+    return dispatch_binary_mul(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
 inline namespace detail
@@ -4324,7 +4324,7 @@ inline void dispatch_in_place_mul(T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator*=(T &a, RealCompoundOpTypes<T> &&b)
+inline auto &operator*=(RealCompoundOpTypes<T> &a, T &&b)
 #else
 template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &a, U &&b)
@@ -4385,13 +4385,13 @@ inline real dispatch_binary_div(const T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline real operator/(T &&a, RealOpTypes<T> &&b)
+inline real operator/(RealOpTypes<T> &&a, T &&b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator/(T &&a, U &&b)
 #endif
 {
-    return dispatch_binary_div(std::forward<T>(a), std::forward<decltype(b)>(b));
+    return dispatch_binary_div(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
 inline namespace detail
@@ -4471,7 +4471,7 @@ inline void dispatch_in_place_div(T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator/=(T &a, RealCompoundOpTypes<T> &&b)
+inline auto &operator/=(RealCompoundOpTypes<T> &a, T &&b)
 #else
 template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &a, U &&b)
@@ -4537,7 +4537,7 @@ inline bool dispatch_real_comparison(const F &f, const real &a, const real &b)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator==(const T &a, const RealOpTypes<T> &b)
+inline bool operator==(const RealOpTypes<T> &a, const T &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &a, const U &b)
@@ -4575,7 +4575,7 @@ inline bool operator==(const T &a, const U &b)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator!=(const T &a, const RealOpTypes<T> &b)
+inline bool operator!=(const RealOpTypes<T> &a, const T &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &a, const U &b)
@@ -4614,7 +4614,7 @@ inline bool operator!=(const T &a, const U &b)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>(const T &a, const RealOpTypes<T> &b)
+inline bool operator>(const RealOpTypes<T> &a, const T &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &a, const U &b)
@@ -4651,7 +4651,7 @@ inline bool operator>(const T &a, const U &b)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>=(const T &a, const RealOpTypes<T> &b)
+inline bool operator>=(const RealOpTypes<T> &a, const T &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &a, const U &b)
@@ -4690,7 +4690,7 @@ inline bool operator>=(const T &a, const U &b)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<(const T &a, const RealOpTypes<T> &b)
+inline bool operator<(const RealOpTypes<T> &a, const T &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &a, const U &b)
@@ -4727,7 +4727,7 @@ inline bool operator<(const T &a, const U &b)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<=(const T &a, const RealOpTypes<T> &b)
+inline bool operator<=(const RealOpTypes<T> &a, const T &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &a, const U &b)
