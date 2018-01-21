@@ -29,6 +29,9 @@ Changes
 Fix
 ~~~
 
+- Fix a compilation error in the in-place operators :cpp:class:`~mppp::real` when using concepts
+  (`#116 <https://github.com/bluescarni/mppp/pull/116>`__).
+
 - Fix a compilation error in the pybind11 utilities when mp++ is configured with quadmath support
   but without MPFR (`#114 <https://github.com/bluescarni/mppp/pull/114>`__).
 
