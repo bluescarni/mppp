@@ -1427,7 +1427,7 @@ inline real128 dispatch_pow(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline real128 pow(const T &x, const Real128OpTypes<T> &y)
+inline real128 pow(const Real128OpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_op_types_enabler<T, U> = 0>
 inline real128 pow(const T &x, const U &y)
@@ -1561,7 +1561,7 @@ constexpr real128 dispatch_add(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-constexpr real128 operator+(const T &x, const Real128CppOpTypes<T> &y)
+constexpr real128 operator+(const Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr real128 operator+(const T &x, const U &y)
@@ -1598,7 +1598,7 @@ inline real128 dispatch_add(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline real128 operator+(const T &x, const Real128MpppOpTypes<T> &y)
+inline real128 operator+(const Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline real128 operator+(const T &x, const U &y)
@@ -1645,7 +1645,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline MPPP_CONSTEXPR_14 T &operator+=(T &x, const Real128CppOpTypes<T> &y)
+inline MPPP_CONSTEXPR_14 auto &operator+=(Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 inline MPPP_CONSTEXPR_14 T &operator+=(T &x, const U &y)
@@ -1683,7 +1683,7 @@ inline void dispatch_in_place_add(T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator+=(T &x, const Real128MpppOpTypes<T> &y)
+inline auto &operator+=(Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &x, const U &y)
@@ -1775,7 +1775,7 @@ constexpr real128 dispatch_sub(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-constexpr real128 operator-(const T &x, const Real128CppOpTypes<T> &y)
+constexpr real128 operator-(const Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr real128 operator-(const T &x, const U &y)
@@ -1812,7 +1812,7 @@ inline real128 dispatch_sub(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline real128 operator-(const T &x, const Real128MpppOpTypes<T> &y)
+inline real128 operator-(const Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline real128 operator-(const T &x, const U &y)
@@ -1857,7 +1857,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const Real128CppOpTypes<T> &y)
+inline MPPP_CONSTEXPR_14 auto &operator-=(Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const U &y)
@@ -1895,7 +1895,7 @@ inline void dispatch_in_place_sub(T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator-=(T &x, const Real128MpppOpTypes<T> &y)
+inline auto &operator-=(Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &x, const U &y)
@@ -1976,7 +1976,7 @@ constexpr real128 dispatch_mul(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-constexpr real128 operator*(const T &x, const Real128CppOpTypes<T> &y)
+constexpr real128 operator*(const Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr real128 operator*(const T &x, const U &y)
@@ -2013,7 +2013,7 @@ inline real128 dispatch_mul(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline real128 operator*(const T &x, const Real128MpppOpTypes<T> &y)
+inline real128 operator*(const Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline real128 operator*(const T &x, const U &y)
@@ -2058,7 +2058,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_mul(T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline MPPP_CONSTEXPR_14 T &operator*=(T &x, const Real128CppOpTypes<T> &y)
+inline MPPP_CONSTEXPR_14 auto &operator*=(Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 inline MPPP_CONSTEXPR_14 T &operator*=(T &x, const U &y)
@@ -2096,7 +2096,7 @@ inline void dispatch_in_place_mul(T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator*=(T &x, const Real128MpppOpTypes<T> &y)
+inline auto &operator*=(Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &x, const U &y)
@@ -2136,7 +2136,7 @@ constexpr real128 dispatch_div(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-constexpr real128 operator/(const T &x, const Real128CppOpTypes<T> &y)
+constexpr real128 operator/(const Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr real128 operator/(const T &x, const U &y)
@@ -2173,7 +2173,7 @@ inline real128 dispatch_div(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline real128 operator/(const T &x, const Real128MpppOpTypes<T> &y)
+inline real128 operator/(const Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline real128 operator/(const T &x, const U &y)
@@ -2218,7 +2218,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_div(T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline MPPP_CONSTEXPR_14 T &operator/=(T &x, const Real128CppOpTypes<T> &y)
+inline MPPP_CONSTEXPR_14 auto &operator/=(Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 inline MPPP_CONSTEXPR_14 T &operator/=(T &x, const U &y)
@@ -2256,7 +2256,7 @@ inline void dispatch_in_place_div(T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator/=(T &x, const Real128MpppOpTypes<T> &y)
+inline auto &operator/=(Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &x, const U &y)
@@ -2305,7 +2305,7 @@ constexpr bool dispatch_eq(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-constexpr bool operator==(const T &x, const Real128CppOpTypes<T> &y)
+constexpr bool operator==(const Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr bool operator==(const T &x, const U &y)
@@ -2352,7 +2352,7 @@ inline bool dispatch_eq(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator==(const T &x, const Real128MpppOpTypes<T> &y)
+inline bool operator==(const Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &x, const U &y)
@@ -2379,7 +2379,7 @@ inline bool operator==(const T &x, const U &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-constexpr bool operator!=(const T &x, const Real128CppOpTypes<T> &y)
+constexpr bool operator!=(const Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr bool operator!=(const T &x, const U &y)
@@ -2410,7 +2410,7 @@ constexpr bool operator!=(const T &x, const U &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator!=(const T &x, const Real128MpppOpTypes<T> &y)
+inline bool operator!=(const Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &x, const U &y)
@@ -2459,7 +2459,7 @@ constexpr bool dispatch_lt(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-constexpr bool operator<(const T &x, const Real128CppOpTypes<T> &y)
+constexpr bool operator<(const Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr bool operator<(const T &x, const U &y)
@@ -2506,7 +2506,7 @@ inline bool dispatch_lt(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<(const T &x, const Real128MpppOpTypes<T> &y)
+inline bool operator<(const Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &x, const U &y)
@@ -2553,7 +2553,7 @@ constexpr bool dispatch_lte(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-constexpr bool operator<=(const T &x, const Real128CppOpTypes<T> &y)
+constexpr bool operator<=(const Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr bool operator<=(const T &x, const U &y)
@@ -2598,7 +2598,7 @@ inline bool dispatch_lte(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<=(const T &x, const Real128MpppOpTypes<T> &y)
+inline bool operator<=(const Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &x, const U &y)
@@ -2647,7 +2647,7 @@ constexpr bool dispatch_gt(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-constexpr bool operator>(const T &x, const Real128CppOpTypes<T> &y)
+constexpr bool operator>(const Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr bool operator>(const T &x, const U &y)
@@ -2694,7 +2694,7 @@ inline bool dispatch_gt(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>(const T &x, const Real128MpppOpTypes<T> &y)
+inline bool operator>(const Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &x, const U &y)
@@ -2741,7 +2741,7 @@ constexpr bool dispatch_gte(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-constexpr bool operator>=(const T &x, const Real128CppOpTypes<T> &y)
+constexpr bool operator>=(const Real128CppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr bool operator>=(const T &x, const U &y)
@@ -2786,7 +2786,7 @@ inline bool dispatch_gte(const T &x, const real128 &y)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>=(const T &x, const Real128MpppOpTypes<T> &y)
+inline bool operator>=(const Real128MpppOpTypes<T> &x, const T &y)
 #else
 template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &x, const U &y)

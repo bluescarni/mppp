@@ -6852,7 +6852,7 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto binomial(const T &n, const IntegerIntegralOpTypes<T> &k)
+inline auto binomial(const IntegerIntegralOpTypes<T> &n, const T &k)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline integer_common_t<T, U> binomial(const T &n, const U &k)
@@ -7052,7 +7052,7 @@ inline T pow_impl(const T &base, const integer<SSize> &exp)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto pow(const T &base, const IntegerOpTypes<T> &exp)
+inline auto pow(const IntegerOpTypes<T> &base, const T &exp)
 #else
 template <typename T, typename U>
 inline integer_common_t<T, U> pow(const T &base, const U &exp)
@@ -7479,7 +7479,7 @@ inline integer<SSize> operator+(const integer<SSize> &n)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator+(const T &op1, const IntegerOpTypes<T> &op2)
+inline auto operator+(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
@@ -7500,7 +7500,7 @@ inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator+=(T &rop, const IntegerOpTypes<T> &op)
+inline auto &operator+=(IntegerOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &rop, const U &op)
@@ -7640,7 +7640,7 @@ integer<SSize> operator-(const integer<SSize> &n)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator-(const T &op1, const IntegerOpTypes<T> &op2)
+inline auto operator-(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
@@ -7661,7 +7661,7 @@ inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator-=(T &rop, const IntegerOpTypes<T> &op)
+inline auto &operator-=(IntegerOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &rop, const U &op)
@@ -7787,7 +7787,7 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator*(const T &op1, const IntegerOpTypes<T> &op2)
+inline auto operator*(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
@@ -7808,7 +7808,7 @@ inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator*=(T &rop, const IntegerOpTypes<T> &op)
+inline auto &operator*=(IntegerOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &rop, const U &op)
@@ -7950,7 +7950,7 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator/(const T &n, const IntegerOpTypes<T> &d)
+inline auto operator/(const IntegerOpTypes<T> &n, const T &d)
 #else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator/(const T &n, const U &d)
@@ -7972,7 +7972,7 @@ inline integer_common_t<T, U> operator/(const T &n, const U &d)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator/=(T &rop, const IntegerOpTypes<T> &op)
+inline auto &operator/=(IntegerOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &rop, const U &op)
@@ -7997,7 +7997,7 @@ inline T &operator/=(T &rop, const U &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator%(const T &n, const IntegerIntegralOpTypes<T> &d)
+inline auto operator%(const IntegerIntegralOpTypes<T> &n, const T &d)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline integer_common_t<T, U> operator%(const T &n, const U &d)
@@ -8018,7 +8018,7 @@ inline integer_common_t<T, U> operator%(const T &n, const U &d)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator%=(T &rop, const IntegerIntegralOpTypes<T> &op)
+inline auto &operator%=(IntegerIntegralOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator%=(T &rop, const U &op)
@@ -8233,7 +8233,7 @@ inline bool dispatch_greater_than(T x, const integer<SSize> &a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator==(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator==(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &op1, const U &op2)
@@ -8251,7 +8251,7 @@ inline bool operator==(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator!=(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator!=(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &op1, const U &op2)
@@ -8269,7 +8269,7 @@ inline bool operator!=(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator<(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &op1, const U &op2)
@@ -8287,7 +8287,7 @@ inline bool operator<(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<=(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator<=(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &op1, const U &op2)
@@ -8305,7 +8305,7 @@ inline bool operator<=(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator>(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &op1, const U &op2)
@@ -8323,7 +8323,7 @@ inline bool operator>(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>=(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator>=(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &op1, const U &op2)
@@ -8411,7 +8411,7 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator|(const T &op1, const IntegerIntegralOpTypes<T> &op2)
+inline auto operator|(const IntegerIntegralOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline integer_common_t<T, U> operator|(const T &op1, const U &op2)
@@ -8436,7 +8436,7 @@ inline integer_common_t<T, U> operator|(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator|=(T &rop, const IntegerIntegralOpTypes<T> &op)
+inline auto &operator|=(IntegerIntegralOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator|=(T &rop, const U &op)
@@ -8506,7 +8506,7 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator&(const T &op1, const IntegerIntegralOpTypes<T> &op2)
+inline auto operator&(const IntegerIntegralOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline integer_common_t<T, U> operator&(const T &op1, const U &op2)
@@ -8531,7 +8531,7 @@ inline integer_common_t<T, U> operator&(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator&=(T &rop, const IntegerIntegralOpTypes<T> &op)
+inline auto &operator&=(IntegerIntegralOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator&=(T &rop, const U &op)
@@ -8601,7 +8601,7 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator^(const T &op1, const IntegerIntegralOpTypes<T> &op2)
+inline auto operator^(const IntegerIntegralOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline integer_common_t<T, U> operator^(const T &op1, const U &op2)
@@ -8626,7 +8626,7 @@ inline integer_common_t<T, U> operator^(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator^=(T &rop, const IntegerIntegralOpTypes<T> &op)
+inline auto &operator^=(IntegerIntegralOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator^=(T &rop, const U &op)

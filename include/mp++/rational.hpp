@@ -1747,7 +1747,7 @@ inline T dispatch_binary_add(T x, const rational<SSize> &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator+(const T &op1, const RationalOpTypes<T> &op2)
+inline auto operator+(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U>
 inline rational_common_t<T, U> operator+(const T &op1, const U &op2)
@@ -1807,7 +1807,7 @@ inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator+=(T &rop, const RationalOpTypes<T> &op)
+inline auto &operator+=(RationalOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &rop, const U &op)
@@ -1939,7 +1939,7 @@ inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator-(const T &op1, const RationalOpTypes<T> &op2)
+inline auto operator-(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U>
 inline rational_common_t<T, U> operator-(const T &op1, const U &op2)
@@ -1999,7 +1999,7 @@ inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator-=(T &rop, const RationalOpTypes<T> &op)
+inline auto &operator-=(RationalOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &rop, const U &op)
@@ -2124,7 +2124,7 @@ inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator*(const T &op1, const RationalOpTypes<T> &op2)
+inline auto operator*(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U>
 inline rational_common_t<T, U> operator*(const T &op1, const U &op2)
@@ -2196,7 +2196,7 @@ inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator*=(T &rop, const RationalOpTypes<T> &op)
+inline auto &operator*=(RationalOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &rop, const U &op)
@@ -2328,7 +2328,7 @@ inline T dispatch_binary_div(T x, const rational<SSize> &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto operator/(const T &op1, const RationalOpTypes<T> &op2)
+inline auto operator/(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U>
 inline rational_common_t<T, U> operator/(const T &op1, const U &op2)
@@ -2408,7 +2408,7 @@ inline void dispatch_in_place_div(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator/=(T &rop, const RationalOpTypes<T> &op)
+inline auto &operator/=(RationalOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &rop, const U &op)
@@ -2461,7 +2461,7 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator==(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator==(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &op1, const U &op2)
@@ -2479,7 +2479,7 @@ inline bool operator==(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator!=(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator!=(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &op1, const U &op2)
@@ -2587,7 +2587,7 @@ inline bool dispatch_greater_than(T x, const rational<SSize> &a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator<(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &op1, const U &op2)
@@ -2605,7 +2605,7 @@ inline bool operator<(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<=(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator<=(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &op1, const U &op2)
@@ -2623,7 +2623,7 @@ inline bool operator<=(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator>(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &op1, const U &op2)
@@ -2641,7 +2641,7 @@ inline bool operator>(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>=(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator>=(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &op1, const U &op2)
@@ -2951,7 +2951,7 @@ inline T pow_impl(const T &base, const rational<SSize> &exp)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline auto pow(const T &base, const RationalOpTypes<T> &exp)
+inline auto pow(const RationalOpTypes<T> &base, const T &exp)
 #else
 template <typename T, typename U>
 inline rational_common_t<T, U> pow(const T &base, const U &exp)
