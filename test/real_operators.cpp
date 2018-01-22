@@ -358,7 +358,11 @@ TEST_CASE("real binary add")
 TEST_CASE("real left in-place add")
 {
     real r0, r1;
+    const real r1_const;
     r0 += r1;
+    REQUIRE(r0.zero_p());
+    REQUIRE(!r0.signbit());
+    r0 += r1_const;
     REQUIRE(r0.zero_p());
     REQUIRE(!r0.signbit());
     r0 = 5;
@@ -1005,7 +1009,11 @@ TEST_CASE("real binary sub")
 TEST_CASE("real left in-place sub")
 {
     real r0, r1;
+    const real r1_const;
     r0 -= r1;
+    REQUIRE(r0.zero_p());
+    REQUIRE(!r0.signbit());
+    r0 -= r1_const;
     REQUIRE(r0.zero_p());
     REQUIRE(!r0.signbit());
     r0 = 5;
@@ -1636,7 +1644,11 @@ TEST_CASE("real binary mul")
 TEST_CASE("real left in-place mul")
 {
     real r0, r1;
+    const real r1_const;
     r0 *= r1;
+    REQUIRE(r0.zero_p());
+    REQUIRE(!r0.signbit());
+    r0 *= r1_const;
     REQUIRE(r0.zero_p());
     REQUIRE(!r0.signbit());
     r0 = 5;
@@ -2268,7 +2280,10 @@ TEST_CASE("real binary div")
 TEST_CASE("real left in-place div")
 {
     real r0, r1;
+    const real r1_const;
     r0 /= r1;
+    REQUIRE(r0.nan_p());
+    r0 /= r1_const;
     REQUIRE(r0.nan_p());
     r0 = 5;
     r1 = 2;
