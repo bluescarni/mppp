@@ -1470,6 +1470,8 @@ involving <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::
 <li>one type satisfies <a class="reference internal" href="#_CPPv2I0EN4mppp7CvrRealE" title="mppp::CvrReal"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CvrReal</span></code></a> and the other type, after the removal of reference
 and cv qualifiers, satisfies <a class="reference internal" href="#_CPPv2I0EN4mppp17RealInteroperableE" title="mppp::RealInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RealInteroperable</span></code></a>.</li>
 </ul>
+<p>A corresponding boolean type trait called <code class="docutils literal"><span class="pre">are_real_op_types</span></code> is also available (even if the compiler does
+not support concepts).</p>
 </dd></dl>
 
 <dl class="concept">
@@ -1492,7 +1494,7 @@ of reference, is not const.</p>
 <span id="mppp::real_prec_minCE"></span><span class="target" id="group__real__prec_1ga9b2da3f0e2b328e1d05e531c97aee26f"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv211mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <code class="descclassname">mppp::</code><code class="descname">real_prec_min</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp13real_prec_minEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Minimum precision for a <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p>This compile-time constant represents the minimum valid precision
-for a <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>. The returned value if guaranteed to be
+for a <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>. The returned value is guaranteed to be
 not less than the <code class="docutils literal"><span class="pre">MPFR_PREC_MIN</span></code> MPFR constant.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1506,7 +1508,7 @@ not less than the <code class="docutils literal"><span class="pre">MPFR_PREC_MIN
 <span id="mppp::real_prec_maxCE"></span><span class="target" id="group__real__prec_1gaf0e95bc2ae1461ed7fb3088aebe6dbde"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv211mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <code class="descclassname">mppp::</code><code class="descname">real_prec_max</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp13real_prec_maxEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Maximum precision for a <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p>This compile-time constant represents the maximum valid precision
-for a <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>. The returned value if guaranteed to be
+for a <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>. The returned value is guaranteed to be
 not greater than the <code class="docutils literal"><span class="pre">MPFR_PREC_MAX</span></code> MPFR constant.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>

@@ -10,15 +10,30 @@ New
 - The pybind11 integration utilities now automatically translate mp++ exceptions into appropriate
   Python exceptions (`#115 <https://github.com/bluescarni/mppp/pull/115>`__).
 
+- Expose various internal type traits in the public API (`#114 <https://github.com/bluescarni/mppp/pull/114>`__).
+
 - Add an implementation of the binomial coefficient for rational top arguments
   (`#113 <https://github.com/bluescarni/mppp/pull/113>`__).
 
 Changes
 ~~~~~~~
 
+- When C++ concepts are enabled, various functions now use automatically-deduced return types
+  to simplify the implementation and improve the generated documentation
+  (`#114 <https://github.com/bluescarni/mppp/pull/114>`__).
+
 - In the CMake config-file package produced by the installation process, ensure
   that the installed package version is considered compatible with any other version with the same
   major version number (`#113 <https://github.com/bluescarni/mppp/pull/113>`__).
+
+Fix
+~~~
+
+- Fix a compilation error in the in-place operators of :cpp:class:`~mppp::real` when using concepts
+  (`#116 <https://github.com/bluescarni/mppp/pull/116>`__).
+
+- Fix a compilation error in the pybind11 utilities when mp++ is configured with quadmath support
+  but without MPFR (`#114 <https://github.com/bluescarni/mppp/pull/114>`__).
 
 0.7 (2018-01-11)
 ----------------

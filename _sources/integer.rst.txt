@@ -57,8 +57,11 @@ Concepts
    involving :cpp:class:`~mppp::integer` and C++ integral types. Specifically, the concept will be ``true``
    if either:
 
-   * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size ``SSize``, or
+   * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size, or
    * one type is an :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::CppIntegralInteroperable` type.
+
+   A corresponding boolean type trait called ``are_integer_integral_op_types`` is also available (even if the compiler does
+   not support concepts).
 
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::IntegerBinarySaveDest
 

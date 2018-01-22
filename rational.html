@@ -494,7 +494,7 @@ will take care of releasing them when the destructor is called.</p>
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the generic constructor of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">mppp::rational</span></a>, if <code class="docutils literal"><span class="pre">x</span></code> is a floating-point value. </li>
+<li><code class="docutils literal"><span class="pre">unspecified</span></code>: any exception thrown by the generic constructor of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">mppp::rational</span></a>. </li>
 </ul>
 </dd>
 </dl>
@@ -892,6 +892,8 @@ template&lt;typename <code class="descname">T</code>, std::size_t <code class="d
 <dd><p>This concept is satisfied if the type <code class="docutils literal"><span class="pre">T</span></code> can interoperate with a <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>
 with static size <code class="docutils literal"><span class="pre">SSize</span></code>. Specifically, this concept will be <code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">T</span></code> satisfies
 <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> or it is an <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with static size <code class="docutils literal"><span class="pre">SSize</span></code>.</p>
+<p>A corresponding boolean type trait called <code class="docutils literal"><span class="pre">is_rational_interoperable</span></code> is also available (even if the compiler does
+not support concepts).</p>
 </dd></dl>
 
 <dl class="concept">
@@ -904,8 +906,13 @@ satisfies <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21Rati
 <dl class="concept">
 <dt id="_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE">
 template&lt;typename <code class="descname">T</code>, std::size_t <code class="descclassname"></code><code class="descname">SSize</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">RationalIntegralInteroperable</code><a class="headerlink" href="#_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied if the type <code class="docutils literal"><span class="pre">T</span></code> satisfies <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalInteroperable</span></code></a>
-and it is not a C++ floating-point type.</p>
+<dd><p>This concept is satisfied if either:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppIntegralInteroperable</span></code></a>, or</li>
+<li><code class="docutils literal"><span class="pre">T</span></code> is an <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with static size <code class="docutils literal"><span class="pre">SSize</span></code>.</li>
+</ul>
+<p>A corresponding boolean type trait called <code class="docutils literal"><span class="pre">is_rational_integral_interoperable</span></code> is also available (even if the compiler does
+not support concepts).</p>
 </dd></dl>
 
 <dl class="concept">
@@ -926,6 +933,8 @@ involving <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mp
 <li>one type is a <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> and the other is a <a class="reference internal" href="#_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalInteroperable</span></code></a>
 type.</li>
 </ul>
+<p>A corresponding boolean type trait called <code class="docutils literal"><span class="pre">are_rational_op_types</span></code> is also available (even if the compiler does
+not support concepts).</p>
 </dd></dl>
 
 </div>
@@ -1347,18 +1356,11 @@ based on the falling factorial is employed.</p>
 <span id="rational-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mppp3powERK1TRK1U">
-<span id="mppp::pow__TCR.UCR"></span><span class="target" id="group__rational__exponentiation_1ga18fa8c7d7911f290bfafced170f9b25e"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">pow</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>base</em>, <em class="property">const</em> U &amp;<em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3powERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mppp3powERK15RationalOpTypesI1TERK1T">
+<span id="mppp::pow__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__exponentiation_1ga5cc14bb2d28feef319cb60baacd46038"></span>auto <code class="descclassname">mppp::</code><code class="descname">pow</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>base</em>, <em class="property">const</em> T &amp;<em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3powERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary exponentiation. </p>
-<p><p>This function is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalOpTypes</span></code></a>.
-The return type is determined as follows:</p>
-<ul class="simple">
-<li>if the non-<a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> argument is a floating-point type <code class="docutils literal"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal"><span class="pre">F</span></code>; otherwise,</li>
-<li>the type of the result is <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>.</li>
-</ul>
-<p>This function will raise <code class="docutils literal"><span class="pre">base</span></code> to the power <code class="docutils literal"><span class="pre">exp</span></code>, and return the result. If one of the arguments
+<p><p>This function will raise <code class="docutils literal"><span class="pre">base</span></code> to the power <code class="docutils literal"><span class="pre">exp</span></code>, and return the result. If one of the arguments
 is a floating-point value, then the result will be computed via <code class="docutils literal"><span class="pre">std::pow()</span></code> and it will also be a
 floating-point value. Otherwise, the result will be a <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>.</p>
 <p>When floating-point types are not involved, the implementation is based on the integral exponentiation
@@ -1509,16 +1511,15 @@ is typically built on top of basic <a class="reference internal" href="#rational
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mpppplERK1TRK1U">
-<span id="mppp::add-operator__TCR.UCR"></span><span class="target" id="group__rational__operators_1ga3b82a25ca521cc58a747fd17d9e63fdd"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppplERK15RationalOpTypesI1TERK1T">
+<span id="mppp::add-operator__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__operators_1gaa56bad9ec9ee8f00cf525eb6233cbfe6"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary addition operator. </p>
-<p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalOpTypes</span></code></a>.
-The return type is determined as follows:</p>
+<p><p>The return type is determined as follows:</p>
 <ul class="simple">
 <li>if the non-<a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> argument is a floating-point type <code class="docutils literal"><span class="pre">F</span></code>, then the
 type of the result is <code class="docutils literal"><span class="pre">F</span></code>; otherwise,</li>
-<li>the type of the result is <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>.</li>
+<li>the type of the result is a <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>.</li>
 </ul>
 </p>
 <p><dl class="docutils">
@@ -1537,8 +1538,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mppppLER1TRK15RationalOpTypesI1TE">
-<span id="mppp::add-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1gac2b0fa08c303fde8d49405669b6f73e7"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator+=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppppLER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mppppLER15RationalOpTypesI1TERK1T">
+<span id="mppp::add-assign-operator__RationalOpTypes:T:R.TCR"></span><span class="target" id="group__rational__operators_1gae60da1cde131baae8e1d47a9a87477de"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator+=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppppLER15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place addition operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1616,16 +1617,15 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mpppmiERK1TRK1U">
-<span id="mppp::sub-operator__TCR.UCR"></span><span class="target" id="group__rational__operators_1gad72c6dfc2507a2fd68474e3e52a01a07"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppmiERK15RationalOpTypesI1TERK1T">
+<span id="mppp::sub-operator__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__operators_1gac0ce1ee4642016e4f9b49e2e956e573a"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary subtraction operator. </p>
-<p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalOpTypes</span></code></a>.
-The return type is determined as follows:</p>
+<p><p>The return type is determined as follows:</p>
 <ul class="simple">
 <li>if the non-<a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> argument is a floating-point type <code class="docutils literal"><span class="pre">F</span></code>, then the
 type of the result is <code class="docutils literal"><span class="pre">F</span></code>; otherwise,</li>
-<li>the type of the result is <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>.</li>
+<li>the type of the result is a <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>.</li>
 </ul>
 </p>
 <p><dl class="docutils">
@@ -1644,8 +1644,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppmIER1TRK15RationalOpTypesI1TE">
-<span id="mppp::sub-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1gafd853682b796919fbab07f98d0a07119"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator-=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmIER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppmIER15RationalOpTypesI1TERK1T">
+<span id="mppp::sub-assign-operator__RationalOpTypes:T:R.TCR"></span><span class="target" id="group__rational__operators_1ga6c65cd106a88c218a1f058de4d3daf8b"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator-=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmIER15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place subtraction operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1705,16 +1705,15 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mpppmlERK1TRK1U">
-<span id="mppp::mul-operator__TCR.UCR"></span><span class="target" id="group__rational__operators_1ga1238b9f0c25ea3d7ca0147872ddf1421"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmlERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppmlERK15RationalOpTypesI1TERK1T">
+<span id="mppp::mul-operator__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__operators_1gae8546f955c9e101fe2b3e51add18e0d1"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmlERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary multiplication operator. </p>
-<p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalOpTypes</span></code></a>.
-The return type is determined as follows:</p>
+<p><p>The return type is determined as follows:</p>
 <ul class="simple">
 <li>if the non-<a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> argument is a floating-point type <code class="docutils literal"><span class="pre">F</span></code>, then the
 type of the result is <code class="docutils literal"><span class="pre">F</span></code>; otherwise,</li>
-<li>the type of the result is <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>.</li>
+<li>the type of the result is a <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>.</li>
 </ul>
 </p>
 <p><dl class="docutils">
@@ -1733,8 +1732,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppmLER1TRK15RationalOpTypesI1TE">
-<span id="mppp::mul-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1gac2432e9c6d2a359fd8056d07a73790cc"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator*=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmLER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppmLER15RationalOpTypesI1TERK1T">
+<span id="mppp::mul-assign-operator__RationalOpTypes:T:R.TCR"></span><span class="target" id="group__rational__operators_1ga4d3e8172f7bdc650331eaa8c167e5518"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator*=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmLER15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place multiplication operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1756,16 +1755,15 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mpppdvERK1TRK1U">
-<span id="mppp::div-operator__TCR.UCR"></span><span class="target" id="group__rational__operators_1ga67aade0367e5e37cbb9784bf98f7f9fd"></span>rational_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdvERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppdvERK15RationalOpTypesI1TERK1T">
+<span id="mppp::div-operator__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__operators_1gaffa490684c6aa3dfd2c28dfa9981fbd8"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdvERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary division operator. </p>
-<p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RationalOpTypes</span></code></a>.
-The return type is determined as follows:</p>
+<p><p>The return type is determined as follows:</p>
 <ul class="simple">
 <li>if the non-<a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> argument is a floating-point type <code class="docutils literal"><span class="pre">F</span></code>, then the
 type of the result is <code class="docutils literal"><span class="pre">F</span></code>; otherwise,</li>
-<li>the type of the result is <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>.</li>
+<li>the type of the result is a <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>.</li>
 </ul>
 </p>
 <p><dl class="docutils">
@@ -1789,8 +1787,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppdVER1TRK15RationalOpTypesI1TE">
-<span id="mppp::div-assign-operator__TR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga5c078a6aeaf8d7294eb99c7634a09734"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator/=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdVER1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppdVER15RationalOpTypesI1TERK1T">
+<span id="mppp::div-assign-operator__RationalOpTypes:T:R.TCR"></span><span class="target" id="group__rational__operators_1ga65c2963da8562f1594ba38cffcb7ca00"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator/=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdVER15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place division operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1814,8 +1812,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppeqERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::eq-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga7bb53add7c94449c1f70bb1a24e2081a"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeqERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppeqERK15RationalOpTypesI1TERK1T">
+<span id="mppp::eq-operator__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__operators_1ga4609a7a0765b79a1b251a7dd0d4bc0d8"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeqERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Equality operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1833,8 +1831,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppneERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::neq-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga521dfee45ad39a1de85e006160473632"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppneERK15RationalOpTypesI1TERK1T">
+<span id="mppp::neq-operator__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__operators_1gaf206baf1ba3717bbf2fe757e12975f21"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Inequality operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1852,8 +1850,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppltERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::lt-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga1bec5fef12870390638ff5d45cfc9978"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppltERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppltERK15RationalOpTypesI1TERK1T">
+<span id="mppp::lt-operator__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__operators_1gaac215569ab58d96faf914420a64fa158"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppltERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Less-than operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1871,8 +1869,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppleERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::lte-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga9092a9305783c4c8493874b24f5bfdd5"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppleERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppleERK15RationalOpTypesI1TERK1T">
+<span id="mppp::lte-operator__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__operators_1ga15159b8e0c476e1eb60401d4efa161c1"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppleERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Less-than or equal operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1890,8 +1888,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppgtERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::gt-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga22eef9e9823d3e65017f46254dfc0429"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgtERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppgtERK15RationalOpTypesI1TERK1T">
+<span id="mppp::gt-operator__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__operators_1gab8d3194c2fdf1659612cb158b4c3ed6d"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgtERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Greater-than operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1909,8 +1907,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppgeERK1TRK15RationalOpTypesI1TE">
-<span id="mppp::gte-operator__TCR.RationalOpTypes:T:CR"></span><span class="target" id="group__rational__operators_1ga6ba9627ffac4c491589844f08100b2b7"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgeERK1TRK15RationalOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppgeERK15RationalOpTypesI1TERK1T">
+<span id="mppp::gte-operator__RationalOpTypes:T:CR.TCR"></span><span class="target" id="group__rational__operators_1ga2c6d27856d25b9cede3e0917eec68231"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgeERK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Greater-than or equal operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>

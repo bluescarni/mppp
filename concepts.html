@@ -156,12 +156,24 @@ template&lt;typename <code class="descname">T</code>&gt;<br /><em class="propert
 (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
 <p>The GCC-style extended 128-bit integral types <code class="docutils literal"><span class="pre">__int128_t</span></code> and <code class="docutils literal"><span class="pre">__uint128_t</span></code> are included as well, if supported
 on the current platform/compiler combination (see also the <a class="reference internal" href="definitions.html#c.MPPP_HAVE_GCC_INT128" title="MPPP_HAVE_GCC_INT128"><code class="xref c c-macro docutils literal"><span class="pre">MPPP_HAVE_GCC_INT128</span></code></a> definition).</p>
+<p>A corresponding boolean type trait called <code class="docutils literal"><span class="pre">is_cpp_interoperable</span></code> is also available (even if the compiler does
+not support concepts).</p>
 </dd></dl>
 
 <dl class="concept">
 <dt id="_CPPv2I0EN4mppp24CppIntegralInteroperableE">
 template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">CppIntegralInteroperable</code><a class="headerlink" href="#_CPPv2I0EN4mppp24CppIntegralInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if <code class="docutils literal"><span class="pre">T</span></code> is an integral <a class="reference internal" href="#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> type.</p>
+<p>A corresponding boolean type trait called <code class="docutils literal"><span class="pre">is_cpp_integral_interoperable</span></code> is also available (even if the compiler does
+not support concepts).</p>
+</dd></dl>
+
+<dl class="concept">
+<dt id="_CPPv2I0EN4mppp29CppFloatingPointInteroperableE">
+template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">CppFloatingPointInteroperable</code><a class="headerlink" href="#_CPPv2I0EN4mppp29CppFloatingPointInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept is satisfied if <code class="docutils literal"><span class="pre">T</span></code> is a floating-point <a class="reference internal" href="#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> type.</p>
+<p>A corresponding boolean type trait called <code class="docutils literal"><span class="pre">is_cpp_floating_point_interoperable</span></code> is also available (even if the compiler does
+not support concepts).</p>
 </dd></dl>
 
 <dl class="concept">

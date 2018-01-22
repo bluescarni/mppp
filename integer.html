@@ -282,8 +282,8 @@ method, which allows to use <a class="reference internal" href="#_CPPv2N4mppp7in
 Via the GMP interfacing facilities, it is thus possible to use directly the GMP C API with
 <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects whenever necessary (e.g., if a GMP function has not been wrapped yet by mp++).</p>
 <p>The <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> class supports a simple binary serialisation API, through member functions
-such as <a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_save()</span></code></a> and <a class="reference internal" href="#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_load()</span></code></a>, and the corresponding
-<a class="reference internal" href="#integer-s11n"><span class="std std-ref">free function overloads</span></a>. Examples of usage are described in the
+such as <a class="reference internal" href="#_CPPv2NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_save()</span></code></a> and <a class="reference internal" href="#_CPPv2N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal"><span class="pre">binary_load()</span></code></a>, and the
+corresponding <a class="reference internal" href="#integer-s11n"><span class="std std-ref">free function overloads</span></a>. Examples of usage are described in the
 <a class="reference internal" href="tutorial_integer.html#tutorial-integer-s11n"><span class="std std-ref">integer tutorial</span></a>.</p>
  </p>
 <div class="breathe-sectiondef docutils container">
@@ -1452,9 +1452,11 @@ generic binary <a class="reference internal" href="#integer-operators"><span cla
 involving <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and C++ integral types. Specifically, the concept will be <code class="docutils literal"><span class="pre">true</span></code>
 if either:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> are both <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with the same static size <code class="docutils literal"><span class="pre">SSize</span></code>, or</li>
+<li><code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> are both <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with the same static size, or</li>
 <li>one type is an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and the other is a <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppIntegralInteroperable</span></code></a> type.</li>
 </ul>
+<p>A corresponding boolean type trait called <code class="docutils literal"><span class="pre">are_integer_integral_op_types</span></code> is also available (even if the compiler does
+not support concepts).</p>
 </dd></dl>
 
 <dl class="concept">
@@ -2337,14 +2339,13 @@ not be altered.</p>
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mppp8binomialERK1TRK1U">
-<span id="mppp::binomial__TCR.UCR"></span><span class="target" id="group__integer__ntheory_1ga64e60b315fb777091da5eb13f8b28fdf"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">binomial</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>n</em>, <em class="property">const</em> U &amp;<em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8binomialERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mppp8binomialERK22IntegerIntegralOpTypesI1TERK1T">
+<span id="mppp::binomial__IntegerIntegralOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__ntheory_1ga0a8506a2f1f6246756f9f182203ba951"></span>auto <code class="descclassname">mppp::</code><code class="descname">binomial</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>n</em>, <em class="property">const</em> T &amp;<em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp8binomialERK22IntegerIntegralOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic binomial coefficient. </p>
-<p><p>This function is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerIntegralOpTypes</span></code></a>.
-The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
-<p>This function will compute the binomial coefficient <span class="math">\({{n}\choose{k}}\)</span>, supporting integral input values.
+<p><p>This function will compute the binomial coefficient <span class="math">\({{n}\choose{k}}\)</span>, supporting integral input values.
 The implementation can handle positive and negative values for both the top and the bottom argument.</p>
+<p>The return type is always an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference external" href="https://arxiv.org/abs/1105.3689/">https://arxiv.org/abs/1105.3689/</a></p>
@@ -2439,7 +2440,7 @@ The implementation can handle positive and negative values for both the top and 
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp6pow_uiER7integerI5SSizeERK7integerI5SSizeEm">
 <span id="mppp::pow_ui__integer:SSize:R.integer:SSize:CR.unsigned-l"></span><span class="target" id="group__integer__exponentiation_1ga2bcbf1eb80cfdda017bb2f6a85f70354"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">pow_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>base</em>, unsigned long <em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6pow_uiER7integerI5SSizeERK7integerI5SSizeEm" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Ternary integer exponentiation. </p>
+<dd><p>Ternary exponentiation for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">base**exp</span></code>.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -2460,7 +2461,7 @@ The implementation can handle positive and negative values for both the top and 
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp6pow_uiERK7integerI5SSizeEm">
 <span id="mppp::pow_ui__integer:SSize:CR.unsigned-l"></span><span class="target" id="group__integer__exponentiation_1ga6c0721a6042cff553a833506b115ec4a"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descclassname">mppp::</code><code class="descname">pow_ui</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>base</em>, unsigned long <em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6pow_uiERK7integerI5SSizeEm" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary integer exponentiation. </p>
+<dd><p>Binary exponentiation for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><code class="docutils literal"><span class="pre">base**exp</span></code>. </dd>
@@ -2476,23 +2477,15 @@ The implementation can handle positive and negative values for both the top and 
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mppp3powERK1TRK1U">
-<span id="mppp::pow__TCR.UCR"></span><span class="target" id="group__integer__exponentiation_1ga05d577362cf997cecbf68ffa2b10d5e7"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">pow</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>base</em>, <em class="property">const</em> U &amp;<em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3powERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary exponentiation. </p>
-<p><p>This function is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerOpTypes</span></code></a>.
-The return type is determined as follows:</p>
-<ul class="simple">
-<li>if the non-<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> argument is a floating-point type <code class="docutils literal"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal"><span class="pre">F</span></code>; otherwise,</li>
-<li>the type of the result is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</li>
-</ul>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mppp3powERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::pow__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__exponentiation_1ga76b3ac111a1e94e67b399c0c1c6886ca"></span>auto <code class="descclassname">mppp::</code><code class="descname">pow</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>base</em>, <em class="property">const</em> T &amp;<em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3powERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Generic binary exponentiation for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p>This function will raise <code class="docutils literal"><span class="pre">base</span></code> to the power <code class="docutils literal"><span class="pre">exp</span></code>, and return the result. If one of the arguments
 is a floating-point value, then the result will be computed via <code class="docutils literal"><span class="pre">std::pow()</span></code> and it will also be a
 floating-point value. Otherwise, the result will be an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.
 In case of a negative integral exponent and integral base, the result will be zero unless
 the absolute value of <code class="docutils literal"><span class="pre">base</span></code> is 1.</p>
-</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><code class="docutils literal"><span class="pre">base**exp</span></code>.</dd>
@@ -2766,12 +2759,11 @@ is typically built on top of basic <a class="reference internal" href="#integer-
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mpppplERK1TRK1U">
-<span id="mppp::add-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1gaef808071d65c2675df3cc828ec973778"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary addition operator. </p>
-<p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerOpTypes</span></code></a>.
-The return type is determined as follows:</p>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppplERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::add-operator__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1ga7a0815473d9ab6df69b919bfe1a10523"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary addition operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p><p>The return type is determined as follows:</p>
 <ul class="simple">
 <li>if the non-<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> argument is a floating-point type <code class="docutils literal"><span class="pre">F</span></code>, then the
 type of the result is <code class="docutils literal"><span class="pre">F</span></code>; otherwise,</li>
@@ -2794,8 +2786,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mppppLER1TRK14IntegerOpTypesI1TE">
-<span id="mppp::add-assign-operator__TR.IntegerOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga42ce699363f64f9688c1ebe5d36ebf5b"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator+=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppppLER1TRK14IntegerOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mppppLER14IntegerOpTypesI1TERK1T">
+<span id="mppp::add-assign-operator__IntegerOpTypes:T:R.TCR"></span><span class="target" id="group__integer__operators_1ga019cbc9e76018af533c3a05d81d5ca02"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator+=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppppLER14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place addition operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -2873,12 +2865,11 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mpppmiERK1TRK1U">
-<span id="mppp::sub-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1ga33d019dd1c7f3ac47fa55891dfdf0767"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary subtraction operator. </p>
-<p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerOpTypes</span></code></a>.
-The return type is determined as follows:</p>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppmiERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::sub-operator__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1gae1b27b0b7d418adaf6c2f9efa29d79a7"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary subtraction operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p><p>The return type is determined as follows:</p>
 <ul class="simple">
 <li>if the non-<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> argument is a floating-point type <code class="docutils literal"><span class="pre">F</span></code>, then the
 type of the result is <code class="docutils literal"><span class="pre">F</span></code>; otherwise,</li>
@@ -2901,8 +2892,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppmIER1TRK14IntegerOpTypesI1TE">
-<span id="mppp::sub-assign-operator__TR.IntegerOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga6a26f695dd49c2cf63eaa9f3f1af3dfd"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator-=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmIER1TRK14IntegerOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppmIER14IntegerOpTypesI1TERK1T">
+<span id="mppp::sub-assign-operator__IntegerOpTypes:T:R.TCR"></span><span class="target" id="group__integer__operators_1gab2d43af6a0f2f764f77aae0a16188250"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator-=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmIER14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place subtraction operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -2962,12 +2953,11 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mpppmlERK1TRK1U">
-<span id="mppp::mul-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1ga168b2e0a9d4d397a49144c5e0e24ad88"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmlERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary multiplication operator. </p>
-<p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerOpTypes</span></code></a>.
-The return type is determined as follows:</p>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppmlERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::mul-operator__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1gac96777aad4ab7c24ecf5e1a254d9f7bf"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmlERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary multiplication operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p><p>The return type is determined as follows:</p>
 <ul class="simple">
 <li>if the non-<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> argument is a floating-point type <code class="docutils literal"><span class="pre">F</span></code>, then the
 type of the result is <code class="docutils literal"><span class="pre">F</span></code>; otherwise,</li>
@@ -2990,8 +2980,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppmLER1TRK14IntegerOpTypesI1TE">
-<span id="mppp::mul-assign-operator__TR.IntegerOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga79d6df2080634c7994d7178830d3dba9"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator*=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmLER1TRK14IntegerOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppmLER14IntegerOpTypesI1TERK1T">
+<span id="mppp::mul-assign-operator__IntegerOpTypes:T:R.TCR"></span><span class="target" id="group__integer__operators_1gaf73418ce2a54a8580290a285ee31d43c"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator*=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmLER14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place multiplication operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3013,12 +3003,11 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mpppdvERK1TRK1U">
-<span id="mppp::div-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1ga6098f18aa6286057ce42e353cdadcde7"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>n</em>, <em class="property">const</em> U &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdvERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary division operator. </p>
-<p><p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerOpTypes</span></code></a>.
-The return type is determined as follows:</p>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppdvERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::div-operator__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1ga379e3330a24b78d20c6e29c1ed8d0fbe"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>n</em>, <em class="property">const</em> T &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdvERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary division operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p><p>The return type is determined as follows:</p>
 <ul class="simple">
 <li>if the non-<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> argument is a floating-point type <code class="docutils literal"><span class="pre">F</span></code>, then the
 type of the result is <code class="docutils literal"><span class="pre">F</span></code>; otherwise,</li>
@@ -3046,8 +3035,8 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppdVER1TRK14IntegerOpTypesI1TE">
-<span id="mppp::div-assign-operator__TR.IntegerOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga5d35ea5e67808d7b9a2608f44e97c11a"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator/=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdVER1TRK14IntegerOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppdVER14IntegerOpTypesI1TERK1T">
+<span id="mppp::div-assign-operator__IntegerOpTypes:T:R.TCR"></span><span class="target" id="group__integer__operators_1gad65a37465e78f824726ecc31fc797d84"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator/=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdVER14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place division operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3070,12 +3059,11 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mppprmERK1TRK1U">
-<span id="mppp::mod-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1gab22eff6ec4119280edd691300335a495"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator%</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>n</em>, <em class="property">const</em> U &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprmERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary modulo operator. </p>
-<p>This operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerIntegralOpTypes</span></code></a>.
-The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mppprmERK22IntegerIntegralOpTypesI1TERK1T">
+<span id="mppp::mod-operator__IntegerIntegralOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1ga8b633527c7e4fea95135b61cdbde0b1f"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator%</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>n</em>, <em class="property">const</em> T &amp;<em>d</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprmERK22IntegerIntegralOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary modulo operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
+<p>The return type is always an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><code class="docutils literal"><span class="pre">n</span> <span class="pre">%</span> <span class="pre">d</span></code>.</dd>
@@ -3097,8 +3085,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mppprMER1TRK22IntegerIntegralOpTypesI1TE">
-<span id="mppp::mod-assign-operator__TR.IntegerIntegralOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga06a8a0b663d42cf55b063e4a54145ba7"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator%=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprMER1TRK22IntegerIntegralOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mppprMER22IntegerIntegralOpTypesI1TERK1T">
+<span id="mppp::mod-assign-operator__IntegerIntegralOpTypes:T:R.TCR"></span><span class="target" id="group__integer__operators_1gaede3e1b1f7ba94c0b9cc314e8bdf6d4d"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator%=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppprMER22IntegerIntegralOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place modulo operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3218,8 +3206,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppeqERK1TRK14IntegerOpTypesI1TE">
-<span id="mppp::eq-operator__TCR.IntegerOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga92b850034481a00f0a620f42e1a8ade2"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeqERK1TRK14IntegerOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppeqERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::eq-operator__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1gaf9876e88f2600d5d7dbf7d1a4209f2df"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeqERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Equality operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3237,8 +3225,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppneERK1TRK14IntegerOpTypesI1TE">
-<span id="mppp::neq-operator__TCR.IntegerOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga02133bcd1a60fb866ea833e717a28a6f"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK1TRK14IntegerOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppneERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::neq-operator__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1gaa86bb585b0df335579842c1452caf3f4"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Inequality operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3256,8 +3244,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppltERK1TRK14IntegerOpTypesI1TE">
-<span id="mppp::lt-operator__TCR.IntegerOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga581fa112ac44dbec34bf2fec2183d5bb"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppltERK1TRK14IntegerOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppltERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::lt-operator__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1gad5b18aabd8056fc5bf99a6a9786224b2"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppltERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Less-than operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3275,8 +3263,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppleERK1TRK14IntegerOpTypesI1TE">
-<span id="mppp::lte-operator__TCR.IntegerOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga260cae5cbbba5add3e4554e0a1a4c9ff"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppleERK1TRK14IntegerOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppleERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::lte-operator__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1ga5d8dee1ca2f4043b1356fd8052ac1fb1"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppleERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Less-than or equal operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3294,8 +3282,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppgtERK1TRK14IntegerOpTypesI1TE">
-<span id="mppp::gt-operator__TCR.IntegerOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga55ac7afc7c393f61a377343d4a7931da"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgtERK1TRK14IntegerOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppgtERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::gt-operator__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1ga6f76b81d662bbb665eeea50e38a1647b"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgtERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Greater-than operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3313,8 +3301,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppgeERK1TRK14IntegerOpTypesI1TE">
-<span id="mppp::gte-operator__TCR.IntegerOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga183a9ea49860a2389bfc7ddb71b44998"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgeERK1TRK14IntegerOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppgeERK14IntegerOpTypesI1TERK1T">
+<span id="mppp::gte-operator__IntegerOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1gaf555116082024b5503ff9688dd685f0c"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes">IntegerOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgeERK14IntegerOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Greater-than or equal operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3351,14 +3339,13 @@ are treated as-if they were represented using two’s complement.</p>
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mppporERK1TRK1U">
-<span id="mppp::or-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1ga5f14cfec51b24a533b946686acc311c7"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator|</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppporERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mppporERK22IntegerIntegralOpTypesI1TERK1T">
+<span id="mppp::or-operator__IntegerIntegralOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1ga3827947872447e4e47352ea2da459d78"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator|</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppporERK22IntegerIntegralOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary bitwise OR operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p><p>This operator returns the bitwise OR of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. Negative operands
 are treated as-if they were represented using two’s complement.</p>
-<p>The operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerIntegralOpTypes</span></code></a>.
-The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
+<p>The return type is always an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
 </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3376,8 +3363,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppoRER1TRK22IntegerIntegralOpTypesI1TE">
-<span id="mppp::or-assign-operator__TR.IntegerIntegralOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1gaca2f742f5fd28548114654246d0d2a78"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator|=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppoRER1TRK22IntegerIntegralOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppoRER22IntegerIntegralOpTypesI1TERK1T">
+<span id="mppp::or-assign-operator__IntegerIntegralOpTypes:T:R.TCR"></span><span class="target" id="group__integer__operators_1ga4fd217d4bb13b979de4075fce8b3a055"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator|=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppoRER22IntegerIntegralOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place bitwise OR operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p>This operator will set <code class="docutils literal"><span class="pre">rop</span></code> to the bitwise OR of <code class="docutils literal"><span class="pre">rop</span></code> and <code class="docutils literal"><span class="pre">op</span></code>. Negative operands
 are treated as-if they were represented using two’s complement.</p>
@@ -3401,14 +3388,13 @@ are treated as-if they were represented using two’s complement.</p>
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mpppanERK1TRK1U">
-<span id="mppp::and-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1gafc814f4cebfd03fdf9ccec2faa6171a4"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator&amp;</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppanERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppanERK22IntegerIntegralOpTypesI1TERK1T">
+<span id="mppp::and-operator__IntegerIntegralOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1gaa9f07eaa07bf65df3be951a4db729d8d"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator&amp;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppanERK22IntegerIntegralOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary bitwise AND operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p><p>This operator returns the bitwise AND of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. Negative operands
 are treated as-if they were represented using two’s complement.</p>
-<p>The operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerIntegralOpTypes</span></code></a>.
-The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
+<p>The return type is always an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
 </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3426,8 +3412,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppaNER1TRK22IntegerIntegralOpTypesI1TE">
-<span id="mppp::and-assign-operator__TR.IntegerIntegralOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga59b3a0eb154315878e430f944390c276"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator&amp;=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppaNER1TRK22IntegerIntegralOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppaNER22IntegerIntegralOpTypesI1TERK1T">
+<span id="mppp::and-assign-operator__IntegerIntegralOpTypes:T:R.TCR"></span><span class="target" id="group__integer__operators_1ga1ae5a0b235fdc7add413e0265dba8acb"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator&amp;=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppaNER22IntegerIntegralOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place bitwise AND operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p>This operator will set <code class="docutils literal"><span class="pre">rop</span></code> to the bitwise AND of <code class="docutils literal"><span class="pre">rop</span></code> and <code class="docutils literal"><span class="pre">op</span></code>. Negative operands
 are treated as-if they were represented using two’s complement.</p>
@@ -3451,14 +3437,13 @@ are treated as-if they were represented using two’s complement.</p>
 
 <dl class="function">
 <dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T, <em class="property">typename</em> U&gt;</dt>
-<dt id="_CPPv2N4mpppeoERK1TRK1U">
-<span id="mppp::xor-operator__TCR.UCR"></span><span class="target" id="group__integer__operators_1gaf8fac7b1423fba4c573b67f5c361d75a"></span>integer_common_t&lt;T, U&gt; <code class="descclassname">mppp::</code><code class="descname">operator^</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>op1</em>, <em class="property">const</em> U &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeoERK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
+<dt id="_CPPv2N4mpppeoERK22IntegerIntegralOpTypesI1TERK1T">
+<span id="mppp::xor-operator__IntegerIntegralOpTypes:T:CR.TCR"></span><span class="target" id="group__integer__operators_1ga7a271b7fe798325e120ae51c21e2169b"></span>auto <code class="descclassname">mppp::</code><code class="descname">operator^</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>op1</em>, <em class="property">const</em> T &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeoERK22IntegerIntegralOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary bitwise XOR operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p><p>This operator returns the bitwise XOR of <code class="docutils literal"><span class="pre">op1</span></code> and <code class="docutils literal"><span class="pre">op2</span></code>. Negative operands
 are treated as-if they were represented using two’s complement.</p>
-<p>The operator is enabled only if <code class="docutils literal"><span class="pre">T</span></code> and <code class="docutils literal"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes"><code class="xref cpp cpp-concept docutils literal"><span class="pre">IntegerIntegralOpTypes</span></code></a>.
-The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
+<p>The return type is always an <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>.</p>
 </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3476,8 +3461,8 @@ The return type is <a class="reference internal" href="#_CPPv2N4mppp7integerE" t
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
-<dt id="_CPPv2N4mpppeOER1TRK22IntegerIntegralOpTypesI1TE">
-<span id="mppp::xor-assign-operator__TR.IntegerIntegralOpTypes:T:CR"></span><span class="target" id="group__integer__operators_1ga9d386557f058d25d7475bd8da1740f63"></span>T &amp;<code class="descclassname">mppp::</code><code class="descname">operator^=</code><span class="sig-paren">(</span>T &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeOER1TRK22IntegerIntegralOpTypesI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mpppeOER22IntegerIntegralOpTypesI1TERK1T">
+<span id="mppp::xor-assign-operator__IntegerIntegralOpTypes:T:R.TCR"></span><span class="target" id="group__integer__operators_1ga430ec371d19116a9ea49a18cb9d8ede9"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator^=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp22IntegerIntegralOpTypesE" title="mppp::IntegerIntegralOpTypes">IntegerIntegralOpTypes</a>&lt;T&gt; &amp;<em>rop</em>, <em class="property">const</em> T &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeOER22IntegerIntegralOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place bitwise XOR operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p>This operator will set <code class="docutils literal"><span class="pre">rop</span></code> to the bitwise XOR of <code class="docutils literal"><span class="pre">rop</span></code> and <code class="docutils literal"><span class="pre">op</span></code>. Negative operands
 are treated as-if they were represented using two’s complement.</p>

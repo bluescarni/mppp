@@ -20,6 +20,9 @@ Concepts
    with static size ``SSize``. Specifically, this concept will be ``true`` if ``T`` satisfies
    :cpp:concept:`~mppp::CppInteroperable` or it is an :cpp:class:`~mppp::integer` with static size ``SSize``.
 
+   A corresponding boolean type trait called ``is_rational_interoperable`` is also available (even if the compiler does
+   not support concepts).
+
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalCvrInteroperable
 
    This concept is satisfied if the type ``T``, after the removal of reference and cv qualifiers,
@@ -27,8 +30,13 @@ Concepts
 
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalIntegralInteroperable
 
-   This concept is satisfied if the type ``T`` satisfies :cpp:concept:`~mppp::RationalInteroperable`
-   and it is not a C++ floating-point type.
+   This concept is satisfied if either:
+
+   * ``T`` satisfies :cpp:concept:`~mppp::CppIntegralInteroperable`, or
+   * ``T`` is an :cpp:class:`~mppp::integer` with static size ``SSize``.
+
+   A corresponding boolean type trait called ``is_rational_integral_interoperable`` is also available (even if the compiler does
+   not support concepts).
 
 .. cpp:concept:: template <typename T, std::size_t SSize> mppp::RationalCvrIntegralInteroperable
 
@@ -44,6 +52,9 @@ Concepts
    * ``T`` and ``U`` are both :cpp:class:`~mppp::rational` with the same static size ``SSize``, or
    * one type is a :cpp:class:`~mppp::rational` and the other is a :cpp:concept:`~mppp::RationalInteroperable`
      type.
+
+   A corresponding boolean type trait called ``are_rational_op_types`` is also available (even if the compiler does
+   not support concepts).
 
 .. _rational_functions:
 
