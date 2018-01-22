@@ -46,7 +46,7 @@ namespace mppp
 /**
  * \rststar
  * This compile-time constant represents the minimum valid precision
- * for a :cpp:class:`~mppp::real`. The returned value if guaranteed to be
+ * for a :cpp:class:`~mppp::real`. The returned value is guaranteed to be
  * not less than the ``MPFR_PREC_MIN`` MPFR constant.
  * \endrststar
  *
@@ -61,7 +61,7 @@ constexpr ::mpfr_prec_t real_prec_min()
 /**
  * \rststar
  * This compile-time constant represents the maximum valid precision
- * for a :cpp:class:`~mppp::real`. The returned value if guaranteed to be
+ * for a :cpp:class:`~mppp::real`. The returned value is guaranteed to be
  * not greater than the ``MPFR_PREC_MAX`` MPFR constant.
  * \endrststar
  *

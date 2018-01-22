@@ -1290,8 +1290,8 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
  * :cpp:class:`~mppp::integer` objects whenever necessary (e.g., if a GMP function has not been wrapped yet by mp++).
  *
  * The :cpp:class:`~mppp::integer` class supports a simple binary serialisation API, through member functions
- * such as :cpp:func:`~mppp::integer::binary_save()` and :cpp:func:`~mppp::integer::binary_load()`, and the corresponding
- * :ref:`free function overloads <integer_s11n>`. Examples of usage are described in the
+ * such as :cpp:func:`~mppp::integer::binary_save()` and :cpp:func:`~mppp::integer::binary_load()`, and the
+ * corresponding :ref:`free function overloads <integer_s11n>`. Examples of usage are described in the
  * :ref:`integer tutorial <tutorial_integer_s11n>`.
  * \endrststar
  */
@@ -3236,22 +3236,22 @@ struct integer_common_type<integer<SSize>, integer<SSize>> {
 };
 
 template <std::size_t SSize, typename U>
-struct integer_common_type<integer<SSize>, U, enable_if_t<is_supported_integral<U>::value>> {
+struct integer_common_type<integer<SSize>, U, enable_if_t<is_cpp_integral_interoperable<U>::value>> {
     using type = integer<SSize>;
 };
 
 template <std::size_t SSize, typename T>
-struct integer_common_type<T, integer<SSize>, enable_if_t<is_supported_integral<T>::value>> {
+struct integer_common_type<T, integer<SSize>, enable_if_t<is_cpp_integral_interoperable<T>::value>> {
     using type = integer<SSize>;
 };
 
 template <std::size_t SSize, typename U>
-struct integer_common_type<integer<SSize>, U, enable_if_t<is_supported_float<U>::value>> {
+struct integer_common_type<integer<SSize>, U, enable_if_t<is_cpp_floating_point_interoperable<U>::value>> {
     using type = U;
 };
 
 template <std::size_t SSize, typename T>
-struct integer_common_type<T, integer<SSize>, enable_if_t<is_supported_float<T>::value>> {
+struct integer_common_type<T, integer<SSize>, enable_if_t<is_cpp_floating_point_interoperable<T>::value>> {
     using type = T;
 };
 
@@ -3274,30 +3274,28 @@ struct is_integer : std::false_type {
 template <std::size_t SSize>
 struct is_integer<integer<SSize>> : std::true_type {
 };
+
+template <typename T, typename U>
+using are_integer_op_types = is_detected<integer_common_t, T, U>;
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool IntegerOpTypes = are_integer_op_types<T, U>::value;
+#else
+using integer_op_types_enabler = enable_if_t<are_integer_op_types<T, U>::value, int>;
+#endif
 }
 
 template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool IntegerOpTypes
-    = is_same_ssize_integer<T, U>::value
-      || (is_integer<T>::value && CppInteroperable<U>) || (is_integer<U>::value && CppInteroperable<T>);
-#else
-using integer_op_types_enabler
-    = enable_if_t<disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_cpp_interoperable<U>>,
-                              conjunction<is_integer<U>, is_cpp_interoperable<T>>>::value,
-                  int>;
-#endif
+using are_integer_integral_op_types
+    = disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_cpp_integral_interoperable<U>>,
+                  conjunction<is_integer<U>, is_cpp_integral_interoperable<T>>>;
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool IntegerIntegralOpTypes
-    = is_same_ssize_integer<T, U>::value
-      || (is_integer<T>::value && CppIntegralInteroperable<U>) || (is_integer<U>::value && CppIntegralInteroperable<T>);
+concept bool IntegerIntegralOpTypes = are_integer_integral_op_types<T, U>::value;
 #else
-using integer_integral_op_types_enabler
-    = enable_if_t<disjunction<is_same_ssize_integer<T, U>, conjunction<is_integer<T>, is_supported_integral<U>>,
-                              conjunction<is_integer<U>, is_supported_integral<T>>>::value,
-                  int>;
+using integer_integral_op_types_enabler = enable_if_t<are_integer_integral_op_types<T, U>::value, int>;
 #endif
 
 /** @defgroup integer_arithmetic integer_arithmetic
@@ -6834,11 +6832,10 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 /// Generic binomial coefficient.
 /**
  * \rststar
- * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is :cpp:class:`~mppp::integer`.
- *
  * This function will compute the binomial coefficient :math:`{{n}\choose{k}}`, supporting integral input values.
  * The implementation can handle positive and negative values for both the top and the bottom argument.
+ *
+ * The return type is always an :cpp:class:`~mppp::integer`.
  *
  * .. seealso::
  *
@@ -6854,14 +6851,12 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
  * @throws std::overflow_error if \p k is outside an implementation-defined range.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline auto binomial(const IntegerIntegralOpTypes<T> &n, const T &k)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline integer_common_t<T, U> binomial(const T &n, const U &k)
 #endif
-    inline integer_common_t<T, U> binomial(const T &n, const U &k)
 {
     return binomial_impl(n, k);
 }
@@ -6935,7 +6930,7 @@ inline int probab_prime_p(const integer<SSize> &n, int reps = 25)
  *  @{
  */
 
-/// Ternary integer exponentiation.
+/// Ternary exponentiation for \link mppp::integer integer\endlink.
 /**
  * This function will set \p rop to <tt>base**exp</tt>.
  *
@@ -6953,7 +6948,7 @@ inline integer<SSize> &pow_ui(integer<SSize> &rop, const integer<SSize> &base, u
     return rop = &tmp.m_mpz;
 }
 
-/// Binary integer exponentiation.
+/// Binary exponentiation for \link mppp::integer integer\endlink.
 /**
  * @param base the base.
  * @param exp the exponent.
@@ -7036,16 +7031,9 @@ inline T pow_impl(const T &base, const integer<SSize> &exp)
 }
 }
 
-/// Binary exponentiation.
+/// Generic binary exponentiation for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
- *   type of the result is ``F``; otherwise,
- * * the type of the result is :cpp:class:`~mppp::integer`.
- *
  * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
  * is a floating-point value, then the result will be computed via ``std::pow()`` and it will also be a
  * floating-point value. Otherwise, the result will be an :cpp:class:`~mppp::integer`.
@@ -7062,8 +7050,13 @@ inline T pow_impl(const T &base, const integer<SSize> &exp)
  * of <tt>unsigned long</tt>.
  * @throws zero_division_error if \p base and \p exp are integrals and \p base is zero and \p exp is negative.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto pow(const IntegerOpTypes<T> &base, const T &exp)
+#else
 template <typename T, typename U>
 inline integer_common_t<T, U> pow(const T &base, const U &exp)
+#endif
 {
     return pow_impl(base, exp);
 }
@@ -7229,7 +7222,7 @@ inline std::size_t binary_size(const integer<SSize> &n)
     return n.binary_size();
 }
 
-inline namespace impl
+inline namespace detail
 {
 
 // Detector for the presence of binary_save().
@@ -7400,7 +7393,7 @@ inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, T n)
 {
     integer<SSize> retval{n};
@@ -7408,19 +7401,19 @@ inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_add(T n, const integer<SSize> &op2)
 {
     return dispatch_binary_add(op2, n);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_add(const integer<SSize> &op1, T x)
 {
     return static_cast<T>(op1) + x;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_add(T x, const integer<SSize> &op2)
 {
     return dispatch_binary_add(op2, x);
@@ -7433,13 +7426,13 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const integer<SSize> &
     add(retval, retval, n);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_add(integer<SSize> &retval, const T &n)
 {
     add(retval, retval, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
@@ -7468,10 +7461,9 @@ inline integer<SSize> operator+(const integer<SSize> &n)
     return n;
 }
 
-/// Binary addition operator.
+/// Binary addition operator for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -7485,8 +7477,13 @@ inline integer<SSize> operator+(const integer<SSize> &n)
  *
  * @return <tt>op1 + op2</tt>.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator+(const IntegerOpTypes<T> &op1, const T &op2)
+#else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
+#endif
 {
     return dispatch_binary_add(op1, op2);
 }
@@ -7503,7 +7500,7 @@ inline integer_common_t<T, U> operator+(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator+=(T &rop, const IntegerOpTypes<T> &op)
+inline auto &operator+=(IntegerOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &rop, const U &op)
@@ -7556,7 +7553,7 @@ inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, T n)
 {
     integer<SSize> retval{n};
@@ -7565,7 +7562,7 @@ inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_sub(T n, const integer<SSize> &op2)
 {
     auto retval = dispatch_binary_sub(op2, n);
@@ -7573,13 +7570,13 @@ inline integer<SSize> dispatch_binary_sub(T n, const integer<SSize> &op2)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_sub(const integer<SSize> &op1, T x)
 {
     return static_cast<T>(op1) - x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_sub(T x, const integer<SSize> &op2)
 {
     return -dispatch_binary_sub(op2, x);
@@ -7592,13 +7589,13 @@ inline void dispatch_in_place_sub(integer<SSize> &retval, const integer<SSize> &
     sub(retval, retval, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_sub(integer<SSize> &retval, const T &n)
 {
     sub(retval, retval, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_sub(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) - x;
@@ -7625,10 +7622,9 @@ integer<SSize> operator-(const integer<SSize> &n)
     return retval;
 }
 
-/// Binary subtraction operator.
+/// Binary subtraction operator for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -7642,8 +7638,13 @@ integer<SSize> operator-(const integer<SSize> &n)
  *
  * @return <tt>op1 - op2</tt>.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator-(const IntegerOpTypes<T> &op1, const T &op2)
+#else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
+#endif
 {
     return dispatch_binary_sub(op1, op2);
 }
@@ -7660,7 +7661,7 @@ inline integer_common_t<T, U> operator-(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator-=(T &rop, const IntegerOpTypes<T> &op)
+inline auto &operator-=(IntegerOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &rop, const U &op)
@@ -7713,7 +7714,7 @@ inline integer<SSize> dispatch_binary_mul(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_mul(const integer<SSize> &op1, T n)
 {
     // NOTE: with respect to addition, here we separate the retval
@@ -7724,19 +7725,19 @@ inline integer<SSize> dispatch_binary_mul(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_mul(T n, const integer<SSize> &op2)
 {
     return dispatch_binary_mul(op2, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_mul(const integer<SSize> &op1, T x)
 {
     return static_cast<T>(op1) * x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_mul(T x, const integer<SSize> &op2)
 {
     return dispatch_binary_mul(op2, x);
@@ -7749,13 +7750,13 @@ inline void dispatch_in_place_mul(integer<SSize> &retval, const integer<SSize> &
     mul(retval, retval, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_mul(integer<SSize> &retval, const T &n)
 {
     mul(retval, retval, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_mul(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) * x;
@@ -7768,10 +7769,9 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
 }
 }
 
-/// Binary multiplication operator.
+/// Binary multiplication operator for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -7785,8 +7785,13 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
  *
  * @return <tt>op1 * op2</tt>.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator*(const IntegerOpTypes<T> &op1, const T &op2)
+#else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
+#endif
 {
     return dispatch_binary_mul(op1, op2);
 }
@@ -7803,7 +7808,7 @@ inline integer_common_t<T, U> operator*(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator*=(T &rop, const IntegerOpTypes<T> &op)
+inline auto &operator*=(IntegerOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &rop, const U &op)
@@ -7825,7 +7830,7 @@ inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, T n)
 {
     integer<SSize> retval;
@@ -7833,7 +7838,7 @@ inline integer<SSize> dispatch_binary_div(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_div(T n, const integer<SSize> &op2)
 {
     integer<SSize> retval;
@@ -7841,13 +7846,13 @@ inline integer<SSize> dispatch_binary_div(T n, const integer<SSize> &op2)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_div(const integer<SSize> &op1, T x)
 {
     return static_cast<T>(op1) / x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_div(T x, const integer<SSize> &op2)
 {
     return x / static_cast<T>(op2);
@@ -7860,13 +7865,13 @@ inline void dispatch_in_place_div(integer<SSize> &retval, const integer<SSize> &
     tdiv_q(retval, retval, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_div(integer<SSize> &retval, const T &n)
 {
     tdiv_q(retval, retval, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_div(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) / x;
@@ -7887,7 +7892,7 @@ inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, T n)
 {
     integer<SSize> q, retval;
@@ -7895,7 +7900,7 @@ inline integer<SSize> dispatch_binary_mod(const integer<SSize> &op1, T n)
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_mod(T n, const integer<SSize> &op2)
 {
     integer<SSize> q, retval;
@@ -7911,24 +7916,23 @@ inline void dispatch_in_place_mod(integer<SSize> &retval, const integer<SSize> &
     tdiv_qr(q, retval, retval, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_mod(integer<SSize> &retval, const T &n)
 {
     integer<SSize> q;
     tdiv_qr(q, retval, retval, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop % op);
 }
 }
 
-/// Binary division operator.
+/// Binary division operator for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
@@ -7944,8 +7948,13 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
  *
  * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator/(const IntegerOpTypes<T> &n, const T &d)
+#else
 template <typename T, typename U>
 inline integer_common_t<T, U> operator/(const T &n, const U &d)
+#endif
 {
     return dispatch_binary_div(n, d);
 }
@@ -7963,7 +7972,7 @@ inline integer_common_t<T, U> operator/(const T &n, const U &d)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator/=(T &rop, const IntegerOpTypes<T> &op)
+inline auto &operator/=(IntegerOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &rop, const U &op)
@@ -7973,11 +7982,10 @@ inline T &operator/=(T &rop, const U &op)
     return rop;
 }
 
-/// Binary modulo operator.
+/// Binary modulo operator for \link mppp::integer integer\endlink.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is :cpp:class:`~mppp::integer`.
+ * The return type is always an :cpp:class:`~mppp::integer`.
  * \endrststar
  *
  * @param n the dividend.
@@ -7988,14 +7996,12 @@ inline T &operator/=(T &rop, const U &op)
  * @throws zero_division_error if \p d is zero.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline auto operator%(const IntegerIntegralOpTypes<T> &n, const T &d)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline integer_common_t<T, U> operator%(const T &n, const U &d)
 #endif
-    inline integer_common_t<T, U> operator%(const T &n, const U &d)
 {
     return dispatch_binary_mod(n, d);
 }
@@ -8012,7 +8018,7 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator%=(T &rop, const IntegerIntegralOpTypes<T> &op)
+inline auto &operator%=(IntegerIntegralOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator%=(T &rop, const U &op)
@@ -8131,25 +8137,25 @@ inline bool dispatch_equality(const integer<SSize> &a, const integer<SSize> &b)
     return std::equal(ptr_a, ptr_a + asize, make_uai(ptr_b), limb_cmp);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline bool dispatch_equality(const integer<SSize> &a, T n)
 {
     return dispatch_equality(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline bool dispatch_equality(T n, const integer<SSize> &a)
 {
     return dispatch_equality(a, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_equality(const integer<SSize> &a, T x)
 {
     return static_cast<T>(a) == x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_equality(T x, const integer<SSize> &a)
 {
     return dispatch_equality(a, x);
@@ -8162,25 +8168,25 @@ inline bool dispatch_less_than(const integer<SSize> &a, const integer<SSize> &b)
     return cmp(a, b) < 0;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline bool dispatch_less_than(const integer<SSize> &a, T n)
 {
     return dispatch_less_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline bool dispatch_less_than(T n, const integer<SSize> &a)
 {
     return dispatch_greater_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_less_than(const integer<SSize> &a, T x)
 {
     return static_cast<T>(a) < x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_less_than(T x, const integer<SSize> &a)
 {
     return dispatch_greater_than(a, x);
@@ -8193,25 +8199,25 @@ inline bool dispatch_greater_than(const integer<SSize> &a, const integer<SSize> 
     return cmp(a, b) > 0;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline bool dispatch_greater_than(const integer<SSize> &a, T n)
 {
     return dispatch_greater_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline bool dispatch_greater_than(T n, const integer<SSize> &a)
 {
     return dispatch_less_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_greater_than(const integer<SSize> &a, T x)
 {
     return static_cast<T>(a) > x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_greater_than(T x, const integer<SSize> &a)
 {
     return dispatch_less_than(a, x);
@@ -8227,7 +8233,7 @@ inline bool dispatch_greater_than(T x, const integer<SSize> &a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator==(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator==(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &op1, const U &op2)
@@ -8245,7 +8251,7 @@ inline bool operator==(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator!=(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator!=(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &op1, const U &op2)
@@ -8263,7 +8269,7 @@ inline bool operator!=(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator<(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &op1, const U &op2)
@@ -8281,7 +8287,7 @@ inline bool operator<(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<=(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator<=(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &op1, const U &op2)
@@ -8299,7 +8305,7 @@ inline bool operator<=(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator>(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &op1, const U &op2)
@@ -8317,7 +8323,7 @@ inline bool operator>(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>=(const T &op1, const IntegerOpTypes<T> &op2)
+inline bool operator>=(const IntegerOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &op1, const U &op2)
@@ -8357,13 +8363,13 @@ inline integer<SSize> dispatch_operator_or(const integer<SSize> &op1, const inte
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_or(const integer<SSize> &op1, const T &op2)
 {
     return dispatch_operator_or(op1, integer<SSize>{op2});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_or(const T &op1, const integer<SSize> &op2)
 {
     return dispatch_operator_or(op2, op1);
@@ -8376,13 +8382,13 @@ inline void dispatch_in_place_or(integer<SSize> &rop, const integer<SSize> &op)
     bitwise_ior(rop, rop, op);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_or(integer<SSize> &rop, const T &op)
 {
     dispatch_in_place_or(rop, integer<SSize>{op});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop | op);
@@ -8395,8 +8401,7 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
  * This operator returns the bitwise OR of ``op1`` and ``op2``. Negative operands
  * are treated as-if they were represented using two's complement.
  *
- * The operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is :cpp:class:`~mppp::integer`.
+ * The return type is always an :cpp:class:`~mppp::integer`.
  * \endrststar
  *
  * @param op1 the first operand.
@@ -8405,14 +8410,12 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
  * @return the bitwise OR of ``op1`` and ``op2``.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline auto operator|(const IntegerIntegralOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline integer_common_t<T, U> operator|(const T &op1, const U &op2)
 #endif
-    inline integer_common_t<T, U> operator|(const T &op1, const U &op2)
 {
     return dispatch_operator_or(op1, op2);
 }
@@ -8433,7 +8436,7 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator|=(T &rop, const IntegerIntegralOpTypes<T> &op)
+inline auto &operator|=(IntegerIntegralOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator|=(T &rop, const U &op)
@@ -8455,13 +8458,13 @@ inline integer<SSize> dispatch_operator_and(const integer<SSize> &op1, const int
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_and(const integer<SSize> &op1, const T &op2)
 {
     return dispatch_operator_and(op1, integer<SSize>{op2});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_and(const T &op1, const integer<SSize> &op2)
 {
     return dispatch_operator_and(op2, op1);
@@ -8474,13 +8477,13 @@ inline void dispatch_in_place_and(integer<SSize> &rop, const integer<SSize> &op)
     bitwise_and(rop, rop, op);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_and(integer<SSize> &rop, const T &op)
 {
     dispatch_in_place_and(rop, integer<SSize>{op});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop & op);
@@ -8493,8 +8496,7 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
  * This operator returns the bitwise AND of ``op1`` and ``op2``. Negative operands
  * are treated as-if they were represented using two's complement.
  *
- * The operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is :cpp:class:`~mppp::integer`.
+ * The return type is always an :cpp:class:`~mppp::integer`.
  * \endrststar
  *
  * @param op1 the first operand.
@@ -8503,14 +8505,12 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
  * @return the bitwise AND of ``op1`` and ``op2``.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline auto operator&(const IntegerIntegralOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline integer_common_t<T, U> operator&(const T &op1, const U &op2)
 #endif
-    inline integer_common_t<T, U> operator&(const T &op1, const U &op2)
 {
     return dispatch_operator_and(op1, op2);
 }
@@ -8531,7 +8531,7 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator&=(T &rop, const IntegerIntegralOpTypes<T> &op)
+inline auto &operator&=(IntegerIntegralOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator&=(T &rop, const U &op)
@@ -8553,13 +8553,13 @@ inline integer<SSize> dispatch_operator_xor(const integer<SSize> &op1, const int
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_xor(const integer<SSize> &op1, const T &op2)
 {
     return dispatch_operator_xor(op1, integer<SSize>{op2});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_operator_xor(const T &op1, const integer<SSize> &op2)
 {
     return dispatch_operator_xor(op2, op1);
@@ -8572,13 +8572,13 @@ inline void dispatch_in_place_xor(integer<SSize> &rop, const integer<SSize> &op)
     bitwise_xor(rop, rop, op);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_xor(integer<SSize> &rop, const T &op)
 {
     dispatch_in_place_xor(rop, integer<SSize>{op});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop ^ op);
@@ -8591,8 +8591,7 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
  * This operator returns the bitwise XOR of ``op1`` and ``op2``. Negative operands
  * are treated as-if they were represented using two's complement.
  *
- * The operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerIntegralOpTypes`.
- * The return type is :cpp:class:`~mppp::integer`.
+ * The return type is always an :cpp:class:`~mppp::integer`.
  * \endrststar
  *
  * @param op1 the first operand.
@@ -8601,14 +8600,12 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
  * @return the bitwise XOR of ``op1`` and ``op2``.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-#if !defined(MPPP_DOXYGEN_INVOKED)
-requires IntegerIntegralOpTypes<T, U>
-#endif
+template <typename T>
+inline auto operator^(const IntegerIntegralOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
+inline integer_common_t<T, U> operator^(const T &op1, const U &op2)
 #endif
-    inline integer_common_t<T, U> operator^(const T &op1, const U &op2)
 {
     return dispatch_operator_xor(op1, op2);
 }
@@ -8629,7 +8626,7 @@ template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator^=(T &rop, const IntegerIntegralOpTypes<T> &op)
+inline auto &operator^=(IntegerIntegralOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator^=(T &rop, const U &op)

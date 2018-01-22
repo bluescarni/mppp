@@ -77,6 +77,25 @@ struct bin_tester {
 TEST_CASE("bin")
 {
     tuple_for_each(sizes{}, bin_tester{});
+    // Let's test the are_integer_integral_op_types type trait here.
+    REQUIRE((are_integer_integral_op_types<integer<1>, integer<1>>::value));
+    REQUIRE((are_integer_integral_op_types<integer<2>, integer<2>>::value));
+    REQUIRE((are_integer_integral_op_types<integer<1>, int>::value));
+    REQUIRE((are_integer_integral_op_types<char, integer<1>>::value));
+#if defined(MPPP_HAVE_GCC_INT128)
+    REQUIRE((are_integer_integral_op_types<__int128_t, integer<1>>::value));
+    REQUIRE((are_integer_integral_op_types<__uint128_t, integer<1>>::value));
+    REQUIRE((are_integer_integral_op_types<integer<1>, __int128_t>::value));
+    REQUIRE((are_integer_integral_op_types<integer<1>, __uint128_t>::value));
+#endif
+    REQUIRE((!are_integer_integral_op_types<integer<1>, integer<1> &>::value));
+    REQUIRE((!are_integer_integral_op_types<const integer<1>, integer<1>>::value));
+    REQUIRE((!are_integer_integral_op_types<int, int>::value));
+    REQUIRE((!are_integer_integral_op_types<int, void>::value));
+    REQUIRE((!are_integer_integral_op_types<void, int>::value));
+    REQUIRE((!are_integer_integral_op_types<void, void>::value));
+    REQUIRE((!are_integer_integral_op_types<integer<1>, integer<2>>::value));
+    REQUIRE((!are_integer_integral_op_types<integer<2>, integer<1>>::value));
 }
 
 struct binomial_tester {

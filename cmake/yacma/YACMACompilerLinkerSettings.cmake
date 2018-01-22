@@ -41,7 +41,7 @@ function(_YACMA_REPORT_FLAGS)
     message(STATUS "YACMA autodetected C++ debug flags: ${YACMA_CXX_FLAGS_DEBUG}")
 endfunction()
 
-# Enable conditionally a CXX flags, if supported by the compiler.
+# Enable conditionally a CXX flag, if supported by the compiler.
 # This is for flags intended to be enabled in all configurations.
 # NOTE: we use macros and go through temporary private variables
 # because it's apparently impossible to append to an internal
@@ -60,7 +60,7 @@ macro(_YACMA_CHECK_ENABLE_CXX_FLAG flag)
     unset(YACMA_CHECK_CXX_FLAG CACHE)
 endmacro()
 
-# Enable conditionally a debug CXX flags, is supported by the compiler.
+# Enable conditionally a debug CXX flag, is supported by the compiler.
 # This is for flags intended to be enabled in debug mode.
 macro(_YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG flag)
     set(CMAKE_REQUIRED_QUIET TRUE)

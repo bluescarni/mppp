@@ -271,6 +271,13 @@ struct string_ctor_tester {
     void operator()(const S &) const
     {
         using rational = rational<S::value>;
+        REQUIRE(is_rational<rational>::value);
+        REQUIRE(!is_rational<int>::value);
+        REQUIRE((is_same_ssize_rational<rational, rational>::value));
+        REQUIRE((!is_same_ssize_rational<rational, mppp::rational<S::value + 1u>>::value));
+        REQUIRE((!is_same_ssize_rational<mppp::rational<S::value + 1u>, rational>::value));
+        REQUIRE((!is_same_ssize_rational<void, int>::value));
+        REQUIRE((!is_same_ssize_rational<rational, std::string>::value));
         REQUIRE((std::is_constructible<rational, const char *>::value));
         REQUIRE((std::is_constructible<rational, std::string>::value));
         REQUIRE((std::is_constructible<rational, std::string &&>::value));

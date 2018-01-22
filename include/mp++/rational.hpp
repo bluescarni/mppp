@@ -52,7 +52,7 @@ using rational_interoperable_enabler = enable_if_t<is_rational_interoperable<T, 
 
 template <typename T, std::size_t SSize>
 using is_rational_integral_interoperable
-    = conjunction<is_rational_interoperable<T, SSize>, negation<std::is_floating_point<T>>>;
+    = disjunction<is_cpp_integral_interoperable<T>, std::is_same<T, integer<SSize>>>;
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -102,6 +102,15 @@ struct is_rational : std::false_type {
 
 template <std::size_t SSize>
 struct is_rational<rational<SSize>> : std::true_type {
+};
+
+// Detect rationals with the same static size.
+template <typename T, typename U>
+struct is_same_ssize_rational : std::false_type {
+};
+
+template <std::size_t SSize>
+struct is_same_ssize_rational<rational<SSize>, rational<SSize>> : std::true_type {
 };
 
 // mpq_view getter fwd declaration.
@@ -539,14 +548,14 @@ public:
 
 private:
     // Implementation of the generic assignment operator.
-    template <typename T, enable_if_t<is_rational_cvr_integral_interoperable<T, SSize>::value, int> = 0>
-    void dispatch_assignment(T &&n)
+    template <typename T>
+    void dispatch_assignment(T &&n, const std::true_type &)
     {
         m_num = std::forward<T>(n);
         m_den.set_one();
     }
-    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
-    void dispatch_assignment(const T &x)
+    template <typename T>
+    void dispatch_assignment(const T &x, const std::false_type &)
     {
         *this = rational{x};
     }
@@ -562,8 +571,7 @@ public:
      *
      * @return a reference to ``this``.
      *
-     * @throws unspecified any exception thrown by the generic constructor of \link mppp::rational\endlink,
-     * if ``x`` is a floating-point value.
+     * @throws unspecified any exception thrown by the generic constructor of \link mppp::rational\endlink.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
     rational &operator=(RationalCvrInteroperable<SSize> &&x)
@@ -572,7 +580,9 @@ public:
     rational &operator=(T &&x)
 #endif
     {
-        dispatch_assignment(std::forward<decltype(x)>(x));
+        dispatch_assignment(
+            std::forward<decltype(x)>(x),
+            std::integral_constant<bool, is_rational_cvr_integral_interoperable<decltype(x), SSize>::value>{});
         return *this;
     }
         /// Assignment from string.
@@ -1108,22 +1118,22 @@ struct rational_common_type<integer<SSize>, rational<SSize>> {
 };
 
 template <std::size_t SSize, typename U>
-struct rational_common_type<rational<SSize>, U, enable_if_t<is_supported_integral<U>::value>> {
+struct rational_common_type<rational<SSize>, U, enable_if_t<is_cpp_integral_interoperable<U>::value>> {
     using type = rational<SSize>;
 };
 
 template <std::size_t SSize, typename T>
-struct rational_common_type<T, rational<SSize>, enable_if_t<is_supported_integral<T>::value>> {
+struct rational_common_type<T, rational<SSize>, enable_if_t<is_cpp_integral_interoperable<T>::value>> {
     using type = rational<SSize>;
 };
 
 template <std::size_t SSize, typename U>
-struct rational_common_type<rational<SSize>, U, enable_if_t<is_supported_float<U>::value>> {
+struct rational_common_type<rational<SSize>, U, enable_if_t<is_cpp_floating_point_interoperable<U>::value>> {
     using type = U;
 };
 
 template <std::size_t SSize, typename T>
-struct rational_common_type<T, rational<SSize>, enable_if_t<is_supported_float<T>::value>> {
+struct rational_common_type<T, rational<SSize>, enable_if_t<is_cpp_floating_point_interoperable<T>::value>> {
     using type = T;
 };
 
@@ -1131,23 +1141,8 @@ template <typename T, typename U>
 using rational_common_t = typename rational_common_type<T, U>::type;
 
 // Implementation of the rational op types concept, used in various operators.
-template <typename T, typename U, typename = void>
-struct are_rational_op_types : std::false_type {
-};
-
-template <std::size_t SSize>
-struct are_rational_op_types<rational<SSize>, rational<SSize>> : std::true_type {
-};
-
-template <std::size_t SSize, typename T>
-struct are_rational_op_types<rational<SSize>, T, enable_if_t<is_rational_interoperable<T, SSize>::value>>
-    : std::true_type {
-};
-
-template <typename T, std::size_t SSize>
-struct are_rational_op_types<T, rational<SSize>, enable_if_t<is_rational_interoperable<T, SSize>::value>>
-    : std::true_type {
-};
+template <typename T, typename U>
+using are_rational_op_types = is_detected<rational_common_t, T, U>;
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -1709,25 +1704,25 @@ inline rational<SSize> dispatch_binary_add(const integer<SSize> &op1, const rati
     return dispatch_binary_add(op2, op1);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_add(const rational<SSize> &op1, T n)
 {
     return dispatch_binary_add(op1, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_add(T n, const rational<SSize> &op2)
 {
     return dispatch_binary_add(op2, n);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_add(const rational<SSize> &op1, T x)
 {
     return static_cast<T>(op1) + x;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_add(T x, const rational<SSize> &op2)
 {
     return dispatch_binary_add(op2, x);
@@ -1737,12 +1732,11 @@ inline T dispatch_binary_add(T x, const rational<SSize> &op2)
 /// Binary addition operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
  *   type of the result is ``F``; otherwise,
- * * the type of the result is :cpp:class:`~mppp::rational`.
+ * * the type of the result is a :cpp:class:`~mppp::rational`.
  *
  * \endrststar
  *
@@ -1751,8 +1745,13 @@ inline T dispatch_binary_add(T x, const rational<SSize> &op2)
  *
  * @return <tt>op1 + op2</tt>.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator+(const RationalOpTypes<T> &op1, const T &op2)
+#else
 template <typename T, typename U>
 inline rational_common_t<T, U> operator+(const T &op1, const U &op2)
+#endif
 {
     return dispatch_binary_add(op1, op2);
 }
@@ -1777,13 +1776,13 @@ inline void dispatch_in_place_add(rational<SSize> &retval, const integer<SSize> 
     }
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_add(rational<SSize> &retval, const T &n)
 {
     dispatch_in_place_add(retval, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_add(rational<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
@@ -1808,7 +1807,7 @@ inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator+=(T &rop, const RationalOpTypes<T> &op)
+inline auto &operator+=(RationalOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &rop, const U &op)
@@ -1895,13 +1894,13 @@ inline rational<SSize> dispatch_binary_sub(const integer<SSize> &op1, const rati
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_sub(const rational<SSize> &op1, T n)
 {
     return dispatch_binary_sub(op1, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_sub(T n, const rational<SSize> &op2)
 {
     auto retval = dispatch_binary_sub(op2, n);
@@ -1909,13 +1908,13 @@ inline rational<SSize> dispatch_binary_sub(T n, const rational<SSize> &op2)
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_sub(const rational<SSize> &op1, T x)
 {
     return static_cast<T>(op1) - x;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
 {
     return -dispatch_binary_sub(op2, x);
@@ -1925,12 +1924,11 @@ inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
 /// Binary subtraction operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
  *   type of the result is ``F``; otherwise,
- * * the type of the result is :cpp:class:`~mppp::rational`.
+ * * the type of the result is a :cpp:class:`~mppp::rational`.
  *
  * \endrststar
  *
@@ -1939,8 +1937,13 @@ inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
  *
  * @return <tt>op1 - op2</tt>.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator-(const RationalOpTypes<T> &op1, const T &op2)
+#else
 template <typename T, typename U>
 inline rational_common_t<T, U> operator-(const T &op1, const U &op2)
+#endif
 {
     return dispatch_binary_sub(op1, op2);
 }
@@ -1965,13 +1968,13 @@ inline void dispatch_in_place_sub(rational<SSize> &retval, const integer<SSize> 
     }
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_sub(rational<SSize> &retval, const T &n)
 {
     dispatch_in_place_sub(retval, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_sub(rational<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) - x;
@@ -1996,7 +1999,7 @@ inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator-=(T &rop, const RationalOpTypes<T> &op)
+inline auto &operator-=(RationalOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &rop, const U &op)
@@ -2078,25 +2081,25 @@ inline rational<SSize> dispatch_binary_mul(const integer<SSize> &op1, const rati
     return dispatch_binary_mul(op2, op1);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_mul(const rational<SSize> &op1, T n)
 {
     return dispatch_binary_mul(op1, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_mul(T n, const rational<SSize> &op2)
 {
     return dispatch_binary_mul(op2, n);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_mul(const rational<SSize> &op1, T x)
 {
     return static_cast<T>(op1) * x;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
 {
     return dispatch_binary_mul(op2, x);
@@ -2106,12 +2109,11 @@ inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
 /// Binary multiplication operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
  *   type of the result is ``F``; otherwise,
- * * the type of the result is :cpp:class:`~mppp::rational`.
+ * * the type of the result is a :cpp:class:`~mppp::rational`.
  *
  * \endrststar
  *
@@ -2120,8 +2122,13 @@ inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
  *
  * @return <tt>op1 * op2</tt>.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator*(const RationalOpTypes<T> &op1, const T &op2)
+#else
 template <typename T, typename U>
 inline rational_common_t<T, U> operator*(const T &op1, const U &op2)
+#endif
 {
     return dispatch_binary_mul(op1, op2);
 }
@@ -2158,13 +2165,13 @@ inline void dispatch_in_place_mul(rational<SSize> &retval, const integer<SSize> 
     }
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_mul(rational<SSize> &retval, const T &n)
 {
     dispatch_in_place_mul(retval, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_mul(rational<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) * x;
@@ -2189,7 +2196,7 @@ inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator*=(T &rop, const RationalOpTypes<T> &op)
+inline auto &operator*=(RationalOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &rop, const U &op)
@@ -2276,25 +2283,25 @@ inline rational<SSize> dispatch_binary_div(const integer<SSize> &op1, const rati
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_div(const rational<SSize> &op1, T n)
 {
     return dispatch_binary_div(op1, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline rational<SSize> dispatch_binary_div(T n, const rational<SSize> &op2)
 {
     return dispatch_binary_div(integer<SSize>{n}, op2);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_div(const rational<SSize> &op1, T x)
 {
     return static_cast<T>(op1) / x;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T dispatch_binary_div(T x, const rational<SSize> &op2)
 {
     return x / static_cast<T>(op2);
@@ -2304,12 +2311,11 @@ inline T dispatch_binary_div(T x, const rational<SSize> &op2)
 /// Binary division operator.
 /**
  * \rststar
- * This operator is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
  * The return type is determined as follows:
  *
  * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
  *   type of the result is ``F``; otherwise,
- * * the type of the result is :cpp:class:`~mppp::rational`.
+ * * the type of the result is a :cpp:class:`~mppp::rational`.
  *
  * \endrststar
  *
@@ -2320,8 +2326,13 @@ inline T dispatch_binary_div(T x, const rational<SSize> &op2)
  *
  * @throws zero_division_error if the division does not involve floating-point types and \p op2 is zero.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto operator/(const RationalOpTypes<T> &op1, const T &op2)
+#else
 template <typename T, typename U>
 inline rational_common_t<T, U> operator/(const T &op1, const U &op2)
+#endif
 {
     return dispatch_binary_div(op1, op2);
 }
@@ -2365,13 +2376,13 @@ inline void dispatch_in_place_div(rational<SSize> &retval, const integer<SSize> 
     fix_den_sign(retval);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_div(rational<SSize> &retval, const T &n)
 {
     dispatch_in_place_div(retval, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_div(rational<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) / x;
@@ -2397,7 +2408,7 @@ inline void dispatch_in_place_div(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline T &operator/=(T &rop, const RationalOpTypes<T> &op)
+inline auto &operator/=(RationalOpTypes<T> &rop, const T &op)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &rop, const U &op)
@@ -2416,25 +2427,25 @@ inline bool dispatch_equality(const rational<SSize> &op1, const rational<SSize> 
     return op1.get_num() == op2.get_num() && op1.get_den() == op2.get_den();
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_rational_cvr_integral_interoperable<T, SSize>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int> = 0>
 inline bool dispatch_equality(const rational<SSize> &op1, const T &op2)
 {
     return op1.get_den().is_one() && op1.get_num() == op2;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_rational_cvr_integral_interoperable<T, SSize>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int> = 0>
 inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 {
     return dispatch_equality(op2, op1);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<!is_rational_integral_interoperable<T, SSize>::value, int> = 0>
 inline bool dispatch_equality(const rational<SSize> &op1, const T &op2)
 {
     return static_cast<T>(op1) == op2;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<!is_rational_integral_interoperable<T, SSize>::value, int> = 0>
 inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 {
     return dispatch_equality(op2, op1);
@@ -2450,7 +2461,7 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator==(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator==(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &op1, const U &op2)
@@ -2468,7 +2479,7 @@ inline bool operator==(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator!=(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator!=(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &op1, const U &op2)
@@ -2499,25 +2510,25 @@ inline bool dispatch_less_than(const integer<SSize> &a, const rational<SSize> &b
     return cmp(a, b) < 0;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline bool dispatch_less_than(const rational<SSize> &a, T n)
 {
     return dispatch_less_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline bool dispatch_less_than(T n, const rational<SSize> &a)
 {
     return dispatch_greater_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_less_than(const rational<SSize> &a, T x)
 {
     return static_cast<T>(a) < x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_less_than(T x, const rational<SSize> &a)
 {
     return dispatch_greater_than(a, x);
@@ -2542,25 +2553,25 @@ inline bool dispatch_greater_than(const integer<SSize> &a, const rational<SSize>
     return cmp(a, b) > 0;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline bool dispatch_greater_than(const rational<SSize> &a, T n)
 {
     return dispatch_greater_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_integral<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
 inline bool dispatch_greater_than(T n, const rational<SSize> &a)
 {
     return dispatch_less_than(a, integer<SSize>{n});
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_greater_than(const rational<SSize> &a, T x)
 {
     return static_cast<T>(a) > x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_supported_float<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_greater_than(T x, const rational<SSize> &a)
 {
     return dispatch_less_than(a, x);
@@ -2576,7 +2587,7 @@ inline bool dispatch_greater_than(T x, const rational<SSize> &a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator<(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &op1, const U &op2)
@@ -2594,7 +2605,7 @@ inline bool operator<(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator<=(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator<=(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &op1, const U &op2)
@@ -2612,7 +2623,7 @@ inline bool operator<=(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator>(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &op1, const U &op2)
@@ -2630,7 +2641,7 @@ inline bool operator>(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-inline bool operator>=(const T &op1, const RationalOpTypes<T> &op2)
+inline bool operator>=(const RationalOpTypes<T> &op1, const T &op2)
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &op1, const U &op2)
@@ -2871,8 +2882,11 @@ inline rational<SSize> pow_impl_impl(const rational<SSize> &base, const rational
     return pow_impl_impl(base, exp.get_num(), exp_sign);
 }
 
-// Rational base, non-floating point exp (i.e., integral or rational exp).
-template <std::size_t SSize, typename T, enable_if_t<!std::is_floating_point<T>::value, int> = 0>
+// Rational base, integral or rational exp.
+template <
+    std::size_t SSize, typename T,
+    enable_if_t<disjunction<is_rational_integral_interoperable<T, SSize>, std::is_same<T, rational<SSize>>>::value,
+                int> = 0>
 inline rational<SSize> pow_impl(const rational<SSize> &base, const T &exp)
 {
     const auto exp_sign = sgn(exp);
@@ -2893,24 +2907,21 @@ inline rational<SSize> pow_impl(const rational<SSize> &base, const T &exp)
 }
 
 // Integral base, rational exponent.
-template <
-    std::size_t SSize, typename T,
-    enable_if_t<conjunction<negation<std::is_floating_point<T>>, negation<std::is_same<T, rational<SSize>>>>::value,
-                int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int> = 0>
 inline rational<SSize> pow_impl(const T &base, const rational<SSize> &exp)
 {
     return pow_impl(rational<SSize>{base}, exp);
 }
 
 // Fp base, rational exponent.
-template <std::size_t SSize, typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T pow_impl(const rational<SSize> &base, const T &exp)
 {
     return std::pow(static_cast<T>(base), exp);
 }
 
 // Rational base, fp exponent.
-template <std::size_t SSize, typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T pow_impl(const T &base, const rational<SSize> &exp)
 {
     return std::pow(base, static_cast<T>(exp));
@@ -2920,13 +2931,6 @@ inline T pow_impl(const T &base, const rational<SSize> &exp)
 /// Binary exponentiation.
 /**
  * \rststar
- * This function is enabled only if ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`.
- * The return type is determined as follows:
- *
- * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
- *   type of the result is ``F``; otherwise,
- * * the type of the result is :cpp:class:`~mppp::rational`.
- *
  * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
  * is a floating-point value, then the result will be computed via ``std::pow()`` and it will also be a
  * floating-point value. Otherwise, the result will be a :cpp:class:`~mppp::rational`.
@@ -2945,8 +2949,13 @@ inline T pow_impl(const T &base, const rational<SSize> &exp)
  * @throws std::domain_error if floating-point types are not involved and \p exp is a rational value (except
  * in a handful of special cases).
  */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T>
+inline auto pow(const RationalOpTypes<T> &base, const T &exp)
+#else
 template <typename T, typename U>
 inline rational_common_t<T, U> pow(const T &base, const U &exp)
+#endif
 {
     return pow_impl(base, exp);
 }

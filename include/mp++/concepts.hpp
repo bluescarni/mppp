@@ -23,34 +23,44 @@
 namespace mppp
 {
 
-inline namespace detail
-{
-
 // Type trait to check if T is a supported integral type.
 // NOTE: mppp::is_integral, for consistency with std::is_integral, will be true also for cv qualified
-// integral types. is_supported_integral, however, is used in contexts where the cv qualifications
+// integral types. is_cpp_integral_interoperable, however, is used in contexts where the cv qualifications
 // matter, and we want this type trait not to be satisfied by integral types which are, e.g.,
 // const qualified.
 template <typename T>
-using is_supported_integral = conjunction<is_integral<T>, std::is_same<remove_cv_t<T>, T>>;
+using is_cpp_integral_interoperable = conjunction<is_integral<T>, std::is_same<remove_cv_t<T>, T>>;
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool CppIntegralInteroperable = is_cpp_integral_interoperable<T>::value;
+#else
+using cpp_integral_interoperable_enabler = enable_if_t<is_cpp_integral_interoperable<T>::value, int>;
+#endif
 
 // Type trait to check if T is a supported floating-point type.
 template <typename T>
-struct is_supported_float : conjunction<std::is_floating_point<T>, std::is_same<remove_cv_t<T>, T>> {
+struct is_cpp_floating_point_interoperable : conjunction<std::is_floating_point<T>, std::is_same<remove_cv_t<T>, T>> {
 };
 
 #if !defined(MPPP_WITH_MPFR)
 
 // Without MPFR, we don't support long double.
 template <>
-struct is_supported_float<long double> : std::false_type {
+struct is_cpp_floating_point_interoperable<long double> : std::false_type {
 };
 
 #endif
 
 template <typename T>
-using is_cpp_interoperable = disjunction<is_supported_integral<T>, is_supported_float<T>>;
-}
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool CppFloatingPointInteroperable = is_cpp_floating_point_interoperable<T>::value;
+#else
+using cpp_floating_point_interoperable_enabler = enable_if_t<is_cpp_floating_point_interoperable<T>::value, int>;
+#endif
+
+template <typename T>
+using is_cpp_interoperable = disjunction<is_cpp_integral_interoperable<T>, is_cpp_floating_point_interoperable<T>>;
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -77,13 +87,6 @@ template <typename T>
 concept bool StringType = is_string_type<T>::value;
 #else
 using string_type_enabler = enable_if_t<is_string_type<T>::value, int>;
-#endif
-
-template <typename T>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool CppIntegralInteroperable = is_supported_integral<T>::value;
-#else
-using cpp_integral_interoperable_enabler = enable_if_t<is_supported_integral<T>::value, int>;
 #endif
 }
 
