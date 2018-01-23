@@ -3084,6 +3084,17 @@ inline bool regular_p(const real &r)
     return r.regular_p();
 }
 
+/// Detect if a \link mppp::real real\endlink is one.
+/**
+ * @param r the \link mppp::real real\endlink to be checked.
+ *
+ * @return \p true if \p r is exactly 1, \p false otherwise.
+ */
+inline bool is_one(const real &r)
+{
+    return r.is_one();
+}
+
 /// Detect the sign of a \link mppp::real real\endlink.
 /**
  * @param r the \link mppp::real real\endlink that will be examined.
@@ -3221,17 +3232,6 @@ inline bool real_gt(const real &a, const real &b)
     }
     const bool b_nan = b.nan_p();
     return (!a.nan_p() && !b_nan) ? (::mpfr_greater_p(a.get_mpfr_t(), b.get_mpfr_t()) != 0) : !b_nan;
-}
-
-/// Detect if a \link mppp::real real\endlink is one.
-/**
- * @param r the \link mppp::real real\endlink to be checked.
- *
- * @return \p true if \p r is exactly 1, \p false otherwise.
- */
-inline bool is_one(const real &r)
-{
-    return r.is_one();
 }
 
 /** @} */
