@@ -8,6 +8,7 @@
 
 #include <mp++/config.hpp>
 
+#include <mp++/detail/mpfr.hpp>
 #include <mp++/real.hpp>
 #include <stdexcept>
 #include <string>
@@ -182,4 +183,29 @@ TEST_CASE("real real_gt")
     REQUIRE(!real_gt(r0, r0));
     REQUIRE(!real_gt(real{"nan", 5}, r0));
     REQUIRE(real_gt(r0, real{"-nan", 5}));
+}
+
+TEST_CASE("real is_one")
+{
+    REQUIRE(!is_one(real{}));
+    REQUIRE(!real{}.is_one());
+    REQUIRE(!is_one(real{-1}));
+    REQUIRE(!real{-1}.is_one());
+    REQUIRE(is_one(real{1}));
+    REQUIRE(real{1}.is_one());
+    REQUIRE(!is_one(real{1.001}));
+    REQUIRE(!real{1.001}.is_one());
+    REQUIRE(!is_one(real{"inf", 5}));
+    REQUIRE(!real{"inf", 5}.is_one());
+    REQUIRE(!is_one(real{"-inf", 5}));
+    REQUIRE(!real{"-inf", 5}.is_one());
+    REQUIRE(!::mpfr_erangeflag_p());
+    REQUIRE(!is_one(real{"nan", 5}));
+    REQUIRE(!::mpfr_erangeflag_p());
+    REQUIRE(!real{"nan", 5}.is_one());
+    REQUIRE(!::mpfr_erangeflag_p());
+    REQUIRE(!is_one(real{"-nan", 5}));
+    REQUIRE(!::mpfr_erangeflag_p());
+    REQUIRE(!real{"-nan", 5}.is_one());
+    REQUIRE(!::mpfr_erangeflag_p());
 }

@@ -1699,6 +1699,17 @@ public:
     {
         return mpfr_regular_p(&m_mpfr) != 0;
     }
+    /// Detect one.
+    /**
+     * @return \p true if \p this is exactly equal to 1, \p false otherwise.
+     */
+    bool is_one() const
+    {
+        // NOTE: preempt calling the comparison function, if this is NaN
+        // (in such case, the range flag will be touched and we do not
+        // want to bother with that).
+        return !nan_p() && (::mpfr_cmp_ui(&m_mpfr, 1u) == 0);
+    }
     /// Detect sign.
     /**
      * @return a positive value if \p this is positive, zero if \p this is zero, a negative value if \p this
@@ -3210,6 +3221,17 @@ inline bool real_gt(const real &a, const real &b)
     }
     const bool b_nan = b.nan_p();
     return (!a.nan_p() && !b_nan) ? (::mpfr_greater_p(a.get_mpfr_t(), b.get_mpfr_t()) != 0) : !b_nan;
+}
+
+/// Detect if a \link mppp::real real\endlink is one.
+/**
+ * @param r the \link mppp::real real\endlink to be checked.
+ *
+ * @return \p true if \p r is exactly 1, \p false otherwise.
+ */
+inline bool is_one(const real &r)
+{
+    return r.is_one();
 }
 
 /** @} */
