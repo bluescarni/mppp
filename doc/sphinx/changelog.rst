@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Add a function to check if a :cpp:class:`~mppp::real` is equal to one
+  (`#117 <https://github.com/bluescarni/mppp/pull/117>`__).
+
 - The pybind11 integration utilities now automatically translate mp++ exceptions into appropriate
   Python exceptions (`#115 <https://github.com/bluescarni/mppp/pull/115>`__).
 

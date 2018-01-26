@@ -50,6 +50,9 @@ Concepts
 
    Note that the modulo, bit-shifting and bitwise logic operators have additional restrictions.
 
+   A corresponding boolean type trait called ``are_integer_op_types`` is also available (even if the compiler does
+   not support concepts).
+
 .. cpp:concept:: template <typename T, typename U> mppp::IntegerIntegralOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the

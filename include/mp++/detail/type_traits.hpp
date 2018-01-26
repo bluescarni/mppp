@@ -187,7 +187,7 @@ struct make_unsigned_impl {
 #if defined(_GLIBCXX_USE_WCHAR_T) && !defined(__WCHAR_UNSIGNED__)
 
 template <>
-struct make_unsigned_impl<wchar_t, void> {
+struct make_unsigned_impl<wchar_t> {
     using type = typename make_unsigned_impl<__WCHAR_TYPE__>::type;
 };
 
