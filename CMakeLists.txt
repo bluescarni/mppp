@@ -10,6 +10,7 @@ message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "mp++ version: ${mp++_VERSION}")
 
 include(YACMACompilerLinkerSettings)
+include(CheckCXXCompilerFlag)
 
 # Assemble the flags.
 set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
@@ -37,6 +38,12 @@ if(MINGW)
   list(APPEND MPPP_CXX_FLAGS_RELEASE "-Wa,-mbig-obj")
 endif()
 
+if(YACMA_COMPILER_IS_GNUCXX)
+    # This is just a hackish way of detecting concepts, need to revisit once
+    # more compilers support them.
+    check_cxx_compiler_flag("-fconcepts" MPPP_COMPILER_SUPPORTS_CONCEPTS)
+endif()
+
 option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
 option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires Boost)." OFF)
@@ -47,12 +54,6 @@ option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability w
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
 mark_as_advanced(MPPP_TEST_PYBIND11)
-
-if(YACMA_COMPILER_IS_GNUCXX)
-    # This is just a hackish way of detecting concepts, need to revisit once
-    # more compilers support them.
-    check_cxx_compiler_flag("-fconcepts" MPPP_COMPILER_SUPPORTS_CONCEPTS)
-endif()
 
 find_package(GMP REQUIRED)
 
