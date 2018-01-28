@@ -9,6 +9,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRE
 message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "mp++ version: ${mp++_VERSION}")
 
+# Set default build type to "Release".
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Release CACHE STRING
+		"Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+	FORCE)
+endif()
+
 include(YACMACompilerLinkerSettings)
 include(CheckCXXCompilerFlag)
 
@@ -38,6 +45,7 @@ if(MINGW)
   list(APPEND MPPP_CXX_FLAGS_RELEASE "-Wa,-mbig-obj")
 endif()
 
+# Concepts detection.
 if(YACMA_COMPILER_IS_GNUCXX)
     # This is just a hackish way of detecting concepts, need to revisit once
     # more compilers support them.
@@ -55,10 +63,13 @@ option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the rea
 option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
 mark_as_advanced(MPPP_TEST_PYBIND11)
 
-find_package(GMP REQUIRED)
-
 # Setup of the mp++ interface library.
 add_library(mp++ INTERFACE)
+
+# Find GMP first of all. We will make mp++ link to the imported
+# target later, because of linker sensitivity to the linking order
+# on some platforms (see the comment below).
+find_package(GMP REQUIRED)
 
 # Optional dependency on MPFR.
 if(MPPP_WITH_MPFR)
