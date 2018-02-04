@@ -7,6 +7,8 @@ Changelog
 Changes
 ~~~~~~~
 
+- Update the internal copy of Catch to the latest version, 2.1.1 (`#119 <https://github.com/bluescarni/mppp/pull/119>`__).
+
 - Small tweaks/improvements to the build system (`#118 <https://github.com/bluescarni/mppp/pull/118>`__,
   `#119 <https://github.com/bluescarni/mppp/pull/119>`__).
 
