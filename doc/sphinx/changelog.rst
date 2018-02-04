@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.9 (unreleased)
+----------------
+
+Changes
+~~~~~~~
+
+- Small tweaks/improvements to the build system (`#118 <https://github.com/bluescarni/mppp/pull/118>`__,
+  `#119 <https://github.com/bluescarni/mppp/pull/119>`__).
+
 0.8 (2018-01-26)
 ----------------
 

@@ -1,8 +1,6 @@
-cmake_policy(SET CMP0048 NEW)
+cmake_minimum_required(VERSION 3.3.0)
 
 project(mp++ VERSION 0.9 LANGUAGES CXX C)
-
-cmake_minimum_required(VERSION 3.3.0)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
@@ -15,6 +13,18 @@ if(NOT CMAKE_BUILD_TYPE)
 		"Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
 	FORCE)
 endif()
+
+# The build options.
+option(MPPP_BUILD_TESTS "Build unit tests." OFF)
+option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
+option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires Boost)." OFF)
+mark_as_advanced(MPPP_BENCHMARK_BOOST)
+option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
+mark_as_advanced(MPPP_BENCHMARK_FLINT)
+option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
+option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
+option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
+mark_as_advanced(MPPP_TEST_PYBIND11)
 
 include(YACMACompilerLinkerSettings)
 include(CheckCXXCompilerFlag)
@@ -52,17 +62,6 @@ if(YACMA_COMPILER_IS_GNUCXX)
     check_cxx_compiler_flag("-fconcepts" MPPP_COMPILER_SUPPORTS_CONCEPTS)
 endif()
 
-option(MPPP_BUILD_TESTS "Build unit tests." OFF)
-option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
-option(MPPP_BENCHMARK_BOOST "Build benchmarks against Boost.Multiprecision (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires Boost)." OFF)
-mark_as_advanced(MPPP_BENCHMARK_BOOST)
-option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
-mark_as_advanced(MPPP_BENCHMARK_FLINT)
-option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
-option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
-option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
-mark_as_advanced(MPPP_TEST_PYBIND11)
-
 # Setup of the mp++ interface library.
 add_library(mp++ INTERFACE)
 
@@ -95,16 +94,18 @@ endif()
 # NOTE: depend on GMP *after* optionally depending on MPFR, as the order
 # of the libraries matters on some platforms.
 target_link_libraries(mp++ INTERFACE GMP::GMP)
-target_include_directories(mp++ INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
 
 # Depend on DbgHelp on MSVC, for the demangling support.
 if(YACMA_COMPILER_IS_MSVC)
     find_package(DbgHelp REQUIRED)
     target_link_libraries(mp++ INTERFACE DbgHelp::DbgHelp)
 endif()
+
+# Finish setting up the mp++ interface target.
+target_include_directories(mp++ INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
 
 # Configure config.hpp.
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in" "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" @ONLY)
