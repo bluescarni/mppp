@@ -143,7 +143,7 @@ mpf('1.10000000000000000000000000000000008')
 Traceback (most recent call last):
      ...
 TypeError: test_real128_conversion(): incompatible function arguments. The following argument types are supported:
-    1. (arg0: real128) -> real128
+    1. (arg0: mppp::real128) -> mppp::real128
 <BLANKLINE>
 Invoked with: mpf('1.09999999999999999999999999999999998')
 
