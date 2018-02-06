@@ -77,6 +77,7 @@ ADD_MPPP_TESTCASE(rational_abs)
 ADD_MPPP_TESTCASE(rational_arith)
 ADD_MPPP_TESTCASE(rational_arith_ops_01)
 ADD_MPPP_TESTCASE(rational_arith_ops_02)
+ADD_MPPP_TESTCASE(rational_arith_ops_03)
 if(NOT MINGW)
     # NOTE: same as above.
     ADD_MPPP_TESTCASE(rational_basic)
