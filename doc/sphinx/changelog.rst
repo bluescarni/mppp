@@ -7,10 +7,13 @@ Changelog
 Changes
 ~~~~~~~
 
-- Update the internal copy of Catch to the latest version, 2.1.1 (`#119 <https://github.com/bluescarni/mppp/pull/119>`__).
+- Add a leading ``mppp::`` to the names of mp++'s classes in the pybind11 custom type casters
+  (`#120 <https://github.com/bluescarni/mppp/pull/120>`__). This should be only a cosmetic change.
+
+- Update the internal copy of Catch to the latest version, 2.1.1 (`#120 <https://github.com/bluescarni/mppp/pull/120>`__).
 
 - Small tweaks/improvements to the build system (`#118 <https://github.com/bluescarni/mppp/pull/118>`__,
-  `#119 <https://github.com/bluescarni/mppp/pull/119>`__).
+  `#120 <https://github.com/bluescarni/mppp/pull/120>`__).
 
 0.8 (2018-01-26)
 ----------------
