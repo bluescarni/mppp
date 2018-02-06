@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Extra: integration with pybind11 &#8212; mp++ 0.8 documentation</title>
+    <title>Extra: integration with pybind11 &#8212; mp++ 0.9 documentation</title>
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.8',
+        VERSION:     '0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -47,7 +47,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           mp++</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.8</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -153,6 +153,11 @@ allows to use C++ functions and classes from Python.</p>
 <p>This function should be called in the definition of a pybind11 extension module, right after the <code class="docutils literal"><span class="pre">PYBIND11_MODULE()</span></code> invocation. </p>
 </dd></dl>
 
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Do <strong>not</strong> forget to invoke the <a class="reference internal" href="#_CPPv2N13mppp_pybind114initEv" title="mppp_pybind11::init"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp_pybind11::init()</span></code></a> function! Failure to do so will result
+in unpredictable runtime errors.</p>
+</div>
 <p>Including the <code class="docutils literal"><span class="pre">mp++/extra/pybind11.hpp</span></code> header and invoking the <a class="reference internal" href="#_CPPv2N13mppp_pybind114initEv" title="mppp_pybind11::init"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp_pybind11::init()</span></code></a> function will register
 <a class="reference external" href="http://pybind11.readthedocs.io/en/master/advanced/cast/custom.html">custom type casters</a>
 that will automatically translate to/from Python mp++ objects used as arguments and return values in
@@ -264,7 +269,7 @@ verify that the value is correctly preserved and translated:</p>
 <span class="gt">Traceback (most recent call last):</span>
      <span class="o">...</span>
 <span class="gr">TypeError</span>: <span class="n">test_real128_conversion(): incompatible function arguments. The following argument types are supported:</span>
-<span class="go">    1. (arg0: real128) -&gt; real128</span>
+<span class="go">    1. (arg0: mppp::real128) -&gt; mppp::real128</span>
 
 <span class="go">Invoked with: mpf(&#39;1.09999999999999999999999999999999998&#39;)</span>
 </pre></div>
@@ -351,7 +356,7 @@ from C++ code into corresponding Python exceptions. Here is an example with <a c
     </p>
     <p>
         &copy; Copyright 2016-2018, Francesco Biscani.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.<br/>
     </p>
   </div>
 </footer>
