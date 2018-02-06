@@ -308,7 +308,7 @@ namespace detail
 {
 template <std::size_t SSize>
 struct type_caster<mppp::integer<SSize>> {
-    PYBIND11_TYPE_CASTER(mppp::integer<SSize>, _("integer[") + _<SSize>() + _("]"));
+    PYBIND11_TYPE_CASTER(mppp::integer<SSize>, _("mppp::integer<") + _<SSize>() + _(">"));
     bool load(handle src, bool)
     {
         return mppp_pybind11::py_integer_to_mppp_int(value, src.ptr());
@@ -321,7 +321,7 @@ struct type_caster<mppp::integer<SSize>> {
 
 template <std::size_t SSize>
 struct type_caster<mppp::rational<SSize>> {
-    PYBIND11_TYPE_CASTER(mppp::rational<SSize>, _("rational[") + _<SSize>() + _("]"));
+    PYBIND11_TYPE_CASTER(mppp::rational<SSize>, _("mppp::rational<") + _<SSize>() + _(">"));
     bool load(handle src, bool)
     {
         if (!::PyObject_IsInstance(src.ptr(), mppp_pybind11::globals::fraction_class->ptr())) {
@@ -348,7 +348,7 @@ struct type_caster<mppp::rational<SSize>> {
 
 template <>
 struct type_caster<mppp::real> {
-    PYBIND11_TYPE_CASTER(mppp::real, _("real"));
+    PYBIND11_TYPE_CASTER(mppp::real, _("mppp::real"));
     bool load(handle src, bool)
     {
         if (!mppp_pybind11::globals::mpmath
@@ -433,7 +433,7 @@ struct type_caster<mppp::real> {
 
 template <>
 struct type_caster<mppp::real128> {
-    PYBIND11_TYPE_CASTER(mppp::real128, _("real128"));
+    PYBIND11_TYPE_CASTER(mppp::real128, _("mppp::real128"));
     bool load(handle src, bool)
     {
         if (!mppp_pybind11::globals::mpmath

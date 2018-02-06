@@ -22,6 +22,11 @@ The API for the pybind11 integration currently includes a single function in the
 
 .. doxygenfunction:: mppp_pybind11::init()
 
+.. note::
+
+   Do **not** forget to invoke the :cpp:func:`mppp_pybind11::init()` function! Failure to do so will result
+   in unpredictable runtime failures.
+
 Including the ``mp++/extra/pybind11.hpp`` header and invoking the :cpp:func:`mppp_pybind11::init()` function will register
 `custom type casters <http://pybind11.readthedocs.io/en/master/advanced/cast/custom.html>`__
 that will automatically translate to/from Python mp++ objects used as arguments and return values in
