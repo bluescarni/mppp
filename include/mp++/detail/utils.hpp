@@ -71,32 +71,6 @@ constexpr make_unsigned_t<T> make_unsigned(T n)
     return static_cast<make_unsigned_t<T>>(n);
 }
 
-// A wrapper for the demangler.
-template <typename T>
-inline std::string type_string()
-{
-    return demangle<T>();
-}
-
-#if defined(MPPP_HAVE_GCC_INT128) && defined(__apple_build_version__)
-
-// NOTE: testing indicates that on OSX the typeid machinery for the 128-bit types
-// is not implemented correctly. Provide a custom implementation as a workaround.
-// We return strings consistent with the output on linux.
-template <>
-inline std::string type_string<__uint128_t>()
-{
-    return "unsigned __int128";
-}
-
-template <>
-inline std::string type_string<__int128_t>()
-{
-    return "__int128";
-}
-
-#endif
-
 // Generic string conversion utility - will use std::to_string() for arithmetic types,
 // x.to_string() otherwise.
 template <typename T, enable_if_t<std::is_arithmetic<T>::value, int> = 0>
@@ -233,7 +207,7 @@ inline
     return retval.first ? retval.second
                         : throw std::overflow_error(
                               "Error while trying to negate the unsigned integral value " + to_string(n)
-                              + ": the result does not fit in the range of the target type '" + type_string<T>() + "'");
+                              + ": the result does not fit in the range of the target type '" + demangle<T>() + "'");
 }
 
 // Safe casting functionality between integral types. It will throw if the conversion overflows the range
@@ -246,7 +220,7 @@ constexpr T safe_cast(const U &n)
                ? static_cast<T>(n)
                : throw std::overflow_error(
                      "Error in the safe conversion between unsigned integral types: the input value " + to_string(n)
-                     + " does not fit in the range of the target type '" + type_string<T>() + "'");
+                     + " does not fit in the range of the target type '" + demangle<T>() + "'");
 }
 
 template <typename T, typename U,
@@ -257,7 +231,7 @@ constexpr T safe_cast(const U &n)
                ? static_cast<T>(n)
                : throw std::overflow_error(
                      "Error in the safe conversion between signed integral types: the input value " + to_string(n)
-                     + " does not fit in the range of the target type '" + type_string<T>() + "'");
+                     + " does not fit in the range of the target type '" + demangle<T>() + "'");
 }
 
 template <typename T, typename U,
@@ -269,7 +243,7 @@ constexpr T safe_cast(const U &n)
                : throw std::overflow_error("Error in the safe conversion from a signed integral type to an unsigned "
                                            "integral type: the input value "
                                            + to_string(n) + " does not fit in the range of the target type '"
-                                           + type_string<T>() + "'");
+                                           + demangle<T>() + "'");
 }
 
 template <typename T, typename U,
@@ -281,7 +255,7 @@ constexpr T safe_cast(const U &n)
                : throw std::overflow_error("Error in the safe conversion from an unsigned integral type to a signed "
                                            "integral type: the input value "
                                            + to_string(n) + " does not fit in the range of the target type '"
-                                           + type_string<T>() + "'");
+                                           + demangle<T>() + "'");
 }
 
 #if defined(MPPP_HAVE_GCC_INT128)
