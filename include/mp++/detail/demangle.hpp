@@ -13,6 +13,8 @@
 #include <typeindex>
 #include <typeinfo>
 
+#include <mp++/config.hpp>
+
 #if defined(__GNUC__) || (defined(__clang__) && !defined(_MSC_VER))
 
 // GCC demangle. This is available also for clang, both with libstdc++ and libc++.
@@ -93,6 +95,25 @@ inline std::string demangle()
 {
     return demangle(typeid(T));
 }
+
+#if defined(MPPP_HAVE_GCC_INT128) && defined(__apple_build_version__)
+
+// NOTE: testing indicates that on OSX the typeid machinery for the 128-bit types
+// is not implemented correctly. Provide a custom implementation as a workaround.
+// We return strings consistent with the output on linux.
+template <>
+inline std::string demangle<__uint128_t>()
+{
+    return "unsigned __int128";
+}
+
+template <>
+inline std::string demangle<__int128_t>()
+{
+    return "__int128";
+}
+
+#endif
 }
 }
 

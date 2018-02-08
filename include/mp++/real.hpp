@@ -34,6 +34,7 @@
 #include <vector>
 
 #include <mp++/concepts.hpp>
+#include <mp++/detail/demangle.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -1907,7 +1908,7 @@ private:
     template <typename T>
     [[noreturn]] void raise_overflow_error() const
     {
-        throw std::overflow_error("Conversion of the real " + to_string() + " to the type '" + type_string<T>()
+        throw std::overflow_error("Conversion of the real " + to_string() + " to the type '" + demangle<T>()
                                   + "' results in overflow");
     }
     // Unsigned integrals, excluding bool.

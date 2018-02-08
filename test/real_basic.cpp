@@ -24,10 +24,10 @@
 #include <utility>
 #include <vector>
 
+#include <mp++/detail/demangle.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
-#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real.hpp>
@@ -1216,7 +1216,7 @@ struct int_conv_tester {
                                  [](const std::overflow_error &ex) {
                                      return ex.what()
                                             == "Conversion of the real " + real{int_t{nl_max<T>()} + 1}.to_string()
-                                                   + " to the type '" + type_string<T>() + "' results in overflow";
+                                                   + " to the type '" + demangle<T>() + "' results in overflow";
                                  });
         REQUIRE((!real{int_t{nl_max<T>()} + 1}.get(rop)));
         REQUIRE(!get(rop, real{int_t{nl_max<T>()} + 1}));
@@ -1225,7 +1225,7 @@ struct int_conv_tester {
                                  [](const std::overflow_error &ex) {
                                      return ex.what()
                                             == "Conversion of the real " + real{int_t{nl_min<T>()} - 1}.to_string()
-                                                   + " to the type '" + type_string<T>() + "' results in overflow";
+                                                   + " to the type '" + demangle<T>() + "' results in overflow";
                                  });
         REQUIRE((!real{int_t{nl_min<T>()} - 1}.get(rop)));
         REQUIRE(!get(rop, real{int_t{nl_min<T>()} - 1}));

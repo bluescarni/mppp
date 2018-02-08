@@ -27,7 +27,7 @@ TEST_CASE("demangle")
     std::cout << demangle<std::vector<std::vector<float>>>() << '\n';
     std::cout << demangle<integer<1>>() << '\n';
     std::cout << demangle<rational<2>>() << '\n';
-#if defined(MPPP_HAVE_GCC_INT128) && !defined(__apple_build_version__)
+#if defined(MPPP_HAVE_GCC_INT128)
     std::cout << demangle<__int128_t>() << '\n';
     std::cout << demangle<__uint128_t>() << '\n';
 #endif
