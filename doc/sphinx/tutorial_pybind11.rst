@@ -32,8 +32,8 @@ Including the ``mp++/extra/pybind11.hpp`` header and invoking the :cpp:func:`mpp
 that will automatically translate to/from Python mp++ objects used as arguments and return values in
 functions exposed from C++. The translation rules are the following:
 
-* :cpp:class:`~mppp::integer` objects are converted to/from Python :ref:`integers <python:typesnumeric>`,
-* :cpp:class:`~mppp::rational` objects are converted to/from Python :py:mod:`fractions`,
+* :cpp:class:`~mppp::integer` objects are converted to/from Python :py:class:`integers <int>`,
+* :cpp:class:`~mppp::rational` objects are converted to/from Python :py:class:`fractions <fractions.Fraction>`,
 * :cpp:class:`~mppp::real` and :cpp:class:`~mppp::real128` objects are translated to/from `mpmath's mpf objects <http://mpmath.org/>`__.
 
 If the mpmath library is not installed, the translations for :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::real` will be disabled
