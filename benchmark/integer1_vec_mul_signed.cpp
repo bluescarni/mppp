@@ -7,6 +7,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <mp++/mp++.hpp>
@@ -94,6 +95,50 @@ int main()
         s += "['mp++','total'," + std::to_string(st1.elapsed()) + "],";
         std::cout << "\nTotal runtime: ";
     }
+    {
+        std::cout << "\n\nBenchmarking int64.";
+        simple_timer st1;
+        double init_time;
+        auto p = get_init_vectors<std::int_least64_t>(init_time);
+        s += "['int64','init'," + std::to_string(init_time) + "],";
+        {
+            simple_timer st2;
+            for (auto i = 0ul; i < size; ++i) {
+                std::get<3>(p)[i] = std::get<0>(p)[i] * std::get<1>(p)[i];
+            }
+            for (auto i = 0ul; i < size; ++i) {
+                std::get<3>(p)[i] = std::get<2>(p)[i] + std::get<3>(p)[i];
+            }
+            std::cout << std::get<3>(p)[size - 1u] << '\n';
+            s += "['int64','operation'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nOperation runtime: ";
+        }
+        s += "['int64','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << "\nTotal runtime: ";
+    }
+#if defined(MPPP_HAVE_GCC_INT128)
+    {
+        std::cout << "\n\nBenchmarking int128.";
+        simple_timer st1;
+        double init_time;
+        auto p = get_init_vectors<__int128_t>(init_time);
+        s += "['int128','init'," + std::to_string(init_time) + "],";
+        {
+            simple_timer st2;
+            for (auto i = 0ul; i < size; ++i) {
+                std::get<3>(p)[i] = std::get<0>(p)[i] * std::get<1>(p)[i];
+            }
+            for (auto i = 0ul; i < size; ++i) {
+                std::get<3>(p)[i] = std::get<2>(p)[i] + std::get<3>(p)[i];
+            }
+            std::cout << static_cast<std::int_least64_t>(std::get<3>(p)[size - 1u]) << '\n';
+            s += "['int128','operation'," + std::to_string(st2.elapsed()) + "],";
+            std::cout << "\nOperation runtime: ";
+        }
+        s += "['int128','total'," + std::to_string(st1.elapsed()) + "],";
+        std::cout << "\nTotal runtime: ";
+    }
+#endif
 #if defined(MPPP_BENCHMARK_BOOST)
     {
         std::cout << "\n\nBenchmarking cpp_int.";
