@@ -148,7 +148,8 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
                 // NOTE: we need to search into the whole all_chars array (instead of just up to all_chars
                 // + base) because apparently mpfr_get_str() seems to ignore lower/upper case when the base
                 // is small enough (e.g., it uses 'a' instead of 'A' when printing in base 11).
-                if (std::binary_search(all_chars, all_chars + sizeof(all_chars), *cptr)) {
+                // NOTE: the range needs to be sizeof() - 1 because sizeof() also includes the terminator.
+                if (std::binary_search(all_chars, all_chars + (sizeof(all_chars) - 1u), *cptr)) {
                     os << '.';
                     dot_added = true;
                 }

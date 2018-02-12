@@ -15,6 +15,11 @@ Changes
 - Small tweaks/improvements to the build system (`#118 <https://github.com/bluescarni/mppp/pull/118>`__,
   `#120 <https://github.com/bluescarni/mppp/pull/120>`__, `#121 <https://github.com/bluescarni/mppp/pull/121>`__).
 
+Fix
+~~~
+
+- Fix a potential bug in the :cpp:class:`~mppp::real` printing code (`#123 <https://github.com/bluescarni/mppp/pull/123>`__).
+
 0.8 (2018-01-26)
 ----------------
 
