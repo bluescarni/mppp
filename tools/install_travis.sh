@@ -56,7 +56,7 @@ elif [[ "${MPPP_BUILD}" == "CoverageGCC5" ]]; then
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-5;
 elif [[ "${MPPP_BUILD}" == "CoverageGCC7" ]]; then
-    CXX=g++-7 CC=gcc-7 cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_TEST_PYBIND11=yes -DPYBIND11_PYTHON_VERSION=3.6 -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage -fconcepts" -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM} ../;
+    CXX=g++-7 CC=gcc-7 cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_TEST_PYBIND11=yes -DPYBIND11_PYTHON_VERSION=3.6 -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage -fconcepts -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC" -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM} ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-7;
