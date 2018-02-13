@@ -1,8 +1,6 @@
 Common concepts
 ===============
 
-*#include <mp++/concepts.hpp>*
-
 .. note::
 
    Generic functions and classes in mp++ support `concepts <https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)>`__
@@ -14,6 +12,8 @@ Common concepts
    Since the syntax of native C++ concepts is clearer than that of the concept emulation layer, the mp++ documentation describes
    and refers to concepts in their native C++ form. As long as concepts are not part of the C++ standard, mp++'s concepts
    will be subject to breaking changes, and they should not be regarded as part of the public mp++ API.
+
+*#include <mp++/concepts.hpp>*
 
 .. cpp:concept:: template <typename T> mppp::CppInteroperable
 
