@@ -56,10 +56,6 @@ if(NOT Quadmath_INCLUDE_DIR OR NOT Quadmath_LIBRARY)
     endif()
 endif()
 
-if(Quadmath_USE_DIRECTLY)
-    message(STATUS "libquadmath will be included and linked directly.")
-endif()
-
 find_package_handle_standard_args(Quadmath DEFAULT_MSG Quadmath_LIBRARY Quadmath_INCLUDE_DIR)
 
 mark_as_advanced(Quadmath_INCLUDE_DIR Quadmath_LIBRARY)
@@ -68,6 +64,7 @@ mark_as_advanced(Quadmath_INCLUDE_DIR Quadmath_LIBRARY)
 if(Quadmath_FOUND AND NOT TARGET Quadmath::quadmath)
     message(STATUS "Creating the 'Quadmath::quadmath' imported target.")
     if(Quadmath_USE_DIRECTLY)
+        message(STATUS "libquadmath will be included and linked directly.")
         # If we are using it directly, we must define an interface library,
         # as we do not have the full path to the shared library.
         add_library(Quadmath::quadmath INTERFACE IMPORTED)
