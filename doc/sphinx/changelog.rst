@@ -4,6 +4,11 @@ Changelog
 0.9 (unreleased)
 ----------------
 
+New
+~~~
+
+- Add a couple of benchmarks against hardware integer types (`#124 <https://github.com/bluescarni/mppp/pull/124>`__).
+
 Changes
 ~~~~~~~
 
@@ -12,8 +17,9 @@ Changes
 
 - Update the internal copy of Catch to the latest version, 2.1.1 (`#120 <https://github.com/bluescarni/mppp/pull/120>`__).
 
-- Small tweaks/improvements to the build system (`#118 <https://github.com/bluescarni/mppp/pull/118>`__,
-  `#120 <https://github.com/bluescarni/mppp/pull/120>`__, `#121 <https://github.com/bluescarni/mppp/pull/121>`__).
+- Small tweaks/improvements to the build system and to the docs (`#118 <https://github.com/bluescarni/mppp/pull/118>`__,
+  `#120 <https://github.com/bluescarni/mppp/pull/120>`__, `#121 <https://github.com/bluescarni/mppp/pull/121>`__,
+  `#124 <https://github.com/bluescarni/mppp/pull/124>`__).
 
 Fix
 ~~~
