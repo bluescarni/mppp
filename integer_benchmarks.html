@@ -186,7 +186,8 @@ are used for the accumulation of the dot product. The benchmark is run in a vari
 <div class="section" id="limb-unsigned-integers">
 <span id="integer1-dot-product-unsigned"></span><h3>1-limb unsigned integers<a class="headerlink" href="#limb-unsigned-integers" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values, and the final dot product
-is less than <span class="math">\(2^{64}\)</span>. mp++ integers with 1 limb of static size are employed.</p>
+is less than <span class="math">\(2^{64}\)</span>. mp++ integers with 1 limb of static size are employed. For this benchmark,
+we also include timings for 64-bit (<code class="docutils literal"><span class="pre">std::uint64_t</span></code>) and 128-bit (<code class="docutils literal"><span class="pre">__uint128_t</span></code>) integers.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer1_dot_product_unsigned.png"><img alt="_images/integer1_dot_product_unsigned.png" src="_images/integer1_dot_product_unsigned.png" style="width: 609.5px; height: 407.0px;" /></a>
 </div>
@@ -194,12 +195,14 @@ is less than <span class="math">\(2^{64}\)</span>. mp++ integers with 1 limb of 
 integer types. This is due to the fact that the GMP API always uses dynamically-allocated memory, even for small values.
 The other integer types all employ a small-value optimisation, and thus avoid the performance cost of heap allocation.</p>
 <p>In this particular benchmark, mp++ is about 3 times faster than GMP (as measured via the <code class="docutils literal"><span class="pre">mpz_int</span></code> wrapper)
-in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark. mp++ is also faster than <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT, albeit by a smaller margin.</p>
+in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark. mp++ is also faster than <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT, albeit by a smaller margin.
+With respect to the 64/128-bit hardware integer types, there are x4/x2 slowdowns in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark.</p>
 </div>
 <div class="section" id="limb-signed-integers">
 <h3>1-limb signed integers<a class="headerlink" href="#limb-signed-integers" title="Permalink to this headline">¶</a></h3>
 <p>This setup is almost identical to the <a class="reference internal" href="#integer1-dot-product-unsigned"><span class="std std-ref">previous one</span></a>, but this time the vectors
-are initialised with both positive <em>and</em> negative values.</p>
+are initialised with both positive <em>and</em> negative values. For this benchmark, we also include timings for 64-bit (<code class="docutils literal"><span class="pre">std::int64_t</span></code>)
+and 128-bit (<code class="docutils literal"><span class="pre">__int128_t</span></code>) integers.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer1_dot_product_signed.png"><img alt="_images/integer1_dot_product_signed.png" src="_images/integer1_dot_product_signed.png" style="width: 610.0px; height: 407.0px;" /></a>
 </div>
@@ -208,7 +211,10 @@ for all libraries, both during the initialisation of the vectors and in the <cod
 This is due to the fact that sign handling in multiprecision computations is typically implemented
 with branches, and when positive and negative values are equally likely the effectiveness of the CPU’s branch predictor
 is much reduced.</p>
-<p>The performance advantage of mp++ with respect to the other libraries is retained, albeit by a smaller margin.</p>
+<p>The performance advantage of mp++ with respect to the other libraries is retained, albeit by a smaller margin.
+With respect to the 64/128-bit hardware integer types, there are x10/x4 slowdowns in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark.
+The worse slowdowns (with respect to the previous unsigned test) are due to the high number of mispredicted
+branches in this particular test.</p>
 </div>
 <div class="section" id="integer2-dot-product-unsigned">
 <span id="id1"></span><h3>2-limb unsigned integers<a class="headerlink" href="#integer2-dot-product-unsigned" title="Permalink to this headline">¶</a></h3>
@@ -240,21 +246,26 @@ instead of accumulating the result into a single scalar).</p>
 <div class="section" id="integer1-vec-mul-unsigned">
 <span id="id3"></span><h3>1-limb unsigned integers<a class="headerlink" href="#integer1-vec-mul-unsigned" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values.
-mp++ integers with 1 limb of static size are employed.</p>
+mp++ integers with 1 limb of static size are employed. For this benchmark,
+we also include timings for 64-bit (<code class="docutils literal"><span class="pre">std::uint64_t</span></code>) and 128-bit (<code class="docutils literal"><span class="pre">__uint128_t</span></code>) integers.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer1_vec_mul_unsigned.png"><img alt="_images/integer1_vec_mul_unsigned.png" src="_images/integer1_vec_mul_unsigned.png" style="width: 610.0px; height: 407.0px;" /></a>
 </div>
 <p>This time mp++ is more than 5 times faster than GMP in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark, while still maintaining
-a performance advantage over <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT.</p>
+a performance advantage over <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT.
+The slowdown in the <code class="docutils literal"><span class="pre">operation</span></code> part of the benchmark with respect to 64-bit integers is less than x3, while mp++ performs
+similarly to 128-bit integers for this particular test.</p>
 </div>
 <div class="section" id="id4">
 <h3>1-limb signed integers<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<p>In this setup, the vectors are initialised with both positive <em>and</em> negative values.</p>
+<p>In this setup, the vectors are initialised with both positive <em>and</em> negative values. For this benchmark, we also include
+timings for 64-bit (<code class="docutils literal"><span class="pre">std::int64_t</span></code>) and 128-bit (<code class="docutils literal"><span class="pre">__int128_t</span></code>) integers.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer1_vec_mul_signed.png"><img alt="_images/integer1_vec_mul_signed.png" src="_images/integer1_vec_mul_signed.png" style="width: 610.0px; height: 407.0px;" /></a>
 </div>
 <p>We can see again how the introduction of mixed positive and negative values impacts performance negatively with respect
-to the <a class="reference internal" href="#integer1-vec-mul-unsigned"><span class="std std-ref">unsigned setup</span></a>.</p>
+to the <a class="reference internal" href="#integer1-vec-mul-unsigned"><span class="std std-ref">unsigned setup</span></a>.
+With respect to the 64/128-bit hardware integer types, there are x4/x2 slowdowns in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark.</p>
 </div>
 <div class="section" id="integer2-vec-mul-unsigned">
 <span id="id5"></span><h3>2-limb unsigned integers<a class="headerlink" href="#integer2-vec-mul-unsigned" title="Permalink to this headline">¶</a></h3>
