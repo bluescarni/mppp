@@ -26,6 +26,8 @@ Fix
 
 - Fix a potential bug in the :cpp:class:`~mppp::real` printing code (`#123 <https://github.com/bluescarni/mppp/pull/123>`__).
 
+- Fix a potential name shadowing issue in the pybind11 integration utilities (`#125 <https://github.com/bluescarni/mppp/pull/125>`__).
+
 0.8 (2018-01-26)
 ----------------
 
