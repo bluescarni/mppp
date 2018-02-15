@@ -381,7 +381,11 @@ struct type_caster<mppp::real> {
             // NOTE: the tuple returned by _mpf_ might contain an mpz from gmpy, instead of a Python integer. Thus, we
             // need to convert to a Python integer in order to be extra sure we pass an object of the correct type
             // to py_integer_to_mppp_int().
-            if (!mppp_pybind11::py_integer_to_mppp_int(sig, int_(mpf_tuple[1]).ptr())) {
+            // NOTE: we use the explicit pybind11::int_ name because apparently there are
+            // shadowing problems when including other pybind11 header. See the reference to a
+            // similar problem here (in our case the issue came from including pybind11/stl_bind.h):
+            // https://github.com/pybind/pybind11/issues/352
+            if (!mppp_pybind11::py_integer_to_mppp_int(sig, pybind11::int_(mpf_tuple[1]).ptr())) {
                 throw std::runtime_error("Could not interpret the significand of an mpf value as an integer object");
             }
             set_z_2exp(value, sig, mpf_tuple[2].cast<::mpfr_exp_t>());
@@ -457,7 +461,8 @@ struct type_caster<mppp::real128> {
             value = mppp::real128_nan();
         } else {
             mppp::integer<1> sig;
-            if (!mppp_pybind11::py_integer_to_mppp_int(sig, int_(mpf_tuple[1]).ptr())) {
+            // NOTE: same as above, regarding the use of the full pybind11::int_ name.
+            if (!mppp_pybind11::py_integer_to_mppp_int(sig, pybind11::int_(mpf_tuple[1]).ptr())) {
                 throw std::runtime_error("Could not interpret the significand of an mpf value as an integer object");
             }
             // NOTE: we have to be careful here. We might have a very large significand
