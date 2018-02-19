@@ -17,7 +17,14 @@ environment:
     - BUILD_TYPE: MSVC15_64
     - BUILD_TYPE: MSVC15_clang_32
     - BUILD_TYPE: MSVC15_clang_64
-    - BUILD_TYPE: Debug
+    - BUILD_TYPE: MinGW
+      TEST_NSPLIT: "2"
+      SPLIT_TEST_NUM: "0"
+      COMPILER: MinGW
+      PLATFORM: x64
+    - BUILD_TYPE: MinGW
+      TEST_NSPLIT: "2"
+      SPLIT_TEST_NUM: "1"
       COMPILER: MinGW
       PLATFORM: x64
 
@@ -56,15 +63,15 @@ install:
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] clang-cl -v
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
 
-- if [%COMPILER%]==[MinGW] set PATH=C:\mingw64\bin;%PATH%
-- if [%COMPILER%]==[MinGW] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z
-- if [%COMPILER%]==[MinGW] 7z x -oC:\ x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z > NUL
-- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/gmp_mingw_64.7z
-- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mpfr_mingw_64.7z
-- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ gmp_mingw_64.7z > NUL
-- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ mpfr_mingw_64.7z > NUL
+- if [%BUILD_TYPE%]==[MinGW] set PATH=C:\mingw64\bin;%PATH%
+- if [%BUILD_TYPE%]==[MinGW] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z
+- if [%BUILD_TYPE%]==[MinGW] 7z x -oC:\ x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z > NUL
+- if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/gmp_mingw_64.7z
+- if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mpfr_mingw_64.7z
+- if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ gmp_mingw_64.7z > NUL
+- if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ mpfr_mingw_64.7z > NUL
 # Rename sh.exe as sh.exe in PATH interferes with MinGW.
-- if [%COMPILER%]==[MinGW] rename "C:\Program Files\Git\usr\bin\sh.exe" "sh2.exe"
+- if [%BUILD_TYPE%]==[MinGW] rename "C:\Program Files\Git\usr\bin\sh.exe" "sh2.exe"
 
 build_script:
 - mkdir build
@@ -91,14 +98,14 @@ build_script:
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Release --target pybind11_test_01
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] cmake --build .
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] cmake --build . -- -v
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake --build .
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake --build . -- -v
 
-- if [%COMPILER%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_CXX_FLAGS="-fconcepts" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=YES -DMPPP_WITH_QUADMATH=yes -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/libgmp.a -DMPFR_INCLUDE_DIR=C:/local/include -DMPFR_LIBRARY=C:/local/lib/libmpfr.a ..
+- if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_CXX_FLAGS="-fconcepts" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=YES -DMPPP_WITH_QUADMATH=yes -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/libgmp.a -DMPFR_INCLUDE_DIR=C:/local/include -DMPFR_LIBRARY=C:/local/lib/libmpfr.a -DMPPP_TEST_NSPLIT=%TEST_NSPLIT% -DMPPP_TEST_SPLIT_NUM=%SPLIT_TEST_NUM% ..
 #- if [%COMPILER%]==[MinGW] cmake --build . --config %BUILD_TYPE% --target all
-- if [%COMPILER%]==[MinGW] mingw32-make -j2 VERBOSE=1
+- if [%BUILD_TYPE%]==[MinGW] mingw32-make -j2 VERBOSE=1
 
 test_script:
 - if [%BUILD_TYPE%]==[MSVC15_32] ctest -V -C Debug -E pybind11
@@ -117,7 +124,7 @@ test_script:
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] ctest -V
 
-- if [%COMPILER%]==[MinGW] ctest -V
+- if [%BUILD_TYPE%]==[MinGW] ctest -V
 
 # Enable this to be able to login to the build worker. You can use the
 # `remmina` program in Ubuntu, use the login information that the line below

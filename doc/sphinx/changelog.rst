@@ -19,7 +19,7 @@ Changes
 
 - Small tweaks/improvements to the build system and to the docs (`#118 <https://github.com/bluescarni/mppp/pull/118>`__,
   `#120 <https://github.com/bluescarni/mppp/pull/120>`__, `#121 <https://github.com/bluescarni/mppp/pull/121>`__,
-  `#124 <https://github.com/bluescarni/mppp/pull/124>`__).
+  `#124 <https://github.com/bluescarni/mppp/pull/124>`__, `#126 <https://github.com/bluescarni/mppp/pull/126>`__).
 
 Fix
 ~~~
