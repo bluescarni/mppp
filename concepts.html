@@ -179,12 +179,11 @@ not support concepts).</p>
 <dl class="concept">
 <dt id="_CPPv2I0EN4mppp10StringTypeE">
 template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">mppp::</code><code class="descname">StringType</code><a class="headerlink" href="#_CPPv2I0EN4mppp10StringTypeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>This concept is satisfied by C++ string-like types. Specifically, the concept will be true if <code class="docutils literal"><span class="pre">T</span></code> is
-any of the following:</p>
+<dd><p>This concept is satisfied by C++ string-like types. Specifically, the concept will be true if <code class="docutils literal"><span class="pre">T</span></code>,
+after the removal of cv qualifiers, is one of the following types:</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">std::string</span></code>,</li>
-<li><code class="docutils literal"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*</span></code>,</li>
-<li><code class="docutils literal"><span class="pre">char</span> <span class="pre">*</span></code>,</li>
+<li>a pointer to (possibly cv qualified) <code class="docutils literal"><span class="pre">char</span></code>,</li>
 <li>a <code class="docutils literal"><span class="pre">char</span></code> array of any size.</li>
 </ul>
 <p>Additionally, if at least C++17 is being used, the concept is satisfied also by <code class="docutils literal"><span class="pre">std::string_view</span></code>.</p>

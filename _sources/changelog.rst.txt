@@ -12,6 +12,9 @@ New
 Changes
 ~~~~~~~
 
+- The :cpp:concept:`mppp::StringType` concept is now satisfied by cv qualified types as well
+  (`#127 <https://github.com/bluescarni/mppp/pull/127>`__).
+
 - Add a leading ``mppp::`` to the names of mp++'s classes in the pybind11 custom type casters
   (`#120 <https://github.com/bluescarni/mppp/pull/120>`__). This should be only a cosmetic change.
 

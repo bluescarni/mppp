@@ -48,12 +48,11 @@ Common concepts
 
 .. cpp:concept:: template <typename T> mppp::StringType
 
-   This concept is satisfied by C++ string-like types. Specifically, the concept will be true if ``T`` is
-   any of the following:
+   This concept is satisfied by C++ string-like types. Specifically, the concept will be true if ``T``,
+   after the removal of cv qualifiers, is one of the following types:
 
    * ``std::string``,
-   * ``const char *``,
-   * ``char *``,
+   * a pointer to (possibly cv qualified) ``char``,
    * a ``char`` array of any size.
 
    Additionally, if at least C++17 is being used, the concept is satisfied also by ``std::string_view``.
