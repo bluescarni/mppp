@@ -704,6 +704,8 @@ public:
             prec = dp;
         }
         ::mpfr_init2(&m_mpfr, prec);
+        // NOTE: handle all cases explicitly, in order to avoid
+        // compiler warnings.
         switch (k) {
             case real_kind::nan:
                 break;

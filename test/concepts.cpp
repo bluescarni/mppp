@@ -63,26 +63,35 @@ TEST_CASE("concepts")
 
     REQUIRE(is_string_type<char *>::value);
     REQUIRE(is_string_type<const char *>::value);
+    REQUIRE(is_string_type<char *const>::value);
+    REQUIRE(is_string_type<const char *>::value);
+    REQUIRE(is_string_type<const char *const>::value);
+    REQUIRE(!is_string_type<char *&>::value);
     REQUIRE(is_string_type<char[]>::value);
+    REQUIRE(is_string_type<const char[]>::value);
     REQUIRE(is_string_type<char[1]>::value);
+    REQUIRE(is_string_type<const char[1]>::value);
     REQUIRE(is_string_type<char[2]>::value);
     REQUIRE(is_string_type<char[10]>::value);
+    REQUIRE(is_string_type<const char[10]>::value);
+    REQUIRE(!is_string_type<const char(&)[10]>::value);
+    REQUIRE(!is_string_type<char(&)[10]>::value);
     REQUIRE(!is_string_type<char>::value);
     REQUIRE(!is_string_type<const char>::value);
     REQUIRE(!is_string_type<int>::value);
     REQUIRE(is_string_type<std::string>::value);
     REQUIRE(!is_string_type<std::string &>::value);
     REQUIRE(!is_string_type<const std::string &>::value);
-    REQUIRE(!is_string_type<const std::string>::value);
+    REQUIRE(is_string_type<const std::string>::value);
     REQUIRE(!is_string_type<char(&)[]>::value);
     REQUIRE(!is_string_type<char(&)[1]>::value);
-    REQUIRE(!is_string_type<const char[2]>::value);
+    REQUIRE(is_string_type<const char[2]>::value);
     REQUIRE(!is_string_type<char(&&)[10]>::value);
 #if MPPP_CPLUSPLUS >= 201703L
     REQUIRE(is_string_type<std::string_view>::value);
     REQUIRE(!is_string_type<std::string_view &>::value);
     REQUIRE(!is_string_type<const std::string_view &>::value);
-    REQUIRE(!is_string_type<const std::string_view>::value);
+    REQUIRE(is_string_type<const std::string_view>::value);
 #endif
     std::string s{"foo"};
     check_dispatch(std::string{"foo"});

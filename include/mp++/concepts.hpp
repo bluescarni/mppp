@@ -72,14 +72,23 @@ using cpp_interoperable_enabler = enable_if_t<is_cpp_interoperable<T>::value, in
 inline namespace detail
 {
 
+// NOTE: remove_pointer_t removes the top level qualifiers of the pointer as well:
+// http://en.cppreference.com/w/cpp/types/remove_pointer
+// After removal of pointer, we could still have a type which is cv-qualified. Thus,
+// we remove cv-qualifications after pointer removal.
 template <typename T>
-using is_string_type = disjunction<std::is_same<T, std::string>, std::is_same<T, const char *>, std::is_same<T, char *>,
-                                   conjunction<std::is_array<T>, std::is_same<remove_extent_t<T>, char>>
+using is_char_pointer = conjunction<std::is_pointer<T>, std::is_same<remove_cv_t<remove_pointer_t<T>>, char>>;
+
+template <typename T>
+using is_string_type
+    = disjunction<std::is_same<remove_cv_t<T>, std::string>, is_char_pointer<T>,
+                  // NOTE: remove_cv_t does remove cv qualifiers from arrays.
+                  conjunction<std::is_array<remove_cv_t<T>>, std::is_same<remove_extent_t<remove_cv_t<T>>, char>>
 #if MPPP_CPLUSPLUS >= 201703L
-                                   ,
-                                   std::is_same<T, std::string_view>
+                  ,
+                  std::is_same<remove_cv_t<T>, std::string_view>
 #endif
-                                   >;
+                  >;
 }
 
 template <typename T>
