@@ -14,6 +14,7 @@
 #include <typeinfo>
 
 #include <mp++/config.hpp>
+#include <mp++/detail/type_traits.hpp>
 
 #if defined(__GNUC__) || (defined(__clang__) && !defined(_MSC_VER))
 
@@ -90,27 +91,40 @@ inline std::string demangle(const std::type_index &t_idx)
 }
 
 // Convenience overload with template type.
-template <typename T>
-inline std::string demangle()
-{
-    return demangle(typeid(T));
-}
-
 #if defined(MPPP_HAVE_GCC_INT128) && defined(__apple_build_version__)
 
 // NOTE: testing indicates that on OSX the typeid machinery for the 128-bit types
 // is not implemented correctly. Provide a custom implementation as a workaround.
 // We return strings consistent with the output on linux.
-template <>
-inline std::string demangle<__uint128_t>()
+template <typename T, enable_if_t<std::is_same<uncvref_t<T>, __uint128_t>::value, int> = 0>
+inline std::string demangle()
 {
+    // NOTE: the GCC/clang demangler does not seem to distinguish
+    // between T and cv-ref T. So let's just return the raw type.
     return "unsigned __int128";
 }
 
-template <>
-inline std::string demangle<__int128_t>()
+template <typename T, enable_if_t<std::is_same<uncvref_t<T>, __int128_t>::value, int> = 0>
+inline std::string demangle()
 {
     return "__int128";
+}
+
+// The default implementation.
+template <typename T, enable_if_t<conjunction<negation<std::is_same<uncvref_t<T>, __int128_t>>,
+                                              negation<std::is_same<uncvref_t<T>, __uint128_t>>>::value,
+                                  int> = 0>
+inline std::string demangle()
+{
+    return demangle(typeid(T));
+}
+
+#else
+
+template <typename T>
+inline std::string demangle()
+{
+    return demangle(typeid(T));
 }
 
 #endif
