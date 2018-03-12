@@ -30,6 +30,14 @@ TEST_CASE("demangle")
 #if defined(MPPP_HAVE_GCC_INT128)
     std::cout << demangle<__int128_t>() << '\n';
     std::cout << demangle<__uint128_t>() << '\n';
+    std::cout << demangle<const __int128_t>() << '\n';
+    std::cout << demangle<const __uint128_t>() << '\n';
+    std::cout << demangle<__int128_t &>() << '\n';
+    std::cout << demangle<__uint128_t &>() << '\n';
+    std::cout << demangle<__int128_t &&>() << '\n';
+    std::cout << demangle<__uint128_t &&>() << '\n';
+    std::cout << demangle<const __int128_t &>() << '\n';
+    std::cout << demangle<const __uint128_t &>() << '\n';
 #endif
 
     // Couple of multithreaded tests.
