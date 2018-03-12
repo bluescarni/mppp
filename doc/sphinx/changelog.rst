@@ -2,7 +2,12 @@ Changelog
 =========
 
 0.10 (unreleased)
-----------------
+-----------------
+
+Fix
+~~~
+
+- Fix demangling failures for 128-bit integers in OSX (`#128 <https://github.com/bluescarni/mppp/pull/128>`__).
 
 0.9 (2018-02-25)
 ----------------

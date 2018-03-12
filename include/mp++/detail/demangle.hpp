@@ -10,6 +10,7 @@
 #define MPPP_DETAIL_DEMANGLE_HPP
 
 #include <string>
+#include <type_traits>
 #include <typeindex>
 #include <typeinfo>
 
