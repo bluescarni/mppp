@@ -150,6 +150,9 @@ inline std::string demangle()
     const unsigned flag
         = unsigned(std::is_const<unref_t<T>>::value) + (unsigned(std::is_volatile<unref_t<T>>::value) << 1u);
     switch (flag) {
+        case 0u:
+            // NOTE: handle this explicitly to keep compiler warnings at bay.
+            break;
         case 1u:
             ret += " const";
             break;
