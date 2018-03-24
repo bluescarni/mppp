@@ -4,6 +4,11 @@ Changelog
 0.10 (unreleased)
 -----------------
 
+New
+~~~
+
+- The demangler is now aware of cv-qualifiers and references (`#129 <https://github.com/bluescarni/mppp/pull/129>`__).
+
 Fix
 ~~~
 
