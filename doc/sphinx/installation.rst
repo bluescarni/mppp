@@ -18,15 +18,14 @@ on the following setups:
 mp++ has been written, tested and benchmarked on x86 processors, but it does not contain any architecture-specific code
 and thus it should run on any architecture supported by GMP (as long as a decent C++11 compiler is available).
 mp++ does use compiler-specific functionality (e.g., 128-bit `integers <https://gcc.gnu.org/onlinedocs/gcc/_005f_005fint128.html>`__
-or `intrinsics <https://msdn.microsoft.com/en-us/library/windows/desktop/hh802933(v=vs.85).aspx>`__ on 64-bit
-architectures) for the implementation of fast integer arithmetics. If such functionality is not available, mp++
+or intrinsics on 64-bit architectures) for the implementation of fast integer arithmetics. If such functionality is not available, mp++
 will fall back to GMP's ``mpn_`` functions.
 
 mp++ has the following dependencies:
 
 * the `GMP <https://gmplib.org/>`__ library, **mandatory** (GMP 5 and later versions are supported,
   the `MPIR <http://mpir.org/>`__ fork of GMP can also be used);
-* on Windows only, the `Debug Help <https://msdn.microsoft.com/en-us/library/windows/desktop/ms679309(v=vs.85).aspx>`__ library,
+* on Windows only, the Debug Help (``DbgHelp``) library,
   **mandatory** (used to enable more informative error messages). The ``DbgHelp`` library is typically included in the operating system;
 * the `GNU MPFR <http://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support for the ``long double`` type (MPFR 3 or a later version is required);

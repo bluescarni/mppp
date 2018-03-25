@@ -9,12 +9,16 @@
 #ifndef MPPP_DETAIL_DEMANGLE_HPP
 #define MPPP_DETAIL_DEMANGLE_HPP
 
+#include <mp++/config.hpp>
+
+#if MPPP_CPLUSPLUS >= 201703L
+#include <string_view>
+#endif
 #include <string>
 #include <type_traits>
 #include <typeindex>
 #include <typeinfo>
 
-#include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
 
 #if defined(__GNUC__) || (defined(__clang__) && !defined(_MSC_VER))
@@ -84,6 +88,16 @@ inline std::string demangle(const std::string &s)
     return demangle(s.c_str());
 }
 
+#if MPPP_CPLUSPLUS >= 201703L
+
+// C++17 string view overload.
+inline std::string demangle(const std::string_view &s)
+{
+    return demangle(s.data());
+}
+
+#endif
+
 // Convenience overload for demangling type_index. Will also work with type_info
 // due to implicit conversion.
 inline std::string demangle(const std::type_index &t_idx)
@@ -91,46 +105,73 @@ inline std::string demangle(const std::type_index &t_idx)
     return demangle(t_idx.name());
 }
 
-// Convenience overload with template type.
-#if defined(MPPP_HAVE_GCC_INT128) && defined(__apple_build_version__)
-
-// NOTE: testing indicates that on OSX the typeid machinery for the 128-bit types
-// is not implemented correctly. Provide a custom implementation as a workaround.
-// We return strings consistent with the output on linux.
-template <typename T, enable_if_t<std::is_same<uncvref_t<T>, __uint128_t>::value, int> = 0>
-inline std::string demangle()
+// Little wrapper to call typeid(T).name(). Necessary because sometimes
+// typeid() on 128-bit ints is not working, and we need to work around that
+// (see below). Works only if T is not cv-qualified and not a reference.
+template <typename T>
+inline std::string typeid_name_wrap()
 {
-    // NOTE: the GCC/clang demangler does not seem to distinguish
-    // between T and cv-ref T. So let's just return the raw type.
-    return "unsigned __int128";
+    static_assert(std::is_same<T, uncvref_t<T>>::value, "The type T cannot be cv-qualified.");
+    return typeid(T).name();
 }
 
-template <typename T, enable_if_t<std::is_same<uncvref_t<T>, __int128_t>::value, int> = 0>
-inline std::string demangle()
+#if defined(MPPP_HAVE_GCC_INT128) && defined(__apple_build_version__)
+
+// NOTE: it seems like on OSX typeid() is not working properly for 128-bit ints, hence
+// we re-implement the functionality via the wrapper. Here we use the type names
+// that are returned in a linux environment.
+template <>
+inline std::string typeid_name_wrap<__int128_t>()
 {
     return "__int128";
 }
 
-// The default implementation.
-template <typename T, enable_if_t<conjunction<negation<std::is_same<uncvref_t<T>, __int128_t>>,
-                                              negation<std::is_same<uncvref_t<T>, __uint128_t>>>::value,
-                                  int> = 0>
-inline std::string demangle()
+template <>
+inline std::string typeid_name_wrap<__uint128_t>()
 {
-    return demangle(typeid(T));
-}
-
-#else
-
-template <typename T>
-inline std::string demangle()
-{
-    return demangle(typeid(T));
+    return "unsigned __int128";
 }
 
 #endif
+
+// Demangler for type T. It will first strip reference and cv qualifications
+// from T, and then re-decorate the resulting demangled name with the original
+// qualifications. The reason we do this is because typeid ignores references
+// and cv qualifications:
+// http://en.cppreference.com/w/cpp/language/typeid
+// See also this SO answer:
+// https://stackoverflow.com/questions/28621844/is-there-a-typeid-for-references
+template <typename T>
+inline std::string demangle()
+{
+    // Get the uncvreffed demangled name.
+    std::string ret = demangle(typeid_name_wrap<uncvref_t<T>>());
+    // Redecorate it with cv qualifiers.
+    const unsigned flag
+        = unsigned(std::is_const<unref_t<T>>::value) + (unsigned(std::is_volatile<unref_t<T>>::value) << 1u);
+    switch (flag) {
+        case 0u:
+            // NOTE: handle this explicitly to keep compiler warnings at bay.
+            break;
+        case 1u:
+            ret += " const";
+            break;
+        case 2u:
+            ret += " volatile";
+            break;
+        case 3u:
+            ret += " const volatile";
+    }
+    // Re-add the reference, if necessary.
+    if (std::is_lvalue_reference<T>::value) {
+        ret += " &";
+    } else if (std::is_rvalue_reference<T>::value) {
+        ret += " &&";
+    }
+    return ret;
 }
-}
+} // namespace detail
+} // namespace mppp
 
 #if defined(_MSC_VER)
 
