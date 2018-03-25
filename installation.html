@@ -152,14 +152,13 @@ on the following setups:</p>
 <p>mp++ has been written, tested and benchmarked on x86 processors, but it does not contain any architecture-specific code
 and thus it should run on any architecture supported by GMP (as long as a decent C++11 compiler is available).
 mp++ does use compiler-specific functionality (e.g., 128-bit <a class="reference external" href="https://gcc.gnu.org/onlinedocs/gcc/_005f_005fint128.html">integers</a>
-or <a class="reference external" href="https://msdn.microsoft.com/en-us/library/windows/desktop/hh802933(v=vs.85).aspx">intrinsics</a> on 64-bit
-architectures) for the implementation of fast integer arithmetics. If such functionality is not available, mp++
+or intrinsics on 64-bit architectures) for the implementation of fast integer arithmetics. If such functionality is not available, mp++
 will fall back to GMP’s <code class="docutils literal"><span class="pre">mpn_</span></code> functions.</p>
 <p>mp++ has the following dependencies:</p>
 <ul class="simple">
 <li>the <a class="reference external" href="https://gmplib.org/">GMP</a> library, <strong>mandatory</strong> (GMP 5 and later versions are supported,
 the <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP can also be used);</li>
-<li>on Windows only, the <a class="reference external" href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms679309(v=vs.85).aspx">Debug Help</a> library,
+<li>on Windows only, the Debug Help (<code class="docutils literal"><span class="pre">DbgHelp</span></code>) library,
 <strong>mandatory</strong> (used to enable more informative error messages). The <code class="docutils literal"><span class="pre">DbgHelp</span></code> library is typically included in the operating system;</li>
 <li>the <a class="reference external" href="http://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library, <em>optional</em>, used in the implementation
 of the <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> class and for providing support for the <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> type (MPFR 3 or a later version is required);</li>
