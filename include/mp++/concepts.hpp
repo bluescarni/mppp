@@ -38,19 +38,25 @@ concept bool CppIntegralInteroperable = is_cpp_integral_interoperable<T>::value;
 using cpp_integral_interoperable_enabler = enable_if_t<is_cpp_integral_interoperable<T>::value, int>;
 #endif
 
+// Type trait to check if T is a supported unsigned integral type.
+template <typename T>
+using is_cpp_unsigned_integral_interoperable = conjunction<is_cpp_integral_interoperable<T>, is_unsigned<T>>;
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool CppUnsignedIntegralInteroperable = is_cpp_unsigned_integral_interoperable<T>::value;
+#else
+using cpp_unsigned_integral_interoperable_enabler = enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int>;
+#endif
+
 // Type trait to check if T is a supported floating-point type.
 template <typename T>
-struct is_cpp_floating_point_interoperable : conjunction<std::is_floating_point<T>, std::is_same<remove_cv_t<T>, T>> {
-};
-
+using is_cpp_floating_point_interoperable = conjunction<std::is_same<remove_cv_t<T>, T>, std::is_floating_point<T>
 #if !defined(MPPP_WITH_MPFR)
-
-// Without MPFR, we don't support long double.
-template <>
-struct is_cpp_floating_point_interoperable<long double> : std::false_type {
-};
-
+                                                        ,
+                                                        negation<std::is_same<T, long double>>
 #endif
+                                                        >;
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -79,6 +85,8 @@ inline namespace detail
 template <typename T>
 using is_char_pointer = conjunction<std::is_pointer<T>, std::is_same<remove_cv_t<remove_pointer_t<T>>, char>>;
 
+} // namespace detail
+
 template <typename T>
 using is_string_type
     = disjunction<std::is_same<remove_cv_t<T>, std::string>, is_char_pointer<T>,
@@ -89,7 +97,6 @@ using is_string_type
                   std::is_same<remove_cv_t<T>, std::string_view>
 #endif
                   >;
-}
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -97,6 +104,6 @@ concept bool StringType = is_string_type<T>::value;
 #else
 using string_type_enabler = enable_if_t<is_string_type<T>::value, int>;
 #endif
-}
+} // namespace mppp
 
 #endif

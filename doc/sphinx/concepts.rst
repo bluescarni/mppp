@@ -39,6 +39,13 @@ Common concepts
    A corresponding boolean type trait called ``is_cpp_integral_interoperable`` is also available (even if the compiler does
    not support concepts).
 
+.. cpp:concept:: template <typename T> mppp::CppUnsignedIntegralInteroperable
+
+   This concept is satisfied if ``T`` is an unsigned integral :cpp:concept:`~mppp::CppInteroperable` type.
+
+   A corresponding boolean type trait called ``is_cpp_unsigned_integral_interoperable`` is also available (even if the compiler does
+   not support concepts).
+
 .. cpp:concept:: template <typename T> mppp::CppFloatingPointInteroperable
 
    This concept is satisfied if ``T`` is a floating-point :cpp:concept:`~mppp::CppInteroperable` type.
