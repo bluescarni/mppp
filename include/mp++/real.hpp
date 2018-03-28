@@ -73,7 +73,7 @@ static_assert(sizeof(expected_mpfr_struct_t) == sizeof(mpfr_struct_t) && offseto
 // and its members' types.
 constexpr void test_mpfr_struct_t()
 {
-    auto[prec, sign, exp, ptr] = mpfr_struct_t{};
+    auto [prec, sign, exp, ptr] = mpfr_struct_t{};
     static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
     (void)prec;
     (void)sign;
@@ -324,7 +324,7 @@ inline void real_lgamma_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t)
 // A small helper to check the input of the trunc() overloads,
 // only fwd declaration (implementation below).
 void check_real_trunc_arg(const real &);
-}
+} // namespace detail
 
 // Fwd declare swap.
 void swap(real &, real &) noexcept;
@@ -423,7 +423,7 @@ inline ::mpfr_prec_t real_dd_prec(const T &x)
     // Return default precision if nonzero, otherwise return the clamped deduced precision.
     return dp ? dp : clamp_mpfr_prec(real_deduce_precision(x));
 }
-}
+} // namespace detail
 
 // NOTE: this is apparently necessary to work around a doxy bug.
 /** @defgroup real_dummy real_dummy
@@ -920,7 +920,7 @@ public:
      * These heuristics aim at ensuring that, whatever the type of ``x``, its value is preserved exactly in the
      * constructed :cpp:class:`~mppp::real`.
      *
-     * Construction from ``bool`` will initialise ``this`` to 1 for ``true``, and ``0`` for ``false``.
+     * Construction from ``bool`` will initialise ``this`` to 1 for ``true``, and 0 for ``false``.
      * \endrststar
      *
      * @param x the construction argument.
@@ -1011,15 +1011,15 @@ public:
         : real(ptag{}, s, base, p)
     {
     }
-        /// Constructor from string and precision.
-        /**
-         * This constructor is equivalent to the constructor from string with a ``base`` value hard-coded to 10.
-         *
-         * @param s the input string.
-         * @param p the desired precision.
-         *
-         * @throws unspecified any exception thrown by the constructor from string, base and precision.
-         */
+    /// Constructor from string and precision.
+    /**
+     * This constructor is equivalent to the constructor from string with a ``base`` value hard-coded to 10.
+     *
+     * @param s the input string.
+     * @param p the desired precision.
+     *
+     * @throws unspecified any exception thrown by the constructor from string, base and precision.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     explicit real(const StringType &s,
 #else
@@ -1030,15 +1030,15 @@ public:
         : real(s, 10, p)
     {
     }
-        /// Constructor from string.
-        /**
-         * This constructor is equivalent to the constructor from string with a ``base`` value hard-coded to 10
-         * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
-         *
-         * @param s the input string.
-         *
-         * @throws unspecified any exception thrown by the constructor from string, base and precision.
-         */
+    /// Constructor from string.
+    /**
+     * This constructor is equivalent to the constructor from string with a ``base`` value hard-coded to 10
+     * and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
+     *
+     * @param s the input string.
+     *
+     * @throws unspecified any exception thrown by the constructor from string, base and precision.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     explicit real(const StringType &s)
 #else
@@ -1450,25 +1450,25 @@ public:
     {
         return set(&other.m_mpfr);
     }
-        /// Generic setter.
-        /**
-         * \rststar
-         * This method will set ``this`` to the value of ``x``. Contrary to the generic assignment operator,
-         * the precision of the assignment is dictated by the precision of ``this``, rather than
-         * being deduced from the type and value of ``x``. Consequently, the precision of ``this`` will not be altered
-         * by the assignment, and a rounding might occur, depending on the operands.
-         *
-         * This method is a thin wrapper around various ``mpfr_set_*()``
-         * assignment functions from the MPFR API.
-         *
-         * .. seealso ::
-         *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-         * \endrststar
-         *
-         * @param x the value to which \p this will be set.
-         *
-         * @return a reference to \p this.
-         */
+    /// Generic setter.
+    /**
+     * \rststar
+     * This method will set ``this`` to the value of ``x``. Contrary to the generic assignment operator,
+     * the precision of the assignment is dictated by the precision of ``this``, rather than
+     * being deduced from the type and value of ``x``. Consequently, the precision of ``this`` will not be altered
+     * by the assignment, and a rounding might occur, depending on the operands.
+     *
+     * This method is a thin wrapper around various ``mpfr_set_*()``
+     * assignment functions from the MPFR API.
+     *
+     * .. seealso ::
+     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     * \endrststar
+     *
+     * @param x the value to which \p this will be set.
+     *
+     * @return a reference to \p this.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     real &set(const RealInteroperable &x)
 #else
@@ -1909,8 +1909,7 @@ private:
     }
     // Small helper to raise an exception when converting to C++ integrals.
     template <typename T>
-    [[noreturn]] void raise_overflow_error() const
-    {
+    [[noreturn]] void raise_overflow_error() const {
         throw std::overflow_error("Conversion of the real " + to_string() + " to the type '" + demangle<T>()
                                   + "' results in overflow");
     }
@@ -2312,7 +2311,7 @@ inline void check_real_trunc_arg(const real &r)
         throw std::domain_error("Cannot truncate a NaN value");
     }
 }
-}
+} // namespace detail
 
 template <typename T, typename U>
 using are_real_op_types
@@ -2777,7 +2776,7 @@ inline real mpfr_nary_op_return_nornd(::mpfr_prec_t min_prec, const F &f, Arg0 &
 }
 
 #endif
-}
+} // namespace detail
 
 /** @defgroup real_arithmetic real_arithmetic
  *  @{
@@ -3339,7 +3338,7 @@ inline real dispatch_pow(const T &x, U &&a)
     tmp = x;
     return dispatch_pow(tmp, std::forward<U>(a));
 }
-}
+} // namespace detail
 
 /// Binary \link mppp::real real\endlink exponentiation.
 /**
@@ -3677,7 +3676,7 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
     f(retval._get_mpfr_t(), MPFR_RNDN);
     return retval;
 }
-}
+} // namespace detail
 
 /** @defgroup real_constants real_constants
  *  @{
@@ -3837,7 +3836,7 @@ inline real dispatch_binary_add(const T &x, U &&a)
     tmp = x;
     return dispatch_binary_add(tmp, std::forward<U>(a));
 }
-}
+} // namespace detail
 
 /// Binary addition involving \link mppp::real real\endlink.
 /**
@@ -3946,7 +3945,7 @@ inline void dispatch_in_place_add(T &x, U &&a)
     dispatch_in_place_add(tmp, std::forward<U>(a));
     real_in_place_convert(x, tmp, a, "addition");
 }
-}
+} // namespace detail
 
 /// In-place addition involving \link mppp::real real\endlink.
 /**
@@ -4065,7 +4064,7 @@ inline real dispatch_binary_sub(const T &x, U &&a)
     tmp = x;
     return dispatch_binary_sub(tmp, std::forward<U>(a));
 }
-}
+} // namespace detail
 
 /// Binary subtraction involving \link mppp::real real\endlink.
 /**
@@ -4143,7 +4142,7 @@ inline void dispatch_in_place_sub(T &x, U &&a)
     dispatch_in_place_sub(tmp, std::forward<U>(a));
     real_in_place_convert(x, tmp, a, "subtraction");
 }
-}
+} // namespace detail
 
 /// In-place subtraction involving \link mppp::real real\endlink.
 /**
@@ -4212,7 +4211,7 @@ inline real dispatch_binary_mul(const T &x, U &&a)
     tmp = x;
     return dispatch_binary_mul(tmp, std::forward<U>(a));
 }
-}
+} // namespace detail
 
 /// Prefix decrement for \link mppp::real real\endlink.
 /**
@@ -4318,7 +4317,7 @@ inline void dispatch_in_place_mul(T &x, U &&a)
     dispatch_in_place_mul(tmp, std::forward<U>(a));
     real_in_place_convert(x, tmp, a, "multiplication");
 }
-}
+} // namespace detail
 
 /// In-place multiplication involving \link mppp::real real\endlink.
 /**
@@ -4387,7 +4386,7 @@ inline real dispatch_binary_div(const T &x, U &&a)
     tmp = x;
     return dispatch_binary_div(tmp, std::forward<U>(a));
 }
-}
+} // namespace detail
 
 /// Binary division involving \link mppp::real real\endlink.
 /**
@@ -4465,7 +4464,7 @@ inline void dispatch_in_place_div(T &x, U &&a)
     dispatch_in_place_div(tmp, std::forward<U>(a));
     real_in_place_convert(x, tmp, a, "division");
 }
-}
+} // namespace detail
 
 /// In-place division involving \link mppp::real real\endlink.
 /**
@@ -4532,7 +4531,7 @@ inline bool dispatch_real_comparison(const F &f, const real &a, const real &b)
 {
     return f(a.get_mpfr_t(), b.get_mpfr_t()) != 0;
 }
-}
+} // namespace detail
 
 /// Equality operator involving \link mppp::real real\endlink.
 /**
@@ -4763,7 +4762,7 @@ inline bool operator<=(const T &a, const U &b)
 }
 
 /** @} */
-}
+} // namespace mppp
 
 #else
 

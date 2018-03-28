@@ -1,3 +1,5 @@
+.. _rational_reference:
+
 Multiprecision rationals
 ========================
 
