@@ -119,7 +119,7 @@ struct is_same_ssize_rational<rational<SSize>, rational<SSize>> : std::true_type
 // (due to the use of const_cast() within the mpz view machinery).
 template <std::size_t SSize>
 mpq_struct_t get_mpq_view(const rational<SSize> &);
-}
+} // namespace detail
 
 /// Multiprecision rational class.
 /**
@@ -586,24 +586,24 @@ public:
             std::integral_constant<bool, is_rational_cvr_integral_interoperable<decltype(x), SSize>::value>{});
         return *this;
     }
-        /// Assignment from string.
-        /**
-         * \rststar
-         * The body of this operator is equivalent to:
-         *
-         * .. code-block:: c++
-         *
-         *    return *this = rational{s};
-         *
-         * That is, a temporary rational is constructed from ``s`` and it is then move-assigned to ``this``.
-         * \endrststar
-         *
-         * @param s the string that will be used for the assignment.
-         *
-         * @return a reference to \p this.
-         *
-         * @throws unspecified any exception thrown by the constructor from string.
-         */
+    /// Assignment from string.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = rational{s};
+     *
+     * That is, a temporary rational is constructed from ``s`` and it is then move-assigned to ``this``.
+     * \endrststar
+     *
+     * @param s the string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     rational &operator=(const StringType &s)
 #else
@@ -893,7 +893,6 @@ public:
      * This method will put ``this`` in canonical form. In particular, this method
      * will make sure that:
      *
-     * * if the numerator is zero, the denominator is set to 1,
      * * the numerator and denominator are coprime (dividing them by their GCD,
      *   if necessary),
      * * the denominator is strictly positive.
@@ -1064,7 +1063,7 @@ static_assert(sizeof(expected_mpq_struct_t) == sizeof(mpq_struct_t)
 
 constexpr bool test_mpq_struct_t()
 {
-    auto[num, den] = mpq_struct_t{};
+    auto [num, den] = mpq_struct_t{};
     (void)num;
     (void)den;
     return std::is_same<decltype(num), mpz_struct_t>::value && std::is_same<decltype(den), mpz_struct_t>::value;
@@ -1257,7 +1256,7 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
         }
     }
 }
-}
+} // namespace detail
 
 /** @defgroup rational_conversion rational_conversion
  *  @{
@@ -1400,7 +1399,7 @@ inline void mul_impl(rational<SSize> &rop, const rational<SSize> &op1, const rat
         mul(rop._get_den(), tmp1, tmp2);
     }
 }
-}
+} // namespace detail
 
 /// Ternary multiplication.
 /**
@@ -1728,7 +1727,7 @@ inline T dispatch_binary_add(T x, const rational<SSize> &op2)
 {
     return dispatch_binary_add(op2, x);
 }
-}
+} // namespace detail
 
 /// Binary addition operator.
 /**
@@ -1794,7 +1793,7 @@ inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
 {
     rop = static_cast<T>(rop + op);
 }
-}
+} // namespace detail
 
 /// In-place addition operator.
 /**
@@ -1920,7 +1919,7 @@ inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
 {
     return -dispatch_binary_sub(op2, x);
 }
-}
+} // namespace detail
 
 /// Binary subtraction operator.
 /**
@@ -1986,7 +1985,7 @@ inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
 {
     rop = static_cast<T>(rop - op);
 }
-}
+} // namespace detail
 
 /// In-place subtraction operator.
 /**
@@ -2105,7 +2104,7 @@ inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
 {
     return dispatch_binary_mul(op2, x);
 }
-}
+} // namespace detail
 
 /// Binary multiplication operator.
 /**
@@ -2183,7 +2182,7 @@ inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
 {
     rop = static_cast<T>(rop * op);
 }
-}
+} // namespace detail
 
 /// In-place multiplication operator.
 /**
@@ -2307,7 +2306,7 @@ inline T dispatch_binary_div(T x, const rational<SSize> &op2)
 {
     return x / static_cast<T>(op2);
 }
-}
+} // namespace detail
 
 /// Binary division operator.
 /**
@@ -2394,7 +2393,7 @@ inline void dispatch_in_place_div(T &rop, const rational<SSize> &op)
 {
     rop = static_cast<T>(rop / op);
 }
-}
+} // namespace detail
 
 /// In-place division operator.
 /**
@@ -2451,7 +2450,7 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 {
     return dispatch_equality(op2, op1);
 }
-}
+} // namespace detail
 
 /// Equality operator.
 /**
@@ -2577,7 +2576,7 @@ inline bool dispatch_greater_than(T x, const rational<SSize> &a)
 {
     return dispatch_less_than(a, x);
 }
-}
+} // namespace detail
 
 /// Less-than operator.
 /**
@@ -2812,7 +2811,7 @@ inline rational<SSize> rational_binomial_impl(const rational<SSize> &t, const T 
 {
     return rational_binomial_impl(t, integer<SSize>{b});
 }
-}
+} // namespace detail
 
 /// Binomial coefficient for \link mppp::rational rational\endlink.
 /**
@@ -2927,7 +2926,7 @@ inline T pow_impl(const T &base, const rational<SSize> &exp)
 {
     return std::pow(base, static_cast<T>(exp));
 }
-}
+} // namespace detail
 
 /// Binary exponentiation.
 /**
@@ -3007,7 +3006,7 @@ inline std::size_t hash(const rational<SSize> &q)
 }
 
 /** @} */
-}
+} // namespace mppp
 
 namespace std
 {
@@ -3023,6 +3022,6 @@ struct hash<mppp::rational<SSize>> {
         return mppp::hash(q);
     }
 };
-}
+} // namespace std
 
 #endif
