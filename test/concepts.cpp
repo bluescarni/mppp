@@ -48,6 +48,17 @@ TEST_CASE("concepts")
     REQUIRE(!is_cpp_unsigned_integral_interoperable<double>::value);
     REQUIRE(!is_cpp_unsigned_integral_interoperable<double &>::value);
     REQUIRE(!is_cpp_unsigned_integral_interoperable<void>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<unsigned>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<bool>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<unsigned char>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<unsigned short>::value);
+    REQUIRE(is_cpp_signed_integral_interoperable<int>::value);
+    REQUIRE(is_cpp_signed_integral_interoperable<signed char>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<int &>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<float>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<double>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<double &>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<void>::value);
 #if defined(MPPP_HAVE_GCC_INT128)
     REQUIRE(is_cpp_integral_interoperable<__int128_t>::value);
     REQUIRE(is_cpp_integral_interoperable<__uint128_t>::value);
@@ -56,7 +67,11 @@ TEST_CASE("concepts")
     REQUIRE(!is_cpp_unsigned_integral_interoperable<__int128_t>::value);
     REQUIRE(is_cpp_unsigned_integral_interoperable<__uint128_t>::value);
     REQUIRE(!is_cpp_unsigned_integral_interoperable<__uint128_t &>::value);
-    REQUIRE(!is_cpp_unsigned_integral_interoperable<const __int128_t>::value);
+    REQUIRE(!is_cpp_unsigned_integral_interoperable<const __uint128_t>::value);
+    REQUIRE(is_cpp_signed_integral_interoperable<__int128_t>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<__uint128_t>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<__int128_t &>::value);
+    REQUIRE(!is_cpp_signed_integral_interoperable<const __int128_t>::value);
 #endif
     REQUIRE(is_cpp_floating_point_interoperable<float>::value);
     REQUIRE(is_cpp_floating_point_interoperable<double>::value);
