@@ -49,6 +49,17 @@ concept bool CppUnsignedIntegralInteroperable = is_cpp_unsigned_integral_interop
 using cpp_unsigned_integral_interoperable_enabler = enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int>;
 #endif
 
+// Type trait to check if T is a supported signed integral type.
+template <typename T>
+using is_cpp_signed_integral_interoperable = conjunction<is_cpp_integral_interoperable<T>, is_signed<T>>;
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool CppSignedIntegralInteroperable = is_cpp_signed_integral_interoperable<T>::value;
+#else
+using cpp_signed_integral_interoperable_enabler = enable_if_t<is_cpp_signed_integral_interoperable<T>::value, int>;
+#endif
+
 // Type trait to check if T is a supported floating-point type.
 template <typename T>
 using is_cpp_floating_point_interoperable = conjunction<std::is_same<remove_cv_t<T>, T>, std::is_floating_point<T>

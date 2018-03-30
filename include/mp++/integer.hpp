@@ -3590,7 +3590,7 @@ inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, 
 }
 } // namespace detail
 
-/// Ternary addition.
+/// Ternary \link mppp::integer integer\endlink addition.
 /**
  * This function will set \p rop to <tt>op1 + op2</tt>.
  *
@@ -3641,7 +3641,7 @@ using integer_static_addsub_1_algo = std::integral_constant<
 // mpn implementation.
 template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
-                                  ::mp_limb_t l2, const std::integral_constant<int, 0> &)
+                                 ::mp_limb_t l2, const std::integral_constant<int, 0> &)
 {
     auto rdata = rop.m_limbs.data();
     auto data1 = op1.m_limbs.data();
@@ -3706,7 +3706,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
 // 1-limb optimisation (no nails).
 template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t, int sign1,
-                                  ::mp_limb_t l2, const std::integral_constant<int, 1> &)
+                                 ::mp_limb_t l2, const std::integral_constant<int, 1> &)
 {
     const auto l1 = op1.m_limbs[0];
     ::mp_limb_t tmp;
@@ -3742,7 +3742,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
 // 2-limb optimisation (no nails).
 template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
-                                  ::mp_limb_t l2, const std::integral_constant<int, 2> &)
+                                 ::mp_limb_t l2, const std::integral_constant<int, 2> &)
 {
     auto rdata = rop.m_limbs.data();
     auto data1 = op1.m_limbs.data();
@@ -3790,14 +3790,10 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
 template <bool AddOrSub, std::size_t SSize>
 inline bool static_addsub_1(static_int<SSize> &rop, const static_int<SSize> &op1, ::mp_limb_t op2)
 {
-    mpz_size_t asize1 = op1._mp_size;
-    int sign1 = asize1 != 0;
-    if (asize1 < 0) {
-        asize1 = -asize1;
-        sign1 = -1;
-    }
+    const mpz_size_t asize1 = std::abs(op1._mp_size);
+    const int sign1 = integral_sign(op1._mp_size);
     const bool retval = static_addsub_1_impl<AddOrSub>(rop, op1, asize1, sign1, op2,
-                                                        integer_static_addsub_1_algo<static_int<SSize>>{});
+                                                       integer_static_addsub_1_algo<static_int<SSize>>{});
     if (integer_static_addsub_1_algo<static_int<SSize>>::value == 0 && retval) {
         // If we used the mpn functions and we actually wrote into rop, then
         // make sure we zero out the unused limbs.
@@ -3808,9 +3804,13 @@ inline bool static_addsub_1(static_int<SSize> &rop, const static_int<SSize> &op1
 }
 } // namespace detail
 
-/// Ternary addition with <tt>unsigned long</tt>.
+/// Ternary \link mppp::integer integer\endlink addition with C++ unsigned integral types.
 /**
- * This function will set \p rop to <tt>op1 + op2</tt>.
+ * \rststar
+ * This function, which sets ``rop`` to ``op1 + op2``, can be a faster
+ * alternative to the :cpp:class:`~mppp::integer` addition function
+ * if ``op2`` fits in a single limb.
+ * \endrststar
  *
  * @param rop the return value.
  * @param op1 the first argument.
@@ -3831,7 +3831,9 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, co
         // For the optimised version below to kick in we need to be sure we can safely convert
         // op2 to an ::mp_limb_t, modulo nail bits. Otherwise, we just call add() after converting
         // op2 to an integer.
-        return add(rop, op1, integer<SSize>{op2});
+        MPPP_MAYBE_TLS integer<SSize> tmp;
+        tmp = op2;
+        return add(rop, op1, tmp);
     }
     const bool s1 = op1.is_static();
     bool sr = rop.is_static();
@@ -3841,7 +3843,7 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, co
             sr = true;
         }
         if (mppp_likely(static_addsub_1<true>(rop._get_union().g_st(), op1._get_union().g_st(),
-                                               static_cast<::mp_limb_t>(op2)))) {
+                                              static_cast<::mp_limb_t>(op2)))) {
             return rop;
         }
     }
@@ -3862,20 +3864,24 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, co
         // NOTE: this branch is possible at the moment only on Windows 64 bit, where unsigned long
         // is 32bit and the mp_limb_t is 64bit. op2 could then be an unsigned long long (64bit) which
         // still fits in an ::mp_limb_t.
-        auto op2_copy = static_cast<::mp_limb_t>(op2);
+        ::mp_limb_t op2_copy[1] = {static_cast<::mp_limb_t>(op2)};
         // NOTE: we have 1 allocated limb, with address &op2_copy. The size has to be 1,
         // as op2 is unsigned, fits in an mp_limbt_t and it is not zero (otherwise we would've taken
         // the other branch).
-        const mpz_struct_t tmp_mpz{1, 1, &op2_copy};
+        const mpz_struct_t tmp_mpz{1, 1, op2_copy};
         ::mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
         // LCOV_EXCL_STOP
     }
     return rop;
 }
 
-/// Ternary subtraction with <tt>unsigned long</tt>.
+/// Ternary \link mppp::integer integer\endlink addition with C++ signed integral types.
 /**
- * This function will set \p rop to <tt>op1 - op2</tt>.
+ * \rststar
+ * This function, which sets ``rop`` to ``op1 + op2``, can be a faster
+ * alternative to the :cpp:class:`~mppp::integer` addition function
+ * if ``op2`` fits in a single limb.
+ * \endrststar
  *
  * @param rop the return value.
  * @param op1 the first argument.
@@ -3885,44 +3891,19 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, co
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1,
-                              const CppUnsignedIntegralInteroperable &op2)
+inline integer<SSize> &add_si(integer<SSize> &rop, const integer<SSize> &op1, const CppSignedIntegralInteroperable &op2)
 #else
-template <std::size_t SSize, typename T, cpp_unsigned_integral_interoperable_enabler<T> = 0>
-inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
+template <std::size_t SSize, typename T, cpp_signed_integral_interoperable_enabler<T> = 0>
+inline integer<SSize> &add_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 #endif
 {
-    if (op2 > GMP_NUMB_MASK) {
-        return sub(rop, op1, integer<SSize>{op2});
+    if (op2 >= uncvref_t<decltype(op2)>(0)) {
+        return add_ui(rop, op1, make_unsigned(op2));
     }
-    const bool s1 = op1.is_static();
-    bool sr = rop.is_static();
-    if (mppp_likely(s1)) {
-        if (!sr) {
-            rop.set_zero();
-            sr = true;
-        }
-        if (mppp_likely(static_addsub_1<false>(rop._get_union().g_st(), op1._get_union().g_st(),
-                                                static_cast<::mp_limb_t>(op2)))) {
-            return rop;
-        }
-    }
-    if (sr) {
-        rop._get_union().promote(SSize + 1u);
-    }
-    if (op2 <= std::numeric_limits<unsigned long>::max()) {
-        ::mpz_sub_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
-    } else {
-        // LCOV_EXCL_START
-        auto op2_copy = static_cast<::mp_limb_t>(op2);
-        const mpz_struct_t tmp_mpz{1, 1, &op2_copy};
-        ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
-        // LCOV_EXCL_STOP
-    }
-    return rop;
+    return sub_ui(rop, op1, nint_abs(op2));
 }
 
-/// Ternary subtraction.
+/// Ternary \link mppp::integer integer\endlink subtraction.
 /**
  * This function will set \p rop to <tt>op1 - op2</tt>.
  *
@@ -3952,6 +3933,89 @@ inline integer<SSize> &sub(integer<SSize> &rop, const integer<SSize> &op1, const
     }
     ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
+}
+
+/// Ternary \link mppp::integer integer\endlink subtraction with C++ unsigned integral types.
+/**
+ * \rststar
+ * This function, which sets ``rop`` to ``op1 - op2``, can be a faster
+ * alternative to the :cpp:class:`~mppp::integer` subtraction function
+ * if ``op2`` fits in a single limb.
+ * \endrststar
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1,
+                              const CppUnsignedIntegralInteroperable &op2)
+#else
+template <std::size_t SSize, typename T, cpp_unsigned_integral_interoperable_enabler<T> = 0>
+inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
+#endif
+{
+    if (op2 > GMP_NUMB_MASK) {
+        MPPP_MAYBE_TLS integer<SSize> tmp;
+        tmp = op2;
+        return sub(rop, op1, tmp);
+    }
+    const bool s1 = op1.is_static();
+    bool sr = rop.is_static();
+    if (mppp_likely(s1)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
+        if (mppp_likely(static_addsub_1<false>(rop._get_union().g_st(), op1._get_union().g_st(),
+                                               static_cast<::mp_limb_t>(op2)))) {
+            return rop;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(SSize + 1u);
+    }
+    if (op2 <= std::numeric_limits<unsigned long>::max()) {
+        ::mpz_sub_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
+    } else {
+        // LCOV_EXCL_START
+        ::mp_limb_t op2_copy[1] = {static_cast<::mp_limb_t>(op2)};
+        const mpz_struct_t tmp_mpz{1, 1, op2_copy};
+        ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
+        // LCOV_EXCL_STOP
+    }
+    return rop;
+}
+
+/// Ternary \link mppp::integer integer\endlink subtraction with C++ signed integral types.
+/**
+ * \rststar
+ * This function, which sets ``rop`` to ``op1 - op2``, can be a faster
+ * alternative to the :cpp:class:`~mppp::integer` subtraction function
+ * if ``op2`` fits in a single limb.
+ * \endrststar
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &sub_si(integer<SSize> &rop, const integer<SSize> &op1, const CppSignedIntegralInteroperable &op2)
+#else
+template <std::size_t SSize, typename T, cpp_signed_integral_interoperable_enabler<T> = 0>
+inline integer<SSize> &sub_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
+#endif
+{
+    if (op2 >= uncvref_t<decltype(op2)>(0)) {
+        return sub_ui(rop, op1, make_unsigned(op2));
+    }
+    return add_ui(rop, op1, nint_abs(op2));
 }
 
 inline namespace detail
