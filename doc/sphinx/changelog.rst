@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Extend the :cpp:func:`~mppp::add_ui()` and :cpp:func:`~mppp::sub_ui()` functions to work on all unsigned
+  C++ integral types, and introduce corresponding :cpp:func:`~mppp::add_si()` and :cpp:func:`~mppp::sub_si()`
+  functions for signed C++ integral types (`#131 <https://github.com/bluescarni/mppp/pull/131>`__).
 - Work on the rational tutorial (`#130 <https://github.com/bluescarni/mppp/pull/130>`__).
 - The demangler is now aware of cv-qualifiers and references (`#129 <https://github.com/bluescarni/mppp/pull/129>`__).
 
