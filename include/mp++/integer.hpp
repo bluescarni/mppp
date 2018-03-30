@@ -130,7 +130,7 @@ constexpr bool test_mpz_struct_t()
 {
     // NOTE: if mpz_struct_t has more or fewer members, this will result
     // in a compile-time error.
-    auto[alloc, size, ptr] = mpz_struct_t{};
+    auto [alloc, size, ptr] = mpz_struct_t{};
     (void)alloc;
     (void)size;
     (void)ptr;
@@ -1095,7 +1095,7 @@ union integer_union {
     s_storage m_st;
     d_storage m_dy;
 };
-}
+} // namespace detail
 
 // Fwd declaration.
 template <std::size_t SSize>
@@ -2252,21 +2252,21 @@ public:
         }
         return std::move(retval.second);
     }
-        /// Generic conversion method.
-        /**
-         * \rststar
-         * This method, similarly to the conversion operator, will convert ``this`` to a
-         * :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into ``rop``. Differently
-         * from the conversion operator, this method does not raise any exception: if the conversion is successful, the
-         * method will return ``true``, otherwise the method will return ``false``. If the conversion fails,
-         * ``rop`` will not be altered.
-         * \endrststar
-         *
-         * @param rop the variable which will store the result of the conversion.
-         *
-         * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
-         * a C++ integral which cannot represent the value of ``this``.
-         */
+    /// Generic conversion method.
+    /**
+     * \rststar
+     * This method, similarly to the conversion operator, will convert ``this`` to a
+     * :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into ``rop``. Differently
+     * from the conversion operator, this method does not raise any exception: if the conversion is successful, the
+     * method will return ``true``, otherwise the method will return ``false``. If the conversion fails,
+     * ``rop`` will not be altered.
+     * \endrststar
+     *
+     * @param rop the variable which will store the result of the conversion.
+     *
+     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
+     * a C++ integral which cannot represent the value of ``this``.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -2917,7 +2917,7 @@ public:
     std::size_t binary_load(const char *src)
     {
 #if MPPP_CPLUSPLUS >= 201703L
-        const auto[size, asize] = bl_read_size_asize(src);
+        const auto [size, asize] = bl_read_size_asize(src);
 #else
         mpz_size_t size;
         make_unsigned_t<mpz_size_t> asize;
@@ -2942,7 +2942,7 @@ private:
         // Size in bytes of the limbs portion of the data.
         const auto lsize = src.size() - sizeof(mpz_size_t);
 #if MPPP_CPLUSPLUS >= 201703L
-        const auto[size, asize] = bl_read_size_asize(src.data());
+        const auto [size, asize] = bl_read_size_asize(src.data());
 #else
         mpz_size_t size;
         make_unsigned_t<mpz_size_t> asize;
@@ -3289,7 +3289,7 @@ concept bool IntegerOpTypes = are_integer_op_types<T, U>::value;
 #else
 using integer_op_types_enabler = enable_if_t<are_integer_op_types<T, U>::value, int>;
 #endif
-}
+} // namespace detail
 
 template <typename T, typename U>
 using are_integer_integral_op_types
@@ -3592,9 +3592,9 @@ inline bool static_addsub(static_int<SSize> &rop, const static_int<SSize> &op1, 
     }
     return retval;
 }
-}
+} // namespace detail
 
-/// Ternary addition.
+/// Ternary \link mppp::integer integer\endlink addition.
 /**
  * This function will set \p rop to <tt>op1 + op2</tt>.
  *
@@ -3633,24 +3633,23 @@ inline integer<SSize> &add(integer<SSize> &rop, const integer<SSize> &op1, const
 inline namespace detail
 {
 
-// Metaprogramming for selecting the algorithm for static add/sub with ui. The selection happens via
+// Metaprogramming for selecting the algorithm for static add/sub with a single limb. The selection happens via
 // an std::integral_constant with 3 possible values:
 // - 0 (default case): use the GMP mpn functions,
 // - 1: selected when there are no nail bits and the static size is 1,
 // - 2: selected when there are no nail bits and the static size is 2.
 template <typename SInt>
-using integer_static_addsub_ui_algo = std::integral_constant<
+using integer_static_addsub_1_algo = std::integral_constant<
     int, (!GMP_NAIL_BITS && SInt::s_size == 1) ? 1 : ((!GMP_NAIL_BITS && SInt::s_size == 2) ? 2 : 0)>;
 
 // mpn implementation.
 template <bool AddOrSub, std::size_t SSize>
-inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
-                                  unsigned long op2, const std::integral_constant<int, 0> &)
+inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
+                                 ::mp_limb_t l2, const std::integral_constant<int, 0> &)
 {
     auto rdata = rop.m_limbs.data();
     auto data1 = op1.m_limbs.data();
     const auto size1 = op1._mp_size;
-    const auto l2 = static_cast<::mp_limb_t>(op2);
     // mpn functions require nonzero arguments.
     if (mppp_unlikely(!l2)) {
         rop._mp_size = size1;
@@ -3710,11 +3709,10 @@ inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize
 
 // 1-limb optimisation (no nails).
 template <bool AddOrSub, std::size_t SSize>
-inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t, int sign1,
-                                  unsigned long op2, const std::integral_constant<int, 1> &)
+inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t, int sign1,
+                                 ::mp_limb_t l2, const std::integral_constant<int, 1> &)
 {
     const auto l1 = op1.m_limbs[0];
-    const auto l2 = static_cast<::mp_limb_t>(op2);
     ::mp_limb_t tmp;
     if ((sign1 >= 0 && AddOrSub) || (sign1 <= 0 && !AddOrSub)) {
         // op1 non-negative and addition, or op1 non-positive and subtraction. Implement
@@ -3747,12 +3745,11 @@ inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize
 
 // 2-limb optimisation (no nails).
 template <bool AddOrSub, std::size_t SSize>
-inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
-                                  unsigned long op2, const std::integral_constant<int, 2> &)
+inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize> &op1, mpz_size_t asize1, int sign1,
+                                 ::mp_limb_t l2, const std::integral_constant<int, 2> &)
 {
     auto rdata = rop.m_limbs.data();
     auto data1 = op1.m_limbs.data();
-    const auto l2 = static_cast<::mp_limb_t>(op2);
     if ((sign1 >= 0 && AddOrSub) || (sign1 <= 0 && !AddOrSub)) {
         // op1 non-negative and addition, or op1 non-positive and subtraction. Implement
         // as a true addition.
@@ -3795,17 +3792,13 @@ inline bool static_addsub_ui_impl(static_int<SSize> &rop, const static_int<SSize
 }
 
 template <bool AddOrSub, std::size_t SSize>
-inline bool static_addsub_ui(static_int<SSize> &rop, const static_int<SSize> &op1, unsigned long op2)
+inline bool static_addsub_1(static_int<SSize> &rop, const static_int<SSize> &op1, ::mp_limb_t op2)
 {
-    mpz_size_t asize1 = op1._mp_size;
-    int sign1 = asize1 != 0;
-    if (asize1 < 0) {
-        asize1 = -asize1;
-        sign1 = -1;
-    }
-    const bool retval = static_addsub_ui_impl<AddOrSub>(rop, op1, asize1, sign1, op2,
-                                                        integer_static_addsub_ui_algo<static_int<SSize>>{});
-    if (integer_static_addsub_ui_algo<static_int<SSize>>::value == 0 && retval) {
+    const mpz_size_t asize1 = std::abs(op1._mp_size);
+    const int sign1 = integral_sign(op1._mp_size);
+    const bool retval = static_addsub_1_impl<AddOrSub>(rop, op1, asize1, sign1, op2,
+                                                       integer_static_addsub_1_algo<static_int<SSize>>{});
+    if (integer_static_addsub_1_algo<static_int<SSize>>::value == 0 && retval) {
         // If we used the mpn functions and we actually wrote into rop, then
         // make sure we zero out the unused limbs.
         // NOTE: same as above, we may have used mpn function when SSize <= opt_size.
@@ -3813,11 +3806,15 @@ inline bool static_addsub_ui(static_int<SSize> &rop, const static_int<SSize> &op
     }
     return retval;
 }
-}
+} // namespace detail
 
-/// Ternary addition with <tt>unsigned long</tt>.
+/// Ternary \link mppp::integer integer\endlink addition with C++ unsigned integral types.
 /**
- * This function will set \p rop to <tt>op1 + op2</tt>.
+ * \rststar
+ * This function, which sets ``rop`` to ``op1 + op2``, can be a faster
+ * alternative to the :cpp:class:`~mppp::integer` addition function
+ * if ``op2`` fits in a single limb.
+ * \endrststar
  *
  * @param rop the return value.
  * @param op1 the first argument.
@@ -3825,21 +3822,23 @@ inline bool static_addsub_ui(static_int<SSize> &rop, const static_int<SSize> &op
  *
  * @return a reference to \p rop.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
+inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1,
+                              const CppUnsignedIntegralInteroperable &op2)
+#else
+template <std::size_t SSize, typename T, cpp_unsigned_integral_interoperable_enabler<T> = 0>
+inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
+#endif
 {
-    // LCOV_EXCL_START
-    if (nl_max<unsigned long>() > GMP_NUMB_MAX) {
+    if (op2 > GMP_NUMB_MAX) {
         // For the optimised version below to kick in we need to be sure we can safely convert
-        // unsigned long to an ::mp_limb_t, modulo nail bits. This because in the optimised version
-        // we cast forcibly op2 to ::mp_limb_t. Otherwise, we just call add() after converting op2 to an
-        // integer.
-        // NOTE: it does not look like this can be hit on any modern setup, apart from Win32, and we
-        // don't check coverage on that.
-        add(rop, op1, integer<SSize>{op2});
-        return rop;
+        // op2 to an ::mp_limb_t, modulo nail bits. Otherwise, we just call add() after converting
+        // op2 to an integer.
+        MPPP_MAYBE_TLS integer<SSize> tmp;
+        tmp = op2;
+        return add(rop, op1, tmp);
     }
-    // LCOV_EXCL_STOP
     const bool s1 = op1.is_static();
     bool sr = rop.is_static();
     if (mppp_likely(s1)) {
@@ -3847,20 +3846,46 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, un
             rop.set_zero();
             sr = true;
         }
-        if (mppp_likely(static_addsub_ui<true>(rop._get_union().g_st(), op1._get_union().g_st(), op2))) {
+        if (mppp_likely(static_addsub_1<true>(rop._get_union().g_st(), op1._get_union().g_st(),
+                                              static_cast<::mp_limb_t>(op2)))) {
             return rop;
         }
     }
     if (sr) {
         rop._get_union().promote(SSize + 1u);
     }
-    ::mpz_add_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), op2);
+    // NOTE: at this point we know that:
+    // - op2 fits in a limb (accounting for nail bits as well),
+    // - op2 may overflow unsigned long, which is the unsigned integral data type
+    //   the GMP API expects.
+    if (op2 <= std::numeric_limits<unsigned long>::max()) {
+        // op2 actually fits in unsigned long, let's just invoke the mpz_add_ui() function directly.
+        ::mpz_add_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
+    } else {
+        // LCOV_EXCL_START
+        // op2 overflows unsigned long, but still fits in a limb. We will create a fake mpz struct
+        // with read-only access for use in the mpz_add() function.
+        // NOTE: this branch is possible at the moment only on Windows 64 bit, where unsigned long
+        // is 32bit and the mp_limb_t is 64bit. op2 could then be an unsigned long long (64bit) which
+        // still fits in an ::mp_limb_t.
+        ::mp_limb_t op2_copy[1] = {static_cast<::mp_limb_t>(op2)};
+        // NOTE: we have 1 allocated limb, with address &op2_copy. The size has to be 1,
+        // as op2 is unsigned, fits in an mp_limbt_t and it is not zero (otherwise we would've taken
+        // the other branch).
+        const mpz_struct_t tmp_mpz{1, 1, op2_copy};
+        ::mpz_add(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
+        // LCOV_EXCL_STOP
+    }
     return rop;
 }
 
-/// Ternary subtraction with <tt>unsigned long</tt>.
+/// Ternary \link mppp::integer integer\endlink addition with C++ signed integral types.
 /**
- * This function will set \p rop to <tt>op1 - op2</tt>.
+ * \rststar
+ * This function, which sets ``rop`` to ``op1 + op2``, can be a faster
+ * alternative to the :cpp:class:`~mppp::integer` addition function
+ * if ``op2`` fits in a single limb.
+ * \endrststar
  *
  * @param rop the return value.
  * @param op1 the first argument.
@@ -3868,34 +3893,21 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, un
  *
  * @return a reference to \p rop.
  */
+#if defined(MPPP_HAVE_CONCEPTS)
 template <std::size_t SSize>
-inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, unsigned long op2)
+inline integer<SSize> &add_si(integer<SSize> &rop, const integer<SSize> &op1, const CppSignedIntegralInteroperable &op2)
+#else
+template <std::size_t SSize, typename T, cpp_signed_integral_interoperable_enabler<T> = 0>
+inline integer<SSize> &add_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
+#endif
 {
-    // LCOV_EXCL_START
-    if (nl_max<unsigned long>() > GMP_NUMB_MASK) {
-        sub(rop, op1, integer<SSize>{op2});
-        return rop;
+    if (op2 >= uncvref_t<decltype(op2)>(0)) {
+        return add_ui(rop, op1, make_unsigned(op2));
     }
-    // LCOV_EXCL_STOP
-    const bool s1 = op1.is_static();
-    bool sr = rop.is_static();
-    if (mppp_likely(s1)) {
-        if (!sr) {
-            rop.set_zero();
-            sr = true;
-        }
-        if (mppp_likely(static_addsub_ui<false>(rop._get_union().g_st(), op1._get_union().g_st(), op2))) {
-            return rop;
-        }
-    }
-    if (sr) {
-        rop._get_union().promote(SSize + 1u);
-    }
-    ::mpz_sub_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), op2);
-    return rop;
+    return sub_ui(rop, op1, nint_abs(op2));
 }
 
-/// Ternary subtraction.
+/// Ternary \link mppp::integer integer\endlink subtraction.
 /**
  * This function will set \p rop to <tt>op1 - op2</tt>.
  *
@@ -3925,6 +3937,89 @@ inline integer<SSize> &sub(integer<SSize> &rop, const integer<SSize> &op1, const
     }
     ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), op2.get_mpz_view());
     return rop;
+}
+
+/// Ternary \link mppp::integer integer\endlink subtraction with C++ unsigned integral types.
+/**
+ * \rststar
+ * This function, which sets ``rop`` to ``op1 - op2``, can be a faster
+ * alternative to the :cpp:class:`~mppp::integer` subtraction function
+ * if ``op2`` fits in a single limb.
+ * \endrststar
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1,
+                              const CppUnsignedIntegralInteroperable &op2)
+#else
+template <std::size_t SSize, typename T, cpp_unsigned_integral_interoperable_enabler<T> = 0>
+inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
+#endif
+{
+    if (op2 > GMP_NUMB_MASK) {
+        MPPP_MAYBE_TLS integer<SSize> tmp;
+        tmp = op2;
+        return sub(rop, op1, tmp);
+    }
+    const bool s1 = op1.is_static();
+    bool sr = rop.is_static();
+    if (mppp_likely(s1)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
+        if (mppp_likely(static_addsub_1<false>(rop._get_union().g_st(), op1._get_union().g_st(),
+                                               static_cast<::mp_limb_t>(op2)))) {
+            return rop;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(SSize + 1u);
+    }
+    if (op2 <= std::numeric_limits<unsigned long>::max()) {
+        ::mpz_sub_ui(&rop._get_union().g_dy(), op1.get_mpz_view(), static_cast<unsigned long>(op2));
+    } else {
+        // LCOV_EXCL_START
+        ::mp_limb_t op2_copy[1] = {static_cast<::mp_limb_t>(op2)};
+        const mpz_struct_t tmp_mpz{1, 1, op2_copy};
+        ::mpz_sub(&rop._get_union().g_dy(), op1.get_mpz_view(), &tmp_mpz);
+        // LCOV_EXCL_STOP
+    }
+    return rop;
+}
+
+/// Ternary \link mppp::integer integer\endlink subtraction with C++ signed integral types.
+/**
+ * \rststar
+ * This function, which sets ``rop`` to ``op1 - op2``, can be a faster
+ * alternative to the :cpp:class:`~mppp::integer` subtraction function
+ * if ``op2`` fits in a single limb.
+ * \endrststar
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &sub_si(integer<SSize> &rop, const integer<SSize> &op1, const CppSignedIntegralInteroperable &op2)
+#else
+template <std::size_t SSize, typename T, cpp_signed_integral_interoperable_enabler<T> = 0>
+inline integer<SSize> &sub_si(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
+#endif
+{
+    if (op2 >= uncvref_t<decltype(op2)>(0)) {
+        return sub_ui(rop, op1, make_unsigned(op2));
+    }
+    return add_ui(rop, op1, nint_abs(op2));
 }
 
 inline namespace detail
@@ -4129,7 +4224,7 @@ inline std::size_t static_mul(static_int<SSize> &rop, const static_int<SSize> &o
     }
     return retval;
 }
-}
+} // namespace detail
 
 /// Ternary multiplication.
 /**
@@ -4360,7 +4455,7 @@ inline std::size_t static_addsubmul(static_int<SSize> &rop, const static_int<SSi
     }
     return retval;
 }
-}
+} // namespace detail
 
 /// Ternary multiply–add.
 /**
@@ -4594,7 +4689,7 @@ inline std::size_t static_mul_2exp(static_int<2> &rop, const static_int<2> &n, s
     rop._mp_size = sign * (1 + (hi != 0u));
     return 0u;
 }
-}
+} // namespace detail
 
 /// Ternary left shift.
 /**
@@ -4919,7 +5014,7 @@ inline void static_tdiv_qr(static_int<SSize> &q, static_int<SSize> &r, const sta
         r.zero_unused_limbs();
     }
 }
-}
+} // namespace detail
 
 /// Ternary truncated division with remainder.
 /**
@@ -5080,7 +5175,7 @@ inline void static_tdiv_q(static_int<SSize> &q, const static_int<SSize> &op1, co
         q.zero_unused_limbs();
     }
 }
-}
+} // namespace detail
 
 /// Ternary truncated division without remainder.
 /**
@@ -5217,7 +5312,7 @@ inline void static_divexact(static_int<SSize> &q, const static_int<SSize> &op1, 
         q.zero_unused_limbs();
     }
 }
-}
+} // namespace detail
 
 /// Exact division (ternary version).
 /**
@@ -5296,7 +5391,7 @@ inline void static_divexact_gcd(static_int<SSize> &q, const static_int<SSize> &o
         q.zero_unused_limbs();
     }
 }
-}
+} // namespace detail
 
 /// Exact division with positive divisor (ternary version).
 /**
@@ -5469,7 +5564,7 @@ inline void static_tdiv_q_2exp(static_int<2> &rop, const static_int<2> &n, ::mp_
     // or one less than that.
     rop._mp_size = sign * (asize - ((rop.m_limbs[std::size_t(asize - 1)] & GMP_NUMB_MASK) == 0u));
 }
-}
+} // namespace detail
 
 /// Ternary right shift.
 /**
@@ -5575,7 +5670,7 @@ inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, 
     }
     return 0;
 }
-}
+} // namespace detail
 
 /// Comparison function for integer.
 /**
@@ -5770,7 +5865,7 @@ inline bool static_not(static_int<SSize> &rop, const static_int<SSize> &op)
     // zero upper limbs as mpn functions are never used in case of optimised size.
     return static_not_impl(rop, op, asize, sign);
 }
-}
+} // namespace detail
 
 /// Bitwise NOT for \link mppp::integer integer\endlink.
 /**
@@ -6036,7 +6131,7 @@ inline void static_ior(static_int<SSize> &rop, const static_int<SSize> &op1, con
     // zero upper limbs as mpn functions are never used in case of optimised size.
     static_ior_impl(rop, op1, op2, asize1, asize2, sign1, sign2);
 }
-}
+} // namespace detail
 
 /// Bitwise OR for \link mppp::integer integer\endlink.
 /**
@@ -6287,7 +6382,7 @@ inline bool static_and(static_int<SSize> &rop, const static_int<SSize> &op1, con
     // zero upper limbs as mpn functions are never used in case of optimised size.
     return static_and_impl(rop, op1, op2, asize1, asize2, sign1, sign2);
 }
-}
+} // namespace detail
 
 /// Bitwise AND for \link mppp::integer integer\endlink.
 /**
@@ -6549,7 +6644,7 @@ inline bool static_xor(static_int<SSize> &rop, const static_int<SSize> &op1, con
     // zero upper limbs as mpn functions are never used in case of optimised size.
     return static_xor_impl(rop, op1, op2, asize1, asize2, sign1, sign2);
 }
-}
+} // namespace detail
 
 /// Bitwise XOR for \link mppp::integer integer\endlink.
 /**
@@ -6653,7 +6748,7 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
     assert(rop._mp_size > 0);
     copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + rop._mp_size, rop.m_limbs.data());
 }
-}
+} // namespace detail
 
 /// GCD (ternary version).
 /**
@@ -6832,7 +6927,7 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
 {
     return binomial_impl(integer<SSize>{n}, k);
 }
-}
+} // namespace detail
 
 /// Generic binomial coefficient.
 /**
@@ -6876,7 +6971,7 @@ inline void nextprime_impl(integer<SSize> &rop, const integer<SSize> &n)
     ::mpz_nextprime(&tmp.m_mpz, n.get_mpz_view());
     rop = &tmp.m_mpz;
 }
-}
+} // namespace detail
 
 /// Compute next prime number (binary version).
 /**
@@ -7034,7 +7129,7 @@ inline T pow_impl(const T &base, const integer<SSize> &exp)
 {
     return std::pow(base, static_cast<T>(exp));
 }
-}
+} // namespace detail
 
 /// Generic binary exponentiation for \link mppp::integer integer\endlink.
 /**
@@ -7118,7 +7213,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
     }
     ::mpz_sqrt(&rop._get_union().g_dy(), n.get_mpz_view());
 }
-}
+} // namespace detail
 
 /// Integer square root (binary version).
 /**
@@ -7247,7 +7342,7 @@ using integer_binary_load_t = decltype(std::declval<Integer &>().binary_load(std
 
 template <typename T, std::size_t SSize>
 using has_integer_binary_load = is_detected<integer_binary_load_t, T, integer<SSize>>;
-}
+} // namespace detail
 
 #if !defined(MPPP_DOXYGEN_INVOKED)
 
@@ -7448,7 +7543,7 @@ inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop + op);
 }
-}
+} // namespace detail
 
 /// Identity operator.
 /**
@@ -7611,7 +7706,7 @@ inline void dispatch_in_place_sub(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop - op);
 }
-}
+} // namespace detail
 
 /// Negated copy.
 /**
@@ -7772,7 +7867,7 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop * op);
 }
-}
+} // namespace detail
 
 /// Binary multiplication operator for \link mppp::integer integer\endlink.
 /**
@@ -7933,7 +8028,7 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop % op);
 }
-}
+} // namespace detail
 
 /// Binary division operator for \link mppp::integer integer\endlink.
 /**
@@ -8227,7 +8322,7 @@ inline bool dispatch_greater_than(T x, const integer<SSize> &a)
 {
     return dispatch_less_than(a, x);
 }
-}
+} // namespace detail
 
 /// Equality operator.
 /**
@@ -8398,7 +8493,7 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop | op);
 }
-}
+} // namespace detail
 
 /// Binary bitwise OR operator for \link mppp::integer integer\endlink.
 /**
@@ -8493,7 +8588,7 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop & op);
 }
-}
+} // namespace detail
 
 /// Binary bitwise AND operator for \link mppp::integer integer\endlink.
 /**
@@ -8588,7 +8683,7 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop ^ op);
 }
-}
+} // namespace detail
 
 /// Binary bitwise XOR operator for \link mppp::integer integer\endlink.
 /**
@@ -8642,7 +8737,7 @@ inline T &operator^=(T &rop, const U &op)
 }
 
 /** @} */
-}
+} // namespace mppp
 
 namespace std
 {
@@ -8668,7 +8763,7 @@ struct hash<mppp::integer<SSize>> {
         return mppp::hash(n);
     }
 };
-}
+} // namespace std
 
 #if defined(_MSC_VER)
 
