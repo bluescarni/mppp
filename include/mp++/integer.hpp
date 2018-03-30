@@ -2608,6 +2608,10 @@ private:
     {
         assert(bs == binary_size());
         auto ptr = reinterpret_cast<const char *>(&m_int.m_st._mp_size);
+        // NOTE: std::copy() has the usual aliasing restrictions to take into account.
+        // Here it should not matter, unless one is somehow trying to save an integer
+        // into itself (I guess?). It's probably not necessary to put these aliasing
+        // restrictions in the user docs.
         std::copy(ptr, ptr + sizeof(mpz_size_t), make_uai(dest));
         ptr = reinterpret_cast<const char *>(is_static() ? m_int.g_st().m_limbs.data() : m_int.g_dy()._mp_d);
         std::copy(ptr, ptr + (bs - sizeof(mpz_size_t)), make_uai(dest + sizeof(mpz_size_t)));
