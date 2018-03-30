@@ -193,7 +193,7 @@ we also include timings for 64-bit (<code class="docutils literal"><span class="
 </div>
 <p>It can be immediately seen how the initialisation cost for the <code class="docutils literal"><span class="pre">mpz_int</span></code> class is much higher than for the other
 integer types. This is due to the fact that the GMP API always uses dynamically-allocated memory, even for small values.
-The other integer types all employ a small-value optimisation, and thus avoid the performance cost of heap allocation.</p>
+The other multiprecision integer types all employ a small-value optimisation, and thus avoid the performance cost of heap allocation.</p>
 <p>In this particular benchmark, mp++ is about 3 times faster than GMP (as measured via the <code class="docutils literal"><span class="pre">mpz_int</span></code> wrapper)
 in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark. mp++ is also faster than <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT, albeit by a smaller margin.
 With respect to the 64/128-bit hardware integer types, there are x4/x2 slowdowns in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark.</p>

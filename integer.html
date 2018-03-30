@@ -1592,7 +1592,7 @@ not be altered.</p>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3addER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE">
 <span id="mppp::add__integer:SSize:R.integer:SSize:CR.integer:SSize:CR"></span><span class="target" id="group__integer__arithmetic_1ga26a89caa27dd312e98821476913d9151"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">add</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3addER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Ternary addition. </p>
+<dd><p>Ternary <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> addition. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">+</span> <span class="pre">op2</span></code>.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1611,10 +1611,12 @@ not be altered.</p>
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
-<dt id="_CPPv2N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeEm">
-<span id="mppp::add_ui__integer:SSize:R.integer:SSize:CR.unsigned-l"></span><span class="target" id="group__integer__arithmetic_1gaada2f1b4c3534a6a825c7ebcf4e17d0d"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">add_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, unsigned long <em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeEm" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Ternary addition with <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span></code>. </p>
-<p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">+</span> <span class="pre">op2</span></code>.</p>
+<dt id="_CPPv2N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable">
+<span id="mppp::add_ui__integer:SSize:R.integer:SSize:CR.CppUnsignedIntegralInteroperableCR"></span><span class="target" id="group__integer__arithmetic_1gaf8513cdb137092c268437a27bcbfe062"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">add_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp32CppUnsignedIntegralInteroperableE" title="mppp::CppUnsignedIntegralInteroperable">CppUnsignedIntegralInteroperable</a> &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Ternary <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> addition with C++ unsigned integral types. </p>
+<p>This function, which sets <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">+</span> <span class="pre">op2</span></code>, can be a faster
+alternative to the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> addition function
+if <code class="docutils literal"><span class="pre">op2</span></code> fits in a single limb.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>. </dd>
@@ -1632,10 +1634,12 @@ not be altered.</p>
 <dl class="function">
 <dt>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
-<dt id="_CPPv2N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeEm">
-<span id="mppp::sub_ui__integer:SSize:R.integer:SSize:CR.unsigned-l"></span><span class="target" id="group__integer__arithmetic_1ga885c83335e2f8cda73c299afd74aecd6"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">sub_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, unsigned long <em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeEm" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Ternary subtraction with <code class="docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span></code>. </p>
-<p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">-</span> <span class="pre">op2</span></code>.</p>
+<dt id="_CPPv2N4mppp6add_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable">
+<span id="mppp::add_si__integer:SSize:R.integer:SSize:CR.CppSignedIntegralInteroperableCR"></span><span class="target" id="group__integer__arithmetic_1ga44f084d1b997112fea1b0c71b287b871"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">add_si</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp30CppSignedIntegralInteroperableE" title="mppp::CppSignedIntegralInteroperable">CppSignedIntegralInteroperable</a> &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6add_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Ternary <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> addition with C++ signed integral types. </p>
+<p>This function, which sets <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">+</span> <span class="pre">op2</span></code>, can be a faster
+alternative to the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> addition function
+if <code class="docutils literal"><span class="pre">op2</span></code> fits in a single limb.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>. </dd>
@@ -1655,8 +1659,54 @@ not be altered.</p>
 <em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3subER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE">
 <span id="mppp::sub__integer:SSize:R.integer:SSize:CR.integer:SSize:CR"></span><span class="target" id="group__integer__arithmetic_1gadafa83607f95ed26147f5233a666d108"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">sub</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3subER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Ternary subtraction. </p>
+<dd><p>Ternary <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> subtraction. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">-</span> <span class="pre">op2</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal"><span class="pre">op1</span></code>: the first argument. </li>
+<li><code class="docutils literal"><span class="pre">op2</span></code>: the second argument.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable">
+<span id="mppp::sub_ui__integer:SSize:R.integer:SSize:CR.CppUnsignedIntegralInteroperableCR"></span><span class="target" id="group__integer__arithmetic_1ga3adbdd9c769a5ed41ba996b98b71cc7f"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">sub_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp32CppUnsignedIntegralInteroperableE" title="mppp::CppUnsignedIntegralInteroperable">CppUnsignedIntegralInteroperable</a> &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Ternary <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> subtraction with C++ unsigned integral types. </p>
+<p>This function, which sets <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">-</span> <span class="pre">op2</span></code>, can be a faster
+alternative to the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> subtraction function
+if <code class="docutils literal"><span class="pre">op2</span></code> fits in a single limb.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal"><span class="pre">op1</span></code>: the first argument. </li>
+<li><code class="docutils literal"><span class="pre">op2</span></code>: the second argument.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
+<dt id="_CPPv2N4mppp6sub_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable">
+<span id="mppp::sub_si__integer:SSize:R.integer:SSize:CR.CppSignedIntegralInteroperableCR"></span><span class="target" id="group__integer__arithmetic_1ga7826fdc81eeb83f6774a3a77997968ad"></span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp::</code><code class="descname">sub_si</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp30CppSignedIntegralInteroperableE" title="mppp::CppSignedIntegralInteroperable">CppSignedIntegralInteroperable</a> &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp6sub_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Ternary <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> subtraction with C++ signed integral types. </p>
+<p>This function, which sets <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span> <span class="pre">-</span> <span class="pre">op2</span></code>, can be a faster
+alternative to the <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> subtraction function
+if <code class="docutils literal"><span class="pre">op2</span></code> fits in a single limb.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">rop</span></code>. </dd>
