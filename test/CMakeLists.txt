@@ -42,7 +42,7 @@ endfunction()
 
 ADD_MPPP_TESTCASE(concepts)
 ADD_MPPP_TESTCASE(integer_abs)
-ADD_MPPP_TESTCASE(integer_addsub_ui)
+ADD_MPPP_TESTCASE(integer_addsub_ui_si)
 ADD_MPPP_TESTCASE(integer_arith)
 ADD_MPPP_TESTCASE(integer_arith_ops_01)
 ADD_MPPP_TESTCASE(integer_arith_ops_02)

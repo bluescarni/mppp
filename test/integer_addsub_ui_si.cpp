@@ -37,6 +37,13 @@ using uint_types = std::tuple<unsigned char, unsigned short, unsigned, unsigned 
 #endif
                               >;
 
+using sint_types = std::tuple<signed char, short, int, long, long long
+#if defined(MPPP_HAVE_GCC_INT128)
+                              ,
+                              __int128_t
+#endif
+                              >;
+
 static std::mt19937 rng;
 
 struct add_ui_tester {
@@ -417,4 +424,60 @@ struct sub_ui_tester {
 TEST_CASE("sub_ui")
 {
     tuple_for_each(sizes{}, sub_ui_tester{});
+}
+
+struct add_si_tester {
+    template <typename S>
+    struct runner {
+        template <typename Int>
+        void operator()(const Int &) const
+        {
+            using integer = integer<S::value>;
+            integer rop;
+            add_si(rop, integer{42}, Int(0));
+            REQUIRE(rop == 42);
+            add_si(rop, integer{42}, Int(23));
+            REQUIRE(rop == 65);
+            add_si(rop, integer{42}, Int(-43));
+            REQUIRE(rop == -1);
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(sint_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("add_si")
+{
+    tuple_for_each(sizes{}, add_si_tester{});
+}
+
+struct sub_si_tester {
+    template <typename S>
+    struct runner {
+        template <typename Int>
+        void operator()(const Int &) const
+        {
+            using integer = integer<S::value>;
+            integer rop;
+            sub_si(rop, integer{42}, Int(0));
+            REQUIRE(rop == 42);
+            sub_si(rop, integer{42}, Int(43));
+            REQUIRE(rop == -1);
+            sub_si(rop, integer{-1}, Int(-101));
+            REQUIRE(rop == 100);
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(sint_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("sub_si")
+{
+    tuple_for_each(sizes{}, sub_si_tester{});
 }
