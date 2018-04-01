@@ -183,9 +183,24 @@ path, etc.). The available configuration options are:</p>
 </ul>
 <p>Note that the <code class="docutils literal"><span class="pre">MPPP_WITH_QUADMATH</span></code> option, at this time, is available only using GCC (all the supported versions) and Clang
 (since version 3.9). When using Clang, it is still necessary to link to the quadmath library from GCC.</p>
-<p>Since mp++ is a header-only library (although with compiled dependencies), there’s no compilation step, unless the tests or the benchmarks are being built,
-and the installation of mp++ via <code class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></code> or similar will just configure and copy the headers to your <code class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></code>,
-in the <code class="docutils literal"><span class="pre">include</span></code> subdirectory.</p>
+<p>To build mp++, you can run the following CMake command from the build directory:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>$ cmake --build .
+</pre></div>
+</div>
+<p>Since mp++ is a header-only library (although with compiled dependencies), there’s no compilation step, unless the tests or the benchmarks are being built.
+To install mp++, you can use the following CMake command:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>$ cmake  --build . --target install
+</pre></div>
+</div>
+<p>The installation command will copy the mp++ headers to the <code class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></code> directory, in the <code class="docutils literal"><span class="pre">include</span></code> subdirectory.</p>
+<p>If you enabled the <code class="docutils literal"><span class="pre">MPPP_BUILD_TESTS</span></code> option, you can run the test suite with the following command:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>$ cmake  --build . --target test
+</pre></div>
+</div>
+<p>If you enabled the <code class="docutils literal"><span class="pre">MPPP_BUILD_BENCHMARKS</span></code> option, you can run the benchmark suite with the following command:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>$ cmake  --build . --target benchmark
+</pre></div>
+</div>
 </div>
 <div class="section" id="installation-via-conda">
 <h2>Installation via conda<a class="headerlink" href="#installation-via-conda" title="Permalink to this headline">¶</a></h2>
@@ -195,8 +210,8 @@ in the <code class="docutils literal"><span class="pre">include</span></code> su
 <p>mp++ is available in the <a class="reference external" href="https://conda.io/docs/">conda</a> package manager from the
 <a class="reference external" href="https://conda-forge.org/">conda-forge</a> channel. Packages for Linux 64-bit, Windows 32/64-bit
 and OSX 64-bit are available. In order to install mp++ via conda, you just need to add <code class="docutils literal"><span class="pre">conda-forge</span></code> to the channels:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>conda config --add channels conda-forge
-conda install mppp
+<div class="highlight-none"><div class="highlight"><pre><span></span>$ conda config --add channels conda-forge
+$ conda install mppp
 </pre></div>
 </div>
 <p>(note that the <a class="reference external" href="https://anaconda.org/conda-forge/mppp">conda package</a> for mp++ is named <code class="docutils literal"><span class="pre">mppp</span></code> rather than <code class="docutils literal"><span class="pre">mp++</span></code>)</p>
@@ -219,7 +234,7 @@ your conda installation.</p>
 </pre></div>
 </div>
 <p>If mp++ is installed in a standard prefix, on a typical GNU/Linux system you can compile this example with the following command:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 main.cpp -lgmp
+<div class="highlight-none"><div class="highlight"><pre><span></span>$ g++ -std=c++11 main.cpp -lgmp
 </pre></div>
 </div>
 <div class="admonition note">
@@ -228,7 +243,7 @@ your conda installation.</p>
 </div>
 <p>If you installed mp++ with optional features enabled, you will need to link the required libraries as well. For instance,
 if both MPFR and quadmath support are enabled, the compilation command on a modern GNU/Linux system will be something like:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 main.cpp -lquadmath -lmpfr -lgmp
+<div class="highlight-none"><div class="highlight"><pre><span></span>$ g++ -std=c++11 main.cpp -lquadmath -lmpfr -lgmp
 </pre></div>
 </div>
 <div class="admonition note">

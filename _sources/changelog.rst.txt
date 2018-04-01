@@ -7,6 +7,7 @@ Changelog
 New
 ~~~
 
+- Add a target in the build system to compile and run the benchmarks (`#135 <https://github.com/bluescarni/mppp/pull/135>`__).
 - Extend the :cpp:func:`~mppp::add_ui()` and :cpp:func:`~mppp::sub_ui()` functions to work on all unsigned
   C++ integral types, and introduce corresponding :cpp:func:`~mppp::add_si()` and :cpp:func:`~mppp::sub_si()`
   functions for signed C++ integral types (`#131 <https://github.com/bluescarni/mppp/pull/131>`__).
@@ -17,7 +18,8 @@ Fix
 ~~~
 
 - Fix a test failure on FreeBSD (`#134 <https://github.com/bluescarni/mppp/pull/134>`__).
-- Various small documentation fixes (`#130 <https://github.com/bluescarni/mppp/pull/130>`__).
+- Various small documentation fixes (`#130 <https://github.com/bluescarni/mppp/pull/130>`__,
+  `#135 <https://github.com/bluescarni/mppp/pull/135>`__).
 - Fix demangling failures for 128-bit integers in OSX (`#128 <https://github.com/bluescarni/mppp/pull/128>`__).
 
 0.9 (2018-02-25)
