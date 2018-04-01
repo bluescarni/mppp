@@ -53,9 +53,32 @@ path, etc.). The available configuration options are:
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only using GCC (all the supported versions) and Clang
 (since version 3.9). When using Clang, it is still necessary to link to the quadmath library from GCC.
 
-Since mp++ is a header-only library (although with compiled dependencies), there's no compilation step, unless the tests or the benchmarks are being built,
-and the installation of mp++ via ``make install`` or similar will just configure and copy the headers to your ``CMAKE_INSTALL_PREFIX``,
-in the ``include`` subdirectory.
+To build mp++, you can run the following CMake command from the build directory:
+
+.. code-block:: none
+
+   $ cmake --build .
+
+Since mp++ is a header-only library (although with compiled dependencies), there's no compilation step, unless the tests or the benchmarks are being built.
+To install mp++, you can use the following CMake command:
+
+.. code-block:: none
+
+   $ cmake  --build . --target install
+
+The installation command will copy the mp++ headers to the ``CMAKE_INSTALL_PREFIX`` directory, in the ``include`` subdirectory.
+
+If you enabled the ``MPPP_BUILD_TESTS`` option, you can run the test suite with the following command:
+
+.. code-block:: none
+
+   $ cmake  --build . --target test
+
+If you enabled the ``MPPP_BUILD_BENCHMARKS`` option, you can run the benchmark suite with the following command:
+
+.. code-block:: none
+
+   $ cmake  --build . --target benchmark
 
 Installation via conda
 ----------------------
@@ -66,10 +89,10 @@ mp++ is available in the `conda <https://conda.io/docs/>`__ package manager from
 `conda-forge <https://conda-forge.org/>`__ channel. Packages for Linux 64-bit, Windows 32/64-bit
 and OSX 64-bit are available. In order to install mp++ via conda, you just need to add ``conda-forge`` to the channels:
 
-.. code-block:: bash
+.. code-block:: none
 
-   conda config --add channels conda-forge
-   conda install mppp
+   $ conda config --add channels conda-forge
+   $ conda install mppp
 
 (note that the `conda package <https://anaconda.org/conda-forge/mppp>`__ for mp++ is named ``mppp`` rather than ``mp++``)
 
@@ -96,7 +119,7 @@ You can test the installation of mp++ with the following simple ``main.cpp`` pro
 
 If mp++ is installed in a standard prefix, on a typical GNU/Linux system you can compile this example with the following command:
 
-.. code-block:: console
+.. code-block:: none
 
    $ g++ -std=c++11 main.cpp -lgmp
 
@@ -107,7 +130,7 @@ If mp++ is installed in a standard prefix, on a typical GNU/Linux system you can
 If you installed mp++ with optional features enabled, you will need to link the required libraries as well. For instance,
 if both MPFR and quadmath support are enabled, the compilation command on a modern GNU/Linux system will be something like:
 
-.. code-block:: console
+.. code-block:: none
 
    $ g++ -std=c++11 main.cpp -lquadmath -lmpfr -lgmp
 

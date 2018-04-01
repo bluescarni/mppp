@@ -13,9 +13,12 @@ if [[ "${MPPP_BUILD}" != DebugGCC48DebugGMP && "${MPPP_BUILD}" != Coverage32GCC6
 fi
 
 if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes ../;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_BUILD_BENCHMARKS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes ../;
     make -j2 VERBOSE=1 install;
     ctest -V;
+
+    # Run the benchmarks as well.
+    make -j2 VERBOSE=1 benchmark;
 
     # Test the CMake export installation.
     cd ../tools/sample_project;
