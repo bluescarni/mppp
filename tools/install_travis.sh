@@ -18,7 +18,7 @@ if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
     ctest -V;
 
     # Run the benchmarks as well.
-    make -j2 benchmark;
+    make -j2 VERBOSE=1 benchmark;
 
     # Test the CMake export installation.
     cd ../tools/sample_project;
