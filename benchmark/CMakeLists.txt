@@ -12,6 +12,10 @@ if(MPPP_BENCHMARK_FLINT)
   find_package(FLINT REQUIRED)
 endif()
 
+# Custom target to run all benchmarks.
+add_custom_target(benchmark)
+
+# Helper to add a benchmark.
 function(ADD_MPPP_BENCHMARK arg1)
   add_executable(${arg1} ${arg1}.cpp)
   target_link_libraries(${arg1} mp++)
@@ -37,6 +41,9 @@ function(ADD_MPPP_BENCHMARK arg1)
   endif()
   set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
   set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
+  # Add the current benchmark to the "benchmark" custom target.
+  add_dependencies(benchmark ${arg1})
+  add_custom_command(TARGET benchmark POST_BUILD COMMAND "${arg1}" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endfunction()
 
 ADD_MPPP_BENCHMARK(integer1_dot_product_unsigned)
