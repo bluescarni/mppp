@@ -185,7 +185,15 @@ struct pow_tester {
         REQUIRE(pow(4.5f, integer{-2}) == std::pow(4.5f, -2.f));
         REQUIRE(pow(integer{2}, 4.5) == std::pow(2., 4.5));
         REQUIRE(pow(4.5, integer{-2}) == std::pow(4.5, -2.));
-#if defined(MPPP_WITH_MPFR)
+        // NOTE: in FreeBSD, the powl() function currently computes
+        // the result in double precision, rather than long double precision.
+        // However, in Release builds, std::pow(2.l, 4.5l) is actually
+        // computed in effectively long double precision at compile time
+        // by the compiler (i.e., the runtime powl() is bypassed and not actually
+        // invoked). This leads to inconsistencies in the two tests below,
+        // so we just disable them in FreeBSD. See also:
+        // https://github.com/bluescarni/mppp/issues/132
+#if defined(MPPP_WITH_MPFR) && !defined(__FreeBSD__)
         REQUIRE(pow(integer{2}, 4.5l) == std::pow(2.l, 4.5l));
         REQUIRE(pow(4.5l, integer{-2}) == std::pow(4.5l, -2.l));
 #endif
