@@ -9,7 +9,7 @@ The benchmarking code is available `here <https://github.com/bluescarni/mppp/tre
 
 In addition to mp++, the following libraries are used in the benchmarks:
 
-* the `Boost.Multiprecision <http://www.boost.org/doc/libs/1_63_0/libs/multiprecision/doc/html/index.html>`__ library.
+* the `Boost.Multiprecision <https://www.boost.org/doc/libs/1_66_0/libs/multiprecision/doc/html/index.html>`__ library.
   Specifically, the ``cpp_int`` and the ``mpz_int`` integer classes are employed in the benchmarks. The former
   is a multiprecision integer class adopting a small-value optimisation, the latter is a thin wrapper around the GMP
   ``mpz_t`` type. In the benchmarks, the ``mpz_int`` class is used only for ease of initialisation
