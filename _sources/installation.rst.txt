@@ -32,7 +32,7 @@ mp++ has the following dependencies:
 * the `quadmath library <https://gcc.gnu.org/onlinedocs/libquadmath/>`__ from GCC, *optional*, used
   in the implementation of the :cpp:class:`~mppp::real128` class (typically, the quadmath library
   is part of GCC and it does not need to be installed separately);
-* the `Boost <http://www.boost.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*, currently used
+* the `Boost <https://www.boost.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*, currently used
   only in the benchmarking suite.
 
 Additionally, `CMake <https://cmake.org/>`__ is the build system used by mp++ and it must also be available when
@@ -187,3 +187,18 @@ For instance, a ``CMakeLists.txt`` file for the simple ``main.cpp`` program pres
    # that C++11 is needed for the compilation.
    # Not strictly necessary with a recent-enough compiler.
    set_property(TARGET main PROPERTY CXX_STANDARD 11)
+
+Platform-specific notes
+-----------------------
+
+FreeBSD
+~~~~~~~
+
+On FreeBSD, the ``long double`` overloads of some mathematical functions (such as ``std::pow()``) are currently implemented in
+``double`` precision. Additionally, if the arguments to such mathematical functions are compile-time constants, the compiler
+*may* decide (depending on the optimisation level) to actually compute the result at compile time using full ``long double`` precision.
+This behaviour can lead to subtle inconsistencies, and it results in one test case from the mp++ test suite failing on FreeBSD.
+
+.. seealso::
+
+   https://github.com/bluescarni/mppp/issues/132

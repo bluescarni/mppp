@@ -86,6 +86,10 @@
 <li><a class="reference internal" href="#installation-via-conda">Installation via conda</a></li>
 <li><a class="reference internal" href="#checking-the-installation">Checking the installation</a></li>
 <li><a class="reference internal" href="#including-mp-in-your-project-via-cmake">Including mp++ in your project via CMake</a></li>
+<li><a class="reference internal" href="#platform-specific-notes">Platform-specific notes</a><ul>
+<li><a class="reference internal" href="#freebsd">FreeBSD</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -165,7 +169,7 @@ of the <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="
 <li>the <a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/">quadmath library</a> from GCC, <em>optional</em>, used
 in the implementation of the <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> class (typically, the quadmath library
 is part of GCC and it does not need to be installed separately);</li>
-<li>the <a class="reference external" href="http://www.boost.org/">Boost</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a> libraries, <em>optional</em>, currently used
+<li>the <a class="reference external" href="https://www.boost.org/">Boost</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a> libraries, <em>optional</em>, currently used
 only in the benchmarking suite.</li>
 </ul>
 <p>Additionally, <a class="reference external" href="https://cmake.org/">CMake</a> is the build system used by mp++ and it must also be available when
@@ -296,6 +300,20 @@ on which mp++ depends (e.g., GMP) are brought into the link chain.</p>
 <span class="c"># Not strictly necessary with a recent-enough compiler.</span>
 <span class="nb">set_property</span><span class="p">(</span><span class="s">TARGET</span> <span class="s">main</span> <span class="s">PROPERTY</span> <span class="s">CXX_STANDARD</span> <span class="s">11</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="platform-specific-notes">
+<h2>Platform-specific notes<a class="headerlink" href="#platform-specific-notes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="freebsd">
+<h3>FreeBSD<a class="headerlink" href="#freebsd" title="Permalink to this headline">¶</a></h3>
+<p>On FreeBSD, the <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> overloads of some mathematical functions (such as <code class="docutils literal"><span class="pre">std::pow()</span></code>) are currently implemented in
+<code class="docutils literal"><span class="pre">double</span></code> precision. Additionally, if the arguments to such mathematical functions are compile-time constants, the compiler
+<em>may</em> decide (depending on the optimisation level) to actually compute the result at compile time using full <code class="docutils literal"><span class="pre">long</span> <span class="pre">double</span></code> precision.
+This behaviour can lead to subtle inconsistencies, and it results in one test case from the mp++ test suite failing on FreeBSD.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="https://github.com/bluescarni/mppp/issues/132">https://github.com/bluescarni/mppp/issues/132</a></p>
+</div>
 </div>
 </div>
 </div>

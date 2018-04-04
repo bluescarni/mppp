@@ -15,7 +15,7 @@ Extra: integration with pybind11
 The ``mp++/extra/pybind11.hpp`` header provides facilities to seamlessly translate
 mp++ multiprecision objects to/from Python in `pybind11 <https://github.com/pybind/pybind11>`__
 modules. pybind11 is a C++11 library that, similarly to the older
-`Boost.Python <http://www.boost.org/doc/libs/1_66_0/libs/python/doc/html/index.html>`__ library,
+`Boost.Python <https://www.boost.org/doc/libs/1_66_0/libs/python/doc/html/index.html>`__ library,
 allows to use C++ functions and classes from Python.
 
 The API for the pybind11 integration currently includes a single function in the ``mppp_pybind11`` namespace:
