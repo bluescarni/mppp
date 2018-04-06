@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.10 (unreleased)
+0.10 (2018-04-06)
 -----------------
 
 New
@@ -13,6 +13,12 @@ New
   functions for signed C++ integral types (`#131 <https://github.com/bluescarni/mppp/pull/131>`__).
 - Initial version of the rational tutorial (`#130 <https://github.com/bluescarni/mppp/pull/130>`__).
 - The demangler is now aware of cv-qualifiers and references (`#129 <https://github.com/bluescarni/mppp/pull/129>`__).
+
+Changes
+~~~~~~~
+
+- **BREAKING**: the :cpp:func:`~mppp::add_ui()` function now **requires** an unsigned integral as the third argument
+  (previously, the function could be invoked with a signed integral argument thanks to C++'s conversion rules).
 
 Fix
 ~~~
