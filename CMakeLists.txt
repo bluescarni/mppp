@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.3.0)
 
-project(mp++ VERSION 0.10 LANGUAGES CXX C)
+project(mp++ VERSION 0.11 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
