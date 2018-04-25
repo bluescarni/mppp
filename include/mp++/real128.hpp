@@ -96,7 +96,7 @@ using is_real128_mppp_interoperable = disjunction<is_integer<T>, is_rational<T>>
 template <typename T, typename U>
 using are_real128_mppp_op_types = disjunction<conjunction<std::is_same<T, real128>, is_real128_mppp_interoperable<U>>,
                                               conjunction<std::is_same<U, real128>, is_real128_mppp_interoperable<T>>>;
-}
+} // namespace detail
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -251,7 +251,7 @@ public:
     /**
      * @param other the real128 that will be moved.
      */
-    constexpr real128(real128 &&other) : real128(other) {}
+    constexpr real128(real128 &&other) noexcept : real128(other) {}
     /// Constructor from a quadruple-precision floating-point value.
     /**
      * This constructor will initialise the internal value with \p x.
@@ -502,26 +502,26 @@ public:
         m_value = x;
         return *this;
     }
-        /// Assignment from mp++ types.
-        /**
-         * \rststar
-         * The body of this operator is equivalent to:
-         *
-         * .. code-block:: c++
-         *
-         *    return *this = real128{x};
-         *
-         * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``x`` and it is then move-assigned to
-         * ``this``.
-         * \endrststar
-         *
-         * @param x the assignment argument.
-         *
-         * @return a reference to \p this.
-         *
-         * @throws unspecified any exception thrown by the construction of a \link mppp::real128 real128\endlink from
-         * ``x``.
-         */
+    /// Assignment from mp++ types.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = real128{x};
+     *
+     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``x`` and it is then move-assigned to
+     * ``this``.
+     * \endrststar
+     *
+     * @param x the assignment argument.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the construction of a \link mppp::real128 real128\endlink from
+     * ``x``.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     real128 &operator=(const Real128MpppInteroperable &x)
 #else
@@ -531,25 +531,25 @@ public:
     {
         return *this = real128{x};
     }
-        /// Assignment from string.
-        /**
-         * \rststar
-         * The body of this operator is equivalent to:
-         *
-         * .. code-block:: c++
-         *
-         *    return *this = real128{s};
-         *
-         * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``s`` and it is then move-assigned to
-         * ``this``.
-         * \endrststar
-         *
-         * @param s the string that will be used for the assignment.
-         *
-         * @return a reference to \p this.
-         *
-         * @throws unspecified any exception thrown by the constructor from string.
-         */
+    /// Assignment from string.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = real128{s};
+     *
+     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``s`` and it is then move-assigned to
+     * ``this``.
+     * \endrststar
+     *
+     * @param s the string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     real128 &operator=(const StringType &s)
 #else
@@ -729,27 +729,27 @@ public:
         }
         return retval;
     }
-        /// Conversion method to interoperable C++ types.
-        /**
-         * \rststar
-         * This method will cast the :cpp:member:`~mppp::real128::m_value` member to the
-         * :cpp:concept:`~mppp::Real128CppInteroperable` type T, and assign the result
-         * to ``rop``.
-         *
-         * .. note::
-         *    This method is provided for consistency with other getter methods,
-         *    and it does not offer any additional functionality over the plain
-         *    conversion operator.
-         *
-         * .. note::
-         *
-         *   This method is marked as ``constexpr`` only if at least C++14 is being used.
-         * \endrststar
-         *
-         * @param rop the variable which will store the result of the conversion.
-         *
-         * @return always ``true``.
-         */
+    /// Conversion method to interoperable C++ types.
+    /**
+     * \rststar
+     * This method will cast the :cpp:member:`~mppp::real128::m_value` member to the
+     * :cpp:concept:`~mppp::Real128CppInteroperable` type T, and assign the result
+     * to ``rop``.
+     *
+     * .. note::
+     *    This method is provided for consistency with other getter methods,
+     *    and it does not offer any additional functionality over the plain
+     *    conversion operator.
+     *
+     * .. note::
+     *
+     *   This method is marked as ``constexpr`` only if at least C++14 is being used.
+     * \endrststar
+     *
+     * @param rop the variable which will store the result of the conversion.
+     *
+     * @return always ``true``.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128CppInteroperable T>
 #else
@@ -759,21 +759,21 @@ public:
     {
         return rop = static_cast<T>(m_value), true;
     }
-        /// Conversion method to mp++ types.
-        /**
-         * \rststar
-         * This method, similarly to the corresponding conversion operator, will convert ``this`` to a
-         * :cpp:concept:`~mppp::Real128MpppInteroperable` type, storing the result of the conversion into ``rop``.
-         * Differently from the conversion operator, this method does not raise any exception: if the conversion is
-         * successful, the method will return ``true``, otherwise the method will return ``false``. If the conversion
-         * fails, ``rop`` will not be altered.
-         * \endrststar
-         *
-         * @param rop the variable which will store the result of the conversion.
-         *
-         * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if
-         * ``this`` does not represent a finite value.
-         */
+    /// Conversion method to mp++ types.
+    /**
+     * \rststar
+     * This method, similarly to the corresponding conversion operator, will convert ``this`` to a
+     * :cpp:concept:`~mppp::Real128MpppInteroperable` type, storing the result of the conversion into ``rop``.
+     * Differently from the conversion operator, this method does not raise any exception: if the conversion is
+     * successful, the method will return ``true``, otherwise the method will return ``false``. If the conversion
+     * fails, ``rop`` will not be altered.
+     * \endrststar
+     *
+     * @param rop the variable which will store the result of the conversion.
+     *
+     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if
+     * ``this`` does not represent a finite value.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128MpppInteroperable T>
 #else
@@ -1409,7 +1409,7 @@ inline real128 dispatch_pow(const T &x, const real128 &y)
 {
     return dispatch_pow(real128{x}, y);
 }
-}
+} // namespace detail
 
 /// Exponentiation.
 /**
@@ -1550,7 +1550,7 @@ constexpr real128 dispatch_add(const T &x, const real128 &y)
 {
     return real128{x + y.m_value};
 }
-}
+} // namespace detail
 
 /// Binary addition involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -1584,7 +1584,7 @@ inline real128 dispatch_add(const T &x, const real128 &y)
 {
     return real128{x} + y;
 }
-}
+} // namespace detail
 
 /// Binary addition involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -1628,7 +1628,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(T &x, const real128 &y)
 {
     x = static_cast<T>(x + y.m_value);
 }
-}
+} // namespace detail
 
 /// In-place addition involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -1669,7 +1669,7 @@ inline void dispatch_in_place_add(T &x, const real128 &y)
 {
     x = static_cast<T>(x + y);
 }
-}
+} // namespace detail
 
 /// In-place addition involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -1764,7 +1764,7 @@ constexpr real128 dispatch_sub(const T &x, const real128 &y)
 {
     return real128{x - y.m_value};
 }
-}
+} // namespace detail
 
 /// Binary subtraction involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -1798,7 +1798,7 @@ inline real128 dispatch_sub(const T &x, const real128 &y)
 {
     return real128{x} - y;
 }
-}
+} // namespace detail
 
 /// Binary subtraction involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -1840,7 +1840,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(T &x, const real128 &y)
 {
     x = static_cast<T>(x - y.m_value);
 }
-}
+} // namespace detail
 
 /// In-place subtraction involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -1881,7 +1881,7 @@ inline void dispatch_in_place_sub(T &x, const real128 &y)
 {
     x = static_cast<T>(x - y);
 }
-}
+} // namespace detail
 
 /// In-place subtraction involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -1965,7 +1965,7 @@ constexpr real128 dispatch_mul(const T &x, const real128 &y)
 {
     return real128{x * y.m_value};
 }
-}
+} // namespace detail
 
 /// Binary multiplication involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -1999,7 +1999,7 @@ inline real128 dispatch_mul(const T &x, const real128 &y)
 {
     return real128{x} * y;
 }
-}
+} // namespace detail
 
 /// Binary multiplication involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -2041,7 +2041,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_mul(T &x, const real128 &y)
 {
     x = static_cast<T>(x * y.m_value);
 }
-}
+} // namespace detail
 
 /// In-place multiplication involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -2082,7 +2082,7 @@ inline void dispatch_in_place_mul(T &x, const real128 &y)
 {
     x = static_cast<T>(x * y);
 }
-}
+} // namespace detail
 
 /// In-place multiplication involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -2125,7 +2125,7 @@ constexpr real128 dispatch_div(const T &x, const real128 &y)
 {
     return real128{x / y.m_value};
 }
-}
+} // namespace detail
 
 /// Binary division involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -2159,7 +2159,7 @@ inline real128 dispatch_div(const T &x, const real128 &y)
 {
     return real128{x} / y;
 }
-}
+} // namespace detail
 
 /// Binary division involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -2201,7 +2201,7 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_div(T &x, const real128 &y)
 {
     x = static_cast<T>(x / y.m_value);
 }
-}
+} // namespace detail
 
 /// In-place division involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -2242,7 +2242,7 @@ inline void dispatch_in_place_div(T &x, const real128 &y)
 {
     x = static_cast<T>(x / y);
 }
-}
+} // namespace detail
 
 /// In-place division involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -2285,7 +2285,7 @@ constexpr bool dispatch_eq(const T &x, const real128 &y)
 {
     return x == y.m_value;
 }
-}
+} // namespace detail
 
 /// Equality operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -2328,7 +2328,7 @@ inline bool dispatch_eq(const T &x, const real128 &y)
 {
     return real128{x} == y;
 }
-}
+} // namespace detail
 
 /// Equality operator involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -2438,7 +2438,7 @@ constexpr bool dispatch_lt(const T &x, const real128 &y)
 {
     return x < y.m_value;
 }
-}
+} // namespace detail
 
 /// Less-than operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -2481,7 +2481,7 @@ inline bool dispatch_lt(const T &x, const real128 &y)
 {
     return real128{x} < y;
 }
-}
+} // namespace detail
 
 /// Less-than operator involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -2534,7 +2534,7 @@ constexpr bool dispatch_lte(const T &x, const real128 &y)
 {
     return x <= y.m_value;
 }
-}
+} // namespace detail
 
 /// Less-than or equal operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -2575,7 +2575,7 @@ inline bool dispatch_lte(const T &x, const real128 &y)
 {
     return real128{x} <= y;
 }
-}
+} // namespace detail
 
 /// Less-than or equal operator involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -2626,7 +2626,7 @@ constexpr bool dispatch_gt(const T &x, const real128 &y)
 {
     return x > y.m_value;
 }
-}
+} // namespace detail
 
 /// Greater-than operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -2669,7 +2669,7 @@ inline bool dispatch_gt(const T &x, const real128 &y)
 {
     return real128{x} > y;
 }
-}
+} // namespace detail
 
 /// Greater-than operator involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -2722,7 +2722,7 @@ constexpr bool dispatch_gte(const T &x, const real128 &y)
 {
     return x >= y.m_value;
 }
-}
+} // namespace detail
 
 /// Greater-than or equal operator involving \link mppp::real128 real128\endlink and C++ types.
 /**
@@ -2763,7 +2763,7 @@ inline bool dispatch_gte(const T &x, const real128 &y)
 {
     return real128{x} >= y;
 }
-}
+} // namespace detail
 
 /// Greater-than or equal operator involving \link mppp::real128 real128\endlink and mp++ types.
 /**
@@ -2824,7 +2824,7 @@ constexpr real128 two_ptwo<32ul>()
 {
     return real128{1ull << 32};
 }
-}
+} // namespace detail
 
 /** @defgroup real128_constants real128_constants
  *  @{
@@ -3005,7 +3005,7 @@ constexpr bool real128_gt(const real128 &x, const real128 &y)
     // - not-NaN vs NaN -> false.
     return (!x.isnan() && !y.isnan()) ? (x > y) : !y.isnan();
 }
-}
+} // namespace mppp
 
 #else
 
