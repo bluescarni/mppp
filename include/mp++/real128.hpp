@@ -996,12 +996,6 @@ public:
     {
         return *this = ::atanq(m_value);
     }
-    /// In-place natural exponential function.
-    /**
-     * This method will set \p this to \f$ \mathrm{e} \f$ raised to the power of \p this.
-     *
-     * @return a reference to \p this.
-     */
     /// In-place hyperbolic sine.
     /**
      * This method will set \p this to its hyperbolic sine.
