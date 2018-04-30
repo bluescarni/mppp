@@ -956,6 +956,46 @@ public:
     {
         return *this = ::cosq(m_value);
     }
+    /// In-place tangent.
+    /**
+     * This method will set \p this to its trigonometric tangent.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &tan()
+    {
+        return *this = ::tanq(m_value);
+    }
+    /// In-place inverse sine.
+    /**
+     * This method will set \p this to its inverse sine.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &asin()
+    {
+        return *this = ::asinq(m_value);
+    }
+    /// In-place inverse cosine.
+    /**
+     * This method will set \p this to its inverse cosine.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &acos()
+    {
+        return *this = ::acosq(m_value);
+    }
+    /// In-place inverse tangent.
+    /**
+     * This method will set \p this to its inverse trigonomotric tangent.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &atan()
+    {
+        return *this = ::atanq(m_value);
+    }
     /// In-place natural exponential function.
     /**
      * This method will set \p this to \f$ \mathrm{e} \f$ raised to the power of \p this.
@@ -1522,6 +1562,50 @@ inline real128 sin(real128 x)
 inline real128 cos(real128 x)
 {
     return x.cos();
+}
+
+/// Unary tangent.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose tangent will be computed.
+ *
+ * @return the tangent of \p x.
+ */
+inline real128 tan(real128 x)
+{
+    return x.tan();
+}
+
+/// Unary inverse sine.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose inverse sine will be computed.
+ *
+ * @return the inverse sine of \p x.
+ */
+inline real128 asin(real128 x)
+{
+    return x.asin();
+}
+
+/// Unary inverse cosine.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose inverse cosine will be computed.
+ *
+ * @return the inverse cosine of \p x.
+ */
+inline real128 acos(real128 x)
+{
+    return x.acos();
+}
+
+/// Unary inverse tangent.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose inverse tangent will be computed.
+ *
+ * @return the inverse tangent of \p x.
+ */
+inline real128 atan(real128 x)
+{
+    return x.atan();
 }
 
 /** @} */
