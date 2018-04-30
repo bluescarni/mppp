@@ -1002,6 +1002,72 @@ public:
      *
      * @return a reference to \p this.
      */
+    /// In-place hyperbolic sine.
+    /**
+     * This method will set \p this to its hyperbolic sine.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &sinh()
+    {
+        return *this = ::sinhq(m_value);
+    }
+    /// In-place hyperbolic cosine.
+    /**
+     * This method will set \p this to its hyperbolic cosine.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &cosh()
+    {
+        return *this = ::coshq(m_value);
+    }
+    /// In-place hyperbolic tangent.
+    /**
+     * This method will set \p this to its hyperbolic tangent.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &tanh()
+    {
+        return *this = ::tanhq(m_value);
+    }
+    /// In-place inverse hyperbolic sine.
+    /**
+     * This method will set \p this to its inverse hyperbolic sine.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &asinh()
+    {
+        return *this = ::asinhq(m_value);
+    }
+    /// In-place inverse hyperbolic cosine.
+    /**
+     * This method will set \p this to its inverse hyperbolic cosine.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &acosh()
+    {
+        return *this = ::acoshq(m_value);
+    }
+    /// In-place inverse hyperbolic tangent.
+    /**
+     * This method will set \p this to its inverse hyperbolic tangent.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &atanh()
+    {
+        return *this = ::atanhq(m_value);
+    }
+    /// In-place natural exponential function.
+    /**
+     * This method will set \p this to \f$ \mathrm{e} \f$ raised to the power of \p this.
+     *
+     * @return a reference to \p this.
+     */
     real128 &exp()
     {
         return *this = ::expq(m_value);
@@ -1606,6 +1672,78 @@ inline real128 acos(real128 x)
 inline real128 atan(real128 x)
 {
     return x.atan();
+}
+
+/** @} */
+
+/** @defgroup real128_trig real128_trig
+ *  @{
+ */
+
+/// Unary hyperbolic sine.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose hyperbolic sine will be computed.
+ *
+ * @return the hyperbolic sine of \p x.
+ */
+inline real128 sinh(real128 x)
+{
+    return x.sinh();
+}
+
+/// Unary hyperbolic cosine.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose hyperbolic cosine will be computed.
+ *
+ * @return the hyperbolic cosine of \p x.
+ */
+inline real128 cosh(real128 x)
+{
+    return x.cosh();
+}
+
+/// Unary hyperbolic tangent.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose hyperbolic tangent will be computed.
+ *
+ * @return the hyperbolic tangent of \p x.
+ */
+inline real128 tanh(real128 x)
+{
+    return x.tanh();
+}
+
+/// Unary inverse hyperbolic sine.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose inverse hyperbolic sine will be computed.
+ *
+ * @return the inverse hyperbolic sine of \p x.
+ */
+inline real128 asinh(real128 x)
+{
+    return x.asinh();
+}
+
+/// Unary inverse hyperbolic cosine.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose inverse hyperbolic cosine will be computed.
+ *
+ * @return the inverse hyperbolic cosine of \p x.
+ */
+inline real128 acosh(real128 x)
+{
+    return x.acosh();
+}
+
+/// Unary inverse hyperbolic tangent.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose inverse hyperbolic tangent will be computed.
+ *
+ * @return the inverse hyperbolic tangent of \p x.
+ */
+inline real128 atanh(real128 x)
+{
+    return x.atanh();
 }
 
 /** @} */
