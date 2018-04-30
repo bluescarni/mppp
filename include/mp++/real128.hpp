@@ -996,6 +996,16 @@ public:
     {
         return *this = ::log2q(m_value);
     }
+    /// In-place error function.
+    /**
+     * This method will set \p this to the value of its error function.
+     *
+     * @return a reference to \p this.
+     */
+    real128 &erf()
+    {
+        return *this = ::erfq(m_value);
+    }
     /// The internal value.
     /**
      * \rststar
@@ -1516,6 +1526,21 @@ inline real128 cos(real128 x)
 
 /** @} */
 
+/** @defgroup real128_miscfuncts real128_miscfuncts
+ *  @{
+ */
+/// Error function.
+/**
+ * @param x the \link mppp::real128 real128\endlink whose erf will be computed.
+ *
+ * @return the erf of \p x.
+ */
+inline real128 erf(real128 x)
+{
+    return x.erf();
+}
+
+/** @} */
 /** @defgroup real128_operators real128_operators
  *  @{
  */
