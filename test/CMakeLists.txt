@@ -110,7 +110,7 @@ if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_signbit)
   ADD_MPPP_TESTCASE(real128_trig)
   ADD_MPPP_TESTCASE(real128_hyperbolic)
-  ADD_MPPP_TESTCASE(real128_erf)
+  ADD_MPPP_TESTCASE(real128_miscfunctions)
 endif()
 
 if(MPPP_WITH_MPFR)

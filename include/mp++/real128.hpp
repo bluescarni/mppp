@@ -1106,6 +1106,16 @@ public:
     {
         return *this = ::erfq(m_value);
     }
+    /// In-place lgamma function
+    /**
+     * This method will set \p this to the value of the natural logarithm of its gamma function  
+     *
+     * @return a reference to \p this.
+     */
+    real128 &lgamma()
+    {
+        return *this = ::lgammaq(m_value);
+    }
     /// The internal value.
     /**
      * \rststar
@@ -1754,6 +1764,17 @@ inline real128 atanh(real128 x)
 inline real128 erf(real128 x)
 {
     return x.erf();
+}
+
+/// Natural logarithm of the gamma funcion
+/**
+ * @param x the \link mppp::real128 real128\endlink whose lgamma will be computed.
+ *
+ * @return the erf of \p x.
+ */
+inline real128 lgamma(real128 x)
+{
+    return x.lgamma();
 }
 
 /** @} */

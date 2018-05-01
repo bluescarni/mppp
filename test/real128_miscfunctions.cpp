@@ -18,6 +18,13 @@ TEST_CASE("real128 erf")
     REQUIRE(erf(real128{}) == 0);
     real128 x;
     REQUIRE(x.erf() == 0);
-    x = 0;
     REQUIRE(abs(erf(real128{"1.234"}) - real128{"0.9190394169576684157198123662625681813"}) < 1E-34);
+}
+
+TEST_CASE("real128 lgamma")
+{
+    REQUIRE(lgamma(real128{1}) == 0);
+    real128 x(1);
+    REQUIRE(x.lgamma() == 0);
+    REQUIRE(abs(lgamma(real128{"1.234"}) - real128{"-0.094478407681159572584826666218660204"}) < 1E-34);
 }
