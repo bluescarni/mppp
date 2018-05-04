@@ -1108,7 +1108,7 @@ public:
     }
     /// In-place lgamma function
     /**
-     * This method will set \p this to the value of the natural logarithm of its gamma function  
+     * This method will set \p this to the value of the natural logarithm of its gamma function.
      *
      * @return a reference to \p this.
      */
@@ -1680,7 +1680,7 @@ inline real128 atan(real128 x)
 
 /** @} */
 
-/** @defgroup real128_trig real128_trig
+/** @defgroup real128_hyper real128_hyper
  *  @{
  */
 
@@ -1749,7 +1749,6 @@ inline real128 atanh(real128 x)
 {
     return x.atanh();
 }
-
 /** @} */
 
 /** @defgroup real128_miscfuncts real128_miscfuncts
@@ -1765,7 +1764,11 @@ inline real128 erf(real128 x)
 {
     return x.erf();
 }
+/** @} */
 
+/** @defgroup real_gamma real_gamma
+ *  @{
+ */
 /// Natural logarithm of the gamma funcion
 /**
  * @param x the \link mppp::real128 real128\endlink whose lgamma will be computed.
@@ -1776,8 +1779,8 @@ inline real128 lgamma(real128 x)
 {
     return x.lgamma();
 }
-
 /** @} */
+
 /** @defgroup real128_operators real128_operators
  *  @{
  */
