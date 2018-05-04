@@ -1766,7 +1766,7 @@ inline real128 erf(real128 x)
 }
 /** @} */
 
-/** @defgroup real_gamma real_gamma
+/** @defgroup real128_gamma real128_gamma
  *  @{
  */
 /// Natural logarithm of the gamma funcion
