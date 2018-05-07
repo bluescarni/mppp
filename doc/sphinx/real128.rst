@@ -122,12 +122,36 @@ Trigonometry
 .. doxygengroup:: real128_trig
    :content-only:
 
+.. real128_hyper:
+
+Hyperbolic functions
+~~~~~~~~~~~~~~~~~~~~
+
+.. doxygengroup:: real128_hyper
+   :content-only:
+
 .. _real128_logexp:
 
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygengroup:: real128_logexp
+   :content-only:
+
+.. _real128_gamma:
+
+Gamma functions
+~~~~~~~~~~~~~~~
+
+.. doxygengroup:: real128_gamma
+   :content-only:
+
+.. _real128_miscfuncts:
+
+Miscellaneous functions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. doxygengroup:: real128_miscfuncts
    :content-only:
 
 .. _real128_io:

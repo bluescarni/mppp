@@ -2,9 +2,9 @@
     "files.exclude": {
         "**/.git": true,
         "build*": true,
-        "doc/doxygen/html/": true,
-        "doc/doxygen/latex/": true,
-        "doc/doxygen/xml/": true,
-        "doc/sphinx/_build/": true
+        "doc/doxygen/html/": true
+    },
+    "files.associations": {
+        "cmath": "cpp"
     }
 }
