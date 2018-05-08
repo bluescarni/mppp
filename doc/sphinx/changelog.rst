@@ -4,9 +4,15 @@ Changelog
 0.11 (unreleased)
 -----------------
 
+New
+~~~
+
+- Wrap more functions from the quadmath API in :cpp:class:`~mppp::real128` (`#140 <https://github.com/bluescarni/mppp/pull/140>`__).
+
 Changes
 ~~~~~~~
 
+- The build system should now detect MPIR installations when looking for GMP (`#139 <https://github.com/bluescarni/mppp/pull/139>`__).
 - Update the internal copy of Catch to the latest version, 2.2.2 (`#137 <https://github.com/bluescarni/mppp/pull/137>`__).
 
 Fix

@@ -20,8 +20,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-static int ntries = 1000;
-
 using namespace mppp;
 using namespace mppp_test;
 
