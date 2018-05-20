@@ -54,7 +54,7 @@ template <std::size_t... I1, std::size_t... I2>
 struct merge_and_renumber<index_sequence<I1...>, index_sequence<I2...>>
     : index_sequence<I1..., (sizeof...(I1) + I2)...> {
 };
-}
+} // namespace impl
 
 template <std::size_t N>
 struct make_index_sequence
@@ -72,18 +72,18 @@ inline namespace impl
 {
 
 template <typename T, typename F, std::size_t... Is>
-void apply_to_each_item(T &&t, const F &f, index_sequence<Is...>)
+inline void apply_to_each_item(T &&t, const F &f, index_sequence<Is...>)
 {
     (void)std::initializer_list<int>{0, (void(f(std::get<Is>(std::forward<T>(t)))), 0)...};
 }
-}
+} // namespace impl
 
 // Tuple for_each(). Execute the functor f on each element of the input Tuple.
 // https://isocpp.org/blog/2015/01/for-each-arg-eric-niebler
 // https://www.reddit.com/r/cpp/comments/2tffv3/for_each_argumentsean_parent/
 // https://www.reddit.com/r/cpp/comments/33b06v/for_each_in_tuple/
 template <class Tuple, class F>
-void tuple_for_each(Tuple &&t, const F &f)
+inline void tuple_for_each(Tuple &&t, const F &f)
 {
     apply_to_each_item(std::forward<Tuple>(t), f,
                        make_index_sequence<std::tuple_size<typename std::decay<Tuple>::type>::value>{});
@@ -122,7 +122,7 @@ inline T lex_cast_tr(const T &x)
 {
     return x;
 }
-}
+} // namespace impl
 
 // Lexical cast: retrieve the string representation of input object x.
 template <typename T>
@@ -278,7 +278,7 @@ struct integral_minmax_dist<__int128_t, void> : integral_minmax_dist<__uint128_t
 };
 
 #endif
-}
+} // namespace mppp_test
 
 // A macro for checking that an expression throws a specific exception object satisfying a predicate.
 #define REQUIRE_THROWS_PREDICATE(expr, exc, pred)                                                                      \
