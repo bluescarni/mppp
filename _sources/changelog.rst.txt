@@ -18,6 +18,7 @@ Changes
 Fix
 ~~~
 
+- Fix a couple of missing ``inline`` specifiers in the tests (`#143 <https://github.com/bluescarni/mppp/pull/143>`__).
 - Fix a missing ``noexcept`` in the move constructor of :cpp:class:`~mppp::real128` (`#138 <https://github.com/bluescarni/mppp/pull/138>`__).
 
 0.10 (2018-04-06)
