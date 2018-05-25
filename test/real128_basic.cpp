@@ -18,6 +18,7 @@
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
 
+#include <ciso646>
 #include <cstdint>
 #include <gmp.h>
 #include <limits>
@@ -54,6 +55,12 @@ TEST_CASE("real128 constructors")
     REQUIRE(std::is_nothrow_destructible<real128>::value);
     REQUIRE(std::is_nothrow_move_constructible<real128>::value);
     REQUIRE(std::is_nothrow_move_assignable<real128>::value);
+#if defined(_LIBCPP_VERSION) || (defined(__GNUC__) && __GNUC__ >= 5)
+    // NOTE: libstdc++ earlier than GCC 5 has a different non-standard name
+    // for this type trait. So we enable the test only if we are using libc++ (from clang)
+    // or if the GCC version is at least 5.
+    REQUIRE(std::is_trivially_copyable<real128>::value);
+#endif
     real128 r;
     REQUIRE((r.m_value == 0));
     constexpr real128 rc;
@@ -464,4 +471,41 @@ TEST_CASE("real128 frexp")
     REQUIRE(exp == 5);
     REQUIRE(frexp(1 / real128{16}, &exp) == real128{"0.5"});
     REQUIRE(exp == -3);
+}
+
+TEST_CASE("real128 numeric_limits")
+{
+    static_assert(std::numeric_limits<real128>::is_specialized, "");
+    REQUIRE(std::numeric_limits<real128>::min() == real128_min());
+    REQUIRE(std::numeric_limits<real128>::max() == real128_max());
+    REQUIRE(std::numeric_limits<real128>::lowest() == -std::numeric_limits<real128>::max());
+    static_assert(std::numeric_limits<real128>::digits == real128_sig_digits(), "");
+    static_assert(std::numeric_limits<real128>::digits10 == 33, "");
+    static_assert(std::numeric_limits<real128>::max_digits10 == 36, "");
+    static_assert(std::numeric_limits<real128>::is_signed, "");
+    static_assert(!std::numeric_limits<real128>::is_integer, "");
+    static_assert(!std::numeric_limits<real128>::is_exact, "");
+    static_assert(std::numeric_limits<real128>::radix == 2, "");
+    REQUIRE(std::numeric_limits<real128>::epsilon() == real128_epsilon());
+    REQUIRE(std::numeric_limits<real128>::round_error() == .5);
+    static_assert(std::numeric_limits<real128>::min_exponent == -16381, "");
+    static_assert(std::numeric_limits<real128>::min_exponent10 == -16381 * 301L / 1000L, "");
+    static_assert(std::numeric_limits<real128>::max_exponent == 16384, "");
+    static_assert(std::numeric_limits<real128>::max_exponent10 == 16384 * 301L / 1000L, "");
+    static_assert(std::numeric_limits<real128>::has_infinity, "");
+    static_assert(std::numeric_limits<real128>::has_quiet_NaN, "");
+    static_assert(!std::numeric_limits<real128>::has_signaling_NaN, "");
+    static_assert(std::numeric_limits<real128>::has_denorm_loss, "");
+    static_assert(std::numeric_limits<real128>::has_denorm == std::denorm_present, "");
+    REQUIRE(std::numeric_limits<real128>::infinity() == real128_inf());
+    REQUIRE(isinf(std::numeric_limits<real128>::infinity()));
+    REQUIRE(isnan(std::numeric_limits<real128>::quiet_NaN()));
+    REQUIRE(std::numeric_limits<real128>::signaling_NaN() == 0);
+    REQUIRE(std::numeric_limits<real128>::denorm_min() == real128_denorm_min());
+    static_assert(std::numeric_limits<real128>::is_iec559, "");
+    static_assert(!std::numeric_limits<real128>::is_bounded, "");
+    static_assert(!std::numeric_limits<real128>::is_modulo, "");
+    static_assert(!std::numeric_limits<real128>::traps, "");
+    static_assert(!std::numeric_limits<real128>::tinyness_before, "");
+    static_assert(std::numeric_limits<real128>::round_style == std::round_to_nearest, "");
 }

@@ -187,3 +187,70 @@ but inline variables are more convenient if C++17 is an option.
 
 .. doxygengroup:: real128_constants
    :content-only:
+
+Standard library specialisations
+--------------------------------
+
+.. cpp:class:: template <> std::numeric_limits<mppp::real128>
+
+   This specialisation exposes the compile-time properties of :cpp:class:`~mppp::real128` as specified by the C++ standard.
+
+   .. cpp:member:: static constexpr bool is_specialized = true
+   .. cpp:member:: static constexpr int digits = 113
+   .. cpp:member:: static constexpr int digits10 = 33
+   .. cpp:member:: static constexpr int max_digits10 = 36
+   .. cpp:member:: static constexpr bool is_signed = true
+   .. cpp:member:: static constexpr bool is_integer = false
+   .. cpp:member:: static constexpr bool is_exact = false
+   .. cpp:member:: static constexpr int radix = 2
+   .. cpp:member:: static constexpr int min_exponent = -16381
+   .. cpp:member:: static constexpr int min_exponent10 = -4931
+   .. cpp:member:: static constexpr int max_exponent = 16384;
+   .. cpp:member:: static constexpr int max_exponent10 = 4931
+   .. cpp:member:: static constexpr bool has_infinity = true
+   .. cpp:member:: static constexpr bool has_quiet_NaN = true
+   .. cpp:member:: static constexpr bool has_signaling_NaN = false
+   .. cpp:member:: static constexpr std::float_denorm_style has_denorm = std::denorm_present
+   .. cpp:member:: static constexpr bool has_denorm_loss = true
+   .. cpp:member:: static constexpr bool is_iec559 = true
+   .. cpp:member:: static constexpr bool is_bounded = false
+   .. cpp:member:: static constexpr bool is_modulo = false
+   .. cpp:member:: static constexpr bool traps = false
+   .. cpp:member:: static constexpr bool tinyness_before = false
+   .. cpp:member:: static constexpr std::float_round_style round_style = std::round_to_nearest
+
+   .. cpp:function:: static constexpr mppp::real128 min()
+
+      :return: the output of :cpp:func:`mppp::real128_min()`.
+
+   .. cpp:function:: static constexpr mppp::real128 max()
+
+      :return: the output of :cpp:func:`mppp::real128_max()`.
+
+   .. cpp:function:: static constexpr mppp::real128 lowest()
+
+      :return: the negative of the output of :cpp:func:`mppp::real128_max()`.
+
+   .. cpp:function:: static constexpr mppp::real128 epsilon()
+
+      :return: the output of :cpp:func:`mppp::real128_epsilon()`.
+
+   .. cpp:function:: static constexpr mppp::real128 round_error()
+
+      :return: ``0.5``.
+
+   .. cpp:function:: static constexpr mppp::real128 infinity()
+
+      :return: the output of :cpp:func:`mppp::real128_inf()`.
+
+   .. cpp:function:: static constexpr mppp::real128 quiet_NaN()
+
+      :return: the output of :cpp:func:`mppp::real128_nan()`.
+
+   .. cpp:function:: static constexpr mppp::real128 signaling_NaN()
+
+      :return: ``0``.
+
+   .. cpp:function:: static constexpr mppp::real128 denorm_min()
+
+     :return: the output of :cpp:func:`mppp::real128_denorm_min()`.

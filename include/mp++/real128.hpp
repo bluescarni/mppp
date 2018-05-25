@@ -242,16 +242,16 @@ public:
      * The default constructor will set \p this to zero.
      */
     constexpr real128() : m_value(0) {}
-    /// Copy constructor.
+    /// Trivial copy constructor.
     /**
-     * @param other the real128 that will be copied.
+     * @param other the construction argument.
      */
-    constexpr real128(const real128 &other) : m_value(other) {}
-    /// Move constructor.
+    constexpr real128(const real128 &other) = default;
+    /// Trivial move constructor.
     /**
-     * @param other the real128 that will be moved.
+     * @param other the construction argument.
      */
-    constexpr real128(real128 &&other) noexcept : real128(other) {}
+    constexpr real128(real128 &&other) = default;
     /// Constructor from a quadruple-precision floating-point value.
     /**
      * This constructor will initialise the internal value with \p x.
@@ -260,12 +260,12 @@ public:
      * used to initialise the internal value.
      */
     constexpr explicit real128(__float128 x) : m_value(x) {}
-/// Constructor from interoperable C++ types.
-/**
- * This constructor will initialise the internal value with \p x.
- *
- * @param x the value that will be used for initialisation.
- */
+    /// Constructor from interoperable C++ types.
+    /**
+     * This constructor will initialise the internal value with \p x.
+     *
+     * @param x the value that will be used for initialisation.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     constexpr explicit real128(Real128CppInteroperable x)
 #else
@@ -448,14 +448,14 @@ public:
         buffer.emplace_back('\0');
         m_value = str_to_float128(buffer.data());
     }
-    /// Defaulted copy assignment operator.
+    /// Trivial copy assignment operator.
     /**
      * @param other the assignment argument.
      *
      * @return a reference to \p this.
      */
     real128 &operator=(const real128 &other) = default;
-    /// Defaulted move assignment operator.
+    /// Trivial move assignment operator.
     /**
      * @param other the assignment argument.
      *
@@ -3275,6 +3275,86 @@ constexpr bool real128_gt(const real128 &x, const real128 &y)
     return (!x.isnan() && !y.isnan()) ? (x > y) : !y.isnan();
 }
 } // namespace mppp
+
+namespace std
+{
+
+// Specialisation of std::numeric_limits for mppp::real128.
+template <>
+class numeric_limits<mppp::real128>
+{
+public:
+    // NOTE: in C++17 and later, constexpr implies inline. That is,
+    // we have no need for the initialisation of the static member outside the class.
+    // Before C++17, however, we *should* do the external initialisation, but, since
+    // this is a full specialisation, that would lead to multiply-defined references
+    // when dealing with multiple translation units. So we avoid that, but that means
+    // that certain uses of the static data members may lead to undefined references
+    // before C++17. See:
+    // http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html#454
+    // NOTE: this is mostly lifted from Boost.Multiprecision.
+    static constexpr bool is_specialized = true;
+    static constexpr mppp::real128(min)()
+    {
+        return mppp::real128_min();
+    }
+    static constexpr mppp::real128(max)()
+    {
+        return mppp::real128_max();
+    }
+    static constexpr mppp::real128 lowest()
+    {
+        return -mppp::real128_max();
+    }
+    static constexpr int digits = 113;
+    static constexpr int digits10 = 33;
+    static constexpr int max_digits10 = 36;
+    static constexpr bool is_signed = true;
+    static constexpr bool is_integer = false;
+    static constexpr bool is_exact = false;
+    static constexpr int radix = 2;
+    static constexpr mppp::real128 epsilon()
+    {
+        return mppp::real128_epsilon();
+    }
+    static constexpr mppp::real128 round_error()
+    {
+        return mppp::real128{.5};
+    }
+    static constexpr int min_exponent = -16381;
+    static constexpr int min_exponent10 = min_exponent * 301L / 1000L;
+    static constexpr int max_exponent = 16384;
+    static constexpr int max_exponent10 = max_exponent * 301L / 1000L;
+    static constexpr bool has_infinity = true;
+    static constexpr bool has_quiet_NaN = true;
+    static constexpr bool has_signaling_NaN = false;
+    static constexpr float_denorm_style has_denorm = denorm_present;
+    static constexpr bool has_denorm_loss = true;
+    static constexpr mppp::real128 infinity()
+    {
+        return mppp::real128_inf();
+    }
+    static constexpr mppp::real128 quiet_NaN()
+    {
+        return mppp::real128_nan();
+    }
+    static constexpr mppp::real128 signaling_NaN()
+    {
+        return mppp::real128{0};
+    }
+    static constexpr mppp::real128 denorm_min()
+    {
+        return mppp::real128_denorm_min();
+    }
+    static constexpr bool is_iec559 = true;
+    static constexpr bool is_bounded = false;
+    static constexpr bool is_modulo = false;
+    static constexpr bool traps = false;
+    static constexpr bool tinyness_before = false;
+    static constexpr float_round_style round_style = round_to_nearest;
+};
+
+} // namespace std
 
 #else
 

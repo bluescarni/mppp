@@ -131,6 +131,8 @@ if(NOT _YACMACompilerLinkerSettingsRun)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wduplicated-branches)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wrestrict)
         _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Waligned-new)
+        # From GCC 8.
+        _YACMA_CHECK_ENABLE_DEBUG_CXX_FLAG(-Wcast-align=strict)
         if(YACMA_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "5.999")
             # NOTE: GCC >= 6 seems to be wrongly warning about visibility attributes
             # in some situations:
