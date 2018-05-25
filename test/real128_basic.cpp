@@ -466,3 +466,40 @@ TEST_CASE("real128 frexp")
     REQUIRE(frexp(1 / real128{16}, &exp) == real128{"0.5"});
     REQUIRE(exp == -3);
 }
+
+TEST_CASE("real128 numeric_limits")
+{
+    static_assert(std::numeric_limits<real128>::is_specialized, "");
+    REQUIRE(std::numeric_limits<real128>::min() == real128_min());
+    REQUIRE(std::numeric_limits<real128>::max() == real128_max());
+    REQUIRE(std::numeric_limits<real128>::lowest() == -std::numeric_limits<real128>::max());
+    static_assert(std::numeric_limits<real128>::digits == real128_sig_digits(), "");
+    static_assert(std::numeric_limits<real128>::digits10 == 33, "");
+    static_assert(std::numeric_limits<real128>::max_digits10 == 36, "");
+    static_assert(std::numeric_limits<real128>::is_signed, "");
+    static_assert(!std::numeric_limits<real128>::is_integer, "");
+    static_assert(!std::numeric_limits<real128>::is_exact, "");
+    static_assert(std::numeric_limits<real128>::radix == 2, "");
+    REQUIRE(std::numeric_limits<real128>::epsilon() == real128_epsilon());
+    REQUIRE(std::numeric_limits<real128>::round_error() == .5);
+    static_assert(std::numeric_limits<real128>::min_exponent == -16381, "");
+    static_assert(std::numeric_limits<real128>::min_exponent10 == -16381 * 301L / 1000L, "");
+    static_assert(std::numeric_limits<real128>::max_exponent == 16384, "");
+    static_assert(std::numeric_limits<real128>::max_exponent10 == 16384 * 301L / 1000L, "");
+    static_assert(std::numeric_limits<real128>::has_infinity, "");
+    static_assert(std::numeric_limits<real128>::has_quiet_NaN, "");
+    static_assert(!std::numeric_limits<real128>::has_signaling_NaN, "");
+    static_assert(std::numeric_limits<real128>::has_denorm_loss, "");
+    static_assert(std::numeric_limits<real128>::has_denorm == std::denorm_present, "");
+    REQUIRE(std::numeric_limits<real128>::infinity() == real128_inf());
+    REQUIRE(isinf(std::numeric_limits<real128>::infinity()));
+    REQUIRE(isnan(std::numeric_limits<real128>::quiet_NaN()));
+    REQUIRE(std::numeric_limits<real128>::signaling_NaN() == 0);
+    REQUIRE(std::numeric_limits<real128>::denorm_min() == real128_denorm_min());
+    static_assert(std::numeric_limits<real128>::is_iec559, "");
+    static_assert(!std::numeric_limits<real128>::is_bounded, "");
+    static_assert(!std::numeric_limits<real128>::is_modulo, "");
+    static_assert(!std::numeric_limits<real128>::traps, "");
+    static_assert(!std::numeric_limits<real128>::tinyness_before, "");
+    static_assert(std::numeric_limits<real128>::round_style == std::round_to_nearest, "");
+}
