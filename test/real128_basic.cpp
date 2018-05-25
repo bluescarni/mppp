@@ -54,7 +54,12 @@ TEST_CASE("real128 constructors")
     REQUIRE(std::is_nothrow_destructible<real128>::value);
     REQUIRE(std::is_nothrow_move_constructible<real128>::value);
     REQUIRE(std::is_nothrow_move_assignable<real128>::value);
+#if !defined(__GLIBCXX__) || __GLIBCXX__ >= 20150422ll
+    // NOTE: libstdc++ earlier than GCC 5 has a different non-standard name
+    // for this type trait. See here for the versioning of libstdc++
+    // https://gcc.gnu.org/onlinedocs/libstdc++/manual/abi.html#abi.versioning.__GLIBCXX__
     REQUIRE(std::is_trivially_copyable<real128>::value);
+#endif
     real128 r;
     REQUIRE((r.m_value == 0));
     constexpr real128 rc;
