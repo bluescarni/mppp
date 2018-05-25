@@ -3306,7 +3306,7 @@ public:
     {
         return -mppp::real128_max();
     }
-    static constexpr int digits = mppp::real128_sig_digits();
+    static constexpr int digits = 113;
     static constexpr int digits10 = 33;
     static constexpr int max_digits10 = 36;
     static constexpr bool is_signed = true;
