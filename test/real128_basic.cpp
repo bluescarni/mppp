@@ -54,6 +54,7 @@ TEST_CASE("real128 constructors")
     REQUIRE(std::is_nothrow_destructible<real128>::value);
     REQUIRE(std::is_nothrow_move_constructible<real128>::value);
     REQUIRE(std::is_nothrow_move_assignable<real128>::value);
+    REQUIRE(std::is_trivially_copyable<real128>::value);
     real128 r;
     REQUIRE((r.m_value == 0));
     constexpr real128 rc;

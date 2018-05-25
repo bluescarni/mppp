@@ -242,16 +242,16 @@ public:
      * The default constructor will set \p this to zero.
      */
     constexpr real128() : m_value(0) {}
-    /// Copy constructor.
+    /// Trivial copy constructor.
     /**
-     * @param other the real128 that will be copied.
+     * @param other the construction argument.
      */
-    constexpr real128(const real128 &other) : m_value(other) {}
-    /// Move constructor.
+    constexpr real128(const real128 &other) = default;
+    /// Trivial move constructor.
     /**
-     * @param other the real128 that will be moved.
+     * @param other the construction argument.
      */
-    constexpr real128(real128 &&other) noexcept : real128(other) {}
+    constexpr real128(real128 &&other) = default;
     /// Constructor from a quadruple-precision floating-point value.
     /**
      * This constructor will initialise the internal value with \p x.
@@ -260,12 +260,12 @@ public:
      * used to initialise the internal value.
      */
     constexpr explicit real128(__float128 x) : m_value(x) {}
-/// Constructor from interoperable C++ types.
-/**
- * This constructor will initialise the internal value with \p x.
- *
- * @param x the value that will be used for initialisation.
- */
+    /// Constructor from interoperable C++ types.
+    /**
+     * This constructor will initialise the internal value with \p x.
+     *
+     * @param x the value that will be used for initialisation.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     constexpr explicit real128(Real128CppInteroperable x)
 #else
@@ -448,14 +448,14 @@ public:
         buffer.emplace_back('\0');
         m_value = str_to_float128(buffer.data());
     }
-    /// Defaulted copy assignment operator.
+    /// Trivial copy assignment operator.
     /**
      * @param other the assignment argument.
      *
      * @return a reference to \p this.
      */
     real128 &operator=(const real128 &other) = default;
-    /// Defaulted move assignment operator.
+    /// Trivial move assignment operator.
     /**
      * @param other the assignment argument.
      *
