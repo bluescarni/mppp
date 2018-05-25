@@ -4,6 +4,18 @@ Changelog
 0.12 (unreleased)
 -----------------
 
+New
+~~~
+
+- Add a specialisation of ``std::numeric_limits`` for :cpp:class:`~mppp::real128`
+  (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
+
+Changes
+~~~~~~~
+
+- Ensure that :cpp:class:`~mppp::real128` is trivially copyable (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
+- Switch to the sphinx pyramid theme for the documentation (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
+
 0.11 (2018-05-22)
 -----------------
 
