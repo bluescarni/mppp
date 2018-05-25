@@ -1,15 +1,17 @@
-<!DOCTYPE html>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Quadruple-precision floats &#8212; mp++ 0.11 documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <title>Quadruple-precision floats &#8212; mp++ 0.12 documentation</title>
+    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11',
+        VERSION:     '0.12',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -20,136 +22,41 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Multiprecision floats" href="real.html" />
     <link rel="prev" title="Multiprecision rationals" href="rational.html" />
-<meta charset='utf-8'>
-<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
-<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
+<!--[if lte IE 6]>
+<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
+<![endif]-->
 
   </head>
   <body>
 
-  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="index.html">
-          mp++</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.11</b></span>
-      </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="real.html" title="Multiprecision floats"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="rational.html" title="Multiprecision rationals"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.12 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Reference</a> &#187;</li> 
+      </ul>
+    </div>  
 
-        <div class="collapse navbar-collapse nav-collapse">
-          <ul class="nav navbar-nav">
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
             
-            
-              <li class="dropdown globaltoc-container">
-  <a role="button"
-     id="dLabelGlobalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="index.html">Site <b class="caret"></b></a>
-  <ul class="dropdown-menu globaltoc"
-      role="menu"
-      aria-labelledby="dLabelGlobalToc"><ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-</ul>
-</ul>
-</li>
-              
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Quadruple-precision floats</a><ul>
-<li><a class="reference internal" href="#the-real128-class">The <code class="docutils literal"><span class="pre">real128</span></code> class</a></li>
-<li><a class="reference internal" href="#types">Types</a></li>
-<li><a class="reference internal" href="#concepts">Concepts</a></li>
-<li><a class="reference internal" href="#functions">Functions</a><ul>
-<li><a class="reference internal" href="#conversion">Conversion</a></li>
-<li><a class="reference internal" href="#arithmetic">Arithmetic</a></li>
-<li><a class="reference internal" href="#comparison">Comparison</a></li>
-<li><a class="reference internal" href="#roots">Roots</a></li>
-<li><a class="reference internal" href="#exponentiation">Exponentiation</a></li>
-<li><a class="reference internal" href="#trigonometry">Trigonometry</a></li>
-<li><a class="reference internal" href="#hyperbolic-functions">Hyperbolic functions</a></li>
-<li><a class="reference internal" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
-<li><a class="reference internal" href="#gamma-functions">Gamma functions</a></li>
-<li><a class="reference internal" href="#miscellaneous-functions">Miscellaneous functions</a></li>
-<li><a class="reference internal" href="#input-output">Input/Output</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#operators">Operators</a></li>
-<li><a class="reference internal" href="#constants">Constants</a></li>
-</ul>
-</li>
-</ul>
-</ul>
-</li>
-              
-            
-            
-              
-                
-  <li>
-    <a href="rational.html" title="Previous Chapter: Multiprecision rationals"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Multiprecisio...</span>
-    </a>
-  </li>
-  <li>
-    <a href="real.html" title="Next Chapter: Multiprecision floats"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Multiprecision floats &raquo;</span>
-    </a>
-  </li>
-              
-            
-            
-            
-            
-              <li class="hidden-sm">
-<div id="sourcelink">
-  <a href="_sources/real128.rst.txt"
-     rel="nofollow">Source</a>
-</div></li>
-            
-          </ul>
-
-          
-            
-<form class="navbar-form navbar-right" action="search.html" method="get">
- <div class="form-group">
-  <input type="text" name="q" class="form-control" placeholder="Search" />
- </div>
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
-          
-        </div>
-    </div>
-  </div>
-
-<div class="container">
-  <div class="row">
-    <div class="col-md-12 content">
-      
   <div class="section" id="quadruple-precision-floats">
 <h1>Quadruple-precision floats<a class="headerlink" href="#quadruple-precision-floats" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
@@ -248,12 +155,12 @@ builtins.</p>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp7real1287real128ERK7real128">
-<span id="mppp::real128::real128__real128CRCE"></span><span class="target" id="classmppp_1_1real128_1a14661d7e0fe8b12596a319d31fe2a9d7"></span><em class="property">constexpr</em> <code class="descname">real128</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real1287real128Ev" title="mppp::real128::real128">real128</a> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real1287real128ERK7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Copy constructor. </p>
+<span id="mppp::real128::real128__real128CRCE"></span><span class="target" id="classmppp_1_1real128_1a608738907981dabcd784ac4890ff8aee"></span><em class="property">constexpr</em> <code class="descname">real128</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real1287real128Ev" title="mppp::real128::real128">real128</a> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real1287real128ERK7real128" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Trivial copy constructor. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">other</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> that will be copied. </li>
+<li><code class="docutils literal"><span class="pre">other</span></code>: the construction argument. </li>
 </ul>
 </dd>
 </dl>
@@ -262,12 +169,12 @@ builtins.</p>
 
 <dl class="function">
 <dt id="_CPPv2N4mppp7real1287real128ERR7real128">
-<span id="mppp::real128::real128__real128RRCE"></span><span class="target" id="classmppp_1_1real128_1af861acb0cc6f34dde0e701916b8c1d42"></span><em class="property">constexpr</em> <code class="descname">real128</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7real1287real128Ev" title="mppp::real128::real128">real128</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real1287real128ERR7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Move constructor. </p>
+<span id="mppp::real128::real128__real128RRCE"></span><span class="target" id="classmppp_1_1real128_1a114179249f82dce084a56ccf87df767b"></span><em class="property">constexpr</em> <code class="descname">real128</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7real1287real128Ev" title="mppp::real128::real128">real128</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real1287real128ERR7real128" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Trivial move constructor. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">other</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> that will be moved. </li>
+<li><code class="docutils literal"><span class="pre">other</span></code>: the construction argument. </li>
 </ul>
 </dd>
 </dl>
@@ -379,7 +286,7 @@ will raise an error.</p>
 <dl class="function">
 <dt id="_CPPv2N4mppp7real128aSERK7real128">
 <span id="mppp::real128::assign-operator__real128CR"></span><span class="target" id="classmppp_1_1real128_1a8ef18e1a83fe90c6669b93afebb43e65"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real128aSERK7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Defaulted copy assignment operator. </p>
+<dd><p>Trivial copy assignment operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>. </dd>
@@ -395,7 +302,7 @@ will raise an error.</p>
 <dl class="function">
 <dt id="_CPPv2N4mppp7real128aSERR7real128">
 <span id="mppp::real128::assign-operator__real128RR"></span><span class="target" id="classmppp_1_1real128_1a858f93a0f18db2351f359d3c7e56a0c4"></span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7real128aSERR7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Defaulted move assignment operator. </p>
+<dd><p>Trivial move assignment operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal"><span class="pre">this</span></code>. </dd>
@@ -2845,24 +2752,321 @@ from the quadmath library.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="standard-library-specialisations">
+<h2>Standard library specialisations<a class="headerlink" href="#standard-library-specialisations" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="_CPPv2IENSt14numeric_limitsIN4mppp7real128EEE">
+template&lt;&gt;<br /><em class="property">class </em><code class="descclassname">std::</code><code class="descname">numeric_limits</code>&lt;mppp::<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a>&gt;<a class="headerlink" href="#_CPPv2IENSt14numeric_limitsIN4mppp7real128EEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This specialisation exposes the compile-time properties of <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> as specified by the C++ standard.</p>
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE14is_specializedE">
+<span id="std::numeric_limits:mppp::real128:::is_specialized__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">is_specialized</code> = true<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE14is_specializedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE6digitsE">
+<span id="std::numeric_limits:mppp::real128:::digits__i"></span><em class="property">static</em> <em class="property">constexpr</em> int <code class="descclassname"></code><code class="descname">digits</code> = 113<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE6digitsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE8digits10E">
+<span id="std::numeric_limits:mppp::real128:::digits10__i"></span><em class="property">static</em> <em class="property">constexpr</em> int <code class="descclassname"></code><code class="descname">digits10</code> = 33<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE8digits10E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE12max_digits10E">
+<span id="std::numeric_limits:mppp::real128:::max_digits10__i"></span><em class="property">static</em> <em class="property">constexpr</em> int <code class="descclassname"></code><code class="descname">max_digits10</code> = 36<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE12max_digits10E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE9is_signedE">
+<span id="std::numeric_limits:mppp::real128:::is_signed__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">is_signed</code> = true<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE9is_signedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE10is_integerE">
+<span id="std::numeric_limits:mppp::real128:::is_integer__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">is_integer</code> = false<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE10is_integerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE8is_exactE">
+<span id="std::numeric_limits:mppp::real128:::is_exact__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">is_exact</code> = false<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE8is_exactE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE5radixE">
+<span id="std::numeric_limits:mppp::real128:::radix__i"></span><em class="property">static</em> <em class="property">constexpr</em> int <code class="descclassname"></code><code class="descname">radix</code> = 2<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE5radixE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE12min_exponentE">
+<span id="std::numeric_limits:mppp::real128:::min_exponent__i"></span><em class="property">static</em> <em class="property">constexpr</em> int <code class="descclassname"></code><code class="descname">min_exponent</code> = -16381<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE12min_exponentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE14min_exponent10E">
+<span id="std::numeric_limits:mppp::real128:::min_exponent10__i"></span><em class="property">static</em> <em class="property">constexpr</em> int <code class="descclassname"></code><code class="descname">min_exponent10</code> = -4931<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE14min_exponent10E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE12max_exponentE">
+<span id="std::numeric_limits:mppp::real128:::max_exponent__i"></span><em class="property">static</em> <em class="property">constexpr</em> int <code class="descclassname"></code><code class="descname">max_exponent</code> = 16384;<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE12max_exponentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE14max_exponent10E">
+<span id="std::numeric_limits:mppp::real128:::max_exponent10__i"></span><em class="property">static</em> <em class="property">constexpr</em> int <code class="descclassname"></code><code class="descname">max_exponent10</code> = 4931<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE14max_exponent10E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE12has_infinityE">
+<span id="std::numeric_limits:mppp::real128:::has_infinity__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">has_infinity</code> = true<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE12has_infinityE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE13has_quiet_NaNE">
+<span id="std::numeric_limits:mppp::real128:::has_quiet_NaN__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">has_quiet_NaN</code> = true<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE13has_quiet_NaNE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE17has_signaling_NaNE">
+<span id="std::numeric_limits:mppp::real128:::has_signaling_NaN__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">has_signaling_NaN</code> = false<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE17has_signaling_NaNE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE10has_denormE">
+<span id="std::numeric_limits:mppp::real128:::has_denorm__std::float_denorm_style"></span><em class="property">static</em> <em class="property">constexpr</em> std::float_denorm_style <code class="descclassname"></code><code class="descname">has_denorm</code> = std::denorm_present<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE10has_denormE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE15has_denorm_lossE">
+<span id="std::numeric_limits:mppp::real128:::has_denorm_loss__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">has_denorm_loss</code> = true<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE15has_denorm_lossE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE9is_iec559E">
+<span id="std::numeric_limits:mppp::real128:::is_iec559__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">is_iec559</code> = true<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE9is_iec559E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE10is_boundedE">
+<span id="std::numeric_limits:mppp::real128:::is_bounded__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">is_bounded</code> = false<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE10is_boundedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE9is_moduloE">
+<span id="std::numeric_limits:mppp::real128:::is_modulo__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">is_modulo</code> = false<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE9is_moduloE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE5trapsE">
+<span id="std::numeric_limits:mppp::real128:::traps__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">traps</code> = false<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE5trapsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE15tinyness_beforeE">
+<span id="std::numeric_limits:mppp::real128:::tinyness_before__b"></span><em class="property">static</em> <em class="property">constexpr</em> bool <code class="descclassname"></code><code class="descname">tinyness_before</code> = false<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE15tinyness_beforeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE11round_styleE">
+<span id="std::numeric_limits:mppp::real128:::round_style__std::float_round_style"></span><em class="property">static</em> <em class="property">constexpr</em> std::float_round_style <code class="descclassname"></code><code class="descname">round_style</code> = std::round_to_nearest<a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE11round_styleE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE3minEv">
+<span id="std::numeric_limits:mppp::real128:::minCE"></span><em class="property">static</em> <em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname"></code><code class="descname">min</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE3minEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the output of <a class="reference internal" href="#_CPPv2N4mppp11real128_minEv" title="mppp::real128_min"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::real128_min()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE3maxEv">
+<span id="std::numeric_limits:mppp::real128:::maxCE"></span><em class="property">static</em> <em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname"></code><code class="descname">max</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE3maxEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the output of <a class="reference internal" href="#_CPPv2N4mppp11real128_maxEv" title="mppp::real128_max"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::real128_max()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE6lowestEv">
+<span id="std::numeric_limits:mppp::real128:::lowestCE"></span><em class="property">static</em> <em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname"></code><code class="descname">lowest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE6lowestEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the negative of the output of <a class="reference internal" href="#_CPPv2N4mppp11real128_maxEv" title="mppp::real128_max"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::real128_max()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE7epsilonEv">
+<span id="std::numeric_limits:mppp::real128:::epsilonCE"></span><em class="property">static</em> <em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname"></code><code class="descname">epsilon</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE7epsilonEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the output of <a class="reference internal" href="#_CPPv2N4mppp15real128_epsilonEv" title="mppp::real128_epsilon"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::real128_epsilon()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE11round_errorEv">
+<span id="std::numeric_limits:mppp::real128:::round_errorCE"></span><em class="property">static</em> <em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname"></code><code class="descname">round_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE11round_errorEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal"><span class="pre">0.5</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE8infinityEv">
+<span id="std::numeric_limits:mppp::real128:::infinityCE"></span><em class="property">static</em> <em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname"></code><code class="descname">infinity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE8infinityEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the output of <a class="reference internal" href="#_CPPv2N4mppp11real128_infEv" title="mppp::real128_inf"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::real128_inf()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE9quiet_NaNEv">
+<span id="std::numeric_limits:mppp::real128:::quiet_NaNCE"></span><em class="property">static</em> <em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname"></code><code class="descname">quiet_NaN</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE9quiet_NaNEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the output of <a class="reference internal" href="#_CPPv2N4mppp11real128_nanEv" title="mppp::real128_nan"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::real128_nan()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE13signaling_NaNEv">
+<span id="std::numeric_limits:mppp::real128:::signaling_NaNCE"></span><em class="property">static</em> <em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname"></code><code class="descname">signaling_NaN</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE13signaling_NaNEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal"><span class="pre">0</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2NSt14numeric_limitsIN4mppp7real128EE10denorm_minEv">
+<span id="std::numeric_limits:mppp::real128:::denorm_minCE"></span><em class="property">static</em> <em class="property">constexpr</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname"></code><code class="descname">denorm_min</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2NSt14numeric_limitsIN4mppp7real128EE10denorm_minEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the output of <a class="reference internal" href="#_CPPv2N4mppp18real128_denorm_minEv" title="mppp::real128_denorm_min"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::real128_denorm_min()</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quadruple-precision floats</a><ul>
+<li><a class="reference internal" href="#the-real128-class">The <code class="docutils literal"><span class="pre">real128</span></code> class</a></li>
+<li><a class="reference internal" href="#types">Types</a></li>
+<li><a class="reference internal" href="#concepts">Concepts</a></li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#conversion">Conversion</a></li>
+<li><a class="reference internal" href="#arithmetic">Arithmetic</a></li>
+<li><a class="reference internal" href="#comparison">Comparison</a></li>
+<li><a class="reference internal" href="#roots">Roots</a></li>
+<li><a class="reference internal" href="#exponentiation">Exponentiation</a></li>
+<li><a class="reference internal" href="#trigonometry">Trigonometry</a></li>
+<li><a class="reference internal" href="#hyperbolic-functions">Hyperbolic functions</a></li>
+<li><a class="reference internal" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
+<li><a class="reference internal" href="#gamma-functions">Gamma functions</a></li>
+<li><a class="reference internal" href="#miscellaneous-functions">Miscellaneous functions</a></li>
+<li><a class="reference internal" href="#input-output">Input/Output</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#operators">Operators</a></li>
+<li><a class="reference internal" href="#constants">Constants</a></li>
+<li><a class="reference internal" href="#standard-library-specialisations">Standard library specialisations</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="rational.html"
+                        title="previous chapter">Multiprecision rationals</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="real.html"
+                        title="next chapter">Multiprecision floats</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
     </div>
-      
-  </div>
-</div>
-<footer class="footer">
-  <div class="container">
-    <p class="pull-right">
-      <a href="#">Back to top</a>
-      
-    </p>
-    <p>
-        &copy; Copyright 2016-2018, Francesco Biscani.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.<br/>
-    </p>
-  </div>
-</footer>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="real.html" title="Multiprecision floats"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="rational.html" title="Multiprecision rationals"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.12 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" >Reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016-2018, Francesco Biscani.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
   </body>
 </html>
