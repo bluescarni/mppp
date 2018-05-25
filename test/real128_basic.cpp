@@ -18,6 +18,7 @@
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
 
+#include <ciso646>
 #include <cstdint>
 #include <gmp.h>
 #include <limits>
@@ -54,10 +55,10 @@ TEST_CASE("real128 constructors")
     REQUIRE(std::is_nothrow_destructible<real128>::value);
     REQUIRE(std::is_nothrow_move_constructible<real128>::value);
     REQUIRE(std::is_nothrow_move_assignable<real128>::value);
-#if !defined(__GLIBCXX__) || __GLIBCXX__ >= 20150422ll
+#if defined(_LIBCPP_VERSION) || (defined(__GNUC__) && __GNUC__ >= 5)
     // NOTE: libstdc++ earlier than GCC 5 has a different non-standard name
-    // for this type trait. See here for the versioning of libstdc++
-    // https://gcc.gnu.org/onlinedocs/libstdc++/manual/abi.html#abi.versioning.__GLIBCXX__
+    // for this type trait. So we enable the test only if we are using libc++ (from clang)
+    // or if the GCC version is at least 5.
     REQUIRE(std::is_trivially_copyable<real128>::value);
 #endif
     real128 r;
