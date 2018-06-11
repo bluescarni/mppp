@@ -13,8 +13,6 @@ New
 Changes
 ~~~~~~~
 
-- **BREAKING**: replace the ``integer_nbits_init`` tag structure with the strongly-typed :cpp:type:`mppp::integer_bitcnt_t` enum
-  (`#145 <https://github.com/bluescarni/mppp/pull/145>`__).
 - Ensure that :cpp:class:`~mppp::real128` is trivially copyable (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
 - Switch to the sphinx pyramid theme for the documentation (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
 
