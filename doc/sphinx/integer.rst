@@ -33,10 +33,8 @@ Types
 
       https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types
 
-.. cpp:enum-class:: mppp::integer_bitcnt_t : mp_bitcnt_t
-
-   A strongly-typed counterpart to :cpp:type:`mp_bitcnt_t`, used in the constructor of :cpp:class:`~mppp::integer`
-   from number of bits.
+.. doxygenstruct:: mppp::integer_nbits_init
+   :members:
 
 Concepts
 --------

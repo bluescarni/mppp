@@ -72,33 +72,34 @@ struct nbits_ctor_tester {
     void operator()(const S &) const
     {
         using integer = integer<S::value>;
-        REQUIRE((integer{integer_bitcnt_t(0)}.is_static()));
-        REQUIRE((integer{integer_bitcnt_t(0)}.is_zero()));
-        REQUIRE((integer{integer_bitcnt_t(1)}.is_static()));
-        REQUIRE((integer{integer_bitcnt_t(1)}.is_zero()));
-        REQUIRE((integer{integer_bitcnt_t(2)}.is_static()));
-        REQUIRE((integer{integer_bitcnt_t(2)}.is_zero()));
-        REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS)}.is_static()));
-        REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS)}.is_zero()));
+        integer_nbits_init ini;
+        REQUIRE((integer{ini, 0}.is_static()));
+        REQUIRE((integer{ini, 0}.is_zero()));
+        REQUIRE((integer{ini, 1}.is_static()));
+        REQUIRE((integer{ini, 1}.is_zero()));
+        REQUIRE((integer{ini, 2}.is_static()));
+        REQUIRE((integer{ini, 2}.is_zero()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS}.is_static()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS}.is_zero()));
         if (S::value == 1) {
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS + 1)}.is_dynamic()));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS + 1)}.is_zero()));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS + 1)}.get_mpz_t()->_mp_alloc == 2));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS + 2)}.is_dynamic()));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS + 2)}.is_zero()));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS + 2)}.get_mpz_t()->_mp_alloc == 2));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * 2)}.is_dynamic()));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * 2)}.is_zero()));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * 2)}.get_mpz_t()->_mp_alloc == 2));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * 2 + 1)}.is_dynamic()));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * 2 + 1)}.is_zero()));
-            REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * 2 + 1)}.get_mpz_t()->_mp_alloc == 3));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 1}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 1}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 1}.get_mpz_t()->_mp_alloc == 2));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 2}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 2}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS + 2}.get_mpz_t()->_mp_alloc == 2));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2}.get_mpz_t()->_mp_alloc == 2));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2 + 1}.is_dynamic()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2 + 1}.is_zero()));
+            REQUIRE((integer{ini, GMP_NUMB_BITS * 2 + 1}.get_mpz_t()->_mp_alloc == 3));
         }
-        REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * S::value)}.is_static()));
-        REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * S::value)}.is_zero()));
-        REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * S::value + 1)}.is_dynamic()));
-        REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * S::value + 1)}.is_zero()));
-        REQUIRE((integer{integer_bitcnt_t(GMP_NUMB_BITS * S::value + 1)}.get_mpz_t()->_mp_alloc == S::value + 1));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value}.is_static()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value}.is_zero()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value + 1}.is_dynamic()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value + 1}.is_zero()));
+        REQUIRE((integer{ini, GMP_NUMB_BITS * S::value + 1}.get_mpz_t()->_mp_alloc == S::value + 1));
     }
 };
 

@@ -88,9 +88,15 @@
 namespace mppp
 {
 
-// Strongly typed enum to represent a bit count in the constructor
-// of integer from number of bits.
-enum class integer_bitcnt_t : ::mp_bitcnt_t {};
+/// Special \link mppp::integer integer\endlink initialisation tag from number of bits.
+/**
+ * \rststar
+ * This structure is used exclusively to disambiguate the constructor of :cpp:class:`~mppp::integer`
+ * from number of bits. It has no members and it serves no other purpose.
+ * \endrststar
+ */
+struct integer_nbits_init {
+};
 
 inline namespace detail
 {
@@ -920,9 +926,8 @@ union integer_union {
         construct_from_limb_array<true>(p, size);
     }
     // Constructor from number of bits.
-    explicit integer_union(integer_bitcnt_t nbits_)
+    explicit integer_union(const integer_nbits_init &, ::mp_bitcnt_t nbits)
     {
-        const auto nbits = static_cast<::mp_bitcnt_t>(nbits_);
         const auto nlimbs = safe_cast<std::size_t>(nbits_to_nlimbs(nbits));
         if (nlimbs <= SSize) {
             // Static storage is enough for the requested number of bits. Def init.
@@ -1428,31 +1433,36 @@ public:
      * \rststar
      * This constructor will initialise ``this`` to zero, allocating enough memory
      * to represent a value with a magnitude of ``nbits`` binary digits. The storage type will be static if ``nbits``
-     * is small enough, dynamic otherwise. For instance, the code
+     * is small enough, dynamic otherwise.
+     *
+     * The first parameter of this constructor, of type :cpp:class:`~mppp::integer_nbits_init`,
+     * is unused, and necessary only to disambiguate this constructor from the generic constructor.
+     *
+     * For instance, the code
      *
      * .. code-block:: c++
      *
-     *    integer n{integer_bitcnt_t(64)};
+     *    integer n{integer_nbits_init{}, 64};
      *
      * will initialise an integer ``n`` with value zero and enough storage for a 64-bit value.
      * \endrststar
      *
      * @param nbits the number of bits of storage that will be allocated.
      *
-     * @throws std::overflow_error if the value of ``nbits`` is larger than an implementation-defined limit.
+     * @throws std::overflow_error if ``nbits`` is larger than an implementation-defined limit.
      */
-    explicit integer(integer_bitcnt_t nbits) : m_int(nbits) {}
-    /// Generic constructor.
-    /**
-     * This constructor will initialize an integer with the value of \p x. The initialization is always
-     * successful if \p x is an integral value (construction from \p bool yields 1 for \p true, 0 for \p false).
-     * If \p x is a floating-point value, the construction will fail if \p x is not finite. Construction from a
-     * floating-point type yields the truncated counterpart of the input value.
-     *
-     * @param x value that will be used to initialize \p this.
-     *
-     * @throws std::domain_error if \p x is a non-finite floating-point value.
-     */
+    explicit integer(integer_nbits_init, ::mp_bitcnt_t nbits) : m_int(integer_nbits_init{}, nbits) {}
+/// Generic constructor.
+/**
+ * This constructor will initialize an integer with the value of \p x. The initialization is always
+ * successful if \p x is an integral value (construction from \p bool yields 1 for \p true, 0 for \p false).
+ * If \p x is a floating-point value, the construction will fail if \p x is not finite. Construction from a
+ * floating-point type yields the truncated counterpart of the input value.
+ *
+ * @param x value that will be used to initialize \p this.
+ *
+ * @throws std::domain_error if \p x is a non-finite floating-point value.
+ */
 #if defined(MPPP_HAVE_CONCEPTS)
     explicit integer(const CppInteroperable &x)
 #else
