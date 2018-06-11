@@ -72,7 +72,7 @@ with the <code class="docutils literal"><span class="pre">MPPP_WITH_MPFR</span><
 <h2>The <code class="docutils literal"><span class="pre">real</span></code> class<a class="headerlink" href="#the-real-class" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="_CPPv2N4mppp4realE">
-<span id="mppp::real"></span><span class="target" id="classmppp_1_1real"></span><em class="property">class </em><code class="descclassname">mppp::</code><code class="descname">real</code><a class="headerlink" href="#_CPPv2N4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::real"></span><span class="target" id="classmppp_1_1real"></span><em class="property">class </em><code class="descname">real</code><a class="headerlink" href="#_CPPv2N4mppp4realE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Multiprecision floating-point class. </p>
 <p><p>This class represents arbitrary-precision real values encoded in a binary floating-point format.
 It acts as a wrapper around the MPFR <code class="docutils literal"><span class="pre">mpfr_t</span></code> type, pairing a multiprecision significand
@@ -1096,10 +1096,8 @@ otherwise the value will be preserved exactly.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;RealInteroperable <em>T</em>&gt;</dt>
 <dt id="_CPPv2NK4mppp4realcv1TEv">
-<span id="mppp::real::castto-T-operatorC"></span><span class="target" id="classmppp_1_1real_1a0cb71965cdda265c972755505416e164"></span><code class="descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp4realcv1TEv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::real::castto-T-operatorC"></span><em class="property">template </em>&lt;RealInteroperable <em>T</em>&gt;<br /><span class="target" id="classmppp_1_1real_1a0cb71965cdda265c972755505416e164"></span><code class="descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp4realcv1TEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic conversion operator. </p>
 <p><p>This operator will convert <code class="docutils literal"><span class="pre">this</span></code> to a <a class="reference internal" href="#_CPPv2I0EN4mppp17RealInteroperableE" title="mppp::RealInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RealInteroperable</span></code></a> type. The conversion
 proceeds as follows:</p>
@@ -1133,10 +1131,8 @@ the absolute value of <code class="docutils literal"><span class="pre">this</spa
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;RealInteroperable <em>T</em>&gt;</dt>
 <dt id="_CPPv2NK4mppp4real3getER1T">
-<span id="mppp::real::get__TRC"></span><span class="target" id="classmppp_1_1real_1ab09f60c57e6f3c7e72041a565bf15c0c"></span>bool <code class="descname">get</code><span class="sig-paren">(</span>T &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp4real3getER1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::real::get__TRC"></span><em class="property">template </em>&lt;RealInteroperable <em>T</em>&gt;<br /><span class="target" id="classmppp_1_1real_1ab09f60c57e6f3c7e72041a565bf15c0c"></span>bool <code class="descname">get</code><span class="sig-paren">(</span>T &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK4mppp4real3getER1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic conversion method. </p>
 <p>This method, similarly to the conversion operator, will convert <code class="docutils literal"><span class="pre">this</span></code> to a
 <a class="reference internal" href="#_CPPv2I0EN4mppp17RealInteroperableE" title="mppp::RealInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">RealInteroperable</span></code></a> type, storing the result of the conversion into <code class="docutils literal"><span class="pre">rop</span></code>. Differently
@@ -1550,10 +1546,8 @@ otherwise the value will be preserved exactly.</p>
 <div class="section" id="assignment">
 <span id="real-assignment"></span><h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;RealSetArgs… <em>Args</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3setER4realDpRK4Args">
-<span id="mppp::set__realR.ArgsCRDp"></span><span class="target" id="group__real__assignment_1ga2e11254c2c8e9974bed5c67356929a60"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">set</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em>, <em class="property">const</em> Args&amp;... <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3setER4realDpRK4Args" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::set__realR.ArgsCRDp"></span><em class="property">template </em>&lt;RealSetArgs... <em>Args</em>&gt;<br /><span class="target" id="group__real__assignment_1ga2e11254c2c8e9974bed5c67356929a60"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">set</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em>, <em class="property">const</em> Args&amp;... <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3setER4realDpRK4Args" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic setter for <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>This function will use the arguments <code class="docutils literal"><span class="pre">args</span></code> to set the value of the <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> <code class="docutils literal"><span class="pre">r</span></code>,
 using one of the available <a class="reference internal" href="#_CPPv2N4mppp4real3setERK4real" title="mppp::real::set"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::real::set()</span></code></a> overloads. That is,
@@ -1582,10 +1576,8 @@ the body of this function is equivalent to</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp10set_z_2expER4realRK7integerI5SSizeE10mpfr_exp_t">
-<span id="mppp::set_z_2exp__realR.integer:SSize:CR.mpfr_exp_t"></span><span class="target" id="group__real__assignment_1ga132db37503d2ee04262494096bd6bb44"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">set_z_2exp</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv210mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10set_z_2expER4realRK7integerI5SSizeE10mpfr_exp_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::set_z_2exp__realR.integer:SSize:CR.mpfr_exp_t"></span><em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;<br /><span class="target" id="group__real__assignment_1ga132db37503d2ee04262494096bd6bb44"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">set_z_2exp</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <a class="reference internal" href="#_CPPv210mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <em>e</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10set_z_2expER4realRK7integerI5SSizeE10mpfr_exp_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> to <span class="math">\(n\times 2^e\)</span>. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">r</span></code> to <span class="math">\(n\times 2^e\)</span>. The precision of <code class="docutils literal"><span class="pre">r</span></code> will not be altered. If <code class="docutils literal"><span class="pre">n</span></code> is zero, the result will be positive zero.</p>
 <p><dl class="docutils">
@@ -1697,10 +1689,8 @@ not be altered.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;</dt>
 <dt id="_CPPv2N4mppp10get_z_2expER7integerI5SSizeERK4real">
-<span id="mppp::get_z_2exp__integer:SSize:R.realCR"></span><span class="target" id="group__real__conversion_1gac2b8e27bb46b51269d97decd176f638d"></span><a class="reference internal" href="#_CPPv210mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <code class="descclassname">mppp::</code><code class="descname">get_z_2exp</code><span class="sig-paren">(</span><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10get_z_2expER7integerI5SSizeERK4real" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::get_z_2exp__integer:SSize:R.realCR"></span><em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;<br /><span class="target" id="group__real__conversion_1gac2b8e27bb46b51269d97decd176f638d"></span><a class="reference internal" href="#_CPPv210mpfr_exp_t" title="mpfr_exp_t">mpfr_exp_t</a> <code class="descclassname">mppp::</code><code class="descname">get_z_2exp</code><span class="sig-paren">(</span><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp10get_z_2expER7integerI5SSizeERK4real" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Extract the significand and the exponent of a <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p>This function will extract the scaled significand of <code class="docutils literal"><span class="pre">r</span></code> into <code class="docutils literal"><span class="pre">n</span></code>, and return the exponent <code class="docutils literal"><span class="pre">e</span></code> such that <code class="docutils literal"><span class="pre">r</span></code> equals <span class="math">\(n\times 2^e\)</span>.</p>
 <p>If <code class="docutils literal"><span class="pre">r</span></code> is not finite, an error will be raised.</p>
@@ -1727,10 +1717,8 @@ not be altered.</p>
 <div class="section" id="arithmetic">
 <span id="real-arithmetic"></span><h3>Arithmetic<a class="headerlink" href="#arithmetic" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3addER4realRR1TRR1U">
-<span id="mppp::add__realR.TRR.URR"></span><span class="target" id="group__real__arithmetic_1gacd97203e2c216f547b7d65950cf27ac6"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">add</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3addER4realRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::add__realR.TRR.URR"></span><em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>&gt;<br /><span class="target" id="group__real__arithmetic_1gacd97203e2c216f547b7d65950cf27ac6"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">add</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3addER4realRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> addition. </p>
 <p>This function will compute <span class="math">\(a+b\)</span>, storing the result in <code class="docutils literal"><span class="pre">rop</span></code>. The precision of the result will be set to the largest precision among the operands.</p>
 <p><dl class="docutils">
@@ -1748,10 +1736,8 @@ not be altered.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3subER4realRR1TRR1U">
-<span id="mppp::sub__realR.TRR.URR"></span><span class="target" id="group__real__arithmetic_1ga2f5fa9cac2b03d27b5f57de455a86ae3"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">sub</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3subER4realRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::sub__realR.TRR.URR"></span><em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>&gt;<br /><span class="target" id="group__real__arithmetic_1ga2f5fa9cac2b03d27b5f57de455a86ae3"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">sub</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3subER4realRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> subtraction. </p>
 <p>This function will compute <span class="math">\(a-b\)</span>, storing the result in <code class="docutils literal"><span class="pre">rop</span></code>. The precision of the result will be set to the largest precision among the operands.</p>
 <p><dl class="docutils">
@@ -1769,10 +1755,8 @@ not be altered.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3mulER4realRR1TRR1U">
-<span id="mppp::mul__realR.TRR.URR"></span><span class="target" id="group__real__arithmetic_1gad4497edd2a16ce91aa17f1ea913c94d7"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">mul</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3mulER4realRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mul__realR.TRR.URR"></span><em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>&gt;<br /><span class="target" id="group__real__arithmetic_1gad4497edd2a16ce91aa17f1ea913c94d7"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">mul</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3mulER4realRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> multiplication. </p>
 <p>This function will compute <span class="math">\(a \times b\)</span>, storing the result in <code class="docutils literal"><span class="pre">rop</span></code>. The precision of the result will be set to the largest precision among the operands.</p>
 <p><dl class="docutils">
@@ -1790,10 +1774,8 @@ not be altered.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3divER4realRR1TRR1U">
-<span id="mppp::div__realR.TRR.URR"></span><span class="target" id="group__real__arithmetic_1gac28ef424821ec037c839fde8adc118c3"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">div</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3divER4realRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::div__realR.TRR.URR"></span><em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>&gt;<br /><span class="target" id="group__real__arithmetic_1gac28ef424821ec037c839fde8adc118c3"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">div</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3divER4realRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> division. </p>
 <p>This function will compute <span class="math">\(a / b\)</span>, storing the result in <code class="docutils literal"><span class="pre">rop</span></code>. The precision of the result will be set to the largest precision among the operands.</p>
 <p><dl class="docutils">
@@ -1811,10 +1793,8 @@ not be altered.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>, CvrReal <em>V</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3fmaER4realRR1TRR1URR1V">
-<span id="mppp::fma__realR.TRR.URR.VRR"></span><span class="target" id="group__real__arithmetic_1gaf8d07d7175905b40496962ae24b075ad"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">fma</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em>, V &amp;&amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3fmaER4realRR1TRR1URR1V" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::fma__realR.TRR.URR.VRR"></span><em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>, CvrReal <em>V</em>&gt;<br /><span class="target" id="group__real__arithmetic_1gaf8d07d7175905b40496962ae24b075ad"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">fma</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em>, V &amp;&amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3fmaER4realRR1TRR1URR1V" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Quaternary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> fused multiply–add. </p>
 <p>This function will compute <span class="math">\(a \times b + c\)</span>, storing the result in <code class="docutils literal"><span class="pre">rop</span></code>. The precision of the result will be set to the largest precision among the operands.</p>
 <p><dl class="docutils">
@@ -1833,10 +1813,8 @@ not be altered.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>, CvrReal <em>V</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3fmaERR1TRR1URR1V">
-<span id="mppp::fma__TRR.URR.VRR"></span><span class="target" id="group__real__arithmetic_1ga3e4d7f80f2468ef8f9b312f00d95720c"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">fma</code><span class="sig-paren">(</span>T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em>, V &amp;&amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3fmaERR1TRR1URR1V" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::fma__TRR.URR.VRR"></span><em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>, CvrReal <em>V</em>&gt;<br /><span class="target" id="group__real__arithmetic_1ga3e4d7f80f2468ef8f9b312f00d95720c"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">fma</code><span class="sig-paren">(</span>T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em>, V &amp;&amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3fmaERR1TRR1URR1V" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> fused multiply–add. </p>
 <p>This function will compute and return <span class="math">\(a \times b + c\)</span>.
 The precision of the result will be set to the largest precision among the operands.</p>
@@ -1855,10 +1833,8 @@ The precision of the result will be set to the largest precision among the opera
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>, CvrReal <em>V</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3fmsER4realRR1TRR1URR1V">
-<span id="mppp::fms__realR.TRR.URR.VRR"></span><span class="target" id="group__real__arithmetic_1ga663d575a98ebcb28a12809ef588b993f"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">fms</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em>, V &amp;&amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3fmsER4realRR1TRR1URR1V" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::fms__realR.TRR.URR.VRR"></span><em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>, CvrReal <em>V</em>&gt;<br /><span class="target" id="group__real__arithmetic_1ga663d575a98ebcb28a12809ef588b993f"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">fms</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em>, V &amp;&amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3fmsER4realRR1TRR1URR1V" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Quaternary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> fused multiply–sub. </p>
 <p>This function will compute <span class="math">\(a \times b - c\)</span>, storing the result in <code class="docutils literal"><span class="pre">rop</span></code>. The precision of the result will be set to the largest precision among the operands.</p>
 <p><dl class="docutils">
@@ -1877,10 +1853,8 @@ The precision of the result will be set to the largest precision among the opera
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>, CvrReal <em>V</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3fmsERR1TRR1URR1V">
-<span id="mppp::fms__TRR.URR.VRR"></span><span class="target" id="group__real__arithmetic_1ga7a9c4b6e047b9eb405afdd6bf4a0fad9"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">fms</code><span class="sig-paren">(</span>T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em>, V &amp;&amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3fmsERR1TRR1URR1V" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::fms__TRR.URR.VRR"></span><em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>, CvrReal <em>V</em>&gt;<br /><span class="target" id="group__real__arithmetic_1ga7a9c4b6e047b9eb405afdd6bf4a0fad9"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">fms</code><span class="sig-paren">(</span>T &amp;&amp;<em>a</em>, U &amp;&amp;<em>b</em>, V &amp;&amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3fmsERR1TRR1URR1V" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> fused multiply–sub. </p>
 <p>This function will compute and return <span class="math">\(a \times b - c\)</span>.
 The precision of the result will be set to the largest precision among the operands.</p>
@@ -2241,10 +2215,8 @@ standard library (e.g., <code class="docutils literal"><span class="pre">std::so
 <div class="section" id="exponentiation">
 <span id="real-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>&gt;</dt>
 <dt id="_CPPv2N4mppp3powER4realRR1TRR1U">
-<span id="mppp::pow__realR.TRR.URR"></span><span class="target" id="group__real__exponentiation_1ga3bb06eabed5f74d07a68e2c481ba33d7"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">pow</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>op1</em>, U &amp;&amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3powER4realRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::pow__realR.TRR.URR"></span><em class="property">template </em>&lt;CvrReal <em>T</em>, CvrReal <em>U</em>&gt;<br /><span class="target" id="group__real__exponentiation_1ga3bb06eabed5f74d07a68e2c481ba33d7"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp::</code><code class="descname">pow</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, T &amp;&amp;<em>op1</em>, U &amp;&amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3powER4realRR1TRR1U" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> exponentiation. </p>
 <p>This function will set <code class="docutils literal"><span class="pre">rop</span></code> to <code class="docutils literal"><span class="pre">op1</span></code> raised to the power of <code class="docutils literal"><span class="pre">op2</span></code>. The precision of <code class="docutils literal"><span class="pre">rop</span></code> will be set to the largest precision among the operands.</p>
 <p><dl class="docutils">
@@ -2262,10 +2234,8 @@ standard library (e.g., <code class="docutils literal"><span class="pre">std::so
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mppp3powERR11RealOpTypesI1TERR1T">
-<span id="mppp::pow__RealOpTypes:T:RR.TRR"></span><span class="target" id="group__real__exponentiation_1ga639892140651f5f0c82c48c6e6b9b749"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">pow</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;&amp;<em>op1</em>, T &amp;&amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3powERR11RealOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::pow__RealOpTypes:T:RR.TRR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__exponentiation_1ga639892140651f5f0c82c48c6e6b9b749"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">pow</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;&amp;<em>op1</em>, T &amp;&amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp3powERR11RealOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> exponentiation. </p>
 <p><p>The precision of the result will be set to the largest precision among the operands.</p>
 <p>Non-<a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>
@@ -2620,10 +2590,8 @@ library if precise and forward-compatible control on the printing format is need
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppplERR11RealOpTypesI1TERR1T">
-<span id="mppp::add-operator__RealOpTypes:T:RR.TRR"></span><span class="target" id="group__real__operators_1ga1107b84b054b6255b3bd7235c41b8ee5"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;&amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERR11RealOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::add-operator__RealOpTypes:T:RR.TRR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1ga1107b84b054b6255b3bd7235c41b8ee5"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">operator+</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;&amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppplERR11RealOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary addition involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>The precision of the result will be set to the largest precision among the operands.</p>
 <p>Non-<a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>
@@ -2652,10 +2620,8 @@ operand to be converted.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mppppLER19RealCompoundOpTypesI1TERR1T">
-<span id="mppp::add-assign-operator__RealCompoundOpTypes:T:R.TRR"></span><span class="target" id="group__real__operators_1gacacbcbb23bd1e0dbe543e00d41491564"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator+=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp19RealCompoundOpTypesE" title="mppp::RealCompoundOpTypes">RealCompoundOpTypes</a>&lt;T&gt; &amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppppLER19RealCompoundOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::add-assign-operator__RealCompoundOpTypes:T:R.TRR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1gacacbcbb23bd1e0dbe543e00d41491564"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator+=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp19RealCompoundOpTypesE" title="mppp::RealCompoundOpTypes">RealCompoundOpTypes</a>&lt;T&gt; &amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppppLER19RealCompoundOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place addition involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>If <code class="docutils literal"><span class="pre">a</span></code> is a <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>, then this operator is equivalent
 to the expression:</p>
@@ -2739,10 +2705,8 @@ and the result is assigned back to <code class="docutils literal"><span class="p
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmiERR11RealOpTypesI1TERR1T">
-<span id="mppp::sub-operator__RealOpTypes:T:RR.TRR"></span><span class="target" id="group__real__operators_1ga27917b12e1fb263fbd0f8b9727ded0ed"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;&amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERR11RealOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::sub-operator__RealOpTypes:T:RR.TRR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1ga27917b12e1fb263fbd0f8b9727ded0ed"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">operator-</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;&amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmiERR11RealOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary subtraction involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>The precision of the result will be set to the largest precision among the operands.</p>
 <p>Non-<a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>
@@ -2771,10 +2735,8 @@ operand to be converted.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmIER19RealCompoundOpTypesI1TERR1T">
-<span id="mppp::sub-assign-operator__RealCompoundOpTypes:T:R.TRR"></span><span class="target" id="group__real__operators_1gada0370554fad2fc4326e9fdcf9731a13"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator-=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp19RealCompoundOpTypesE" title="mppp::RealCompoundOpTypes">RealCompoundOpTypes</a>&lt;T&gt; &amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmIER19RealCompoundOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::sub-assign-operator__RealCompoundOpTypes:T:R.TRR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1gada0370554fad2fc4326e9fdcf9731a13"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator-=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp19RealCompoundOpTypesE" title="mppp::RealCompoundOpTypes">RealCompoundOpTypes</a>&lt;T&gt; &amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmIER19RealCompoundOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place subtraction involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>If <code class="docutils literal"><span class="pre">a</span></code> is a <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>, then this operator is equivalent
 to the expression:</p>
@@ -2841,10 +2803,8 @@ and the result is assigned back to <code class="docutils literal"><span class="p
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmlERR11RealOpTypesI1TERR1T">
-<span id="mppp::mul-operator__RealOpTypes:T:RR.TRR"></span><span class="target" id="group__real__operators_1ga2fcc0257cb4d1a541f28396d981e3016"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">operator*</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;&amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmlERR11RealOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mul-operator__RealOpTypes:T:RR.TRR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1ga2fcc0257cb4d1a541f28396d981e3016"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">operator*</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;&amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmlERR11RealOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary multiplication involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>The precision of the result will be set to the largest precision among the operands.</p>
 <p>Non-<a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>
@@ -2873,10 +2833,8 @@ operand to be converted.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppmLER19RealCompoundOpTypesI1TERR1T">
-<span id="mppp::mul-assign-operator__RealCompoundOpTypes:T:R.TRR"></span><span class="target" id="group__real__operators_1gafb785ce6d6c7cf1cedf398f2abdb5b6e"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator*=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp19RealCompoundOpTypesE" title="mppp::RealCompoundOpTypes">RealCompoundOpTypes</a>&lt;T&gt; &amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmLER19RealCompoundOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::mul-assign-operator__RealCompoundOpTypes:T:R.TRR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1gafb785ce6d6c7cf1cedf398f2abdb5b6e"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator*=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp19RealCompoundOpTypesE" title="mppp::RealCompoundOpTypes">RealCompoundOpTypes</a>&lt;T&gt; &amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppmLER19RealCompoundOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place multiplication involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>If <code class="docutils literal"><span class="pre">a</span></code> is a <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>, then this operator is equivalent
 to the expression:</p>
@@ -2909,10 +2867,8 @@ and the result is assigned back to <code class="docutils literal"><span class="p
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppdvERR11RealOpTypesI1TERR1T">
-<span id="mppp::div-operator__RealOpTypes:T:RR.TRR"></span><span class="target" id="group__real__operators_1ga09eb2371aebdbcef6eea5baeac68d636"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">operator/</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;&amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdvERR11RealOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::div-operator__RealOpTypes:T:RR.TRR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1ga09eb2371aebdbcef6eea5baeac68d636"></span><a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp::</code><code class="descname">operator/</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;&amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdvERR11RealOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary division involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>The precision of the result will be set to the largest precision among the operands.</p>
 <p>Non-<a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> operands will be converted to <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>
@@ -2941,10 +2897,8 @@ operand to be converted.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppdVER19RealCompoundOpTypesI1TERR1T">
-<span id="mppp::div-assign-operator__RealCompoundOpTypes:T:R.TRR"></span><span class="target" id="group__real__operators_1gafebbb632eda5d16bb83b55fef907fcac"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator/=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp19RealCompoundOpTypesE" title="mppp::RealCompoundOpTypes">RealCompoundOpTypes</a>&lt;T&gt; &amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdVER19RealCompoundOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::div-assign-operator__RealCompoundOpTypes:T:R.TRR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1gafebbb632eda5d16bb83b55fef907fcac"></span>auto &amp;<code class="descclassname">mppp::</code><code class="descname">operator/=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I00EN4mppp19RealCompoundOpTypesE" title="mppp::RealCompoundOpTypes">RealCompoundOpTypes</a>&lt;T&gt; &amp;<em>a</em>, T &amp;&amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppdVER19RealCompoundOpTypesI1TERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place division involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>If <code class="docutils literal"><span class="pre">a</span></code> is a <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a>, then this operator is equivalent
 to the expression:</p>
@@ -2977,10 +2931,8 @@ and the result is assigned back to <code class="docutils literal"><span class="p
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppeqERK11RealOpTypesI1TERK1T">
-<span id="mppp::eq-operator__RealOpTypes:T:CR.TCR"></span><span class="target" id="group__real__operators_1gad853f9d0a1a9041cd252bceaee03e4e2"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeqERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::eq-operator__RealOpTypes:T:CR.TCR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1gad853f9d0a1a9041cd252bceaee03e4e2"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppeqERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Equality operator involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>This operator will compare <code class="docutils literal"><span class="pre">a</span></code> and <code class="docutils literal"><span class="pre">b</span></code>, returning <code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">a</span></code> is
 equal to <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">false</span></code> otherwise. The comparison is performed via the
@@ -3017,10 +2969,8 @@ for an equality predicate that handles NaN specially.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppneERK11RealOpTypesI1TERK1T">
-<span id="mppp::neq-operator__RealOpTypes:T:CR.TCR"></span><span class="target" id="group__real__operators_1gafc18fe4d7b1c85640d49aded3f9f33a8"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::neq-operator__RealOpTypes:T:CR.TCR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1gafc18fe4d7b1c85640d49aded3f9f33a8"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppneERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Inequality operator involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>This operator will compare <code class="docutils literal"><span class="pre">a</span></code> and <code class="docutils literal"><span class="pre">b</span></code>, returning <code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">a</span></code> is
 different from <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">false</span></code> otherwise. The comparison is performed via the
@@ -3057,10 +3007,8 @@ for an equality predicate that handles NaN specially.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppgtERK11RealOpTypesI1TERK1T">
-<span id="mppp::gt-operator__RealOpTypes:T:CR.TCR"></span><span class="target" id="group__real__operators_1ga8f528c94bd528a10cf1888b1f71425de"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgtERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::gt-operator__RealOpTypes:T:CR.TCR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1ga8f528c94bd528a10cf1888b1f71425de"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgtERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Greater-than operator involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>This operator will compare <code class="docutils literal"><span class="pre">a</span></code> and <code class="docutils literal"><span class="pre">b</span></code>, returning <code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">a</span></code> is
 greater than <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">false</span></code> otherwise. The comparison is performed via the
@@ -3098,10 +3046,8 @@ NaN specially.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppgeERK11RealOpTypesI1TERK1T">
-<span id="mppp::gte-operator__RealOpTypes:T:CR.TCR"></span><span class="target" id="group__real__operators_1ga0ad3ca80fc9202ce59c0796481a64165"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgeERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::gte-operator__RealOpTypes:T:CR.TCR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1ga0ad3ca80fc9202ce59c0796481a64165"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppgeERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Greater-than or equal operator involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>This operator will compare <code class="docutils literal"><span class="pre">a</span></code> and <code class="docutils literal"><span class="pre">b</span></code>, returning <code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">a</span></code> is
 greater than or equal to <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">false</span></code> otherwise. The comparison is performed via the
@@ -3137,10 +3083,8 @@ greater than or equal to any value, and no value is greater than or equal to NaN
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppltERK11RealOpTypesI1TERK1T">
-<span id="mppp::lt-operator__RealOpTypes:T:CR.TCR"></span><span class="target" id="group__real__operators_1gacf8014d0745ca9383de9b1885a536c8c"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppltERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::lt-operator__RealOpTypes:T:CR.TCR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1gacf8014d0745ca9383de9b1885a536c8c"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppltERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Less-than operator involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>This operator will compare <code class="docutils literal"><span class="pre">a</span></code> and <code class="docutils literal"><span class="pre">b</span></code>, returning <code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">a</span></code> is
 less than <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">false</span></code> otherwise. The comparison is performed via the
@@ -3178,10 +3122,8 @@ NaN specially.</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<em class="property">template </em>&lt;<em class="property">typename</em> T&gt;</dt>
 <dt id="_CPPv2N4mpppleERK11RealOpTypesI1TERK1T">
-<span id="mppp::lte-operator__RealOpTypes:T:CR.TCR"></span><span class="target" id="group__real__operators_1ga7c79e7f80fbb319565513144ac62aae6"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppleERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<span id="mppp::lte-operator__RealOpTypes:T:CR.TCR"></span><em class="property">template </em>&lt;<em class="property">typename</em> T&gt;<br /><span class="target" id="group__real__operators_1ga7c79e7f80fbb319565513144ac62aae6"></span>bool <code class="descclassname">mppp::</code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2I00EN4mppp11RealOpTypesE" title="mppp::RealOpTypes">RealOpTypes</a>&lt;T&gt; &amp;<em>a</em>, <em class="property">const</em> T &amp;<em>b</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mpppleERK11RealOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Less-than or equal operator involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>This operator will compare <code class="docutils literal"><span class="pre">a</span></code> and <code class="docutils literal"><span class="pre">b</span></code>, returning <code class="docutils literal"><span class="pre">true</span></code> if <code class="docutils literal"><span class="pre">a</span></code> is
 less than or equal to <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">false</span></code> otherwise. The comparison is performed via the
