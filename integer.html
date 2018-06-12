@@ -273,16 +273,13 @@ If <code class="docutils literal"><span class="pre">size</span></code> is zero, 
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N4mppp7integer7integerE18integer_nbits_init11mp_bitcnt_t">
-<span id="mppp::integer::integer__integer_nbits_init.mp_bitcnt_t"></span><span class="target" id="classmppp_1_1integer_1ac0bc25ad3fad8d4f3c06146b26f27258"></span><code class="descname">integer</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp18integer_nbits_initE" title="mppp::integer_nbits_init">integer_nbits_init</a>, <a class="reference internal" href="#_CPPv211mp_bitcnt_t" title="mp_bitcnt_t">mp_bitcnt_t</a> <em>nbits</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerE18integer_nbits_init11mp_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N4mppp7integer7integerE16integer_bitcnt_t">
+<span id="mppp::integer::integer__integer_bitcnt_t"></span><span class="target" id="classmppp_1_1integer_1a00da5499d8ad55ad55ddde7426103fa7"></span><code class="descname">integer</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2N4mppp16integer_bitcnt_tE" title="mppp::integer_bitcnt_t">integer_bitcnt_t</a> <em>nbits</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp7integer7integerE16integer_bitcnt_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from number of bits. </p>
 <p><p>This constructor will initialise <code class="docutils literal"><span class="pre">this</span></code> to zero, allocating enough memory
 to represent a value with a magnitude of <code class="docutils literal"><span class="pre">nbits</span></code> binary digits. The storage type will be static if <code class="docutils literal"><span class="pre">nbits</span></code>
-is small enough, dynamic otherwise.</p>
-<p>The first parameter of this constructor, of type <a class="reference internal" href="#_CPPv2N4mppp18integer_nbits_initE" title="mppp::integer_nbits_init"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer_nbits_init</span></code></a>,
-is unused, and necessary only to disambiguate this constructor from the generic constructor.</p>
-<p>For instance, the code</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">integer</span> <span class="n">n</span><span class="p">{</span><span class="n">integer_nbits_init</span><span class="p">{},</span> <span class="mi">64</span><span class="p">};</span>
+is small enough, dynamic otherwise. For instance, the code</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">integer</span> <span class="n">n</span><span class="p">{</span><span class="n">integer_bitcnt_t</span><span class="p">(</span><span class="mi">64</span><span class="p">)};</span>
 </pre></div>
 </div>
 <p>will initialise an integer <code class="docutils literal"><span class="pre">n</span></code> with value zero and enough storage for a 64-bit value.</p>
@@ -295,7 +292,7 @@ is unused, and necessary only to disambiguate this constructor from the generic 
 </dd>
 <dt><strong>Exceptions</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal"><span class="pre">nbits</span></code> is larger than an implementation-defined limit. </li>
+<li><code class="docutils literal"><span class="pre">std::overflow_error</span></code>: if the value of <code class="docutils literal"><span class="pre">nbits</span></code> is larger than an implementation-defined limit. </li>
 </ul>
 </dd>
 </dl>
@@ -1316,13 +1313,11 @@ number.</p>
 </div>
 </dd></dl>
 
-<dl class="class">
-<dt id="_CPPv2N4mppp18integer_nbits_initE">
-<span id="mppp::integer_nbits_init"></span><span class="target" id="structmppp_1_1integer__nbits__init"></span><em class="property">struct </em><code class="descname">integer_nbits_init</code><a class="headerlink" href="#_CPPv2N4mppp18integer_nbits_initE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Special <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a> initialisation tag from number of bits. </p>
-<p><p>This structure is used exclusively to disambiguate the constructor of <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
-from number of bits. It has no members and it serves no other purpose.</p>
- </p>
+<dl class="enum-class">
+<dt id="_CPPv2N4mppp16integer_bitcnt_tE">
+<em class="property">enum class </em><code class="descclassname">mppp::</code><code class="descname">integer_bitcnt_t</code> : <a class="reference internal" href="#_CPPv211mp_bitcnt_t" title="mp_bitcnt_t">mp_bitcnt_t</a><a class="headerlink" href="#_CPPv2N4mppp16integer_bitcnt_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A strongly-typed counterpart to <a class="reference internal" href="#_CPPv211mp_bitcnt_t" title="mp_bitcnt_t"><code class="xref cpp cpp-type docutils literal"><span class="pre">mp_bitcnt_t</span></code></a>, used in the constructor of <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+from number of bits.</p>
 </dd></dl>
 
 </div>
