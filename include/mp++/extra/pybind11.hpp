@@ -107,7 +107,7 @@ inline void cleanup()
     globals::fraction_class.reset();
     globals::gmp_numb_bits.reset();
 }
-}
+} // namespace detail
 
 /// Initialisation function for the pybind11 integration.
 /**
@@ -226,7 +226,7 @@ inline mppp::integer<SSize> py_long_to_mppp_int(const ::PyLongObject *nptr)
     }
     const auto nbits = static_cast<::mp_bitcnt_t>(static_cast<::mp_bitcnt_t>(PyLong_SHIFT) * abs_ob_size);
     // Construct the retval with the necessary number of bits.
-    mppp::integer<SSize> retval{mppp::integer_nbits_init{}, nbits};
+    mppp::integer<SSize> retval{mppp::integer_bitcnt_t(nbits)};
     // Init it with the first digit. The Python integer is nonzero, so this is safe.
     retval = ob_digit[--abs_ob_size];
     // Add the remaining limbs.
@@ -299,8 +299,8 @@ inline py::int_ mppp_int_to_py(const mppp::integer<SSize> &src)
     }
     return retval;
 }
-}
-}
+} // namespace detail
+} // namespace mppp_pybind11
 
 namespace pybind11
 {
@@ -522,8 +522,8 @@ struct type_caster<mppp::real128> {
 };
 
 #endif
-}
-}
+} // namespace detail
+} // namespace pybind11
 
 #if defined(__clang__) || defined(__GNUC__)
 
