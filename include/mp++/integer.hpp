@@ -7418,8 +7418,8 @@ inline std::size_t binary_load(integer<SSize> &n, T &&src)
  * This function will return a hash value for ``n``. The hash value depends only on the value of ``n``
  * (and *not* on its storage type).
  *
- * A specialisation of the standard ``std::hash`` functor is also provided, so that it is possible to use
- * :cpp:class:`~mppp::integer` in standard unordered associative containers out of the box.
+ * A :ref:`specialisation <integer_std_specialisations>` of the standard ``std::hash`` functor is also provided, so that
+ * it is possible to use :cpp:class:`~mppp::integer` in standard unordered associative containers out of the box.
  * \endrststar
  *
  * @param n the integer whose hash value will be computed.
@@ -8732,22 +8732,17 @@ inline T &operator^=(T &rop, const U &op)
 namespace std
 {
 
-/// Specialisation of \p std::hash for mppp::integer.
+// Specialisation of \p std::hash for mppp::integer.
 template <size_t SSize>
 struct hash<mppp::integer<SSize>> {
 // NOTE: these typedefs have been deprecated in C++17.
 #if MPPP_CPLUSPLUS < 201703L
-    /// The argument type.
-    typedef mppp::integer<SSize> argument_type;
-    /// The result type.
-    typedef size_t result_type;
+    // The argument type.
+    using argument_type = mppp::integer<SSize>;
+    // The result type.
+    using result_type = size_t;
 #endif
-    /// Call operator.
-    /**
-     * @param n the integer whose hash will be returned.
-     *
-     * @return a hash value for \p n.
-     */
+    // Call operator.
     size_t operator()(const mppp::integer<SSize> &n) const
     {
         return mppp::hash(n);
