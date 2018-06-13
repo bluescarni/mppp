@@ -2988,8 +2988,8 @@ inline rational<SSize> &canonicalise(rational<SSize> &rop)
  * \rststar
  * This function will return a hash value for ``q``.
  *
- * A specialisation of the standard ``std::hash`` functor is also provided, so that it is possible to use
- * :cpp:class:`~mppp::rational` in standard unordered associative containers out of the box.
+ * A :ref:`specialisation <rational_std_specialisations>` of the standard ``std::hash`` functor is also provided, so
+ * that it is possible to use :cpp:class:`~mppp::rational` in standard unordered associative containers out of the box.
  * \endrststar
  *
  * @param q the rational whose hash value will be computed.
@@ -3011,6 +3011,7 @@ inline std::size_t hash(const rational<SSize> &q)
 namespace std
 {
 
+// Specialisation of std::hash for mppp::rational.
 template <size_t SSize>
 struct hash<mppp::rational<SSize>> {
 #if MPPP_CPLUSPLUS < 201703L
