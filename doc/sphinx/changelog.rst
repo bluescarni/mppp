@@ -9,6 +9,7 @@ New
 
 - Add a specialisation of ``std::numeric_limits`` for :cpp:class:`~mppp::real128`
   (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
+- Various documentation additions (`#145 <https://github.com/bluescarni/mppp/pull/145>`__).
 
 Changes
 ~~~~~~~
