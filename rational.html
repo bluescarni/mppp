@@ -1326,8 +1326,8 @@ The printing format is described in <a class="reference internal" href="#_CPPv2N
 <span id="mppp::hash__rational:SSize:CR"></span><em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;<br /><span class="target" id="group__rational__other_1gaf1eb15ff76a2fad2de1579a8c081bb6c"></span>std::size_t <code class="descclassname">mppp::</code><code class="descname">hash</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;SSize&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N4mppp4hashERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Hash value. </p>
 <p><p>This function will return a hash value for <code class="docutils literal"><span class="pre">q</span></code>.</p>
-<p>A specialisation of the standard <code class="docutils literal"><span class="pre">std::hash</span></code> functor is also provided, so that it is possible to use
-<a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> in standard unordered associative containers out of the box.</p>
+<p>A <a class="reference internal" href="#rational-std-specialisations"><span class="std std-ref">specialisation</span></a> of the standard <code class="docutils literal"><span class="pre">std::hash</span></code> functor is also provided, so
+that it is possible to use <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> in standard unordered associative containers out of the box.</p>
 </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1740,6 +1740,44 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 </dd></dl>
 
 </div>
+<div class="section" id="standard-library-specialisations">
+<span id="rational-std-specialisations"></span><h2>Standard library specialisations<a class="headerlink" href="#standard-library-specialisations" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="_CPPv2I_6size_tENSt4hashIN4mppp8rationalI5SSizeEEEE">
+template&lt;size_t <code class="descclassname"></code><code class="descname">SSize</code>&gt;<br /><em class="property">class </em><code class="descclassname">std::</code><code class="descname">hash</code>&lt;mppp::<a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;<a class="reference internal" href="#_CPPv2I_6size_tENSt4hashIN4mppp8rationalI5SSizeEEEE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::SSize">SSize</a>&gt;&gt;<a class="headerlink" href="#_CPPv2I_6size_tENSt4hashIN4mppp8rationalI5SSizeEEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Specialisation of <code class="docutils literal"><span class="pre">std::hash</span></code> for <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">mppp::rational</span></code></a>.</p>
+<dl class="type">
+<dt id="_CPPv2NSt4hashIN4mppp8rationalI5SSizeEEE13argument_typeE">
+<em class="property">using </em><code class="descclassname"></code><code class="descname">argument_type</code> = mppp::<a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;<a class="reference internal" href="#_CPPv2I_6size_tENSt4hashIN4mppp8rationalI5SSizeEEEE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::SSize">SSize</a>&gt;<a class="headerlink" href="#_CPPv2NSt4hashIN4mppp8rationalI5SSizeEEE13argument_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv2NSt4hashIN4mppp8rationalI5SSizeEEE11result_typeE">
+<em class="property">using </em><code class="descclassname"></code><code class="descname">result_type</code> = size_t<a class="headerlink" href="#_CPPv2NSt4hashIN4mppp8rationalI5SSizeEEE11result_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference internal" href="#_CPPv2NSt4hashIN4mppp8rationalI5SSizeEEE13argument_typeE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::argument_type"><code class="xref cpp cpp-type docutils literal"><span class="pre">argument_type</span></code></a> and <a class="reference internal" href="#_CPPv2NSt4hashIN4mppp8rationalI5SSizeEEE11result_typeE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::result_type"><code class="xref cpp cpp-type docutils literal"><span class="pre">result_type</span></code></a> type aliases are defined only until C++14.</p>
+</div>
+<dl class="function">
+<dt id="_CPPv2NKSt4hashIN4mppp8rationalI5SSizeEEEclERKN4mppp8rationalI5SSizeEE">
+<span id="std::hash:mppp::rational:SSize::::call-operator__mppp::rational:SSize:CRC"></span>size_t <code class="descclassname"></code><code class="descname">operator()</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational">rational</a>&lt;<a class="reference internal" href="#_CPPv2I_6size_tENSt4hashIN4mppp8rationalI5SSizeEEEE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NKSt4hashIN4mppp8rationalI5SSizeEEEclERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> – the input <a class="reference internal" href="#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">mppp::rational</span></code></a>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a hash value for <em>q</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -1764,6 +1802,7 @@ type of the result is <code class="docutils literal"><span class="pre">F</span><
 </ul>
 </li>
 <li><a class="reference internal" href="#operators">Operators</a></li>
+<li><a class="reference internal" href="#standard-library-specialisations">Standard library specialisations</a></li>
 </ul>
 </li>
 </ul>

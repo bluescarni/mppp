@@ -2536,8 +2536,8 @@ the <a class="reference internal" href="#_CPPv2NK4mppp7integer9to_stringEi" titl
 <dd><p>Hash value. </p>
 <p><p>This function will return a hash value for <code class="docutils literal"><span class="pre">n</span></code>. The hash value depends only on the value of <code class="docutils literal"><span class="pre">n</span></code>
 (and <em>not</em> on its storage type).</p>
-<p>A specialisation of the standard <code class="docutils literal"><span class="pre">std::hash</span></code> functor is also provided, so that it is possible to use
-<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> in standard unordered associative containers out of the box.</p>
+<p>A <a class="reference internal" href="#integer-std-specialisations"><span class="std std-ref">specialisation</span></a> of the standard <code class="docutils literal"><span class="pre">std::hash</span></code> functor is also provided, so that
+it is possible to use <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> in standard unordered associative containers out of the box.</p>
 </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3251,6 +3251,44 @@ are treated as-if they were represented using two’s complement.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="standard-library-specialisations">
+<span id="integer-std-specialisations"></span><h2>Standard library specialisations<a class="headerlink" href="#standard-library-specialisations" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="_CPPv2I_6size_tENSt4hashIN4mppp7integerI5SSizeEEEE">
+template&lt;size_t <code class="descclassname"></code><code class="descname">SSize</code>&gt;<br /><em class="property">class </em><code class="descclassname">std::</code><code class="descname">hash</code>&lt;mppp::<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv2I_6size_tENSt4hashIN4mppp7integerI5SSizeEEEE" title="std::hash&lt;mppp::integer&lt;SSize&gt;&gt;::SSize">SSize</a>&gt;&gt;<a class="headerlink" href="#_CPPv2I_6size_tENSt4hashIN4mppp7integerI5SSizeEEEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Specialisation of <code class="docutils literal"><span class="pre">std::hash</span></code> for <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">mppp::integer</span></code></a>.</p>
+<dl class="type">
+<dt id="_CPPv2NSt4hashIN4mppp7integerI5SSizeEEE13argument_typeE">
+<em class="property">using </em><code class="descclassname"></code><code class="descname">argument_type</code> = mppp::<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv2I_6size_tENSt4hashIN4mppp7integerI5SSizeEEEE" title="std::hash&lt;mppp::integer&lt;SSize&gt;&gt;::SSize">SSize</a>&gt;<a class="headerlink" href="#_CPPv2NSt4hashIN4mppp7integerI5SSizeEEE13argument_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="_CPPv2NSt4hashIN4mppp7integerI5SSizeEEE11result_typeE">
+<em class="property">using </em><code class="descclassname"></code><code class="descname">result_type</code> = size_t<a class="headerlink" href="#_CPPv2NSt4hashIN4mppp7integerI5SSizeEEE11result_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference internal" href="#_CPPv2NSt4hashIN4mppp7integerI5SSizeEEE13argument_typeE" title="std::hash&lt;mppp::integer&lt;SSize&gt;&gt;::argument_type"><code class="xref cpp cpp-type docutils literal"><span class="pre">argument_type</span></code></a> and <a class="reference internal" href="#_CPPv2NSt4hashIN4mppp7integerI5SSizeEEE11result_typeE" title="std::hash&lt;mppp::integer&lt;SSize&gt;&gt;::result_type"><code class="xref cpp cpp-type docutils literal"><span class="pre">result_type</span></code></a> type aliases are defined only until C++14.</p>
+</div>
+<dl class="function">
+<dt id="_CPPv2NKSt4hashIN4mppp7integerI5SSizeEEEclERKN4mppp7integerI5SSizeEE">
+<span id="std::hash:mppp::integer:SSize::::call-operator__mppp::integer:SSize:CRC"></span>size_t <code class="descclassname"></code><code class="descname">operator()</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv2I_6size_tENSt4hashIN4mppp7integerI5SSizeEEEE" title="std::hash&lt;mppp::integer&lt;SSize&gt;&gt;::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NKSt4hashIN4mppp7integerI5SSizeEEEclERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> – the input <a class="reference internal" href="#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">mppp::integer</span></code></a>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a hash value for <em>n</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -3281,6 +3319,7 @@ are treated as-if they were represented using two’s complement.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#operators">Operators</a></li>
+<li><a class="reference internal" href="#standard-library-specialisations">Standard library specialisations</a></li>
 </ul>
 </li>
 </ul>

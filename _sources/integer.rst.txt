@@ -199,3 +199,25 @@ is typically built on top of basic :ref:`functions <integer_functions>`.
 
 .. doxygengroup:: integer_operators
    :content-only:
+
+.. _integer_std_specialisations:
+
+Standard library specialisations
+--------------------------------
+
+.. cpp:class:: template <size_t SSize> std::hash<mppp::integer<SSize>>
+
+   Specialisation of ``std::hash`` for :cpp:class:`mppp::integer`.
+
+   .. cpp:type:: public argument_type = mppp::integer<SSize>
+   .. cpp:type:: public result_type = size_t
+
+   .. note::
+
+      The :cpp:type:`argument_type` and :cpp:type:`result_type` type aliases are defined only until C++14.
+
+   .. cpp:function:: public size_t operator()(const mppp::integer<SSize> &n) const
+
+      :param n: the input :cpp:class:`mppp::integer`.
+
+      :return: a hash value for *n*.
