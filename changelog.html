@@ -61,12 +61,16 @@
 <ul class="simple">
 <li>Add a specialisation of <code class="docutils literal"><span class="pre">std::numeric_limits</span></code> for <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/144">#144</a>).</li>
-<li>Various documentation additions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/145">#145</a>).</li>
 </ul>
 </div>
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>The addition/subtraction operators of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> now use the low-level <a class="reference internal" href="integer.html#_CPPv2N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal"><span class="pre">add_ui()</span></code></a>
+and <a class="reference internal" href="integer.html#_CPPv2N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::sub_ui"><code class="xref cpp cpp-func docutils literal"><span class="pre">sub_ui()</span></code></a> primitives when the other argument is a C++ integral
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/147">#147</a>).</li>
+<li>Various documentation additions and improvements (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/146">#146</a>),
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/148">#148</a>).</li>
 <li><strong>BREAKING</strong>: replace the <code class="docutils literal"><span class="pre">integer_nbits_init</span></code> tag structure with the strongly-typed <a class="reference internal" href="integer.html#_CPPv2N4mppp16integer_bitcnt_tE" title="mppp::integer_bitcnt_t"><code class="xref cpp cpp-type docutils literal"><span class="pre">mppp::integer_bitcnt_t</span></code></a> enum
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/145">#145</a>).</li>
 <li>Ensure that <a class="reference internal" href="real128.html#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> is trivially copyable (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/144">#144</a>).</li>

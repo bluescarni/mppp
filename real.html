@@ -1283,14 +1283,17 @@ to produce exactly the original value when used in one of the constructors from 
 <div class="section" id="types">
 <h2>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h2>
 <dl class="type">
+<dt id="_CPPv2N4mppp13mpfr_struct_tE">
+<em class="property">using </em><code class="descclassname">mppp::</code><code class="descname">mpfr_struct_t</code> = std::remove_extent&lt;mpfr_t&gt;::type<a class="headerlink" href="#_CPPv2N4mppp13mpfr_struct_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The C structure used by MPFR to represent arbitrary-precision floats.
+The MPFR type <code class="docutils literal"><span class="pre">mpfr_t</span></code> is defined as an array of size 1 of this structure.</p>
+</dd></dl>
+
+<dl class="type">
 <dt id="_CPPv211mpfr_prec_t">
 <span id="mpfr_prec_t"></span><em class="property">type </em><code class="descclassname"></code><code class="descname">mpfr_prec_t</code><a class="headerlink" href="#_CPPv211mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>An integral type defined by the MPFR library, used to represent the precision of <code class="docutils literal"><span class="pre">mpfr_t</span></code>
 and (by extension) <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> objects.</p>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference external" href="http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types">http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types</a></p>
-</div>
 </dd></dl>
 
 <dl class="type">
@@ -1298,44 +1301,34 @@ and (by extension) <a class="reference internal" href="#_CPPv2N4mppp4realE" titl
 <span id="mpfr_exp_t"></span><em class="property">type </em><code class="descclassname"></code><code class="descname">mpfr_exp_t</code><a class="headerlink" href="#_CPPv210mpfr_exp_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>An integral type defined by the MPFR library, used to represent the exponent of <code class="docutils literal"><span class="pre">mpfr_t</span></code>
 and (by extension) <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="enum-class">
+<dt id="_CPPv2N4mppp9real_kindE">
+<em class="property">enum class </em><code class="descclassname">mppp::</code><code class="descname">real_kind</code><a class="headerlink" href="#_CPPv2N4mppp9real_kindE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This scoped enum is used to initialise a <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> with
+one of the three special values NaN, infinity or zero.</p>
+<dl class="enumerator">
+<dt id="_CPPv2N4mppp9real_kind3nanE">
+<em class="property">enumerator </em><code class="descclassname"></code><code class="descname">nan</code> = MPFR_NAN_KIND<a class="headerlink" href="#_CPPv2N4mppp9real_kind3nanE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv2N4mppp9real_kind3infE">
+<em class="property">enumerator </em><code class="descclassname"></code><code class="descname">inf</code> = MPFR_INF_KIND<a class="headerlink" href="#_CPPv2N4mppp9real_kind3infE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv2N4mppp9real_kind4zeroE">
+<em class="property">enumerator </em><code class="descclassname"></code><code class="descname">zero</code> = MPFR_ZERO_KIND<a class="headerlink" href="#_CPPv2N4mppp9real_kind4zeroE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference external" href="http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types">http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types</a></p>
 </div>
-</dd></dl>
-
-<dl class="type">
-<dt id="_CPPv2N4mppp13mpfr_struct_tE">
-<span id="mppp::mpfr_struct_t"></span><span class="target" id="mpfr_8hpp_1ae4fc758938822fe3fe4b113407fed318"></span><em class="property">typedef </em>std::remove_extent&lt;mpfr_t&gt;::type <code class="descclassname">mppp::</code><code class="descname">mpfr_struct_t</code><a class="headerlink" href="#_CPPv2N4mppp13mpfr_struct_tE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>The MPFR structure underlying <code class="docutils literal"><span class="pre">mpfr_t</span></code>. </p>
-<p>The MPFR <code class="docutils literal"><span class="pre">mpfr_t</span></code> type is an array of size 1 of an unspecified structure, which is here aliased as <code class="docutils literal"><span class="pre">mpfr_struct_t</span></code>. </p>
-</dd></dl>
-
-<dl class="type">
-<dt id="_CPPv2N4mppp9real_kindE">
-<span id="mppp::real_kind"></span><span class="target" id="group__real__dummy_1ga88f2893b7b7d83362a4f4a45605a0185"></span><em class="property">enum </em><code class="descclassname">mppp::</code><code class="descname">real_kind</code><a class="headerlink" href="#_CPPv2N4mppp9real_kindE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Special initialisation tags for <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
-<p><p>This scoped enum is used to initialise a <a class="reference internal" href="#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> with
-one of the three special values NaN, infinity or zero.</p>
- </p>
-<p><em>Values:</em></p>
-<dl class="enumerator">
-<dt id="_CPPv2N4mppp3nanE">
-<span class="target" id="group__real__dummy_1gga88f2893b7b7d83362a4f4a45605a0185aa3d2de7675556553a5f08e4c88d2c228"></span><code class="descname">nan</code> = MPFR_NAN_KIND<a class="headerlink" href="#_CPPv2N4mppp3nanE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="enumerator">
-<dt id="_CPPv2N4mppp3infE">
-<span class="target" id="group__real__dummy_1gga88f2893b7b7d83362a4f4a45605a0185aee7b630995e7a36b6420696989441e2d"></span><code class="descname">inf</code> = MPFR_INF_KIND<a class="headerlink" href="#_CPPv2N4mppp3infE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="enumerator">
-<dt id="_CPPv2N4mppp4zeroE">
-<span class="target" id="group__real__dummy_1gga88f2893b7b7d83362a4f4a45605a0185ad02c4c4cde7ae76252540d116a40f23a"></span><code class="descname">zero</code> = MPFR_ZERO_KIND<a class="headerlink" href="#_CPPv2N4mppp4zeroE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="concepts">
 <h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>

@@ -19,27 +19,33 @@ The ``real`` class
 Types
 -----
 
+.. cpp:type:: mppp::mpfr_struct_t = std::remove_extent<mpfr_t>::type
+
+   The C structure used by MPFR to represent arbitrary-precision floats.
+   The MPFR type ``mpfr_t`` is defined as an array of size 1 of this structure.
+
 .. cpp:type:: mpfr_prec_t
 
    An integral type defined by the MPFR library, used to represent the precision of ``mpfr_t``
    and (by extension) :cpp:class:`~mppp::real` objects.
-
-   .. seealso::
-
-      http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
 
 .. cpp:type:: mpfr_exp_t
 
    An integral type defined by the MPFR library, used to represent the exponent of ``mpfr_t``
    and (by extension) :cpp:class:`~mppp::real` objects.
 
-   .. seealso::
+.. cpp:enum-class:: mppp::real_kind
 
-      http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
+   This scoped enum is used to initialise a :cpp:class:`~mppp::real` with
+   one of the three special values NaN, infinity or zero.
 
-.. doxygentypedef:: mppp::mpfr_struct_t
+   .. cpp:enumerator:: nan = MPFR_NAN_KIND
+   .. cpp:enumerator:: inf = MPFR_INF_KIND
+   .. cpp:enumerator:: zero = MPFR_ZERO_KIND
 
-.. doxygenenum:: mppp::real_kind
+.. seealso::
+
+   http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
 
 Concepts
 --------
