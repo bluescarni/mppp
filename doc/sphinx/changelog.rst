@@ -9,12 +9,15 @@ New
 
 - Add a specialisation of ``std::numeric_limits`` for :cpp:class:`~mppp::real128`
   (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
-- Various documentation additions and improvements (`#146 <https://github.com/bluescarni/mppp/pull/146>`__),
-  (`#148 <https://github.com/bluescarni/mppp/pull/148>`__)
 
 Changes
 ~~~~~~~
 
+- The addition/subtraction operators of :cpp:class:`~mppp::integer` now use the low-level :cpp:func:`~mppp::add_ui()`
+  and :cpp:func:`~mppp::sub_ui()` primitives when the other argument is a C++ integral
+  (`#147 <https://github.com/bluescarni/mppp/pull/147>`__).
+- Various documentation additions and improvements (`#146 <https://github.com/bluescarni/mppp/pull/146>`__),
+  (`#148 <https://github.com/bluescarni/mppp/pull/148>`__).
 - **BREAKING**: replace the ``integer_nbits_init`` tag structure with the strongly-typed :cpp:type:`mppp::integer_bitcnt_t` enum
   (`#145 <https://github.com/bluescarni/mppp/pull/145>`__).
 - Ensure that :cpp:class:`~mppp::real128` is trivially copyable (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
