@@ -76,12 +76,8 @@ constexpr ::mpfr_prec_t real_prec_max()
 
 /** @} */
 
-/// The MPFR structure underlying <tt>mpfr_t</tt>.
-/**
- * The MPFR \p mpfr_t type is an array of size 1 of an unspecified structure,
- * which is here aliased as <tt>mpfr_struct_t</tt>.
- */
-typedef std::remove_extent<::mpfr_t>::type mpfr_struct_t;
+// The MPFR structure underlying mpfr_t.
+using mpfr_struct_t = std::remove_extent<::mpfr_t>::type;
 
 inline namespace detail
 {
@@ -185,7 +181,7 @@ inline void inst_mpfr_cleanup()
 inline const mpfr_cleanup mpfr_cleanup_register;
 
 #endif
-}
-}
+} // namespace detail
+} // namespace mppp
 
 #endif
