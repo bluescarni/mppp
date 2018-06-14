@@ -425,21 +425,13 @@ inline ::mpfr_prec_t real_dd_prec(const T &x)
 }
 } // namespace detail
 
-// NOTE: this is apparently necessary to work around a doxy bug.
-/** @defgroup real_dummy real_dummy
- *  @{
- */
+// Doxygen gets confused by this.
+#if !defined(MPPP_DOXYGEN_INVOKED)
 
-/// Special initialisation tags for \link mppp::real real\endlink.
-/**
- * \rststar
- * This scoped enum is used to initialise a :cpp:class:`~mppp::real` with
- * one of the three special values NaN, infinity or zero.
- * \endrststar
- */
+// Special initialisation tags for real
 enum class real_kind { nan = MPFR_NAN_KIND, inf = MPFR_INF_KIND, zero = MPFR_ZERO_KIND };
 
-/** @} */
+#endif
 
 // For the future:
 // - construction from/conversion to interoperables can probably be improved performance wise, especially
