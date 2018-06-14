@@ -1110,8 +1110,6 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 // - gcd() can be improved (see notes).
 // - functions still to be de-branched: all the mpn implementations, if worth it.
 //   Probably better to wait for benchmarks before moving.
-// - performance improvements for arithmetic with C++ integrals? (e.g., use add_ui() and similar rather than cting
-//   temporary).
 // - for s11n, we could consider implementing binary_save/load overloads based on iterators. These could return
 //   the iterator at the end of the serialised representation, and maybe the original iterator if errors
 //   occurred? Probably some code could be refactored/shared with the char * interface, taking advantage
@@ -7483,11 +7481,20 @@ inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+// NOTE: use the add_si/add_ui functions when adding to C++ integrals.
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, T n)
 {
-    integer<SSize> retval{n};
-    add(retval, retval, op1);
+    integer<SSize> retval;
+    add_ui(retval, op1, n);
+    return retval;
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_signed_integral_interoperable<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_add(const integer<SSize> &op1, T n)
+{
+    integer<SSize> retval;
+    add_si(retval, op1, n);
     return retval;
 }
 
@@ -7516,10 +7523,16 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const integer<SSize> &
     add(retval, retval, n);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_add(integer<SSize> &retval, const T &n)
 {
-    add(retval, retval, integer<SSize>{n});
+    add_ui(retval, retval, n);
+}
+
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_signed_integral_interoperable<T>::value, int> = 0>
+inline void dispatch_in_place_add(integer<SSize> &retval, const T &n)
+{
+    add_si(retval, retval, n);
 }
 
 template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
@@ -7643,12 +7656,19 @@ inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, const integ
     return retval;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int> = 0>
 inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, T n)
 {
-    integer<SSize> retval{n};
-    sub(retval, retval, op1);
-    retval.neg();
+    integer<SSize> retval;
+    sub_ui(retval, op1, n);
+    return retval;
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_signed_integral_interoperable<T>::value, int> = 0>
+inline integer<SSize> dispatch_binary_sub(const integer<SSize> &op1, T n)
+{
+    integer<SSize> retval;
+    sub_si(retval, op1, n);
     return retval;
 }
 
@@ -7679,10 +7699,16 @@ inline void dispatch_in_place_sub(integer<SSize> &retval, const integer<SSize> &
     sub(retval, retval, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int> = 0>
 inline void dispatch_in_place_sub(integer<SSize> &retval, const T &n)
 {
-    sub(retval, retval, integer<SSize>{n});
+    sub_ui(retval, retval, n);
+}
+
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_signed_integral_interoperable<T>::value, int> = 0>
+inline void dispatch_in_place_sub(integer<SSize> &retval, const T &n)
+{
+    sub_si(retval, retval, n);
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
