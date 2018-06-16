@@ -218,10 +218,10 @@ using real128_op_types_enabler
  * treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
  * are needed).
  *
- * The :cpp:class:`~mppp::real128` class is a `literal type <http://en.cppreference.com/w/cpp/concept/LiteralType>`__,
- * and, whenever possible, operations involving :cpp:class:`~mppp::real128` are marked as ``constexpr``. Some functions
- * which are not ``constexpr`` in the quadmath library have been reimplemented as ``constexpr`` functions via compiler
- * builtins.
+ * The :cpp:class:`~mppp::real128` class is a `literal type
+ * <https://en.cppreference.com/w/cpp/named_req/LiteralType>`__, and, whenever possible, operations involving
+ * :cpp:class:`~mppp::real128` are marked as ``constexpr``. Some functions which are not ``constexpr`` in the quadmath
+ * library have been reimplemented as ``constexpr`` functions via compiler builtins.
  *
  * .. seealso::
  *    https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html

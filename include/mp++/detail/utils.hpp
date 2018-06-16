@@ -111,9 +111,9 @@ std::string to_string(__int128_t);
 template <typename T>
 constexpr make_unsigned_t<T> nint_abs(T n)
 {
-// NOTE: we should assert about negative n, but this is guaranteed to work properly only
-// from C++17:
-// https://stackoverflow.com/questions/26072709/alternative-to-asserts-for-constexpr-functions
+    // NOTE: we should assert about negative n, but this is guaranteed to work properly only
+    // from C++17:
+    // https://stackoverflow.com/questions/26072709/alternative-to-asserts-for-constexpr-functions
 #if MPPP_CPLUSPLUS >= 201703L
     assert(n < T(0));
 #endif
@@ -332,7 +332,7 @@ inline std::string to_string(__int128_t n)
 #pragma warning(pop)
 
 #endif
-}
-}
+} // namespace detail
+} // namespace mppp
 
 #endif

@@ -45,7 +45,7 @@ Types
 
 .. seealso::
 
-   http://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
+   https://www.mpfr.org/mpfr-current/mpfr.html#Nomenclature-and-Types
 
 Concepts
 --------

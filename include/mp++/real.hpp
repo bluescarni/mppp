@@ -166,7 +166,7 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
         // Add the exponent at the end of the string, if both the value and the exponent
         // are nonzero.
         // NOTE: for bases greater than 10 we need '@' for the exponent, rather than 'e' or 'E'.
-        // http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+        // https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
         os << (base <= 10 ? 'e' : '@');
         if (exp_sgn == 1) {
             // Add extra '+' if the exponent is positive, for consistency with
@@ -979,7 +979,7 @@ public:
      * and no default precision has been set, an error will be raised.
      *
      * .. seealso::
-     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
      * \endrststar
      *
      * @param s the input string.
@@ -1431,7 +1431,7 @@ public:
      * This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
      *
      * .. seealso ::
-     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
      * \endrststar
      *
      * @param other the value to which \p this will be set.
@@ -1454,7 +1454,7 @@ public:
      * assignment functions from the MPFR API.
      *
      * .. seealso ::
-     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
      * \endrststar
      *
      * @param x the value to which \p this will be set.
@@ -1507,7 +1507,7 @@ public:
      * This method is a thin wrapper around the ``mpfr_set_str()`` assignment function from the MPFR API.
      *
      * .. seealso ::
-     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
      * \endrststar
      *
      * @param s the string to which \p this will be set.
@@ -1569,7 +1569,7 @@ public:
      *    It is the user's responsibility to ensure that ``x`` has been correctly initialised.
      *
      * .. seealso ::
-     *    http://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
      * \endrststar
      *
      * @param x the ``mpfr_t`` to which \p this will be set.
