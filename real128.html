@@ -134,10 +134,9 @@ the computation. Similarly, the relational operators, <code class="docutils lite
 most one argument to <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> before performing the comparison. Alternative comparison functions
 treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
 are needed).</p>
-<p>The <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> class is a <a class="reference external" href="http://en.cppreference.com/w/cpp/concept/LiteralType">literal type</a>,
-and, whenever possible, operations involving <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> are marked as <code class="docutils literal"><span class="pre">constexpr</span></code>. Some functions
-which are not <code class="docutils literal"><span class="pre">constexpr</span></code> in the quadmath library have been reimplemented as <code class="docutils literal"><span class="pre">constexpr</span></code> functions via compiler
-builtins.</p>
+<p>The <a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> class is a <a class="reference external" href="https://en.cppreference.com/w/cpp/named_req/LiteralType">literal type</a>, and, whenever possible, operations involving
+<a class="reference internal" href="#_CPPv2N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal"><span class="pre">real128</span></code></a> are marked as <code class="docutils literal"><span class="pre">constexpr</span></code>. Some functions which are not <code class="docutils literal"><span class="pre">constexpr</span></code> in the quadmath
+library have been reimplemented as <code class="docutils literal"><span class="pre">constexpr</span></code> functions via compiler builtins.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p><a class="reference external" href="https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html">https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html</a></p>
