@@ -161,7 +161,9 @@ struct mpz_alloc_cache {
     // The number of arrays actually stored in each cache entry.
     std::array<std::size_t, max_size> sizes;
     // NOTE: use round brackets init for the usual GCC 4.8 workaround.
-    constexpr mpz_alloc_cache() : caches(), sizes() {}
+    // NOTE: this will zero initialise recursively both members: we will
+    // have all nullptrs in the caches, and all cache sizes will be zeroes.
+    mpz_alloc_cache() : caches(), sizes() {}
     // Clear the cache, deallocating all the data in the arrays.
     void clear() noexcept
     {
@@ -194,9 +196,37 @@ struct mpz_alloc_cache {
 // NOTE: static objects inside inline functions always refer to the same
 // object in different TUs:
 // https://stackoverflow.com/questions/32172137/local-static-thread-local-variables-of-inline-functions
+// NOTE: some link/notes regarding thread_local:
+// - thread_local alone also implies "static":
+//   http://eel.is/c++draft/dcl.stc
+//   https://stackoverflow.com/questions/22794382/are-c11-thread-local-variables-automatically-static
+// - all variables declared thread_local have "thread storage duration", that is,
+//   they live for the duration of the thread: http://eel.is/c++draft/basic.stc.thread
+// - there are 2 ways variables with thread storage duration may be initialised:
+//   - static initialisation, which is possible for constexpr-like entities:
+//     http://eel.is/c++draft/basic.start.static
+//     Note that it says: "Constant initialization is performed if a variable or temporary object with static or thread
+//     storage duration is initialized by a constant initializer for the entity". So it seems like block-scope
+//     variables with thread storage duration will be initialised as part of constant initialisation at thread startup,
+//     if possible. See also the cppreference page:
+//     https://en.cppreference.com/w/cpp/language/storage_duration#Static_local_variables
+//     (here it is talking about static local variables, but it should apply also to thread_local variables
+//     as indicated here: https://en.cppreference.com/w/cpp/language/initialization).
+//   - dynamic initialisation otherwise, meaning that the variable is initialised the first time control
+//     passes through its declaration:
+//     http://eel.is/c++draft/stmt.dcl#4
+// - destruction of objecs with thread storage duration happens before the destruction of objects with
+//   static storage duration:
+//   http://eel.is/c++draft/basic.start.term#2
+// - "All static initialization strongly happens before any dynamic initialization.":
+//   http://eel.is/c++draft/basic.start#static-2
+// - "If the completion of the constructor or dynamic initialization of an object with thread storage duration is
+//   sequenced before that of another, the completion of the destructor of the second is sequenced before the initiation
+//   of the destructor of the first." (that is, objects are destroyed in reverse with respect to construction order):
+//   http://eel.is/c++draft/basic.start.term#3
 inline mpz_alloc_cache &get_mpz_alloc_cache()
 {
-    static thread_local mpz_alloc_cache mpzc;
+    thread_local mpz_alloc_cache mpzc;
     return mpzc;
 }
 
