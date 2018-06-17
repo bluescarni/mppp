@@ -13,9 +13,9 @@ New
 Changes
 ~~~~~~~
 
-- The addition/subtraction operators of :cpp:class:`~mppp::integer` now use the low-level :cpp:func:`~mppp::add_ui()`
-  and :cpp:func:`~mppp::sub_ui()` primitives when the other argument is a C++ integral
-  (`#147 <https://github.com/bluescarni/mppp/pull/147>`__).
+- The addition/subtraction operators of :cpp:class:`~mppp::integer` now use the low-level :cpp:func:`~mppp::add_ui()`,
+  :cpp:func:`~mppp::add_si()`, :cpp:func:`~mppp::sub_ui()` and :cpp:func:`~mppp::sub_si()` primitives when the other argument is a
+  C++ integral (`#147 <https://github.com/bluescarni/mppp/pull/147>`__).
 - Various documentation additions, improvements and fixes (`#146 <https://github.com/bluescarni/mppp/pull/146>`__),
   (`#148 <https://github.com/bluescarni/mppp/pull/148>`__), (`#149 <https://github.com/bluescarni/mppp/pull/149>`__).
 - **BREAKING**: replace the ``integer_nbits_init`` tag structure with the strongly-typed :cpp:type:`mppp::integer_bitcnt_t` enum
