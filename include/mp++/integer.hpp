@@ -27,9 +27,6 @@
 #include <iostream>
 #include <limits>
 #include <new>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <numeric>
-#endif
 #include <stdexcept>
 #include <string>
 #if MPPP_CPLUSPLUS >= 201703L
@@ -215,7 +212,7 @@ struct mpz_alloc_cache {
 //   - dynamic initialisation otherwise, meaning that the variable is initialised the first time control
 //     passes through its declaration:
 //     http://eel.is/c++draft/stmt.dcl#4
-// - destruction of objecs with thread storage duration happens before the destruction of objects with
+// - destruction of objects with thread storage duration happens before the destruction of objects with
 //   static storage duration:
 //   http://eel.is/c++draft/basic.start.term#2
 // - "All static initialization strongly happens before any dynamic initialization.":
@@ -6699,83 +6696,24 @@ inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op
 inline namespace detail
 {
 
-// Implementation of the function to count the number of trailing 0-bits in
-// an unsigned integral value for GCC/clang. The ctz builtin is available
-// in all supported GCC/clang versions.
-#if defined(__clang__) || defined(__GNUC__)
-
-// Dispatch based on the integer type.
-inline int builtin_ctz_impl(unsigned n)
-{
-    return __builtin_ctz(n);
-}
-
-inline int builtin_ctz_impl(unsigned long n)
-{
-    return __builtin_ctzl(n);
-}
-
-inline int builtin_ctz_impl(unsigned long long n)
-{
-    return __builtin_ctzll(n);
-}
-
-// NOTE: we checked earlier that mp_limb_t is one of the 3 types supported by the
-// ctz builtin. No need to constrain the template.
-template <typename T>
-inline unsigned builtin_ctz(T n)
-{
-    assert(n != 0u);
-    return static_cast<unsigned>(builtin_ctz_impl(n));
-}
-
-// Binary GCD implemented with the help of the ctz builtin for the removal
-// of power-of-2 factors. See also:
-// https://en.wikipedia.org/wiki/Binary_GCD_algorithm
-// Credits to Howard Hinnant for the implementation:
-// https://groups.google.com/a/isocpp.org/forum/#!topic/std-proposals/8WB2Z9d7A0w
-template <typename T>
-inline T binary_gcd_ctz(T x, T y)
-{
-    static_assert(std::is_integral<T>::value && std::is_unsigned<T>::value,
-                  "This function works only on unsigned integral types.");
-    assert(x != 0u && y != 0u);
-    const auto cf2 = builtin_ctz(x | y);
-    x >>= builtin_ctz(x);
-    while (true) {
-        y >>= builtin_ctz(y);
-        if (x == y) {
-            break;
-        }
-        if (x > y) {
-            std::swap(x, y);
-        }
-        if (x == 1u) {
-            break;
-        }
-        y -= x;
-    }
-    return x << cf2;
-}
-
-#endif
-
 // Selection of the algorithm for static GCD:
-// - for 1 limb, we can do static GCD if we have the ctz builtins or if
-//   we are using C++17,
+// - for 1 limb, we have a specialised implementation using mpn_gcd_1(), available everywhere,
 // - otherwise we just use the mpn/mpz functions.
 template <typename SInt>
-using integer_static_gcd_algo = std::integral_constant<int,
-#if defined(__clang__) || defined(__GNUC__) || MPPP_CPLUSPLUS >= 201703L
-                                                       SInt::s_size == 1 ? 1 :
-#endif
-                                                                         0>;
+using integer_static_gcd_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : 0>;
 
 // mpn/mpz implementation.
 template <std::size_t SSize>
 inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
                             mpz_size_t asize1, mpz_size_t asize2, const std::integral_constant<int, 0> &)
 {
+    // NOTE: performance testing indicates that, even if mpz_gcd() does special casing
+    // for zeroes and 1-limb values, it is still worth it to repeat the special casing
+    // here. This is probably because if we manage to actually call mpn_gcd_1() here,
+    // we avoid interacting with dynamically allocated memory below in the thread-local
+    // object. If we ever start using mpn_gcd(), we will probably have to re-do a
+    // performance analysis.
+    //
     // Handle zeroes.
     if (!asize1) {
         // NOTE: we want the result to be positive, and to copy only the set limbs.
@@ -6823,7 +6761,6 @@ template <std::size_t SSize>
 inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
                             mpz_size_t asize1, mpz_size_t asize2, const std::integral_constant<int, 1> &)
 {
-#if defined(__clang__) || defined(__GNUC__)
     // Handle the special cases first.
     if (asize1 == 0) {
         // gcd(0, n) = abs(n). This also covers the convention
@@ -6843,15 +6780,15 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     // will also have size 1.
     rop._mp_size = 1;
     // Compute the limb value.
-    rop.m_limbs[0] = binary_gcd_ctz(op1.m_limbs[0] & GMP_NUMB_MASK, op2.m_limbs[0] & GMP_NUMB_MASK);
-#elif MPPP_CPLUSPLUS >= 201703L
-    (void)asize1;
-    (void)asize2;
-    // NOTE: std::gcd() handles zero inputs just fine, no need to special case them.
-    const auto res = std::gcd(op1.m_limbs[0] & GMP_NUMB_MASK, op2.m_limbs[0] & GMP_NUMB_MASK);
-    rop._mp_size = (res != 0u);
-    rop.m_limbs[0] = res;
-#endif
+    // NOTE: as an alternative, here we could have a custom binary GCD. See for
+    // instance this implementation by Howard Hinnant using compiler intrinsics:
+    // https://groups.google.com/a/isocpp.org/forum/#!topic/std-proposals/8WB2Z9d7A0w
+    // Testing however shows that mpn_gcd_1() is quite well optimised, so let's
+    // use it and keep in mind the option about the binary GCD for the future.
+    // NOTE: at the commit c146af86e416cf1348d0b3fc454600b47b523f4f we have an implementation
+    // of the binary GCD which I think should be suitable for 2-limb statics (with some
+    // extensions to the ctz builtins for 128-bit ints).
+    rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(1), op2.m_limbs[0]);
 }
 
 template <std::size_t SSize>
@@ -6860,10 +6797,10 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
     static_gcd_impl(rop, op1, op2, std::abs(op1._mp_size), std::abs(op2._mp_size),
                     integer_static_gcd_algo<static_int<SSize>>{});
     if (integer_static_gcd_algo<static_int<SSize>>::value == 0) {
-        // If we used the mpn functions, zero the unused limbs on top (if necessary).
-        // NOTE: as usual, potential of mpn use on optimised size (e.g., if we are on
-        // C++14 on an implementation that does not provide ctz builtins and with
-        // static size 1: in such case, the code path above invokes mpn/mpz functions).
+        // If we used the generic function, zero the unused limbs on top (if necessary).
+        // NOTE: as usual, potential of mpn/mpz use on optimised size (e.g., with 2-limb
+        // static ints we are currently invoking mpz_gcd() - this could produce a result
+        // with only the lower limb, and the higher limb is not zeroed out).
         rop.zero_unused_limbs();
     }
 }
