@@ -6732,7 +6732,8 @@ inline unsigned builtin_ctz(T n)
 // Binary GCD implemented with the help of the ctz builtin for the removal
 // of power-of-2 factors. See also:
 // https://en.wikipedia.org/wiki/Binary_GCD_algorithm
-// Credits to Howard Hinnant for the implementation.
+// Credits to Howard Hinnant for the implementation:
+// https://groups.google.com/a/isocpp.org/forum/#!topic/std-proposals/8WB2Z9d7A0w
 template <typename T>
 inline T binary_gcd_ctz(T x, T y)
 {
@@ -6856,8 +6857,8 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 template <std::size_t SSize>
 inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
-    const mpz_size_t asize1 = std::abs(op1._mp_size), asize2 = std::abs(op2._mp_size);
-    static_gcd_impl(rop, op1, op2, asize1, asize2, integer_static_gcd_algo<static_int<SSize>>{});
+    static_gcd_impl(rop, op1, op2, std::abs(op1._mp_size), std::abs(op2._mp_size),
+                    integer_static_gcd_algo<static_int<SSize>>{});
     if (integer_static_gcd_algo<static_int<SSize>>::value == 0) {
         // If we used the mpn functions, zero the unused limbs on top (if necessary).
         // NOTE: as usual, potential of mpn use on optimised size (e.g., if we are on
