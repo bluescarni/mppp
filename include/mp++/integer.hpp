@@ -4832,7 +4832,7 @@ using integer_have_dlimb_div = std::integral_constant<bool,
 #endif
                                                       >;
 
-// Selection of algorithm for static division:
+// Selection of the algorithm for static division:
 // - for 1 limb, we can always do static division,
 // - for 2 limbs, we need the dual limb division if avaiable,
 // - otherwise we just use the mpn functions.
@@ -4871,15 +4871,12 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
         copy_limbs_no(data2, data2 + asize2, op2_alt.data());
         data2 = op2_alt.data();
     }
-#if !defined(NDEBUG)
-    // Small helper function to verify that all pointers are distinct. Used exclusively for debugging purposes.
-    auto distinct_op = [&q, &r, data1, data2]() -> bool {
+    // Verify that all pointers are distinct. Used exclusively for debugging purposes.
+    assert(([&q, &r, data1, data2]() -> bool {
         const ::mp_limb_t *ptrs[] = {q.m_limbs.data(), r.m_limbs.data(), data1, data2};
         std::sort(ptrs, ptrs + 4, std::less<const ::mp_limb_t *>());
         return std::unique(ptrs, ptrs + 4) == (ptrs + 4);
-    };
-#endif
-    assert(distinct_op());
+    }()));
     // Proceed to the division.
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
@@ -5109,15 +5106,12 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
         copy_limbs_no(data2, data2 + asize2, op2_alt.data());
         data2 = op2_alt.data();
     }
-#if !defined(NDEBUG)
-    // Small helper function to verify that all pointers are distinct. Used exclusively for debugging purposes.
-    auto distinct_op = [&q, data1, data2]() -> bool {
+    // Verify that all pointers are distinct.
+    assert(([&q, data1, data2]() -> bool {
         const ::mp_limb_t *ptrs[] = {q.m_limbs.data(), data1, data2};
         std::sort(ptrs, ptrs + 3, std::less<const ::mp_limb_t *>());
         return std::unique(ptrs, ptrs + 3) == (ptrs + 3);
-    };
-#endif
-    assert(distinct_op());
+    }()));
     // Proceed to the division.
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
