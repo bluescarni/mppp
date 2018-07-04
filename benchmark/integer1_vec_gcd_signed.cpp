@@ -61,8 +61,8 @@ static inline std::tuple<std::vector<T>, std::vector<T>, std::vector<T>> get_ini
         }
         return static_cast<T>(retval * (sign(rng) ? 1 : -1));
     };
-    std::generate(v1.begin(), v1.end(), [&mult_rng]() { return mult_rng(9); });
-    std::generate(v2.begin(), v2.end(), [&mult_rng]() { return mult_rng(4); });
+    std::generate(v1.begin(), v1.end(), [&mult_rng]() { return mult_rng(14); });
+    std::generate(v2.begin(), v2.end(), [&mult_rng]() { return mult_rng(14); });
     std::cout << "\nInit runtime: ";
     init_time = st.elapsed();
     return std::make_tuple(std::move(v1), std::move(v2), std::move(v3));

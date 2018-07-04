@@ -6765,15 +6765,17 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     if (asize1 == 0) {
         // gcd(0, n) = abs(n). This also covers the convention
         // that gcd(0, 0) = 0.
+        // NOTE: don't use the copy assignment operator of static_int,
+        // as the size needs to be set to positive.
         rop._mp_size = asize2;
-        rop.m_limbs[0] = op2.m_limbs[0];
+        rop.m_limbs = op2.m_limbs;
         return;
     }
     if (asize2 == 0) {
         // gcd(n, 0) = abs(n).
         // NOTE: op1 is not zero, its size can only be 1.
         rop._mp_size = 1;
-        rop.m_limbs[0] = op1.m_limbs[0];
+        rop.m_limbs = op1.m_limbs;
         return;
     }
     // At this point, asize1 == asize2 == 1, and the result
