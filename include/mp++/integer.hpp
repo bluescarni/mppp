@@ -27,9 +27,6 @@
 #include <iostream>
 #include <limits>
 #include <new>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <numeric>
-#endif
 #include <stdexcept>
 #include <string>
 #if MPPP_CPLUSPLUS >= 201703L
@@ -215,7 +212,7 @@ struct mpz_alloc_cache {
 //   - dynamic initialisation otherwise, meaning that the variable is initialised the first time control
 //     passes through its declaration:
 //     http://eel.is/c++draft/stmt.dcl#4
-// - destruction of objecs with thread storage duration happens before the destruction of objects with
+// - destruction of objects with thread storage duration happens before the destruction of objects with
 //   static storage duration:
 //   http://eel.is/c++draft/basic.start.term#2
 // - "All static initialization strongly happens before any dynamic initialization.":
@@ -388,7 +385,8 @@ inline ::mp_limb_t limb_add_overflow(::mp_limb_t a, ::mp_limb_t b, ::mp_limb_t *
 }
 
 // Implementation of the function to count the number of leading zeroes
-// in an unsigned integral value for GCC/clang.
+// in an unsigned integral value for GCC/clang. The clz builtin is available
+// in all supported GCC/clang versions.
 #if defined(__clang__) || defined(__GNUC__)
 
 // Dispatch based on the integer type.
@@ -520,17 +518,15 @@ inline bool check_no_nails(const ::mp_limb_t &l)
 inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
 {
     assert(check_no_nails(lo) && check_no_nails(hi));
-    // NOTE: this contraption ensures the correct result. The possibilities for hi/lo
-    // nonzero are:
-    // hi | lo | asize | idx
-    // ---------------------
-    //  1 |  1 |     2 |   3
-    //  1 |  0 |     2 |   2
-    //  0 |  1 |     1 |   1
-    //  0 |  0 |     0 |   0
-    constexpr std::int_least8_t table[] = {0, 1, 2, 2};
-    const auto idx = (lo != 0u) + ((hi != 0u) << 1);
-    return static_cast<mpz_size_t>(table[idx]);
+    const auto lonz = static_cast<unsigned>(lo != 0u), hinz = static_cast<unsigned>(hi != 0u);
+    // NOTE: this contraption ensures the correct result:
+    // hi | lo | asize
+    // -----------------------------
+    //  1 |  1 | 1 * 2 + (0 & 1) = 2
+    //  1 |  0 | 1 * 2 + (0 & 0) = 2
+    //  0 |  1 | 0 * 2 + (1 & 1) = 1
+    //  0 |  0 | 0 * 2 + (1 & 0) = 0
+    return static_cast<mpz_size_t>(hinz * 2u + (static_cast<unsigned>(!hinz) & lonz));
 }
 
 // Branchless sign function for C++ integrals:
@@ -1137,7 +1133,6 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 //   of aborting). This is probably not an immediate concern though.
 // - pow() can probably benefit for some specialised static implementation, especially in conjunction with
 //   mpn_sqr().
-// - gcd() can be improved (see notes).
 // - functions still to be de-branched: all the mpn implementations, if worth it.
 //   Probably better to wait for benchmarks before moving.
 // - for s11n, we could consider implementing binary_save/load overloads based on iterators. These could return
@@ -1146,26 +1141,43 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 //   of the fact that std::copy() actually returns something. Longer term, we probably should add optional
 //   support for boost.serialization, cereal, etc.
 
-// NOTE: bits to keep in mind:
-// - the use of GMP_NUMB_MASK we make is not necessary currently, because the GMP API at the present time
-//   always expects and returns limbs with the nail bits set to zero (see the docs). So, in essence, we would
-//   need to take care of masking only in our specialised implementations of basic primitives (e.g., bit shifting).
-//   However, it is also mentioned in the GMP docs that in the future it *may* be possible that limbs with nonzero
-//   nail bits are allowed, and that's why we always mask when operating on the limbs. Removing the excessive masking
-//   is not too hard to do, see this commit for instance:
-//   30c23c8984d2955d19c35af84e7845dba88d94c0
-//   If in the future we want to remove the extra masking, we can take this commit as a starting point.
-// - regarding the zeroing of the upper limbs in static_int. The idea here is that, to implement optimised basic
-//   primitives for small static sizes, it is convenient to rely on the fact that unused limbs are zeroed out.
-//   This has a series of consequences:
-//   - whenever we write into the static int, we must take care of zeroing out the upper limbs
-//     that are unused in the representation of the current value. This holds both when using the mpn_ functions
-//     and when implementing our own specialised primitives;
-//   - if the static size is small, we can copy/assign limb arrays around without caring for the effective size, as
-//     all limbs are always initialised to some value. With large static size, we cannot do that as the upper
-//     limbs are not necessarily inited;
-//   - if the static size is small, we can just peek into the limbs without caring for the real size, this saves
-//     branching (see the odd_p() implementation for instance).
+// NOTE: about the nails:
+// - whenever we need to read the *numerical value* of a limb (e.g., in our optimised primitives),
+//   we don't make any assumption about nail bits. That is, we assume that anything could be in that bit,
+//   so we always mask the limb read with GMP_NUMB_MASK (which, today, is a no-op on virtually all setups).
+//   This ensures that we are actually working with a subsection of a multiprecision value, uncontaminated
+//   by extraneous bits. If, on the other hand, we are just doing a copy of the limb we don't care about
+//   the nail bit as we are not using the numerical value of the limb, and any extraneous bit has no
+//   consequence on any computation.
+// - If we are using the mpz/mpn API, we don't care about nail bits because we assume that is handled by
+//   the GMP library itself. Not our problem.
+// - When we produce manually (i.e., without using the mpz/mpn API) some limb to be written out to
+//   an integer, we take care of ensuring that no nail bits are set. This is actually currently required
+//   by the GMP API:
+//
+//   "All the mpn functions accepting limb data will expect the nail bits to be zero on entry, and will
+//    return data with the nails similarly all zero."
+//
+//    Again, this masking before writing will be a no-op in most cases. And in many cases we don't have
+//    to do anything explicitly as many of our primitives require no nails or they just don't end up
+//    writing into nail bits (see the shift operators for an exception to this).
+// - This whole topic of nails is at this time largely academic and unlikely to have any real impact,
+//   as it seems like nobody builds GMP with nails support nowadays. If we ever want to get rid of
+//   all the masking, see commit 30c23c8984d2955d19c35af84e7845dba88d94c0 for a starting point.
+
+// NOTE: about the zeroing of the upper limbs in static_int:
+// - the idea here is that, to implement optimised basic primitives for small static sizes, it is convenient
+//   to rely on the fact that unused limbs are zeroed out. This can reduce branching and it generally
+//   simplifies the code.
+// - Because of this, whenever we write into a "small" static int, we must take care of zeroing out the upper limbs
+//   that are unused in the representation of the current value. This holds both when using the mpn/mpz functions
+//   and when implementing our own specialised primitives (note however that if we can prove that we are calling mpn
+//   or mpz on a non-small integer, then we can omit the call to zero_upper_limbs() - we do this occasionally).
+// - If the static size is small, we can copy/assign limb arrays around without caring for the effective size, as
+//   all limbs are always initialised to some value. With large static size, we cannot do that as the upper
+//   limbs are not necessarily inited.
+// - Contrary to the nail business, ensuring that the upper limbs are zeroed is essential, and it is something
+//   we check in the unit tests.
 
 /// Multiprecision integer class.
 /**
@@ -4628,7 +4640,7 @@ inline std::size_t static_mul_2exp(static_int<1> &rop, const static_int<1> &n, s
         // The two conditions:
         // - if the shift is >= number of data bits, the operation will certainly
         //   fail (as the operand is nonzero);
-        // - shifting by s would overflow  the single limb.
+        // - shifting by s would overflow the single limb.
         // NOTE: s is at least 1, so in the right shift above we never risk UB due to too much shift.
         // NOTE: for the size hint: s / nbits is the number of entire limbs shifted, +1 because the shifted
         // limbs add to the current size (1), +1 because another limb might be needed.
@@ -4832,7 +4844,7 @@ using integer_have_dlimb_div = std::integral_constant<bool,
 #endif
                                                       >;
 
-// Selection of algorithm for static division:
+// Selection of the algorithm for static division:
 // - for 1 limb, we can always do static division,
 // - for 2 limbs, we need the dual limb division if avaiable,
 // - otherwise we just use the mpn functions.
@@ -4871,15 +4883,12 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
         copy_limbs_no(data2, data2 + asize2, op2_alt.data());
         data2 = op2_alt.data();
     }
-#if !defined(NDEBUG)
-    // Small helper function to verify that all pointers are distinct. Used exclusively for debugging purposes.
-    auto distinct_op = [&q, &r, data1, data2]() -> bool {
+    // Verify that all pointers are distinct. Used exclusively for debugging purposes.
+    assert(([&q, &r, data1, data2]() -> bool {
         const ::mp_limb_t *ptrs[] = {q.m_limbs.data(), r.m_limbs.data(), data1, data2};
         std::sort(ptrs, ptrs + 4, std::less<const ::mp_limb_t *>());
         return std::unique(ptrs, ptrs + 4) == (ptrs + 4);
-    };
-#endif
-    assert(distinct_op());
+    }()));
     // Proceed to the division.
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
@@ -5109,15 +5118,12 @@ inline void static_tdiv_q_impl(static_int<SSize> &q, const static_int<SSize> &op
         copy_limbs_no(data2, data2 + asize2, op2_alt.data());
         data2 = op2_alt.data();
     }
-#if !defined(NDEBUG)
-    // Small helper function to verify that all pointers are distinct. Used exclusively for debugging purposes.
-    auto distinct_op = [&q, data1, data2]() -> bool {
+    // Verify that all pointers are distinct.
+    assert(([&q, data1, data2]() -> bool {
         const ::mp_limb_t *ptrs[] = {q.m_limbs.data(), data1, data2};
         std::sort(ptrs, ptrs + 3, std::less<const ::mp_limb_t *>());
         return std::unique(ptrs, ptrs + 3) == (ptrs + 3);
-    };
-#endif
-    assert(distinct_op());
+    }()));
     // Proceed to the division.
     if (asize2 == 1) {
         // Optimization when the divisor has 1 limb.
@@ -6705,26 +6711,24 @@ inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op
 inline namespace detail
 {
 
+// Selection of the algorithm for static GCD:
+// - for 1 limb, we have a specialised implementation using mpn_gcd_1(), available everywhere,
+// - otherwise we just use the mpn/mpz functions.
+template <typename SInt>
+using integer_static_gcd_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : 0>;
+
+// mpn/mpz implementation.
 template <std::size_t SSize>
-inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            mpz_size_t asize1, mpz_size_t asize2, const std::integral_constant<int, 0> &)
 {
-    mpz_size_t asize1 = op1._mp_size, asize2 = op2._mp_size;
-    if (asize1 < 0) {
-        asize1 = -asize1;
-    }
-    if (asize2 < 0) {
-        asize2 = -asize2;
-    }
-#if MPPP_CPLUSPLUS >= 201703L
-    if (asize1 == 1 && asize2 == 1) {
-        // NOTE: once we have 1/2 limbs specialisations, we could consider taking
-        // this branch for asize <= 1, and set the output size to g != 0 as usual.
-        // We'll need to compare it to a custom binary GCD anyway...
-        rop._mp_size = 1;
-        rop.m_limbs[0] = std::gcd(op1.m_limbs[0] & GMP_NUMB_MASK, op2.m_limbs[0] & GMP_NUMB_MASK);
-        return;
-    }
-#endif
+    // NOTE: performance testing indicates that, even if mpz_gcd() does special casing
+    // for zeroes and 1-limb values, it is still worth it to repeat the special casing
+    // here. This is probably because if we manage to actually call mpn_gcd_1() here,
+    // we avoid interacting with dynamically allocated memory below in the thread-local
+    // object. If we ever start using mpn_gcd(), we will probably have to re-do a
+    // performance analysis.
+    //
     // Handle zeroes.
     if (!asize1) {
         // NOTE: we want the result to be positive, and to copy only the set limbs.
@@ -6766,6 +6770,61 @@ inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, con
     assert(rop._mp_size > 0);
     copy_limbs_no(tmp.m_mpz._mp_d, tmp.m_mpz._mp_d + rop._mp_size, rop.m_limbs.data());
 }
+
+// 1-limb optimization.
+template <std::size_t SSize>
+inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
+                            mpz_size_t asize1, mpz_size_t asize2, const std::integral_constant<int, 1> &)
+{
+    // Handle the special cases first.
+    if (asize1 == 0) {
+        // gcd(0, n) = abs(n). This also covers the convention
+        // that gcd(0, 0) = 0.
+        // NOTE: don't use the copy assignment operator of static_int,
+        // as the size needs to be set to positive.
+        rop._mp_size = asize2;
+        rop.m_limbs = op2.m_limbs;
+        return;
+    }
+    if (asize2 == 0) {
+        // gcd(n, 0) = abs(n).
+        // NOTE: op1 is not zero, its size can only be 1.
+        rop._mp_size = 1;
+        rop.m_limbs = op1.m_limbs;
+        return;
+    }
+    // At this point, asize1 == asize2 == 1, and the result
+    // will also have size 1.
+    rop._mp_size = 1;
+    // Compute the limb value.
+    // NOTE: as an alternative, here we could have a custom binary GCD. See for
+    // instance this implementation by Howard Hinnant using compiler intrinsics:
+    // https://groups.google.com/a/isocpp.org/forum/#!topic/std-proposals/8WB2Z9d7A0w
+    // Testing however shows that mpn_gcd_1() is quite well optimised, so let's
+    // use it and keep in mind the option about the binary GCD for the future.
+    // NOTE: at the commit c146af86e416cf1348d0b3fc454600b47b523f4f we have an implementation
+    // of the binary GCD, just in case.
+    // NOTE: currently, the binary GCD is faster on Zen processors, but I believe
+    // that is because the current GMP version does not have optimised GCD assembly for Zen.
+    // We need to benchmark again when the next GMP version comes out. If the binary GCD
+    // is still faster, we should consider using it instead of mpn_gcd_1(), as even on Intel
+    // processors the binary GCD is only marginally slower than mpn_gcd_1().
+    rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(1), op2.m_limbs[0]);
+}
+
+template <std::size_t SSize>
+inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
+{
+    static_gcd_impl(rop, op1, op2, std::abs(op1._mp_size), std::abs(op2._mp_size),
+                    integer_static_gcd_algo<static_int<SSize>>{});
+    if (integer_static_gcd_algo<static_int<SSize>>::value == 0) {
+        // If we used the generic function, zero the unused limbs on top (if necessary).
+        // NOTE: as usual, potential of mpn/mpz use on optimised size (e.g., with 2-limb
+        // static ints we are currently invoking mpz_gcd() - this could produce a result
+        // with only the lower limb, and the higher limb is not zeroed out).
+        rop.zero_unused_limbs();
+    }
+}
 } // namespace detail
 
 /// GCD (ternary version).
@@ -6788,8 +6847,6 @@ inline integer<SSize> &gcd(integer<SSize> &rop, const integer<SSize> &op1, const
             rop.set_zero();
         }
         static_gcd(rop._get_union().g_st(), op1._get_union().g_st(), op2._get_union().g_st());
-        // Currently GCD is always done via mpn. Make sure to zero the upper limbs, if needed.
-        rop._get_union().g_st().zero_unused_limbs();
         return rop;
     }
     if (sr) {
