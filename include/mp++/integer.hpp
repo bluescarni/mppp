@@ -518,10 +518,8 @@ inline bool check_no_nails(const ::mp_limb_t &l)
 inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
 {
     assert(check_no_nails(lo) && check_no_nails(hi));
-    const auto lonz = static_cast<unsigned>(lo != 0u);
-    const auto hinz = static_cast<unsigned>(hi != 0u);
-    // NOTE: this contraption ensures the correct result. The possibilities for hi/lo
-    // nonzero are:
+    const auto lonz = static_cast<unsigned>(lo != 0u), hinz = static_cast<unsigned>(hi != 0u);
+    // NOTE: this contraption ensures the correct result:
     // hi | lo | asize
     // -----------------------------
     //  1 |  1 | 1 * 2 + (0 & 1) = 2
@@ -1143,26 +1141,43 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 //   of the fact that std::copy() actually returns something. Longer term, we probably should add optional
 //   support for boost.serialization, cereal, etc.
 
-// NOTE: bits to keep in mind:
-// - the use of GMP_NUMB_MASK we make is not necessary currently, because the GMP API at the present time
-//   always expects and returns limbs with the nail bits set to zero (see the docs). So, in essence, we would
-//   need to take care of masking only in our specialised implementations of basic primitives (e.g., bit shifting).
-//   However, it is also mentioned in the GMP docs that in the future it *may* be possible that limbs with nonzero
-//   nail bits are allowed, and that's why we always mask when operating on the limbs. Removing the excessive masking
-//   is not too hard to do, see this commit for instance:
-//   30c23c8984d2955d19c35af84e7845dba88d94c0
-//   If in the future we want to remove the extra masking, we can take this commit as a starting point.
-// - regarding the zeroing of the upper limbs in static_int. The idea here is that, to implement optimised basic
-//   primitives for small static sizes, it is convenient to rely on the fact that unused limbs are zeroed out.
-//   This has a series of consequences:
-//   - whenever we write into the static int, we must take care of zeroing out the upper limbs
-//     that are unused in the representation of the current value. This holds both when using the mpn_ functions
-//     and when implementing our own specialised primitives;
-//   - if the static size is small, we can copy/assign limb arrays around without caring for the effective size, as
-//     all limbs are always initialised to some value. With large static size, we cannot do that as the upper
-//     limbs are not necessarily inited;
-//   - if the static size is small, we can just peek into the limbs without caring for the real size, this saves
-//     branching (see the odd_p() implementation for instance).
+// NOTE: about the nails:
+// - whenever we need to read the *numerical value* of a limb (e.g., in our optimised primitives),
+//   we don't make any assumption about nail bits. That is, we assume that anything could be in that bit,
+//   so we always mask the limb read with GMP_NUMB_MASK (which, today, is a no-op on virtually all setups).
+//   This ensures that we are actually working with a subsection of a multiprecision value, uncontaminated
+//   by extraneous bits. If, on the other hand, we are just doing a copy of the limb we don't care about
+//   the nail bit as we are not using the numerical value of the limb, and any extraneous bit has no
+//   consequence on any computation.
+// - If we are using the mpz/mpn API, we don't care about nail bits because we assume that is handled by
+//   the GMP library itself. Not our problem.
+// - When we produce manually (i.e., without using the mpz/mpn API) some limb to be written out to
+//   an integer, we take care of ensuring that no nail bits are set. This is actually currently required
+//   by the GMP API:
+//
+//   "All the mpn functions accepting limb data will expect the nail bits to be zero on entry, and will
+//    return data with the nails similarly all zero."
+//
+//    Again, this masking before writing will be a no-op in most cases. And in many cases we don't have
+//    to do anything explicitly as many of our primitives require no nails or they just don't end up
+//    writing into nail bits (see the shift operators for an exception to this).
+// - This whole topic of nails is at this time largely academic and unlikely to have any real impact,
+//   as it seems like nobody builds GMP with nails support nowadays. If we ever want to get rid of
+//   all the masking, see commit 30c23c8984d2955d19c35af84e7845dba88d94c0 for a starting point.
+
+// NOTE: about the zeroing of the upper limbs in static_int:
+// - the idea here is that, to implement optimised basic primitives for small static sizes, it is convenient
+//   to rely on the fact that unused limbs are zeroed out. This can reduce branching and it generally
+//   simplifies the code.
+// - Because of this, whenever we write into a "small" static int, we must take care of zeroing out the upper limbs
+//   that are unused in the representation of the current value. This holds both when using the mpn/mpz functions
+//   and when implementing our own specialised primitives (note however that if we can prove that we are calling mpn
+//   or mpz on a non-small integer, then we can omit the call to zero_upper_limbs() - we do this occasionally).
+// - If the static size is small, we can copy/assign limb arrays around without caring for the effective size, as
+//   all limbs are always initialised to some value. With large static size, we cannot do that as the upper
+//   limbs are not necessarily inited.
+// - Contrary to the nail business, ensuring that the upper limbs are zeroed is essential, and it is something
+//   we check in the unit tests.
 
 /// Multiprecision integer class.
 /**
@@ -4625,7 +4640,7 @@ inline std::size_t static_mul_2exp(static_int<1> &rop, const static_int<1> &n, s
         // The two conditions:
         // - if the shift is >= number of data bits, the operation will certainly
         //   fail (as the operand is nonzero);
-        // - shifting by s would overflow  the single limb.
+        // - shifting by s would overflow the single limb.
         // NOTE: s is at least 1, so in the right shift above we never risk UB due to too much shift.
         // NOTE: for the size hint: s / nbits is the number of entire limbs shifted, +1 because the shifted
         // limbs add to the current size (1), +1 because another limb might be needed.
@@ -6788,8 +6803,12 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
     // Testing however shows that mpn_gcd_1() is quite well optimised, so let's
     // use it and keep in mind the option about the binary GCD for the future.
     // NOTE: at the commit c146af86e416cf1348d0b3fc454600b47b523f4f we have an implementation
-    // of the binary GCD which I think should be suitable for 2-limb statics (with some
-    // extensions to the ctz builtins for 128-bit ints).
+    // of the binary GCD, just in case.
+    // NOTE: currently, the binary GCD is faster on Zen processors, but I believe
+    // that is because the current GMP version does not have optimised GCD assembly for Zen.
+    // We need to benchmark again when the next GMP version comes out. If the binary GCD
+    // is still faster, we should consider using it instead of mpn_gcd_1(), as even on Intel
+    // processors the binary GCD is only marginally slower than mpn_gcd_1().
     rop.m_limbs[0] = ::mpn_gcd_1(op1.m_limbs.data(), static_cast<::mp_size_t>(1), op2.m_limbs[0]);
 }
 

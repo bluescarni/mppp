@@ -307,3 +307,24 @@ with 2 limbs of static size are employed.
 .. figure:: _static/integer2_vec_lshift_signed.png
    :scale: 50%
    :align: center
+
+GCD
+^^^
+
+In this benchmark we compute the element-wise GCD of two randomly-generated vectors of
+size :math:`3\times 10^7`, followed by the sum of all the values in the GCD vector.
+
+1-limb signed integers
+........................
+
+In this setup, the vectors are initialised with small positive *and* negative values with an average size, in bits,
+of approximately 49. All the computations fit within a single 64-bit word, and mp++ integers with 1 limb of static size are employed.
+
+.. note::
+
+   Due to the current lack of an optimised assembly implementation of GCD primitives for Ryzen processors in GMP, this test
+   was run on an Intel Xeon E5-2698 v4 CPU instead.
+
+.. figure:: _static/integer1_vec_gcd_signed.png
+   :scale: 50%
+   :align: center
