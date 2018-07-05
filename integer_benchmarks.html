@@ -292,6 +292,24 @@ with 2 limbs of static size are employed.</p>
 </div>
 </div>
 </div>
+<div class="section" id="gcd">
+<h2>GCD<a class="headerlink" href="#gcd" title="Permalink to this headline">¶</a></h2>
+<p>In this benchmark we compute the element-wise GCD of two randomly-generated vectors of
+size <span class="math">\(3\times 10^7\)</span>, followed by the sum of all the values in the GCD vector.</p>
+<div class="section" id="id19">
+<h3>1-limb signed integers<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<p>In this setup, the vectors are initialised with small positive <em>and</em> negative values with an average size, in bits,
+of approximately 49. All the computations fit within a single 64-bit word, and mp++ integers with 1 limb of static size are employed.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Due to the current lack of an optimised assembly implementation of GCD primitives for Ryzen processors in GMP, this test
+was run on an Intel Xeon E5-2698 v4 CPU instead.</p>
+</div>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/integer1_vec_gcd_signed.png"><img alt="_images/integer1_vec_gcd_signed.png" src="_images/integer1_vec_gcd_signed.png" style="width: 610.0px; height: 407.0px;" /></a>
+</div>
+</div>
+</div>
 </div>
 
 
@@ -336,6 +354,10 @@ with 2 limbs of static size are employed.</p>
 <li><a class="reference internal" href="#id16">1-limb signed integers</a></li>
 <li><a class="reference internal" href="#id17">2-limb unsigned integers</a></li>
 <li><a class="reference internal" href="#id18">2-limb signed integers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gcd">GCD</a><ul>
+<li><a class="reference internal" href="#id19">1-limb signed integers</a></li>
 </ul>
 </li>
 </ul>
