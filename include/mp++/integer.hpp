@@ -518,17 +518,17 @@ inline bool check_no_nails(const ::mp_limb_t &l)
 inline mpz_size_t size_from_lohi(const ::mp_limb_t &lo, const ::mp_limb_t &hi)
 {
     assert(check_no_nails(lo) && check_no_nails(hi));
+    const auto lonz = static_cast<unsigned>(lo != 0u);
+    const auto hinz = static_cast<unsigned>(hi != 0u);
     // NOTE: this contraption ensures the correct result. The possibilities for hi/lo
     // nonzero are:
-    // hi | lo | asize | idx
-    // ---------------------
-    //  1 |  1 |     2 |   3
-    //  1 |  0 |     2 |   2
-    //  0 |  1 |     1 |   1
-    //  0 |  0 |     0 |   0
-    constexpr std::int_least8_t table[] = {0, 1, 2, 2};
-    const auto idx = (lo != 0u) + ((hi != 0u) << 1);
-    return static_cast<mpz_size_t>(table[idx]);
+    // hi | lo | asize
+    // -----------------------------
+    //  1 |  1 | 1 * 2 + (0 & 1) = 2
+    //  1 |  0 | 1 * 2 + (0 & 0) = 2
+    //  0 |  1 | 0 * 2 + (1 & 1) = 1
+    //  0 |  0 | 0 * 2 + (1 & 0) = 0
+    return static_cast<mpz_size_t>(hinz * 2u + (static_cast<unsigned>(!hinz) & lonz));
 }
 
 // Branchless sign function for C++ integrals:
