@@ -27,8 +27,8 @@
 
 // clang-cl supports __builtin_expect().
 #if defined(__clang__)
-#define mppp_likely(x) __builtin_expect(!!(x), 1)
-#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
+#define mppp_likely(x) __builtin_expect(static_cast<bool>(x), 1)
+#define mppp_unlikely(x) __builtin_expect(static_cast<bool>(x), 0)
 #else
 #define mppp_likely(x) (x)
 #define mppp_unlikely(x) (x)
@@ -37,8 +37,8 @@
 
 #elif defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
 
-#define mppp_likely(x) __builtin_expect(!!(x), 1)
-#define mppp_unlikely(x) __builtin_expect(!!(x), 0)
+#define mppp_likely(x) __builtin_expect(static_cast<bool>(x), 1)
+#define mppp_unlikely(x) __builtin_expect(static_cast<bool>(x), 0)
 #define MPPP_RESTRICT __restrict
 
 #else
