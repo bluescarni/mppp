@@ -13,6 +13,7 @@ New
 Changes
 ~~~~~~~
 
+- Update the internal copy of Catch to the latest version, 2.4.0 (`#152 <https://github.com/bluescarni/mppp/pull/152>`__).
 - Various improvements to the GCD implementation for :cpp:class:`~mppp::integer`
   (`#150 <https://github.com/bluescarni/mppp/pull/150>`__).
 - The addition/subtraction operators of :cpp:class:`~mppp::integer` now use the low-level :cpp:func:`~mppp::add_ui()`,
