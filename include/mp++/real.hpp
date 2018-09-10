@@ -428,8 +428,12 @@ inline ::mpfr_prec_t real_dd_prec(const T &x)
 // Doxygen gets confused by this.
 #if !defined(MPPP_DOXYGEN_INVOKED)
 
-// Special initialisation tags for real
-enum class real_kind { nan = MPFR_NAN_KIND, inf = MPFR_INF_KIND, zero = MPFR_ZERO_KIND };
+// Special initialisation tags for real.
+enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
+    nan = MPFR_NAN_KIND,
+    inf = MPFR_INF_KIND,
+    zero = MPFR_ZERO_KIND
+};
 
 #endif
 
@@ -707,6 +711,18 @@ public:
             case real_kind::zero:
                 set_zero(sign);
                 break;
+            default:
+                // Clean up before throwing.
+                ::mpfr_clear(&m_mpfr);
+                throw std::invalid_argument(
+                    "The 'real_kind' value passed to the constructor of a real ("
+                    + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(k))
+                    + ") is not one of the three allowed values ('nan'="
+                    + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(real_kind::nan))
+                    + ", 'inf'="
+                    + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(real_kind::inf))
+                    + " and 'zero'="
+                    + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(real_kind::zero)) + ")");
         }
     }
     /// Constructor from a special value and precision.

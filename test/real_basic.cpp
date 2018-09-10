@@ -596,6 +596,21 @@ TEST_CASE("real kind constructors")
                == std::string{"Cannot init a real with an automatically-deduced precision if "
                               "the global default precision has not been set"};
     });
+    // Wrong value for the real_kind enum.
+    REQUIRE_THROWS_PREDICATE(
+        (real{real_kind(MPFR_NAN_KIND + MPFR_INF_KIND + MPFR_ZERO_KIND), 12}), std::invalid_argument,
+        [](const std::invalid_argument &ex) {
+            return ex.what()
+                   == "The 'real_kind' value passed to the constructor of a real ("
+                          + std::to_string(MPFR_NAN_KIND + MPFR_INF_KIND + MPFR_ZERO_KIND)
+                          + ") is not one of the three allowed values ('nan'="
+                          + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(real_kind::nan))
+                          + ", 'inf'="
+                          + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(real_kind::inf))
+                          + " and 'zero'="
+                          + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(real_kind::zero))
+                          + ")";
+        });
 }
 
 struct int_ass_tester {
