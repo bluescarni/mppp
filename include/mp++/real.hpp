@@ -1738,6 +1738,8 @@ public:
     }
     /// Get the sign bit.
     /**
+     * The sign bit is set if ``this`` is negative, -0, or a NaN whose representation has its sign bit set.
+     *
      * @return the sign bit of \p this.
      */
     bool signbit() const
@@ -3120,6 +3122,8 @@ inline int sgn(const real &r)
 
 /// Get the sign bit of a \link mppp::real real\endlink.
 /**
+ * The sign bit is set if ``r`` is negative, -0, or a NaN whose representation has its sign bit set.
+ *
  * @param r the \link mppp::real real\endlink that will be examined.
  *
  * @return the sign bit of \p r.
