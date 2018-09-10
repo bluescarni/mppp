@@ -37,15 +37,15 @@ Among the features specific to :cpp:class:`~mppp::integer` we find:
 
 * specialised arithmetic primitives (fused multiply-add/sub, addition/subtraction with C++ unsigned
   integrals, ...),
-* functionality related to prime numbers (:cpp:func:`~mppp::probab_prime_p()`, :cpp:func:`~mppp::nextprime()`, ...),
+* prime numbers functions (:cpp:func:`~mppp::probab_prime_p()`, :cpp:func:`~mppp::nextprime()`, ...),
 * parity detection (:cpp:func:`~mppp::even_p()`, :cpp:func:`~mppp::odd_p()`),
 * several additional :ref:`division functions <integer_division>`,
 * :ref:`number-theoretic functions <integer_ntheory>` (GCD, factorial, binomial coefficient, ...),
 * integer :ref:`roots <integer_roots>` and :ref:`exponentiation <integer_exponentiation>`,
-* hashing (including a specialisation of ``std::hash``, so that it is possible to use
+* hashing (including a :ref:`specialisation <integer_std_specialisations>` of ``std::hash``, so that it is possible to use
   :cpp:class:`~mppp::integer` in standard unordered containers out of the box),
-* various utility functions specific to :cpp:class:`~mppp::integer` objects (detect size in bits/limbs,
-  detect and/or promote/demote storage type, ...).
+* binary :ref:`serialisation <tutorial_integer_s11n>`,
+* various utility functions (detect size in bits/limbs, detect and/or promote/demote storage type, ...).
 
 Many of these features, which are documented in detail in the :ref:`integer reference <integer_reference>`, are available
 in multiple overloads, often both as free and member functions.

@@ -69,7 +69,7 @@ a few additional capabilities:
   functions are available;
 * a few :ref:`exponentiation <rational_exponentiation>` and :ref:`number-theoretic <rational_ntheory>`
   functions are available;
-* like :cpp:class:`~mppp::integer`, :cpp:class:`~mppp::rational` also provides a specialisation
+* like :cpp:class:`~mppp::integer`, :cpp:class:`~mppp::rational` also provides a :ref:`specialisation <rational_std_specialisations>`
   of ``std::hash`` for use in the standard unordered containers.
 
 Many of these features, which are documented in detail in the :ref:`rational reference <rational_reference>`, are available

@@ -103,7 +103,9 @@ Let's take a look at an example of a pybind11 module enabling automatic translat
 
 Note that we have exposed functions which just return a copy of their input parameter.
 This will allow us to verify that the automatic translation between mp++ and Python objects
-works as intended. Now let's try to call the exposed functions from Python:
+works as intended. Now, assuming that we have built the code above into a Python extension
+called ``pybind11_test_01`` (see the `pybind11 documentation <https://pybind11.readthedocs.io/en/master/compiling.html>`__
+for details), we can try to call the exposed functions from Python:
 
 >>> import pybind11_test_01 as p
 >>> from fractions import Fraction as F
@@ -144,8 +146,6 @@ Traceback (most recent call last):
      ...
 TypeError: test_real128_conversion(): incompatible function arguments. The following argument types are supported:
     1. (arg0: mppp::real128) -> mppp::real128
-<BLANKLINE>
-Invoked with: mpf('1.09999999999999999999999999999999998')
 
 A :cpp:class:`~mppp::real128` will be successfully converted to an ``mpf`` iff the current mpmath working precision is exactly 113.
 A :cpp:class:`~mppp::real` will be successfully converted to an ``mpf`` iff its precision is not greater than the current mpmath working precision:

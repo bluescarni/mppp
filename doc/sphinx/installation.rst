@@ -3,6 +3,9 @@
 Installation
 ============
 
+Introduction
+------------
+
 mp++ is written in modern C++, and it requires a compiler able to understand at least C++11
 (mp++ will also use some features from C++14 and C++17, if supported by the compiler). mp++ is known to run
 on the following setups:
