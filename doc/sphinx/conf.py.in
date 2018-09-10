@@ -366,6 +366,11 @@ latex_engine = 'xelatex'
 #
 # latex_domain_indices = True
 
+# NOTE: sphinx 1.8 adds an option for using xindy instead of makeindex,
+# enabled by default. Turn this off for the time being as it adds
+# yet another dependency to the latex toolchain and it is still unclear
+# to me what the advantages are.
+latex_use_xindy = False
 
 # -- Options for manual page output ---------------------------------------
 
