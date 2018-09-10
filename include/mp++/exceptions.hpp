@@ -18,7 +18,7 @@ namespace mppp
 /**
  * \rststar
  * This exception inherits all members (including constructors) from
- * `std::domain_error <http://en.cppreference.com/w/cpp/error/domain_error>`_. It will be thrown
+ * `std::domain_error <https://en.cppreference.com/w/cpp/error/domain_error>`_. It will be thrown
  * when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
  * represent infinities.
  * \endrststar
@@ -26,6 +26,6 @@ namespace mppp
 struct zero_division_error final : std::domain_error {
     using std::domain_error::domain_error;
 };
-}
+} // namespace mppp
 
 #endif

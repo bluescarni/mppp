@@ -141,18 +141,18 @@ is typically built on top of basic :ref:`functions <rational_functions>`.
 Standard library specialisations
 --------------------------------
 
-.. cpp:class:: template <size_t SSize> std::hash<mppp::rational<SSize>>
+.. cpp:class:: template <std::size_t SSize> std::hash<mppp::rational<SSize>>
 
    Specialisation of ``std::hash`` for :cpp:class:`mppp::rational`.
 
    .. cpp:type:: public argument_type = mppp::rational<SSize>
-   .. cpp:type:: public result_type = size_t
+   .. cpp:type:: public result_type = std::size_t
 
    .. note::
 
       The :cpp:type:`argument_type` and :cpp:type:`result_type` type aliases are defined only until C++14.
 
-   .. cpp:function:: public size_t operator()(const mppp::rational<SSize> &q) const
+   .. cpp:function:: public std::size_t operator()(const mppp::rational<SSize> &q) const
 
       :param q: the input :cpp:class:`mppp::rational`.
 
