@@ -205,7 +205,7 @@ Standard library specialisations
    .. cpp:member:: public static constexpr int radix = 2
    .. cpp:member:: public static constexpr int min_exponent = -16381
    .. cpp:member:: public static constexpr int min_exponent10 = -4931
-   .. cpp:member:: public static constexpr int max_exponent = 16384;
+   .. cpp:member:: public static constexpr int max_exponent = 16384
    .. cpp:member:: public static constexpr int max_exponent10 = 4931
    .. cpp:member:: public static constexpr bool has_infinity = true
    .. cpp:member:: public static constexpr bool has_quiet_NaN = true

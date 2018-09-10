@@ -1,116 +1,256 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    
     <title>Integer benchmarks &#8212; mp++ 0.12 documentation</title>
-    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
+
+    <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.12',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <link rel="stylesheet" type="text/css" href="_static/notosanscjkjp.css" />
+    <link rel="stylesheet" type="text/css" href="_static/roboto.css" />
+    <link rel="stylesheet" type="text/css" href="_static/material-design-lite-1.3.0/material.blue_grey-indigo.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_materialdesign_theme.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/sphinx_materialdesign_theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Changelog" href="changelog.html" />
-    <link rel="prev" title="Benchmarks" href="benchmarks.html" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-<!--[if lte IE 6]>
-<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
-<![endif]-->
-
+    <link rel="prev" title="Benchmarks" href="benchmarks.html" /> 
   </head>
-  <body>
+<body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-drawer"><header class="mdl-layout__header mdl-layout__header--waterfall ">
+    <div class="mdl-layout__header-row">
+        
+        <nav class="mdl-navigation breadcrumb">
+            <a class="mdl-navigation__link" href="benchmarks.html">Benchmarks</a><i class="material-icons">navigate_next</i>
+            <a class="mdl-navigation__link is-active">Integer benchmarks</a>
+        </nav>
+        <div class="mdl-layout-spacer"></div>
+        <nav class="mdl-navigation">
+        
+<form class="form-inline pull-sm-right" action="search.html" method="get">
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
+        <label id="quick-search-icon" class="mdl-button mdl-js-button mdl-button--icon"  for="waterfall-exp">
+            <i class="material-icons">search</i>
+        </label>
+        <div class="mdl-textfield__expandable-holder">
+          <input class="mdl-textfield__input" type="text" name="q"  id="waterfall-exp" placeholder="Search" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </div>
+      </div>
+      <div class="mdl-tooltip" data-mdl-for="quick-search-icon">
+      Quick search
+      </div>
+</form>
+        
+<a id="button-show-source"
+    class="mdl-button mdl-js-button mdl-button--icon"
+    href="_sources/integer_benchmarks.rst.txt" rel="nofollow">
+<i class="material-icons">code</i>
+</a>
+<div class="mdl-tooltip" data-mdl-for="button-show-source">
+Show Source
+</div>
+        </nav>
+    </div>
+    <div class="mdl-layout__header-row header-links">
+      <div class="mdl-layout-spacer"></div>
+      <nav class="mdl-navigation">
+          <a  class="mdl-navigation__link" href="index.html">
+                  <i class="material-icons navigation-link-icon">home</i>
+                  Home
+              </a>
+          
+              <a  class="mdl-navigation__link" href="https://github.com/bluescarni/mppp">
+                  <i class="material-icons navigation-link-icon">link</i>
+                  GitHub
+              </a>
+      </nav>
+    </div>
+</header><header class="mdl-layout__drawer">
+    
+          <!-- Title -->
+      <span class="mdl-layout-title">
+          <a class="title" href="index.html">
+              <span class="title-text">
+                  mp++
+              </span>
+          </a>
+      </span>
+    
+    
+      <div class="globaltoc">
+        <span class="mdl-layout-title toc">Table Of Contents</span>
+        
+        
+            
+            <nav class="mdl-navigation">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_constr.html">Construction, conversion and assignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_io.html">Input and output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_numtower.html">The numerical tower and type coercion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_commonops.html">Common operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Integer benchmarks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
 
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="changelog.html" title="Changelog"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="benchmarks.html" title="Benchmarks"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.12 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="benchmarks.html" accesskey="U">Benchmarks</a> &#187;</li> 
-      </ul>
-    </div>  
+            </nav>
+        
+        </div>
+    
+</header>
+        <main class="mdl-layout__content" tabIndex="0">
+<header class="mdl-layout__drawer">
+    
+          <!-- Title -->
+      <span class="mdl-layout-title">
+          <a class="title" href="index.html">
+              <span class="title-text">
+                  mp++
+              </span>
+          </a>
+      </span>
+    
+    
+      <div class="globaltoc">
+        <span class="mdl-layout-title toc">Table Of Contents</span>
+        
+        
+            
+            <nav class="mdl-navigation">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_constr.html">Construction, conversion and assignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_io.html">Input and output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_numtower.html">The numerical tower and type coercion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_commonops.html">Common operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Integer benchmarks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            </nav>
+        
+        </div>
+    
+</header>
 
     <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+        <div class="page-content">
+        
   <div class="section" id="integer-benchmarks">
 <h1>Integer benchmarks<a class="headerlink" href="#integer-benchmarks" title="Permalink to this headline">¶</a></h1>
 <p>For each benchmarked library, the timings in the bar charts are split into three parts:</p>
 <ul class="simple">
-<li>the <code class="docutils literal"><span class="pre">init</span></code> bar, which accounts for the time needed for the initialisation of the benchmark data,</li>
-<li>the <code class="docutils literal"><span class="pre">operation</span></code> bar, which represents the time needed to actually perform the operation being benchmarked,</li>
-<li>the <code class="docutils literal"><span class="pre">total</span></code> bar, which represents the total runtime of the benchmark.</li>
+<li>the <code class="docutils literal notranslate"><span class="pre">init</span></code> bar, which accounts for the time needed for the initialisation of the benchmark data,</li>
+<li>the <code class="docutils literal notranslate"><span class="pre">operation</span></code> bar, which represents the time needed to actually perform the operation being benchmarked,</li>
+<li>the <code class="docutils literal notranslate"><span class="pre">total</span></code> bar, which represents the total runtime of the benchmark.</li>
 </ul>
 <p>The intent is to provide a breakdown which measures both the performance of the operation
 being benchmarked and the effect of the small value optimisation implemented in mp++ (the latter
 tends to have a noticeable impact in the initialisation phase of the benchmarks, which usually involves
-the creation of a large number of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects).</p>
+the creation of a large number of <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects).</p>
 <div class="section" id="dot-product">
 <span id="integer-dot-product"></span><h2>Dot product<a class="headerlink" href="#dot-product" title="Permalink to this headline">¶</a></h2>
 <p>This benchmark measures the time needed to compute the dot product of two integer vectors of size
-<span class="math">\(3\times 10^7\)</span> containing randomly-generated values. The multiply-add primitives of each library
+<span class="math notranslate nohighlight">\(3\times 10^7\)</span> containing randomly-generated values. The multiply-add primitives of each library
 are used for the accumulation of the dot product. The benchmark is run in a variety of different setups.</p>
 <div class="section" id="limb-unsigned-integers">
 <span id="integer1-dot-product-unsigned"></span><h3>1-limb unsigned integers<a class="headerlink" href="#limb-unsigned-integers" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values, and the final dot product
-is less than <span class="math">\(2^{64}\)</span>. mp++ integers with 1 limb of static size are employed. For this benchmark,
-we also include timings for 64-bit (<code class="docutils literal"><span class="pre">std::uint64_t</span></code>) and 128-bit (<code class="docutils literal"><span class="pre">__uint128_t</span></code>) integers.</p>
+is less than <span class="math notranslate nohighlight">\(2^{64}\)</span>. mp++ integers with 1 limb of static size are employed. For this benchmark,
+we also include timings for 64-bit (<code class="docutils literal notranslate"><span class="pre">std::uint64_t</span></code>) and 128-bit (<code class="docutils literal notranslate"><span class="pre">__uint128_t</span></code>) integers.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer1_dot_product_unsigned.png"><img alt="_images/integer1_dot_product_unsigned.png" src="_images/integer1_dot_product_unsigned.png" style="width: 609.5px; height: 407.0px;" /></a>
 </div>
-<p>It can be immediately seen how the initialisation cost for the <code class="docutils literal"><span class="pre">mpz_int</span></code> class is much higher than for the other
+<p>It can be immediately seen how the initialisation cost for the <code class="docutils literal notranslate"><span class="pre">mpz_int</span></code> class is much higher than for the other
 integer types. This is due to the fact that the GMP API always uses dynamically-allocated memory, even for small values.
 The other multiprecision integer types all employ a small-value optimisation, and thus avoid the performance cost of heap allocation.</p>
-<p>In this particular benchmark, mp++ is about 3 times faster than GMP (as measured via the <code class="docutils literal"><span class="pre">mpz_int</span></code> wrapper)
-in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark. mp++ is also faster than <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT, albeit by a smaller margin.
-With respect to the 64/128-bit hardware integer types, there are x4/x2 slowdowns in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark.</p>
+<p>In this particular benchmark, mp++ is about 3 times faster than GMP (as measured via the <code class="docutils literal notranslate"><span class="pre">mpz_int</span></code> wrapper)
+in the <code class="docutils literal notranslate"><span class="pre">operation</span></code> portion of the benchmark. mp++ is also faster than <code class="docutils literal notranslate"><span class="pre">cpp_int</span></code> and FLINT, albeit by a smaller margin.
+With respect to the 64/128-bit hardware integer types, there are x4/x2 slowdowns in the <code class="docutils literal notranslate"><span class="pre">operation</span></code> portion of the benchmark.</p>
 </div>
 <div class="section" id="limb-signed-integers">
 <h3>1-limb signed integers<a class="headerlink" href="#limb-signed-integers" title="Permalink to this headline">¶</a></h3>
 <p>This setup is almost identical to the <a class="reference internal" href="#integer1-dot-product-unsigned"><span class="std std-ref">previous one</span></a>, but this time the vectors
-are initialised with both positive <em>and</em> negative values. For this benchmark, we also include timings for 64-bit (<code class="docutils literal"><span class="pre">std::int64_t</span></code>)
-and 128-bit (<code class="docutils literal"><span class="pre">__int128_t</span></code>) integers.</p>
+are initialised with both positive <em>and</em> negative values. For this benchmark, we also include timings for 64-bit (<code class="docutils literal notranslate"><span class="pre">std::int64_t</span></code>)
+and 128-bit (<code class="docutils literal notranslate"><span class="pre">__int128_t</span></code>) integers.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer1_dot_product_signed.png"><img alt="_images/integer1_dot_product_signed.png" src="_images/integer1_dot_product_signed.png" style="width: 610.0px; height: 407.0px;" /></a>
 </div>
 <p>The presence of both positive and negative values has a noticeable performance impact with respect to the previous test
-for all libraries, both during the initialisation of the vectors and in the <code class="docutils literal"><span class="pre">operation</span></code> part of the benchmark.
+for all libraries, both during the initialisation of the vectors and in the <code class="docutils literal notranslate"><span class="pre">operation</span></code> part of the benchmark.
 This is due to the fact that sign handling in multiprecision computations is typically implemented
 with branches, and when positive and negative values are equally likely the effectiveness of the CPU’s branch predictor
 is much reduced.</p>
 <p>The performance advantage of mp++ with respect to the other libraries is retained, albeit by a smaller margin.
-With respect to the 64/128-bit hardware integer types, there are x10/x4 slowdowns in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark.
+With respect to the 64/128-bit hardware integer types, there are x10/x4 slowdowns in the <code class="docutils literal notranslate"><span class="pre">operation</span></code> portion of the benchmark.
 The worse slowdowns (with respect to the previous unsigned test) are due to the high number of mispredicted
 branches in this particular test.</p>
 </div>
 <div class="section" id="integer2-dot-product-unsigned">
 <span id="id1"></span><h3>2-limb unsigned integers<a class="headerlink" href="#integer2-dot-product-unsigned" title="Permalink to this headline">¶</a></h3>
 <p>This setup is the 2-limb version of the <a class="reference internal" href="#integer1-dot-product-unsigned"><span class="std std-ref">1-limb unsigned benchmark</span></a>:
-the vectors are initialised with larger non-negative values, the final result is less than <span class="math">\(2^{128}\)</span>, and
+the vectors are initialised with larger non-negative values, the final result is less than <span class="math notranslate nohighlight">\(2^{128}\)</span>, and
 mp++ integers with 2 limbs of static size are now employed.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer2_dot_product_unsigned.png"><img alt="_images/integer2_dot_product_unsigned.png" src="_images/integer2_dot_product_unsigned.png" style="width: 610.0px; height: 407.0px;" /></a>
@@ -129,7 +269,7 @@ non-negative values.</p>
 </div>
 <div class="section" id="vector-multiply-add">
 <span id="integer-vec-mul"></span><h2>Vector multiply-add<a class="headerlink" href="#vector-multiply-add" title="Permalink to this headline">¶</a></h2>
-<p>In this benchmark, we first compute the element-wise multiplication of two random vectors of size <span class="math">\(3\times 10^7\)</span>,
+<p>In this benchmark, we first compute the element-wise multiplication of two random vectors of size <span class="math notranslate nohighlight">\(3\times 10^7\)</span>,
 followed by the addition to another random vector of the same size. This workload allows to measure the efficiency
 of the multiplication and addition operations (whereas in the dot product benchmark the multiply-add primitives were
 employed), and it also increases the pressure on the memory subsystem (due to the need to write into large vectors
@@ -138,25 +278,25 @@ instead of accumulating the result into a single scalar).</p>
 <span id="id3"></span><h3>1-limb unsigned integers<a class="headerlink" href="#integer1-vec-mul-unsigned" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values.
 mp++ integers with 1 limb of static size are employed. For this benchmark,
-we also include timings for 64-bit (<code class="docutils literal"><span class="pre">std::uint64_t</span></code>) and 128-bit (<code class="docutils literal"><span class="pre">__uint128_t</span></code>) integers.</p>
+we also include timings for 64-bit (<code class="docutils literal notranslate"><span class="pre">std::uint64_t</span></code>) and 128-bit (<code class="docutils literal notranslate"><span class="pre">__uint128_t</span></code>) integers.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer1_vec_mul_unsigned.png"><img alt="_images/integer1_vec_mul_unsigned.png" src="_images/integer1_vec_mul_unsigned.png" style="width: 610.0px; height: 407.0px;" /></a>
 </div>
-<p>This time mp++ is more than 5 times faster than GMP in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark, while still maintaining
-a performance advantage over <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT.
-The slowdown in the <code class="docutils literal"><span class="pre">operation</span></code> part of the benchmark with respect to 64-bit integers is less than x3, while mp++ performs
+<p>This time mp++ is more than 5 times faster than GMP in the <code class="docutils literal notranslate"><span class="pre">operation</span></code> portion of the benchmark, while still maintaining
+a performance advantage over <code class="docutils literal notranslate"><span class="pre">cpp_int</span></code> and FLINT.
+The slowdown in the <code class="docutils literal notranslate"><span class="pre">operation</span></code> part of the benchmark with respect to 64-bit integers is less than x3, while mp++ performs
 similarly to 128-bit integers for this particular test.</p>
 </div>
 <div class="section" id="id4">
 <h3>1-limb signed integers<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the vectors are initialised with both positive <em>and</em> negative values. For this benchmark, we also include
-timings for 64-bit (<code class="docutils literal"><span class="pre">std::int64_t</span></code>) and 128-bit (<code class="docutils literal"><span class="pre">__int128_t</span></code>) integers.</p>
+timings for 64-bit (<code class="docutils literal notranslate"><span class="pre">std::int64_t</span></code>) and 128-bit (<code class="docutils literal notranslate"><span class="pre">__int128_t</span></code>) integers.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer1_vec_mul_signed.png"><img alt="_images/integer1_vec_mul_signed.png" src="_images/integer1_vec_mul_signed.png" style="width: 610.0px; height: 407.0px;" /></a>
 </div>
 <p>We can see again how the introduction of mixed positive and negative values impacts performance negatively with respect
 to the <a class="reference internal" href="#integer1-vec-mul-unsigned"><span class="std std-ref">unsigned setup</span></a>.
-With respect to the 64/128-bit hardware integer types, there are x4/x2 slowdowns in the <code class="docutils literal"><span class="pre">operation</span></code> portion of the benchmark.</p>
+With respect to the 64/128-bit hardware integer types, there are x4/x2 slowdowns in the <code class="docutils literal notranslate"><span class="pre">operation</span></code> portion of the benchmark.</p>
 </div>
 <div class="section" id="integer2-vec-mul-unsigned">
 <span id="id5"></span><h3>2-limb unsigned integers<a class="headerlink" href="#integer2-vec-mul-unsigned" title="Permalink to this headline">¶</a></h3>
@@ -179,7 +319,7 @@ mp++ integers with 2 limbs of static size are now employed.</p>
 <div class="section" id="vector-division">
 <h2>Vector division<a class="headerlink" href="#vector-division" title="Permalink to this headline">¶</a></h2>
 <p>In this benchmark we compute the element-wise division with remainder of two randomly-generated vectors of
-size <span class="math">\(3\times 10^7\)</span>, followed by the sum of all the values in the quotient vector.</p>
+size <span class="math notranslate nohighlight">\(3\times 10^7\)</span>, followed by the sum of all the values in the quotient vector.</p>
 <div class="section" id="integer1-vec-div-unsigned">
 <span id="id7"></span><h3>1-limb unsigned integers<a class="headerlink" href="#integer1-vec-div-unsigned" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the integer vectors are initialised with small <em>non-negative</em> values.
@@ -219,15 +359,15 @@ mp++ integers with 2 limbs of static size are now employed.</p>
 </div>
 <div class="section" id="sorting">
 <h2>Sorting<a class="headerlink" href="#sorting" title="Permalink to this headline">¶</a></h2>
-<p>This benchmark consists of the sorting (via <code class="docutils literal"><span class="pre">std::sort()</span></code>) of a randomly-generated vector of <span class="math">\(3\times 10^7\)</span> integers.</p>
+<p>This benchmark consists of the sorting (via <code class="docutils literal notranslate"><span class="pre">std::sort()</span></code>) of a randomly-generated vector of <span class="math notranslate nohighlight">\(3\times 10^7\)</span> integers.</p>
 <div class="section" id="id11">
 <h3>1-limb unsigned integers<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the integer vector is initialised with small <em>non-negative</em> values. mp++ integers with 1 limb of static size are employed.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer1_sort_unsigned.png"><img alt="_images/integer1_sort_unsigned.png" src="_images/integer1_sort_unsigned.png" style="width: 610.0px; height: 407.0px;" /></a>
 </div>
-<p>Here again it can be seen how the small-value optimisation implemented in mp++, <code class="docutils literal"><span class="pre">cpp_int</span></code> and FLINT pays off on large
-datasets with respect to plain GMP integers. mp++ shows a modest performance increase with respect to <code class="docutils literal"><span class="pre">cpp_int</span></code>
+<p>Here again it can be seen how the small-value optimisation implemented in mp++, <code class="docutils literal notranslate"><span class="pre">cpp_int</span></code> and FLINT pays off on large
+datasets with respect to plain GMP integers. mp++ shows a modest performance increase with respect to <code class="docutils literal notranslate"><span class="pre">cpp_int</span></code>
 and FLINT.</p>
 </div>
 <div class="section" id="id12">
@@ -239,7 +379,7 @@ and FLINT.</p>
 </div>
 <div class="section" id="id13">
 <h3>2-limb unsigned integers<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
-<p>In this setup, the integer vector is initialised with <em>non-negative</em> values in the <span class="math">\(\left[2^{64},2^{128}\right)\)</span> range.
+<p>In this setup, the integer vector is initialised with <em>non-negative</em> values in the <span class="math notranslate nohighlight">\(\left[2^{64},2^{128}\right)\)</span> range.
 mp++ integers with 2 limbs of static size are employed.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer2_sort_unsigned.png"><img alt="_images/integer2_sort_unsigned.png" src="_images/integer2_sort_unsigned.png" style="width: 610.0px; height: 407.0px;" /></a>
@@ -247,7 +387,7 @@ mp++ integers with 2 limbs of static size are employed.</p>
 </div>
 <div class="section" id="id14">
 <h3>2-limb signed integers<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
-<p>In this setup, the vector is initialised with both positive <em>and</em> negative values in the <span class="math">\(\left(-2^{128},2^{128}\right)\)</span> range.
+<p>In this setup, the vector is initialised with both positive <em>and</em> negative values in the <span class="math notranslate nohighlight">\(\left(-2^{128},2^{128}\right)\)</span> range.
 mp++ integers with 2 limbs of static size are employed.</p>
 <div class="figure align-center">
 <a class="reference internal image-reference" href="_images/integer2_sort_signed.png"><img alt="_images/integer2_sort_signed.png" src="_images/integer2_sort_signed.png" style="width: 610.0px; height: 407.0px;" /></a>
@@ -256,7 +396,7 @@ mp++ integers with 2 limbs of static size are employed.</p>
 </div>
 <div class="section" id="left-bit-shift">
 <h2>Left bit shift<a class="headerlink" href="#left-bit-shift" title="Permalink to this headline">¶</a></h2>
-<p>This benchmark consists of the element-wise left bit shifting of a randomly-generated vector of <span class="math">\(3\times 10^7\)</span> integers.</p>
+<p>This benchmark consists of the element-wise left bit shifting of a randomly-generated vector of <span class="math notranslate nohighlight">\(3\times 10^7\)</span> integers.</p>
 <div class="section" id="id15">
 <h3>1-limb unsigned integers<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the integer vector is initialised with small <em>non-negative</em> values, which are then left bit shifted
@@ -275,7 +415,7 @@ by a small random amount (so that the result always fits into a machine word). m
 </div>
 <div class="section" id="id17">
 <h3>2-limb unsigned integers<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
-<p>In this setup, the integer vector is initialised with <em>non-negative</em> values in the <span class="math">\(\left[2^{64},2^{128}\right)\)</span> range,
+<p>In this setup, the integer vector is initialised with <em>non-negative</em> values in the <span class="math notranslate nohighlight">\(\left[2^{64},2^{128}\right)\)</span> range,
 which are then left bit shifted by a small random amount (so that the result always fits into 2 machine words). mp++ integers
 with 2 limbs of static size are employed.</p>
 <div class="figure align-center">
@@ -284,7 +424,7 @@ with 2 limbs of static size are employed.</p>
 </div>
 <div class="section" id="id18">
 <h3>2-limb signed integers<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
-<p>In this setup, the integer vector is initialised with positive <em>and</em> negative values in the <span class="math">\(\left(-2^{128},2^{128}\right)\)</span> range,
+<p>In this setup, the integer vector is initialised with positive <em>and</em> negative values in the <span class="math notranslate nohighlight">\(\left(-2^{128},2^{128}\right)\)</span> range,
 which are then left bit shifted by a small random amount (so that the result always fits into 2 machine words). mp++ integers
 with 2 limbs of static size are employed.</p>
 <div class="figure align-center">
@@ -295,7 +435,7 @@ with 2 limbs of static size are employed.</p>
 <div class="section" id="gcd">
 <h2>GCD<a class="headerlink" href="#gcd" title="Permalink to this headline">¶</a></h2>
 <p>In this benchmark we compute the element-wise GCD of two randomly-generated vectors of
-size <span class="math">\(3\times 10^7\)</span>, followed by the sum of all the values in the GCD vector.</p>
+size <span class="math notranslate nohighlight">\(3\times 10^7\)</span>, followed by the sum of all the values in the GCD vector.</p>
 <div class="section" id="id19">
 <h3>1-limb signed integers<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
 <p>In this setup, the vectors are initialised with small positive <em>and</em> negative values with an average size, in bits,
@@ -313,13 +453,14 @@ was run on an Intel Xeon E5-2698 v4 CPU instead.</p>
 </div>
 
 
-          </div>
         </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
+        <div class="side-doc-outline">
+            <div class="side-doc-outline--content"> 
+<div class="localtoc">
+    <p class="caption">
+      <span class="caption-text">Table Of Contents</span>
+    </p>
+    <ul>
 <li><a class="reference internal" href="#">Integer benchmarks</a><ul>
 <li><a class="reference internal" href="#dot-product">Dot product</a><ul>
 <li><a class="reference internal" href="#limb-unsigned-integers">1-limb unsigned integers</a></li>
@@ -364,45 +505,49 @@ was run on an Intel Xeon E5-2698 v4 CPU instead.</p>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="benchmarks.html"
-                        title="previous chapter">Benchmarks</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="changelog.html"
-                        title="next chapter">Changelog</a></p>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+            </div>
         </div>
-      </div>
+
       <div class="clearer"></div>
+    </div><div class="pagenation">
+     <a id="button-prev" href="benchmarks.html" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored" role="botton" accesskey="P">
+         <i class="pagenation-arrow-L material-icons">arrow_back</i>
+         <div class="pagenation-text">
+            <span class="pagenation-direction">Previous</span>
+            <div>Benchmarks</div>
+         </div>
+     </a>
+     <a id="button-next" href="changelog.html" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored" role="botton" accesskey="N">
+        <i class="pagenation-arrow-R material-icons">arrow_forward</i>
+        <div class="pagenation-text">
+            <span class="pagenation-direction">Next</span>
+            <div>Changelog</div>
+        </div>
+     </a>
+  </div>
+        <footer class="mdl-mini-footer">
+    <div class="mdl-mini-footer__left-section">
+      <div class="mdl-logo">mp++</div>
+      <div>
+        
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+      </div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="changelog.html" title="Changelog"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="benchmarks.html" title="Benchmarks"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.12 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="benchmarks.html" >Benchmarks</a> &#187;</li> 
-      </ul>
+
+    <div class="mdl-mini-footer__right-section">
+        <div>&copy; Copyright 2016-2018, Francesco Biscani.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.0b1 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2016-2018, Francesco Biscani.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+</footer>
+        </main>
     </div>
   </body>
 </html>

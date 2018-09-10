@@ -1,66 +1,206 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    
     <title>Construction, conversion and assignment &#8212; mp++ 0.12 documentation</title>
-    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
+
+    <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.12',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <link rel="stylesheet" type="text/css" href="_static/notosanscjkjp.css" />
+    <link rel="stylesheet" type="text/css" href="_static/roboto.css" />
+    <link rel="stylesheet" type="text/css" href="_static/material-design-lite-1.3.0/material.blue_grey-indigo.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_materialdesign_theme.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/sphinx_materialdesign_theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Input and output" href="tutorial_io.html" />
-    <link rel="prev" title="Preliminaries" href="tutorial_prelim.html" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-<!--[if lte IE 6]>
-<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
-<![endif]-->
-
+    <link rel="prev" title="Preliminaries" href="tutorial_prelim.html" /> 
   </head>
-  <body>
+<body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-drawer"><header class="mdl-layout__header mdl-layout__header--waterfall ">
+    <div class="mdl-layout__header-row">
+        
+        <nav class="mdl-navigation breadcrumb">
+            <a class="mdl-navigation__link" href="tutorial.html">Tutorial</a><i class="material-icons">navigate_next</i>
+            <a class="mdl-navigation__link is-active">Construction, conversion and assignment</a>
+        </nav>
+        <div class="mdl-layout-spacer"></div>
+        <nav class="mdl-navigation">
+        
+<form class="form-inline pull-sm-right" action="search.html" method="get">
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
+        <label id="quick-search-icon" class="mdl-button mdl-js-button mdl-button--icon"  for="waterfall-exp">
+            <i class="material-icons">search</i>
+        </label>
+        <div class="mdl-textfield__expandable-holder">
+          <input class="mdl-textfield__input" type="text" name="q"  id="waterfall-exp" placeholder="Search" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </div>
+      </div>
+      <div class="mdl-tooltip" data-mdl-for="quick-search-icon">
+      Quick search
+      </div>
+</form>
+        
+<a id="button-show-source"
+    class="mdl-button mdl-js-button mdl-button--icon"
+    href="_sources/tutorial_constr.rst.txt" rel="nofollow">
+<i class="material-icons">code</i>
+</a>
+<div class="mdl-tooltip" data-mdl-for="button-show-source">
+Show Source
+</div>
+        </nav>
+    </div>
+    <div class="mdl-layout__header-row header-links">
+      <div class="mdl-layout-spacer"></div>
+      <nav class="mdl-navigation">
+          <a  class="mdl-navigation__link" href="index.html">
+                  <i class="material-icons navigation-link-icon">home</i>
+                  Home
+              </a>
+          
+              <a  class="mdl-navigation__link" href="https://github.com/bluescarni/mppp">
+                  <i class="material-icons navigation-link-icon">link</i>
+                  GitHub
+              </a>
+      </nav>
+    </div>
+</header><header class="mdl-layout__drawer">
+    
+          <!-- Title -->
+      <span class="mdl-layout-title">
+          <a class="title" href="index.html">
+              <span class="title-text">
+                  mp++
+              </span>
+          </a>
+      </span>
+    
+    
+      <div class="globaltoc">
+        <span class="mdl-layout-title toc">Table Of Contents</span>
+        
+        
+            
+            <nav class="mdl-navigation">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Construction, conversion and assignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_io.html">Input and output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_numtower.html">The numerical tower and type coercion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_commonops.html">Common operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integer_benchmarks.html">Integer benchmarks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
 
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="tutorial_io.html" title="Input and output"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="tutorial_prelim.html" title="Preliminaries"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.12 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="tutorial.html" accesskey="U">Tutorial</a> &#187;</li> 
-      </ul>
-    </div>  
+            </nav>
+        
+        </div>
+    
+</header>
+        <main class="mdl-layout__content" tabIndex="0">
+<header class="mdl-layout__drawer">
+    
+          <!-- Title -->
+      <span class="mdl-layout-title">
+          <a class="title" href="index.html">
+              <span class="title-text">
+                  mp++
+              </span>
+          </a>
+      </span>
+    
+    
+      <div class="globaltoc">
+        <span class="mdl-layout-title toc">Table Of Contents</span>
+        
+        
+            
+            <nav class="mdl-navigation">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Construction, conversion and assignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_io.html">Input and output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_numtower.html">The numerical tower and type coercion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_commonops.html">Common operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integer_benchmarks.html">Integer benchmarks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            </nav>
+        
+        </div>
+    
+</header>
 
     <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+        <div class="page-content">
+        
   <div class="section" id="construction-conversion-and-assignment">
 <h1>Construction, conversion and assignment<a class="headerlink" href="#construction-conversion-and-assignment" title="Permalink to this headline">¶</a></h1>
 <p>All of mp++’s multiprecision classes default-construct to zero:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">;</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span>
 
 <span class="n">rat_t</span> <span class="n">q</span><span class="p">;</span>
@@ -77,72 +217,72 @@
 on curly brackets. Using the same syntax, it is possible to:</p>
 <ul class="simple">
 <li>initialise multiprecision objects from objects of (most of) C++’s numerical types (see the
-<a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal"><span class="pre">CppInteroperable</span></code></a> concept for a full list),</li>
+<a class="reference internal" href="concepts.html#_CPPv3I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> concept for a full list),</li>
 <li>initialise multiprecision objects from multiprecision objects of a different type,</li>
 <li>initialise C++ numerical objects from multiprecision objects.</li>
 </ul>
 <p>Let’s see a few examples:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
 <span class="kt">int</span> <span class="n">m</span><span class="p">{</span><span class="n">n</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">m</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In the code above, we are creating a multiprecision integer <code class="docutils literal"><span class="pre">n</span></code> from the C++ <code class="docutils literal"><span class="pre">int</span></code> literal <code class="docutils literal"><span class="pre">42</span></code>. We are then converting
-<code class="docutils literal"><span class="pre">n</span></code> back to <code class="docutils literal"><span class="pre">int</span></code>, and checking that the converted value is the original one. As a general rule, mp++ will strive
+<p>In the code above, we are creating a multiprecision integer <code class="docutils literal notranslate"><span class="pre">n</span></code> from the C++ <code class="docutils literal notranslate"><span class="pre">int</span></code> literal <code class="docutils literal notranslate"><span class="pre">42</span></code>. We are then converting
+<code class="docutils literal notranslate"><span class="pre">n</span></code> back to <code class="docutils literal notranslate"><span class="pre">int</span></code>, and checking that the converted value is the original one. As a general rule, mp++ will strive
 to preserve the exact input value during construction and conversion. If this is not possible, what happens next depends
-on the types and values involved. For instance, initialising an <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>
+on the types and values involved. For instance, initialising an <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
 with a floating-point value results in truncation:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mf">1.23</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mf">1.23</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In a similar fashion, initialising an <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> with a <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> also
+<p>In a similar fashion, initialising an <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> with a <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> also
 results in truncation:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">}};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">}};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
-<p><a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> cannot represent non-finite values, thus construction
+<p><a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> cannot represent non-finite values, thus construction
 from such values will raise an exception:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">infinity</span><span class="p">()};</span>  <span class="c1">// Raises std::domain_error.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">infinity</span><span class="p">()};</span>  <span class="c1">// Raises std::domain_error.</span>
 <span class="n">rat_t</span> <span class="n">q</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">quiet_NaN</span><span class="p">()};</span> <span class="c1">// Raises std::domain_error.</span>
 </pre></div>
 </div>
-<p>Construction of C++ integrals from <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> might fail
-in case of overflow, and it will produce the truncated value when constructing from <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">n</span><span class="p">{</span><span class="n">int_t</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="mi">1024</span><span class="p">};</span>         <span class="c1">// int construction from very large value,</span>
+<p>Construction of C++ integrals from <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> might fail
+in case of overflow, and it will produce the truncated value when constructing from <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">n</span><span class="p">{</span><span class="n">int_t</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="mi">1024</span><span class="p">};</span>         <span class="c1">// int construction from very large value,</span>
                                  <span class="c1">// raises std::overflow_error.</span>
 <span class="n">assert</span><span class="p">((</span><span class="kt">int</span><span class="p">{</span><span class="n">rat_t</span><span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">}}</span> <span class="o">==</span> <span class="mi">1</span><span class="p">));</span> <span class="c1">// int construction from rational truncates.</span>
 </pre></div>
 </div>
-<p>On the other hand, conversion of <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects to C++ floating-point types does not raise any error
+<p>On the other hand, conversion of <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects to C++ floating-point types does not raise any error
 even if it does not preserve the exact value:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="n">f</span><span class="p">{</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;32327737199221993919239912&quot;</span><span class="p">}};</span> <span class="c1">// Constructs a single-precision approximation</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="n">f</span><span class="p">{</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;32327737199221993919239912&quot;</span><span class="p">}};</span> <span class="c1">// Constructs a single-precision approximation</span>
                                               <span class="c1">// of the original integer.</span>
 </pre></div>
 </div>
 <p>The documentation of the multiprecision classes explains in detail the behaviour during construction and conversion.</p>
 <p>All of mp++’s multiprecision classes can also be initialised from string-like entities (see the
-<a class="reference internal" href="concepts.html#_CPPv2I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal"><span class="pre">StringType</span></code></a> concept for a full list). By default, string input is interpreted as the base-10 representation
+<a class="reference internal" href="concepts.html#_CPPv3I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">StringType</span></code></a> concept for a full list). By default, string input is interpreted as the base-10 representation
 of the desired value, and parsing follows (hopefully) intuitive rules:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-42&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mi">42</span><span class="p">)</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-42&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">rat_t</span><span class="p">{</span><span class="s">&quot;3/2&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="mf">1.5</span><span class="p">)</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">real128</span><span class="p">{</span><span class="s">&quot;2.5&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="mf">2.5</span><span class="p">);</span>
 <span class="n">assert</span><span class="p">((</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;-3.125E-2&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mf">0.03125</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>Note that for <a class="reference internal" href="real.html#_CPPv2N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal"><span class="pre">real</span></code></a> we need to provide the precision as an additional parameter when constructing from string (in
+<p>Note that for <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> we need to provide the precision as an additional parameter when constructing from string (in
 this specific example, 100 bits of precision are used). Depending on the multiprecision class, additional string constructors are available
 which allow to specify a different base for the representation of the value:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">((</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-101010&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mi">42</span><span class="p">))</span>          <span class="c1">// Base 2.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">((</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-101010&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mi">42</span><span class="p">))</span>          <span class="c1">// Base 2.</span>
 <span class="n">assert</span><span class="p">((</span><span class="n">rat_t</span><span class="p">{</span><span class="s">&quot;2a/1c&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">}</span> <span class="o">==</span> <span class="mf">1.5</span><span class="p">))</span>           <span class="c1">// Base 16.</span>
 <span class="n">assert</span><span class="p">((</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;7B.1&quot;</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">100</span><span class="p">}</span> <span class="o">==</span> <span class="mf">235.03125</span><span class="p">));</span> <span class="c1">// Base 32, 100 bits of precision.</span>
 </pre></div>
 </div>
 <p>It is of course also possible to assign values to already-constructed multiprecision objects. In general, the behaviour
 of the assignment operators mirrors the behaviour of the corresponding constructors. For instance:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
 <span class="n">n</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.7</span><span class="p">;</span>
@@ -163,7 +303,7 @@ of the assignment operators mirrors the behaviour of the corresponding construct
 </div>
 <p>Note however that, due to language limitations, it is <strong>not</strong> possible to assign a multiprecision value to a C++ numerical object.
 Explicitly casting the multiprecision value before the assignment will however work:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
 <span class="n">n</span> <span class="o">=</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span>                   <span class="c1">// This will NOT compile.</span>
 <span class="n">n</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">});</span> <span class="c1">// This will compile.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
@@ -172,50 +312,51 @@ Explicitly casting the multiprecision value before the assignment will however w
 </div>
 
 
-          </div>
         </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="tutorial_prelim.html"
-                        title="previous chapter">Preliminaries</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="tutorial_io.html"
-                        title="next chapter">Input and output</a></p>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+        <div class="side-doc-outline">
+            <div class="side-doc-outline--content"> 
+            </div>
         </div>
-      </div>
+
       <div class="clearer"></div>
+    </div><div class="pagenation">
+     <a id="button-prev" href="tutorial_prelim.html" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored" role="botton" accesskey="P">
+         <i class="pagenation-arrow-L material-icons">arrow_back</i>
+         <div class="pagenation-text">
+            <span class="pagenation-direction">Previous</span>
+            <div>Preliminaries</div>
+         </div>
+     </a>
+     <a id="button-next" href="tutorial_io.html" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored" role="botton" accesskey="N">
+        <i class="pagenation-arrow-R material-icons">arrow_forward</i>
+        <div class="pagenation-text">
+            <span class="pagenation-direction">Next</span>
+            <div>Input and output</div>
+        </div>
+     </a>
+  </div>
+        <footer class="mdl-mini-footer">
+    <div class="mdl-mini-footer__left-section">
+      <div class="mdl-logo">mp++</div>
+      <div>
+        
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+      </div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="tutorial_io.html" title="Input and output"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="tutorial_prelim.html" title="Preliminaries"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.12 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="tutorial.html" >Tutorial</a> &#187;</li> 
-      </ul>
+
+    <div class="mdl-mini-footer__right-section">
+        <div>&copy; Copyright 2016-2018, Francesco Biscani.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.0b1 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2016-2018, Francesco Biscani.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+</footer>
+        </main>
     </div>
   </body>
 </html>

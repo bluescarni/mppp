@@ -1,86 +1,226 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    
     <title>Rational tutorial &#8212; mp++ 0.12 documentation</title>
-    <link rel="stylesheet" href="_static/pyramid.css" type="text/css" />
+
+    <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.12',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <link rel="stylesheet" type="text/css" href="_static/notosanscjkjp.css" />
+    <link rel="stylesheet" type="text/css" href="_static/roboto.css" />
+    <link rel="stylesheet" type="text/css" href="_static/material-design-lite-1.3.0/material.blue_grey-indigo.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_materialdesign_theme.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/sphinx_materialdesign_theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Quadruple-precision float tutorial" href="tutorial_real128.html" />
-    <link rel="prev" title="Integer tutorial" href="tutorial_integer.html" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Neuton&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nobile:regular,italic,bold,bolditalic&amp;subset=latin" type="text/css" media="screen" charset="utf-8" />
-<!--[if lte IE 6]>
-<link rel="stylesheet" href="_static/ie6.css" type="text/css" media="screen" charset="utf-8" />
-<![endif]-->
-
+    <link rel="prev" title="Integer tutorial" href="tutorial_integer.html" /> 
   </head>
-  <body>
+<body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-drawer"><header class="mdl-layout__header mdl-layout__header--waterfall ">
+    <div class="mdl-layout__header-row">
+        
+        <nav class="mdl-navigation breadcrumb">
+            <a class="mdl-navigation__link" href="tutorial.html">Tutorial</a><i class="material-icons">navigate_next</i>
+            <a class="mdl-navigation__link is-active">Rational tutorial</a>
+        </nav>
+        <div class="mdl-layout-spacer"></div>
+        <nav class="mdl-navigation">
+        
+<form class="form-inline pull-sm-right" action="search.html" method="get">
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
+        <label id="quick-search-icon" class="mdl-button mdl-js-button mdl-button--icon"  for="waterfall-exp">
+            <i class="material-icons">search</i>
+        </label>
+        <div class="mdl-textfield__expandable-holder">
+          <input class="mdl-textfield__input" type="text" name="q"  id="waterfall-exp" placeholder="Search" />
+          <input type="hidden" name="check_keywords" value="yes" />
+          <input type="hidden" name="area" value="default" />
+        </div>
+      </div>
+      <div class="mdl-tooltip" data-mdl-for="quick-search-icon">
+      Quick search
+      </div>
+</form>
+        
+<a id="button-show-source"
+    class="mdl-button mdl-js-button mdl-button--icon"
+    href="_sources/tutorial_rational.rst.txt" rel="nofollow">
+<i class="material-icons">code</i>
+</a>
+<div class="mdl-tooltip" data-mdl-for="button-show-source">
+Show Source
+</div>
+        </nav>
+    </div>
+    <div class="mdl-layout__header-row header-links">
+      <div class="mdl-layout-spacer"></div>
+      <nav class="mdl-navigation">
+          <a  class="mdl-navigation__link" href="index.html">
+                  <i class="material-icons navigation-link-icon">home</i>
+                  Home
+              </a>
+          
+              <a  class="mdl-navigation__link" href="https://github.com/bluescarni/mppp">
+                  <i class="material-icons navigation-link-icon">link</i>
+                  GitHub
+              </a>
+      </nav>
+    </div>
+</header><header class="mdl-layout__drawer">
+    
+          <!-- Title -->
+      <span class="mdl-layout-title">
+          <a class="title" href="index.html">
+              <span class="title-text">
+                  mp++
+              </span>
+          </a>
+      </span>
+    
+    
+      <div class="globaltoc">
+        <span class="mdl-layout-title toc">Table Of Contents</span>
+        
+        
+            
+            <nav class="mdl-navigation">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_constr.html">Construction, conversion and assignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_io.html">Input and output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_numtower.html">The numerical tower and type coercion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_commonops.html">Common operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Rational tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integer_benchmarks.html">Integer benchmarks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
 
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="tutorial_real128.html" title="Quadruple-precision float tutorial"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="tutorial_integer.html" title="Integer tutorial"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.12 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="tutorial.html" accesskey="U">Tutorial</a> &#187;</li> 
-      </ul>
-    </div>  
+            </nav>
+        
+        </div>
+    
+</header>
+        <main class="mdl-layout__content" tabIndex="0">
+<header class="mdl-layout__drawer">
+    
+          <!-- Title -->
+      <span class="mdl-layout-title">
+          <a class="title" href="index.html">
+              <span class="title-text">
+                  mp++
+              </span>
+          </a>
+      </span>
+    
+    
+      <div class="globaltoc">
+        <span class="mdl-layout-title toc">Table Of Contents</span>
+        
+        
+            
+            <nav class="mdl-navigation">
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tutorial_prelim.html">Preliminaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_constr.html">Construction, conversion and assignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_io.html">Input and output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_numtower.html">The numerical tower and type coercion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_commonops.html">Common operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Rational tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real128.html">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Common concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="integer_benchmarks.html">Integer benchmarks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            </nav>
+        
+        </div>
+    
+</header>
 
     <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+        <div class="page-content">
+        
   <div class="section" id="rational-tutorial">
 <span id="tutorial-rational"></span><h1>Rational tutorial<a class="headerlink" href="#rational-tutorial" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> is a class that builds upon <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> to provide
+<p><a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> is a class that builds upon <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> to provide
 an implementation of rational numbers represented as a numerator-denominator
-<a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> pairs.</p>
-<p>Like <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> is parametrised over
-an integral value <code class="docutils literal"><span class="pre">SSize</span></code> which represents the number of limbs that will be
+<a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> pairs.</p>
+<p>Like <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> is parametrised over
+an integral value <code class="docutils literal notranslate"><span class="pre">SSize</span></code> which represents the number of limbs that will be
 stored directly within both the numerator and the denominator before resorting to dynamic memory allocation
 (see the <a class="reference internal" href="tutorial_integer.html#tutorial-integer"><span class="std std-ref">integer tutorial</span></a> for a detailed explanation of the meaning
-of the <code class="docutils literal"><span class="pre">SSize</span></code> parameter).</p>
-<p>The <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> class adopts the usual <em>canonical</em> representation of rational numbers:</p>
+of the <code class="docutils literal notranslate"><span class="pre">SSize</span></code> parameter).</p>
+<p>The <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> class adopts the usual <em>canonical</em> representation of rational numbers:</p>
 <ul class="simple">
 <li>numerator and denominator are coprime,</li>
 <li>the denominator is always strictly positive.</li>
 </ul>
-<p>This representation is usually enforced automatically by the <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> API (however,
+<p>This representation is usually enforced automatically by the <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> API (however,
 a couple of low-level functions are available to access and mutate directly the numerator and the denominator
 in performance-critical scenarios).</p>
-<p>In addition to the features common to all mp++ classes, the <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> API provides
+<p>In addition to the features common to all mp++ classes, the <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> API provides
 a few additional capabilities:</p>
 <ul>
-<li><p class="first">it is possible to construct a <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> from an integral pair
+<li><p class="first">it is possible to construct a <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> from an integral pair
 of arguments representing the numerator and the denominator:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>                <span class="c1">// Construction from int numerator and denominator.</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>                <span class="c1">// Construction from int numerator and denominator.</span>
 
 <span class="n">rat_t</span> <span class="n">q2</span><span class="p">{</span><span class="kt">long</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">),</span> <span class="kt">short</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span><span class="p">)};</span> <span class="c1">// Construction from mixed numerator and denominator types.</span>
 
@@ -88,12 +228,12 @@ of arguments representing the numerator and the denominator:</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">it is possible to get const and mutable references to the <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> objects
-representing the numerator and the denominator via the <a class="reference internal" href="rational.html#_CPPv2NK4mppp8rational7get_numEv" title="mppp::rational::get_num"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::rational::get_num()</span></code></a>,
-<a class="reference internal" href="rational.html#_CPPv2NK4mppp8rational7get_denEv" title="mppp::rational::get_den"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::rational::get_den()</span></code></a>, <a class="reference internal" href="rational.html#_CPPv2N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::rational::_get_num()</span></code></a> and
-<a class="reference internal" href="rational.html#_CPPv2N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::rational::_get_den()</span></code></a> member functions. These accessors allow to use
-any function from the <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a> API on the numerator and on the denominator:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
+<li><p class="first">it is possible to get const and mutable references to the <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
+representing the numerator and the denominator via the <a class="reference internal" href="rational.html#_CPPv3NK4mppp8rational7get_numEv" title="mppp::rational::get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::get_num()</span></code></a>,
+<a class="reference internal" href="rational.html#_CPPv3NK4mppp8rational7get_denEv" title="mppp::rational::get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::get_den()</span></code></a>, <a class="reference internal" href="rational.html#_CPPv3N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::_get_num()</span></code></a> and
+<a class="reference internal" href="rational.html#_CPPv3N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::_get_den()</span></code></a> member functions. These accessors allow to use
+any function from the <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> API on the numerator and on the denominator:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">q1</span><span class="p">.</span><span class="n">get_num</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">);</span> <span class="c1">// Const access to numerator and denominator.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">q1</span><span class="p">.</span><span class="n">get_den</span><span class="p">()</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
 
@@ -103,10 +243,10 @@ any function from the <a class="reference internal" href="integer.html#_CPPv2N4m
 </pre></div>
 </div>
 </li>
-<li><p class="first">the <a class="reference internal" href="rational.html#_CPPv2N4mppp8rational12canonicaliseEv" title="mppp::rational::canonicalise"><code class="xref cpp cpp-func docutils literal"><span class="pre">mppp::rational::canonicalise()</span></code></a> member function (and its free function counterpart)
-can be used to canonicalise a <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a>. This is normally not necessary,
+<li><p class="first">the <a class="reference internal" href="rational.html#_CPPv3N4mppp8rational12canonicaliseEv" title="mppp::rational::canonicalise"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::canonicalise()</span></code></a> member function (and its free function counterpart)
+can be used to canonicalise a <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>. This is normally not necessary,
 unless the numerator or the denominator have been changed manually via the mutable getters:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">};</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">};</span>
 <span class="n">q1</span><span class="p">.</span><span class="n">_get_num</span><span class="p">()</span> <span class="o">=</span> <span class="mi">9</span><span class="p">;</span>         <span class="c1">// Change the numerator using the mutable getter.</span>
                            <span class="c1">// WARNING: q1 = 9/6, not in canonical form any more!</span>
 
@@ -121,19 +261,19 @@ functions are available;</p>
 <li><p class="first">a few <a class="reference internal" href="rational.html#rational-exponentiation"><span class="std std-ref">exponentiation</span></a> and <a class="reference internal" href="rational.html#rational-ntheory"><span class="std std-ref">number-theoretic</span></a>
 functions are available;</p>
 </li>
-<li><p class="first">like <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> also provides a specialisation
-of <code class="docutils literal"><span class="pre">std::hash</span></code> for use in the standard unordered containers.</p>
+<li><p class="first">like <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> also provides a <a class="reference internal" href="rational.html#rational-std-specialisations"><span class="std std-ref">specialisation</span></a>
+of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code> for use in the standard unordered containers.</p>
 </li>
 </ul>
 <p>Many of these features, which are documented in detail in the <a class="reference internal" href="rational.html#rational-reference"><span class="std std-ref">rational reference</span></a>, are available
 in multiple overloads, often both as free and member functions.</p>
 <div class="section" id="interacting-with-the-gmp-api">
 <h2>Interacting with the GMP API<a class="headerlink" href="#interacting-with-the-gmp-api" title="Permalink to this headline">¶</a></h2>
-<p>Like <a class="reference internal" href="integer.html#_CPPv2N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> provides facilities for interfacing
+<p>Like <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> provides facilities for interfacing
 with the <a class="reference external" href="https://gmplib.org/">GMP</a> library. Currently, the interoperability is limited to
-<a class="reference internal" href="rational.html#_CPPv2N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal"><span class="pre">rational</span></code></a> objects being able to be constructed and assigned from both <code class="docutils literal"><span class="pre">mpz_t</span></code>
-and <code class="docutils literal"><span class="pre">mpq_t</span></code> objects:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
+<a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> objects being able to be constructed and assigned from both <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code>
+and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code> objects:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
 <span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>      <span class="c1">// Init an mpz_t with the value -4.</span>
 
 <span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="n">m</span><span class="p">};</span>                 <span class="c1">// Init a rat_t from the mpz_t.</span>
@@ -162,58 +302,63 @@ and <code class="docutils literal"><span class="pre">mpq_t</span></code> objects
 </div>
 
 
-          </div>
         </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
+        <div class="side-doc-outline">
+            <div class="side-doc-outline--content"> 
+<div class="localtoc">
+    <p class="caption">
+      <span class="caption-text">Table Of Contents</span>
+    </p>
+    <ul>
 <li><a class="reference internal" href="#">Rational tutorial</a><ul>
 <li><a class="reference internal" href="#interacting-with-the-gmp-api">Interacting with the GMP API</a></li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="tutorial_integer.html"
-                        title="previous chapter">Integer tutorial</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="tutorial_real128.html"
-                        title="next chapter">Quadruple-precision float tutorial</a></p>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+            </div>
         </div>
-      </div>
+
       <div class="clearer"></div>
+    </div><div class="pagenation">
+     <a id="button-prev" href="tutorial_integer.html" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored" role="botton" accesskey="P">
+         <i class="pagenation-arrow-L material-icons">arrow_back</i>
+         <div class="pagenation-text">
+            <span class="pagenation-direction">Previous</span>
+            <div>Integer tutorial</div>
+         </div>
+     </a>
+     <a id="button-next" href="tutorial_real128.html" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored" role="botton" accesskey="N">
+        <i class="pagenation-arrow-R material-icons">arrow_forward</i>
+        <div class="pagenation-text">
+            <span class="pagenation-direction">Next</span>
+            <div>Quadruple-precision float tutorial</div>
+        </div>
+     </a>
+  </div>
+        <footer class="mdl-mini-footer">
+    <div class="mdl-mini-footer__left-section">
+      <div class="mdl-logo">mp++</div>
+      <div>
+        
+        <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+      </div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="tutorial_real128.html" title="Quadruple-precision float tutorial"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="tutorial_integer.html" title="Integer tutorial"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">mp++ 0.12 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="tutorial.html" >Tutorial</a> &#187;</li> 
-      </ul>
+
+    <div class="mdl-mini-footer__right-section">
+        <div>&copy; Copyright 2016-2018, Francesco Biscani.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.0b1 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2016-2018, Francesco Biscani.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+</footer>
+        </main>
     </div>
   </body>
 </html>

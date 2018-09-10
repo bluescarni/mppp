@@ -13,18 +13,21 @@ New
 Changes
 ~~~~~~~
 
+- Initialising a :cpp:class:`~mppp::real` with an invalid :cpp:type:`~mppp::real_kind` enum value now raises an
+  exception, rather than initialising to NaN (`#153 <https://github.com/bluescarni/mppp/pull/153>`__).
+- Switch to the sphinx material design theme for the documentation (`#153 <https://github.com/bluescarni/mppp/pull/153>`__).
 - Update the internal copy of Catch to the latest version, 2.4.0 (`#152 <https://github.com/bluescarni/mppp/pull/152>`__).
 - Various improvements to the GCD implementation for :cpp:class:`~mppp::integer`
   (`#150 <https://github.com/bluescarni/mppp/pull/150>`__).
 - The addition/subtraction operators of :cpp:class:`~mppp::integer` now use the low-level :cpp:func:`~mppp::add_ui()`,
   :cpp:func:`~mppp::add_si()`, :cpp:func:`~mppp::sub_ui()` and :cpp:func:`~mppp::sub_si()` primitives when the other argument is a
   C++ integral (`#147 <https://github.com/bluescarni/mppp/pull/147>`__).
-- Various documentation additions, improvements and fixes (`#146 <https://github.com/bluescarni/mppp/pull/146>`__),
-  (`#148 <https://github.com/bluescarni/mppp/pull/148>`__), (`#149 <https://github.com/bluescarni/mppp/pull/149>`__).
+- Various documentation additions, improvements and fixes (`#146 <https://github.com/bluescarni/mppp/pull/146>`__,
+  `#148 <https://github.com/bluescarni/mppp/pull/148>`__, `#149 <https://github.com/bluescarni/mppp/pull/149>`__,
+  `#153 <https://github.com/bluescarni/mppp/pull/153>`__).
 - **BREAKING**: replace the ``integer_nbits_init`` tag structure with the strongly-typed :cpp:type:`mppp::integer_bitcnt_t` enum
   (`#145 <https://github.com/bluescarni/mppp/pull/145>`__).
 - Ensure that :cpp:class:`~mppp::real128` is trivially copyable (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
-- Switch to the sphinx pyramid theme for the documentation (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
 
 0.11 (2018-05-22)
 -----------------
