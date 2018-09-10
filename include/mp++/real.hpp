@@ -714,15 +714,13 @@ public:
             default:
                 // Clean up before throwing.
                 ::mpfr_clear(&m_mpfr);
+                using kind_cast_t = std::underlying_type<::mpfr_kind_t>::type;
                 throw std::invalid_argument(
                     "The 'real_kind' value passed to the constructor of a real ("
-                    + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(k))
-                    + ") is not one of the three allowed values ('nan'="
-                    + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(real_kind::nan))
-                    + ", 'inf'="
-                    + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(real_kind::inf))
-                    + " and 'zero'="
-                    + std::to_string(static_cast<std::underlying_type<::mpfr_kind_t>::type>(real_kind::zero)) + ")");
+                    + std::to_string(static_cast<kind_cast_t>(k)) + ") is not one of the three allowed values ('nan'="
+                    + std::to_string(static_cast<kind_cast_t>(real_kind::nan))
+                    + ", 'inf'=" + std::to_string(static_cast<kind_cast_t>(real_kind::inf))
+                    + " and 'zero'=" + std::to_string(static_cast<kind_cast_t>(real_kind::zero)) + ")");
         }
     }
     /// Constructor from a special value and precision.
