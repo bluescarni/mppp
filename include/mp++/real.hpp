@@ -3680,7 +3680,7 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
  * This function will return a :cpp:class:`~mppp::real` :math:`\pi`
  * with a precision of ``p``. If ``p`` is zero, the precision
  * will be set to the value returned by :cpp:func:`~mppp::real_get_default_prec()`.
- * If no default precision has been set, an error will be raised.
+ * If ``p`` is zero and no default precision has been set, an error will be raised.
  * \endrststar
  *
  * @param p the desired precision.
