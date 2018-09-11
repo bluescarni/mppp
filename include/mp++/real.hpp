@@ -3503,7 +3503,8 @@ inline real rootn_ui(T &&r,
 #endif
                      unsigned long k)
 {
-    auto rootn_ui_wrapper = [k](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_rootn_ui(r, o, k, rnd); };
+    auto rootn_ui_wrapper
+        = [k](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_rootn_ui(rop, op, k, rnd); };
     return mpfr_nary_op_return(0, rootn_ui_wrapper, std::forward<decltype(r)>(r));
 }
 
