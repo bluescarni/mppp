@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Add all the root functions from the MPFR API to the :cpp:class:`~mppp::real` API
+  (`#154 <https://github.com/bluescarni/mppp/pull/154>`__).
 - Add a specialisation of ``std::numeric_limits`` for :cpp:class:`~mppp::real128`
   (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
 

@@ -257,7 +257,7 @@
 </li>
       <li><a href="rational.html#_CPPv3N4mppp12canonicaliseER8rationalI5SSizeE">mppp::canonicalise (C++ function)</a>
 </li>
-      <li><a href="real128.html#_CPPv3N4mppp4cbrtE7real128">mppp::cbrt (C++ function)</a>
+      <li><a href="real.html#_CPPv3N4mppp4cbrtER4realRR7CvrReal">mppp::cbrt (C++ function)</a>, <a href="real.html#_CPPv3N4mppp4cbrtERR7CvrReal">[1]</a>, <a href="real128.html#_CPPv3N4mppp4cbrtE7real128">[2]</a>
 </li>
       <li><a href="integer.html#_CPPv3N4mppp3cmpERK7integerI5SSizeERK7integerI5SSizeE">mppp::cmp (C++ function)</a>, <a href="rational.html#_CPPv3N4mppp3cmpERK7integerI5SSizeERK8rationalI5SSizeE">[1]</a>, <a href="rational.html#_CPPv3N4mppp3cmpERK8rationalI5SSizeERK7integerI5SSizeE">[2]</a>, <a href="rational.html#_CPPv3N4mppp3cmpERK8rationalI5SSizeERK8rationalI5SSizeE">[3]</a>, <a href="real.html#_CPPv3N4mppp3cmpERK4realRK4real">[4]</a>
 </li>
@@ -529,12 +529,12 @@
 </li>
       <li><a href="rational.html#_CPPv3NK4mppp8rational7get_denEv">mppp::rational::get_den (C++ function)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rational.html#_CPPv3NK4mppp8rational7get_numEv">mppp::rational::get_num (C++ function)</a>
 </li>
       <li><a href="rational.html#_CPPv3N4mppp8rational5int_tE">mppp::rational::int_t (C++ type)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rational.html#_CPPv3N4mppp8rational3invEv">mppp::rational::inv (C++ function)</a>
 </li>
       <li><a href="rational.html#_CPPv3NK4mppp8rational12is_canonicalEv">mppp::rational::is_canonical (C++ function)</a>
@@ -681,6 +681,8 @@
 </li>
       <li><a href="real.html#_CPPv3N4mppp4real3absEv">mppp::real::abs (C++ function)</a>
 </li>
+      <li><a href="real.html#_CPPv3N4mppp4real4cbrtEv">mppp::real::cbrt (C++ function)</a>
+</li>
       <li><a href="real.html#_CPPv3N4mppp4real3cosEv">mppp::real::cos (C++ function)</a>
 </li>
       <li><a href="real.html#_CPPv3N4mppp4real3expEv">mppp::real::exp (C++ function)</a>
@@ -714,6 +716,8 @@
       <li><a href="real.html#_CPPv3N4mppp4real10prec_roundE11mpfr_prec_t">mppp::real::prec_round (C++ function)</a>
 </li>
       <li><a href="real.html#_CPPv3N4mppp4real4realE9real_kind">mppp::real::real (C++ function)</a>, <a href="real.html#_CPPv3N4mppp4real4realE9real_kind11mpfr_prec_t">[1]</a>, <a href="real.html#_CPPv3N4mppp4real4realE9real_kindi11mpfr_prec_t">[2]</a>, <a href="real.html#_CPPv3N4mppp4real4realEK6mpfr_t">[3]</a>, <a href="real.html#_CPPv3N4mppp4real4realEPKcPKc">[4]</a>, <a href="real.html#_CPPv3N4mppp4real4realEPKcPKc11mpfr_prec_t">[5]</a>, <a href="real.html#_CPPv3N4mppp4real4realEPKcPKci11mpfr_prec_t">[6]</a>, <a href="real.html#_CPPv3N4mppp4real4realERK10StringType">[7]</a>, <a href="real.html#_CPPv3N4mppp4real4realERK10StringType11mpfr_prec_t">[8]</a>, <a href="real.html#_CPPv3N4mppp4real4realERK10StringTypei11mpfr_prec_t">[9]</a>, <a href="real.html#_CPPv3N4mppp4real4realERK17RealInteroperable11mpfr_prec_t">[10]</a>, <a href="real.html#_CPPv3N4mppp4real4realERK4real">[11]</a>, <a href="real.html#_CPPv3N4mppp4real4realERK4real11mpfr_prec_t">[12]</a>, <a href="real.html#_CPPv3N4mppp4real4realERR4real">[13]</a>, <a href="real.html#_CPPv3N4mppp4real4realERR6mpfr_t">[14]</a>, <a href="real.html#_CPPv3N4mppp4real4realEv">[15]</a>
+</li>
+      <li><a href="real.html#_CPPv3N4mppp4real8rec_sqrtEv">mppp::real::rec_sqrt (C++ function)</a>
 </li>
       <li><a href="real.html#_CPPv3NK4mppp4real9regular_pEv">mppp::real::regular_p (C++ function)</a>
 </li>
@@ -777,7 +781,11 @@
 </li>
       <li><a href="real.html#_CPPv3IDpEN4mppp11RealSetArgsE">mppp::RealSetArgs (C++ concept)</a>
 </li>
+      <li><a href="real.html#_CPPv3N4mppp8rec_sqrtER4realRR7CvrReal">mppp::rec_sqrt (C++ function)</a>, <a href="real.html#_CPPv3N4mppp8rec_sqrtERR7CvrReal">[1]</a>
+</li>
       <li><a href="real.html#_CPPv3N4mppp9regular_pERK4real">mppp::regular_p (C++ function)</a>
+</li>
+      <li><a href="real.html#_CPPv3N4mppp8rootn_uiER4realRR7CvrRealm">mppp::rootn_ui (C++ function)</a>, <a href="real.html#_CPPv3N4mppp8rootn_uiERR7CvrRealm">[1]</a>
 </li>
       <li><a href="real128.html#_CPPv3N4mppp7scalblnERK7real128l">mppp::scalbln (C++ function)</a>
 </li>

@@ -1146,6 +1146,7 @@ object must contain a valid <code class="docutils literal notranslate"><span cla
 <dt id="_CPPv3NK4mppp4real7signbitEv">
 <span id="_CPPv2NK4mppp4real7signbitEv"></span><span id="mppp::real::signbitC"></span><span class="target" id="classmppp_1_1real_1a6f469168d0123748c8b2cffbdc0f5bb4"></span>bool <code class="descname">signbit</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv3NK4mppp4real7signbitEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the sign bit. </p>
+<p>The sign bit is set if <code class="docutils literal notranslate"><span class="pre">this</span></code> is negative, -0, or a NaN whose representation has its sign bit set.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>the sign bit of <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
@@ -1321,6 +1322,31 @@ to produce exactly the original value when used in one of the constructors from 
 <span id="_CPPv2N4mppp4real4sqrtEv"></span><span id="mppp::real::sqrt"></span><span class="target" id="classmppp_1_1real_1afedac0ece98bdbc3aaf31ea07b1e7b8d"></span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp4real4sqrtEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place square root. </p>
 <p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its square root. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N4mppp4real8rec_sqrtEv">
+<span id="_CPPv2N4mppp4real8rec_sqrtEv"></span><span id="mppp::real::rec_sqrt"></span><span class="target" id="classmppp_1_1real_1ae4f08001b3d373314408ef9674680566"></span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">rec_sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp4real8rec_sqrtEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place reciprocal square root. </p>
+<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its reciprocal square root. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero, the result will be a positive infinity (regardless of the sign of <code class="docutils literal notranslate"><span class="pre">this</span></code>). If <code class="docutils literal notranslate"><span class="pre">this</span></code> is a positive infinity, the result will be +0. If <code class="docutils literal notranslate"><span class="pre">this</span></code> is negative, the result will be NaN.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N4mppp4real4cbrtEv">
+<span id="_CPPv2N4mppp4real4cbrtEv"></span><span id="mppp::real::cbrt"></span><span class="target" id="classmppp_1_1real_1a286883da2c58c478938613d9ffa446c2"></span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">cbrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp4real4cbrtEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place cubic root. </p>
+<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its cubic root. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
@@ -2197,6 +2223,7 @@ The precision of the result will be set to the largest precision among the opera
 <dt id="_CPPv3N4mppp7signbitERK4real">
 <span id="_CPPv2N4mppp7signbitERK4real"></span><span id="mppp::signbit__realCR"></span><span class="target" id="group__real__comparison_1gaa86d0c5988e30ef3d341b208b412f9f6"></span>bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">signbit</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> &amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp7signbitERK4real" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the sign bit of a <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
+<p>The sign bit is set if <code class="docutils literal notranslate"><span class="pre">r</span></code> is negative, -0, or a NaN whose representation has its sign bit set.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>the sign bit of <code class="docutils literal notranslate"><span class="pre">r</span></code>. </dd>
@@ -2338,6 +2365,127 @@ standard library (e.g., <code class="docutils literal notranslate"><span class="
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal notranslate"><span class="pre">r</span></code>: the operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N4mppp8rec_sqrtER4realRR7CvrReal">
+<span id="_CPPv2N4mppp8rec_sqrtER4realRR7CvrReal"></span><span id="mppp::rec_sqrt__realR.CvrRealRR"></span><span class="target" id="group__real__roots_1ga231f6565f716e8263f0d788761818a79"></span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rec_sqrt</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv3I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp8rec_sqrtER4realRR7CvrReal" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> reciprocal square root. </p>
+<p>This function will compute the reciprocal square root of <code class="docutils literal notranslate"><span class="pre">op</span></code> and store it into <code class="docutils literal notranslate"><span class="pre">rop</span></code>. The precision of the result will be equal to the precision of <code class="docutils literal notranslate"><span class="pre">op</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">op</span></code> is zero, <code class="docutils literal notranslate"><span class="pre">rop</span></code> will be set to a positive infinity (regardless of the sign of <code class="docutils literal notranslate"><span class="pre">op</span></code>). If <code class="docutils literal notranslate"><span class="pre">op</span></code> is a positive infinity, <code class="docutils literal notranslate"><span class="pre">rop</span></code> will be set to +0. If <code class="docutils literal notranslate"><span class="pre">op</span></code> is negative, <code class="docutils literal notranslate"><span class="pre">rop</span></code> will be set to NaN.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal notranslate"><span class="pre">op</span></code>: the operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N4mppp8rec_sqrtERR7CvrReal">
+<span id="_CPPv2N4mppp8rec_sqrtERR7CvrReal"></span><span id="mppp::rec_sqrt__CvrRealRR"></span><span class="target" id="group__real__roots_1ga38c83b72d40d3573bdebb3327b03f4b4"></span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rec_sqrt</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv3I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp8rec_sqrtERR7CvrReal" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Unary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> reciprocal square root. </p>
+<p>This function will compute and return the reciprocal square root of <code class="docutils literal notranslate"><span class="pre">r</span></code>. The precision of the result will be equal to the precision of <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">r</span></code> is zero, a positive infinity will be returned (regardless of the sign of <code class="docutils literal notranslate"><span class="pre">r</span></code>). If <code class="docutils literal notranslate"><span class="pre">r</span></code> is a positive infinity, +0 will be returned. If <code class="docutils literal notranslate"><span class="pre">r</span></code> is negative, NaN will be returned.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the reciprocal square root of <code class="docutils literal notranslate"><span class="pre">r</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">r</span></code>: the operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N4mppp4cbrtER4realRR7CvrReal">
+<span id="_CPPv2N4mppp4cbrtER4realRR7CvrReal"></span><span id="mppp::cbrt__realR.CvrRealRR"></span><span class="target" id="group__real__roots_1gaab29a9234259881d9b2f969156cbf05b"></span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cbrt</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv3I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp4cbrtER4realRR7CvrReal" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> cubic root. </p>
+<p>This function will compute the cubic root of <code class="docutils literal notranslate"><span class="pre">op</span></code> and store it into <code class="docutils literal notranslate"><span class="pre">rop</span></code>. The precision of the result will be equal to the precision of <code class="docutils literal notranslate"><span class="pre">op</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal notranslate"><span class="pre">op</span></code>: the operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N4mppp4cbrtERR7CvrReal">
+<span id="_CPPv2N4mppp4cbrtERR7CvrReal"></span><span id="mppp::cbrt__CvrRealRR"></span><span class="target" id="group__real__roots_1ga58536df4026d1aad86c0c0fcab5eb740"></span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cbrt</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv3I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp4cbrtERR7CvrReal" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Unary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> cubic root. </p>
+<p>This function will compute and return the cubic root of <code class="docutils literal notranslate"><span class="pre">r</span></code>. The precision of the result will be equal to the precision of <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the cubic root of <code class="docutils literal notranslate"><span class="pre">r</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">r</span></code>: the operand.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N4mppp8rootn_uiER4realRR7CvrRealm">
+<span id="_CPPv2N4mppp8rootn_uiER4realRR7CvrRealm"></span><span id="mppp::rootn_ui__realR.CvrRealRR.unsigned-l"></span><span class="target" id="group__real__roots_1ga4e119fb6510a78b00ff2d9e233338c25"></span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rootn_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv3I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> &amp;&amp;<em>op</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp8rootn_uiER4realRR7CvrRealm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> k-th root. </p>
+<p>This function will compute the k-th root of <code class="docutils literal notranslate"><span class="pre">op</span></code> and store it into <code class="docutils literal notranslate"><span class="pre">rop</span></code>. The precision of the result will be equal to the precision of <code class="docutils literal notranslate"><span class="pre">op</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">k</span></code> is zero, the result will be NaN. If <code class="docutils literal notranslate"><span class="pre">k</span></code> is odd (resp. even) and <code class="docutils literal notranslate"><span class="pre">op</span></code> negative (including negative infinity), the result will be a negative number (resp. NaN). If <code class="docutils literal notranslate"><span class="pre">op</span></code> is zero, the result will be zero with the sign obtained by the usual limit rules, i.e., the same sign as <code class="docutils literal notranslate"><span class="pre">op</span></code> if <code class="docutils literal notranslate"><span class="pre">k</span></code> is odd, and positive if <code class="docutils literal notranslate"><span class="pre">k</span></code> is even.</p>
+<p><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function is available from MPFR 4 onwards.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
+<li><code class="docutils literal notranslate"><span class="pre">op</span></code>: the operand. </li>
+<li><code class="docutils literal notranslate"><span class="pre">k</span></code>: the degree of the root.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N4mppp8rootn_uiERR7CvrRealm">
+<span id="_CPPv2N4mppp8rootn_uiERR7CvrRealm"></span><span id="mppp::rootn_ui__CvrRealRR.unsigned-l"></span><span class="target" id="group__real__roots_1ga63bcd59543fba2f5a22156a0559a2f75"></span><a class="reference internal" href="#_CPPv3N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rootn_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv3I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> &amp;&amp;<em>r</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp8rootn_uiERR7CvrRealm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Unary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> k-th root. </p>
+<p>This function will compute and return the k-th root of <code class="docutils literal notranslate"><span class="pre">r</span></code>. The precision of the result will be equal to the precision of <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">k</span></code> is zero, the result will be NaN. If <code class="docutils literal notranslate"><span class="pre">k</span></code> is odd (resp. even) and <code class="docutils literal notranslate"><span class="pre">r</span></code> negative (including negative infinity), the result will be a negative number (resp. NaN). If <code class="docutils literal notranslate"><span class="pre">r</span></code> is zero, the result will be zero with the sign obtained by the usual limit rules, i.e., the same sign as <code class="docutils literal notranslate"><span class="pre">r</span></code> if <code class="docutils literal notranslate"><span class="pre">k</span></code> is odd, and positive if <code class="docutils literal notranslate"><span class="pre">k</span></code> is even.</p>
+<p><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function is available from MPFR 4 onwards.</p>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the k-th root of <code class="docutils literal notranslate"><span class="pre">r</span></code>. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">r</span></code>: the operand. </li>
+<li><code class="docutils literal notranslate"><span class="pre">k</span></code>: the degree of the root.</li>
 </ul>
 </dd>
 </dl>
