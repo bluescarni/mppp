@@ -104,9 +104,6 @@ TEST_CASE("real cbrt")
 TEST_CASE("real rootn_ui")
 {
     real r0{0};
-    r0.rootn_ui(3);
-    REQUIRE(r0.get_prec() == real_deduce_precision(0));
-    REQUIRE(r0.zero_p());
     real rop;
     REQUIRE(rootn_ui(rop, r0, 3).zero_p());
     REQUIRE(rop.get_prec() == real_deduce_precision(0));
@@ -120,7 +117,7 @@ TEST_CASE("real rootn_ui")
     rootn_ui(rop, r0, 3);
     REQUIRE(rop == -3);
     REQUIRE(rop.get_prec() == 128);
-    r0.rootn_ui(3);
+    rootn_ui(r0, r0, 3);
     REQUIRE(r0 == -3);
     REQUIRE(r0.get_prec() == 128);
     // Special cases.

@@ -2246,32 +2246,6 @@ public:
         ::mpfr_cbrt(&m_mpfr, &m_mpfr, MPFR_RNDN);
         return *this;
     }
-#if MPFR_VERSION_MAJOR >= 4 || defined(MPPP_DOXYGEN_INVOKED)
-    /// In-place k-th root.
-    /**
-     * This method will set ``this`` to its k-th root.
-     * The precision of ``this`` will not be altered.
-     *
-     * If ``k`` is zero, the result will be NaN. If ``k`` is odd (resp. even) and ``this``
-     * negative (including negative infinity), the result will be a negative number (resp. NaN).
-     * If ``this`` is zero, the result will be zero with the sign obtained by the usual limit rules, i.e.,
-     * the same sign as ``this`` if ``k`` is odd, and positive if ``k`` is even.
-     *
-     * \rststar
-     * .. note::
-     *    This method is available from MPFR 4 onwards.
-     * \endrststar
-     *
-     * @param k the degree of the root.
-     *
-     * @return a reference to ``this``.
-     */
-    real &rootn_ui(unsigned long k)
-    {
-        ::mpfr_rootn_ui(&m_mpfr, &m_mpfr, k, MPFR_RNDN);
-        return *this;
-    }
-#endif
     /// In-place sine.
     /**
      * This method will set ``this`` to its sine.
@@ -2697,35 +2671,19 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
 }
 
-#if MPPP_CPLUSPLUS >= 201703L
-
-// A small wrapper to call an MPFR function f with arguments args. If Rnd is true,
+// A small wrapper to call an MPFR function f with arguments args. If the first param is true_type,
 // the rounding mode MPFR_RNDN will be appended at the end of the function arguments list.
-template <bool Rnd, typename F, typename... Args>
-inline void mpfr_nary_func_wrapper(const F &f, Args &&... args)
-{
-    if constexpr (Rnd) {
-        f(std::forward<Args>(args)..., MPFR_RNDN);
-    } else {
-        f(std::forward<Args>(args)...);
-    }
-}
-
-#else
-
-template <bool Rnd, typename F, typename... Args, enable_if_t<Rnd == true, int> = 0>
-inline void mpfr_nary_func_wrapper(const F &f, Args &&... args)
+template <typename F, typename... Args>
+inline void mpfr_nary_func_wrapper(const std::true_type &, const F &f, Args &&... args)
 {
     f(std::forward<Args>(args)..., MPFR_RNDN);
 }
 
-template <bool Rnd, typename F, typename... Args, enable_if_t<Rnd == false, int> = 0>
-inline void mpfr_nary_func_wrapper(const F &f, Args &&... args)
+template <typename F, typename... Args>
+inline void mpfr_nary_func_wrapper(const std::false_type &, const F &f, Args &&... args)
 {
     f(std::forward<Args>(args)...);
 }
-
-#endif
 
 // Apply the MPFR n-ary function F with return value rop and real arguments (arg0, args...).
 // The precision of rop will be set to the maximum of the precision among the arguments,
@@ -2749,14 +2707,16 @@ inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Ar
     if (p.second == r_prec) {
         // The largest precision among the operands and the precision of the return value
         // match. No need to steal, just execute the function.
-        mpfr_nary_func_wrapper<Rnd>(f, rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
+        mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpfr_t(), arg0.get_mpfr_t(),
+                               args.get_mpfr_t()...);
     } else {
         if (r_prec > p.second) {
             // The precision of the return value is larger than the largest precision
             // among the operands. We can reset its precision destructively
             // because we know it does not overlap with any operand.
             rop.set_prec_impl<false>(p.second);
-            mpfr_nary_func_wrapper<Rnd>(f, rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
+            mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpfr_t(), arg0.get_mpfr_t(),
+                                   args.get_mpfr_t()...);
         } else if (!p.first || p.first->get_prec() != p.second) {
             // This covers 2 cases:
             // - the precision of the return value is smaller than the largest precision
@@ -2771,12 +2731,14 @@ inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Ar
             // NOTE: we assume all the precs in the operands are valid, so we will not need
             // to check them.
             rop.prec_round_impl<false>(p.second);
-            mpfr_nary_func_wrapper<Rnd>(f, rop._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
+            mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, rop._get_mpfr_t(), arg0.get_mpfr_t(),
+                                   args.get_mpfr_t()...);
         } else {
             // The precision of the return value is smaller than the largest precision among the operands,
             // and we have a candidate for stealing with enough precision: we will use it as return
             // value and then swap out the result to rop.
-            mpfr_nary_func_wrapper<Rnd>(f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
+            mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(),
+                                   args.get_mpfr_t()...);
             swap(*p.first, rop);
         }
     }
@@ -2813,13 +2775,15 @@ inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&
     if (p.first && p.first->get_prec() == p.second) {
         // There's at least one arg we can steal from, and its precision is large enough
         // to contain the result. Use it.
-        mpfr_nary_func_wrapper<Rnd>(f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
+        mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, p.first->_get_mpfr_t(), arg0.get_mpfr_t(),
+                               args.get_mpfr_t()...);
         return std::move(*p.first);
     }
     // Either we cannot steal from any arg, or the candidate(s) do not have enough precision.
     // Init a new value and use it instead.
     real retval{real::ptag{}, p.second, true};
-    mpfr_nary_func_wrapper<Rnd>(f, retval._get_mpfr_t(), arg0.get_mpfr_t(), args.get_mpfr_t()...);
+    mpfr_nary_func_wrapper(std::integral_constant<bool, Rnd>{}, f, retval._get_mpfr_t(), arg0.get_mpfr_t(),
+                           args.get_mpfr_t()...);
     return retval;
 }
 
