@@ -3267,214 +3267,99 @@ inline bool real_gt(const real &a, const real &b)
 
 /** @} */
 
-/** @defgroup real_roots real_roots
- *  @{
- */
+#if !defined(MPPP_DOXYGEN_INVOKED)
 
-/// Binary \link mppp::real real\endlink square root.
-/**
- * This function will compute the square root of ``op`` and store it
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
+// Square root.
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real &sqrt(real &rop, CvrReal &&op)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
+#endif
 inline real &sqrt(real &rop, T &&op)
-#endif
 {
-    return mpfr_nary_op(0, ::mpfr_sqrt, rop, std::forward<decltype(op)>(op));
+    return mpfr_nary_op(0, ::mpfr_sqrt, rop, std::forward<T>(op));
 }
 
-/// Unary \link mppp::real real\endlink square root.
-/**
- * This function will compute and return the square root of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * @param r the operand.
- *
- * @return the square root of \p r.
- */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real sqrt(CvrReal &&r)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
+#endif
 inline real sqrt(T &&r)
-#endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_sqrt, std::forward<decltype(r)>(r));
+    return mpfr_nary_op_return(0, ::mpfr_sqrt, std::forward<T>(r));
 }
 
-/// Binary \link mppp::real real\endlink reciprocal square root.
-/**
- * This function will compute the reciprocal square root of ``op`` and store it
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * If ``op`` is zero, ``rop`` will be set to a positive infinity (regardless of the sign of ``op``).
- * If ``op`` is a positive infinity, ``rop`` will be set to +0. If ``op`` is negative,
- * ``rop`` will be set to NaN.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
+// Reciprocal square root.
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real &rec_sqrt(real &rop, CvrReal &&op)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
+#endif
 inline real &rec_sqrt(real &rop, T &&op)
-#endif
 {
-    return mpfr_nary_op(0, ::mpfr_rec_sqrt, rop, std::forward<decltype(op)>(op));
+    return mpfr_nary_op(0, ::mpfr_rec_sqrt, rop, std::forward<T>(op));
 }
 
-/// Unary \link mppp::real real\endlink reciprocal square root.
-/**
- * This function will compute and return the reciprocal square root of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * If ``r`` is zero, a positive infinity will be returned (regardless of the sign of ``r``).
- * If ``r`` is a positive infinity, +0 will be returned. If ``r`` is negative,
- * NaN will be returned.
- *
- * @param r the operand.
- *
- * @return the reciprocal square root of \p r.
- */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real rec_sqrt(CvrReal &&r)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
+#endif
 inline real rec_sqrt(T &&r)
-#endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_rec_sqrt, std::forward<decltype(r)>(r));
+    return mpfr_nary_op_return(0, ::mpfr_rec_sqrt, std::forward<T>(r));
 }
 
-/// Binary \link mppp::real real\endlink cubic root.
-/**
- * This function will compute the cubic root of ``op`` and store it
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
+// Cubic root.
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real &cbrt(real &rop, CvrReal &&op)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
+#endif
 inline real &cbrt(real &rop, T &&op)
-#endif
 {
-    return mpfr_nary_op(0, ::mpfr_cbrt, rop, std::forward<decltype(op)>(op));
+    return mpfr_nary_op(0, ::mpfr_cbrt, rop, std::forward<T>(op));
 }
 
-/// Unary \link mppp::real real\endlink cubic root.
-/**
- * This function will compute and return the cubic root of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * @param r the operand.
- *
- * @return the cubic root of \p r.
- */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real cbrt(CvrReal &&r)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
+#endif
 inline real cbrt(T &&r)
-#endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_cbrt, std::forward<decltype(r)>(r));
+    return mpfr_nary_op_return(0, ::mpfr_cbrt, std::forward<T>(r));
 }
 
-#if MPFR_VERSION_MAJOR >= 4 || defined(MPPP_DOXYGEN_INVOKED)
+#if MPFR_VERSION_MAJOR >= 4
 
-/// Binary \link mppp::real real\endlink k-th root.
-/**
- * This function will compute the k-th root of ``op`` and store it
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * If ``k`` is zero, the result will be NaN. If ``k`` is odd (resp. even) and ``op``
- * negative (including negative infinity), the result will be a negative number (resp. NaN).
- * If ``op`` is zero, the result will be zero with the sign obtained by the usual limit rules, i.e.,
- * the same sign as ``op`` if ``k`` is odd, and positive if ``k`` is even.
- *
- * \rststar
- * .. note::
- *    This function is available from MPFR 4 onwards.
- * \endrststar
- *
- * @param rop the return value.
- * @param op the operand.
- * @param k the degree of the root.
- *
- * @return a reference to \p rop.
- */
+// K-th root.
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real &rootn_ui(real &rop, CvrReal &&op,
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real &rootn_ui(real &rop, T &&op,
 #endif
-                      unsigned long k)
+inline real &rootn_ui(real &rop, T &&op, unsigned long k)
 {
     auto rootn_ui_wrapper = [k](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_rootn_ui(r, o, k, rnd); };
-    return mpfr_nary_op(0, rootn_ui_wrapper, rop, std::forward<decltype(op)>(op));
+    return mpfr_nary_op(0, rootn_ui_wrapper, rop, std::forward<T>(op));
 }
 
-/// Unary \link mppp::real real\endlink k-th root.
-/**
- * This function will compute and return the k-th root of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * If ``k`` is zero, the result will be NaN. If ``k`` is odd (resp. even) and ``r``
- * negative (including negative infinity), the result will be a negative number (resp. NaN).
- * If ``r`` is zero, the result will be zero with the sign obtained by the usual limit rules, i.e.,
- * the same sign as ``r`` if ``k`` is odd, and positive if ``k`` is even.
- *
- * \rststar
- * .. note::
- *    This function is available from MPFR 4 onwards.
- * \endrststar
- *
- * @param r the operand.
- * @param k the degree of the root.
- *
- * @return the k-th root of \p r.
- */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real rootn_ui(CvrReal &&r,
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real rootn_ui(T &&r,
 #endif
-                     unsigned long k)
+inline real rootn_ui(T &&r, unsigned long k)
 {
     auto rootn_ui_wrapper
         = [k](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_rootn_ui(rop, op, k, rnd); };
-    return mpfr_nary_op_return(0, rootn_ui_wrapper, std::forward<decltype(r)>(r));
+    return mpfr_nary_op_return(0, rootn_ui_wrapper, std::forward<T>(r));
 }
 
 #endif
-
-/** @} */
+#endif
 
 /** @defgroup real_exponentiation real_exponentiation
  *  @{

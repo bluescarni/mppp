@@ -149,8 +149,130 @@ Comparison
 Roots
 ~~~~~
 
-.. doxygengroup:: real_roots
-   :content-only:
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sqrt(mppp::real &rop, T &&op)
+
+   Binary :cpp:class:`~mppp::real` square root.
+
+   This function will compute the square root of *op* and store it
+   into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   If *op* is -0, *rop* will be set to -0. If *op* is negative, *rop* will be set to NaN.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sqrt(T &&r)
+
+   Unary :cpp:class:`~mppp::real` square root.
+
+   This function will compute and return the square root of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   If *r* is -0, the result will be -0. If *r* is negative, the result will be NaN.
+
+   :param r: the operand.
+
+   :return: the square root of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::rec_sqrt(mppp::real &rop, T &&op)
+
+   Binary :cpp:class:`~mppp::real` reciprocal square root.
+
+   This function will compute the reciprocal square root of *op* and store it into *rop*. The precision
+   of the result will be equal to the precision of *op*.
+
+   If *op* is zero, *rop* will be set to a positive infinity (regardless of the sign of *op*).
+   If *op* is a positive infinity, *rop* will be set to +0. If *op* is negative, *rop* will be set to NaN.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::rec_sqrt(T &&r)
+
+   Unary :cpp:class:`~mppp::real` reciprocal square root.
+
+   This function will compute and return the reciprocal square root of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   If *r* is zero, a positive infinity will be returned (regardless of the sign of *r*).
+   If *r* is a positive infinity, +0 will be returned. If *r* is negative,
+   NaN will be returned.
+
+   :param r: the operand.
+
+   :return: the reciprocal square root of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cbrt(mppp::real &rop, T &&op)
+
+   Binary :cpp:class:`~mppp::real` cubic root.
+
+   This function will compute the cubic root of *op* and store it
+   into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cbrt(T &&r)
+
+   Unary :cpp:class:`~mppp::real` cubic root.
+
+   This function will compute and return the cubic root of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the operand.
+
+   :return: the cubic root of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &rootn_ui(mppp::real &rop, T &&op, unsigned long k)
+
+   Binary :cpp:class:`~mppp::real` k-th root.
+
+   This function will compute the k-th root of *op* and store it
+   into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   If *k* is zero, the result will be NaN. If *k* is odd (resp. even) and *op*
+   negative (including negative infinity), the result will be a negative number (resp. NaN).
+   If *op* is zero, the result will be zero with the sign obtained by the usual limit rules, i.e.,
+   the same sign as *op* if *k* is odd, and positive if *k* is even.
+
+   .. note::
+      This function is available from MPFR 4 onwards.
+
+   :param rop: the return value.
+   :param op: the operand.
+   :param k: the degree of the root.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real rootn_ui(T &&r, unsigned long k)
+
+   Unary :cpp:class:`~mppp::real` k-th root.
+
+   This function will compute and return the k-th root of *r*.
+   The precision of the result will be equal to the precision
+   of *r*.
+
+   If *k* is zero, the result will be NaN. If *k* is odd (resp. even) and *r*
+   negative (including negative infinity), the result will be a negative number (resp. NaN).
+   If *r* is zero, the result will be zero with the sign obtained by the usual limit rules, i.e.,
+   the same sign as *r* if *k* is odd, and positive if *k* is even.
+
+   .. note::
+      This function is available from MPFR 4 onwards.
+
+   :param r: the operand.
+   :param k: the degree of the root.
+
+   :return: the k-th root of *r*.
 
 .. _real_exponentiation:
 
