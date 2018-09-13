@@ -139,6 +139,7 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
                 // by the Standard: the values of the decimal digits are contiguous.
                 // (i.e., '1' - '0' == 1, ... '9' - '0' == 9)
                 // """
+                // http://eel.is/c++draft/lex.charset#3
                 if (*cptr >= '0' && *cptr <= '9') {
                     os << '.';
                     dot_added = true;
