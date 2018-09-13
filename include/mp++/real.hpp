@@ -2691,6 +2691,9 @@ inline void mpfr_nary_func_wrapper(const std::false_type &, const F &f, Args &&.
 // Resources may be stolen from one of the arguments, if possible.
 // The Rnd flag controls whether to add the rounding mode (MPFR_RNDN) at the end
 // of the function arguments list or not.
+// NOTE: this function assumes that all arguments are reals. When we want to invoke MPFR
+// functions that have argument types other than mpfr_t, then we will have to wrap them
+// into a lambda (or similar) that has only mpfr_t arguments.
 template <bool Rnd, typename F, typename Arg0, typename... Args>
 inline real &mpfr_nary_op_impl(::mpfr_prec_t min_prec, const F &f, real &rop, Arg0 &&arg0, Args &&... args)
 {

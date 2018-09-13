@@ -179,6 +179,8 @@ Roots
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::rec_sqrt(mppp::real &rop, T &&op)
 
+   .. versionadded:: 0.12
+
    Binary :cpp:class:`~mppp::real` reciprocal square root.
 
    This function will compute the reciprocal square root of *op* and store it into *rop*. The precision
@@ -193,6 +195,8 @@ Roots
    :return: a reference to *rop*.
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::rec_sqrt(T &&r)
+
+   .. versionadded:: 0.12
 
    Unary :cpp:class:`~mppp::real` reciprocal square root.
 
@@ -209,6 +213,8 @@ Roots
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cbrt(mppp::real &rop, T &&op)
 
+   .. versionadded:: 0.12
+
    Binary :cpp:class:`~mppp::real` cubic root.
 
    This function will compute the cubic root of *op* and store it
@@ -222,6 +228,8 @@ Roots
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cbrt(T &&r)
 
+   .. versionadded:: 0.12
+
    Unary :cpp:class:`~mppp::real` cubic root.
 
    This function will compute and return the cubic root of *r*.
@@ -232,6 +240,8 @@ Roots
    :return: the cubic root of *r*.
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &rootn_ui(mppp::real &rop, T &&op, unsigned long k)
+
+   .. versionadded:: 0.12
 
    Binary :cpp:class:`~mppp::real` k-th root.
 
@@ -254,6 +264,8 @@ Roots
    :return: a reference to *rop*.
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real rootn_ui(T &&r, unsigned long k)
+
+   .. versionadded:: 0.12
 
    Unary :cpp:class:`~mppp::real` k-th root.
 
