@@ -7275,18 +7275,18 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
                 copy_limbs_no(out_ptr, out_ptr + new_size, rs_data);
             }
             // Clear out unused limbs, if needed.
-            rs.zero_unused_limbs();
+            rs.zero_upper_limbs(static_cast<std::size_t>(new_size));
         } else {
             // Special casing for zero.
             rs._mp_size = 0;
             rs.zero_upper_limbs(0);
         }
-        return;
+    } else {
+        if (sr) {
+            rop.promote();
+        }
+        ::mpz_sqrt(&rop._get_union().g_dy(), n.get_mpz_view());
     }
-    if (sr) {
-        rop.promote();
-    }
-    ::mpz_sqrt(&rop._get_union().g_dy(), n.get_mpz_view());
 }
 } // namespace detail
 
@@ -7324,6 +7324,50 @@ inline integer<SSize> sqrt(const integer<SSize> &n)
     return retval;
 }
 
+inline namespace detail
+{
+
+// TODO: test the zeroing of the upper limbs, both here
+// and in the sqrt() implementation.
+template <std::size_t SSize>
+inline void static_sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSize> &n)
+{
+    auto &rops = rop._get_union().g_st(), &rems = rem._get_union().g_st();
+    const auto &ns = n._get_union().g_st();
+    // NOTE: we know this is not negative, from the check above.
+    const mpz_size_t size = ns._mp_size;
+    if (mppp_likely(size)) {
+        // NOTE: rop and n must be separate. rem and n can coincide. See:
+        // https://gmplib.org/manual/Low_002dlevel-Functions.html
+        // In case of overlap of rop and n, we need to go through a tmp variable.
+        std::array<::mp_limb_t, SSize> tmp;
+        const bool overlap = (&rops == &ns);
+        const auto rops_data = rops.m_limbs.data(), out_ptr = overlap ? tmp.data() : rops_data,
+                   rems_data = rems.m_limbs.data();
+        // Do the computation. The function will return the size of the remainder.
+        const auto rem_size = ::mpn_sqrtrem(out_ptr, rems_data, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
+        // Compute the size of the output (which is ceil(size / 2)).
+        const mpz_size_t rop_size = size / 2 + size % 2;
+        assert(!rop_size || (out_ptr[rop_size - 1] & GMP_NUMB_MASK));
+        // Write out the result, clearing the unused limbs.
+        rops._mp_size = rop_size;
+        if (overlap) {
+            copy_limbs_no(out_ptr, out_ptr + rop_size, rops_data);
+        }
+        rops.zero_upper_limbs(static_cast<std::size_t>(rop_size));
+        rems._mp_size = rem_size;
+        rems.zero_upper_limbs(static_cast<std::size_t>(rem_size));
+    } else {
+        // Special casing for zero.
+        rops._mp_size = 0;
+        rops.zero_upper_limbs(0);
+        rems._mp_size = 0;
+        rems.zero_upper_limbs(0);
+    }
+}
+
+} // namespace detail
+
 template <std::size_t SSize>
 inline void sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSize> &n)
 {
@@ -7332,7 +7376,8 @@ inline void sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSiz
                                     "remainder 'rem' must be distinct objects");
     }
     if (mppp_unlikely(n.sgn() == -1)) {
-        throw zero_division_error("Cannot compute the square root of the negative number " + n.to_string());
+        throw zero_division_error("Cannot compute the square root with remainder of the negative number "
+                                  + n.to_string());
     }
     const bool srop = rop.is_static(), srem = rem.is_static(), ns = n.is_static();
     if (mppp_likely(ns)) {
