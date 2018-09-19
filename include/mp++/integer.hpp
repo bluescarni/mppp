@@ -7256,31 +7256,31 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
         if (!sr) {
             rop.set_zero();
         }
-        static_int<SSize> &rs = rop._get_union().g_st();
-        const static_int<SSize> &ns = n._get_union().g_st();
+        auto &rs = rop._get_union().g_st();
+        const auto &ns = n._get_union().g_st();
         // NOTE: we know this is not negative, from the check above.
         const mpz_size_t size = ns._mp_size;
-        if (!size) {
+        if (mppp_likely(size)) {
+            // In case of overlap we need to go through a tmp variable.
+            std::array<::mp_limb_t, SSize> tmp;
+            const bool overlap = (&rs == &ns);
+            const auto rs_data = rs.m_limbs.data(), out_ptr = overlap ? tmp.data() : rs_data;
+            ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
+            // Compute the size of the output (which is ceil(size / 2)).
+            const mpz_size_t new_size = size / 2 + size % 2;
+            assert(!new_size || (out_ptr[new_size - 1] & GMP_NUMB_MASK));
+            // Write out the result.
+            rs._mp_size = new_size;
+            if (overlap) {
+                copy_limbs_no(out_ptr, out_ptr + new_size, rs_data);
+            }
+            // Clear out unused limbs, if needed.
+            rs.zero_unused_limbs();
+        } else {
             // Special casing for zero.
             rs._mp_size = 0;
             rs.zero_upper_limbs(0);
-            return;
         }
-        // In case of overlap we need to go through a tmp variable.
-        std::array<::mp_limb_t, SSize> tmp;
-        const bool overlap = (&rs == &ns);
-        auto out_ptr = overlap ? tmp.data() : rs.m_limbs.data();
-        ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
-        // Compute the size of the output (which is ceil(size / 2)).
-        const mpz_size_t new_size = size / 2 + size % 2;
-        assert(!new_size || (out_ptr[new_size - 1] & GMP_NUMB_MASK));
-        // Write out the result.
-        rs._mp_size = new_size;
-        if (overlap) {
-            copy_limbs_no(out_ptr, out_ptr + new_size, rs.m_limbs.data());
-        }
-        // Clear out unused limbs, if needed.
-        rs.zero_unused_limbs();
         return;
     }
     if (sr) {
@@ -7322,6 +7322,37 @@ inline integer<SSize> sqrt(const integer<SSize> &n)
     integer<SSize> retval;
     sqrt_impl(retval, n);
     return retval;
+}
+
+template <std::size_t SSize>
+inline void sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSize> &n)
+{
+    if (mppp_unlikely(&rop == &rem)) {
+        throw std::invalid_argument("When performing an integer square root with remainder, the result 'rop' and the "
+                                    "remainder 'rem' must be distinct objects");
+    }
+    if (mppp_unlikely(n.sgn() == -1)) {
+        throw zero_division_error("Cannot compute the square root of the negative number " + n.to_string());
+    }
+    const bool srop = rop.is_static(), srem = rem.is_static(), ns = n.is_static();
+    if (mppp_likely(ns)) {
+        if (!srop) {
+            rop.set_zero();
+        }
+        if (!srem) {
+            rem.set_zero();
+        }
+        static_sqrtrem(rop._get_union().g_st(), rem._get_union().g_st(), n._get_union().g_st());
+        // sqrtrem can never fail.
+        return;
+    }
+    if (srop) {
+        rop._get_union().promote();
+    }
+    if (srem) {
+        rem._get_union().promote();
+    }
+    ::mpz_sqrtrem(&rop._get_union().g_dy(), &rem._get_union().g_dy(), n.get_mpz_view());
 }
 
 /** @} */
