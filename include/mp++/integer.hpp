@@ -1143,6 +1143,11 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 //   occurred? Probably some code could be refactored/shared with the char * interface, taking advantage
 //   of the fact that std::copy() actually returns something. Longer term, we probably should add optional
 //   support for boost.serialization, cereal, etc.
+// - for the comparison operators, we should consider using lower level primitives for comparisons with
+//   both C++ integrals and FP, instead of going through type conversions (same as done for add_ui() etc.).
+// - perhaps we should consider adding new overloads to functions which return more than one value
+//   (e.g., tdiv_qr(), sqrtrem(), etc.). At this time we have only the GMP-style overload, perhaps
+//   we could have an overload that returns the two values as tuple/pair/array.
 
 // NOTE: about the nails:
 // - whenever we need to read the *numerical value* of a limb (e.g., in our optimised primitives),
