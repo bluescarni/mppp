@@ -315,3 +315,53 @@ TEST_CASE("sqrtrem")
     n2 = n1;
     sqrtrem(n1, n2, n2);
 }
+
+struct perfect_square_p_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+
+        // A few simple tests.
+        REQUIRE(perfect_square_p(integer{}));
+        REQUIRE(perfect_square_p(integer{1}));
+        REQUIRE(!perfect_square_p(integer{2}));
+        REQUIRE(perfect_square_p(integer{4}));
+        REQUIRE(perfect_square_p(integer{25}));
+        REQUIRE(!perfect_square_p(integer{-1}));
+        REQUIRE(!perfect_square_p(integer{-2}));
+        REQUIRE(!perfect_square_p(integer{-4}));
+        REQUIRE(!perfect_square_p(integer{-25}));
+
+        mpz_raii tmp;
+        integer n;
+        std::uniform_int_distribution<int> sdist(0, 1);
+        // Run a variety of tests with operands with x number of limbs.
+        auto random_xy = [&](unsigned x) {
+            for (int i = 0; i < ntries; ++i) {
+                // Reset n every once in a while.
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    n = integer{};
+                }
+                random_integer(tmp, x, rng);
+                n = &tmp.m_mpz;
+                if (n.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n.promote();
+                }
+                REQUIRE(::mpz_perfect_square_p(&tmp.m_mpz) == perfect_square_p(n));
+            }
+        };
+
+        random_xy(0);
+        random_xy(1);
+        random_xy(2);
+        random_xy(3);
+        random_xy(4);
+    }
+};
+
+TEST_CASE("perfect_square_p")
+{
+    tuple_for_each(sizes{}, perfect_square_p_tester{});
+}

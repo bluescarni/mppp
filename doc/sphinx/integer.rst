@@ -201,6 +201,16 @@ Roots
    :exception std\:\:domain_error: if *n* is negative.
    :exception std\:\:invalid_argument: if *rop* and *rem* are the same object.
 
+.. cpp:function:: template <std::size_t SSize> bool mppp::perfect_square_p(const mppp::integer<SSize> &n)
+
+   Detect perfect square.
+
+   This function returns ``True`` if *n* is a perfect square, ``False`` otherwise.
+
+   :param n: the argument.
+
+   :return: ``True`` if *n* is a perfect square, ``False`` otherwise.
+
 .. _integer_io:
 
 Input/Output

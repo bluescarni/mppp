@@ -7387,6 +7387,32 @@ inline void sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSiz
     }
 }
 
+// Detect perfect square.
+template <std::size_t SSize>
+inline bool perfect_square_p(const integer<SSize> &n)
+{
+    const auto &u = n._get_union();
+    // NOTE: the size is part of the common initial sequence.
+    const auto size = u.m_st._mp_size;
+    if (mppp_likely(size > 0)) {
+        // n is positive. Extract a pointer to the limbs
+        // and call the mpn function.
+        const mp_limb_t *ptr;
+        if (mppp_likely(n.is_static())) {
+            ptr = u.g_st().m_limbs.data();
+        } else {
+            ptr = u.g_dy()._mp_d;
+        }
+        // NOTE: as usual, we assume that we can freely cast any valid mpz_size_t to
+        // mp_size_t when calling mpn functions.
+        return static_cast<bool>(::mpn_perfect_square_p(ptr, static_cast<::mp_size_t>(size)));
+    } else {
+        // n is zero or negative. It is a perfect square
+        // only if zero.
+        return size == 0;
+    }
+}
+
 /** @defgroup integer_io integer_io
  *  @{
  */
