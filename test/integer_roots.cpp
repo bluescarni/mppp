@@ -349,7 +349,7 @@ struct perfect_square_p_tester {
                     // Promote sometimes, if possible.
                     n.promote();
                 }
-                REQUIRE(::mpz_perfect_square_p(&tmp.m_mpz) == perfect_square_p(n));
+                REQUIRE(static_cast<bool>(::mpz_perfect_square_p(&tmp.m_mpz)) == perfect_square_p(n));
             }
         };
 
