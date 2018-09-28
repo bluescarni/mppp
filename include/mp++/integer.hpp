@@ -7410,7 +7410,7 @@ inline bool perfect_square_p(const integer<SSize> &n)
         }
         // NOTE: as usual, we assume that we can freely cast any valid mpz_size_t to
         // mp_size_t when calling mpn functions.
-        return static_cast<bool>(::mpn_perfect_square_p(ptr, static_cast<::mp_size_t>(size)));
+        return ::mpn_perfect_square_p(ptr, static_cast<::mp_size_t>(size)) != 0;
     } else {
         // n is zero or negative. It is a perfect square
         // only if zero.
