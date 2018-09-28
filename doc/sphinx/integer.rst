@@ -160,8 +160,46 @@ Exponentiation
 Roots
 ~~~~~
 
-.. doxygengroup:: integer_roots
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::sqrt(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n)
+
+   Binary :cpp:class:`~mppp::integer` square root.
+
+   This function will set *rop* to the truncated integer part of the square root of *n*.
+
+   :param rop: the return value.
+   :param n: the argument.
+
+   :return: a reference to *rop*.
+
+   :exception std\:\:domain_error: if *n* is negative.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::sqrt(const mppp::integer<SSize> &n)
+
+   Unary :cpp:class:`~mppp::integer` square root.
+
+   This function will return the truncated integer part of the square root of *n*.
+
+   :param n: the argument.
+
+   :return: the integer square root of *n*.
+
+   :exception std\:\:domain_error: if *n* is negative.
+
+.. cpp:function:: template <std::size_t SSize> void mppp::sqrtrem(mppp::integer<SSize> &rop, mppp::integer<SSize> &rem, const mppp::integer<SSize> &n)
+
+   :cpp:class:`~mppp::integer` square root with remainder.
+
+   This function will set *rop* to the truncated integer part of the square root of *n*, and *rem* to the remainder of the operation.
+   That is, *rem* will be equal to ``n-rop*rop``, and it will be zero if *n* is a perfect square.
+
+   *rop* and *rem* must be distinct objects.
+
+   :param rop: the first return value (i.e., the integer square root of *n*).
+   :param rem: the second return value (i.e., the remainder of the operation).
+   :param n: the argument.
+
+   :exception std\:\:domain_error: if *n* is negative.
+   :exception std\:\:invalid_argument: if *rop* and *rem* are the same object.
 
 .. _integer_io:
 

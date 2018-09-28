@@ -104,12 +104,15 @@ static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_s
                   && offsetof(mpz_struct_t, _mp_size) == offsetof(expected_mpz_struct_t, _mp_size)
                   && offsetof(mpz_struct_t, _mp_d) == offsetof(expected_mpz_struct_t, _mp_d)
                   && std::is_same<::mp_limb_t *, decltype(std::declval<mpz_struct_t>()._mp_d)>::value &&
-                  // mp_bitcnt_t is used in shift operators, so we double-check it is unsigned. If it is not
+                  // mp_bitcnt_t is used in shift operators, so we double-check it is an unsigned integral. If it is not
                   // we might end up shifting by negative values, which is UB.
-                  std::is_unsigned<::mp_bitcnt_t>::value &&
+                  std::is_integral<::mp_bitcnt_t>::value && std::is_unsigned<::mp_bitcnt_t>::value &&
                   // The mpn functions accept sizes as ::mp_size_t, but we generally represent sizes as mpz_size_t.
                   // We need then to make sure we can always cast safely mpz_size_t to ::mp_size_t. Inspection
                   // of the gmp.h header seems to indicate that mpz_size_t is never larger than ::mp_size_t.
+                  // NOTE: since mp_size_t is the size type used by mpn functions, it is expected that it cannot
+                  // have smaller range than mpz_size_t, otherwise mpz_t would contain numbers too large to be
+                  // used as arguments in the mpn functions.
                   nl_min<mpz_size_t>() >= nl_min<::mp_size_t>() && nl_max<mpz_size_t>() <= nl_max<::mp_size_t>(),
               "Invalid mpz_t struct layout and/or GMP types.");
 
@@ -7238,13 +7241,10 @@ inline integer_common_t<T, U> pow(const T &base, const U &exp)
 
 /** @} */
 
-/** @defgroup integer_roots integer_roots
- *  @{
- */
-
 inline namespace detail
 {
 
+// Implementation of sqrt.
 template <std::size_t SSize>
 inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
 {
@@ -7258,8 +7258,11 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
         }
         auto &rs = rop._get_union().g_st();
         const auto &ns = n._get_union().g_st();
-        // NOTE: we know this is not negative, from the check above.
-        const mpz_size_t size = ns._mp_size;
+        // NOTE: we know n is not negative, from the check above.
+        assert(ns._mp_size >= 0);
+        // NOTE: cast this to the unsigned counterpart, this will make
+        // the computation of new_size below more efficient.
+        const auto size = static_cast<make_unsigned_t<mpz_size_t>>(ns._mp_size);
         if (mppp_likely(size)) {
             // In case of overlap we need to go through a tmp variable.
             std::array<::mp_limb_t, SSize> tmp;
@@ -7267,10 +7270,10 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
             const auto rs_data = rs.m_limbs.data(), out_ptr = overlap ? tmp.data() : rs_data;
             ::mpn_sqrtrem(out_ptr, nullptr, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
             // Compute the size of the output (which is ceil(size / 2)).
-            const mpz_size_t new_size = size / 2 + size % 2;
-            assert(!new_size || (out_ptr[new_size - 1] & GMP_NUMB_MASK));
+            const auto new_size = size / 2u + size % 2u;
+            assert(!new_size || (out_ptr[new_size - 1u] & GMP_NUMB_MASK));
             // Write out the result.
-            rs._mp_size = new_size;
+            rs._mp_size = static_cast<mpz_size_t>(new_size);
             if (overlap) {
                 copy_limbs_no(out_ptr, out_ptr + new_size, rs_data);
             }
@@ -7290,17 +7293,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
 }
 } // namespace detail
 
-/// Integer square root (binary version).
-/**
- * This method will set \p rop to the integer square root of \p n.
- *
- * @param rop the return value.
- * @param n the integer whose integer square root will be computed.
- *
- * @return a reference to \p rop.
- *
- * @throws std::domain_error if \p n is negative.
- */
+// Binary sqrt.
 template <std::size_t SSize>
 inline integer<SSize> &sqrt(integer<SSize> &rop, const integer<SSize> &n)
 {
@@ -7308,14 +7301,7 @@ inline integer<SSize> &sqrt(integer<SSize> &rop, const integer<SSize> &n)
     return rop;
 }
 
-/// Integer square root (unary version).
-/**
- * @param n the integer whose integer square root will be computed.
- *
- * @return the integer square root of \p n.
- *
- * @throws std::domain_error if \p n is negative.
- */
+// Unary sqrt.
 template <std::size_t SSize>
 inline integer<SSize> sqrt(const integer<SSize> &n)
 {
@@ -7327,15 +7313,15 @@ inline integer<SSize> sqrt(const integer<SSize> &n)
 inline namespace detail
 {
 
-// TODO: test the zeroing of the upper limbs, both here
-// and in the sqrt() implementation.
+// Static sqrtrem implementation.
 template <std::size_t SSize>
-inline void static_sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSize> &n)
+inline void static_sqrtrem(static_int<SSize> &rops, static_int<SSize> &rems, const static_int<SSize> &ns)
 {
-    auto &rops = rop._get_union().g_st(), &rems = rem._get_union().g_st();
-    const auto &ns = n._get_union().g_st();
-    // NOTE: we know this is not negative, from the check above.
-    const mpz_size_t size = ns._mp_size;
+    // NOTE: we require non-negative n (this is checked in sqrtrem()).
+    assert(ns._mp_size >= 0);
+    // NOTE: cast this to the unsigned counterpart, this will make
+    // the computation of rop_size below more efficient.
+    const auto size = static_cast<make_unsigned_t<mpz_size_t>>(ns._mp_size);
     if (mppp_likely(size)) {
         // NOTE: rop and n must be separate. rem and n can coincide. See:
         // https://gmplib.org/manual/Low_002dlevel-Functions.html
@@ -7347,15 +7333,15 @@ inline void static_sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integ
         // Do the computation. The function will return the size of the remainder.
         const auto rem_size = ::mpn_sqrtrem(out_ptr, rems_data, ns.m_limbs.data(), static_cast<::mp_size_t>(size));
         // Compute the size of the output (which is ceil(size / 2)).
-        const mpz_size_t rop_size = size / 2 + size % 2;
-        assert(!rop_size || (out_ptr[rop_size - 1] & GMP_NUMB_MASK));
+        const auto rop_size = size / 2u + size % 2u;
+        assert(!rop_size || (out_ptr[rop_size - 1u] & GMP_NUMB_MASK));
         // Write out the result, clearing the unused limbs.
-        rops._mp_size = rop_size;
+        rops._mp_size = static_cast<mpz_size_t>(rop_size);
         if (overlap) {
             copy_limbs_no(out_ptr, out_ptr + rop_size, rops_data);
         }
         rops.zero_upper_limbs(static_cast<std::size_t>(rop_size));
-        rems._mp_size = rem_size;
+        rems._mp_size = static_cast<mpz_size_t>(rem_size);
         rems.zero_upper_limbs(static_cast<std::size_t>(rem_size));
     } else {
         // Special casing for zero.
@@ -7368,6 +7354,7 @@ inline void static_sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integ
 
 } // namespace detail
 
+// sqrt with remainder.
 template <std::size_t SSize>
 inline void sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSize> &n)
 {
@@ -7387,20 +7374,18 @@ inline void sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSiz
         if (!srem) {
             rem.set_zero();
         }
+        // NOTE: sqrtrem() can never fail.
         static_sqrtrem(rop._get_union().g_st(), rem._get_union().g_st(), n._get_union().g_st());
-        // sqrtrem can never fail.
-        return;
+    } else {
+        if (srop) {
+            rop._get_union().promote();
+        }
+        if (srem) {
+            rem._get_union().promote();
+        }
+        ::mpz_sqrtrem(&rop._get_union().g_dy(), &rem._get_union().g_dy(), n.get_mpz_view());
     }
-    if (srop) {
-        rop._get_union().promote();
-    }
-    if (srem) {
-        rem._get_union().promote();
-    }
-    ::mpz_sqrtrem(&rop._get_union().g_dy(), &rem._get_union().g_dy(), n.get_mpz_view());
 }
-
-/** @} */
 
 /** @defgroup integer_io integer_io
  *  @{
