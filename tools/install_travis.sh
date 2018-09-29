@@ -104,9 +104,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
         exit 1;
     fi
     cd ../sphinx;
-    # Rely on the pre-release of sphinx 1.8 at this time.
-    pip install --user --pre sphinx
-    pip install --user breathe requests[security] sphinx_materialdesign_theme
+    pip install --user breathe requests[security] sphinx sphinx_materialdesign_theme
     # There are some warnings in real128 and in the sphinx code currently.
     # Ignore them.
     export SPHINX_OUTPUT=`make html linkcheck 2>&1 | grep -v "Duplicate declaration" | grep -v "is deprecated" >/dev/null`;

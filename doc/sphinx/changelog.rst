@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Add all the root functions from the GMP API to the :cpp:class:`~mppp::integer` API
+  (`#156 <https://github.com/bluescarni/mppp/pull/156>`__).
 - Add all the root functions from the MPFR API to the :cpp:class:`~mppp::real` API
   (`#154 <https://github.com/bluescarni/mppp/pull/154>`__).
 - Add a specialisation of ``std::numeric_limits`` for :cpp:class:`~mppp::real128`
