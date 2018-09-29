@@ -224,7 +224,7 @@ struct div_tester {
 
         // In-place div with self.
         retval = "-3/4";
-        retval /= retval;
+        retval /= *&retval;
         REQUIRE(retval == rational(1));
     }
 };

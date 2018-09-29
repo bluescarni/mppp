@@ -110,7 +110,7 @@ struct ior_tester {
                 bitwise_ior(n1, n3, n2);
                 ::mpz_ior(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
                 REQUIRE(n1 == integer{&m1.m_mpz});
-                old_n1 |= old_n1;
+                old_n1 |= *&old_n1;
                 REQUIRE(n1 == old_n1);
             }
         };
@@ -855,7 +855,7 @@ struct and_tester {
                 bitwise_and(n1, n3, n2);
                 ::mpz_and(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
                 REQUIRE(n1 == integer{&m1.m_mpz});
-                old_n1 &= old_n1;
+                old_n1 &= *&old_n1;
                 REQUIRE(n1 == old_n1);
             }
         };
@@ -1348,7 +1348,7 @@ struct xor_tester {
                 bitwise_xor(n1, n3, n2);
                 ::mpz_xor(&m1.m_mpz, &m3.m_mpz, &m2.m_mpz);
                 REQUIRE(n1 == integer{&m1.m_mpz});
-                old_n1 ^= old_n1;
+                old_n1 ^= *&old_n1;
                 REQUIRE(n1 == old_n1);
             }
         };

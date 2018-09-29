@@ -284,7 +284,7 @@ struct mod_tester {
         REQUIRE((!is_modable_inplace<int, integer>::value));
         // In-place mod with self.
         retval = 5;
-        retval %= retval;
+        retval %= *&retval;
         REQUIRE(retval == 0);
     }
 };

@@ -536,7 +536,7 @@ struct copy_move_tester {
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_dynamic());
         // Self assignments.
-        q2 = q2;
+        q2 = *&q2;
         REQUIRE(lex_cast(q2) == "-123");
         REQUIRE(q2.get_num().is_static());
         REQUIRE(q2.get_den().is_dynamic());

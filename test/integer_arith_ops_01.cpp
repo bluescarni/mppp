@@ -401,7 +401,7 @@ struct sub_tester {
         REQUIRE((!is_subtractable_inplace<const int, integer>::value));
         // In-place sub with self.
         retval = -5;
-        retval -= retval;
+        retval -= *&retval;
         REQUIRE(retval == 0);
     }
 };

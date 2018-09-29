@@ -207,7 +207,7 @@ struct div_tester {
 
         // In-place div with self.
         retval = -5;
-        retval /= retval;
+        retval /= *&retval;
         REQUIRE(retval == 1);
     }
 };

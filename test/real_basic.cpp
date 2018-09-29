@@ -694,7 +694,7 @@ TEST_CASE("real assignment")
     REQUIRE(::mpfr_equal_p(r0.get_mpfr_t(), r1.get_mpfr_t()));
     auto old_r1(r1);
     // Self assignment.
-    r1 = r1;
+    r1 = *&r1;
     REQUIRE(old_r1.get_prec() == r1.get_prec());
     REQUIRE(::mpfr_equal_p(r1.get_mpfr_t(), old_r1.get_mpfr_t()));
     // Move assignment.
