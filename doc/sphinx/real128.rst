@@ -148,7 +148,7 @@ Gamma functions
 
 .. _real128_miscfuncts:
 
-Miscellaneous functions
+Other special functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygengroup:: real128_miscfuncts
@@ -164,8 +164,8 @@ Input/Output
 
 .. _real128_operators:
 
-Operators
----------
+Mathematical operators
+----------------------
 
 .. doxygengroup:: real128_operators
    :content-only:

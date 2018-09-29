@@ -336,8 +336,8 @@ Input/Output
 
 .. _real_operators:
 
-Operators
----------
+Mathematical operators
+----------------------
 
 .. doxygengroup:: real_operators
    :content-only:

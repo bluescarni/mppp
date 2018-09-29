@@ -304,8 +304,8 @@ Other
 
 .. _integer_operators:
 
-Operators
----------
+Mathematical operators
+----------------------
 
 Overloaded operators are provided for convenience. Their interface is generic, and their implementation
 is typically built on top of basic :ref:`functions <integer_functions>`.
