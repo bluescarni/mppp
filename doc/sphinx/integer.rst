@@ -205,11 +205,64 @@ Roots
 
    Detect perfect square.
 
-   This function returns ``True`` if *n* is a perfect square, ``False`` otherwise.
+   This function returns ``true`` if *n* is a perfect square, ``false`` otherwise.
 
    :param n: the argument.
 
-   :return: ``True`` if *n* is a perfect square, ``False`` otherwise.
+   :return: ``true`` if *n* is a perfect square, ``false`` otherwise.
+
+.. cpp:function:: template <std::size_t SSize> bool mppp::root(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n, unsigned long m)
+
+   Ternary :math:`m`-th root.
+
+   This function will set *rop* to the truncated integer part of the :math:`m`-th root of *n*. The return value will be ``true`` if the
+   computation is exact, ``false`` otherwise.
+
+   :param rop: the return value.
+   :param n: the argument.
+   :param m: the degree of the root.
+
+   :return: ``true`` if the computation is exact, ``false`` otherwise.
+
+   :exception std\:\:domain_error: if *m* is even and *n* is negative, or if *m* is zero.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::root(const mppp::integer<SSize> &n, unsigned long m)
+
+   Binary :math:`m`-th root.
+
+   This function will return the truncated integer part of the :math:`m`-th root of *n*.
+
+   :param n: the argument.
+   :param m: the degree of the root.
+
+   :return: the truncated integer part of the :math:`m`-th root of *n*.
+
+   :exception std\:\:domain_error: if *m* is even and *n* is negative, or if *m* is zero.
+
+.. cpp:function:: template <std::size_t SSize> void mppp::rootrem(mppp::integer<SSize> &rop, mppp::integer<SSize> &rem, const mppp::integer<SSize> &n, unsigned long m)
+
+   :math:`m`-th root with remainder.
+
+   This function will set *rop* to the truncated integer part of the :math:`m`-th root of *n*, and *rem* to the remainder
+   of the operation. That is, *rem* will be equal to ``n-rop**m``, and it will be zero if *n* is a perfect power.
+
+   :param rop: the first return value (i.e., the :math:`m`-th root root of *n*).
+   :param rem: the second return value (i.e., the remainder of the operation).
+   :param n: the argument.
+   :param m: the degree of the root.
+
+   :exception std\:\:domain_error: if *m* is even and *n* is negative, or if *m* is zero.
+
+.. cpp:function:: template <std::size_t SSize> bool mppp::perfect_power_p(const mppp::integer<SSize> &n)
+
+   Detect perfect power.
+
+   This function will return ``true`` if *n* is a perfect power, that is, if there exist integers :math:`a` and :math:`b`,
+   with :math:`b>1`, such that *n* equals :math:`a^b`.  Otherwise, the function will return ``false``.
+
+   :param n: the argument.
+
+   :return: ``true`` if *n* is a perfect power, ``false`` otherwise.
 
 .. _integer_io:
 

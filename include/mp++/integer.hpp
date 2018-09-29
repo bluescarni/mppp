@@ -7254,7 +7254,7 @@ template <std::size_t SSize>
 inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
 {
     if (mppp_unlikely(n._get_union().m_st._mp_size < 0)) {
-        throw std::domain_error("Cannot compute the square root of the negative number " + n.to_string());
+        throw std::domain_error("Cannot compute the integer square root of the negative number " + n.to_string());
     }
     const bool sr = rop.is_static(), sn = n.is_static();
     if (mppp_likely(sn)) {
@@ -7368,7 +7368,7 @@ inline void sqrtrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSiz
                                     "remainder 'rem' must be distinct objects");
     }
     if (mppp_unlikely(n.sgn() == -1)) {
-        throw zero_division_error("Cannot compute the square root with remainder of the negative number "
+        throw zero_division_error("Cannot compute the integer square root with remainder of the negative number "
                                   + n.to_string());
     }
     const bool srop = rop.is_static(), srem = rem.is_static(), ns = n.is_static();
@@ -7416,6 +7416,57 @@ inline bool perfect_square_p(const integer<SSize> &n)
         // only if zero.
         return size == 0;
     }
+}
+
+// m-th root, ternary version.
+template <std::size_t SSize>
+inline bool root(integer<SSize> &rop, const integer<SSize> &n, unsigned long m)
+{
+    if (mppp_unlikely(!m)) {
+        throw std::domain_error("Cannot compute the integer m-th root of an integer if m is zero");
+    }
+    if (mppp_unlikely(!(m % 2u) && n.sgn() == -1)) {
+        throw std::domain_error("Cannot compute the integer root of degree " + std::to_string(m)
+                                + " of the negative number " + n.to_string());
+    }
+    MPPP_MAYBE_TLS mpz_raii tmp;
+    const auto ret = ::mpz_root(&tmp.m_mpz, n.get_mpz_view(), m);
+    rop = &tmp.m_mpz;
+    return ret != 0;
+}
+
+// m-th root, binary version.
+template <std::size_t SSize>
+inline integer<SSize> root(const integer<SSize> &n, unsigned long m)
+{
+    integer<SSize> retval;
+    root(retval, n, m);
+    return retval;
+}
+
+// m-th root with remainder.
+template <std::size_t SSize>
+inline void rootrem(integer<SSize> &rop, integer<SSize> &rem, const integer<SSize> &n, unsigned long m)
+{
+    if (mppp_unlikely(!m)) {
+        throw std::domain_error("Cannot compute the integer m-th root with remainder of an integer if m is zero");
+    }
+    if (mppp_unlikely(!(m % 2u) && n.sgn() == -1)) {
+        throw std::domain_error("Cannot compute the integer root with remainder of degree " + std::to_string(m)
+                                + " of the negative number " + n.to_string());
+    }
+    MPPP_MAYBE_TLS mpz_raii tmp_rop;
+    MPPP_MAYBE_TLS mpz_raii tmp_rem;
+    ::mpz_rootrem(&tmp_rop.m_mpz, &tmp_rem.m_mpz, n.get_mpz_view(), m);
+    rop = &tmp_rop.m_mpz;
+    rem = &tmp_rem.m_mpz;
+}
+
+// Detect perfect power.
+template <std::size_t SSize>
+inline bool perfect_power_p(const integer<SSize> &n)
+{
+    return ::mpz_perfect_power_p(n.get_mpz_view()) != 0;
 }
 
 /** @defgroup integer_io integer_io

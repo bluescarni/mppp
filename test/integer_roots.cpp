@@ -100,14 +100,14 @@ struct sqrt_tester {
         // Error testing.
         n2 = integer{-1};
         REQUIRE_THROWS_PREDICATE(sqrt(n1, n2), std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot compute the square root of the negative number -1";
+            return std::string(ex.what()) == "Cannot compute the integer square root of the negative number -1";
         });
         REQUIRE_THROWS_PREDICATE(sqrt(integer{-2}), std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot compute the square root of the negative number -2";
+            return std::string(ex.what()) == "Cannot compute the integer square root of the negative number -2";
         });
         n2 = integer{-3};
         REQUIRE_THROWS_PREDICATE(n2.sqrt(), std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot compute the square root of the negative number -3";
+            return std::string(ex.what()) == "Cannot compute the integer square root of the negative number -3";
         });
         mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
@@ -225,10 +225,12 @@ struct sqrtrem_tester {
         // Error testing.
         n3 = -1;
         REQUIRE_THROWS_PREDICATE(sqrtrem(n1, n2, n3), std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot compute the square root with remainder of the negative number -1";
+            return std::string(ex.what())
+                   == "Cannot compute the integer square root with remainder of the negative number -1";
         });
         REQUIRE_THROWS_PREDICATE(sqrtrem(n1, n2, integer{-2}), std::domain_error, [](const std::domain_error &ex) {
-            return std::string(ex.what()) == "Cannot compute the square root with remainder of the negative number -2";
+            return std::string(ex.what())
+                   == "Cannot compute the integer square root with remainder of the negative number -2";
         });
         REQUIRE_THROWS_PREDICATE(
             sqrtrem(n1, n1, integer{2}), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -364,4 +366,156 @@ struct perfect_square_p_tester {
 TEST_CASE("perfect_square_p")
 {
     tuple_for_each(sizes{}, perfect_square_p_tester{});
+}
+
+struct root_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+
+        // A few simple tests.
+        REQUIRE(root(integer{0}, 1) == 0);
+        REQUIRE(root(integer{0}, 2) == 0);
+        REQUIRE(root(integer{0}, 3) == 0);
+        REQUIRE(root(integer{8}, 3) == 2);
+        REQUIRE(root(integer{9}, 3) == 2);
+        REQUIRE(root(integer{16}, 4) == 2);
+        REQUIRE(root(integer{20}, 4) == 2);
+        REQUIRE(root(integer{-8}, 3) == -2);
+        REQUIRE(root(integer{-9}, 3) == -2);
+        REQUIRE(root(integer{-27}, 3) == -3);
+        REQUIRE(root(integer{-30}, 3) == -3);
+
+        // Tests for the ternary overload.
+        integer rop;
+        REQUIRE(root(rop, integer{0}, 1));
+        REQUIRE(rop == 0);
+        REQUIRE(root(rop, integer{0}, 2));
+        REQUIRE(rop == 0);
+        REQUIRE(root(rop, integer{0}, 3));
+        REQUIRE(rop == 0);
+        REQUIRE(root(rop, integer{8}, 3));
+        REQUIRE(rop == 2);
+        REQUIRE(!root(rop, integer{9}, 3));
+        REQUIRE(rop == 2);
+        REQUIRE(root(rop, integer{16}, 4));
+        REQUIRE(rop == 2);
+        REQUIRE(!root(rop, integer{20}, 4));
+        REQUIRE(rop == 2);
+        REQUIRE(root(rop, integer{-8}, 3));
+        REQUIRE(rop == -2);
+        REQUIRE(!root(rop, integer{-9}, 3));
+        REQUIRE(rop == -2);
+        REQUIRE(root(rop, integer{-27}, 3));
+        REQUIRE(rop == -3);
+        REQUIRE(!root(rop, integer{-30}, 3));
+        REQUIRE(rop == -3);
+
+        // Error checking.
+        REQUIRE_THROWS_PREDICATE(root(integer{8}, 0), std::domain_error, [](const std::domain_error &ex) {
+            return std::string(ex.what()) == "Cannot compute the integer m-th root of an integer if m is zero";
+        });
+        REQUIRE_THROWS_PREDICATE(root(integer{-16}, 4), std::domain_error, [](const std::domain_error &ex) {
+            return std::string(ex.what()) == "Cannot compute the integer root of degree 4 of the negative number -16";
+        });
+    }
+};
+
+TEST_CASE("root")
+{
+    tuple_for_each(sizes{}, root_tester{});
+}
+
+struct rootrem_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        integer rop, rem;
+
+        rootrem(rop, rem, integer{0}, 1);
+        REQUIRE(rop == 0);
+        REQUIRE(rem == 0);
+        rootrem(rop, rem, integer{0}, 2);
+        REQUIRE(rop == 0);
+        REQUIRE(rem == 0);
+        rootrem(rop, rem, integer{0}, 3);
+        REQUIRE(rop == 0);
+        REQUIRE(rem == 0);
+        rootrem(rop, rem, integer{8}, 3);
+        REQUIRE(rop == 2);
+        REQUIRE(rem == 0);
+        rootrem(rop, rem, integer{9}, 3);
+        REQUIRE(rop == 2);
+        REQUIRE(rem == 1);
+        rootrem(rop, rem, integer{10}, 3);
+        REQUIRE(rop == 2);
+        REQUIRE(rem == 2);
+        rootrem(rop, rem, integer{16}, 4);
+        REQUIRE(rop == 2);
+        REQUIRE(rem == 0);
+        rootrem(rop, rem, integer{20}, 4);
+        REQUIRE(rop == 2);
+        REQUIRE(rem == 4);
+        rootrem(rop, rem, integer{-8}, 3);
+        REQUIRE(rop == -2);
+        REQUIRE(rem == 0);
+        rootrem(rop, rem, integer{-9}, 3);
+        REQUIRE(rop == -2);
+        REQUIRE(rem == -1);
+        rootrem(rop, rem, integer{-10}, 3);
+        REQUIRE(rop == -2);
+        REQUIRE(rem == -2);
+        rootrem(rop, rem, integer{-27}, 3);
+        REQUIRE(rop == -3);
+        REQUIRE(rem == 0);
+        rootrem(rop, rem, integer{-30}, 3);
+        REQUIRE(rop == -3);
+        REQUIRE(rem == -3);
+
+        // Error checking.
+        REQUIRE_THROWS_PREDICATE(rootrem(rop, rem, integer{8}, 0), std::domain_error, [](const std::domain_error &ex) {
+            return std::string(ex.what())
+                   == "Cannot compute the integer m-th root with remainder of an integer if m is zero";
+        });
+        REQUIRE_THROWS_PREDICATE(
+            rootrem(rop, rem, integer{-16}, 4), std::domain_error, [](const std::domain_error &ex) {
+                return std::string(ex.what())
+                       == "Cannot compute the integer root with remainder of degree 4 of the negative number -16";
+            });
+    }
+};
+
+TEST_CASE("rootrem")
+{
+    tuple_for_each(sizes{}, rootrem_tester{});
+}
+
+struct perfect_power_p_tester {
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        using integer = integer<S::value>;
+        REQUIRE(perfect_power_p(integer{}));
+        REQUIRE(perfect_power_p(integer{1}));
+        REQUIRE(perfect_power_p(integer{-1}));
+        REQUIRE(!perfect_power_p(integer{2}));
+        REQUIRE(!perfect_power_p(integer{-2}));
+        REQUIRE(!perfect_power_p(integer{3}));
+        REQUIRE(!perfect_power_p(integer{-3}));
+        REQUIRE(perfect_power_p(integer{4}));
+        REQUIRE(!perfect_power_p(integer{-4}));
+        REQUIRE(perfect_power_p(integer{8}));
+        REQUIRE(perfect_power_p(integer{-8}));
+        REQUIRE(perfect_power_p(integer{16}));
+        REQUIRE(!perfect_power_p(integer{-16}));
+        REQUIRE(perfect_power_p(integer{27}));
+        REQUIRE(perfect_power_p(integer{-27}));
+    }
+};
+
+TEST_CASE("perfect_power_p")
+{
+    tuple_for_each(sizes{}, perfect_power_p_tester{});
 }
