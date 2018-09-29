@@ -2497,47 +2497,187 @@ the absolute value of <code class="docutils literal notranslate"><span class="pr
 <div class="section" id="roots">
 <span id="integer-roots"></span><h3>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="_CPPv3N4mppp4sqrtER7integerI5SSizeERK7integerI5SSizeE">
-<span id="_CPPv2N4mppp4sqrtER7integerI5SSizeERK7integerI5SSizeE"></span><span id="mppp::sqrt__integer:SSize:R.integer:SSize:CR"></span><em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;<br /><span class="target" id="group__integer__roots_1ga7c85b9f103191c22720feb29977601e0"></span><a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrt</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp4sqrtER7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Integer square root (binary version). </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to the integer square root of <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: the integer whose integer square root will be computed.</li>
+<dt id="_CPPv3I_NSt6size_tEEN4mppp4sqrtERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
+<span id="_CPPv2I_NSt6size_tEEN4mppp4sqrtERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4sqrtERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrt::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrt</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4sqrtERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrt::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4sqrtERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrt::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp4sqrtERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary <a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> square root.</p>
+<p>This function will set <em>rop</em> to the truncated integer part of the square root of <em>n</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the return value.</li>
+<li><strong>n</strong> – the argument.</li>
 </ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">n</span></code> is negative. </li>
-</ul>
-</dd>
-</dl>
-</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a reference to <em>rop</em>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Throws:</th><td class="field-body"><p class="first last"><strong>std::domain_error</strong> – if <em>n</em> is negative.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N4mppp4sqrtERK7integerI5SSizeE">
-<span id="_CPPv2N4mppp4sqrtERK7integerI5SSizeE"></span><span id="mppp::sqrt__integer:SSize:CR"></span><em class="property">template </em>&lt;std::size_t <em>SSize</em>&gt;<br /><span class="target" id="group__integer__roots_1ga286667c7246d1c448ca1a5c386358a97"></span><a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrt</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;SSize&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp4sqrtERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Integer square root (unary version). </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>the integer square root of <code class="docutils literal notranslate"><span class="pre">n</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: the integer whose integer square root will be computed.</li>
+<dt id="_CPPv3I_NSt6size_tEEN4mppp4sqrtERKN4mppp7integerI5SSizeEE">
+<span id="_CPPv2I_NSt6size_tEEN4mppp4sqrtERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4sqrtERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrt::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrt</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4sqrtERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrt::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp4sqrtERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Unary <a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> square root.</p>
+<p>This function will return the truncated integer part of the square root of <em>n</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> – the argument.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the integer square root of <em>n</em>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Throws:</th><td class="field-body"><strong>std::domain_error</strong> – if <em>n</em> is negative.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
+<span id="_CPPv2I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />void <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrtrem</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrtrem::SSize">SSize</a>&gt; &amp;<em>rop</em>, mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrtrem::SSize">SSize</a>&gt; &amp;<em>rem</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrtrem::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> square root with remainder.</p>
+<p>This function will set <em>rop</em> to the truncated integer part of the square root of <em>n</em>, and <em>rem</em> to the remainder of the operation.
+That is, <em>rem</em> will be equal to <code class="docutils literal notranslate"><span class="pre">n-rop*rop</span></code>, and it will be zero if <em>n</em> is a perfect square.</p>
+<p><em>rop</em> and <em>rem</em> must be distinct objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the first return value (i.e., the integer square root of <em>n</em>).</li>
+<li><strong>rem</strong> – the second return value (i.e., the remainder of the operation).</li>
+<li><strong>n</strong> – the argument.</li>
 </ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">n</span></code> is negative. </li>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Throws:</th><td class="field-body"><ul class="first last simple">
+<li><strong>std::domain_error</strong> – if <em>n</em> is negative.</li>
+<li><strong>std::invalid_argument</strong> – if <em>rop</em> and <em>rem</em> are the same object.</li>
 </ul>
-</dd>
-</dl>
-</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3I_NSt6size_tEEN4mppp16perfect_square_pERKN4mppp7integerI5SSizeEE">
+<span id="_CPPv2I_NSt6size_tEEN4mppp16perfect_square_pERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">perfect_square_p</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp16perfect_square_pERKN4mppp7integerI5SSizeEE" title="mppp::perfect_square_p::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp16perfect_square_pERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Detect perfect square.</p>
+<p>This function returns <code class="docutils literal notranslate"><span class="pre">true</span></code> if <em>n</em> is a perfect square, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> – the argument.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">true</span></code> if <em>n</em> is a perfect square, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm">
+<span id="_CPPv2I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">root</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::root::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::root::SSize">SSize</a>&gt; &amp;<em>n</em>, unsigned long <em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Ternary <span class="math notranslate nohighlight">\(m\)</span>-th root.</p>
+<p>This function will set <em>rop</em> to the truncated integer part of the <span class="math notranslate nohighlight">\(m\)</span>-th root of <em>n</em>. The return value will be <code class="docutils literal notranslate"><span class="pre">true</span></code> if the
+computation is exact, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the return value.</li>
+<li><strong>n</strong> – the argument.</li>
+<li><strong>m</strong> – the degree of the root.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal notranslate"><span class="pre">true</span></code> if the computation is exact, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Throws:</th><td class="field-body"><p class="first last"><strong>std::domain_error</strong> – if <em>m</em> is even and <em>n</em> is negative, or if <em>m</em> is zero.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3I_NSt6size_tEEN4mppp4rootERKN4mppp7integerI5SSizeEEm">
+<span id="_CPPv2I_NSt6size_tEEN4mppp4rootERKN4mppp7integerI5SSizeEEm"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::root::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">root</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::root::SSize">SSize</a>&gt; &amp;<em>n</em>, unsigned long <em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERKN4mppp7integerI5SSizeEEm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary <span class="math notranslate nohighlight">\(m\)</span>-th root.</p>
+<p>This function will return the truncated integer part of the <span class="math notranslate nohighlight">\(m\)</span>-th root of <em>n</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> – the argument.</li>
+<li><strong>m</strong> – the degree of the root.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the truncated integer part of the <span class="math notranslate nohighlight">\(m\)</span>-th root of <em>n</em>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Throws:</th><td class="field-body"><p class="first last"><strong>std::domain_error</strong> – if <em>m</em> is even and <em>n</em> is negative, or if <em>m</em> is zero.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm">
+<span id="_CPPv2I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />void <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rootrem</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::rootrem::SSize">SSize</a>&gt; &amp;<em>rop</em>, mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::rootrem::SSize">SSize</a>&gt; &amp;<em>rem</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::rootrem::SSize">SSize</a>&gt; &amp;<em>n</em>, unsigned long <em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><span class="math notranslate nohighlight">\(m\)</span>-th root with remainder.</p>
+<p>This function will set <em>rop</em> to the truncated integer part of the <span class="math notranslate nohighlight">\(m\)</span>-th root of <em>n</em>, and <em>rem</em> to the remainder
+of the operation. That is, <em>rem</em> will be equal to <code class="docutils literal notranslate"><span class="pre">n-rop**m</span></code>, and it will be zero if <em>n</em> is a perfect power.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the first return value (i.e., the <span class="math notranslate nohighlight">\(m\)</span>-th root root of <em>n</em>).</li>
+<li><strong>rem</strong> – the second return value (i.e., the remainder of the operation).</li>
+<li><strong>n</strong> – the argument.</li>
+<li><strong>m</strong> – the degree of the root.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Throws:</th><td class="field-body"><p class="first last"><strong>std::domain_error</strong> – if <em>m</em> is even and <em>n</em> is negative, or if <em>m</em> is zero.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3I_NSt6size_tEEN4mppp15perfect_power_pERKN4mppp7integerI5SSizeEE">
+<span id="_CPPv2I_NSt6size_tEEN4mppp15perfect_power_pERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">perfect_power_p</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp15perfect_power_pERKN4mppp7integerI5SSizeEE" title="mppp::perfect_power_p::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp15perfect_power_pERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Detect perfect power.</p>
+<p>This function will return <code class="docutils literal notranslate"><span class="pre">true</span></code> if <em>n</em> is a perfect power, that is, if there exist integers <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span>,
+with <span class="math notranslate nohighlight">\(b&gt;1\)</span>, such that <em>n</em> equals <span class="math notranslate nohighlight">\(a^b\)</span>.  Otherwise, the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> – the argument.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">true</span></code> if <em>n</em> is a perfect power, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -3504,7 +3644,7 @@ are treated as-if they were represented using two’s complement.</p>
 
     <div class="mdl-mini-footer__right-section">
         <div>&copy; Copyright 2016-2018, Francesco Biscani.</div>
-      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.0 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.1 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
 </footer>
         </main>
