@@ -2543,7 +2543,10 @@ the absolute value of <code class="docutils literal notranslate"><span class="pr
 <dl class="function">
 <dt id="_CPPv3I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
 <span id="_CPPv2I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />void <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sqrtrem</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrtrem::SSize">SSize</a>&gt; &amp;<em>rop</em>, mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrtrem::SSize">SSize</a>&gt; &amp;<em>rem</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrtrem::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp7sqrtremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p><a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> square root with remainder.</p>
+<dd><div class="versionadded">
+<p><span class="versionmodified">New in version 0.12.</span></p>
+</div>
+<p><a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> square root with remainder.</p>
 <p>This function will set <em>rop</em> to the truncated integer part of the square root of <em>n</em>, and <em>rem</em> to the remainder of the operation.
 That is, <em>rem</em> will be equal to <code class="docutils literal notranslate"><span class="pre">n-rop*rop</span></code>, and it will be zero if <em>n</em> is a perfect square.</p>
 <p><em>rop</em> and <em>rem</em> must be distinct objects.</p>
@@ -2571,7 +2574,10 @@ That is, <em>rem</em> will be equal to <code class="docutils literal notranslate
 <dl class="function">
 <dt id="_CPPv3I_NSt6size_tEEN4mppp16perfect_square_pERKN4mppp7integerI5SSizeEE">
 <span id="_CPPv2I_NSt6size_tEEN4mppp16perfect_square_pERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">perfect_square_p</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp16perfect_square_pERKN4mppp7integerI5SSizeEE" title="mppp::perfect_square_p::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp16perfect_square_pERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Detect perfect square.</p>
+<dd><div class="versionadded">
+<p><span class="versionmodified">New in version 0.12.</span></p>
+</div>
+<p>Detect perfect square.</p>
 <p>This function returns <code class="docutils literal notranslate"><span class="pre">true</span></code> if <em>n</em> is a perfect square, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2588,7 +2594,10 @@ That is, <em>rem</em> will be equal to <code class="docutils literal notranslate
 <dl class="function">
 <dt id="_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm">
 <span id="_CPPv2I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">root</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::root::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::root::SSize">SSize</a>&gt; &amp;<em>n</em>, unsigned long <em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Ternary <span class="math notranslate nohighlight">\(m\)</span>-th root.</p>
+<dd><div class="versionadded">
+<p><span class="versionmodified">New in version 0.12.</span></p>
+</div>
+<p>Ternary <span class="math notranslate nohighlight">\(m\)</span>-th root.</p>
 <p>This function will set <em>rop</em> to the truncated integer part of the <span class="math notranslate nohighlight">\(m\)</span>-th root of <em>n</em>. The return value will be <code class="docutils literal notranslate"><span class="pre">true</span></code> if the
 computation is exact, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2615,7 +2624,10 @@ computation is exact, <code class="docutils literal notranslate"><span class="pr
 <dl class="function">
 <dt id="_CPPv3I_NSt6size_tEEN4mppp4rootERKN4mppp7integerI5SSizeEEm">
 <span id="_CPPv2I_NSt6size_tEEN4mppp4rootERKN4mppp7integerI5SSizeEEm"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::root::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">root</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::root::SSize">SSize</a>&gt; &amp;<em>n</em>, unsigned long <em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp4rootERKN4mppp7integerI5SSizeEEm" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary <span class="math notranslate nohighlight">\(m\)</span>-th root.</p>
+<dd><div class="versionadded">
+<p><span class="versionmodified">New in version 0.12.</span></p>
+</div>
+<p>Binary <span class="math notranslate nohighlight">\(m\)</span>-th root.</p>
 <p>This function will return the truncated integer part of the <span class="math notranslate nohighlight">\(m\)</span>-th root of <em>n</em>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2640,7 +2652,10 @@ computation is exact, <code class="docutils literal notranslate"><span class="pr
 <dl class="function">
 <dt id="_CPPv3I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm">
 <span id="_CPPv2I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />void <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rootrem</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::rootrem::SSize">SSize</a>&gt; &amp;<em>rop</em>, mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::rootrem::SSize">SSize</a>&gt; &amp;<em>rem</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::rootrem::SSize">SSize</a>&gt; &amp;<em>n</em>, unsigned long <em>m</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp7rootremERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p><span class="math notranslate nohighlight">\(m\)</span>-th root with remainder.</p>
+<dd><div class="versionadded">
+<p><span class="versionmodified">New in version 0.12.</span></p>
+</div>
+<p><span class="math notranslate nohighlight">\(m\)</span>-th root with remainder.</p>
 <p>This function will set <em>rop</em> to the truncated integer part of the <span class="math notranslate nohighlight">\(m\)</span>-th root of <em>n</em>, and <em>rem</em> to the remainder
 of the operation. That is, <em>rem</em> will be equal to <code class="docutils literal notranslate"><span class="pre">n-rop**m</span></code>, and it will be zero if <em>n</em> is a perfect power.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2665,7 +2680,10 @@ of the operation. That is, <em>rem</em> will be equal to <code class="docutils l
 <dl class="function">
 <dt id="_CPPv3I_NSt6size_tEEN4mppp15perfect_power_pERKN4mppp7integerI5SSizeEE">
 <span id="_CPPv2I_NSt6size_tEEN4mppp15perfect_power_pERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">perfect_power_p</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7integerE" title="mppp::integer">integer</a>&lt;<a class="reference internal" href="#_CPPv3I_NSt6size_tEEN4mppp15perfect_power_pERKN4mppp7integerI5SSizeEE" title="mppp::perfect_power_p::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3I_NSt6size_tEEN4mppp15perfect_power_pERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Detect perfect power.</p>
+<dd><div class="versionadded">
+<p><span class="versionmodified">New in version 0.12.</span></p>
+</div>
+<p>Detect perfect power.</p>
 <p>This function will return <code class="docutils literal notranslate"><span class="pre">true</span></code> if <em>n</em> is a perfect power, that is, if there exist integers <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span>,
 with <span class="math notranslate nohighlight">\(b&gt;1\)</span>, such that <em>n</em> equals <span class="math notranslate nohighlight">\(a^b\)</span>.  Otherwise, the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2847,8 +2865,8 @@ the program’s end or a thread’s exit. This function does exactly that.</p>
 
 </div>
 </div>
-<div class="section" id="operators">
-<span id="integer-operators"></span><h2>Operators<a class="headerlink" href="#operators" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mathematical-operators">
+<span id="integer-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
 <p>Overloaded operators are provided for convenience. Their interface is generic, and their implementation
 is typically built on top of basic <a class="reference internal" href="#integer-functions"><span class="std std-ref">functions</span></a>.</p>
 <dl class="function">
@@ -3599,7 +3617,7 @@ are treated as-if they were represented using two’s complement.</p>
 <li><a class="reference internal" href="#other">Other</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#operators">Operators</a></li>
+<li><a class="reference internal" href="#mathematical-operators">Mathematical operators</a></li>
 <li><a class="reference internal" href="#standard-library-specialisations">Standard library specialisations</a></li>
 </ul>
 </li>

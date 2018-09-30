@@ -1773,8 +1773,8 @@ after the conversion of one of the operands to <a class="reference internal" hre
 </dd></dl>
 
 </div>
-<div class="section" id="miscellaneous-functions">
-<span id="real128-miscfuncts"></span><h3>Miscellaneous functions<a class="headerlink" href="#miscellaneous-functions" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="other-special-functions">
+<span id="real128-miscfuncts"></span><h3>Other special functions<a class="headerlink" href="#other-special-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="_CPPv3N4mppp3erfE7real128">
 <span id="_CPPv2N4mppp3erfE7real128"></span><span id="mppp::erf__real128"></span><span class="target" id="group__real128__miscfuncts_1ga21c1ebfc2b442b5a4c3996667adc8ad1"></span><a class="reference internal" href="#_CPPv3N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">erf</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv3N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp3erfE7real128" title="Permalink to this definition">¶</a><br /></dt>
@@ -1850,9 +1850,33 @@ library if precise and forward-compatible control on the printing format is need
 </dd></dl>
 
 </div>
+<div class="section" id="other">
+<span id="real128-operators"></span><h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="_CPPv3N4mppp4hashERKN4mppp7real128E">
+<span id="_CPPv2N4mppp4hashERKN4mppp7real128E"></span><span id="mppp::hash__mppp::real128CR"></span>std::size_t <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">hash</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv3N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mppp4hashERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified">New in version 0.12.</span></p>
 </div>
-<div class="section" id="operators">
-<span id="real128-operators"></span><h2>Operators<a class="headerlink" href="#operators" title="Permalink to this headline">¶</a></h2>
+<p>Hash function for <a class="reference internal" href="#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
+<p>All NaN values produce the same hash value. For non-NaN arguments, this function
+guarantees that <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">==</span> <span class="pre">y</span></code> implies <code class="docutils literal notranslate"><span class="pre">hash(x)</span> <span class="pre">==</span> <span class="pre">hash(y)</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> – the argument.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a hash value for <em>x</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="mathematical-operators">
+<h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="_CPPv3N4mpppplE7real128">
 <span id="_CPPv2N4mpppplE7real128"></span><span id="mppp::add-operator__real128CE"></span><span class="target" id="group__real128__operators_1ga11aa474412513c25bcaa56fa9df53864"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv3N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator+</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv3N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N4mpppplE7real128" title="Permalink to this definition">¶</a><br /></dt>
@@ -3091,11 +3115,12 @@ from the quadmath library.</p>
 <li><a class="reference internal" href="#hyperbolic-functions">Hyperbolic functions</a></li>
 <li><a class="reference internal" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
 <li><a class="reference internal" href="#gamma-functions">Gamma functions</a></li>
-<li><a class="reference internal" href="#miscellaneous-functions">Miscellaneous functions</a></li>
+<li><a class="reference internal" href="#other-special-functions">Other special functions</a></li>
 <li><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li><a class="reference internal" href="#other">Other</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#operators">Operators</a></li>
+<li><a class="reference internal" href="#mathematical-operators">Mathematical operators</a></li>
 <li><a class="reference internal" href="#constants">Constants</a></li>
 <li><a class="reference internal" href="#standard-library-specialisations">Standard library specialisations</a></li>
 </ul>

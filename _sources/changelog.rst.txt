@@ -7,6 +7,7 @@ Changelog
 New
 ~~~
 
+- Add a hash function for :cpp:class:`~mppp::real128` (`#157 <https://github.com/bluescarni/mppp/pull/157>`__).
 - Add all the root functions from the GMP API to the :cpp:class:`~mppp::integer` API
   (`#156 <https://github.com/bluescarni/mppp/pull/156>`__).
 - Add all the root functions from the MPFR API to the :cpp:class:`~mppp::real` API
@@ -32,6 +33,11 @@ Changes
 - **BREAKING**: replace the ``integer_nbits_init`` tag structure with the strongly-typed :cpp:type:`mppp::integer_bitcnt_t` enum
   (`#145 <https://github.com/bluescarni/mppp/pull/145>`__).
 - Ensure that :cpp:class:`~mppp::real128` is trivially copyable (`#144 <https://github.com/bluescarni/mppp/pull/144>`__).
+
+Fix
+~~~
+
+- Fix various warnings issued by Clang 7 in the unit tests (`#157 <https://github.com/bluescarni/mppp/pull/157>`__).
 
 0.11 (2018-05-22)
 -----------------
@@ -378,7 +384,7 @@ Changes
 
 - Make sure the MPFR cleanup routine is automatically called on shutdown (`#22 <https://github.com/bluescarni/mppp/pull/22>`__).
 
-- Performance improvements for :cpp:func:`mppp::integer::nbits()` on GCC and clang (`#17 <https://github.com/bluescarni/mppp/pull/17>`__).
+- Performance improvements for :cpp:func:`mppp::integer::nbits()` on GCC and Clang (`#17 <https://github.com/bluescarni/mppp/pull/17>`__).
 
 Fix
 ~~~
