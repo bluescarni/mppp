@@ -164,6 +164,23 @@ Input/Output
 
 .. _real128_operators:
 
+Other
+~~~~~
+
+.. cpp:function:: std::size_t mppp::hash(const mppp::real128 &x)
+
+   .. versionadded:: 0.12
+
+   Hash function for :cpp:class:`~mppp::real128`.
+
+   All NaN values produce the same hash value. For non-NaN arguments, this function
+   guarantees that ``x == y`` implies ``hash(x) == hash(y)``.
+
+   :param x: the argument.
+
+   :return: a hash value for *x*.
+
+
 Mathematical operators
 ----------------------
 

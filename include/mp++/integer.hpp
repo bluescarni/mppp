@@ -7667,7 +7667,7 @@ inline std::size_t hash(const integer<SSize> &n)
     for (std::size_t i = 0; i < asize; ++i) {
         // The hash combiner. This is lifted directly from Boost. See also:
         // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
-        retval ^= (ptr[i] & GMP_NUMB_MASK) + std::size_t(0x9e3779b9) + (retval << 6) + (retval >> 2);
+        retval ^= (ptr[i] & GMP_NUMB_MASK) + std::size_t(0x9e3779b9ul) + (retval << 6) + (retval >> 2);
     }
     return retval;
 }
