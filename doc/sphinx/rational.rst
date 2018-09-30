@@ -127,8 +127,8 @@ Other
 
 .. _rational_operators:
 
-Operators
----------
+Mathematical operators
+----------------------
 
 Overloaded operators are provided for convenience. Their interface is generic, and their implementation
 is typically built on top of basic :ref:`functions <rational_functions>`.

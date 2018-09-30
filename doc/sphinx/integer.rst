@@ -187,6 +187,8 @@ Roots
 
 .. cpp:function:: template <std::size_t SSize> void mppp::sqrtrem(mppp::integer<SSize> &rop, mppp::integer<SSize> &rem, const mppp::integer<SSize> &n)
 
+   .. versionadded:: 0.12
+
    :cpp:class:`~mppp::integer` square root with remainder.
 
    This function will set *rop* to the truncated integer part of the square root of *n*, and *rem* to the remainder of the operation.
@@ -203,6 +205,8 @@ Roots
 
 .. cpp:function:: template <std::size_t SSize> bool mppp::perfect_square_p(const mppp::integer<SSize> &n)
 
+   .. versionadded:: 0.12
+
    Detect perfect square.
 
    This function returns ``true`` if *n* is a perfect square, ``false`` otherwise.
@@ -212,6 +216,8 @@ Roots
    :return: ``true`` if *n* is a perfect square, ``false`` otherwise.
 
 .. cpp:function:: template <std::size_t SSize> bool mppp::root(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n, unsigned long m)
+
+   .. versionadded:: 0.12
 
    Ternary :math:`m`-th root.
 
@@ -228,6 +234,8 @@ Roots
 
 .. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::root(const mppp::integer<SSize> &n, unsigned long m)
 
+   .. versionadded:: 0.12
+
    Binary :math:`m`-th root.
 
    This function will return the truncated integer part of the :math:`m`-th root of *n*.
@@ -240,6 +248,8 @@ Roots
    :exception std\:\:domain_error: if *m* is even and *n* is negative, or if *m* is zero.
 
 .. cpp:function:: template <std::size_t SSize> void mppp::rootrem(mppp::integer<SSize> &rop, mppp::integer<SSize> &rem, const mppp::integer<SSize> &n, unsigned long m)
+
+   .. versionadded:: 0.12
 
    :math:`m`-th root with remainder.
 
@@ -254,6 +264,8 @@ Roots
    :exception std\:\:domain_error: if *m* is even and *n* is negative, or if *m* is zero.
 
 .. cpp:function:: template <std::size_t SSize> bool mppp::perfect_power_p(const mppp::integer<SSize> &n)
+
+   .. versionadded:: 0.12
 
    Detect perfect power.
 
@@ -292,8 +304,8 @@ Other
 
 .. _integer_operators:
 
-Operators
----------
+Mathematical operators
+----------------------
 
 Overloaded operators are provided for convenience. Their interface is generic, and their implementation
 is typically built on top of basic :ref:`functions <integer_functions>`.

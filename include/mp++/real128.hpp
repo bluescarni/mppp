@@ -3251,6 +3251,39 @@ inline constexpr real128 sqrt2_128 = real128_sqrt2();
 
 /** @} */
 
+// Hash.
+inline std::size_t hash(const real128 &x)
+{
+    // NOTE: in order to detect if x is zero/nan, resort to reading directly into the ieee fields.
+    // This avoids calling the fpclassify() function, which internally invokes a compiler library function.
+    ieee_float128 ief;
+    ief.value = x.m_value;
+    const auto is_zero = ief.i_eee.exponent == 0u && ief.i_eee.mant_low == 0u && ief.i_eee.mant_high == 0u;
+    const auto is_nan = ief.i_eee.exponent == 32767ul && (ief.i_eee.mant_low != 0u || ief.i_eee.mant_high != 0u);
+    // Read the bit-level representation of x and mix it up using a hash combiner.
+    struct float128_split_t {
+        // NOTE: unsigned long long is guaranteed to be at least 64-bit wide.
+        unsigned long long part1 : 64;
+        unsigned long long part2 : 64;
+    };
+    union float128_split {
+        __float128 value;
+        float128_split_t split;
+    };
+    float128_split fs;
+    fs.value = x.m_value;
+    auto retval = fs.split.part1;
+    // The hash combiner. This is lifted directly from Boost. See also:
+    // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3876.pdf
+    retval ^= fs.split.part2 + 0x9e3779b9ull + (retval << 6) + (retval >> 2);
+    // This last step will set retval to zero if x is zero, and to -1 if x is NaN. We need this because:
+    // - +0.0 and -0.0 have a different bit-level representation, but they are mathematically equal
+    //   and they are equal according to operator==();
+    // - we want to ensure that all NaN values produce the same hash.
+    retval = (retval & static_cast<unsigned long long>(-!is_zero)) | static_cast<unsigned long long>(-is_nan);
+    return static_cast<std::size_t>(retval);
+}
+
 // NOTE: put these definitions here, as we need the comparison operators to be available.
 constexpr bool real128_equal_to(const real128 &x, const real128 &y)
 {

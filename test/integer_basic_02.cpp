@@ -138,7 +138,7 @@ struct copy_move_tester {
         REQUIRE(m4 == 123);
         REQUIRE(m3.is_dynamic());
         REQUIRE(m4.is_dynamic());
-        m4 = m4;
+        m4 = *&m4;
         REQUIRE(m4.is_dynamic());
         REQUIRE(m4 == 123);
         m4 = std::move(m4);

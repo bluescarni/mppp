@@ -358,7 +358,7 @@ struct sub_tester {
 
         // In-place sub with self.
         retval = "3/4";
-        retval -= retval;
+        retval -= *&retval;
         REQUIRE(retval == rational{});
     }
 };
