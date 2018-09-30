@@ -180,7 +180,6 @@ Other
 
    :return: a hash value for *x*.
 
-
 Mathematical operators
 ----------------------
 
