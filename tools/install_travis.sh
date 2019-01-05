@@ -33,7 +33,7 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
     # Download and compile locally GMP in debug mode.
-    wget ftp://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.bz2;
+    wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2;
     tar xjvf gmp-6.1.2.tar.bz2;
     cd gmp-6.1.2;
     CXX=g++-4.8 CC=gcc-4.8 ./configure --disable-shared --enable-assert --enable-alloca=debug --disable-assembly CFLAGS="-g -fsanitize=address";
