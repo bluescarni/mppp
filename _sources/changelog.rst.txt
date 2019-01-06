@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.13 (unreleased)
+-----------------
+
+Changes
+~~~~~~~
+
+- Update the internal copy of Catch to the latest version, 2.5.0 (`#158 <https://github.com/bluescarni/mppp/pull/158>`__).
+
 0.12 (2018-10-11)
 -----------------
 
