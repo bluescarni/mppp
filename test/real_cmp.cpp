@@ -32,6 +32,8 @@ TEST_CASE("real naninf")
     REQUIRE(number_p(real{12}));
     REQUIRE(!real{12}.zero_p());
     REQUIRE(!zero_p(real{12}));
+    REQUIRE(!real{12}.is_zero());
+    REQUIRE(!is_zero(real{12}));
     REQUIRE(real{12}.regular_p());
     REQUIRE(regular_p(real{12}));
 
@@ -43,6 +45,8 @@ TEST_CASE("real naninf")
     REQUIRE(number_p(real{}));
     REQUIRE(real{}.zero_p());
     REQUIRE(zero_p(real{}));
+    REQUIRE(real{}.is_zero());
+    REQUIRE(is_zero(real{}));
     REQUIRE(!real{}.regular_p());
     REQUIRE(!regular_p(real{}));
 
@@ -55,6 +59,8 @@ TEST_CASE("real naninf")
     REQUIRE(!number_p(real{"nan"}));
     REQUIRE(!real{"nan"}.zero_p());
     REQUIRE(!zero_p(real{"nan"}));
+    REQUIRE(!real{"nan"}.is_zero());
+    REQUIRE(!is_zero(real{"nan"}));
     REQUIRE(!real{"nan"}.regular_p());
     REQUIRE(!regular_p(real{"nan"}));
 
@@ -66,6 +72,8 @@ TEST_CASE("real naninf")
     REQUIRE(!number_p(real{"inf"}));
     REQUIRE(!real{"inf"}.zero_p());
     REQUIRE(!zero_p(real{"inf"}));
+    REQUIRE(!real{"inf"}.is_zero());
+    REQUIRE(!is_zero(real{"inf"}));
     REQUIRE(!real{"inf"}.regular_p());
     REQUIRE(!regular_p(real{"-inf"}));
     real_reset_default_prec();
