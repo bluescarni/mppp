@@ -37,6 +37,9 @@ function(ADD_MPPP_TESTCASE arg1)
     set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
     set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
   endif()
+  # Visibility settings.
+  set_target_properties(${arg1} PROPERTIES CXX_VISIBILITY_PRESET hidden)
+  set_target_properties(${arg1} PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
   add_test(${arg1} ${arg1})
 endfunction()
 

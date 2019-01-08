@@ -41,6 +41,9 @@ function(ADD_MPPP_BENCHMARK arg1)
   endif()
   set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
   set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
+  # Visibility settings.
+  set_target_properties(${arg1} PROPERTIES CXX_VISIBILITY_PRESET hidden)
+  set_target_properties(${arg1} PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
   # Add the current benchmark to the "benchmark" custom target.
   add_dependencies(benchmark ${arg1})
   add_custom_command(TARGET benchmark POST_BUILD COMMAND "${arg1}" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
