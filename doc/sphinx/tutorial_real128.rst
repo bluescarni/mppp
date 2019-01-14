@@ -27,3 +27,13 @@ Like :cpp:type:`__float128`, :cpp:class:`~mppp::real128` is a
 for ``constexpr`` compile-time computations. Additionally, :cpp:class:`~mppp::real128`
 implements as ``constexpr`` constructs a variety of functions which are not ``constexpr``
 for :cpp:type:`__float128`.
+
+In addition to the features common to all mp++ classes, the :cpp:class:`~mppp::real128` API provides
+a few additional capabilities:
+
+* construction/conversion from/to :cpp:type:`__float128`,
+* direct access to the internal :cpp:type:`__float128` instance (via the public ``m_value``
+  data member),
+* a variety of mathematical functions wrapping the
+  `libquadmath library routines <https://gcc.gnu.org/onlinedocs/libquadmath/Math-Library-Routines.html#Math-Library-Routines>`__,
+* sss
