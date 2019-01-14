@@ -4,9 +4,15 @@ Changelog
 0.13 (unreleased)
 -----------------
 
+New
+~~~
+
+- Introduce additional function overloads for :cpp:class:`~mppp::real` (`#159 <https://github.com/bluescarni/mppp/pull/159>`__).
+
 Changes
 ~~~~~~~
 
+- Various build system improvements (`#159 <https://github.com/bluescarni/mppp/pull/159>`__).
 - Update the internal copy of Catch to the latest version, 2.5.0 (`#158 <https://github.com/bluescarni/mppp/pull/158>`__).
 
 0.12 (2018-10-11)
