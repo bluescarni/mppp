@@ -8,7 +8,7 @@ available in GCC and (more recently) clang. :cpp:type:`__float128` is an impleme
 `quadruple-precision IEEE 754 binary floating-point standard <https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format>`__,
 which provides up to 36 decimal digits of precision.
 
-:cpp:class:`~mppp::real128` is available in mp++ if the library was configured with the
+:cpp:class:`~mppp::real128` is available in mp++ if the library is configured with the
 ``MPPP_WITH_QUADMATH`` option enabled (see the :ref:`installation instructions <installation>`).
 Note that mp++ needs access to both the ``quadmath.h`` header file and the quadmath library
 ``libquadmath.so``, which may be installed in non-standard locations. While GCC is typically

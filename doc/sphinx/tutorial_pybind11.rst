@@ -154,7 +154,7 @@ A :cpp:class:`~mppp::real` will be successfully converted to an ``mpf`` iff its 
 >>> p.test_real_conversion(mpf("1.1"), 100)
 Traceback (most recent call last):
      ...
-ValueError: Cannot convert the real 1.1000000000000000888178419700125 to an mpf: the precision of the real (100) is smaller than the current mpf precision (53). Please increase the current mpf precision to at least 100 in order to avoid this error
+ValueError: Cannot convert the real 1.1000000000000000888178419700125 to an mpf: the precision of the real (100) is greater than the current mpf precision (53). Please increase the current mpf precision to at least 100 in order to avoid this error
 >>> mp.prec = 100;
 >>> p.test_real_conversion(mpf("1.1"), 100)
 mpf('1.1000000000000000000000000000003')
@@ -209,7 +209,8 @@ We can verify that the conversion between mp++ and Python works transparently wh
 {'a': mpf('1.0'), 'b': mpf('3.0')}
 
 Finally, the pybind11 integration utilities will automatically translate mp++ :ref:`exceptions <exceptions>` thrown
-from C++ code into corresponding Python exceptions. Here is an example with :cpp:class:`~mppp::zero_division_error`:
+from C++ code into corresponding Python exceptions. Here is an example where mp++'s :cpp:class:`~mppp::zero_division_error`
+exception is translated to Python's :py:exc:`ZeroDivisionError` exception:
 
 >>> p.test_zero_division_error()
 Traceback (most recent call last):

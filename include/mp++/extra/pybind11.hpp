@@ -403,7 +403,7 @@ struct type_caster<mppp::real> {
         if (prec < src_prec) {
             throw std::invalid_argument("Cannot convert the real " + src.to_string()
                                         + " to an mpf: the precision of the real (" + std::to_string(src_prec)
-                                        + ") is smaller than the current mpf precision (" + std::to_string(prec)
+                                        + ") is greater than the current mpf precision (" + std::to_string(prec)
                                         + "). Please increase the current mpf precision to at least "
                                         + std::to_string(src_prec) + " in order to avoid this error");
         }
