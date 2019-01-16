@@ -1,3 +1,5 @@
+.. _real128_reference:
+
 Quadruple-precision floats
 ==========================
 
@@ -203,6 +205,8 @@ but inline variables are more convenient if C++17 is an option.
 
 .. doxygengroup:: real128_constants
    :content-only:
+
+.. _real128_std_specs:
 
 Standard library specialisations
 --------------------------------

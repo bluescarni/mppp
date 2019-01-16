@@ -208,7 +208,7 @@ using real128_op_types_enabler
  *    r2.abs();     // Member function abs(): replaces the value of r2 with its
  *                  // absolute value.
  *
- * Note that at this time only a small subset of the quadmath API has been wrapped by :cpp:class:`~mppp::real128`.
+ * Note that at this time a subset of the quadmath API has been wrapped by :cpp:class:`~mppp::real128`.
  *
  * Various :ref:`overloaded operators <real128_operators>` are provided.
  * The common arithmetic operators (``+``, ``-``, ``*`` and ``/``) always return :cpp:class:`~mppp::real128`
