@@ -200,7 +200,84 @@ Show Source
         
   <div class="section" id="quadruple-precision-float-tutorial">
 <span id="tutorial-real128"></span><h1>Quadruple-precision float tutorial<a class="headerlink" href="#quadruple-precision-float-tutorial" title="Permalink to this headline">¶</a></h1>
-<p>TBD</p>
+<p>The <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class is a thin wrapper around the <a class="reference internal" href="real128.html#_CPPv310__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> type
+available in GCC and (more recently) clang. <a class="reference internal" href="real128.html#_CPPv310__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> is an implementation the
+<a class="reference external" href="https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format">quadruple-precision IEEE 754 binary floating-point standard</a>,
+which provides up to 36 decimal digits of precision.</p>
+<p><a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> is available in mp++ if the library is configured with the
+<code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option enabled (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).
+Note that mp++ needs access to both the <code class="docutils literal notranslate"><span class="pre">quadmath.h</span></code> header file and the quadmath library
+<code class="docutils literal notranslate"><span class="pre">libquadmath.so</span></code>, which may be installed in non-standard locations. While GCC is typically
+able to resolve the correct paths automatically, clang might need assistance
+in order to identify the location of these files.</p>
+<p>As a thin wrapper, <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> adds a few extra features
+on top of what <a class="reference internal" href="real128.html#_CPPv310__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> already provides. Specifically, <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>:</p>
+<ul class="simple">
+<li>can interact with the other mp++ classes,</li>
+<li>can be constructed from string-like objects,</li>
+<li>supports the standard C++ <code class="docutils literal notranslate"><span class="pre">iostream</span></code> facilities.</li>
+</ul>
+<p>Like <a class="reference internal" href="real128.html#_CPPv310__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>, <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> is a
+<a class="reference external" href="https://en.cppreference.com/w/cpp/named_req/LiteralType">literal type</a>, and thus it can be used
+for <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> compile-time computations. Additionally, <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
+implements as <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> constructs a variety of functions which are not <code class="docutils literal notranslate"><span class="pre">constexpr</span></code>
+for <a class="reference internal" href="real128.html#_CPPv310__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>.</p>
+<p>In addition to the features common to all mp++ classes, the <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> API provides
+a few additional capabilities:</p>
+<ul>
+<li><p class="first">construction/conversion from/to <a class="reference internal" href="real128.html#_CPPv310__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span> <span class="n">r</span><span class="p">{</span><span class="n">__float128</span><span class="p">(</span><span class="mi">42</span><span class="p">)};</span>                <span class="c1">// Construction from a __float128.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">__float128</span><span class="o">&gt;</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span> <span class="c1">// Conversion to __float128.</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">direct access to the internal <a class="reference internal" href="real128.html#_CPPv310__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> instance (via the public <a class="reference internal" href="real128.html#_CPPv3N4mppp7real1287m_valueE" title="mppp::real128::m_value"><code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">m_value</span></code></a>
+data member):</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span> <span class="n">r</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
+<span class="n">r</span><span class="p">.</span><span class="n">m_value</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>                 <span class="c1">// Modify directly the internal __float128 member.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="mi">2</span><span class="p">);</span>
+
+<span class="n">r</span><span class="p">.</span><span class="n">m_value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">assert</span><span class="p">(</span><span class="o">::</span><span class="n">cosq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// Call a libquadmath function directly on the internal member.</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">a variety of mathematical <a class="reference internal" href="real128.html#real128-functions"><span class="std std-ref">functions</span></a> wrapping the
+<a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/Math-Library-Routines.html#Math-Library-Routines">libquadmath library routines</a>.
+Note that the <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> function names drop the suffix <code class="docutils literal notranslate"><span class="pre">q</span></code> appearing in the names of the libquadmath routines, and, as usual
+in mp++, they are supposed to be found via ADL. Member function overloads for the unary functions are also available:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span> <span class="n">r</span><span class="p">{</span><span class="mi">42</span><span class="p">};</span>
+
+<span class="c1">// Trigonometry.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">cosq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">sinq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
+
+<span class="c1">// Logarithms and exponentials.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">expq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">log10</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">log10q</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
+
+<span class="c1">// Etc.</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">lgamma</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">lgammaq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">erf</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="o">::</span><span class="n">erfq</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">m_value</span><span class="p">));</span>
+
+<span class="c1">// Member function overloads.</span>
+<span class="k">auto</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">r</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">cos</span><span class="p">()</span> <span class="o">==</span> <span class="n">tmp</span><span class="p">);</span> <span class="c1">// NOTE: r.cos() will set r to its cosine.</span>
+<span class="n">tmp</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">r</span><span class="p">);</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">sin</span><span class="p">()</span> <span class="o">==</span> <span class="n">tmp</span><span class="p">);</span> <span class="c1">// NOTE: r.sin() will set r to its sine.</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">NaN-friendly hashing and comparison functions, for use in standard algorithms and containers;</p>
+</li>
+<li><p class="first">a <a class="reference internal" href="real128.html#real128-std-specs"><span class="std std-ref">specialisation</span></a> of the <code class="docutils literal notranslate"><span class="pre">std::numeric_limits</span></code> class template;</p>
+</li>
+<li><p class="first">a selection of quadruple-precision compile-time <a class="reference internal" href="real128.html#real128-constants"><span class="std std-ref">mathematical constants</span></a>.</p>
+</li>
+</ul>
+<p>The <a class="reference internal" href="real128.html#real128-reference"><span class="std std-ref">real128 reference</span></a> contains the detailed description of all the features
+provided by <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
 </div>
 
 
