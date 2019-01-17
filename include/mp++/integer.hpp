@@ -1280,7 +1280,7 @@ integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
  *    n.abs();     // Member function abs(): replaces the value of n with its
  *                 // absolute value.
  *
- * Note that at this time only a small subset of the GMP API has been wrapped by :cpp:class:`~mppp::integer`.
+ * Note that at this time a subset of the GMP API has been wrapped by :cpp:class:`~mppp::integer`.
  *
  * Various :ref:`overloaded operators <integer_operators>` are provided.
  * For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion

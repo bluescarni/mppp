@@ -557,7 +557,7 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
  *    r3.abs();     // Member function abs(): replaces the value of r3 with its
  *                  // absolute value.
  *
- * Note that at this time only a small subset of the MPFR API has been wrapped by :cpp:class:`~mppp::real`.
+ * Note that at this time a subset of the MPFR API has been wrapped by :cpp:class:`~mppp::real`.
  *
  * Various :ref:`overloaded operators <real_operators>` are provided. The arithmetic operators always return
  * a :cpp:class:`~mppp::real` result. The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will
