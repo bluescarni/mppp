@@ -46,7 +46,7 @@ a few additional capabilities:
 
      real128 r{1};
      r.m_value += 1;                 // Modify directly the internal __float128 member.
-     assert(r.m_value == 2);
+     assert(r == 2);
 
      r.m_value = 0;
      assert(::cosq(r.m_value) == 1); // Call a libquadmath function directly on the internal member.
@@ -54,7 +54,7 @@ a few additional capabilities:
 * a variety of mathematical :ref:`functions <real128_functions>` wrapping the
   `libquadmath library routines <https://gcc.gnu.org/onlinedocs/libquadmath/Math-Library-Routines.html#Math-Library-Routines>`__.
   Note that the :cpp:class:`~mppp::real128` function names drop the suffix ``q`` appearing in the names of the libquadmath routines, and, as usual
-  in mp++, they are supposed to be found via ADL. Member function overloads of the unary functions are also available:
+  in mp++, they are supposed to be found via ADL. Member function overloads for the unary functions are also available:
 
   .. code-block:: c++
 
