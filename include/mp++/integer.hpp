@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <functional>
 #include <initializer_list>
 #include <ios>
@@ -2285,7 +2286,7 @@ public:
     {
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
-            throw std::overflow_error("Conversion of the integer " + to_string() + " to the type '" + demangle<T>()
+            throw std::overflow_error("The conversion of the integer " + to_string() + " to the type '" + demangle<T>()
                                       + "' results in overflow");
         }
         return std::move(retval.second);
@@ -7490,7 +7491,151 @@ inline bool perfect_power_p(const integer<SSize> &n)
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
 {
-    return os << n.to_string();
+    // Fetch the stream's flags.
+    const auto flags = os.flags();
+
+    // Start by figuring out the base.
+    const auto base = [flags]() -> int {
+        const auto bflags = flags & std::ios_base::basefield;
+        switch (bflags) {
+            case std::ios_base::dec:
+                return 10;
+            case std::ios_base::hex:
+                return 16;
+            case std::ios_base::oct:
+                return 8;
+            default:
+                // NOTE: in case more than one base
+                // flag is set, or no base flags are set,
+                // just use 10.
+                return 10;
+        }
+    }();
+
+    // Determine the fill type.
+    const auto fill = [flags]() -> int {
+        const auto fflags = flags & std::ios_base::adjustfield;
+        switch (fflags) {
+            case std::ios_base::left:
+                return 1;
+            case std::ios_base::right:
+                return 2;
+            case std::ios_base::internal:
+                return 3;
+            default:
+                if (fflags == uncvref_t<decltype(fflags)>(0)) {
+                    // It seems like we need to consider the case in which no fill
+                    // flags are set as a right fill.
+                    return 2;
+                }
+                // If more flags are active simultaneously,
+                // just return 0.
+                return 0;
+        }
+    }();
+
+    // Cache.
+    const auto n_sgn = n.sgn();
+
+    // Should we prefix the base? Do it only if:
+    // - the number is nonzero,
+    // - the showbase flag is set,
+    // - the base is not 10.
+    const bool with_base_prefix = n_sgn != 0 && (flags & std::ios_base::showbase) != 0 && base != 10;
+
+    // Uppercase?
+    const bool uppercase = (flags & std::ios_base::uppercase) != 0;
+
+    // Write out to a temporary vector in the required base. This will produce
+    // a representation in the required base, with no base prefix and no
+    // extra '+' for nonnegative integers.
+    MPPP_MAYBE_TLS std::vector<char> tmp;
+    mpz_to_str(tmp, n.get_mpz_view(), base);
+    // NOTE: tmp contains the terminator, and it might be
+    // larger than needed. Make sure to shrink it so that
+    // the last element is the terminator.
+    tmp.resize(static_cast<decltype(tmp.size())>(std::strlen(tmp.data()) + 1u));
+
+    if (n_sgn == -1) {
+        // Negative number.
+        if (with_base_prefix) {
+            // If we need the base prefix, we will have to add the base after the minus sign.
+            assert(tmp[0] == '-');
+            if (base == 16) {
+                // NOTE: in an integer, the only uppercase change
+                // is in the 'x'/'X' part of the hex prefix.
+                const std::array<char, 2> hex_prefix{'0', uppercase ? 'X' : 'x'};
+                tmp.insert(tmp.begin() + 1, hex_prefix.begin(), hex_prefix.end());
+            } else {
+                tmp.insert(tmp.begin() + 1, '0');
+            }
+        }
+    } else {
+        // Nonnegative number. We will be prepending up to 3 characters to the number
+        // representation:
+        // - 1 or 2 for the base prefix ('0' for octal, '0x'/'0X' for hex),
+        // - the '+' sign, if requested.
+        const bool with_plus = (flags & std::ios_base::showpos) != 0;
+        std::array<char, 3> prep_buffer;
+        const auto prep_n = [&prep_buffer, with_plus, with_base_prefix, base, uppercase]() -> std::size_t {
+            std::size_t ret = 0;
+            if (with_plus) {
+                prep_buffer[ret++] = '+';
+            }
+            if (with_base_prefix) {
+                prep_buffer[ret++] = '0';
+                if (base == 16) {
+                    prep_buffer[ret++] = uppercase ? 'X' : 'x';
+                }
+            }
+            return ret;
+        }();
+        // Prepend the additional characters.
+        tmp.insert(tmp.begin(), prep_buffer.data(), prep_buffer.data() + prep_n);
+    }
+
+    // Do the filling.
+    if (fill != 0) {
+        // Compute the total size of the number
+        // representation (i.e., without fill characters).
+        // NOTE: -1 because of the terminator.
+        const auto final_size = tmp.size() - 1u;
+        // Get the stream width.
+        const auto width = os.width();
+        // We are going to do the filling
+        // only if the stream width is larger
+        // than the total size of the number.
+        if (width >= 0 && make_unsigned(width) > final_size) {
+            // Compute how much fill we need.
+            const auto fill_size = safe_cast<decltype(tmp.size())>(make_unsigned(width) - final_size);
+            // Get the fill character.
+            const auto fill_char = os.fill();
+            switch (fill) {
+                case 1:
+                    // Left fill: fill characters at the end.
+                    tmp.insert(tmp.end() - 1, fill_size, fill_char);
+                    break;
+                case 2:
+                    // Right fill: fill characters at the beginning.
+                    tmp.insert(tmp.begin(), fill_size, fill_char);
+                    break;
+                case 3: {
+                    // Internal fill: the fill characters are always after the sign (if present)
+                    // and the base prefix (if present).
+                    auto delta = static_cast<int>(tmp[0] == '+' || tmp[0] == '-');
+                    if (with_base_prefix) {
+                        delta += base == 16 ? 2 : 1;
+                    }
+                    tmp.insert(tmp.begin() + delta, fill_size, fill_char);
+                    break;
+                }
+            }
+        }
+    }
+
+    // Write out the unformatted data.
+    os.write(tmp.data(), safe_cast<std::streamsize>(tmp.size() - 1u));
+    return os;
 }
 
 /// Input stream operator.
