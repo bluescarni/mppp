@@ -7523,14 +7523,9 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
             case std::ios_base::internal:
                 return 3;
             default:
-                if (fflags == uncvref_t<decltype(fflags)>(0)) {
-                    // It seems like we need to consider the case in which no fill
-                    // flags are set as a right fill.
-                    return 2;
-                }
-                // If more flags are active simultaneously,
-                // just return 0.
-                return 0;
+                // NOTE: assume right fill if no fill is set,
+                // or if multiple values are set.
+                return 2;
         }
     }();
 
@@ -7624,7 +7619,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
                     // and the base prefix (if present).
                     auto delta = static_cast<int>(tmp[0] == '+' || tmp[0] == '-');
                     if (with_base_prefix) {
-                        delta += base == 16 ? 2 : 1;
+                        delta += 1 + static_cast<int>(base == 16);
                     }
                     tmp.insert(tmp.begin() + delta, fill_size, fill_char);
                     break;
