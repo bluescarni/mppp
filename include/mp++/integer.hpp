@@ -7589,41 +7589,40 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
         tmp.insert(tmp.begin(), prep_buffer.data(), prep_buffer.data() + prep_n);
     }
 
-    // Do the filling.
-    if (fill != 0) {
-        // Compute the total size of the number
-        // representation (i.e., without fill characters).
-        // NOTE: -1 because of the terminator.
-        const auto final_size = tmp.size() - 1u;
-        // Get the stream width.
-        const auto width = os.width();
-        // We are going to do the filling
-        // only if the stream width is larger
-        // than the total size of the number.
-        if (width >= 0 && make_unsigned(width) > final_size) {
-            // Compute how much fill we need.
-            const auto fill_size = safe_cast<decltype(tmp.size())>(make_unsigned(width) - final_size);
-            // Get the fill character.
-            const auto fill_char = os.fill();
-            switch (fill) {
-                case 1:
-                    // Left fill: fill characters at the end.
-                    tmp.insert(tmp.end() - 1, fill_size, fill_char);
-                    break;
-                case 2:
-                    // Right fill: fill characters at the beginning.
-                    tmp.insert(tmp.begin(), fill_size, fill_char);
-                    break;
-                case 3: {
-                    // Internal fill: the fill characters are always after the sign (if present)
-                    // and the base prefix (if present).
-                    auto delta = static_cast<int>(tmp[0] == '+' || tmp[0] == '-');
-                    if (with_base_prefix) {
-                        delta += 1 + static_cast<int>(base == 16);
-                    }
-                    tmp.insert(tmp.begin() + delta, fill_size, fill_char);
-                    break;
+    // Compute the total size of the number
+    // representation (i.e., without fill characters).
+    // NOTE: -1 because of the terminator.
+    const auto final_size = tmp.size() - 1u;
+
+    // Get the stream width.
+    const auto width = os.width();
+
+    // We are going to do the filling
+    // only if the stream width is larger
+    // than the total size of the number.
+    if (width >= 0 && make_unsigned(width) > final_size) {
+        // Compute how much fill we need.
+        const auto fill_size = safe_cast<decltype(tmp.size())>(make_unsigned(width) - final_size);
+        // Get the fill character.
+        const auto fill_char = os.fill();
+        switch (fill) {
+            case 1:
+                // Left fill: fill characters at the end.
+                tmp.insert(tmp.end() - 1, fill_size, fill_char);
+                break;
+            case 2:
+                // Right fill: fill characters at the beginning.
+                tmp.insert(tmp.begin(), fill_size, fill_char);
+                break;
+            case 3: {
+                // Internal fill: the fill characters are always after the sign (if present)
+                // and the base prefix (if present).
+                auto delta = static_cast<int>(tmp[0] == '+' || tmp[0] == '-');
+                if (with_base_prefix) {
+                    delta += 1 + static_cast<int>(base == 16);
                 }
+                tmp.insert(tmp.begin() + delta, fill_size, fill_char);
+                break;
             }
         }
     }
