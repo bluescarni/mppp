@@ -7496,8 +7496,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
 
     // Start by figuring out the base.
     const auto base = [flags]() -> int {
-        const auto bflags = flags & std::ios_base::basefield;
-        switch (bflags) {
+        switch (flags & std::ios_base::basefield) {
             case std::ios_base::dec:
                 return 10;
             case std::ios_base::hex:
@@ -7514,8 +7513,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
 
     // Determine the fill type.
     const auto fill = [flags]() -> int {
-        const auto fflags = flags & std::ios_base::adjustfield;
-        switch (fflags) {
+        switch (flags & std::ios_base::adjustfield) {
             case std::ios_base::left:
                 return 1;
             case std::ios_base::right:
@@ -7549,7 +7547,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
     // NOTE: tmp contains the terminator, and it might be
     // larger than needed. Make sure to shrink it so that
     // the last element is the terminator.
-    tmp.resize(static_cast<decltype(tmp.size())>(std::strlen(tmp.data()) + 1u));
+    tmp.resize(static_cast<decltype(tmp.size())>(std::strlen(tmp.data())) + 1u);
 
     if (n_sgn == -1) {
         // Negative number.
@@ -7559,7 +7557,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
             if (base == 16) {
                 // NOTE: in an integer, the only uppercase change
                 // is in the 'x'/'X' part of the hex prefix.
-                const std::array<char, 2> hex_prefix{{'0', uppercase ? 'X' : 'x'}};
+                const std::array<char, 2> hex_prefix = {'0', uppercase ? 'X' : 'x'};
                 tmp.insert(tmp.begin() + 1, hex_prefix.begin(), hex_prefix.end());
             } else {
                 tmp.insert(tmp.begin() + 1, '0');
