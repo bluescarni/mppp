@@ -7557,7 +7557,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
             if (base == 16) {
                 // NOTE: in an integer, the only uppercase change
                 // is in the 'x'/'X' part of the hex prefix.
-                const std::array<char, 2> hex_prefix = {'0', uppercase ? 'X' : 'x'};
+                const std::array<char, 2> hex_prefix = {{'0', uppercase ? 'X' : 'x'}};
                 tmp.insert(tmp.begin() + 1, hex_prefix.begin(), hex_prefix.end());
             } else {
                 tmp.insert(tmp.begin() + 1, '0');
