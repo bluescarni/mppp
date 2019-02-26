@@ -464,27 +464,6 @@ struct stream_tester {
             oss << integer{-123};
             REQUIRE(oss.str() == "-123");
         }
-        {
-            std::stringstream ss;
-            ss << integer{};
-            integer n(12);
-            ss >> n;
-            REQUIRE(n == 0);
-        }
-        {
-            std::stringstream ss;
-            ss << integer{-123};
-            integer n;
-            ss >> n;
-            REQUIRE(n == -123);
-        }
-        {
-            std::stringstream ss;
-            ss.str("-42");
-            integer n;
-            ss >> n;
-            REQUIRE(n == -42);
-        }
     }
 };
 

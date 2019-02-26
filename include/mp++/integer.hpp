@@ -7470,24 +7470,8 @@ inline bool perfect_power_p(const integer<SSize> &n)
     return ::mpz_perfect_power_p(n.get_mpz_view()) != 0;
 }
 
-/** @defgroup integer_io integer_io
- *  @{
- */
 
-/// Output stream operator.
-/**
- * \rststar
- * This operator will print to the stream ``os`` the :cpp:class:`~mppp::integer` ``n`` in base 10. Internally it uses
- * the :cpp:func:`mppp::integer::to_string()` method.
- * \endrststar
- *
- * @param os the target stream.
- * @param n the input integer.
- *
- * @return a reference to \p os.
- *
- * @throws unspecified any exception thrown by integer::to_string().
- */
+// Output stream operator.
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
 {
@@ -7629,30 +7613,6 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
     os.write(tmp.data(), safe_cast<std::streamsize>(tmp.size() - 1u));
     return os;
 }
-
-/// Input stream operator.
-/**
- * \rststar
- * This operator is equivalent to extracting a line from the stream and assigning it to ``n``.
- * \endrststar
- *
- * @param is the input stream.
- * @param n the integer to which the string extracted from the stream will be assigned.
- *
- * @return a reference to \p is.
- *
- * @throws unspecified any exception thrown by \link mppp::integer integer\endlink's assignment operator from string.
- */
-template <std::size_t SSize>
-inline std::istream &operator>>(std::istream &is, integer<SSize> &n)
-{
-    MPPP_MAYBE_TLS std::string tmp_str;
-    std::getline(is, tmp_str);
-    n = tmp_str;
-    return is;
-}
-
-/** @} */
 
 /** @defgroup integer_s11n integer_s11n
  *  @{
