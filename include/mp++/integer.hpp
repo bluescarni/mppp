@@ -7471,6 +7471,45 @@ inline bool perfect_power_p(const integer<SSize> &n)
     return ::mpz_perfect_power_p(n.get_mpz_view()) != 0;
 }
 
+inline namespace detail
+{
+
+// Helper to get the base from a stream's flags.
+inline int stream_flags_to_base(std::ios_base::fmtflags flags)
+{
+    switch (flags & std::ios_base::basefield) {
+        case std::ios_base::dec:
+            return 10;
+        case std::ios_base::hex:
+            return 16;
+        case std::ios_base::oct:
+            return 8;
+        default:
+            // NOTE: in case more than one base
+            // flag is set, or no base flags are set,
+            // just use 10.
+            return 10;
+    }
+}
+
+// Helper to get the fill type from a stream's flags.
+inline int stream_flags_to_fill(std::ios_base::fmtflags flags)
+{
+    switch (flags & std::ios_base::adjustfield) {
+        case std::ios_base::left:
+            return 1;
+        case std::ios_base::right:
+            return 2;
+        case std::ios_base::internal:
+            return 3;
+        default:
+            // NOTE: assume right fill if no fill is set,
+            // or if multiple values are set.
+            return 2;
+    }
+}
+
+} // namespace detail
 
 // Output stream operator.
 template <std::size_t SSize>
@@ -7480,37 +7519,10 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
     const auto flags = os.flags();
 
     // Start by figuring out the base.
-    const auto base = [flags]() -> int {
-        switch (flags & std::ios_base::basefield) {
-            case std::ios_base::dec:
-                return 10;
-            case std::ios_base::hex:
-                return 16;
-            case std::ios_base::oct:
-                return 8;
-            default:
-                // NOTE: in case more than one base
-                // flag is set, or no base flags are set,
-                // just use 10.
-                return 10;
-        }
-    }();
+    const auto base = stream_flags_to_base(flags);
 
     // Determine the fill type.
-    const auto fill = [flags]() -> int {
-        switch (flags & std::ios_base::adjustfield) {
-            case std::ios_base::left:
-                return 1;
-            case std::ios_base::right:
-                return 2;
-            case std::ios_base::internal:
-                return 3;
-            default:
-                // NOTE: assume right fill if no fill is set,
-                // or if multiple values are set.
-                return 2;
-        }
-    }();
+    const auto fill = stream_flags_to_fill(flags);
 
     // Cache.
     const auto n_sgn = n.sgn();
@@ -7611,7 +7623,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
     // Apply a final toupper() transformation in base 16, if needed.
     if (base == 16 && uppercase) {
         const auto &cloc = std::locale::classic();
-        for (decltype(tmp.size()) i = 0; i < tmp.size() - 1u; ++i){
+        for (decltype(tmp.size()) i = 0; i < tmp.size() - 1u; ++i) {
             if (std::isalpha(tmp[i], cloc)) {
                 tmp[i] = std::toupper(tmp[i], cloc);
             }
