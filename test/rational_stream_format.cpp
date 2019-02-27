@@ -88,6 +88,30 @@ struct out_tester {
         REQUIRE(runner(rational{-1}, std::oct, std::showbase, std::uppercase) == "-01");
         REQUIRE(runner(rational{-1}, std::hex, std::showbase, std::uppercase) == "-0X1");
 
+        REQUIRE(runner(rational{1, 2}, std::dec) == "1/2");
+        REQUIRE(runner(rational{1, 2}, std::oct) == "1/2");
+        REQUIRE(runner(rational{1, 2}, std::hex) == "1/2");
+
+        REQUIRE(runner(rational{1, 2}, std::dec, std::showbase) == "1/2");
+        REQUIRE(runner(rational{1, 2}, std::oct, std::showbase) == "01/02");
+        REQUIRE(runner(rational{1, 2}, std::hex, std::showbase) == "0x1/0x2");
+
+        REQUIRE(runner(rational{1, 2}, std::dec, std::showbase, std::uppercase) == "1/2");
+        REQUIRE(runner(rational{1, 2}, std::oct, std::showbase, std::uppercase) == "01/02");
+        REQUIRE(runner(rational{1, 2}, std::hex, std::showbase, std::uppercase) == "0X1/0X2");
+
+        REQUIRE(runner(rational{-1, 2}, std::dec) == "-1/2");
+        REQUIRE(runner(rational{-1, 2}, std::oct) == "-1/2");
+        REQUIRE(runner(rational{-1, 2}, std::hex) == "-1/2");
+
+        REQUIRE(runner(rational{-1, 2}, std::dec, std::showbase) == "-1/2");
+        REQUIRE(runner(rational{-1, 2}, std::oct, std::showbase) == "-01/02");
+        REQUIRE(runner(rational{-1, 2}, std::hex, std::showbase) == "-0x1/0x2");
+
+        REQUIRE(runner(rational{-1, 2}, std::dec, std::showbase, std::uppercase) == "-1/2");
+        REQUIRE(runner(rational{-1, 2}, std::oct, std::showbase, std::uppercase) == "-01/02");
+        REQUIRE(runner(rational{-1, 2}, std::hex, std::showbase, std::uppercase) == "-0X1/0X2");
+
         REQUIRE(runner(rational{42}, std::dec) == "42");
         REQUIRE(runner(rational{42}, std::oct) == "52");
         REQUIRE(runner(rational{42}, std::hex) == "2a");

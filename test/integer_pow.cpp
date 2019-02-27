@@ -115,21 +115,21 @@ struct pow_tester {
                                          return oe.what()
                                                 == "Cannot convert the integral value "
                                                        + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + " to unsigned long: the value is too large.";
+                                                       + " to unsigned long: the value is too large";
                                      });
             REQUIRE_THROWS_PREDICATE(pow(integer{-4}, integer{std::numeric_limits<unsigned long long>::max()}),
                                      std::overflow_error, [](const std::overflow_error &oe) {
                                          return oe.what()
                                                 == "Cannot convert the integral value "
                                                        + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + " to unsigned long: the value is too large.";
+                                                       + " to unsigned long: the value is too large";
                                      });
             REQUIRE_THROWS_PREDICATE(pow(-4, integer{std::numeric_limits<unsigned long long>::max()}),
                                      std::overflow_error, [](const std::overflow_error &oe) {
                                          return oe.what()
                                                 == "Cannot convert the integral value "
                                                        + std::to_string(std::numeric_limits<unsigned long long>::max())
-                                                       + " to unsigned long: the value is too large.";
+                                                       + " to unsigned long: the value is too large";
                                      });
         }
         REQUIRE_THROWS_PREDICATE(pow(integer{0}, -1), zero_division_error, [](const zero_division_error &zde) {
