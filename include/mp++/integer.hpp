@@ -27,6 +27,7 @@
 #include <ios>
 #include <iostream>
 #include <limits>
+#include <locale>
 #include <new>
 #include <stdexcept>
 #include <string>
@@ -7539,9 +7540,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
             // If we need the base prefix, we will have to add the base after the minus sign.
             assert(tmp[0] == '-');
             if (base == 16) {
-                // NOTE: in an integer, the only uppercase change
-                // is in the 'x'/'X' part of the hex prefix.
-                const std::array<char, 2> hex_prefix = {{'0', uppercase ? 'X' : 'x'}};
+                constexpr std::array<char, 2> hex_prefix = {{'0', 'x'}};
                 tmp.insert(tmp.begin() + 1, hex_prefix.begin(), hex_prefix.end());
             } else {
                 tmp.insert(tmp.begin() + 1, '0');
@@ -7554,7 +7553,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
         // - the '+' sign, if requested.
         const bool with_plus = (flags & std::ios_base::showpos) != 0;
         std::array<char, 3> prep_buffer;
-        const auto prep_n = [&prep_buffer, with_plus, with_base_prefix, base, uppercase]() -> std::size_t {
+        const auto prep_n = [&prep_buffer, with_plus, with_base_prefix, base]() -> std::size_t {
             std::size_t ret = 0;
             if (with_plus) {
                 prep_buffer[ret++] = '+';
@@ -7562,7 +7561,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
             if (with_base_prefix) {
                 prep_buffer[ret++] = '0';
                 if (base == 16) {
-                    prep_buffer[ret++] = uppercase ? 'X' : 'x';
+                    prep_buffer[ret++] = 'x';
                 }
             }
             return ret;
@@ -7605,6 +7604,16 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
                 }
                 tmp.insert(tmp.begin() + delta, fill_size, fill_char);
                 break;
+            }
+        }
+    }
+
+    // Apply a final toupper() transformation in base 16, if needed.
+    if (base == 16 && uppercase) {
+        const auto &cloc = std::locale::classic();
+        for (decltype(tmp.size()) i = 0; i < tmp.size() - 1u; ++i){
+            if (std::isalpha(tmp[i], cloc)) {
+                tmp[i] = std::toupper(tmp[i], cloc);
             }
         }
     }
