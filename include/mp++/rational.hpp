@@ -12,12 +12,16 @@
 #include <mp++/config.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <cstring>
 #include <functional>
+#include <ios>
 #include <iostream>
 #include <limits>
+#include <locale>
 #include <stdexcept>
 #include <string>
 #if MPPP_CPLUSPLUS >= 201703L
@@ -35,6 +39,7 @@
 #include <mp++/detail/mpfr.hpp>
 #endif
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/exceptions.hpp>
 #include <mp++/integer.hpp>
 
@@ -1610,10 +1615,6 @@ inline rational<SSize> inv(const rational<SSize> &q)
 
 /** @} */
 
-/** @defgroup rational_io rational_io
- *  @{
- */
-
 /// Output stream operator.
 /**
  * \rststar
@@ -1631,32 +1632,174 @@ inline rational<SSize> inv(const rational<SSize> &q)
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
 {
-    return os << q.to_string();
-}
+    // Fetch the stream's flags.
+    const auto flags = os.flags();
 
-/// Input stream operator.
-/**
- * \rststar
- * This operator is equivalent to extracting a line from the stream and assigning it to ``q``.
- * \endrststar
- *
- * @param is the input stream.
- * @param q the rational to which the string extracted from the stream will be assigned.
- *
- * @return a reference to \p is.
- *
- * @throws unspecified any exception thrown by \link mppp::rational rational\endlink's assignment operator from string.
- */
-template <std::size_t SSize>
-inline std::istream &operator>>(std::istream &is, rational<SSize> &q)
-{
-    MPPP_MAYBE_TLS std::string tmp_str;
-    std::getline(is, tmp_str);
-    q = tmp_str;
-    return is;
-}
+    // Start by figuring out the base.
+    const auto base = stream_flags_to_base(flags);
 
-/** @} */
+    // Determine the fill type.
+    const auto fill = stream_flags_to_fill(flags);
+
+    // Cache.
+    const auto q_sgn = q.sgn();
+
+    // Should we prefix the base? Do it only if:
+    // - the number is nonzero,
+    // - the showbase flag is set,
+    // - the base is not 10.
+    const bool with_base_prefix = q_sgn != 0 && (flags & std::ios_base::showbase) != 0 && base != 10;
+
+    // Uppercase?
+    const bool uppercase = (flags & std::ios_base::uppercase) != 0;
+
+    // Is the denominator unitary? If it is, we will skip all formatting
+    // related to the denominator.
+    const bool den_unitary = q.get_den().is_one();
+
+    // Write out to temporary vectors in the required base. This will produce
+    // a representation in the required base, with no base prefix and no
+    // extra '+' for nonnegative integers.
+    MPPP_MAYBE_TLS std::vector<char> tmp_num, tmp_den;
+    mpz_to_str(tmp_num, q.get_num().get_mpz_view(), base);
+    if (!den_unitary) {
+        mpz_to_str(tmp_den, q.get_den().get_mpz_view(), base);
+    }
+    // NOTE: the tmp vectors contain the terminator, and they might be
+    // larger than needed. Make sure to shrink them so that
+    // the last element is the terminator.
+    tmp_num.resize(static_cast<decltype(tmp_num.size())>(std::strlen(tmp_num.data())) + 1u);
+    if (!den_unitary) {
+        tmp_den.resize(static_cast<decltype(tmp_den.size())>(std::strlen(tmp_den.data())) + 1u);
+    }
+    constexpr std::array<char, 2> hex_prefix = {{'0', 'x'}};
+
+    // Formatting for the numerator.
+    if (q_sgn == -1) {
+        // Negative number.
+        if (with_base_prefix) {
+            // If we need the base prefix, we will have to add the base after the minus sign
+            // in the numerator.
+            assert(tmp_num[0] == '-');
+            if (base == 16) {
+                tmp_num.insert(tmp_num.begin() + 1, hex_prefix.begin(), hex_prefix.end());
+            } else {
+                tmp_num.insert(tmp_num.begin() + 1, '0');
+            }
+        }
+    } else {
+        // Nonnegative number. We will be prepending up to 3 characters to the number
+        // representation in the numerator:
+        // - 1 or 2 for the base prefix ('0' for octal, '0x'/'0X' for hex),
+        // - the '+' sign, if requested.
+        const bool with_plus = (flags & std::ios_base::showpos) != 0;
+        std::array<char, 3> prep_buffer;
+        const auto prep_n = [&prep_buffer, with_plus, with_base_prefix, base]() -> std::size_t {
+            std::size_t ret = 0;
+            if (with_plus) {
+                prep_buffer[ret++] = '+';
+            }
+            if (with_base_prefix) {
+                prep_buffer[ret++] = '0';
+                if (base == 16) {
+                    prep_buffer[ret++] = 'x';
+                }
+            }
+            return ret;
+        }();
+        // Prepend the additional characters.
+        tmp_num.insert(tmp_num.begin(), prep_buffer.data(), prep_buffer.data() + prep_n);
+    }
+
+    // Formatting for the denominator: it cannot be negative, and it will ignore
+    // the showpos flag (which will affect only the numerator). The only thing
+    // to do is prepending the base prefix at the very beginning if requested.
+    if (!den_unitary && with_base_prefix) {
+        if (base == 16) {
+            tmp_den.insert(tmp_den.begin(), hex_prefix.begin(), hex_prefix.end());
+        } else {
+            tmp_den.insert(tmp_den.begin(), '0');
+        }
+    }
+
+    // Compute the total size of the number
+    // representation (i.e., without fill characters).
+    // Check for overflow.
+    // LCOV_EXCL_START
+    if (mppp_unlikely(!den_unitary
+                      && tmp_num.size() > std::numeric_limits<decltype(tmp_num.size())>::max() - tmp_den.size())) {
+        throw std::overflow_error("Overflow in rational's stream insertion operator");
+    }
+    // LCOV_EXCL_STOP
+    // NOTE: -1 because of the terminator, tmp_den.size() stays as is because in that
+    // case we'll need the divisor symbol as well.
+    const auto final_size = (tmp_num.size() - 1u) + den_unitary ? 0u : tmp_den.size();
+
+    // Get the stream width.
+    const auto width = os.width();
+
+    // We are going to do the filling
+    // only if the stream width is larger
+    // than the total size of the number.
+    if (width >= 0 && make_unsigned(width) > final_size) {
+        // Compute how much fill we need.
+        const auto fill_size = safe_cast<decltype(tmp_num.size())>(make_unsigned(width) - final_size);
+        // Get the fill character.
+        const auto fill_char = os.fill();
+        switch (fill) {
+            case 1:
+                // Left fill: fill characters at the end.
+                // NOTE: the end is the numerator's end, if den is
+                // unitary, otherwise it is the denominator's end.
+                if (den_unitary) {
+                    tmp_num.insert(tmp_num.end() - 1, fill_size, fill_char);
+                } else {
+                    tmp_den.insert(tmp_den.end() - 1, fill_size, fill_char);
+                }
+                break;
+            case 2:
+                // Right fill: fill characters at the beginning (that is, always
+                // before the numerator starts).
+                tmp_num.insert(tmp_num.begin(), fill_size, fill_char);
+                break;
+            case 3: {
+                // Internal fill: the fill characters are always after the sign (if present).
+                // NOTE: contrary to integer, the internal fill does not take into account
+                // the base prefix, and it happens only if a sign is present.
+                const auto delta = static_cast<int>(tmp_num[0] == '+' || tmp_num[0] == '-');
+                tmp_num.insert(tmp_num.begin() + delta, fill_size, fill_char);
+                break;
+            }
+        }
+    }
+
+    // Apply a final toupper() transformation in base 16, if needed.
+    if (base == 16 && uppercase) {
+        const auto &cloc = std::locale::classic();
+        for (decltype(tmp_num.size()) i = 0; i < tmp_num.size() - 1u; ++i) {
+            if (std::isalpha(tmp_num[i], cloc)) {
+                tmp_num[i] = std::toupper(tmp_num[i], cloc);
+            }
+        }
+        if (!den_unitary) {
+            for (decltype(tmp_den.size()) i = 0; i < tmp_den.size() - 1u; ++i) {
+                if (std::isalpha(tmp_den[i], cloc)) {
+                    tmp_den[i] = std::toupper(tmp_den[i], cloc);
+                }
+            }
+        }
+    }
+
+    // Write out the unformatted data.
+    os.write(tmp_num.data(), safe_cast<std::streamsize>(tmp_num.size() - 1u));
+    if (!den_unitary) {
+        constexpr char div_sep = '/';
+        os.write(&div_sep, 1);
+        os.write(tmp_den.data(), safe_cast<std::streamsize>(tmp_den.size() - 1u));
+    }
+
+    return os;
+}
 
 /** @defgroup rational_operators rational_operators
  *  @{

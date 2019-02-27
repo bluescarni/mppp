@@ -1291,41 +1291,6 @@ struct stream_tester {
             oss << rational{12, 6};
             REQUIRE(oss.str() == "2");
         }
-        {
-            std::stringstream ss;
-            ss << rational{};
-            rational q(12);
-            ss >> q;
-            REQUIRE(lex_cast(q) == "0");
-        }
-        {
-            std::stringstream ss;
-            ss << rational{-123};
-            rational q;
-            ss >> q;
-            REQUIRE(lex_cast(q) == "-123");
-        }
-        {
-            std::stringstream ss;
-            ss << rational{-12, 6};
-            rational q;
-            ss >> q;
-            REQUIRE(lex_cast(q) == "-2");
-        }
-        {
-            std::stringstream ss;
-            ss << rational{6, 12};
-            rational q;
-            ss >> q;
-            REQUIRE(lex_cast(q) == "1/2");
-        }
-        {
-            std::stringstream ss;
-            ss.str("-42");
-            rational q;
-            ss >> q;
-            REQUIRE(lex_cast(q) == "-42");
-        }
     }
 };
 

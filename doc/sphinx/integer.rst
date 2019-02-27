@@ -287,7 +287,7 @@ Input/Output
 
    This function will direct to the output stream *os* the input integer *n*.
 
-   :param os: the target stream.
+   :param os: the output stream.
    :param n: the input :cpp:class:`~mppp::integer`.
 
    :return: a reference to *os*.
