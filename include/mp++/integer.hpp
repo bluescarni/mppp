@@ -338,7 +338,7 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
     const auto size_base = ::mpz_sizeinbase(mpz, base);
     // LCOV_EXCL_START
     if (mppp_unlikely(size_base > nl_max<std::size_t>() - 2u)) {
-        throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
+        throw std::overflow_error("Too many digits in the conversion of mpz_t to string");
     }
     // LCOV_EXCL_STOP
     // Total max size is the size in base plus an optional sign and the null terminator.
@@ -348,7 +348,7 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
     // Overflow check.
     // LCOV_EXCL_START
     if (mppp_unlikely(total_size > nl_max<std::vector<char>::size_type>())) {
-        throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
+        throw std::overflow_error("Too many digits in the conversion of mpz_t to string");
     }
     // LCOV_EXCL_STOP
     out.resize(static_cast<std::vector<char>::size_type>(total_size));
@@ -6960,7 +6960,7 @@ inline unsigned long integer_exp_to_ulong(const T &exp)
     // unsigned already.
     if (mppp_unlikely(static_cast<make_unsigned_t<T>>(exp) > nl_max<unsigned long>())) {
         throw std::overflow_error("Cannot convert the integral value " + mppp::to_string(exp)
-                                  + " to unsigned long: the value is too large.");
+                                  + " to unsigned long: the value is too large");
     }
     return static_cast<unsigned long>(exp);
 }
@@ -6973,7 +6973,7 @@ inline unsigned long integer_exp_to_ulong(const integer<SSize> &exp)
     } catch (const std::overflow_error &) {
         // Rewrite the error message.
         throw std::overflow_error("Cannot convert the integral value " + exp.to_string()
-                                  + " to unsigned long: the value is too large.");
+                                  + " to unsigned long: the value is too large");
     }
 }
 
