@@ -276,6 +276,8 @@ Roots
 
    :return: ``true`` if *n* is a perfect power, ``false`` otherwise.
 
+.. _integer_io:
+
 Input/Output
 ~~~~~~~~~~~~
 
