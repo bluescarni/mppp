@@ -1733,7 +1733,7 @@ inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
     // LCOV_EXCL_STOP
     // NOTE: -1 because of the terminator, tmp_den.size() stays as is because in that
     // case we'll need the divisor symbol as well.
-    const auto final_size = (tmp_num.size() - 1u) + den_unitary ? 0u : tmp_den.size();
+    const auto final_size = (tmp_num.size() - 1u) + (den_unitary ? 0u : tmp_den.size());
 
     // Get the stream width.
     const auto width = os.width();
