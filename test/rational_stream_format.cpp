@@ -260,13 +260,25 @@ struct out_tester {
         REQUIRE(runner(rational{-42}, std::oct, std::showpos) == "-52");
         REQUIRE(runner(rational{-42}, std::hex, std::showpos) == "-2a");
 
+        REQUIRE(runner(rational{-42, 13}, std::dec, std::showpos) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showpos) == "-52/15");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showpos) == "-2a/d");
+
         REQUIRE(runner(rational{-42}, std::dec, std::showbase, std::showpos) == "-42");
         REQUIRE(runner(rational{-42}, std::oct, std::showbase, std::showpos) == "-052");
         REQUIRE(runner(rational{-42}, std::hex, std::showbase, std::showpos) == "-0x2a");
 
+        REQUIRE(runner(rational{-42, 13}, std::dec, std::showbase, std::showpos) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::showpos) == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::showpos) == "-0x2a/0xd");
+
         REQUIRE(runner(rational{-42}, std::dec, std::showbase, std::uppercase, std::showpos) == "-42");
         REQUIRE(runner(rational{-42}, std::oct, std::showbase, std::uppercase, std::showpos) == "-052");
         REQUIRE(runner(rational{-42}, std::hex, std::showbase, std::uppercase, std::showpos) == "-0X2A");
+
+        REQUIRE(runner(rational{-42, 13}, std::dec, std::showbase, std::uppercase, std::showpos) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos) == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos) == "-0X2A/0XD");
 
         // Tests with default fill (right).
         REQUIRE(runner(rational{0}, std::setw(0)) == "0");
@@ -283,12 +295,26 @@ struct out_tester {
         REQUIRE(runner(rational{42}, std::setw(2)) == "42");
         REQUIRE(runner(rational{42}, std::setw(10)) == "        42");
 
+        REQUIRE(runner(rational{42, 13}, std::setw(0)) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(-1)) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(-2)) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(1)) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(2)) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(10)) == "     42/13");
+
         REQUIRE(runner(rational{-42}, std::setw(0)) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(-1)) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(-2)) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(1)) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(2)) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(10)) == "       -42");
+
+        REQUIRE(runner(rational{-42, 13}, std::setw(0)) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(-1)) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(-2)) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(1)) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(2)) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(10)) == "    -42/13");
 
         REQUIRE(runner(rational{42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10))
                 == "     +0X2A");
@@ -311,6 +337,40 @@ struct out_tester {
         REQUIRE(runner(rational{-42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3)) == "-052");
         REQUIRE(runner(rational{-42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4)) == "-052");
         REQUIRE(runner(rational{-42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5)) == " -052");
+
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10))
+                == " +0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3))
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4))
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5))
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10))
+                == "  +052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3))
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4))
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5))
+                == "+052/015");
+
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10))
+                == " -0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3))
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4))
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5))
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10))
+                == "  -052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3))
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4))
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5))
+                == "-052/015");
 
         REQUIRE(runner(rational{42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
                        std::setfill('*'))
