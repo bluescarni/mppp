@@ -397,6 +397,31 @@ struct out_tester {
             runner(rational{42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::setfill('*'))
             == "*+052");
 
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'))
+                == "*+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'))
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'))
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'))
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'))
+                == "**+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'))
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'))
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'))
+                == "+052/015");
+
         REQUIRE(runner(rational{-42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
                        std::setfill('*'))
                 == "*****-0X2A");
@@ -422,6 +447,31 @@ struct out_tester {
                        std::setfill('*'))
                 == "*-052");
 
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'))
+                == "*-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'))
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'))
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'))
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'))
+                == "**-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'))
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'))
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'))
+                == "-052/015");
+
         // Tests with right fill.
         REQUIRE(runner(rational{0}, std::setw(0), std::right) == "0");
         REQUIRE(runner(rational{0}, std::setw(-1), std::right) == "0");
@@ -437,12 +487,26 @@ struct out_tester {
         REQUIRE(runner(rational{42}, std::setw(2), std::right) == "42");
         REQUIRE(runner(rational{42}, std::setw(10), std::right) == "        42");
 
+        REQUIRE(runner(rational{42, 13}, std::setw(0), std::right) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(-1), std::right) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(-2), std::right) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(1), std::right) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(2), std::right) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(10), std::right) == "     42/13");
+
         REQUIRE(runner(rational{-42}, std::setw(0), std::right) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(-1), std::right) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(-2), std::right) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(1), std::right) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(2), std::right) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(10), std::right) == "       -42");
+
+        REQUIRE(runner(rational{-42, 13}, std::setw(0), std::right) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(-1), std::right) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(-2), std::right) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(1), std::right) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(2), std::right) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(10), std::right) == "    -42/13");
 
         REQUIRE(runner(rational{42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10), std::right)
                 == "     +0X2A");
@@ -461,6 +525,31 @@ struct out_tester {
         REQUIRE(runner(rational{42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::right)
                 == " +052");
 
+        REQUIRE(
+            runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10), std::right)
+            == " +0X2A/0XD");
+        REQUIRE(
+            runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3), std::right)
+            == "+0X2A/0XD");
+        REQUIRE(
+            runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4), std::right)
+            == "+0X2A/0XD");
+        REQUIRE(
+            runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5), std::right)
+            == "+0X2A/0XD");
+        REQUIRE(
+            runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10), std::right)
+            == "  +052/015");
+        REQUIRE(
+            runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3), std::right)
+            == "+052/015");
+        REQUIRE(
+            runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4), std::right)
+            == "+052/015");
+        REQUIRE(
+            runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::right)
+            == "+052/015");
+
         REQUIRE(runner(rational{-42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10), std::right)
                 == "     -0X2A");
         REQUIRE(runner(rational{-42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3), std::right)
@@ -477,6 +566,31 @@ struct out_tester {
                 == "-052");
         REQUIRE(runner(rational{-42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::right)
                 == " -052");
+
+        REQUIRE(
+            runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10), std::right)
+            == " -0X2A/0XD");
+        REQUIRE(
+            runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3), std::right)
+            == "-0X2A/0XD");
+        REQUIRE(
+            runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4), std::right)
+            == "-0X2A/0XD");
+        REQUIRE(
+            runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5), std::right)
+            == "-0X2A/0XD");
+        REQUIRE(
+            runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10), std::right)
+            == "  -052/015");
+        REQUIRE(
+            runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3), std::right)
+            == "-052/015");
+        REQUIRE(
+            runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4), std::right)
+            == "-052/015");
+        REQUIRE(
+            runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::right)
+            == "-052/015");
 
         REQUIRE(runner(rational{42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
                        std::setfill('*'), std::right)
@@ -503,6 +617,31 @@ struct out_tester {
                        std::setfill('*'), std::right)
                 == "*+052");
 
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::right)
+                == "*+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::right)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::right)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::right)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::right)
+                == "**+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::right)
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::right)
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::right)
+                == "+052/015");
+
         REQUIRE(runner(rational{-42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
                        std::setfill('*'), std::right)
                 == "*****-0X2A");
@@ -528,6 +667,31 @@ struct out_tester {
                        std::setfill('*'), std::right)
                 == "*-052");
 
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::right)
+                == "*-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::right)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::right)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::right)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::right)
+                == "**-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::right)
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::right)
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::right)
+                == "-052/015");
+
         // Left fill.
         REQUIRE(runner(rational{0}, std::setw(0), std::left) == "0");
         REQUIRE(runner(rational{0}, std::setw(-1), std::left) == "0");
@@ -543,12 +707,26 @@ struct out_tester {
         REQUIRE(runner(rational{42}, std::setw(2), std::left) == "42");
         REQUIRE(runner(rational{42}, std::setw(10), std::left) == "42        ");
 
+        REQUIRE(runner(rational{42, 13}, std::setw(0), std::left) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(-1), std::left) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(-2), std::left) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(1), std::left) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(2), std::left) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(10), std::left) == "42/13     ");
+
         REQUIRE(runner(rational{-42}, std::setw(0), std::left) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(-1), std::left) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(-2), std::left) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(1), std::left) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(2), std::left) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(10), std::left) == "-42       ");
+
+        REQUIRE(runner(rational{-42, 13}, std::setw(0), std::left) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(-1), std::left) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(-2), std::left) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(1), std::left) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(2), std::left) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(10), std::left) == "-42/13    ");
 
         REQUIRE(runner(rational{42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10), std::left)
                 == "+0X2A     ");
@@ -567,6 +745,25 @@ struct out_tester {
         REQUIRE(runner(rational{42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::left)
                 == "+052 ");
 
+        REQUIRE(
+            runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10), std::left)
+            == "+0X2A/0XD ");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3), std::left)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4), std::left)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5), std::left)
+                == "+0X2A/0XD");
+        REQUIRE(
+            runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10), std::left)
+            == "+052/015  ");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3), std::left)
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4), std::left)
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::left)
+                == "+052/015");
+
         REQUIRE(runner(rational{-42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10), std::left)
                 == "-0X2A     ");
         REQUIRE(runner(rational{-42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3), std::left)
@@ -583,6 +780,31 @@ struct out_tester {
                 == "-052");
         REQUIRE(runner(rational{-42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::left)
                 == "-052 ");
+
+        REQUIRE(
+            runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10), std::left)
+            == "-0X2A/0XD ");
+        REQUIRE(
+            runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3), std::left)
+            == "-0X2A/0XD");
+        REQUIRE(
+            runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4), std::left)
+            == "-0X2A/0XD");
+        REQUIRE(
+            runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5), std::left)
+            == "-0X2A/0XD");
+        REQUIRE(
+            runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10), std::left)
+            == "-052/015  ");
+        REQUIRE(
+            runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3), std::left)
+            == "-052/015");
+        REQUIRE(
+            runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4), std::left)
+            == "-052/015");
+        REQUIRE(
+            runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::left)
+            == "-052/015");
 
         REQUIRE(runner(rational{42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
                        std::setfill('*'), std::left)
@@ -609,6 +831,31 @@ struct out_tester {
                        std::setfill('*'), std::left)
                 == "+052*");
 
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::left)
+                == "+0X2A/0XD*");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::left)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::left)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::left)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::left)
+                == "+052/015**");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::left)
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::left)
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::left)
+                == "+052/015");
+
         REQUIRE(runner(rational{-42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
                        std::setfill('*'), std::left)
                 == "-0X2A*****");
@@ -634,6 +881,31 @@ struct out_tester {
                        std::setfill('*'), std::left)
                 == "-052*");
 
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::left)
+                == "-0X2A/0XD*");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::left)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::left)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::left)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::left)
+                == "-052/015**");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::left)
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::left)
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::left)
+                == "-052/015");
+
         // Internal fill.
         REQUIRE(runner(rational{0}, std::setw(0), std::internal) == "0");
         REQUIRE(runner(rational{0}, std::setw(-1), std::internal) == "0");
@@ -649,12 +921,26 @@ struct out_tester {
         REQUIRE(runner(rational{42}, std::setw(2), std::internal) == "42");
         REQUIRE(runner(rational{42}, std::setw(10), std::internal) == "        42");
 
+        REQUIRE(runner(rational{42, 13}, std::setw(0), std::internal) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(-1), std::internal) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(-2), std::internal) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(1), std::internal) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(2), std::internal) == "42/13");
+        REQUIRE(runner(rational{42, 13}, std::setw(10), std::internal) == "     42/13");
+
         REQUIRE(runner(rational{-42}, std::setw(0), std::internal) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(-1), std::internal) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(-2), std::internal) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(1), std::internal) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(2), std::internal) == "-42");
         REQUIRE(runner(rational{-42}, std::setw(10), std::internal) == "-       42");
+
+        REQUIRE(runner(rational{-42, 13}, std::setw(0), std::internal) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(-1), std::internal) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(-2), std::internal) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(1), std::internal) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(2), std::internal) == "-42/13");
+        REQUIRE(runner(rational{-42, 13}, std::setw(10), std::internal) == "-    42/13");
 
         REQUIRE(
             runner(rational{42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10), std::internal)
@@ -674,6 +960,31 @@ struct out_tester {
                 == "+052");
         REQUIRE(runner(rational{42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::internal)
                 == "+ 052");
+
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::internal)
+                == "+ 0X2A/0XD");
+        REQUIRE(
+            runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3), std::internal)
+            == "+0X2A/0XD");
+        REQUIRE(
+            runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4), std::internal)
+            == "+0X2A/0XD");
+        REQUIRE(
+            runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5), std::internal)
+            == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::internal)
+                == "+  052/015");
+        REQUIRE(
+            runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3), std::internal)
+            == "+052/015");
+        REQUIRE(
+            runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4), std::internal)
+            == "+052/015");
+        REQUIRE(
+            runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::internal)
+            == "+052/015");
 
         REQUIRE(
             runner(rational{-42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10), std::internal)
@@ -700,6 +1011,31 @@ struct out_tester {
             runner(rational{-42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5), std::internal)
             == "- 052");
 
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::internal)
+                == "- 0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::internal)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::internal)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::internal)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::internal)
+                == "-  052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::internal)
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::internal)
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::internal)
+                == "-052/015");
+
         REQUIRE(runner(rational{42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
                        std::setfill('*'), std::internal)
                 == "+*****0X2A");
@@ -725,6 +1061,31 @@ struct out_tester {
                        std::setfill('*'), std::internal)
                 == "+*052");
 
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::internal)
+                == "+*0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::internal)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::internal)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::internal)
+                == "+0X2A/0XD");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::internal)
+                == "+**052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::internal)
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::internal)
+                == "+052/015");
+        REQUIRE(runner(rational{42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::internal)
+                == "+052/015");
+
         REQUIRE(runner(rational{-42}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
                        std::setfill('*'), std::internal)
                 == "-*****0X2A");
@@ -749,6 +1110,31 @@ struct out_tester {
         REQUIRE(runner(rational{-42}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
                        std::setfill('*'), std::internal)
                 == "-*052");
+
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::internal)
+                == "-*0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::internal)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::internal)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::hex, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::internal)
+                == "-0X2A/0XD");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(10),
+                       std::setfill('*'), std::internal)
+                == "-**052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(3),
+                       std::setfill('*'), std::internal)
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(4),
+                       std::setfill('*'), std::internal)
+                == "-052/015");
+        REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
+                       std::setfill('*'), std::internal)
+                == "-052/015");
     }
 };
 
