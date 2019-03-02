@@ -7582,6 +7582,18 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
         tmp.insert(tmp.begin(), prep_buffer.data(), prep_buffer.data() + prep_n);
     }
 
+    // Apply a final toupper() transformation in base 16, if needed,
+    // but do it before doing the filling in order to avoid
+    // uppercasing the fill character.
+    if (base == 16 && uppercase) {
+        const auto &cloc = std::locale::classic();
+        for (decltype(tmp.size()) i = 0; i < tmp.size() - 1u; ++i) {
+            if (std::isalpha(tmp[i], cloc)) {
+                tmp[i] = std::toupper(tmp[i], cloc);
+            }
+        }
+    }
+
     // Compute the total size of the number
     // representation (i.e., without fill characters).
     // NOTE: -1 because of the terminator.
@@ -7616,16 +7628,6 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
                 }
                 tmp.insert(tmp.begin() + delta, fill_size, fill_char);
                 break;
-            }
-        }
-    }
-
-    // Apply a final toupper() transformation in base 16, if needed.
-    if (base == 16 && uppercase) {
-        const auto &cloc = std::locale::classic();
-        for (decltype(tmp.size()) i = 0; i < tmp.size() - 1u; ++i) {
-            if (std::isalpha(tmp[i], cloc)) {
-                tmp[i] = std::toupper(tmp[i], cloc);
             }
         }
     }

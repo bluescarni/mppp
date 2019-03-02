@@ -1722,6 +1722,25 @@ inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
         }
     }
 
+    // Apply a final toupper() transformation in base 16, if needed,
+    // but do it before doing the filling in order to avoid
+    // uppercasing the fill character.
+    if (base == 16 && uppercase) {
+        const auto &cloc = std::locale::classic();
+        for (decltype(tmp_num.size()) i = 0; i < tmp_num.size() - 1u; ++i) {
+            if (std::isalpha(tmp_num[i], cloc)) {
+                tmp_num[i] = std::toupper(tmp_num[i], cloc);
+            }
+        }
+        if (!den_unitary) {
+            for (decltype(tmp_den.size()) i = 0; i < tmp_den.size() - 1u; ++i) {
+                if (std::isalpha(tmp_den[i], cloc)) {
+                    tmp_den[i] = std::toupper(tmp_den[i], cloc);
+                }
+            }
+        }
+    }
+
     // Compute the total size of the number
     // representation (i.e., without fill characters).
     // Check for overflow.
@@ -1769,23 +1788,6 @@ inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
                 const auto delta = static_cast<int>(tmp_num[0] == '+' || tmp_num[0] == '-');
                 tmp_num.insert(tmp_num.begin() + delta, fill_size, fill_char);
                 break;
-            }
-        }
-    }
-
-    // Apply a final toupper() transformation in base 16, if needed.
-    if (base == 16 && uppercase) {
-        const auto &cloc = std::locale::classic();
-        for (decltype(tmp_num.size()) i = 0; i < tmp_num.size() - 1u; ++i) {
-            if (std::isalpha(tmp_num[i], cloc)) {
-                tmp_num[i] = std::toupper(tmp_num[i], cloc);
-            }
-        }
-        if (!den_unitary) {
-            for (decltype(tmp_den.size()) i = 0; i < tmp_den.size() - 1u; ++i) {
-                if (std::isalpha(tmp_den[i], cloc)) {
-                    tmp_den[i] = std::toupper(tmp_den[i], cloc);
-                }
             }
         }
     }
