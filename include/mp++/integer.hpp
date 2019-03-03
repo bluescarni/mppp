@@ -7515,6 +7515,14 @@ inline int stream_flags_to_fill(std::ios_base::fmtflags flags)
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
 {
+    // Get the stream width.
+    const auto width = os.width();
+
+    // Reset the stream width to zero, like the operator<<() does for builtin types.
+    // https://en.cppreference.com/w/cpp/io/manip/setw
+    // Do it here so we ensure the stream width is reset in face of exceptions.
+    os.width(0);
+
     // Fetch the stream's flags.
     const auto flags = os.flags();
 
@@ -7599,9 +7607,6 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
     // NOTE: -1 because of the terminator.
     const auto final_size = tmp.size() - 1u;
 
-    // Get the stream width.
-    const auto width = os.width();
-
     // We are going to do the filling
     // only if the stream width is larger
     // than the total size of the number.
@@ -7633,8 +7638,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
     }
 
     // Write out the unformatted data.
-    os.write(tmp.data(), safe_cast<std::streamsize>(tmp.size() - 1u));
-    return os;
+    return os.write(tmp.data(), safe_cast<std::streamsize>(tmp.size() - 1u));
 }
 
 /** @defgroup integer_s11n integer_s11n

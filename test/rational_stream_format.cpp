@@ -1159,6 +1159,13 @@ struct out_tester {
         REQUIRE(runner(rational{-42, 13}, std::oct, std::showbase, std::uppercase, std::showpos, std::setw(5),
                        std::setfill('*'), std::internal)
                 == "-052/015");
+
+        // A test to make sure that the stream width is reset to zero properly.
+        {
+            std::ostringstream oss;
+            oss << std::setfill('a') << std::setw(10) << rational{42, 13} << "\n\n\n";
+            REQUIRE(oss.str() == "aaaaa42/13\n\n\n");
+        }
     }
 };
 

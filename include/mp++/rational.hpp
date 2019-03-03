@@ -1632,6 +1632,14 @@ inline rational<SSize> inv(const rational<SSize> &q)
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
 {
+    // Get the stream width.
+    const auto width = os.width();
+
+    // Reset the stream width to zero, like the operator<<() does for builtin types.
+    // https://en.cppreference.com/w/cpp/io/manip/setw
+    // Do it here so we ensure the stream width is reset in face of exceptions.
+    os.width(0);
+
     // Fetch the stream's flags.
     const auto flags = os.flags();
 
@@ -1753,9 +1761,6 @@ inline std::ostream &operator<<(std::ostream &os, const rational<SSize> &q)
     // NOTE: -1 because of the terminator, tmp_den.size() stays as is because in that
     // case we'll need the divisor symbol as well.
     const auto final_size = (tmp_num.size() - 1u) + (den_unitary ? 0u : tmp_den.size());
-
-    // Get the stream width.
-    const auto width = os.width();
 
     // We are going to do the filling
     // only if the stream width is larger
