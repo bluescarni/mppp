@@ -1284,11 +1284,6 @@ inline std::ostream &operator<<(std::ostream &os, const real128 &x)
     // Get the stream width.
     const auto width = os.width();
 
-    // Reset the stream width to zero, like the operator<<() does for builtin types.
-    // https://en.cppreference.com/w/cpp/io/manip/setw
-    // Do it here so we ensure the stream width is reset in face of exceptions.
-    os.width(0);
-
     // Fetch the stream's flags.
     const auto flags = os.flags();
 
@@ -1443,7 +1438,14 @@ inline std::ostream &operator<<(std::ostream &os, const real128 &x)
     }
 
     // Write out.
-    return os << buffer.data();
+    os << buffer.data();
+
+    // Reset the stream width to zero, like the operator<<() does for builtin types.
+    // https://en.cppreference.com/w/cpp/io/manip/setw
+    // Do it here so we ensure we don't alter the state of the stream until the very end.
+    os.width(0);
+
+    return os;
 }
 
 /** @defgroup real128_comparison real128_comparison
