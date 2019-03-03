@@ -58,14 +58,4 @@ TEST_CASE("real128 io")
     // Some subnormals.
     check_round_trip(real128{"1E-4960"});
     check_round_trip(real128{"-1E-4960"});
-    // Small tests for the input stream.
-    real128 r;
-    std::istringstream iss;
-    iss.str("123.456");
-    iss >> r;
-    REQUIRE((r.m_value == real128{"123.456"}.m_value));
-    iss.clear();
-    iss.str("-1E-4000");
-    iss >> r;
-    REQUIRE((r.m_value == real128{"-1E-4000"}.m_value));
 }

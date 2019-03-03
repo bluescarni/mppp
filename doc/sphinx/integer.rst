@@ -285,7 +285,7 @@ Input/Output
 
    Stream insertion operator.
 
-   This function will direct to the output stream *os* the input integer *n*.
+   This function will direct to the output stream *os* the input :cpp:class:`~mppp::integer` *n*.
 
    :param os: the output stream.
    :param n: the input :cpp:class:`~mppp::integer`.
