@@ -37,6 +37,15 @@ static inline std::string runner(const Int &n, Flags &&... flags)
     return oss.str();
 }
 
+// NOTE: libstdc++ earlier than GCC 5 has incomplete support for stream format flags
+// (e.g., missing std::hexfloat). Thus, we will enabled some tests only on MSVC,
+// libc++ or a recent enough GCC.
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION) && defined(__GNUC__) && __GNUC__ < 5
+
+#define MPPP_TEST_OLD_LIBSTDCPP
+
+#endif
+
 TEST_CASE("real128 stream format")
 {
     // Simple examples.
@@ -87,9 +96,11 @@ TEST_CASE("real128 stream format")
     REQUIRE(runner(real128{"inf"}, std::showpos, std::fixed) == "+inf");
     REQUIRE(runner(real128{"nan"}, std::showpos, std::fixed) == "nan");
 
+#if !defined(MPPP_TEST_OLD_LIBSTDCPP)
     // Hexfloat.
     REQUIRE(runner(real128{0}, std::showpos, std::hexfloat) == "+0x0p+0");
     REQUIRE(runner(real128{0}, std::hexfloat) == "0x0p+0");
     REQUIRE(runner(real128{0}, std::showpos, std::hexfloat, std::setprecision(100)) == "+0x0p+0");
     REQUIRE(runner(real128{0}, std::hexfloat, std::setprecision(100)) == "0x0p+0");
+#endif
 }
