@@ -1904,6 +1904,12 @@ inline real128 erf(real128 x)
 
 /** @} */
 
+// Next real128 from 'from' to 'to'.
+inline real128 nextafter(const real128 &from, const real128 &to)
+{
+    return real128{::nextafterq(from.m_value, to.m_value)};
+}
+
 /** @defgroup real128_operators real128_operators
  *  @{
  */
