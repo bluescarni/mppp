@@ -101,6 +101,40 @@ TEST_CASE("real128 stream format")
     REQUIRE(runner(real128{0}, std::showpos, std::hexfloat) == "+0x0p+0");
     REQUIRE(runner(real128{0}, std::hexfloat) == "0x0p+0");
     REQUIRE(runner(real128{0}, std::showpos, std::hexfloat, std::setprecision(100)) == "+0x0p+0");
+    // The hexfloat format does not care about precision.
     REQUIRE(runner(real128{0}, std::hexfloat, std::setprecision(100)) == "0x0p+0");
+    REQUIRE(runner(real128{42}, std::hexfloat, std::setprecision(100)) == "0x1.5p+5");
+    REQUIRE(runner(real128{42}, std::hexfloat, std::setprecision(100), std::showpos) == "+0x1.5p+5");
+    REQUIRE(runner(real128{-42}, std::hexfloat, std::setprecision(100)) == "-0x1.5p+5");
+    REQUIRE(runner(real128{-42}, std::hexfloat, std::setprecision(100), std::showpos) == "-0x1.5p+5");
+    REQUIRE(runner(real128{"0.1"}, std::hexfloat, std::setprecision(100)) == runner(real128{"0.1"}, std::hexfloat));
+    REQUIRE(runner(real128{"inf"}, std::hexfloat, std::setprecision(100)) == "inf");
+    REQUIRE(runner(real128{"-inf"}, std::hexfloat, std::setprecision(100)) == "-inf");
+    REQUIRE(runner(real128{"inf"}, std::hexfloat, std::setprecision(100), std::showpos) == "+inf");
+    REQUIRE(runner(real128{"nan"}, std::hexfloat, std::setprecision(100)) == "nan");
 #endif
+
+    // Precision.
+    REQUIRE(runner(real128{0}, std::setprecision(10)) == "0");
+    REQUIRE(runner(real128{0}, std::setprecision(0)) == "0");
+    REQUIRE(runner(real128{0}, std::setprecision(1)) == "0");
+    REQUIRE(runner(real128{1}, std::setprecision(10)) == "1");
+    REQUIRE(runner(real128{1}, std::setprecision(0)) == "1");
+    REQUIRE(runner(real128{1}, std::setprecision(1)) == "1");
+    REQUIRE(runner(real128{1}, std::setprecision(10), std::showpos) == "+1");
+    REQUIRE(runner(real128{1}, std::setprecision(0), std::showpos) == "+1");
+    REQUIRE(runner(real128{1}, std::setprecision(1), std::showpos) == "+1");
+    REQUIRE(runner(real128{-1}, std::setprecision(10)) == "-1");
+    REQUIRE(runner(real128{-1}, std::setprecision(0)) == "-1");
+    REQUIRE(runner(real128{-1}, std::setprecision(1)) == "-1");
+    // The normal format does not care about precision
+    REQUIRE(runner(real128{1} / 10, std::setprecision(6)) == runner(real128{1} / 10, std::setprecision(16)));
+    // The fixed/scientific ones do.
+    REQUIRE(runner(real128{1} / 10, std::fixed, std::setprecision(6))
+            != runner(real128{1} / 10, std::fixed, std::setprecision(16)));
+    REQUIRE(runner(real128{1} / 10, std::scientific, std::setprecision(6))
+            != runner(real128{1} / 10, std::scientific, std::setprecision(16)));
+    REQUIRE(runner(real128{1} / 10, std::fixed, std::setprecision(16)) == "0.1000000000000000");
+    REQUIRE(runner(real128{1} / 10, std::fixed, std::setprecision(16), std::showpos) == "+0.1000000000000000");
+    REQUIRE(runner(real128{-1} / 10, std::fixed, std::setprecision(16)) == "-0.1000000000000000");
 }

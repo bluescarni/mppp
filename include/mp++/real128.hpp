@@ -1360,6 +1360,7 @@ inline std::ostream &operator<<(std::ostream &os, const real128 &x)
 #if defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wtautological-constant-out-of-range-compare"
+        // NOTE: some versions of clang complain about this comparison.
         if (make_unsigned(ret) > std::numeric_limits<decltype(buffer.size())>::max() - 1u) {
             throw std::overflow_error("Overflow in real128's stream insertion operator");
         }
