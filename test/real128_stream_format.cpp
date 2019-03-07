@@ -73,11 +73,11 @@ TEST_CASE("real128 stream format")
     REQUIRE(runner(real128{"nan"}, std::showpos) == "nan");
 
     // Scientific notation.
-    REQUIRE(runner(real128{0}, std::showpos, std::scientific) == runner(0., std::showpos, std::scientific));
-    REQUIRE(runner(real128{1}, std::showpos, std::scientific) == runner(1., std::showpos, std::scientific));
-    REQUIRE(runner(real128{-1}, std::showpos, std::scientific) == runner(-1., std::showpos, std::scientific));
-    REQUIRE(runner(real128{42}, std::showpos, std::scientific) == runner(42., std::showpos, std::scientific));
-    REQUIRE(runner(real128{-42}, std::showpos, std::scientific) == runner(-42., std::showpos, std::scientific));
+    REQUIRE(runner(real128{0}, std::showpos, std::scientific) == "+0.000000e+00");
+    REQUIRE(runner(real128{1}, std::showpos, std::scientific) == "+1.000000e+00");
+    REQUIRE(runner(real128{-1}, std::showpos, std::scientific) == "-1.000000e+00");
+    REQUIRE(runner(real128{42}, std::showpos, std::scientific) == "+4.200000e+01");
+    REQUIRE(runner(real128{-42}, std::showpos, std::scientific) == "-4.200000e+01");
     REQUIRE(runner(real128{21} / 2, std::showpos, std::scientific) == "+1.050000e+01");
     REQUIRE(runner(real128{-21} / 2, std::showpos, std::scientific) == "-1.050000e+01");
     REQUIRE(runner(real128{"-inf"}, std::showpos, std::scientific) == "-inf");

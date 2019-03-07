@@ -47,7 +47,7 @@ struct ieee_t {
     std::uint_least8_t negative : 1;
 #endif
 }
-#ifdef __MINGW32__
+#if defined(__MINGW32__)
 // On mingw targets the ms-bitfields option is active by default.
 // Therefore enforce gnu-bitfield style.
 __attribute__((gcc_struct))
@@ -95,7 +95,7 @@ inline __float128 str_to_float128(const char *s)
     }
     return retval;
 }
-}
-}
+} // namespace detail
+} // namespace mppp
 
 #endif
