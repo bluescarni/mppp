@@ -4,11 +4,6 @@ Changelog
 0.13 (unreleased)
 -----------------
 
-New
-~~~
-
-- Introduce additional function overloads for :cpp:class:`~mppp::real` (`#159 <https://github.com/bluescarni/mppp/pull/159>`__).
-
 Changes
 ~~~~~~~
 
