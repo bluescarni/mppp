@@ -1064,8 +1064,7 @@ static_assert(sizeof(expected_mpq_struct_t) == sizeof(mpq_struct_t)
 constexpr bool test_mpq_struct_t()
 {
     auto [num, den] = mpq_struct_t{};
-    (void)num;
-    (void)den;
+    ignore(num, den);
     return std::is_same<decltype(num), mpz_struct_t>::value && std::is_same<decltype(den), mpz_struct_t>::value;
 }
 

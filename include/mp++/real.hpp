@@ -75,10 +75,7 @@ constexpr void test_mpfr_struct_t()
 {
     auto [prec, sign, exp, ptr] = mpfr_struct_t{};
     static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
-    (void)prec;
-    (void)sign;
-    (void)exp;
-    (void)ptr;
+    ignore(prec, sign, exp, ptr);
 }
 
 #endif
@@ -620,7 +617,7 @@ private:
     {
         assert(ignore_prec);
         assert(real_prec_check(p));
-        (void)ignore_prec;
+        ignore(ignore_prec);
         ::mpfr_init2(&m_mpfr, p);
     }
 
