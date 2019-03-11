@@ -64,8 +64,8 @@ install:
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
 
 - if [%BUILD_TYPE%]==[MinGW] set PATH=C:\mingw64\bin;%PATH%
-- if [%BUILD_TYPE%]==[MinGW] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z
-- if [%BUILD_TYPE%]==[MinGW] 7z x -oC:\ x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z > NUL
+- if [%BUILD_TYPE%]==[MinGW] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z
+- if [%BUILD_TYPE%]==[MinGW] 7z x -oC:\ x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z > NUL
 - if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/gmp_mingw_64.7z
 - if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mpfr_mingw_64.7z
 - if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ gmp_mingw_64.7z > NUL
