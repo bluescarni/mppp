@@ -672,7 +672,18 @@ struct static_int {
         // Just forward to the copy assignment.
         return operator=(other);
     }
+#ifdef __MINGW32__
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
+
+#endif
     bool dtor_checks() const
+#ifdef __MINGW32__
+
+#pragma GCC diagnostic pop
+
+#endif
     {
         // LCOV_EXCL_START
         const auto asize = abs_size();
