@@ -14,6 +14,7 @@ Changes
 Fix
 ~~~
 
+- Work around a compilation error on MSVC when using C++17 (`#162 <https://github.com/bluescarni/mppp/pull/162>`__).
 - Various documentation fixes (`#160 <https://github.com/bluescarni/mppp/pull/160>`__).
 
 0.12 (2018-10-11)
