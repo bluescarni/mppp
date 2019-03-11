@@ -127,9 +127,7 @@ constexpr bool test_mpz_struct_t()
     // NOTE: if mpz_struct_t has more or fewer members, this will result
     // in a compile-time error.
     auto [alloc, size, ptr] = mpz_struct_t{};
-    (void)alloc;
-    (void)size;
-    (void)ptr;
+    ignore(alloc, size, ptr);
     return std::is_same<decltype(alloc), mpz_alloc_t>::value && std::is_same<decltype(size), mpz_size_t>::value
            && std::is_same<decltype(ptr), ::mp_limb_t *>::value;
 }
@@ -298,7 +296,7 @@ inline void mpz_init_nbits(mpz_struct_t &rop, ::mp_bitcnt_t nbits, std::size_t n
 #if defined(MPPP_HAVE_THREAD_LOCAL)
     if (!mpz_init_from_cache_impl(rop, nlimbs)) {
 #endif
-        (void)nlimbs;
+        ignore(nlimbs);
         // NOTE: nbits == 0 is allowed.
         ::mpz_init2(&rop, nbits);
 #if defined(MPPP_HAVE_THREAD_LOCAL)
@@ -3492,8 +3490,7 @@ inline bool static_add_impl(static_int<SSize> &rop, const static_int<SSize> &op1
                             mpz_size_t asize1, mpz_size_t asize2, int sign1, int sign2,
                             const std::integral_constant<int, 1> &)
 {
-    (void)asize1;
-    (void)asize2;
+    ignore(asize1, asize2);
     auto rdata = rop.m_limbs.data();
     auto data1 = op1.m_limbs.data(), data2 = op2.m_limbs.data();
     // NOTE: both asizes have to be 0 or 1 here.
@@ -3728,7 +3725,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
         if (asize1 > 1 || (asize1 == 1 && (data1[0] & GMP_NUMB_MASK) >= l2)) {
             // abs(op1) >= abs(op2).
             const auto br = ::mpn_sub_1(rdata, data1, static_cast<::mp_size_t>(asize1), l2);
-            (void)br;
+            ignore(br);
             assert(!br);
             // The asize can be the original one or original - 1 (we subtracted a limb). If size1 was positive,
             // sign2 has to be negative and we potentially subtract 1, if size1 was negative then sign2 has to be
@@ -3737,7 +3734,7 @@ inline bool static_addsub_1_impl(static_int<SSize> &rop, const static_int<SSize>
         } else {
             // abs(op2) > abs(op1).
             const auto br = ::mpn_sub_1(rdata, &l2, 1, data1[0]);
-            (void)br;
+            ignore(br);
             assert(!br);
             // The size must be +-1, as abs(op2) == abs(op1) is handled above.
             assert((rdata[0] & GMP_NUMB_MASK));
@@ -5279,9 +5276,7 @@ inline void static_divexact_impl(static_int<SSize> &q, const static_int<SSize> &
     }
 #else
     // Avoid compiler warnings for unused parameters.
-    (void)sign1;
-    (void)sign2;
-    (void)asize2;
+    ignore(sign1, sign2, asize2);
 #endif
     // General implementation (via the mpz function).
     MPPP_MAYBE_TLS mpz_raii tmp;

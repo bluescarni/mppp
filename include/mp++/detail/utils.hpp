@@ -327,6 +327,15 @@ inline std::string to_string(__int128_t n)
 
 #endif
 
+// Helper to ignore unused variables.
+// NOTE: the return type has to be int, rather than void, for compatibility
+// with C++11 constexpr.
+template <typename... Args>
+constexpr int ignore(Args &&...)
+{
+    return 0;
+}
+
 #if defined(_MSC_VER)
 
 #pragma warning(pop)
