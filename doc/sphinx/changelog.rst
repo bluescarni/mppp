@@ -7,6 +7,7 @@ Changelog
 Changes
 ~~~~~~~
 
+- Update copyright date (`#162 <https://github.com/bluescarni/mppp/pull/162>`__).
 - Add a tutorial for :cpp:class:`~mppp::real128` (`#160 <https://github.com/bluescarni/mppp/pull/160>`__).
 - Various build system improvements (`#159 <https://github.com/bluescarni/mppp/pull/159>`__).
 - Update the internal copy of Catch to the latest version, 2.5.0 (`#158 <https://github.com/bluescarni/mppp/pull/158>`__).
