@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -155,8 +155,9 @@ int main()
          "ha=\"center\", fontsize=9)\n"
          "    legend(loc='upper left')\n"
          "    g.fig.suptitle('"
-         + name + "')\n"
-                  "    g.savefig('"
+         + name
+         + "')\n"
+           "    g.savefig('"
          + name + ".png', bbox_inches='tight', dpi=150)\n";
     std::ofstream of(name + ".py", std::ios_base::trunc);
     of << s;
