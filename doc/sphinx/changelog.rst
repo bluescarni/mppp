@@ -14,6 +14,8 @@ Changes
 Fix
 ~~~
 
+- Fix a compilation error when using booleans as second arguments in the ``pow()`` and ``binomial()`` overloads of :cpp:class:`~mppp::integer`
+  (`#162 <https://github.com/bluescarni/mppp/pull/162>`__).
 - Work around a compilation error on MSVC when using C++17 (`#162 <https://github.com/bluescarni/mppp/pull/162>`__).
 - Various documentation fixes (`#160 <https://github.com/bluescarni/mppp/pull/160>`__).
 
