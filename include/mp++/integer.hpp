@@ -4008,11 +4008,22 @@ template <std::size_t SSize, typename T, cpp_unsigned_integral_interoperable_ena
 inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 #endif
 {
+#if !defined(__clang__) && defined(__GNUC__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wbool-compare"
+
+#endif
     if (op2 > GMP_NUMB_MASK) {
         MPPP_MAYBE_TLS integer<SSize> tmp;
         tmp = op2;
         return sub(rop, op1, tmp);
     }
+#if !defined(__clang__) && defined(__GNUC__)
+
+#pragma GCC diagnostic pop
+
+#endif
     const bool s1 = op1.is_static();
     bool sr = rop.is_static();
     if (mppp_likely(s1)) {
@@ -6962,10 +6973,20 @@ inline unsigned long integer_exp_to_ulong(const T &exp)
     // NOTE: make_unsigned_t<T> is T if T is already unsigned.
     // Don't use the make_unsigned() helper, as exp might be
     // unsigned already.
+    static_assert(!std::is_same<T,bool>::value, "Cannot use the bool type in make_unsigned_t.");
     if (mppp_unlikely(static_cast<make_unsigned_t<T>>(exp) > nl_max<unsigned long>())) {
         throw std::overflow_error("Cannot convert the integral value " + mppp::to_string(exp)
                                   + " to unsigned long: the value is too large.");
     }
+    return static_cast<unsigned long>(exp);
+}
+
+// NOTE: special case bool, otherwise we end up invoking make_unsigned_t<bool> in the
+// previous overload, which is not well-defined:
+// https://en.cppreference.com/w/cpp/types/make_unsigned
+inline unsigned long integer_exp_to_ulong(bool exp)
+{
+
     return static_cast<unsigned long>(exp);
 }
 

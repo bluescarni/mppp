@@ -106,6 +106,8 @@ struct binomial_tester {
         int_type n;
         REQUIRE(binomial(n, 0) == 1);
         REQUIRE(binomial(n, 1) == 0);
+        REQUIRE(binomial(n, false) == 1);
+        REQUIRE(binomial(n, true) == 0);
         n = 1;
         REQUIRE(binomial(n, 1) == 1);
         n = 5;
