@@ -679,11 +679,6 @@ struct static_int {
 
 #endif
     bool dtor_checks() const
-#ifdef __MINGW32__
-
-#pragma GCC diagnostic pop
-
-#endif
     {
         // LCOV_EXCL_START
         const auto asize = abs_size();
@@ -711,6 +706,11 @@ struct static_int {
         return true;
         // LCOV_EXCL_STOP
     }
+#ifdef __MINGW32__
+
+#pragma GCC diagnostic pop
+
+#endif
     ~static_int()
     {
         assert(dtor_checks());
