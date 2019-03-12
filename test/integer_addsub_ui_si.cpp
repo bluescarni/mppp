@@ -228,6 +228,13 @@ struct add_ui_tester {
     inline void operator()(const S &) const
     {
         tuple_for_each(uint_types{}, runner<S>{});
+        // Run a couple of tests with bool as well.
+        using integer = integer<S::value>;
+        integer n1, n2{42};
+        add_ui(n1, n2, true);
+        REQUIRE(n1 == 43);
+        add_ui(n1, n2, false);
+        REQUIRE(n1 == 42);
     }
 };
 
@@ -418,6 +425,13 @@ struct sub_ui_tester {
     inline void operator()(const S &) const
     {
         tuple_for_each(uint_types{}, runner<S>{});
+        // Run a couple of tests with bool as well.
+        using integer = integer<S::value>;
+        integer n1, n2{42};
+        sub_ui(n1, n2, true);
+        REQUIRE(n1 == 41);
+        sub_ui(n1, n2, false);
+        REQUIRE(n1 == 42);
     }
 };
 
