@@ -212,7 +212,7 @@ on top of which mp++ is built,</li>
 (e.g., when performance is critical) and higher-level, more readable and user-friendly code.</p>
 <p>To give an idea of the type of tradeoffs involved in the choice between low-level and high-level
 API, consider the simple task of adding two multiprecision integers <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>. This can be accomplished
-either via the overloaded binary operator for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (as seen in the previous section), or via the
+either via the overloaded binary operator for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (as seen in the previous section), or via the
 lower-level <code class="docutils literal notranslate"><span class="pre">add()</span></code> primitive (which is documented in the <a class="reference internal" href="integer.html#integer-arithmetic"><span class="std std-ref">integer reference</span></a>):</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">2</span><span class="p">},</span> <span class="n">b</span><span class="p">{</span><span class="mi">4</span><span class="p">};</span>
 
@@ -246,7 +246,7 @@ matter in the simple example above, it will start to matter in less trivial case
 </pre></div>
 </div>
 <p>In this example, we are computing the sum of the integral values held in a vector <code class="docutils literal notranslate"><span class="pre">v</span></code>. When using the binary operator,
-at each step of the iteration a new temporary <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is constructed by the expression <code class="docutils literal notranslate"><span class="pre">sum1</span> <span class="pre">+</span> <span class="pre">n</span></code>, and
+at each step of the iteration a new temporary <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is constructed by the expression <code class="docutils literal notranslate"><span class="pre">sum1</span> <span class="pre">+</span> <span class="pre">n</span></code>, and
 this temporary value is then move-assigned to <code class="docutils literal notranslate"><span class="pre">sum1</span></code>. When using the <code class="docutils literal notranslate"><span class="pre">add()</span></code> function, the creation of the temporary is
 avoided altogether as the result of the addition is written directly into the accumulator <code class="docutils literal notranslate"><span class="pre">sum2</span></code>. Thus, the first version
 of the loop will necessarily be less efficient than the second one. Note that, in this specific case, we can recover optimal
@@ -274,7 +274,7 @@ creation of unnecessary temporaries):</p>
 <span class="n">assert</span><span class="p">(</span><span class="n">gcd1</span> <span class="o">==</span> <span class="n">gcd2</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Here we are computing the GCD of the integers stored in the vector <code class="docutils literal notranslate"><span class="pre">v</span></code>. mp++ provides two overloads for the <a class="reference internal" href="integer.html#_CPPv3N4mppp3gcdER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::gcd"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">gcd()</span></code></a> function:</p>
+<p>Here we are computing the GCD of the integers stored in the vector <code class="docutils literal notranslate"><span class="pre">v</span></code>. mp++ provides two overloads for the <a class="reference internal" href="integer.html#_CPPv4N4mppp3gcdER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::gcd"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">gcd()</span></code></a> function:</p>
 <ul class="simple">
 <li>a binary overload, taking as input the two operands, and returning their GCD,</li>
 <li>a ternary overload, taking the return value as first parameter and the two operands as second
@@ -282,7 +282,7 @@ and third parameters.</li>
 </ul>
 <p>Like in the previous example, the ternary overload avoids the creation and subsequent assignment of a temporary value, and will thus perform
 better. The binary GCD overload, on the other hand, is easier to use (no need to prepare a return value beforehand) and closer
-to a functional style. The presence of binary and ternary overloads for the same functionality is not restricted to <a class="reference internal" href="integer.html#_CPPv3N4mppp3gcdER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::gcd"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">gcd()</span></code></a>,
+to a functional style. The presence of binary and ternary overloads for the same functionality is not restricted to <a class="reference internal" href="integer.html#_CPPv4N4mppp3gcdER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::gcd"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">gcd()</span></code></a>,
 but it’s a common feature for many of mp++’s binary functions and operators.</p>
 <p>For unary functions and operators, there’s an additional degree of freedom in the API. Unary functions in mp++ are often provided with the
 following set of overloads:</p>
@@ -305,7 +305,7 @@ following set of overloads:</p>
 <span class="n">assert</span><span class="p">(</span><span class="n">n3_abs</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="integer.html#_CPPv3N4mppp7integer3absEv" title="mppp::integer::abs"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::abs()</span></code></a> member function computes and stores the absolute value directly into the calling object.
+<p>The <a class="reference internal" href="integer.html#_CPPv4N4mppp7integer3absEv" title="mppp::integer::abs"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::abs()</span></code></a> member function computes and stores the absolute value directly into the calling object.
 The unary function (much like <code class="docutils literal notranslate"><span class="pre">std::abs()</span></code>) takes as input an integer and returns its absolute value. The GMP-style
 binary <code class="docutils literal notranslate"><span class="pre">abs()</span></code> function stores into the first argument the absolute value of the second argument.</p>
 <p>The nullary member function overload is provided to cater to the common use case in which a value is mutated in-place
@@ -367,8 +367,8 @@ of argument, let’s pretend that it will not :)</td></tr>
     </div>
 
     <div class="mdl-mini-footer__right-section">
-        <div>&copy; Copyright 2016-2018, Francesco Biscani.</div>
-      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.3 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
+        <div>&copy; Copyright 2016-2019, Francesco Biscani.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
 </footer>
         </main>

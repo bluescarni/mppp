@@ -200,44 +200,44 @@ Show Source
         
   <div class="section" id="integer-tutorial">
 <span id="tutorial-integer"></span><h1>Integer tutorial<a class="headerlink" href="#integer-tutorial" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> was the first class implemented in mp++, and as a result it is currently
+<p><a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> was the first class implemented in mp++, and as a result it is currently
 the most featureful and optimised among mp++’s multiprecision classes.</p>
-<p>One of the first things that can be noticed about <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is that the class is parametrised over
+<p>One of the first things that can be noticed about <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is that the class is parametrised over
 an integral value <code class="docutils literal notranslate"><span class="pre">SSize</span></code>, called the <em>static size</em>. This compile-time constant represents the number of <em>limbs</em> that will be
-stored directly within an <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> object before resorting to dynamic memory allocation.
+stored directly within an <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> object before resorting to dynamic memory allocation.
 A limb is the part of a multiprecision integer that fits in a single word-sized unsigned integral type:
 in the same way an integral value in base 10 is represented as a sequence of digits in the <span class="math notranslate nohighlight">\(\left[0,9\right]\)</span> range,
-an <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> object is represented internally by an array of 32-bit or 64-bit
+an <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> object is represented internally by an array of 32-bit or 64-bit
 unsigned C++ integral values. Thus, for instance, if <code class="docutils literal notranslate"><span class="pre">SSize</span></code> is set to 2 on a 64-bit system,
-<a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is able to represent values in the <span class="math notranslate nohighlight">\(\left(-2^{128},2^{128}\right)\)</span> range
+<a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is able to represent values in the <span class="math notranslate nohighlight">\(\left(-2^{128},2^{128}\right)\)</span> range
 without resorting to dynamic memory allocation. In general, an <code class="docutils literal notranslate"><span class="pre">SSize</span></code> value of 1 is a good default choice for many
 use cases.</p>
 <p>In addition to the <a class="reference internal" href="tutorial_commonops.html#tutorial-commonops"><span class="std std-ref">common operators</span></a> available for all of mp++’s multiprecision classes,
-<a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> supports the following additional operators:</p>
+<a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> supports the following additional operators:</p>
 <ul class="simple">
 <li>the modulo operator <code class="docutils literal notranslate"><span class="pre">%</span></code>, which computes the remainder of integer division,</li>
 <li>the bitshifting operators <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>,</li>
 <li>the bitwise logical operators <code class="docutils literal notranslate"><span class="pre">~</span></code>, <code class="docutils literal notranslate"><span class="pre">&amp;</span></code>, <code class="docutils literal notranslate"><span class="pre">|</span></code> and <code class="docutils literal notranslate"><span class="pre">^</span></code>.</li>
 </ul>
 <p>In addition to the binary versions of these operators, the in-place versions are also available. Lower level ternary
-primitives (e.g., <a class="reference internal" href="integer.html#_CPPv3N4mppp8mul_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="mppp::mul_2exp"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mul_2exp()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv3N4mppp11tdiv_q_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="mppp::tdiv_q_2exp"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">tdiv_q_2exp()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv3N4mppp11bitwise_iorER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::bitwise_ior"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">bitwise_ior()</span></code></a>, etc.)
+primitives (e.g., <a class="reference internal" href="integer.html#_CPPv4N4mppp8mul_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="mppp::mul_2exp"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mul_2exp()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4N4mppp11tdiv_q_2expER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="mppp::tdiv_q_2exp"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">tdiv_q_2exp()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4N4mppp11bitwise_iorER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::bitwise_ior"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">bitwise_ior()</span></code></a>, etc.)
 are also provided for those situations in which it is desirable to pass the return value as a function
 parameter, rather than creating a new return value (as explained earlier in the <a class="reference internal" href="tutorial_api.html#tutorial-api"><span class="std std-ref">API overview</span></a>).
 For consistency with C++11, the <code class="docutils literal notranslate"><span class="pre">%</span></code> operator returns a remainder with the same sign as the dividend. The bit-shifting
 operators <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> correspond respectively to multiplication and division by a power of 2. The bitwise logical
-operators behave as-if <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> used a two’s complement representation (even if internally
+operators behave as-if <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> used a two’s complement representation (even if internally
 a sign-magnitude representation is used instead).</p>
-<p>Among the features specific to <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> we find:</p>
+<p>Among the features specific to <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> we find:</p>
 <ul class="simple">
 <li>specialised arithmetic primitives (fused multiply-add/sub, addition/subtraction with C++ unsigned
 integrals, …),</li>
-<li>prime numbers functions (<a class="reference internal" href="integer.html#_CPPv3N4mppp14probab_prime_pERK7integerI5SSizeEi" title="mppp::probab_prime_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">probab_prime_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv3N4mppp9nextprimeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::nextprime"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">nextprime()</span></code></a>, …),</li>
-<li>parity detection (<a class="reference internal" href="integer.html#_CPPv3N4mppp6even_pERK7integerI5SSizeE" title="mppp::even_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">even_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv3N4mppp5odd_pERK7integerI5SSizeE" title="mppp::odd_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">odd_p()</span></code></a>),</li>
+<li>prime numbers functions (<a class="reference internal" href="integer.html#_CPPv4N4mppp14probab_prime_pERK7integerI5SSizeEi" title="mppp::probab_prime_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">probab_prime_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4N4mppp9nextprimeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::nextprime"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">nextprime()</span></code></a>, …),</li>
+<li>parity detection (<a class="reference internal" href="integer.html#_CPPv4N4mppp6even_pERK7integerI5SSizeE" title="mppp::even_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">even_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4N4mppp5odd_pERK7integerI5SSizeE" title="mppp::odd_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">odd_p()</span></code></a>),</li>
 <li>several additional <a class="reference internal" href="integer.html#integer-division"><span class="std std-ref">division functions</span></a>,</li>
 <li><a class="reference internal" href="integer.html#integer-ntheory"><span class="std std-ref">number-theoretic functions</span></a> (GCD, factorial, binomial coefficient, …),</li>
 <li>integer <a class="reference internal" href="integer.html#integer-roots"><span class="std std-ref">roots</span></a> and <a class="reference internal" href="integer.html#integer-exponentiation"><span class="std std-ref">exponentiation</span></a>,</li>
 <li>hashing (including a <a class="reference internal" href="integer.html#integer-std-specialisations"><span class="std std-ref">specialisation</span></a> of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code>, so that it is possible to use
-<a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> in standard unordered containers out of the box),</li>
+<a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> in standard unordered containers out of the box),</li>
 <li>binary <a class="reference internal" href="#tutorial-integer-s11n"><span class="std std-ref">serialisation</span></a>,</li>
 <li>various utility functions (detect size in bits/limbs, detect and/or promote/demote storage type, …).</li>
 </ul>
@@ -245,13 +245,13 @@ integrals, …),</li>
 in multiple overloads, often both as free and member functions.</p>
 <div class="section" id="interacting-with-the-gmp-api">
 <h2>Interacting with the GMP API<a class="headerlink" href="#interacting-with-the-gmp-api" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> provides a variety of ways for interfacing with the <a class="reference external" href="https://gmplib.org/">GMP</a> library.
-There are a few reasons why one would want to use <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> in conjunction with the GMP API, such as:</p>
+<p><a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> provides a variety of ways for interfacing with the <a class="reference external" href="https://gmplib.org/">GMP</a> library.
+There are a few reasons why one would want to use <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> in conjunction with the GMP API, such as:</p>
 <ul class="simple">
 <li>the necessity of using functions from the GMP API which have not (yet) been wrapped/implemented by mp++,</li>
 <li>passing data from/to mp++ to/from another GMP-based multiprecision library.</li>
 </ul>
-<p>To start with, <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is constructible and assignable from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> objects:</p>
+<p>To start with, <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is constructible and assignable from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> objects:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
 <span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>  <span class="c1">// Init an mpz_t with the value -4.</span>
 
@@ -265,10 +265,10 @@ There are a few reasons why one would want to use <a class="reference internal" 
 <span class="n">mpz_clear</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>            <span class="c1">// Clear the mpz_t.</span>
 </pre></div>
 </div>
-<p>Second, it is possible to get a reference to an <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> from an <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
-via the <a class="reference internal" href="integer.html#_CPPv3N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> member function. This member function will
-first switch the calling <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> to dynamic storage (if the calling
-<a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is not already employing dynamic storage), and it will then return
+<p>Second, it is possible to get a reference to an <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> from an <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
+via the <a class="reference internal" href="integer.html#_CPPv4N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> member function. This member function will
+first switch the calling <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> to dynamic storage (if the calling
+<a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> is not already employing dynamic storage), and it will then return
 a raw non-owning pointer which can be used both as a const and mutable parameter in the GMP API.
 For example:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">b</span><span class="p">;</span>
@@ -283,13 +283,13 @@ For example:</p>
 <span class="n">mpz_clear</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>                             <span class="c1">// Clear the mpz_t.</span>
 </pre></div>
 </div>
-<p>It is important to emphasise that <a class="reference internal" href="integer.html#_CPPv3N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> forces the use of dynamic storage,
+<p>It is important to emphasise that <a class="reference internal" href="integer.html#_CPPv4N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> forces the use of dynamic storage,
 thus incurring in a potential performance hit. If only const access is needed, a better alternative to
-<a class="reference internal" href="integer.html#_CPPv3N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> is the <a class="reference internal" href="integer.html#_CPPv3NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_view()</span></code></a> member function.
-<a class="reference internal" href="integer.html#_CPPv3NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_view()</span></code></a> returns a read-only view of
-the calling <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> which is implicitly convertible to a <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">mpz_t</span></code>, and which can thus be
+<a class="reference internal" href="integer.html#_CPPv4N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> is the <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_view()</span></code></a> member function.
+<a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_view()</span></code></a> returns a read-only view of
+the calling <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> which is implicitly convertible to a <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">mpz_t</span></code>, and which can thus be
 used as a non-mutable function parameter in the GMP API. The creation of the read-only view is lightweight,
-and, crucially, it does not force the use of dynamic storage in the calling <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.
+and, crucially, it does not force the use of dynamic storage in the calling <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.
 We can slightly modify to previous example to use a read-only view as the third parameter in the <code class="docutils literal notranslate"><span class="pre">mpz_add()</span></code> call,
 and verify that the creation of the read-only view did not trigger a promotion from static to dynamic storage:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">b</span><span class="p">;</span>
@@ -305,7 +305,7 @@ and verify that the creation of the read-only view did not trigger a promotion f
 <span class="n">mpz_clear</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>                                <span class="c1">// Clear the mpz_t.</span>
 </pre></div>
 </div>
-<p>It must be noted that both <a class="reference internal" href="integer.html#_CPPv3N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv3NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_view()</span></code></a>
+<p>It must be noted that both <a class="reference internal" href="integer.html#_CPPv4N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_view()</span></code></a>
 have to be used carefully, as they return non-owning objects which can easily lead to dangling pointers or references, if misused.
 The documentation of the two functions explains in detail some of the potential pitfalls that users need to be aware of.</p>
 </div>
@@ -314,11 +314,11 @@ The documentation of the two functions explains in detail some of the potential 
 <div class="versionadded">
 <p><span class="versionmodified">New in version 0.7.</span></p>
 </div>
-<p>mp++ provides a simple <a class="reference internal" href="integer.html#integer-s11n"><span class="std std-ref">API for the (de)serialisation</span></a> of <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
+<p>mp++ provides a simple <a class="reference internal" href="integer.html#integer-s11n"><span class="std std-ref">API for the (de)serialisation</span></a> of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
 into/from memory buffers and C++ streams. Possible uses of the serialisation API include persistence (e.g.,
-saving/loading <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> values to/from a file), the transmission of <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects over
+saving/loading <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> values to/from a file), the transmission of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects over
 the network (e.g., in distributed computing applications), inter-process communication, etc. The API consists of two main
-overloaded functions, <a class="reference internal" href="integer.html#_CPPv3NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_save()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv3N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_load()</span></code></a> (plus their
+overloaded functions, <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_save()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_load()</span></code></a> (plus their
 free-function counterparts).</p>
 <p>Let’s see a few examples of the serialisation API in action:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">42</span><span class="p">},</span> <span class="n">b</span><span class="p">;</span>
@@ -338,7 +338,7 @@ back into the <code class="docutils literal notranslate"><span class="pre">b</sp
 value of <code class="docutils literal notranslate"><span class="pre">a</span></code>.</p>
 <p>Additional overloads are available for the save/load functions, targeting <code class="docutils literal notranslate"><span class="pre">std::vector&lt;char&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">std::array&lt;char&gt;</span></code>
 and C++ streams. The <code class="docutils literal notranslate"><span class="pre">std::vector&lt;char&gt;</span></code> <code class="docutils literal notranslate"><span class="pre">binary_save()</span></code> overload takes care of enlarging the target vector
-as much as needed to store the serialised <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>:</p>
+as much as needed to store the serialised <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">42</span><span class="p">},</span> <span class="n">b</span><span class="p">;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span> <span class="n">buffer</span><span class="p">;</span>   <span class="c1">// An initially-empty vector buffer.</span>
 
@@ -350,7 +350,7 @@ as much as needed to store the serialised <a class="reference internal" href="in
 <span class="n">assert</span><span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">a</span><span class="p">);</span>             <span class="c1">// Check that the original value is recovered.</span>
 </pre></div>
 </div>
-<p>Both <a class="reference internal" href="integer.html#_CPPv3NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_save()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv3N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_load()</span></code></a> retun a <code class="docutils literal notranslate"><span class="pre">std::size_t</span></code> value
+<p>Both <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_save()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_load()</span></code></a> retun a <code class="docutils literal notranslate"><span class="pre">std::size_t</span></code> value
 representing the number of bytes written/read during (de)serialisation, or zero if an error occurred. A return value
 of zero can occur, for instance, when serialising into a <code class="docutils literal notranslate"><span class="pre">std::array&lt;char&gt;</span></code> with insufficient storage:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">42</span><span class="p">},</span> <span class="n">b</span><span class="p">;</span>
@@ -369,8 +369,8 @@ of zero can occur, for instance, when serialising into a <code class="docutils l
 <span class="n">assert</span><span class="p">(</span><span class="n">b</span> <span class="o">==</span> <span class="n">a</span><span class="p">);</span>                         <span class="c1">// Check that the original value is recovered.</span>
 </pre></div>
 </div>
-<p>The amount of bytes of storage necessary to serialise an <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> can always be computed via
-the <a class="reference internal" href="integer.html#_CPPv3NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_size()</span></code></a> function.</p>
+<p>The amount of bytes of storage necessary to serialise an <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> can always be computed via
+the <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_size()</span></code></a> function.</p>
 <p>Overloads for C++ streams work in a (hopefully) unsurprising fashion:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">a</span><span class="p">{</span><span class="mi">42</span><span class="p">},</span> <span class="n">b</span><span class="p">;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">stringstream</span> <span class="n">ss</span><span class="p">;</span> <span class="c1">// Let&#39;s use a string stream for this example.</span>
@@ -389,7 +389,7 @@ against maliciously-crafted data. Users are thus advised not to load data from u
 <li>the current binary serialisation format is compiler, platform and architecture specific, it is not portable
 and it might be subject to changes in future versions of mp++. Users are thus advised not to use
 the binary serialisation format for long-term persistence or as a data exchange format: for such
-purposes, it is better to use the string representation of <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects.</li>
+purposes, it is better to use the string representation of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects.</li>
 </ul>
 </div>
 </div>
@@ -448,8 +448,8 @@ purposes, it is better to use the string representation of <a class="reference i
     </div>
 
     <div class="mdl-mini-footer__right-section">
-        <div>&copy; Copyright 2016-2018, Francesco Biscani.</div>
-      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.3 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
+        <div>&copy; Copyright 2016-2019, Francesco Biscani.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
 </footer>
         </main>

@@ -200,16 +200,11 @@ Show Source
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="unreleased">
 <h2>0.13 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="new">
-<h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Introduce additional function overloads for <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/159">#159</a>).</li>
-</ul>
-</div>
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Add a tutorial for <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/160">#160</a>).</li>
+<li>Update copyright date (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/162">#162</a>).</li>
+<li>Add a tutorial for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/160">#160</a>).</li>
 <li>Various build system improvements (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/159">#159</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 2.5.0 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/158">#158</a>).</li>
 </ul>
@@ -217,96 +212,99 @@ Show Source
 <div class="section" id="fix">
 <h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Fix a compilation error when using booleans as second arguments in the <code class="docutils literal notranslate"><span class="pre">pow()</span></code> and <code class="docutils literal notranslate"><span class="pre">binomial()</span></code> overloads of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/162">#162</a>).</li>
+<li>Work around a compilation error on MSVC when using C++17 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/162">#162</a>).</li>
 <li>Various documentation fixes (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/160">#160</a>).</li>
 </ul>
 </div>
 </div>
 <div class="section" id="id1">
 <h2>0.12 (2018-10-11)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id2">
-<h3>New<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="new">
+<h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Add a hash function for <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/157">#157</a>).</li>
-<li>Add all the root functions from the GMP API to the <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> API
+<li>Add a hash function for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/157">#157</a>).</li>
+<li>Add all the root functions from the GMP API to the <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> API
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/156">#156</a>).</li>
-<li>Add all the root functions from the MPFR API to the <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> API
+<li>Add all the root functions from the MPFR API to the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> API
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/154">#154</a>).</li>
-<li>Add a specialisation of <code class="docutils literal notranslate"><span class="pre">std::numeric_limits</span></code> for <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
+<li>Add a specialisation of <code class="docutils literal notranslate"><span class="pre">std::numeric_limits</span></code> for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/144">#144</a>).</li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h3>Changes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Changes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Initialising a <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> with an invalid <a class="reference internal" href="real.html#_CPPv3N4mppp9real_kindE" title="mppp::real_kind"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">real_kind</span></code></a> enum value now raises an
+<li>Initialising a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> with an invalid <a class="reference internal" href="real.html#_CPPv4N4mppp9real_kindE" title="mppp::real_kind"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">real_kind</span></code></a> enum value now raises an
 exception, rather than initialising to NaN (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/153">#153</a>).</li>
 <li>Switch to the sphinx material design theme for the documentation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/153">#153</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 2.4.0 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/152">#152</a>).</li>
-<li>Various improvements to the GCD implementation for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
+<li>Various improvements to the GCD implementation for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/150">#150</a>).</li>
-<li>The addition/subtraction operators of <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> now use the low-level <a class="reference internal" href="integer.html#_CPPv3N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a>,
-<a class="reference internal" href="integer.html#_CPPv3N4mppp6add_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::add_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_si()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv3N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::sub_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_ui()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv3N4mppp6sub_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::sub_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_si()</span></code></a> primitives when the other argument is a
+<li>The addition/subtraction operators of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> now use the low-level <a class="reference internal" href="integer.html#_CPPv4N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a>,
+<a class="reference internal" href="integer.html#_CPPv4N4mppp6add_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::add_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_si()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::sub_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_ui()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4N4mppp6sub_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::sub_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_si()</span></code></a> primitives when the other argument is a
 C++ integral (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/147">#147</a>).</li>
 <li>Various documentation additions, improvements and fixes (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/146">#146</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/148">#148</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/149">#149</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/153">#153</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/155">#155</a>).</li>
-<li><strong>BREAKING</strong>: replace the <code class="docutils literal notranslate"><span class="pre">integer_nbits_init</span></code> tag structure with the strongly-typed <a class="reference internal" href="integer.html#_CPPv3N4mppp16integer_bitcnt_tE" title="mppp::integer_bitcnt_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mppp::integer_bitcnt_t</span></code></a> enum
+<li><strong>BREAKING</strong>: replace the <code class="docutils literal notranslate"><span class="pre">integer_nbits_init</span></code> tag structure with the strongly-typed <a class="reference internal" href="integer.html#_CPPv4N4mppp16integer_bitcnt_tE" title="mppp::integer_bitcnt_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">mppp::integer_bitcnt_t</span></code></a> enum
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/145">#145</a>).</li>
-<li>Ensure that <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> is trivially copyable (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/144">#144</a>).</li>
+<li>Ensure that <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> is trivially copyable (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/144">#144</a>).</li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h3>Fix<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Fix<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fix various warnings issued by Clang 7 in the unit tests (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/157">#157</a>).</li>
 </ul>
 </div>
 </div>
+<div class="section" id="id4">
+<h2>0.11 (2018-05-22)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id5">
-<h2>0.11 (2018-05-22)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id6">
-<h3>New<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<h3>New<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Wrap more functions from the quadmath API in <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/140">#140</a>).</li>
+<li>Wrap more functions from the quadmath API in <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/140">#140</a>).</li>
 </ul>
 </div>
-<div class="section" id="id7">
-<h3>Changes<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h3>Changes<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>The build system should now detect MPIR installations when looking for GMP (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/139">#139</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 2.2.2 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/137">#137</a>).</li>
 </ul>
 </div>
-<div class="section" id="id8">
-<h3>Fix<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h3>Fix<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fix a couple of missing <code class="docutils literal notranslate"><span class="pre">inline</span></code> specifiers in the tests (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/143">#143</a>).</li>
-<li>Fix a missing <code class="docutils literal notranslate"><span class="pre">noexcept</span></code> in the move constructor of <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/138">#138</a>).</li>
+<li>Fix a missing <code class="docutils literal notranslate"><span class="pre">noexcept</span></code> in the move constructor of <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/138">#138</a>).</li>
 </ul>
 </div>
 </div>
+<div class="section" id="id8">
+<h2>0.10 (2018-04-06)<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id9">
-<h2>0.10 (2018-04-06)<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id10">
-<h3>New<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<h3>New<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Add a target in the build system to compile and run the benchmarks (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/135">#135</a>).</li>
-<li>Extend the <a class="reference internal" href="integer.html#_CPPv3N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv3N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::sub_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_ui()</span></code></a> functions to work on all unsigned
-C++ integral types, and introduce corresponding <a class="reference internal" href="integer.html#_CPPv3N4mppp6add_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::add_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_si()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv3N4mppp6sub_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::sub_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_si()</span></code></a>
+<li>Extend the <a class="reference internal" href="integer.html#_CPPv4N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::sub_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_ui()</span></code></a> functions to work on all unsigned
+C++ integral types, and introduce corresponding <a class="reference internal" href="integer.html#_CPPv4N4mppp6add_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::add_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_si()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4N4mppp6sub_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::sub_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_si()</span></code></a>
 functions for signed C++ integral types (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/131">#131</a>).</li>
 <li>Initial version of the rational tutorial (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/130">#130</a>).</li>
 <li>The demangler is now aware of cv-qualifiers and references (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/129">#129</a>).</li>
 </ul>
 </div>
-<div class="section" id="id11">
-<h3>Changes<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id10">
+<h3>Changes<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><strong>BREAKING</strong>: the <a class="reference internal" href="integer.html#_CPPv3N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a> function now <strong>requires</strong> an unsigned integral as the third argument
+<li><strong>BREAKING</strong>: the <a class="reference internal" href="integer.html#_CPPv4N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a> function now <strong>requires</strong> an unsigned integral as the third argument
 (previously, the function could be invoked with a signed integral argument thanks to C++’s conversion rules).</li>
 </ul>
 </div>
-<div class="section" id="id12">
-<h3>Fix<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id11">
+<h3>Fix<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fix a test failure on FreeBSD (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/134">#134</a>).</li>
 <li>Various small documentation fixes (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/130">#130</a>,
@@ -315,18 +313,18 @@ functions for signed C++ integral types (<a class="reference external" href="htt
 </ul>
 </div>
 </div>
+<div class="section" id="id12">
+<h2>0.9 (2018-02-25)<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id13">
-<h2>0.9 (2018-02-25)<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id14">
-<h3>New<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<h3>New<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Add a couple of benchmarks against hardware integer types (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/124">#124</a>).</li>
 </ul>
 </div>
-<div class="section" id="id15">
-<h3>Changes<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id14">
+<h3>Changes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>The <a class="reference internal" href="concepts.html#_CPPv3I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::StringType</span></code></a> concept is now satisfied by cv qualified types as well
+<li>The <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::StringType</span></code></a> concept is now satisfied by cv qualified types as well
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/127">#127</a>).</li>
 <li>Add a leading <code class="docutils literal notranslate"><span class="pre">mppp::</span></code> to the names of mp++’s classes in the pybind11 custom type casters
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/120">#120</a>). This should be only a cosmetic change.</li>
@@ -336,20 +334,20 @@ functions for signed C++ integral types (<a class="reference external" href="htt
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/124">#124</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/126">#126</a>).</li>
 </ul>
 </div>
-<div class="section" id="id16">
-<h3>Fix<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id15">
+<h3>Fix<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Fix a potential bug in the <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> printing code (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/123">#123</a>).</li>
+<li>Fix a potential bug in the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> printing code (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/123">#123</a>).</li>
 <li>Fix a potential name shadowing issue in the pybind11 integration utilities (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/125">#125</a>).</li>
 </ul>
 </div>
 </div>
+<div class="section" id="id16">
+<h2>0.8 (2018-01-26)<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id17">
-<h2>0.8 (2018-01-26)<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id18">
-<h3>New<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<h3>New<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Add a function to check if a <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is equal to one
+<li>Add a function to check if a <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> is equal to one
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/117">#117</a>).</li>
 <li>The pybind11 integration utilities now automatically translate mp++ exceptions into appropriate
 Python exceptions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/115">#115</a>).</li>
@@ -358,8 +356,8 @@ Python exceptions (<a class="reference external" href="https://github.com/bluesc
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/113">#113</a>).</li>
 </ul>
 </div>
-<div class="section" id="id19">
-<h3>Changes<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id18">
+<h3>Changes<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>When C++ concepts are enabled, various functions now use automatically-deduced return types
 to simplify the implementation and improve the generated documentation
@@ -369,42 +367,42 @@ that the installed package version is considered compatible with any other versi
 major version number (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/113">#113</a>).</li>
 </ul>
 </div>
-<div class="section" id="id20">
-<h3>Fix<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id19">
+<h3>Fix<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Fix a compilation error in the in-place operators of <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> when using concepts
+<li>Fix a compilation error in the in-place operators of <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> when using concepts
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/116">#116</a>).</li>
 <li>Fix a compilation error in the pybind11 utilities when mp++ is configured with quadmath support
 but without MPFR (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/114">#114</a>).</li>
 </ul>
 </div>
 </div>
+<div class="section" id="id20">
+<h2>0.7 (2018-01-11)<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id21">
-<h2>0.7 (2018-01-11)<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id22">
-<h3>New<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<h3>New<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Implement the initial version of the binary serialisation API (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/110">#110</a>).</li>
 <li>Add builds based on MSVC 2017 in Appveyor (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/110">#110</a>).</li>
-<li>Extend the <a class="reference internal" href="concepts.html#_CPPv3I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> concept to include all C++ integral types
+<li>Extend the <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> concept to include all C++ integral types
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/104">#104</a>).</li>
-<li>Add left bit shift benchmarks for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/103">#103</a>).</li>
+<li>Add left bit shift benchmarks for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/103">#103</a>).</li>
 <li>Implement division without remainder (<code class="docutils literal notranslate"><span class="pre">tdiv_q()</span></code>) and exact division with positive divisor (<code class="docutils literal notranslate"><span class="pre">divexact_gcd()</span></code>)
-for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/103">#103</a>).</li>
-<li>Implement the <code class="docutils literal notranslate"><span class="pre">trunc()</span></code> and  <code class="docutils literal notranslate"><span class="pre">integer_p()</span></code> primitives for <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
+for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/103">#103</a>).</li>
+<li>Implement the <code class="docutils literal notranslate"><span class="pre">trunc()</span></code> and  <code class="docutils literal notranslate"><span class="pre">integer_p()</span></code> primitives for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/102">#102</a>).</li>
-<li>Implement the <a class="reference internal" href="integer.html#_CPPv3N4mppp19free_integer_cachesEv" title="mppp::free_integer_caches"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">free_integer_caches()</span></code></a> function to manually free the caches used internally by
-<a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/98">#98</a>).</li>
+<li>Implement the <a class="reference internal" href="integer.html#_CPPv4N4mppp19free_integer_cachesEv" title="mppp::free_integer_caches"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">free_integer_caches()</span></code></a> function to manually free the caches used internally by
+<a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/98">#98</a>).</li>
 </ul>
 </div>
-<div class="section" id="id23">
-<h3>Changes<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id22">
+<h3>Changes<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Update copyright date (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/110">#110</a>).</li>
 <li>Various updates to the documentation and to the benchmarks (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/107">#107</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/108">#108</a>).</li>
 <li>Add an internal demangling utility to improve the quality of the error messages (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/105">#105</a>).</li>
-<li>Various performance improvements for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> division, fused multiply-add, left bit shift,
+<li>Various performance improvements for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> division, fused multiply-add, left bit shift,
 addition and multiplication
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/103">#103</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/106">#106</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/108">#108</a>).</li>
@@ -413,90 +411,90 @@ addition and multiplication
 </ul>
 </div>
 </div>
+<div class="section" id="id23">
+<h2>0.6 (2017-12-05)<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id24">
-<h2>0.6 (2017-12-05)<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id25">
-<h3>New<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<h3>New<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Implement additional <code class="docutils literal notranslate"><span class="pre">get()</span></code> conversion functions for <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/96">#96</a>).</li>
-<li>Implement the increment and decrement operators for <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/95">#95</a>).</li>
+<li>Implement additional <code class="docutils literal notranslate"><span class="pre">get()</span></code> conversion functions for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/96">#96</a>).</li>
+<li>Implement the increment and decrement operators for <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/95">#95</a>).</li>
 <li>Implement support for <code class="docutils literal notranslate"><span class="pre">__int128_t</span></code> and <code class="docutils literal notranslate"><span class="pre">__uint128_t</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/90">#90</a>).</li>
-<li>Implement the bitwise logic operators for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/86">#86</a>).</li>
+<li>Implement the bitwise logic operators for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/86">#86</a>).</li>
 <li>Initial implementation of the <a class="reference internal" href="tutorial_pybind11.html#tutorial-pybind11"><span class="std std-ref">pybind11 integration utilities</span></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/81">#81</a>).</li>
-<li>Implement the <code class="docutils literal notranslate"><span class="pre">frexp()</span></code> primitive for <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/81">#81</a>).</li>
-<li>Implement the <code class="docutils literal notranslate"><span class="pre">get/set_z_2exp()</span></code> primitives for <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/77">#77</a>).</li>
-<li>Implement construction with preallocated storage for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
-<li>Implement construction from an array of limbs for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/73">#73</a>).</li>
+<li>Implement the <code class="docutils literal notranslate"><span class="pre">frexp()</span></code> primitive for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/81">#81</a>).</li>
+<li>Implement the <code class="docutils literal notranslate"><span class="pre">get/set_z_2exp()</span></code> primitives for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/77">#77</a>).</li>
+<li>Implement construction with preallocated storage for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
+<li>Implement construction from an array of limbs for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/73">#73</a>).</li>
 </ul>
 </div>
-<div class="section" id="id26">
-<h3>Changes<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id25">
+<h3>Changes<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Various additions to the tutorial (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/97">#97</a>).</li>
 <li><strong>BREAKING</strong>: the imported target created by the installation process has been renamed from <code class="docutils literal notranslate"><span class="pre">Mp++</span></code> to <code class="docutils literal notranslate"><span class="pre">mp++</span></code>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/94">#94</a>).</li>
 <li>Take advantage of <code class="docutils literal notranslate"><span class="pre">std::gcd()</span></code> on C++17 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/93">#93</a>).</li>
-<li>Update the benchmark results for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
-<li>Add division benchmarks for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
-<li>A few performance tweaks for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
-<li>Simplifications in the bit shifting primitives for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/85">#85</a>).</li>
-<li>Split an <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> test in two parts to curb memory usage during compilation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/80">#80</a>).</li>
+<li>Update the benchmark results for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
+<li>Add division benchmarks for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
+<li>A few performance tweaks for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
+<li>Simplifications in the bit shifting primitives for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/85">#85</a>).</li>
+<li>Split an <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> test in two parts to curb memory usage during compilation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/80">#80</a>).</li>
 <li>Use bit counting intrinsics in MSVC (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/79">#79</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 2.0.1 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/76">#76</a>).</li>
-<li>Improve the performance of generic assignment for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
-<li>Improve construction from C++ integrals for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
+<li>Improve the performance of generic assignment for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
+<li>Improve construction from C++ integrals for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
 </ul>
+</div>
+<div class="section" id="id26">
+<h3>Fix<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fix <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> warnings in release mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/97">#97</a>).</li>
+<li>Various internal cleanups in <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/80">#80</a>,
+<a class="reference external" href="https://github.com/bluescarni/mppp/pull/85">#85</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/86">#86</a>).</li>
+<li>Small fixes regarding the use of GMP type aliases in <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/73">#73</a>).</li>
+</ul>
+</div>
 </div>
 <div class="section" id="id27">
-<h3>Fix<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>Fix <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> warnings in release mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/97">#97</a>).</li>
-<li>Various internal cleanups in <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/80">#80</a>,
-<a class="reference external" href="https://github.com/bluescarni/mppp/pull/85">#85</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/86">#86</a>).</li>
-<li>Small fixes regarding the use of GMP type aliases in <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/73">#73</a>).</li>
-</ul>
-</div>
-</div>
+<h2>0.5 (2017-11-07)<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id28">
-<h2>0.5 (2017-11-07)<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id29">
-<h3>New<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
+<h3>New<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Implement the <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/40">#40</a>).</li>
+<li>Implement the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/40">#40</a>).</li>
 <li>Add non-throwing GMP-style conversion functions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/59">#59</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/61">#61</a>).</li>
-<li>Implement move constructors and move assignment operators from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code> for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
-and <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/57">#57</a>).</li>
-<li>Implement a cache for the allocation of limbs arrays in small <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
+<li>Implement move constructors and move assignment operators from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code> for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
+and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/57">#57</a>).</li>
+<li>Implement a cache for the allocation of limbs arrays in small <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/55">#55</a>).</li>
-<li>Implement the <a class="reference internal" href="real128.html#_CPPv3N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>).</li>
-<li>Implement the <code class="docutils literal notranslate"><span class="pre">sub_ui()</span></code> primitive for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/37">#37</a>).</li>
+<li>Implement the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>).</li>
+<li>Implement the <code class="docutils literal notranslate"><span class="pre">sub_ui()</span></code> primitive for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/37">#37</a>).</li>
 <li>Add a CI build testing against the latest unstable GMP branch (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/34">#34</a>).</li>
-<li>Add assignment operators from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
+<li>Add assignment operators from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/32">#32</a>).</li>
-<li>Add the possibility of constructing non-canonical <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> objects from numerator/denominator pairs
+<li>Add the possibility of constructing non-canonical <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> objects from numerator/denominator pairs
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>).</li>
 </ul>
 </div>
-<div class="section" id="id30">
-<h3>Changes<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id29">
+<h3>Changes<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Use the sphinx bootstrap theme for the html documentation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/71">#71</a>).</li>
-<li>Various simplifications in the <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> API (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/66">#66</a>).</li>
-<li>Introduce a <a class="reference internal" href="concepts.html#_CPPv3I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">StringType</span></code></a> concept and use it to reduce the number of overloads in the
+<li>Various simplifications in the <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> API (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/66">#66</a>).</li>
+<li>Introduce a <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">StringType</span></code></a> concept and use it to reduce the number of overloads in the
 constructors/assignment operators from string (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/63">#63</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/64">#64</a>).</li>
-<li>The <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> functions accepting the return value as a parameter will now
+<li>The <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> functions accepting the return value as a parameter will now
 demote a return value with dynamic storage to static storage if the other arguments all have static storage
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/58">#58</a>).</li>
-<li>The free functions for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> now return a reference
+<li>The free functions for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> now return a reference
 to the return value, rather than <code class="docutils literal notranslate"><span class="pre">void</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/56">#56</a>).</li>
-<li>Performance improvements and code simplifications for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> division
+<li>Performance improvements and code simplifications for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> division
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/55">#55</a>).</li>
 <li>Minor improvements in the static checks for the expected layouts of <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/53">#53</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/42">#42</a>).</li>
 <li>Enable additional compiler warning flags in debug builds for GCC (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/52">#52</a>).</li>
-<li><strong>BREAKING</strong>: various improvements/changes to the bit shifting functions for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>,
+<li><strong>BREAKING</strong>: various improvements/changes to the bit shifting functions for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>,
 and the exception raised by the bit shifting operators is not any more
 <code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>, it is now <code class="docutils literal notranslate"><span class="pre">std::overflow_error</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/48">#48</a>).</li>
 <li>Various updates to the benchmarks (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/39">#39</a>).</li>
@@ -504,56 +502,56 @@ and the exception raised by the bit shifting operators is not any more
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/37">#37</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 1.9.7 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/36">#36</a>).</li>
 <li>Bump up the minimum required CMake version to 3.3 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>).</li>
-<li>Performance improvements and simplifications in the <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> constructors and assignment operators
+<li>Performance improvements and simplifications in the <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> constructors and assignment operators
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/32">#32</a>).</li>
 </ul>
 </div>
-<div class="section" id="id31">
-<h3>Fix<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id30">
+<h3>Fix<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixes/improvements in the support for <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/50">#50</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/54">#54</a>).</li>
 <li>Fix the compilation of the tests on Clang 5 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/43">#43</a>).</li>
-<li>Fix too lax constraints in the implementation of in-place operators for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and
-<a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/41">#41</a>).</li>
+<li>Fix too lax constraints in the implementation of in-place operators for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and
+<a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/41">#41</a>).</li>
 <li>Fix the PDF build of the documentation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/39">#39</a>).</li>
 <li>Fix a few missing <code class="docutils literal notranslate"><span class="pre">inline</span></code> specifiers (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/38">#38</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/41">#41</a>).</li>
 <li>Fix C++ version detection on MSVC (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/36">#36</a>).</li>
-<li>Fix missing tests for <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> hashing (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/29">#29</a>).</li>
+<li>Fix missing tests for <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> hashing (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/29">#29</a>).</li>
 <li>Fix some MSVC warnings when compiling the tests in release mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>).</li>
 <li>Various minor documentation fixes.</li>
 </ul>
 </div>
 </div>
+<div class="section" id="id31">
+<h2>0.4 (2017-07-29)<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id32">
-<h2>0.4 (2017-07-29)<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id33">
-<h3>New<a class="headerlink" href="#id33" title="Permalink to this headline">¶</a></h3>
+<h3>New<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Implement the constructors from a range of characters and from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
-and <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
-<li>Implement the assignment operator and the constructor from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> in <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
+<li>Implement the constructors from a range of characters and from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
+and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
+<li>Implement the assignment operator and the constructor from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> in <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/19">#19</a>).</li>
 </ul>
 </div>
-<div class="section" id="id34">
-<h3>Changes<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id33">
+<h3>Changes<a class="headerlink" href="#id33" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Expand CI to include GCC 7 in C++17 mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/27">#27</a>).</li>
 <li>Improve testing coverage (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
 <li>Various extensions to the benchmark suite (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
-<li>Various performance improvements in <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> thanks to the reduction of the number of branches
+<li>Various performance improvements in <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> thanks to the reduction of the number of branches
 in the implementation of basic arithmetic for the 1/2-limb specialisations (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 1.9.6 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/24">#24</a>).</li>
-<li>Performance improvements for <a class="reference internal" href="integer.html#_CPPv3NK4mppp7integer4sizeEv" title="mppp::integer::size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::size()</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
-<li>Performance improvements for the construction/conversion of <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> from/to C++ integrals
+<li>Performance improvements for <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer4sizeEv" title="mppp::integer::size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::size()</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
+<li>Performance improvements for the construction/conversion of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> from/to C++ integrals
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
 <li>Make sure the MPFR cleanup routine is automatically called on shutdown (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/22">#22</a>).</li>
-<li>Performance improvements for <a class="reference internal" href="integer.html#_CPPv3NK4mppp7integer5nbitsEv" title="mppp::integer::nbits"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::nbits()</span></code></a> on GCC and Clang (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/17">#17</a>).</li>
+<li>Performance improvements for <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer5nbitsEv" title="mppp::integer::nbits"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::nbits()</span></code></a> on GCC and Clang (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/17">#17</a>).</li>
 </ul>
 </div>
-<div class="section" id="id35">
-<h3>Fix<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id34">
+<h3>Fix<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fix a build failure on older GMP versions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
 <li>Fix a build system bug when building the benchmarks with older CMake versions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
@@ -561,36 +559,36 @@ in the implementation of basic arithmetic for the 1/2-limb specialisations (<a c
 </ul>
 </div>
 </div>
+<div class="section" id="id35">
+<h2>0.3 (2017-06-12)<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id36">
-<h2>0.3 (2017-06-12)<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id37">
-<h3>New<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h3>
+<h3>New<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Implement the multiprecision <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/14">#14</a>).</li>
-<li>Implement fast assignment functions to zero and plus/minus one for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
-<li>Add assignment operators from string for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
-<li>Implement the <code class="docutils literal notranslate"><span class="pre">submul()</span></code> primitive for <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
-<li>Implement the assignment operator from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> in <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, and use it in various function
+<li>Implement the multiprecision <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/14">#14</a>).</li>
+<li>Implement fast assignment functions to zero and plus/minus one for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
+<li>Add assignment operators from string for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
+<li>Implement the <code class="docutils literal notranslate"><span class="pre">submul()</span></code> primitive for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
+<li>Implement the assignment operator from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> in <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, and use it in various function
 in order to avoid the creation of a temporary.</li>
 </ul>
 </div>
-<div class="section" id="id38">
-<h3>Changes<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id37">
+<h3>Changes<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Performance improvements for the copy/move assignment operators of <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
+<li>Performance improvements for the copy/move assignment operators of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
 </ul>
 </div>
-<div class="section" id="id39">
-<h3>Fix<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id38">
+<h3>Fix<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Various small documentation fixes.</li>
 </ul>
 </div>
 </div>
+<div class="section" id="id39">
+<h2>0.2 (2017-05-09)<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id40">
-<h2>0.2 (2017-05-09)<a class="headerlink" href="#id40" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id41">
-<h3>New<a class="headerlink" href="#id41" title="Permalink to this headline">¶</a></h3>
+<h3>New<a class="headerlink" href="#id40" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Provide a CMake config-file package as part of the install process.</li>
 <li>Implement the missing in-place modulo operator with C++ integrals
@@ -607,8 +605,8 @@ coefficient.</li>
 <li>Add a static member to <code class="docutils literal notranslate"><span class="pre">integer</span></code> storing the static size.</li>
 </ul>
 </div>
-<div class="section" id="id42">
-<h3>Changes<a class="headerlink" href="#id42" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id41">
+<h3>Changes<a class="headerlink" href="#id41" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Split out the library in multiple files.</li>
 <li>Rename the <code class="docutils literal notranslate"><span class="pre">mp_integer</span></code> class to <code class="docutils literal notranslate"><span class="pre">integer</span></code>.</li>
@@ -620,8 +618,8 @@ coefficient.</li>
 <li>Remove the custom namespace option.</li>
 </ul>
 </div>
-<div class="section" id="id43">
-<h3>Fix<a class="headerlink" href="#id43" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id42">
+<h3>Fix<a class="headerlink" href="#id42" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fix operators example in the documentation.</li>
 </ul>
@@ -640,74 +638,73 @@ coefficient.</li>
     <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
 <li><a class="reference internal" href="#unreleased">0.13 (unreleased)</a><ul>
-<li><a class="reference internal" href="#new">New</a></li>
 <li><a class="reference internal" href="#changes">Changes</a></li>
 <li><a class="reference internal" href="#fix">Fix</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#id1">0.12 (2018-10-11)</a><ul>
-<li><a class="reference internal" href="#id2">New</a></li>
-<li><a class="reference internal" href="#id3">Changes</a></li>
-<li><a class="reference internal" href="#id4">Fix</a></li>
+<li><a class="reference internal" href="#new">New</a></li>
+<li><a class="reference internal" href="#id2">Changes</a></li>
+<li><a class="reference internal" href="#id3">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id5">0.11 (2018-05-22)</a><ul>
-<li><a class="reference internal" href="#id6">New</a></li>
-<li><a class="reference internal" href="#id7">Changes</a></li>
-<li><a class="reference internal" href="#id8">Fix</a></li>
+<li><a class="reference internal" href="#id4">0.11 (2018-05-22)</a><ul>
+<li><a class="reference internal" href="#id5">New</a></li>
+<li><a class="reference internal" href="#id6">Changes</a></li>
+<li><a class="reference internal" href="#id7">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id9">0.10 (2018-04-06)</a><ul>
-<li><a class="reference internal" href="#id10">New</a></li>
-<li><a class="reference internal" href="#id11">Changes</a></li>
-<li><a class="reference internal" href="#id12">Fix</a></li>
+<li><a class="reference internal" href="#id8">0.10 (2018-04-06)</a><ul>
+<li><a class="reference internal" href="#id9">New</a></li>
+<li><a class="reference internal" href="#id10">Changes</a></li>
+<li><a class="reference internal" href="#id11">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id13">0.9 (2018-02-25)</a><ul>
-<li><a class="reference internal" href="#id14">New</a></li>
-<li><a class="reference internal" href="#id15">Changes</a></li>
-<li><a class="reference internal" href="#id16">Fix</a></li>
+<li><a class="reference internal" href="#id12">0.9 (2018-02-25)</a><ul>
+<li><a class="reference internal" href="#id13">New</a></li>
+<li><a class="reference internal" href="#id14">Changes</a></li>
+<li><a class="reference internal" href="#id15">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id17">0.8 (2018-01-26)</a><ul>
-<li><a class="reference internal" href="#id18">New</a></li>
-<li><a class="reference internal" href="#id19">Changes</a></li>
-<li><a class="reference internal" href="#id20">Fix</a></li>
+<li><a class="reference internal" href="#id16">0.8 (2018-01-26)</a><ul>
+<li><a class="reference internal" href="#id17">New</a></li>
+<li><a class="reference internal" href="#id18">Changes</a></li>
+<li><a class="reference internal" href="#id19">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id21">0.7 (2018-01-11)</a><ul>
-<li><a class="reference internal" href="#id22">New</a></li>
-<li><a class="reference internal" href="#id23">Changes</a></li>
+<li><a class="reference internal" href="#id20">0.7 (2018-01-11)</a><ul>
+<li><a class="reference internal" href="#id21">New</a></li>
+<li><a class="reference internal" href="#id22">Changes</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id24">0.6 (2017-12-05)</a><ul>
-<li><a class="reference internal" href="#id25">New</a></li>
-<li><a class="reference internal" href="#id26">Changes</a></li>
-<li><a class="reference internal" href="#id27">Fix</a></li>
+<li><a class="reference internal" href="#id23">0.6 (2017-12-05)</a><ul>
+<li><a class="reference internal" href="#id24">New</a></li>
+<li><a class="reference internal" href="#id25">Changes</a></li>
+<li><a class="reference internal" href="#id26">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id28">0.5 (2017-11-07)</a><ul>
-<li><a class="reference internal" href="#id29">New</a></li>
-<li><a class="reference internal" href="#id30">Changes</a></li>
-<li><a class="reference internal" href="#id31">Fix</a></li>
+<li><a class="reference internal" href="#id27">0.5 (2017-11-07)</a><ul>
+<li><a class="reference internal" href="#id28">New</a></li>
+<li><a class="reference internal" href="#id29">Changes</a></li>
+<li><a class="reference internal" href="#id30">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id32">0.4 (2017-07-29)</a><ul>
-<li><a class="reference internal" href="#id33">New</a></li>
-<li><a class="reference internal" href="#id34">Changes</a></li>
-<li><a class="reference internal" href="#id35">Fix</a></li>
+<li><a class="reference internal" href="#id31">0.4 (2017-07-29)</a><ul>
+<li><a class="reference internal" href="#id32">New</a></li>
+<li><a class="reference internal" href="#id33">Changes</a></li>
+<li><a class="reference internal" href="#id34">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id36">0.3 (2017-06-12)</a><ul>
-<li><a class="reference internal" href="#id37">New</a></li>
-<li><a class="reference internal" href="#id38">Changes</a></li>
-<li><a class="reference internal" href="#id39">Fix</a></li>
+<li><a class="reference internal" href="#id35">0.3 (2017-06-12)</a><ul>
+<li><a class="reference internal" href="#id36">New</a></li>
+<li><a class="reference internal" href="#id37">Changes</a></li>
+<li><a class="reference internal" href="#id38">Fix</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id40">0.2 (2017-05-09)</a><ul>
-<li><a class="reference internal" href="#id41">New</a></li>
-<li><a class="reference internal" href="#id42">Changes</a></li>
-<li><a class="reference internal" href="#id43">Fix</a></li>
+<li><a class="reference internal" href="#id39">0.2 (2017-05-09)</a><ul>
+<li><a class="reference internal" href="#id40">New</a></li>
+<li><a class="reference internal" href="#id41">Changes</a></li>
+<li><a class="reference internal" href="#id42">Fix</a></li>
 </ul>
 </li>
 </ul>
@@ -745,8 +742,8 @@ coefficient.</li>
     </div>
 
     <div class="mdl-mini-footer__right-section">
-        <div>&copy; Copyright 2016-2018, Francesco Biscani.</div>
-      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.3 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
+        <div>&copy; Copyright 2016-2019, Francesco Biscani.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
 </footer>
         </main>

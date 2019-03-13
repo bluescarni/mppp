@@ -218,7 +218,7 @@ Show Source
 on curly brackets. Using the same syntax, it is possible to:</p>
 <ul class="simple">
 <li>initialise multiprecision objects from objects of (most of) C++’s numerical types (see the
-<a class="reference internal" href="concepts.html#_CPPv3I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> concept for a full list),</li>
+<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> concept for a full list),</li>
 <li>initialise multiprecision objects from multiprecision objects of a different type,</li>
 <li>initialise C++ numerical objects from multiprecision objects.</li>
 </ul>
@@ -232,32 +232,32 @@ on curly brackets. Using the same syntax, it is possible to:</p>
 <p>In the code above, we are creating a multiprecision integer <code class="docutils literal notranslate"><span class="pre">n</span></code> from the C++ <code class="docutils literal notranslate"><span class="pre">int</span></code> literal <code class="docutils literal notranslate"><span class="pre">42</span></code>. We are then converting
 <code class="docutils literal notranslate"><span class="pre">n</span></code> back to <code class="docutils literal notranslate"><span class="pre">int</span></code>, and checking that the converted value is the original one. As a general rule, mp++ will strive
 to preserve the exact input value during construction and conversion. If this is not possible, what happens next depends
-on the types and values involved. For instance, initialising an <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
+on the types and values involved. For instance, initialising an <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
 with a floating-point value results in truncation:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mf">1.23</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>In a similar fashion, initialising an <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> with a <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> also
+<p>In a similar fashion, initialising an <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> with a <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> also
 results in truncation:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">}};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
-<p><a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> cannot represent non-finite values, thus construction
+<p><a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> cannot represent non-finite values, thus construction
 from such values will raise an exception:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">infinity</span><span class="p">()};</span>  <span class="c1">// Raises std::domain_error.</span>
 <span class="n">rat_t</span> <span class="n">q</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;::</span><span class="n">quiet_NaN</span><span class="p">()};</span> <span class="c1">// Raises std::domain_error.</span>
 </pre></div>
 </div>
-<p>Construction of C++ integrals from <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> might fail
-in case of overflow, and it will produce the truncated value when constructing from <a class="reference internal" href="rational.html#_CPPv3N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>:</p>
+<p>Construction of C++ integrals from <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> might fail
+in case of overflow, and it will produce the truncated value when constructing from <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">n</span><span class="p">{</span><span class="n">int_t</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="mi">1024</span><span class="p">};</span>         <span class="c1">// int construction from very large value,</span>
                                  <span class="c1">// raises std::overflow_error.</span>
 <span class="n">assert</span><span class="p">((</span><span class="kt">int</span><span class="p">{</span><span class="n">rat_t</span><span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">}}</span> <span class="o">==</span> <span class="mi">1</span><span class="p">));</span> <span class="c1">// int construction from rational truncates.</span>
 </pre></div>
 </div>
-<p>On the other hand, conversion of <a class="reference internal" href="integer.html#_CPPv3N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects to C++ floating-point types does not raise any error
+<p>On the other hand, conversion of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects to C++ floating-point types does not raise any error
 even if it does not preserve the exact value:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span> <span class="n">f</span><span class="p">{</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;32327737199221993919239912&quot;</span><span class="p">}};</span> <span class="c1">// Constructs a single-precision approximation</span>
                                               <span class="c1">// of the original integer.</span>
@@ -265,7 +265,7 @@ even if it does not preserve the exact value:</p>
 </div>
 <p>The documentation of the multiprecision classes explains in detail the behaviour during construction and conversion.</p>
 <p>All of mp++’s multiprecision classes can also be initialised from string-like entities (see the
-<a class="reference internal" href="concepts.html#_CPPv3I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">StringType</span></code></a> concept for a full list). By default, string input is interpreted as the base-10 representation
+<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">StringType</span></code></a> concept for a full list). By default, string input is interpreted as the base-10 representation
 of the desired value, and parsing follows (hopefully) intuitive rules:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">(</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-42&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">rat_t</span><span class="p">{</span><span class="s">&quot;3/2&quot;</span><span class="p">}</span> <span class="o">==</span> <span class="mf">1.5</span><span class="p">)</span>
@@ -273,7 +273,7 @@ of the desired value, and parsing follows (hopefully) intuitive rules:</p>
 <span class="n">assert</span><span class="p">((</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;-3.125E-2&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mf">0.03125</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>Note that for <a class="reference internal" href="real.html#_CPPv3N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> we need to provide the precision as an additional parameter when constructing from string (in
+<p>Note that for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> we need to provide the precision as an additional parameter when constructing from string (in
 this specific example, 100 bits of precision are used). Depending on the multiprecision class, additional string constructors are available
 which allow to specify a different base for the representation of the value:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">assert</span><span class="p">((</span><span class="n">int_t</span><span class="p">{</span><span class="s">&quot;-101010&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">}</span> <span class="o">==</span> <span class="o">-</span><span class="mi">42</span><span class="p">))</span>          <span class="c1">// Base 2.</span>
@@ -353,8 +353,8 @@ Explicitly casting the multiprecision value before the assignment will however w
     </div>
 
     <div class="mdl-mini-footer__right-section">
-        <div>&copy; Copyright 2016-2018, Francesco Biscani.</div>
-      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.3 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
+        <div>&copy; Copyright 2016-2019, Francesco Biscani.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
 </footer>
         </main>
