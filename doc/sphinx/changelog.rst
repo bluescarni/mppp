@@ -1,12 +1,13 @@
 Changelog
 =========
 
-0.13 (unreleased)
+0.13 (2019-03-13)
 -----------------
 
 Changes
 ~~~~~~~
 
+- Update copyright date (`#162 <https://github.com/bluescarni/mppp/pull/162>`__).
 - Add a tutorial for :cpp:class:`~mppp::real128` (`#160 <https://github.com/bluescarni/mppp/pull/160>`__).
 - Various build system improvements (`#159 <https://github.com/bluescarni/mppp/pull/159>`__).
 - Update the internal copy of Catch to the latest version, 2.5.0 (`#158 <https://github.com/bluescarni/mppp/pull/158>`__).
@@ -14,6 +15,9 @@ Changes
 Fix
 ~~~
 
+- Fix a compilation error when using booleans as second arguments in the ``pow()`` and ``binomial()`` overloads of :cpp:class:`~mppp::integer`
+  (`#162 <https://github.com/bluescarni/mppp/pull/162>`__).
+- Work around a compilation error on MSVC when using C++17 (`#162 <https://github.com/bluescarni/mppp/pull/162>`__).
 - Various documentation fixes (`#160 <https://github.com/bluescarni/mppp/pull/160>`__).
 
 0.12 (2018-10-11)

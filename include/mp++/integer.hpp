@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -674,6 +674,12 @@ struct static_int {
         // Just forward to the copy assignment.
         return operator=(other);
     }
+#ifdef __MINGW32__
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
+
+#endif
     bool dtor_checks() const
     {
         // LCOV_EXCL_START
@@ -702,6 +708,11 @@ struct static_int {
         return true;
         // LCOV_EXCL_STOP
     }
+#ifdef __MINGW32__
+
+#pragma GCC diagnostic pop
+
+#endif
     ~static_int()
     {
         assert(dtor_checks());
@@ -3843,30 +3854,10 @@ inline bool static_addsub_1(static_int<SSize> &rop, const static_int<SSize> &op1
     }
     return retval;
 }
-} // namespace detail
 
-/// Ternary \link mppp::integer integer\endlink addition with C++ unsigned integral types.
-/**
- * \rststar
- * This function, which sets ``rop`` to ``op1 + op2``, can be a faster
- * alternative to the :cpp:class:`~mppp::integer` addition function
- * if ``op2`` fits in a single limb.
- * \endrststar
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1,
-                              const CppUnsignedIntegralInteroperable &op2)
-#else
-template <std::size_t SSize, typename T, cpp_unsigned_integral_interoperable_enabler<T> = 0>
-inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
-#endif
+// Implementation of add_ui().
+template <std::size_t SSize, typename T>
+inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 {
     if (op2 > GMP_NUMB_MAX) {
         // For the optimised version below to kick in we need to be sure we can safely convert
@@ -3914,6 +3905,42 @@ inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, co
         // LCOV_EXCL_STOP
     }
     return rop;
+}
+
+// NOTE: special-case bool in order to avoid spurious compiler warnings when
+// mixing up bool and other integral types.
+template <std::size_t SSize>
+inline integer<SSize> &add_ui_impl(integer<SSize> &rop, const integer<SSize> &op1, bool op2)
+{
+    return add_ui_impl(rop, op1, static_cast<unsigned>(op2));
+}
+
+} // namespace detail
+
+/// Ternary \link mppp::integer integer\endlink addition with C++ unsigned integral types.
+/**
+ * \rststar
+ * This function, which sets ``rop`` to ``op1 + op2``, can be a faster
+ * alternative to the :cpp:class:`~mppp::integer` addition function
+ * if ``op2`` fits in a single limb.
+ * \endrststar
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1,
+                              const CppUnsignedIntegralInteroperable &op2)
+#else
+template <std::size_t SSize, typename T, cpp_unsigned_integral_interoperable_enabler<T> = 0>
+inline integer<SSize> &add_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
+#endif
+{
+    return add_ui_impl(rop, op1, op2);
 }
 
 /// Ternary \link mppp::integer integer\endlink addition with C++ signed integral types.
@@ -3976,28 +4003,12 @@ inline integer<SSize> &sub(integer<SSize> &rop, const integer<SSize> &op1, const
     return rop;
 }
 
-/// Ternary \link mppp::integer integer\endlink subtraction with C++ unsigned integral types.
-/**
- * \rststar
- * This function, which sets ``rop`` to ``op1 - op2``, can be a faster
- * alternative to the :cpp:class:`~mppp::integer` subtraction function
- * if ``op2`` fits in a single limb.
- * \endrststar
- *
- * @param rop the return value.
- * @param op1 the first argument.
- * @param op2 the second argument.
- *
- * @return a reference to \p rop.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize>
-inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1,
-                              const CppUnsignedIntegralInteroperable &op2)
-#else
-template <std::size_t SSize, typename T, cpp_unsigned_integral_interoperable_enabler<T> = 0>
-inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
-#endif
+inline namespace detail
+{
+
+// Implementation of sub_ui().
+template <std::size_t SSize, typename T>
+inline integer<SSize> &sub_ui_impl(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
 {
     if (op2 > GMP_NUMB_MASK) {
         MPPP_MAYBE_TLS integer<SSize> tmp;
@@ -4029,6 +4040,42 @@ inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, co
         // LCOV_EXCL_STOP
     }
     return rop;
+}
+
+// NOTE: special-case bool in order to avoid spurious compiler warnings when
+// mixing up bool and other integral types.
+template <std::size_t SSize>
+inline integer<SSize> &sub_ui_impl(integer<SSize> &rop, const integer<SSize> &op1, bool op2)
+{
+    return sub_ui_impl(rop, op1, static_cast<unsigned>(op2));
+}
+
+} // namespace detail
+
+/// Ternary \link mppp::integer integer\endlink subtraction with C++ unsigned integral types.
+/**
+ * \rststar
+ * This function, which sets ``rop`` to ``op1 - op2``, can be a faster
+ * alternative to the :cpp:class:`~mppp::integer` subtraction function
+ * if ``op2`` fits in a single limb.
+ * \endrststar
+ *
+ * @param rop the return value.
+ * @param op1 the first argument.
+ * @param op2 the second argument.
+ *
+ * @return a reference to \p rop.
+ */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <std::size_t SSize>
+inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1,
+                              const CppUnsignedIntegralInteroperable &op2)
+#else
+template <std::size_t SSize, typename T, cpp_unsigned_integral_interoperable_enabler<T> = 0>
+inline integer<SSize> &sub_ui(integer<SSize> &rop, const integer<SSize> &op1, const T &op2)
+#endif
+{
+    return sub_ui_impl(rop, op1, op2);
 }
 
 /// Ternary \link mppp::integer integer\endlink subtraction with C++ signed integral types.
@@ -6953,10 +7000,20 @@ inline unsigned long integer_exp_to_ulong(const T &exp)
     // NOTE: make_unsigned_t<T> is T if T is already unsigned.
     // Don't use the make_unsigned() helper, as exp might be
     // unsigned already.
+    static_assert(!std::is_same<T, bool>::value, "Cannot use the bool type in make_unsigned_t.");
     if (mppp_unlikely(static_cast<make_unsigned_t<T>>(exp) > nl_max<unsigned long>())) {
         throw std::overflow_error("Cannot convert the integral value " + mppp::to_string(exp)
                                   + " to unsigned long: the value is too large");
     }
+    return static_cast<unsigned long>(exp);
+}
+
+// NOTE: special case bool, otherwise we end up invoking make_unsigned_t<bool> in the
+// previous overload, which is not well-defined:
+// https://en.cppreference.com/w/cpp/types/make_unsigned
+inline unsigned long integer_exp_to_ulong(bool exp)
+{
+
     return static_cast<unsigned long>(exp);
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -30,10 +30,10 @@ using namespace mppp_bench;
 #if defined(MPPP_BENCHMARK_BOOST)
 // Make sure we use the cpp_int version that does the overflow check, in order to
 // match mp++'s behaviour.
-using cpp_int = boost::multiprecision::
-    number<boost::multiprecision::cpp_int_backend<0, 0, boost::multiprecision::signed_magnitude,
-                                                  boost::multiprecision::checked>,
-           boost::multiprecision::et_off>;
+using cpp_int
+    = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
+                                        0, 0, boost::multiprecision::signed_magnitude, boost::multiprecision::checked>,
+                                    boost::multiprecision::et_off>;
 using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, boost::multiprecision::et_off>;
 #endif
 
@@ -135,8 +135,9 @@ int main()
          "legend = False, size = 5.5, aspect = 1.5)\n"
          "    legend(loc='upper left')\n"
          "    g.fig.suptitle('"
-         + name + "')\n"
-                  "    g.savefig('"
+         + name
+         + "')\n"
+           "    g.savefig('"
          + name + ".svg', bbox_inches='tight')\n";
     std::ofstream of(name + ".py", std::ios_base::trunc);
     of << s;
