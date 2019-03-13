@@ -64,8 +64,8 @@ install:
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
 
 - if [%BUILD_TYPE%]==[MinGW] set PATH=C:\mingw64\bin;%PATH%
-- if [%BUILD_TYPE%]==[MinGW] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z
-- if [%BUILD_TYPE%]==[MinGW] 7z x -oC:\ x86_64-6.2.0-release-posix-seh-rt_v5-rev1.7z > NUL
+- if [%BUILD_TYPE%]==[MinGW] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z
+- if [%BUILD_TYPE%]==[MinGW] 7z x -oC:\ x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z > NUL
 - if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/gmp_mingw_64.7z
 - if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] call tools\appveyor-download.cmd https://github.com/bluescarni/binary_deps/raw/master/mpfr_mingw_64.7z
 - if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] 7z x -oC:\ gmp_mingw_64.7z > NUL
@@ -82,9 +82,9 @@ build_script:
 - if [%BUILD_TYPE%]==[MSVC15_32] cmake .. -G "Visual Studio 14 2015" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_TEST_PYBIND11=yes
 - if [%BUILD_TYPE%]==[MSVC15_32] cmake --build . --config Release --target pybind11_test_01
 
-- if [%BUILD_TYPE%]==[MSVC17_32] cmake .. -G "Visual Studio 15 2017" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
+- if [%BUILD_TYPE%]==[MSVC17_32] cmake .. -G "Visual Studio 15 2017" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_STANDARD=17
 - if [%BUILD_TYPE%]==[MSVC17_32] cmake --build . --config Debug
-- if [%BUILD_TYPE%]==[MSVC17_32] cmake .. -G "Visual Studio 15 2017" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_TEST_PYBIND11=yes
+- if [%BUILD_TYPE%]==[MSVC17_32] cmake .. -G "Visual Studio 15 2017" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_TEST_PYBIND11=yes -DCMAKE_CXX_STANDARD=17
 - if [%BUILD_TYPE%]==[MSVC17_32] cmake --build . --config Release --target pybind11_test_01
 
 - if [%BUILD_TYPE%]==[MSVC15_64] cmake .. -G "Visual Studio 14 2015 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
@@ -92,9 +92,9 @@ build_script:
 - if [%BUILD_TYPE%]==[MSVC15_64] cmake .. -G "Visual Studio 14 2015 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_TEST_PYBIND11=yes
 - if [%BUILD_TYPE%]==[MSVC15_64] cmake --build . --config Release --target pybind11_test_01
 
-- if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
+- if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_STANDARD=17
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Debug
-- if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_TEST_PYBIND11=yes
+- if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_TEST_PYBIND11=yes -DCMAKE_CXX_STANDARD=17
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Release --target pybind11_test_01
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
@@ -103,7 +103,7 @@ build_script:
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake --build . -- -v
 
-- if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_CXX_FLAGS="-fconcepts" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=YES -DMPPP_WITH_QUADMATH=yes -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/libgmp.a -DMPFR_INCLUDE_DIR=C:/local/include -DMPFR_LIBRARY=C:/local/lib/libmpfr.a -DMPPP_TEST_NSPLIT=%TEST_NSPLIT% -DMPPP_TEST_SPLIT_NUM=%SPLIT_TEST_NUM% ..
+- if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Os -fconcepts" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=YES -DMPPP_WITH_QUADMATH=yes -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/libgmp.a -DMPFR_INCLUDE_DIR=C:/local/include -DMPFR_LIBRARY=C:/local/lib/libmpfr.a -DMPPP_TEST_NSPLIT=%TEST_NSPLIT% -DMPPP_TEST_SPLIT_NUM=%SPLIT_TEST_NUM% ..
 #- if [%COMPILER%]==[MinGW] cmake --build . --config %BUILD_TYPE% --target all
 - if [%BUILD_TYPE%]==[MinGW] mingw32-make -j2 VERBOSE=1
 

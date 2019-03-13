@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -1064,8 +1064,7 @@ static_assert(sizeof(expected_mpq_struct_t) == sizeof(mpq_struct_t)
 constexpr bool test_mpq_struct_t()
 {
     auto [num, den] = mpq_struct_t{};
-    (void)num;
-    (void)den;
+    ignore(num, den);
     return std::is_same<decltype(num), mpz_struct_t>::value && std::is_same<decltype(den), mpz_struct_t>::value;
 }
 

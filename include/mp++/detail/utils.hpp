@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -326,6 +326,15 @@ inline std::string to_string(__int128_t n)
 }
 
 #endif
+
+// Helper to ignore unused variables.
+// NOTE: the return type has to be int, rather than void, for compatibility
+// with C++11 constexpr.
+template <typename... Args>
+constexpr int ignore(Args &&...)
+{
+    return 0;
+}
 
 #if defined(_MSC_VER)
 

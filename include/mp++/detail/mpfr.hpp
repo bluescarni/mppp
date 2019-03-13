@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -19,6 +19,7 @@
 #include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 
 #if MPFR_VERSION_MAJOR < 3
 
@@ -173,7 +174,7 @@ const mpfr_cleanup mpfr_cleanup_holder<T>::s_cleanup;
 inline void inst_mpfr_cleanup()
 {
     auto ptr = &mpfr_cleanup_holder<>::s_cleanup;
-    (void)ptr;
+    ignore(ptr);
 }
 
 #else

@@ -2,7 +2,7 @@
 # http://websvn.kde.org/trunk/KDE/kdeutils/cmake/modules/FindGMP.cmake?view=markup&pathrev=675218
 
 # Copyright (c) 2006, Laurent Montel, <montel@kde.org>
-# Copyright (c) 2008-2018 Francesco Biscani, <bluescarni@gmail.com>
+# Copyright (c) 2008-2019 Francesco Biscani, <bluescarni@gmail.com>
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions

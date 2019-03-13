@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -88,6 +88,8 @@ struct pow_tester {
 
         // Tests for the convenience pow() overloads.
         REQUIRE(pow(integer{0}, 0) == 1);
+        REQUIRE(pow(integer{0}, false) == 1);
+        REQUIRE(pow(integer{3}, true) == 3);
         REQUIRE(pow(0, integer{0}) == 1);
         REQUIRE((std::is_same<integer, decltype(pow(integer{0}, 0))>::value));
         REQUIRE((std::is_same<integer, decltype(pow(0, integer{0}))>::value));

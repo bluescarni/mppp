@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -75,10 +75,7 @@ constexpr void test_mpfr_struct_t()
 {
     auto [prec, sign, exp, ptr] = mpfr_struct_t{};
     static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
-    (void)prec;
-    (void)sign;
-    (void)exp;
-    (void)ptr;
+    ignore(prec, sign, exp, ptr);
 }
 
 #endif
@@ -620,7 +617,7 @@ private:
     {
         assert(ignore_prec);
         assert(real_prec_check(p));
-        (void)ignore_prec;
+        ignore(ignore_prec);
         ::mpfr_init2(&m_mpfr, p);
     }
 
@@ -1701,14 +1698,6 @@ public:
     bool zero_p() const
     {
         return mpfr_zero_p(&m_mpfr) != 0;
-    }
-    /// Detect zero.
-    /**
-     * @return \p true if \p this is zero, \p false otherwise.
-     */
-    bool is_zero() const
-    {
-        return zero_p();
     }
     /// Detect regular number.
     /**
@@ -3113,17 +3102,6 @@ inline bool number_p(const real &r)
 inline bool zero_p(const real &r)
 {
     return r.zero_p();
-}
-
-/// Detect if a \link mppp::real real\endlink is zero.
-/**
- * @param r the \link mppp::real real\endlink that will be examined.
- *
- * @return \p true if \p r is zero, \p false otherwise.
- */
-inline bool is_zero(const real &r)
-{
-    return r.is_zero();
 }
 
 /// Detect if a \link mppp::real real\endlink is a regular number.

@@ -65,6 +65,7 @@ if(YACMA_COMPILER_IS_INTELXX)
 endif()
 if(MINGW)
   # In MinGW some tests generate big object files.
+  message(STATUS "Enabling the '-Wa,-mbig-obj' flag for MinGW.")
   list(APPEND MPPP_CXX_FLAGS_DEBUG "-Wa,-mbig-obj")
   list(APPEND MPPP_CXX_FLAGS_RELEASE "-Wa,-mbig-obj")
 endif()

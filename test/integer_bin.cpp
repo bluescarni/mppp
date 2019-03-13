@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -106,6 +106,8 @@ struct binomial_tester {
         int_type n;
         REQUIRE(binomial(n, 0) == 1);
         REQUIRE(binomial(n, 1) == 0);
+        REQUIRE(binomial(n, false) == 1);
+        REQUIRE(binomial(n, true) == 0);
         n = 1;
         REQUIRE(binomial(n, 1) == 1);
         n = 5;

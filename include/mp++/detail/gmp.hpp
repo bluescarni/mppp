@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -95,7 +95,7 @@ struct mpf_raii {
     }
     mpf_struct_t m_mpf;
 };
-}
-}
+} // namespace detail
+} // namespace mppp
 
 #endif
