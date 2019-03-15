@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.14 (unreleased)
+-----------------
+
+Fix
+~~~
+
+- Fixes for the demangler on OSX when 128-bit integers are involved (`#163 <https://github.com/bluescarni/mppp/pull/163>`__).
+
 0.13 (2019-03-13)
 -----------------
 
