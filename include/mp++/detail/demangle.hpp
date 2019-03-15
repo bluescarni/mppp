@@ -123,13 +123,13 @@ inline std::string typeid_name_wrap()
 template <>
 inline std::string typeid_name_wrap<__int128_t>()
 {
-    return "__int128";
+    return "n";
 }
 
 template <>
 inline std::string typeid_name_wrap<__uint128_t>()
 {
-    return "unsigned __int128";
+    return "o";
 }
 
 #endif

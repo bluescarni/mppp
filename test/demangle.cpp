@@ -48,7 +48,13 @@ TEST_CASE("demangle")
     std::cout << demangle<void volatile const>() << '\n';
 #if defined(MPPP_HAVE_GCC_INT128)
     std::cout << demangle<__int128_t>() << '\n';
+    std::cout << demangle<__int128_t *>() << '\n';
+    std::cout << demangle<__int128_t const *>() << '\n';
+    std::cout << demangle<__int128_t const *const>() << '\n';
     std::cout << demangle<__uint128_t>() << '\n';
+    std::cout << demangle<__uint128_t *>() << '\n';
+    std::cout << demangle<__uint128_t const *>() << '\n';
+    std::cout << demangle<__uint128_t const *const>() << '\n';
     std::cout << demangle<const __int128_t>() << '\n';
     std::cout << demangle<const __uint128_t>() << '\n';
     std::cout << demangle<__int128_t &>() << '\n';

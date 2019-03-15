@@ -14,144 +14,144 @@ env:
 
 matrix:
   include:
-    - env: MPPP_BUILD="ReleaseGCC48"
-      compiler: gcc
-      os: linux
-      addons:
-        apt:
-          packages:
-          - g++-4.8
-    - env: MPPP_BUILD="DebugGCC48"
-      compiler: gcc
-      os: linux
-      addons:
-        apt:
-          packages:
-          - g++-4.8
-    - env: MPPP_BUILD="DebugGCC48DebugGMP"
-      compiler: gcc
-      os: linux
-      addons:
-        apt:
-          packages:
-          - g++-4.8
-          - cmake3
-    - env: MPPP_BUILD="DebugGCC48DebugGMPUnstable"
-      compiler: gcc
-      os: linux
-      addons:
-        apt:
-          packages:
-          - g++-4.8
-          - cmake3
-          - mercurial
-          - autoconf
-          - texinfo
-    - env: MPPP_BUILD="CoverageGCC5" SPLIT_TEST_NUM="0" TEST_NSPLIT="2"
-      compiler: gcc
-      os: linux
-      addons:
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          packages:
-          - gcc-5
-          - g++-5
-    - env: MPPP_BUILD="CoverageGCC5" SPLIT_TEST_NUM="1" TEST_NSPLIT="2"
-      compiler: gcc
-      os: linux
-      addons:
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          packages:
-          - gcc-5
-          - g++-5
-    - env: MPPP_BUILD="CoverageGCC7" SPLIT_TEST_NUM="0" TEST_NSPLIT="2"
-      compiler: gcc
-      os: linux
-      addons:
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          packages:
-          - gcc-7
-          - g++-7
-    - env: MPPP_BUILD="CoverageGCC7" SPLIT_TEST_NUM="1" TEST_NSPLIT="2"
-      compiler: gcc
-      os: linux
-      addons:
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          packages:
-          - gcc-7
-          - g++-7
-    - env: MPPP_BUILD="Coverage32GCC6" SPLIT_TEST_NUM="0" TEST_NSPLIT="2"
-      compiler: gcc
-      os: linux
-      addons:
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          packages:
-          - gcc-multilib
-          - g++-multilib
-          - gcc-6
-          - gcc-6-multilib
-          - g++-6
-          - g++-6-multilib
-          - cmake3
-    - env: MPPP_BUILD="Coverage32GCC6" SPLIT_TEST_NUM="1" TEST_NSPLIT="2"
-      compiler: gcc
-      os: linux
-      addons:
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          packages:
-          - gcc-multilib
-          - g++-multilib
-          - gcc-6
-          - gcc-6-multilib
-          - g++-6
-          - g++-6-multilib
-          - cmake3
-    - env: MPPP_BUILD="DebugClang39"
-      compiler: clang
-      os: linux
-      addons:
-        apt:
-          sources:
-          - llvm-toolchain-trusty-3.9
-          - ubuntu-toolchain-r-test
-          packages:
-          - clang-3.9
-          - gcc-7
-          - g++-7
-    - env: MPPP_BUILD="ReleaseClang38"
-      compiler: clang
-      os: linux
-      addons:
-        apt:
-          sources:
-          - llvm-toolchain-trusty-3.8
-          packages:
-          - clang-3.8
-    - env: MPPP_BUILD="Documentation"
-      os: linux
-      addons:
-        apt:
-          sources:
-          - ubuntu-toolchain-r-test
-          packages:
-          - gcc-5
-          - g++-5
-          - texlive
-          - texlive-latex-extra
-          - texlive-xetex
-          - lmodern
-          - latexmk
+    # - env: MPPP_BUILD="ReleaseGCC48"
+    #   compiler: gcc
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       packages:
+    #       - g++-4.8
+    # - env: MPPP_BUILD="DebugGCC48"
+    #   compiler: gcc
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       packages:
+    #       - g++-4.8
+    # - env: MPPP_BUILD="DebugGCC48DebugGMP"
+    #   compiler: gcc
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       packages:
+    #       - g++-4.8
+    #       - cmake3
+    # - env: MPPP_BUILD="DebugGCC48DebugGMPUnstable"
+    #   compiler: gcc
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       packages:
+    #       - g++-4.8
+    #       - cmake3
+    #       - mercurial
+    #       - autoconf
+    #       - texinfo
+    # - env: MPPP_BUILD="CoverageGCC5" SPLIT_TEST_NUM="0" TEST_NSPLIT="2"
+    #   compiler: gcc
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - ubuntu-toolchain-r-test
+    #       packages:
+    #       - gcc-5
+    #       - g++-5
+    # - env: MPPP_BUILD="CoverageGCC5" SPLIT_TEST_NUM="1" TEST_NSPLIT="2"
+    #   compiler: gcc
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - ubuntu-toolchain-r-test
+    #       packages:
+    #       - gcc-5
+    #       - g++-5
+    # - env: MPPP_BUILD="CoverageGCC7" SPLIT_TEST_NUM="0" TEST_NSPLIT="2"
+    #   compiler: gcc
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - ubuntu-toolchain-r-test
+    #       packages:
+    #       - gcc-7
+    #       - g++-7
+    # - env: MPPP_BUILD="CoverageGCC7" SPLIT_TEST_NUM="1" TEST_NSPLIT="2"
+    #   compiler: gcc
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - ubuntu-toolchain-r-test
+    #       packages:
+    #       - gcc-7
+    #       - g++-7
+    # - env: MPPP_BUILD="Coverage32GCC6" SPLIT_TEST_NUM="0" TEST_NSPLIT="2"
+    #   compiler: gcc
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - ubuntu-toolchain-r-test
+    #       packages:
+    #       - gcc-multilib
+    #       - g++-multilib
+    #       - gcc-6
+    #       - gcc-6-multilib
+    #       - g++-6
+    #       - g++-6-multilib
+    #       - cmake3
+    # - env: MPPP_BUILD="Coverage32GCC6" SPLIT_TEST_NUM="1" TEST_NSPLIT="2"
+    #   compiler: gcc
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - ubuntu-toolchain-r-test
+    #       packages:
+    #       - gcc-multilib
+    #       - g++-multilib
+    #       - gcc-6
+    #       - gcc-6-multilib
+    #       - g++-6
+    #       - g++-6-multilib
+    #       - cmake3
+    # - env: MPPP_BUILD="DebugClang39"
+    #   compiler: clang
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - llvm-toolchain-trusty-3.9
+    #       - ubuntu-toolchain-r-test
+    #       packages:
+    #       - clang-3.9
+    #       - gcc-7
+    #       - g++-7
+    # - env: MPPP_BUILD="ReleaseClang38"
+    #   compiler: clang
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - llvm-toolchain-trusty-3.8
+    #       packages:
+    #       - clang-3.8
+    # - env: MPPP_BUILD="Documentation"
+    #   os: linux
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - ubuntu-toolchain-r-test
+    #       packages:
+    #       - gcc-5
+    #       - g++-5
+    #       - texlive
+    #       - texlive-latex-extra
+    #       - texlive-xetex
+    #       - lmodern
+    #       - latexmk
     - env: MPPP_BUILD="OSXDebug"
       os: osx
       osx_image: xcode6.4
