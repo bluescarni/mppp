@@ -127,9 +127,33 @@ inline std::string typeid_name_wrap<__int128_t>()
 }
 
 template <>
+inline std::string typeid_name_wrap<__int128_t *>()
+{
+    return "Pn";
+}
+
+template <>
+inline std::string typeid_name_wrap<__int128_t const *>()
+{
+    return "PKn";
+}
+
+template <>
 inline std::string typeid_name_wrap<__uint128_t>()
 {
     return "o";
+}
+
+template <>
+inline std::string typeid_name_wrap<__uint128_t *>()
+{
+    return "Po";
+}
+
+template <>
+inline std::string typeid_name_wrap<__uint128_t const *>()
+{
+    return "PKo";
 }
 
 #endif

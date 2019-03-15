@@ -63,6 +63,7 @@ TEST_CASE("demangle")
     std::cout << demangle<__uint128_t &&>() << '\n';
     std::cout << demangle<const __int128_t &>() << '\n';
     std::cout << demangle<const __uint128_t &>() << '\n';
+    std::cout << demangle<std::vector<__int128_t>>() << '\n';
 #endif
 
     // Couple of multithreaded tests.
