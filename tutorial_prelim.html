@@ -220,13 +220,13 @@ if you don’t need all the features provided by mp++, and it may improve compil
 implementation details which may change from version to version in incompatible ways.</p>
 </div>
 <p>We will also assume, for convenience, that mp++’s multiprecision classes have been lifted into the root namespace,
-and we will introduce a couple of handy aliases for the <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
+and we will introduce a couple of handy aliases for the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>
 classes:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="n">int_t</span> <span class="o">=</span> <span class="n">mppp</span><span class="o">::</span><span class="n">integer</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
 <span class="k">using</span> <span class="n">rat_t</span> <span class="o">=</span> <span class="n">mppp</span><span class="o">::</span><span class="n">rational</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">;</span>
 </pre></div>
 </div>
-<p><a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> are class templates parametrised over a positive
+<p><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> are class templates parametrised over a positive
 integral value (referred to as <em>static size</em>) which indicates how many limbs will be stored in static storage
 before resorting to dynamic memory allocation. In the definitions above, <code class="docutils literal notranslate"><span class="pre">int_t</span></code> and <code class="docutils literal notranslate"><span class="pre">rat_t</span></code> will store
 values of size up to 1 limb without resorting to heap memory allocation. On modern 64-bit architectures,

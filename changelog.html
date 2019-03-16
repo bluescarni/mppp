@@ -221,7 +221,7 @@ Show Source
 <div class="section" id="id2">
 <h3>Fix<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Fix a compilation error when using booleans as second arguments in the <code class="docutils literal notranslate"><span class="pre">pow()</span></code> and <code class="docutils literal notranslate"><span class="pre">binomial()</span></code> overloads of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
+<li>Fix a compilation error when using booleans as second arguments in the <code class="docutils literal notranslate"><span class="pre">pow()</span></code> and <code class="docutils literal notranslate"><span class="pre">binomial()</span></code> overloads of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/162">#162</a>).</li>
 <li>Work around a compilation error on MSVC when using C++17 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/162">#162</a>).</li>
 <li>Various documentation fixes (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/160">#160</a>).</li>
@@ -234,7 +234,7 @@ Show Source
 <h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Add a hash function for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/157">#157</a>).</li>
-<li>Add all the root functions from the GMP API to the <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> API
+<li>Add all the root functions from the GMP API to the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> API
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/156">#156</a>).</li>
 <li>Add all the root functions from the MPFR API to the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> API
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/154">#154</a>).</li>
@@ -249,10 +249,10 @@ Show Source
 exception, rather than initialising to NaN (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/153">#153</a>).</li>
 <li>Switch to the sphinx material design theme for the documentation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/153">#153</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 2.4.0 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/152">#152</a>).</li>
-<li>Various improvements to the GCD implementation for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
+<li>Various improvements to the GCD implementation for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/150">#150</a>).</li>
-<li>The addition/subtraction operators of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> now use the low-level <a class="reference internal" href="integer.html#_CPPv4N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a>,
-<a class="reference internal" href="integer.html#_CPPv4N4mppp6add_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::add_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_si()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::sub_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_ui()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4N4mppp6sub_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::sub_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_si()</span></code></a> primitives when the other argument is a
+<li>The addition/subtraction operators of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> now use the low-level <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6add_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a>,
+<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6add_siER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::add_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_si()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6sub_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::sub_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_ui()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6sub_siER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::sub_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_si()</span></code></a> primitives when the other argument is a
 C++ integral (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/147">#147</a>).</li>
 <li>Various documentation additions, improvements and fixes (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/146">#146</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/148">#148</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/149">#149</a>,
@@ -298,8 +298,8 @@ C++ integral (<a class="reference external" href="https://github.com/bluescarni/
 <h3>New<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Add a target in the build system to compile and run the benchmarks (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/135">#135</a>).</li>
-<li>Extend the <a class="reference internal" href="integer.html#_CPPv4N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4N4mppp6sub_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::sub_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_ui()</span></code></a> functions to work on all unsigned
-C++ integral types, and introduce corresponding <a class="reference internal" href="integer.html#_CPPv4N4mppp6add_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::add_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_si()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4N4mppp6sub_siER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::sub_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_si()</span></code></a>
+<li>Extend the <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6add_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6sub_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::sub_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_ui()</span></code></a> functions to work on all unsigned
+C++ integral types, and introduce corresponding <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6add_siER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::add_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_si()</span></code></a> and <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6sub_siER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK30CppSignedIntegralInteroperable" title="mppp::sub_si"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">sub_si()</span></code></a>
 functions for signed C++ integral types (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/131">#131</a>).</li>
 <li>Initial version of the rational tutorial (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/130">#130</a>).</li>
 <li>The demangler is now aware of cv-qualifiers and references (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/129">#129</a>).</li>
@@ -308,7 +308,7 @@ functions for signed C++ integral types (<a class="reference external" href="htt
 <div class="section" id="id12">
 <h3>Changes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><strong>BREAKING</strong>: the <a class="reference internal" href="integer.html#_CPPv4N4mppp6add_uiER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a> function now <strong>requires</strong> an unsigned integral as the third argument
+<li><strong>BREAKING</strong>: the <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6add_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK32CppUnsignedIntegralInteroperable" title="mppp::add_ui"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">add_ui()</span></code></a> function now <strong>requires</strong> an unsigned integral as the third argument
 (previously, the function could be invoked with a signed integral argument thanks to C++’s conversion rules).</li>
 </ul>
 </div>
@@ -395,13 +395,13 @@ but without MPFR (<a class="reference external" href="https://github.com/bluesca
 <li>Add builds based on MSVC 2017 in Appveyor (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/110">#110</a>).</li>
 <li>Extend the <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> concept to include all C++ integral types
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/104">#104</a>).</li>
-<li>Add left bit shift benchmarks for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/103">#103</a>).</li>
+<li>Add left bit shift benchmarks for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/103">#103</a>).</li>
 <li>Implement division without remainder (<code class="docutils literal notranslate"><span class="pre">tdiv_q()</span></code>) and exact division with positive divisor (<code class="docutils literal notranslate"><span class="pre">divexact_gcd()</span></code>)
-for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/103">#103</a>).</li>
+for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/103">#103</a>).</li>
 <li>Implement the <code class="docutils literal notranslate"><span class="pre">trunc()</span></code> and  <code class="docutils literal notranslate"><span class="pre">integer_p()</span></code> primitives for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/102">#102</a>).</li>
 <li>Implement the <a class="reference internal" href="integer.html#_CPPv4N4mppp19free_integer_cachesEv" title="mppp::free_integer_caches"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">free_integer_caches()</span></code></a> function to manually free the caches used internally by
-<a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/98">#98</a>).</li>
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/98">#98</a>).</li>
 </ul>
 </div>
 <div class="section" id="id24">
@@ -411,7 +411,7 @@ for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" titl
 <li>Various updates to the documentation and to the benchmarks (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/107">#107</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/108">#108</a>).</li>
 <li>Add an internal demangling utility to improve the quality of the error messages (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/105">#105</a>).</li>
-<li>Various performance improvements for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> division, fused multiply-add, left bit shift,
+<li>Various performance improvements for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> division, fused multiply-add, left bit shift,
 addition and multiplication
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/103">#103</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/106">#106</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/108">#108</a>).</li>
@@ -426,14 +426,14 @@ addition and multiplication
 <h3>New<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Implement additional <code class="docutils literal notranslate"><span class="pre">get()</span></code> conversion functions for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/96">#96</a>).</li>
-<li>Implement the increment and decrement operators for <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/95">#95</a>).</li>
+<li>Implement the increment and decrement operators for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/95">#95</a>).</li>
 <li>Implement support for <code class="docutils literal notranslate"><span class="pre">__int128_t</span></code> and <code class="docutils literal notranslate"><span class="pre">__uint128_t</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/90">#90</a>).</li>
-<li>Implement the bitwise logic operators for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/86">#86</a>).</li>
+<li>Implement the bitwise logic operators for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/86">#86</a>).</li>
 <li>Initial implementation of the <a class="reference internal" href="tutorial_pybind11.html#tutorial-pybind11"><span class="std std-ref">pybind11 integration utilities</span></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/81">#81</a>).</li>
 <li>Implement the <code class="docutils literal notranslate"><span class="pre">frexp()</span></code> primitive for <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/81">#81</a>).</li>
 <li>Implement the <code class="docutils literal notranslate"><span class="pre">get/set_z_2exp()</span></code> primitives for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/77">#77</a>).</li>
-<li>Implement construction with preallocated storage for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
-<li>Implement construction from an array of limbs for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/73">#73</a>).</li>
+<li>Implement construction with preallocated storage for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
+<li>Implement construction from an array of limbs for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/73">#73</a>).</li>
 </ul>
 </div>
 <div class="section" id="id27">
@@ -443,24 +443,24 @@ addition and multiplication
 <li><strong>BREAKING</strong>: the imported target created by the installation process has been renamed from <code class="docutils literal notranslate"><span class="pre">Mp++</span></code> to <code class="docutils literal notranslate"><span class="pre">mp++</span></code>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/94">#94</a>).</li>
 <li>Take advantage of <code class="docutils literal notranslate"><span class="pre">std::gcd()</span></code> on C++17 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/93">#93</a>).</li>
-<li>Update the benchmark results for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
-<li>Add division benchmarks for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
-<li>A few performance tweaks for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
-<li>Simplifications in the bit shifting primitives for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/85">#85</a>).</li>
-<li>Split an <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> test in two parts to curb memory usage during compilation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/80">#80</a>).</li>
+<li>Update the benchmark results for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
+<li>Add division benchmarks for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
+<li>A few performance tweaks for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/91">#91</a>).</li>
+<li>Simplifications in the bit shifting primitives for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/85">#85</a>).</li>
+<li>Split an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> test in two parts to curb memory usage during compilation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/80">#80</a>).</li>
 <li>Use bit counting intrinsics in MSVC (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/79">#79</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 2.0.1 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/76">#76</a>).</li>
-<li>Improve the performance of generic assignment for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
-<li>Improve construction from C++ integrals for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
+<li>Improve the performance of generic assignment for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
+<li>Improve construction from C++ integrals for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/74">#74</a>).</li>
 </ul>
 </div>
 <div class="section" id="id28">
 <h3>Fix<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Fix <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> warnings in release mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/97">#97</a>).</li>
-<li>Various internal cleanups in <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/80">#80</a>,
+<li>Fix <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> warnings in release mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/97">#97</a>).</li>
+<li>Various internal cleanups in <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/80">#80</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/85">#85</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/86">#86</a>).</li>
-<li>Small fixes regarding the use of GMP type aliases in <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/73">#73</a>).</li>
+<li>Small fixes regarding the use of GMP type aliases in <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/73">#73</a>).</li>
 </ul>
 </div>
 </div>
@@ -472,16 +472,16 @@ addition and multiplication
 <li>Implement the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/40">#40</a>).</li>
 <li>Add non-throwing GMP-style conversion functions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/59">#59</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/61">#61</a>).</li>
-<li>Implement move constructors and move assignment operators from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code> for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
-and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/57">#57</a>).</li>
-<li>Implement a cache for the allocation of limbs arrays in small <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
+<li>Implement move constructors and move assignment operators from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code> for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>
+and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/57">#57</a>).</li>
+<li>Implement a cache for the allocation of limbs arrays in small <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> objects
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/55">#55</a>).</li>
 <li>Implement the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>).</li>
-<li>Implement the <code class="docutils literal notranslate"><span class="pre">sub_ui()</span></code> primitive for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/37">#37</a>).</li>
+<li>Implement the <code class="docutils literal notranslate"><span class="pre">sub_ui()</span></code> primitive for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/37">#37</a>).</li>
 <li>Add a CI build testing against the latest unstable GMP branch (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/34">#34</a>).</li>
-<li>Add assignment operators from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
+<li>Add assignment operators from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/32">#32</a>).</li>
-<li>Add the possibility of constructing non-canonical <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> objects from numerator/denominator pairs
+<li>Add the possibility of constructing non-canonical <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> objects from numerator/denominator pairs
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>).</li>
 </ul>
 </div>
@@ -489,21 +489,21 @@ and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" ti
 <h3>Changes<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Use the sphinx bootstrap theme for the html documentation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/71">#71</a>).</li>
-<li>Various simplifications in the <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> API (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/66">#66</a>).</li>
+<li>Various simplifications in the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> API (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/66">#66</a>).</li>
 <li>Introduce a <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">StringType</span></code></a> concept and use it to reduce the number of overloads in the
 constructors/assignment operators from string (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/63">#63</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/64">#64</a>).</li>
-<li>The <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> functions accepting the return value as a parameter will now
+<li>The <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> functions accepting the return value as a parameter will now
 demote a return value with dynamic storage to static storage if the other arguments all have static storage
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/58">#58</a>).</li>
-<li>The free functions for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> now return a reference
+<li>The free functions for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> now return a reference
 to the return value, rather than <code class="docutils literal notranslate"><span class="pre">void</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/56">#56</a>).</li>
-<li>Performance improvements and code simplifications for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> division
+<li>Performance improvements and code simplifications for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> division
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/55">#55</a>).</li>
 <li>Minor improvements in the static checks for the expected layouts of <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/53">#53</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/42">#42</a>).</li>
 <li>Enable additional compiler warning flags in debug builds for GCC (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/52">#52</a>).</li>
-<li><strong>BREAKING</strong>: various improvements/changes to the bit shifting functions for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>,
+<li><strong>BREAKING</strong>: various improvements/changes to the bit shifting functions for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>,
 and the exception raised by the bit shifting operators is not any more
 <code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>, it is now <code class="docutils literal notranslate"><span class="pre">std::overflow_error</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/48">#48</a>).</li>
 <li>Various updates to the benchmarks (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/39">#39</a>).</li>
@@ -511,7 +511,7 @@ and the exception raised by the bit shifting operators is not any more
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/37">#37</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 1.9.7 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/36">#36</a>).</li>
 <li>Bump up the minimum required CMake version to 3.3 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/31">#31</a>).</li>
-<li>Performance improvements and simplifications in the <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> constructors and assignment operators
+<li>Performance improvements and simplifications in the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> constructors and assignment operators
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/32">#32</a>).</li>
 </ul>
 </div>
@@ -521,12 +521,12 @@ and the exception raised by the bit shifting operators is not any more
 <li>Fixes/improvements in the support for <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/50">#50</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/54">#54</a>).</li>
 <li>Fix the compilation of the tests on Clang 5 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/43">#43</a>).</li>
-<li>Fix too lax constraints in the implementation of in-place operators for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> and
-<a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/41">#41</a>).</li>
+<li>Fix too lax constraints in the implementation of in-place operators for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/41">#41</a>).</li>
 <li>Fix the PDF build of the documentation (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/39">#39</a>).</li>
 <li>Fix a few missing <code class="docutils literal notranslate"><span class="pre">inline</span></code> specifiers (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/38">#38</a>, <a class="reference external" href="https://github.com/bluescarni/mppp/pull/41">#41</a>).</li>
 <li>Fix C++ version detection on MSVC (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/36">#36</a>).</li>
-<li>Fix missing tests for <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> hashing (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/29">#29</a>).</li>
+<li>Fix missing tests for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> hashing (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/29">#29</a>).</li>
 <li>Fix some MSVC warnings when compiling the tests in release mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/28">#28</a>).</li>
 <li>Various minor documentation fixes.</li>
 </ul>
@@ -537,9 +537,9 @@ and the exception raised by the bit shifting operators is not any more
 <div class="section" id="id34">
 <h3>New<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Implement the constructors from a range of characters and from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>
-and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
-<li>Implement the assignment operator and the constructor from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> in <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>
+<li>Implement the constructors from a range of characters and from <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code> for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>
+and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
+<li>Implement the assignment operator and the constructor from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> in <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/19">#19</a>).</li>
 </ul>
 </div>
@@ -549,11 +549,11 @@ and <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" ti
 <li>Expand CI to include GCC 7 in C++17 mode (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/27">#27</a>).</li>
 <li>Improve testing coverage (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
 <li>Various extensions to the benchmark suite (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
-<li>Various performance improvements in <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> thanks to the reduction of the number of branches
+<li>Various performance improvements in <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> thanks to the reduction of the number of branches
 in the implementation of basic arithmetic for the 1/2-limb specialisations (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/25">#25</a>).</li>
 <li>Update the internal copy of Catch to the latest version, 1.9.6 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/24">#24</a>).</li>
 <li>Performance improvements for <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer4sizeEv" title="mppp::integer::size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::size()</span></code></a> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
-<li>Performance improvements for the construction/conversion of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> from/to C++ integrals
+<li>Performance improvements for the construction/conversion of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> from/to C++ integrals
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/23">#23</a>).</li>
 <li>Make sure the MPFR cleanup routine is automatically called on shutdown (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/22">#22</a>).</li>
 <li>Performance improvements for <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer5nbitsEv" title="mppp::integer::nbits"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::nbits()</span></code></a> on GCC and Clang (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/17">#17</a>).</li>
@@ -573,18 +573,18 @@ in the implementation of basic arithmetic for the 1/2-limb specialisations (<a c
 <div class="section" id="id38">
 <h3>New<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Implement the multiprecision <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/14">#14</a>).</li>
-<li>Implement fast assignment functions to zero and plus/minus one for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
-<li>Add assignment operators from string for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
-<li>Implement the <code class="docutils literal notranslate"><span class="pre">submul()</span></code> primitive for <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
-<li>Implement the assignment operator from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> in <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, and use it in various function
+<li>Implement the multiprecision <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> class (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/14">#14</a>).</li>
+<li>Implement fast assignment functions to zero and plus/minus one for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</li>
+<li>Add assignment operators from string for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</li>
+<li>Implement the <code class="docutils literal notranslate"><span class="pre">submul()</span></code> primitive for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</li>
+<li>Implement the assignment operator from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> in <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>, and use it in various function
 in order to avoid the creation of a temporary.</li>
 </ul>
 </div>
 <div class="section" id="id39">
 <h3>Changes<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Performance improvements for the copy/move assignment operators of <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>.</li>
+<li>Performance improvements for the copy/move assignment operators of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</li>
 </ul>
 </div>
 <div class="section" id="id40">

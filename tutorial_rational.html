@@ -200,26 +200,26 @@ Show Source
         
   <div class="section" id="rational-tutorial">
 <span id="tutorial-rational"></span><h1>Rational tutorial<a class="headerlink" href="#rational-tutorial" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> is a class that builds upon <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> to provide
+<p><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> is a class that builds upon <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> to provide
 an implementation of rational numbers represented as a numerator-denominator
-<a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> pairs.</p>
-<p>Like <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> is parametrised over
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> pairs.</p>
+<p>Like <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> is parametrised over
 an integral value <code class="docutils literal notranslate"><span class="pre">SSize</span></code> which represents the number of limbs that will be
 stored directly within both the numerator and the denominator before resorting to dynamic memory allocation
 (see the <a class="reference internal" href="tutorial_integer.html#tutorial-integer"><span class="std std-ref">integer tutorial</span></a> for a detailed explanation of the meaning
 of the <code class="docutils literal notranslate"><span class="pre">SSize</span></code> parameter).</p>
-<p>The <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> class adopts the usual <em>canonical</em> representation of rational numbers:</p>
+<p>The <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> class adopts the usual <em>canonical</em> representation of rational numbers:</p>
 <ul class="simple">
 <li>numerator and denominator are coprime,</li>
 <li>the denominator is always strictly positive.</li>
 </ul>
-<p>This representation is usually enforced automatically by the <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> API (however,
+<p>This representation is usually enforced automatically by the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> API (however,
 a couple of low-level functions are available to access and mutate directly the numerator and the denominator
 in performance-critical scenarios).</p>
-<p>In addition to the features common to all mp++ classes, the <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> API provides
+<p>In addition to the features common to all mp++ classes, the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> API provides
 a few additional capabilities:</p>
 <ul>
-<li><p class="first">it is possible to construct a <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> from an integral pair
+<li><p class="first">it is possible to construct a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> from an integral pair
 of arguments representing the numerator and the denominator:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">};</span>                <span class="c1">// Construction from int numerator and denominator.</span>
 
@@ -229,11 +229,11 @@ of arguments representing the numerator and the denominator:</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">it is possible to get const and mutable references to the <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> objects
+<li><p class="first">it is possible to get const and mutable references to the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> objects
 representing the numerator and the denominator via the <a class="reference internal" href="rational.html#_CPPv4NK4mppp8rational7get_numEv" title="mppp::rational::get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::get_num()</span></code></a>,
 <a class="reference internal" href="rational.html#_CPPv4NK4mppp8rational7get_denEv" title="mppp::rational::get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::get_den()</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::_get_num()</span></code></a> and
 <a class="reference internal" href="rational.html#_CPPv4N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::_get_den()</span></code></a> member functions. These accessors allow to use
-any function from the <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a> API on the numerator and on the denominator:</p>
+any function from the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> API on the numerator and on the denominator:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">q1</span><span class="p">.</span><span class="n">get_num</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">);</span> <span class="c1">// Const access to numerator and denominator.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">q1</span><span class="p">.</span><span class="n">get_den</span><span class="p">()</span> <span class="o">==</span> <span class="mi">5</span><span class="p">);</span>
@@ -245,7 +245,7 @@ any function from the <a class="reference internal" href="integer.html#_CPPv4N4m
 </div>
 </li>
 <li><p class="first">the <a class="reference internal" href="rational.html#_CPPv4N4mppp8rational12canonicaliseEv" title="mppp::rational::canonicalise"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::canonicalise()</span></code></a> member function (and its free function counterpart)
-can be used to canonicalise a <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a>. This is normally not necessary,
+can be used to canonicalise a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>. This is normally not necessary,
 unless the numerator or the denominator have been changed manually via the mutable getters:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">rat_t</span> <span class="n">q1</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">};</span>
 <span class="n">q1</span><span class="p">.</span><span class="n">_get_num</span><span class="p">()</span> <span class="o">=</span> <span class="mi">9</span><span class="p">;</span>         <span class="c1">// Change the numerator using the mutable getter.</span>
@@ -262,7 +262,7 @@ functions are available;</p>
 <li><p class="first">a few <a class="reference internal" href="rational.html#rational-exponentiation"><span class="std std-ref">exponentiation</span></a> and <a class="reference internal" href="rational.html#rational-ntheory"><span class="std std-ref">number-theoretic</span></a>
 functions are available;</p>
 </li>
-<li><p class="first">like <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> also provides a <a class="reference internal" href="rational.html#rational-std-specialisations"><span class="std std-ref">specialisation</span></a>
+<li><p class="first">like <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> also provides a <a class="reference internal" href="rational.html#rational-std-specialisations"><span class="std std-ref">specialisation</span></a>
 of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code> for use in the standard unordered containers.</p>
 </li>
 </ul>
@@ -270,9 +270,9 @@ of <code class="docutils literal notranslate"><span class="pre">std::hash</span>
 in multiple overloads, often both as free and member functions.</p>
 <div class="section" id="interacting-with-the-gmp-api">
 <h2>Interacting with the GMP API<a class="headerlink" href="#interacting-with-the-gmp-api" title="Permalink to this headline">¶</a></h2>
-<p>Like <a class="reference internal" href="integer.html#_CPPv4N4mppp7integerE" title="mppp::integer"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> provides facilities for interfacing
+<p>Like <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> provides facilities for interfacing
 with the <a class="reference external" href="https://gmplib.org/">GMP</a> library. Currently, the interoperability is limited to
-<a class="reference internal" href="rational.html#_CPPv4N4mppp8rationalE" title="mppp::rational"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code></a> objects being able to be constructed and assigned from both <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code>
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> objects being able to be constructed and assigned from both <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code>
 and <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code> objects:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
 <span class="n">mpz_init_set_si</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">);</span>      <span class="c1">// Init an mpz_t with the value -4.</span>
