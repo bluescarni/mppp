@@ -42,11 +42,6 @@ if(YACMA_COMPILER_IS_MSVC)
   # and enable the bigobj option.
   list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
   list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
-  if(CMAKE_CXX_COMPILER_VERSION STRGREATER "19.20.2700.0")
-    message(STATUS " enable C++17")
-    list(APPEND MPPP_CXX_FLAGS_DEBUG "/std:c++17")
-    list(APPEND MPPP_CXX_FLAGS_RELEASE "/std:c++17")
-  endif()
   if(YACMA_COMPILER_IS_CLANGXX)
     # clang-cl emits various warnings from GMP/MPFR, let's just silence them.
     # NOTE: at one point in the recent past, MSVC added an options similar to GCC's isystem:
