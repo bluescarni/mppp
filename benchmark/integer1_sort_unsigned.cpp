@@ -55,7 +55,7 @@ template <typename T>
 static inline std::vector<T> get_init_vector(double &init_time)
 {
     rng.seed(0);
-    std::uniform_int_distribution</*unsigned long*/unsigned int> dist(0, 600000u/*l*/);
+    std::uniform_int_distribution<unsigned long> dist(0, 600000ul);
     simple_timer st;
     std::vector<T> retval(size);
     std::generate(retval.begin(), retval.end(), [&dist]() { return T(dist(rng)); });

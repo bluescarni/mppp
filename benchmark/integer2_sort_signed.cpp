@@ -55,7 +55,7 @@ template <typename T>
 static inline std::vector<T> get_init_vector(double &init_time)
 {
     rng.seed(0);
-    std::uniform_int_distribution</*long*/ int> dist(-300000/*l*/, 300000/*l*/);
+    std::uniform_int_distribution<long> dist(-300000l, 300000l);
     simple_timer st;
     std::vector<T> retval(size);
     std::generate(retval.begin(), retval.end(), [&dist]() { return static_cast<T>(T(dist(rng)) << (GMP_NUMB_BITS)); });
