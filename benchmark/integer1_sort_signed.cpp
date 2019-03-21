@@ -18,7 +18,7 @@
 #include "simple_timer.hpp"
 #include "constStrings.hpp"
 
-#include "boost/format.hpp"
+#include <boost/format.hpp>
 
 
 #if defined(MPPP_BENCHMARK_BOOST)
