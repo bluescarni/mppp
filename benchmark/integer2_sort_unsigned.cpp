@@ -17,6 +17,9 @@
 #include <vector>
 
 #include "simple_timer.hpp"
+#include "constStrings.hpp"
+
+#include <boost/format.hpp>
 
 #if defined(MPPP_BENCHMARK_BOOST)
 #include <boost/multiprecision/cpp_int.hpp>
@@ -56,7 +59,7 @@ static inline std::vector<T> get_init_vector(double &init_time)
     simple_timer st;
     std::vector<T> retval(size);
     std::generate(retval.begin(), retval.end(), [&dist]() { return static_cast<T>(T(dist(rng)) << (GMP_NUMB_BITS)); });
-    std::cout << "\nInit runtime: ";
+    std::cout << initRuntime;
     init_time = st.elapsed();
     return retval;
 }
@@ -72,7 +75,8 @@ int main()
                     "    import pandas\n"
                     "    data = [";
     {
-        std::cout << "\n\nBenchmarking mp++.";
+        std::cout << "\nSort unsigned 2\n----------------------------------" << std::endl;
+        std::cout << bench_mpp;
         simple_timer st1;
         double init_time;
         auto v = get_init_vector<integer_t>(init_time);
@@ -81,14 +85,14 @@ int main()
             simple_timer st2;
             std::sort(v.begin(), v.end());
             s += "['mp++','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            std::cout << sortRuntime;
         }
         s += "['mp++','total'," + std::to_string(st1.elapsed()) + "],";
-        std::cout << "\nTotal runtime: ";
+        std::cout << totalRuntime;
     }
 #if defined(MPPP_BENCHMARK_BOOST)
     {
-        std::cout << "\n\nBenchmarking cpp_int.";
+        std::cout << bench_cpp_int;
         simple_timer st1;
         double init_time;
         auto v = get_init_vector<cpp_int>(init_time);
@@ -97,13 +101,13 @@ int main()
             simple_timer st2;
             std::sort(v.begin(), v.end());
             s += "['Boost (cpp_int)','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            std::cout << sortRuntime;
         }
         s += "['Boost (cpp_int)','total'," + std::to_string(st1.elapsed()) + "],";
-        std::cout << "\nTotal runtime: ";
+        std::cout << totalRuntime;
     }
     {
-        std::cout << "\n\nBenchmarking mpz_int.";
+        std::cout << bench_mpz_int;
         simple_timer st1;
         double init_time;
         auto v = get_init_vector<mpz_int>(init_time);
@@ -112,15 +116,15 @@ int main()
             simple_timer st2;
             std::sort(v.begin(), v.end());
             s += "['Boost (mpz_int)','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            std::cout << sortRuntime;
         }
         s += "['Boost (mpz_int)','total'," + std::to_string(st1.elapsed()) + "],";
-        std::cout << "\nTotal runtime: ";
+        std::cout << totalRuntime;
     }
 #endif
 #if defined(MPPP_BENCHMARK_FLINT)
     {
-        std::cout << "\n\nBenchmarking fmpzxx.";
+        std::cout << bench_fmpzxx;
         simple_timer st1;
         double init_time;
         auto v = get_init_vector<fmpzxx>(init_time);
@@ -131,34 +135,15 @@ int main()
                 return ::fmpz_cmp(a._data().inner, b._data().inner) < 0;
             });
             s += "['FLINT','sorting'," + std::to_string(st2.elapsed()) + "],";
-            std::cout << "\nSorting runtime: ";
+            std::cout << sortRuntime;
         }
         s += "['FLINT','total'," + std::to_string(st1.elapsed()) + "],";
-        std::cout << "\nTotal runtime: ";
+        std::cout << totalRuntime;
     }
 #endif
-    s += "]\n"
-         "    retval = pandas.DataFrame(data)\n"
-         "    retval.columns = ['Library','Task','Runtime (ms)']\n"
-         "    return retval\n\n"
-         "if __name__ == '__main__':\n"
-         "    import matplotlib as mpl\n"
-         "    mpl.use('Agg')\n"
-         "    from matplotlib.pyplot import legend\n"
-         "    import seaborn as sns\n"
-         "    df = get_data()\n"
-         "    g = sns.factorplot(x='Library', y = 'Runtime (ms)', hue='Task', data=df, kind='bar', palette='muted', "
-         "legend = False, size = 5.5, aspect = 1.5)\n"
-         "    for p in g.ax.patches:\n"
-         "        height = p.get_height()\n"
-         "        g.ax.text(p.get_x()+p.get_width()/2., height + 8, '{}'.format(int(height)), "
-         "ha=\"center\", fontsize=9)\n"
-         "    legend(loc='upper left')\n"
-         "    g.fig.suptitle('"
-         + name
-         + "')\n"
-           "    g.savefig('"
-         + name + ".png', bbox_inches='tight', dpi=150)\n";
+    s += boost::str(boost::format(pySuffix) % name);
     std::ofstream of(name + ".py", std::ios_base::trunc);
     of << s;
+    of.close();
+    std::cout << "\n\n" << std::flush;
 }
