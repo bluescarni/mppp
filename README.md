@@ -1,7 +1,7 @@
 # mp++
 
-[![Build Status](https://travis-ci.org/bluescarni/mppp.svg?branch=master)](https://travis-ci.org/bluescarni/mppp)
-[![Build status](https://ci.appveyor.com/api/projects/status/github/bluescarni/mppp?branch=master&svg=true)](https://ci.appveyor.com/project/bluescarni/mppp)
+[![Build Status](https://img.shields.io/travis/bluescarni/mppp/master.svg?logo=travis&style=for-the-badge)](https://travis-ci.org/bluescarni/mppp)
+[![Build Status](https://img.shields.io/appveyor/ci/bluescarni/mppp/master.svg?logo=appveyor&style=for-the-badge)](https://ci.appveyor.com/project/bluescarni/mppp)
 [![codecov.io](https://codecov.io/github/bluescarni/mppp/coverage.svg?branch=master)](https://codecov.io/github/bluescarni/mppp?branch=master)
 [![Docs](https://media.readthedocs.org/static/projects/badges/passing.svg)](http://bluescarni.github.io/mppp/)
 [![Join the chat at https://gitter.im/bluescarni/mppp](https://badges.gitter.im/bluescarni/mppp.svg)](https://gitter.im/bluescarni/mppp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
