@@ -4,9 +4,15 @@ Changelog
 0.14 (unreleased)
 -----------------
 
+Changes
+~~~~~~~
+
+- Various improvements to the benchmarks (`#166 <https://github.com/bluescarni/mppp/pull/166>`__).
+
 Fix
 ~~~
 
+- Fix an issue in the build system when compiling the unit tests in release mode with MSVC (`#164 <https://github.com/bluescarni/mppp/pull/164>`__).
 - Fixes for the demangler on OSX when 128-bit integers are involved (`#163 <https://github.com/bluescarni/mppp/pull/163>`__).
 
 0.13 (2019-03-13)
