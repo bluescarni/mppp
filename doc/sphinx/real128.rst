@@ -163,7 +163,7 @@ Floating-point manipulation
 
 .. cpp:function:: mppp::real128 nextafter(const mppp::real128 &from, const mppp::real128 &to)
 
-   .. versionadded:: 0.13
+   .. versionadded:: 0.14
 
    This function returns the next representable value of *from* in the direction of *to*.
 
@@ -179,19 +179,8 @@ Floating-point manipulation
 Input/Output
 ~~~~~~~~~~~~
 
-.. cpp:function:: std::ostream &mppp::operator<<(std::ostream &os, const mppp::real128 &x)
-
-   Stream insertion operator.
-
-   This function will direct to the output stream *os* the input :cpp:class:`~mppp::real128` *x*.
-
-   :param os: the output stream.
-   :param x: the input :cpp:class:`~mppp::real128`.
-
-   :return: a reference to *os*.
-
-   :exception std\:\:overflow_error: in case of (unlikely) overflow errors.
-   :exception unspecified: any exception raised by the public interface of ``std::ostream`` or by memory allocation errors.
+.. doxygengroup:: real128_io
+   :content-only:
 
 Other
 ~~~~~

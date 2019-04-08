@@ -8,6 +8,7 @@
 
 #include <quadmath.h>
 #include <random>
+#include <sstream>
 
 #include <mp++/real128.hpp>
 
@@ -25,6 +26,9 @@ static inline void check_round_trip(const real128 &r)
     const auto tmp = r.to_string();
     real128 r2{tmp};
     REQUIRE(((r.m_value == r2.m_value) || (r.isnan() && r2.isnan() && r.signbit() == r2.signbit())));
+    std::ostringstream oss;
+    oss << r;
+    REQUIRE(oss.str() == tmp);
 }
 
 TEST_CASE("real128 io")

@@ -118,7 +118,6 @@ if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_trig)
   ADD_MPPP_TESTCASE(real128_hyperbolic)
   ADD_MPPP_TESTCASE(real128_miscfunctions)
-  ADD_MPPP_TESTCASE(real128_stream_format)
 endif()
 
 if(MPPP_WITH_MPFR)

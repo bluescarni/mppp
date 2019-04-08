@@ -16,10 +16,8 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
-#include <ios>
 #include <iostream>
 #include <limits>
-#include <locale>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -143,6 +141,8 @@ using real128_op_types_enabler
 // - the constructor from integer *may* be implemented in a faster way by reading directly the hi/lo parts
 //   and writing them to the ieee union (instead right now we are using __float128 arithmetics and quadmath
 //   functions). Make sure to benchmark first though...
+// - initial code for stream formatting at 687b86d9380a534048f62aac3815c31b094e52d2. The problem to be
+//   solved is the segfault in MinGW.
 
 /// Quadruple-precision floating-point class.
 /**
@@ -1278,181 +1278,37 @@ inline real128 scalbln(const real128 &x, long n)
 
 /** @} */
 
-// Output stream operator.
+/** @defgroup real128_io real128_io
+ *  @{
+ */
+
+/// Output stream operator.
+/**
+ * \rststar
+ * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real128` ``x``. The current implementation
+ * ignores any formatting flag specified in ``os``, and the print format will be the one
+ * described in :cpp:func:`mppp::real128::to_string()`.
+ *
+ * .. warning::
+ *    In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
+ *    flags. For the time being, users are encouraged to use the ``quadmath_snprintf()`` function from the quadmath
+ *    library if precise and forward-compatible control on the printing format is needed.
+ * \endrststar
+ *
+ * @param os the target stream.
+ * @param x the input \link mppp::real128 real128\endlink.
+ *
+ * @return a reference to \p os.
+ *
+ * @throws unspecified any exception thrown by real128::to_string().
+ */
 inline std::ostream &operator<<(std::ostream &os, const real128 &x)
 {
-    // Get the stream width.
-    const auto width = os.width();
-
-    // Fetch the stream's flags.
-    const auto flags = os.flags();
-
-    // Determine the fill type.
-    const auto fill = stream_flags_to_fill(flags);
-
-    // Showpos?
-    const auto showpos = (flags & std::ios_base::showpos) != 0;
-
-    // Uppercase?
-    const bool uppercase = (flags & std::ios_base::uppercase) != 0;
-
-    // The char buffer. First we will be writing into
-    // it a representation of the absolute value of x,
-    // and later we will add fill, enable showpos
-    // and switch to uppercase as needed.
-    MPPP_MAYBE_TLS std::vector<char> buffer;
-
-    if (x.finite()) {
-        // Do the formatting with the absolute value of x.
-        const auto abs_x = abs(x);
-
-        // Scientific?
-        const auto scientific = (flags & std::ios_base::scientific) != 0;
-
-        // Fixed?
-        const auto fixed = (flags & std::ios_base::fixed) != 0;
-
-        // Fetch the stream's precision, convert to int.
-        const auto os_prec = safe_cast<int>(os.precision());
-
-        // The format string.
-        MPPP_MAYBE_TLS std::string fmt;
-        fmt = "%";
-
-        if (scientific && fixed) {
-            // scientific + fixed means hexfloat.
-            // NOTE: hexfloat seems to ignore:
-            // - the stream precision,
-            // - showpoint.
-            // However, it seems to respect showpos.
-            fmt += "Qa";
-        } else {
-            // Showpoint?
-            if ((flags & std::ios_base::showpoint) != 0) {
-                // NOTE: the # flag activates the "alternate form"
-                // of the output format. For the "f", "e" and "g" types,
-                // the alternate form ensures that the output always
-                // contains a decimal point. For the "g" type, trailing
-                // zeroes will not be removed.
-                fmt += "#";
-            }
-
-            if (os_prec >= 0) {
-                // NOTE: enable the precision field only
-                // if the stream's precision is non-negative.
-                fmt += ".*";
-            }
-
-            fmt += "Q";
-            // NOTE: "g" is the default type, different
-            // from both scientific and fixed.
-            fmt += fixed ? "f" : (scientific ? "e" : "g");
-        }
-
-        // Determine how much storage we need.
-        const auto ret = os_prec >= 0 ? ::quadmath_snprintf(nullptr, 0, fmt.c_str(), os_prec, abs_x.m_value)
-                                      : ::quadmath_snprintf(nullptr, 0, fmt.c_str(), abs_x.m_value);
-
-        // LCOV_EXCL_START
-        if (ret < 0) {
-            throw std::runtime_error("quadmath_snprintf() returned an error code");
-        }
-#if defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wtautological-constant-out-of-range-compare"
-        // NOTE: some versions of clang complain about this comparison.
-        if (make_unsigned(ret) > std::numeric_limits<decltype(buffer.size())>::max() - 1u) {
-            throw std::overflow_error("Overflow in real128's stream insertion operator");
-        }
-#pragma GCC diagnostic pop
-#endif
-        // LCOV_EXCL_STOP
-
-        // Resize the buffer and write into it.
-        buffer.resize(safe_cast<decltype(buffer.size())>(make_unsigned(ret)) + 1u);
-        if (os_prec >= 0) {
-            ::quadmath_snprintf(buffer.data(), safe_cast<std::size_t>(buffer.size()), fmt.c_str(), os_prec,
-                                abs_x.m_value);
-        } else {
-            ::quadmath_snprintf(buffer.data(), safe_cast<std::size_t>(buffer.size()), fmt.c_str(), abs_x.m_value);
-        }
-    } else {
-        // No formatting needed for inf/nan.
-        constexpr char inf_str[] = "inf";
-        constexpr char nan_str[] = "nan";
-        if (x.isinf()) {
-            buffer.assign(std::begin(inf_str), std::end(inf_str));
-        } else {
-            buffer.assign(std::begin(nan_str), std::end(nan_str));
-        }
-    }
-
-    // Prepend the sign, if needed.
-    if (!x.isnan()) {
-        if (x.m_value < 0) {
-            buffer.insert(buffer.begin(), '-');
-        } else if (showpos) {
-            buffer.insert(buffer.begin(), '+');
-        }
-    }
-
-    // Apply a final toupper() transformation, if needed,
-    // but do it before doing the filling in order to avoid
-    // uppercasing the fill character.
-    if (uppercase) {
-        const auto &cloc = std::locale::classic();
-        for (decltype(buffer.size()) i = 0; i < buffer.size() - 1u; ++i) {
-            if (std::isalpha(buffer[i], cloc)) {
-                buffer[i] = std::toupper(buffer[i], cloc);
-            }
-        }
-    }
-
-    // Compute the total size of the number
-    // representation (i.e., without fill characters).
-    // NOTE: -1 because of the terminator.
-    const auto final_size = buffer.size() - 1u;
-
-    // We are going to do the filling
-    // only if the stream width is larger
-    // than the total size of the number.
-    if (width >= 0 && make_unsigned(width) > final_size) {
-        // Compute how much fill we need.
-        const auto fill_size = safe_cast<decltype(buffer.size())>(make_unsigned(width) - final_size);
-        // Get the fill character.
-        const auto fill_char = os.fill();
-        switch (fill) {
-            case 1:
-                // Left fill: fill characters at the end.
-                buffer.insert(buffer.end() - 1, fill_size, fill_char);
-                break;
-            case 2:
-                // Right fill: fill characters at the beginning.
-                buffer.insert(buffer.begin(), fill_size, fill_char);
-                break;
-            case 3: {
-                // Internal fill: the fill characters are always after the sign (if present).
-                // If no sign is present and hexfloat is requested, the fill chars
-                // are after 0x/0X. Otherwise, we just do a right fill.
-                auto delta = static_cast<int>(buffer[0] == '+' || buffer[0] == '-');
-                delta += static_cast<int>(buffer.size() >= 2u && buffer[0] == '0'
-                                          && (buffer[1] == 'x' || buffer[1] == 'X'));
-                buffer.insert(buffer.begin() + delta, fill_size, fill_char);
-                break;
-            }
-        }
-    }
-
-    // Write out.
-    os << buffer.data();
-
-    // Reset the stream width to zero, like the operator<<() does for builtin types.
-    // https://en.cppreference.com/w/cpp/io/manip/setw
-    // Do it here so we ensure we don't alter the state of the stream until the very end.
-    os.width(0);
-
+    float128_stream(os, x.m_value);
     return os;
 }
+
+/** @} */
 
 /** @defgroup real128_comparison real128_comparison
  *  @{
