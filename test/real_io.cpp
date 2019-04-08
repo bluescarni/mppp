@@ -121,13 +121,4 @@ TEST_CASE("real io")
         oss << real{123, 100};
         REQUIRE(::mpfr_equal_p(real{123, 100}.get_mpfr_t(), real{oss.str(), 100}.get_mpfr_t()));
     }
-    {
-        std::stringstream iss;
-        iss.str("-1.1");
-        real_set_default_prec(110);
-        real r;
-        iss >> r;
-        real_reset_default_prec();
-        REQUIRE(::mpfr_equal_p(real{"-1.1", 110}.get_mpfr_t(), r.get_mpfr_t()));
-    }
 }

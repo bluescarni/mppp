@@ -4,10 +4,18 @@ Changelog
 0.14 (unreleased)
 -----------------
 
+New
+~~~
+
+- :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational` now respect the format
+  flags in output streams (`#161 <https://github.com/bluescarni/mppp/pull/161>`__).
+
 Changes
 ~~~~~~~
 
 - Various improvements to the benchmarks (`#166 <https://github.com/bluescarni/mppp/pull/166>`__).
+- **BREAKING**: the input stream operators have been removed from all classes
+  (`#161 <https://github.com/bluescarni/mppp/pull/161>`__).
 
 Fix
 ~~~
