@@ -32,7 +32,7 @@
 namespace mppp
 {
 
-inline namespace detail
+namespace detail
 {
 
 #if defined(_MSC_VER)

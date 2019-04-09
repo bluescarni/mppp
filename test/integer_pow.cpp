@@ -40,14 +40,14 @@ struct pow_tester {
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
-        mpz_raii m1, m2;
+        detail::mpz_raii m1, m2;
         integer n1, n2;
         ::mpz_pow_ui(&m1.m_mpz, &m2.m_mpz, 0u);
         REQUIRE(&pow_ui(n1, n2, 0) == &n1);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(pow_ui(n2, 0)) == lex_cast(m1)));
         REQUIRE(n1.is_static());
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         std::uniform_int_distribution<unsigned> edist(0, 20);
         // Run a variety of tests with operands with x number of limbs.
@@ -59,7 +59,7 @@ struct pow_tester {
                 }
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();

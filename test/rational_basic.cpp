@@ -71,7 +71,7 @@ struct int_ctor_tester {
             REQUIRE((std::is_constructible<rational, Int &&>::value));
             REQUIRE((std::is_constructible<rational, const Int &>::value));
             REQUIRE(lex_cast(Int(0)) == lex_cast(rational{Int(0)}));
-            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
+            auto constexpr min = detail::nl_min<Int>(), max = detail::nl_max<Int>();
             REQUIRE(lex_cast(min) == lex_cast(rational{min}));
             REQUIRE(lex_cast(max) == lex_cast(rational{max}));
             std::atomic<bool> fail(false);
@@ -271,13 +271,13 @@ struct string_ctor_tester {
     void operator()(const S &) const
     {
         using rational = rational<S::value>;
-        REQUIRE(is_rational<rational>::value);
-        REQUIRE(!is_rational<int>::value);
-        REQUIRE((is_same_ssize_rational<rational, rational>::value));
-        REQUIRE((!is_same_ssize_rational<rational, mppp::rational<S::value + 1u>>::value));
-        REQUIRE((!is_same_ssize_rational<mppp::rational<S::value + 1u>, rational>::value));
-        REQUIRE((!is_same_ssize_rational<void, int>::value));
-        REQUIRE((!is_same_ssize_rational<rational, std::string>::value));
+        REQUIRE(detail::is_rational<rational>::value);
+        REQUIRE(!detail::is_rational<int>::value);
+        REQUIRE((detail::is_same_ssize_rational<rational, rational>::value));
+        REQUIRE((!detail::is_same_ssize_rational<rational, mppp::rational<S::value + 1u>>::value));
+        REQUIRE((!detail::is_same_ssize_rational<mppp::rational<S::value + 1u>, rational>::value));
+        REQUIRE((!detail::is_same_ssize_rational<void, int>::value));
+        REQUIRE((!detail::is_same_ssize_rational<rational, std::string>::value));
         REQUIRE((std::is_constructible<rational, const char *>::value));
         REQUIRE((std::is_constructible<rational, std::string>::value));
         REQUIRE((std::is_constructible<rational, std::string &&>::value));
@@ -375,7 +375,7 @@ struct mpq_copy_ctor_tester {
     void operator()(const S &) const
     {
         using rational = rational<S::value>;
-        mpq_raii m;
+        detail::mpq_raii m;
         REQUIRE((std::is_constructible<rational, const ::mpq_t>::value));
         REQUIRE(lex_cast(rational{&m.m_mpq}) == "0");
         ::mpz_set_si(mpq_numref(&m.m_mpq), 1234);
@@ -452,7 +452,7 @@ struct mpz_ctor_tester {
     {
         using rational = rational<S::value>;
         using integer = integer<S::value>;
-        mpz_raii m;
+        detail::mpz_raii m;
         REQUIRE((std::is_constructible<rational, const ::mpz_t>::value));
         REQUIRE(rational{&m.m_mpz}.is_zero());
         REQUIRE(rational{&m.m_mpz}.get_num().is_static());
@@ -798,7 +798,7 @@ struct mpq_copy_ass_tester {
         REQUIRE((std::is_assignable<rational &, ::mpq_t>::value));
         REQUIRE((!std::is_assignable<const rational &, ::mpq_t>::value));
         rational q;
-        mpq_raii m;
+        detail::mpq_raii m;
         q = &m.m_mpq;
         REQUIRE(lex_cast(q) == "0");
         ::mpq_set_si(&m.m_mpq, 1234, 1);
@@ -870,7 +870,7 @@ struct mpz_ass_tester {
         REQUIRE((std::is_assignable<rational &, ::mpz_t>::value));
         REQUIRE((!std::is_assignable<const rational &, ::mpz_t>::value));
         rational q{6, 5};
-        mpz_raii m;
+        detail::mpz_raii m;
         ::mpz_set_si(&m.m_mpz, 1234);
         q = &m.m_mpz;
         REQUIRE(q.get_num() == 1234);
@@ -998,7 +998,7 @@ struct int_convert_tester {
             using integer = typename rational::int_t;
             REQUIRE((is_convertible<rational, Int>::value));
             REQUIRE(roundtrip_conversion<rational>(0));
-            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
+            auto constexpr min = detail::nl_min<Int>(), max = detail::nl_max<Int>();
             REQUIRE(roundtrip_conversion<rational>(min));
             REQUIRE(roundtrip_conversion<rational>(max));
             REQUIRE(roundtrip_conversion<rational>(min + Int(1)));

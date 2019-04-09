@@ -92,14 +92,17 @@ inline void tuple_for_each(Tuple &&t, const F &f)
 inline namespace impl
 {
 
-template <typename T, typename std::enable_if<mppp::is_integral<T>::value && mppp::is_signed<T>::value, int>::type = 0>
+template <typename T,
+          typename std::enable_if<mppp::detail::is_integral<T>::value && mppp::detail::is_signed<T>::value, int>::type
+          = 0>
 inline long long lex_cast_tr(T n)
 {
     return static_cast<long long>(n);
 }
 
 template <typename T,
-          typename std::enable_if<mppp::is_integral<T>::value && mppp::is_unsigned<T>::value, int>::type = 0>
+          typename std::enable_if<mppp::detail::is_integral<T>::value && mppp::detail::is_unsigned<T>::value, int>::type
+          = 0>
 inline unsigned long long lex_cast_tr(T n)
 {
     return static_cast<unsigned long long>(n);
@@ -134,12 +137,12 @@ inline std::string lex_cast(const T &x)
     return oss.str();
 }
 
-inline std::string lex_cast(const mppp::mpz_raii &m)
+inline std::string lex_cast(const mppp::detail::mpz_raii &m)
 {
-    return mppp::mpz_to_str(&m.m_mpz);
+    return mppp::detail::mpz_to_str(&m.m_mpz);
 }
 
-inline std::string lex_cast(const mppp::mpq_raii &m)
+inline std::string lex_cast(const mppp::detail::mpq_raii &m)
 {
     return mppp::rational<1>(&m.m_mpq).to_string();
 }
@@ -148,24 +151,24 @@ inline std::string lex_cast(const mppp::mpq_raii &m)
 
 inline std::string lex_cast(__uint128_t n)
 {
-    return mppp::to_string(n);
+    return mppp::detail::to_string(n);
 }
 
 inline std::string lex_cast(__int128_t n)
 {
-    return mppp::to_string(n);
+    return mppp::detail::to_string(n);
 }
 
 #endif
 
 // Set mpz to random value with n limbs. Top limb is divided by div.
-inline void random_integer(mppp::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
+inline void random_integer(mppp::detail::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
 {
     if (!n) {
         ::mpz_set_ui(&m.m_mpz, 0);
         return;
     }
-    MPPP_MAYBE_TLS mppp::mpz_raii tmp;
+    MPPP_MAYBE_TLS mppp::detail::mpz_raii tmp;
     std::uniform_int_distribution<::mp_limb_t> dist(0u, std::numeric_limits<::mp_limb_t>::max());
     // Set the first limb.
     ::mpz_set_str(&m.m_mpz, lex_cast((dist(rng) & GMP_NUMB_MASK) / div).c_str(), 10);
@@ -177,13 +180,13 @@ inline void random_integer(mppp::mpz_raii &m, unsigned n, std::mt19937 &rng, ::m
 }
 
 // Set mpq to random value with n limbs for num/den.
-inline void random_rational(mppp::mpq_raii &m, unsigned n, std::mt19937 &rng)
+inline void random_rational(mppp::detail::mpq_raii &m, unsigned n, std::mt19937 &rng)
 {
     if (!n) {
         ::mpq_set_ui(&m.m_mpq, 0, 1);
         return;
     }
-    MPPP_MAYBE_TLS mppp::mpz_raii tmp;
+    MPPP_MAYBE_TLS mppp::detail::mpz_raii tmp;
     std::uniform_int_distribution<::mp_limb_t> dist(0u, std::numeric_limits<::mp_limb_t>::max());
     // Set the first limb.
     ::mpz_set_str(mpq_numref(&m.m_mpq), lex_cast(dist(rng) & GMP_NUMB_MASK).c_str(), 10);
@@ -204,13 +207,13 @@ inline void random_rational(mppp::mpq_raii &m, unsigned n, std::mt19937 &rng)
 }
 
 // Set mpz to the max value with n limbs.
-inline void max_integer(mppp::mpz_raii &m, unsigned n)
+inline void max_integer(mppp::detail::mpz_raii &m, unsigned n)
 {
     if (!n) {
         ::mpz_set_ui(&m.m_mpz, 0);
         return;
     }
-    MPPP_MAYBE_TLS mppp::mpz_raii tmp;
+    MPPP_MAYBE_TLS mppp::detail::mpz_raii tmp;
     // Set the first limb.
     ::mpz_set_str(&m.m_mpz, lex_cast(GMP_NUMB_MAX).c_str(), 10);
     for (unsigned i = 1u; i < n; ++i) {

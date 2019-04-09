@@ -52,7 +52,7 @@ namespace mppp_pybind11
 
 namespace py = pybind11;
 
-inline namespace detail
+namespace detail
 {
 
 template <typename = void>
@@ -196,7 +196,7 @@ inline void init()
     ac.m_armed = false;
 }
 
-inline namespace detail
+namespace detail
 {
 
 // Convert a Python long object to an mppp integer.

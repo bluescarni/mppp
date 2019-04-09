@@ -36,7 +36,7 @@ struct even_odd_tester {
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
-        mpz_raii m1;
+        detail::mpz_raii m1;
         integer n1;
         REQUIRE(even_p(n1));
         REQUIRE(n1.even_p());
@@ -73,14 +73,14 @@ struct even_odd_tester {
         REQUIRE(n1.even_p());
         REQUIRE(!odd_p(n1));
         REQUIRE(!n1.odd_p());
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Random tests with x number of limbs.
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m1.m_mpz, &tmp.m_mpz);
-                n1 = integer(mpz_to_str(&tmp.m_mpz));
+                n1 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m1.m_mpz, &m1.m_mpz);
                     n1.neg();

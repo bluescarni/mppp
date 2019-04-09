@@ -25,7 +25,7 @@
 namespace mppp
 {
 
-inline namespace detail
+namespace detail
 {
 
 // mpz_t is an array of some struct.

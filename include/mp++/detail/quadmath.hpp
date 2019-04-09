@@ -23,7 +23,7 @@
 namespace mppp
 {
 
-inline namespace detail
+namespace detail
 {
 // Machinery for low-level manipulation of __float128. Inspired by:
 // https://github.com/gcc-mirror/gcc/blob/master/libquadmath/quadmath-imp.h

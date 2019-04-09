@@ -45,7 +45,7 @@
 
 namespace mppp
 {
-inline namespace detail
+namespace detail
 {
 
 inline std::string demangle(const char *s)

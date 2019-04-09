@@ -39,13 +39,13 @@ struct ior_tester {
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
-        mpz_raii m1, m2, m3;
+        detail::mpz_raii m1, m2, m3;
         integer n1, n2, n3;
         ::mpz_ior(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         bitwise_ior(n1, n2, n3);
         REQUIRE(n1 == integer{&m1.m_mpz});
         REQUIRE(n1 == (n2 | n3));
-        mpz_raii tmp1, tmp2;
+        detail::mpz_raii tmp1, tmp2;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
@@ -488,7 +488,7 @@ struct not_tester {
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
-        mpz_raii m1, m2;
+        detail::mpz_raii m1, m2;
         integer n1, n2;
         ::mpz_com(&m1.m_mpz, &m2.m_mpz);
         bitwise_not(n1, n2);
@@ -507,7 +507,7 @@ struct not_tester {
         bitwise_not(n1, n2);
         REQUIRE(n1 == integer{&m1.m_mpz});
         REQUIRE(n1 == ~n2);
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {
@@ -784,13 +784,13 @@ struct and_tester {
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
-        mpz_raii m1, m2, m3;
+        detail::mpz_raii m1, m2, m3;
         integer n1, n2, n3;
         ::mpz_and(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         bitwise_and(n1, n2, n3);
         REQUIRE(n1 == integer{&m1.m_mpz});
         REQUIRE(n1 == (n2 & n3));
-        mpz_raii tmp1, tmp2;
+        detail::mpz_raii tmp1, tmp2;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
@@ -1275,13 +1275,13 @@ struct xor_tester {
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
-        mpz_raii m1, m2, m3;
+        detail::mpz_raii m1, m2, m3;
         integer n1, n2, n3;
         ::mpz_xor(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         bitwise_xor(n1, n2, n3);
         REQUIRE(n1 == integer{&m1.m_mpz});
         REQUIRE(n1 == (n2 ^ n3));
-        mpz_raii tmp1, tmp2;
+        detail::mpz_raii tmp1, tmp2;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {

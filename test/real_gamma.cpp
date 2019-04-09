@@ -20,12 +20,12 @@ TEST_CASE("real gamma")
 {
     real r0{1};
     r0.gamma();
-    REQUIRE(r0.get_prec() == real_deduce_precision(0));
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(r0 == 1);
     real rop;
     r0 = real{1};
     REQUIRE(gamma(rop, r0) == 1);
-    REQUIRE(rop.get_prec() == real_deduce_precision(0));
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(gamma(r0) == 1);
     REQUIRE(gamma(std::move(r0)) == 1);
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
@@ -35,12 +35,12 @@ TEST_CASE("real lgamma")
 {
     real r0{1};
     r0.lgamma();
-    REQUIRE(r0.get_prec() == real_deduce_precision(0));
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(r0 == 0);
     real rop;
     r0 = real{1};
     REQUIRE(lgamma(rop, r0) == 0);
-    REQUIRE(rop.get_prec() == real_deduce_precision(0));
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(lgamma(r0) == 0);
     REQUIRE(lgamma(std::move(r0)) == 0);
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);

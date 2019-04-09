@@ -190,7 +190,7 @@ struct mpz_copy_ass_tester {
     {
         using integer = integer<S::value>;
         integer n;
-        mpz_raii m;
+        detail::mpz_raii m;
         n = &m.m_mpz;
         REQUIRE(lex_cast(n) == "0");
         ::mpz_set_si(&m.m_mpz, 1234);
@@ -208,11 +208,11 @@ struct mpz_copy_ass_tester {
         // Random testing.
         std::atomic<bool> fail(false);
         auto f = [&fail](unsigned u) {
-            std::uniform_int_distribution<long> dist(nl_min<long>(), nl_max<long>());
+            std::uniform_int_distribution<long> dist(detail::nl_min<long>(), detail::nl_max<long>());
             std::uniform_int_distribution<int> sdist(0, 1);
             std::mt19937 eng(static_cast<std::mt19937::result_type>(u + mt_rng_seed));
             for (auto i = 0; i < ntries; ++i) {
-                mpz_raii mpz;
+                detail::mpz_raii mpz;
                 auto tmp = dist(eng);
                 ::mpz_set_si(&mpz.m_mpz, tmp);
                 integer z;
@@ -271,7 +271,7 @@ struct mpz_move_ass_tester {
         // Random testing.
         std::atomic<bool> fail(false);
         auto f = [&fail](unsigned u) {
-            std::uniform_int_distribution<long> dist(nl_min<long>(), nl_max<long>());
+            std::uniform_int_distribution<long> dist(detail::nl_min<long>(), detail::nl_max<long>());
             std::uniform_int_distribution<int> sdist(0, 1);
             std::mt19937 eng(static_cast<std::mt19937::result_type>(u + mt_rng_seed));
             for (auto i = 0; i < ntries; ++i) {
@@ -512,7 +512,7 @@ struct int_convert_tester {
             using integer = integer<S::value>;
             REQUIRE((is_convertible<integer, Int>::value));
             REQUIRE(roundtrip_conversion<integer>(0));
-            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
+            auto constexpr min = detail::nl_min<Int>(), max = detail::nl_max<Int>();
             REQUIRE(roundtrip_conversion<integer>(min));
             REQUIRE(roundtrip_conversion<integer>(max));
             REQUIRE(roundtrip_conversion<integer>(Int(42)));
@@ -733,7 +733,7 @@ struct sizes_tester {
         // Static data member.
         REQUIRE(integer::ssize == S::value);
         // Random testing.
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         auto random_x = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {

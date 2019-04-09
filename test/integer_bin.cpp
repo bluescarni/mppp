@@ -39,7 +39,7 @@ struct bin_tester {
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
-        mpz_raii m1, m2;
+        detail::mpz_raii m1, m2;
         integer n1, n2;
         ::mpz_bin_ui(&m1.m_mpz, &m2.m_mpz, 0u);
         REQUIRE(&bin_ui(n1, n2, 0) == &n1);
@@ -117,7 +117,7 @@ struct binomial_tester {
         // Random tests.
         std::uniform_int_distribution<int> ud(-1000, 1000);
         std::uniform_int_distribution<int> promote_dist(0, 1);
-        mpz_raii m;
+        detail::mpz_raii m;
         for (int i = 0; i < ntries; ++i) {
             auto tmp1 = ud(rng), tmp2 = ud(rng);
             n = tmp1;

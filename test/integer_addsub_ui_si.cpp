@@ -54,7 +54,7 @@ struct add_ui_tester {
         {
             using integer = integer<S::value>;
             // Start with all zeroes.
-            mpz_raii m1, m2;
+            detail::mpz_raii m1, m2;
             integer n1, n2;
             REQUIRE(&add_ui(n1, n2, Int(0u)) == &n1);
             ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 0);
@@ -85,7 +85,7 @@ struct add_ui_tester {
             ::mpz_add_ui(&m1.m_mpz, &m2.m_mpz, 123);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
-            mpz_raii tmp;
+            detail::mpz_raii tmp;
             std::uniform_int_distribution<int> sdist(0, 1);
             integral_minmax_dist<Int> uldist;
             // Run a variety of tests with operands with x number of limbs.
@@ -97,7 +97,7 @@ struct add_ui_tester {
                     }
                     random_integer(tmp, x, rng);
                     ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                         n2.neg();
@@ -111,7 +111,7 @@ struct add_ui_tester {
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     const auto rul = uldist(rng);
                     add_ui(n1, integer{}, rul);
-                    mpz_raii empty;
+                    detail::mpz_raii empty;
                     ::mpz_add(&m1.m_mpz, &empty.m_mpz, integer{rul}.get_mpz_view());
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     add_ui(n1, n2, rul);
@@ -251,7 +251,7 @@ struct sub_ui_tester {
         {
             using integer = integer<S::value>;
             // Start with all zeroes.
-            mpz_raii m1, m2;
+            detail::mpz_raii m1, m2;
             integer n1, n2;
             REQUIRE(&sub_ui(n1, n2, Int(0u)) == &n1);
             ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 0);
@@ -282,7 +282,7 @@ struct sub_ui_tester {
             ::mpz_sub_ui(&m1.m_mpz, &m2.m_mpz, 123);
             REQUIRE((lex_cast(n1) == lex_cast(m1)));
             REQUIRE(n1.is_static());
-            mpz_raii tmp;
+            detail::mpz_raii tmp;
             std::uniform_int_distribution<int> sdist(0, 1);
             integral_minmax_dist<Int> uldist;
             // Run a variety of tests with operands with x number of limbs.
@@ -294,7 +294,7 @@ struct sub_ui_tester {
                     }
                     random_integer(tmp, x, rng);
                     ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                    n2 = integer(mpz_to_str(&tmp.m_mpz));
+                    n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                     if (sdist(rng)) {
                         ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                         n2.neg();
@@ -308,7 +308,7 @@ struct sub_ui_tester {
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     const auto rul = uldist(rng);
                     sub_ui(n1, integer{}, rul);
-                    mpz_raii empty;
+                    detail::mpz_raii empty;
                     ::mpz_sub(&m1.m_mpz, &empty.m_mpz, integer{rul}.get_mpz_view());
                     REQUIRE((lex_cast(n1) == lex_cast(m1)));
                     sub_ui(n1, n2, rul);

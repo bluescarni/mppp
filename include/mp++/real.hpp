@@ -49,7 +49,7 @@
 namespace mppp
 {
 
-inline namespace detail
+namespace detail
 {
 
 // Some misc tests to check that the mpfr struct conforms to our expectations.
@@ -94,7 +94,7 @@ inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
     constexpr char all_chars[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     // Check the base.
     if (mppp_unlikely(base < 2 || base > 62)) {
-        throw std::invalid_argument("Cannot convert a real to a string in base " + mppp::to_string(base)
+        throw std::invalid_argument("Cannot convert a real to a string in base " + detail::to_string(base)
                                     + ": the base must be in the [2,62] range");
     }
     // Special values first.
@@ -328,26 +328,27 @@ void check_real_trunc_arg(const real &);
 void swap(real &, real &) noexcept;
 
 template <typename T>
-using is_real_interoperable = disjunction<is_cpp_interoperable<T>, is_integer<T>, is_rational<T>
+using is_real_interoperable = detail::disjunction<is_cpp_interoperable<T>, detail::is_integer<T>, detail::is_rational<T>
 #if defined(MPPP_WITH_QUADMATH)
-                                          ,
-                                          std::is_same<T, real128>
+                                                  ,
+                                                  std::is_same<T, real128>
 #endif
-                                          >;
+                                                  >;
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
 concept bool RealInteroperable = is_real_interoperable<T>::value;
 #else
-using real_interoperable_enabler = enable_if_t<is_real_interoperable<T>::value, int>;
+using real_interoperable_enabler = detail::enable_if_t<is_real_interoperable<T>::value, int>;
 #endif
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-concept bool CvrReal = std::is_same<uncvref_t<T>, real>::value;
+concept bool CvrReal = std::is_same<detail::uncvref_t<T>, real>::value;
 #else
 template <typename... Args>
-using cvr_real_enabler = enable_if_t<conjunction<std::is_same<uncvref_t<Args>, real>...>::value, int>;
+using cvr_real_enabler
+    = detail::enable_if_t<detail::conjunction<std::is_same<detail::uncvref_t<Args>, real>...>::value, int>;
 #endif
 
 /// Get the default precision for \link mppp::real real\endlink objects.
@@ -369,7 +370,7 @@ using cvr_real_enabler = enable_if_t<conjunction<std::is_same<uncvref_t<Args>, r
  */
 inline mpfr_prec_t real_get_default_prec()
 {
-    return real_constants<>::default_prec.load(std::memory_order_relaxed);
+    return detail::real_constants<>::default_prec.load(std::memory_order_relaxed);
 }
 
 /// Set the default precision for \link mppp::real real\endlink objects.
@@ -387,12 +388,12 @@ inline mpfr_prec_t real_get_default_prec()
  */
 inline void real_set_default_prec(::mpfr_prec_t p)
 {
-    if (mppp_unlikely(p && !real_prec_check(p))) {
-        throw std::invalid_argument("Cannot set the default precision to " + mppp::to_string(p)
-                                    + ": the value must be either zero or between " + mppp::to_string(real_prec_min())
-                                    + " and " + mppp::to_string(real_prec_max()));
+    if (mppp_unlikely(p && !detail::real_prec_check(p))) {
+        throw std::invalid_argument("Cannot set the default precision to " + detail::to_string(p)
+                                    + ": the value must be either zero or between " + detail::to_string(real_prec_min())
+                                    + " and " + detail::to_string(real_prec_max()));
     }
-    real_constants<>::default_prec.store(p, std::memory_order_relaxed);
+    detail::real_constants<>::default_prec.store(p, std::memory_order_relaxed);
 }
 
 /// Reset the default precision for \link mppp::real real\endlink objects.
@@ -406,10 +407,10 @@ inline void real_set_default_prec(::mpfr_prec_t p)
  */
 inline void real_reset_default_prec()
 {
-    real_constants<>::default_prec.store(0);
+    detail::real_constants<>::default_prec.store(0);
 }
 
-inline namespace detail
+namespace detail
 {
 
 // Get the default precision, if set, otherwise the clamped deduced precision for x.
@@ -582,10 +583,10 @@ class real
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
     {
-        if (mppp_unlikely(!real_prec_check(p))) {
-            throw std::invalid_argument("Cannot init a real with a precision of " + mppp::to_string(p)
-                                        + ": the maximum allowed precision is " + mppp::to_string(real_prec_max())
-                                        + ", the minimum allowed precision is " + mppp::to_string(real_prec_min()));
+        if (mppp_unlikely(!detail::real_prec_check(p))) {
+            throw std::invalid_argument("Cannot init a real with a precision of " + detail::to_string(p)
+                                        + ": the maximum allowed precision is " + detail::to_string(real_prec_max())
+                                        + ", the minimum allowed precision is " + detail::to_string(real_prec_min()));
         }
         return p;
     }
@@ -616,8 +617,8 @@ private:
     explicit real(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
     {
         assert(ignore_prec);
-        assert(real_prec_check(p));
-        ignore(ignore_prec);
+        assert(detail::real_prec_check(p));
+        detail::ignore(ignore_prec);
         ::mpfr_init2(&m_mpfr, p);
     }
 
@@ -755,7 +756,7 @@ private:
             return check_init_prec(provided);
         }
         // Return the default or deduced precision.
-        return real_dd_prec(x);
+        return detail::real_dd_prec(x);
     }
     // Construction from FPs.
     // Alias for the MPFR assignment functions from FP types.
@@ -792,11 +793,12 @@ private:
         dispatch_integral_init(p, b);
         ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
-    template <typename T, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
+    template <typename T,
+              detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
         dispatch_integral_init(p, n);
-        if (n <= nl_max<unsigned long>()) {
+        if (n <= detail::nl_max<unsigned long>()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
             // NOTE: here and elsewhere let's use a 2-limb integer, in the hope
@@ -804,11 +806,12 @@ private:
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
-    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
+    template <typename T,
+              detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
     {
         dispatch_integral_init(p, n);
-        if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (n <= detail::nl_max<long>() && n >= detail::nl_min<long>()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
@@ -823,7 +826,7 @@ private:
     template <std::size_t SSize>
     void dispatch_construction(const rational<SSize> &q, ::mpfr_prec_t p)
     {
-        const auto v = get_mpq_view(q);
+        const auto v = detail::get_mpq_view(q);
         ::mpfr_init2(&m_mpfr, compute_init_precision(p, q));
         ::mpfr_set_q(&m_mpfr, &v, MPFR_RNDN);
     }
@@ -884,7 +887,7 @@ private:
             // Write the significand into this.
             write_significand();
             // Add the hidden bit on top.
-            const auto r_2_112 = real_constants<>::get_2_112();
+            const auto r_2_112 = detail::real_constants<>::get_2_112();
             ::mpfr_add(&m_mpfr, &m_mpfr, &r_2_112.first, MPFR_RNDN);
             // Multiply by 2 raised to the adjusted exponent.
             ::mpfr_mul_2si(&m_mpfr, &m_mpfr, static_cast<long>(std::get<1>(t)) - (16383l + 112), MPFR_RNDN);
@@ -949,7 +952,7 @@ private:
     void construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
     {
         if (mppp_unlikely(base && (base < 2 || base > 62))) {
-            throw std::invalid_argument("Cannot construct a real from a string in base " + mppp::to_string(base)
+            throw std::invalid_argument("Cannot construct a real from a string in base " + detail::to_string(base)
                                         + ": the base must either be zero or in the [2,62] range");
         }
         const ::mpfr_prec_t prec = p ? check_init_prec(p) : real_get_default_prec();
@@ -962,7 +965,7 @@ private:
         if (mppp_unlikely(ret == -1)) {
             ::mpfr_clear(&m_mpfr);
             throw std::invalid_argument(std::string{"The string '"} + s + "' does not represent a valid real in base "
-                                        + mppp::to_string(base));
+                                        + detail::to_string(base));
         }
     }
     explicit real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
@@ -1143,7 +1146,7 @@ public:
     {
         if (m_mpfr._mpfr_d) {
             // The object is not moved-from, destroy it.
-            assert(real_prec_check(get_prec()));
+            assert(detail::real_prec_check(get_prec()));
             ::mpfr_clear(&m_mpfr);
         }
     }
@@ -1199,7 +1202,7 @@ private:
     void dispatch_fp_assignment(fp_a_ptr<T> ptr, const T &x)
     {
         if (SetPrec) {
-            set_prec_impl<false>(real_dd_prec(x));
+            set_prec_impl<false>(detail::real_dd_prec(x));
         }
         ptr(&m_mpfr, x, MPFR_RNDN);
     }
@@ -1223,7 +1226,7 @@ private:
     void dispatch_integral_ass_prec(const T &n)
     {
         if (SetPrec) {
-            set_prec_impl<false>(real_dd_prec(n));
+            set_prec_impl<false>(detail::real_dd_prec(n));
         }
     }
     // Special casing for bool.
@@ -1233,21 +1236,23 @@ private:
         dispatch_integral_ass_prec<SetPrec>(b);
         ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
     }
-    template <bool SetPrec, typename T, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
+    template <bool SetPrec, typename T,
+              detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>>::value, int> = 0>
     void dispatch_assignment(const T &n)
     {
         dispatch_integral_ass_prec<SetPrec>(n);
-        if (n <= nl_max<unsigned long>()) {
+        if (n <= detail::nl_max<unsigned long>()) {
             ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
-    template <bool SetPrec, typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
+    template <bool SetPrec, typename T,
+              detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
     void dispatch_assignment(const T &n)
     {
         dispatch_integral_ass_prec<SetPrec>(n);
-        if (n <= nl_max<long>() && n >= nl_min<long>()) {
+        if (n <= detail::nl_max<long>() && n >= detail::nl_min<long>()) {
             ::mpfr_set_si(&m_mpfr, static_cast<long>(n), MPFR_RNDN);
         } else {
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
@@ -1257,7 +1262,7 @@ private:
     void dispatch_assignment(const integer<SSize> &n)
     {
         if (SetPrec) {
-            set_prec_impl<false>(real_dd_prec(n));
+            set_prec_impl<false>(detail::real_dd_prec(n));
         }
         ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
     }
@@ -1265,9 +1270,9 @@ private:
     void dispatch_assignment(const rational<SSize> &q)
     {
         if (SetPrec) {
-            set_prec_impl<false>(real_dd_prec(q));
+            set_prec_impl<false>(detail::real_dd_prec(q));
         }
-        const auto v = get_mpq_view(q);
+        const auto v = detail::get_mpq_view(q);
         ::mpfr_set_q(&m_mpfr, &v, MPFR_RNDN);
     }
 #if defined(MPPP_WITH_QUADMATH)
@@ -1275,7 +1280,7 @@ private:
     void dispatch_assignment(const real128 &x)
     {
         if (SetPrec) {
-            set_prec_impl<false>(real_dd_prec(x));
+            set_prec_impl<false>(detail::real_dd_prec(x));
         }
         assign_real128(x);
     }
@@ -1317,7 +1322,7 @@ private:
     void string_assignment_impl(const char *s, int base)
     {
         if (mppp_unlikely(base && (base < 2 || base > 62))) {
-            throw std::invalid_argument("Cannot assign a real from a string in base " + mppp::to_string(base)
+            throw std::invalid_argument("Cannot assign a real from a string in base " + detail::to_string(base)
                                         + ": the base must either be zero or in the [2,62] range");
         }
         const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
@@ -1325,7 +1330,7 @@ private:
             ::mpfr_set_nan(&m_mpfr);
             throw std::invalid_argument(std::string{"The string '"} + s
                                         + "' cannot be interpreted as a floating-point value in base "
-                                        + mppp::to_string(base));
+                                        + detail::to_string(base));
         }
     }
     // Dispatching for string assignment.
@@ -1779,10 +1784,10 @@ private:
     // Utility function to check precision in set_prec().
     static ::mpfr_prec_t check_set_prec(::mpfr_prec_t p)
     {
-        if (mppp_unlikely(!real_prec_check(p))) {
-            throw std::invalid_argument("Cannot set the precision of a real to the value " + mppp::to_string(p)
-                                        + ": the maximum allowed precision is " + mppp::to_string(real_prec_max())
-                                        + ", the minimum allowed precision is " + mppp::to_string(real_prec_min()));
+        if (mppp_unlikely(!detail::real_prec_check(p))) {
+            throw std::invalid_argument("Cannot set the precision of a real to the value " + detail::to_string(p)
+                                        + ": the maximum allowed precision is " + detail::to_string(real_prec_max())
+                                        + ", the minimum allowed precision is " + detail::to_string(real_prec_min()));
         }
         return p;
     }
@@ -1843,13 +1848,13 @@ public:
 private:
     // Generic conversion.
     // integer.
-    template <typename T, enable_if_t<is_integer<T>::value, int> = 0>
+    template <typename T, detail::enable_if_t<detail::is_integer<T>::value, int> = 0>
     T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
             throw std::domain_error("Cannot convert a non-finite real to an integer");
         }
-        MPPP_MAYBE_TLS mpz_raii mpz;
+        MPPP_MAYBE_TLS detail::mpz_raii mpz;
         // Truncate the value when converting to integer.
         ::mpfr_get_z(&mpz.m_mpz, &m_mpfr, MPFR_RNDZ);
         return T{&mpz.m_mpz};
@@ -1862,7 +1867,7 @@ private:
         ::mpfr_clear_erangeflag();
         // NOTE: this call can fail if the exponent of this is very close to the upper/lower limits of the exponent
         // type. If the call fails (signalled by a range flag being set), we will return error.
-        MPPP_MAYBE_TLS mpz_raii mpz;
+        MPPP_MAYBE_TLS detail::mpz_raii mpz;
         const ::mpfr_exp_t exp2 = ::mpfr_get_z_2exp(&mpz.m_mpz, &m_mpfr);
         // NOTE: not sure at the moment how to trigger this, let's leave it for now.
         // LCOV_EXCL_START
@@ -1878,15 +1883,15 @@ private:
         rop._get_den().set_one();
         if (exp2 >= ::mpfr_exp_t(0)) {
             // The output value will be an integer.
-            rop._get_num() <<= make_unsigned(exp2);
+            rop._get_num() <<= detail::make_unsigned(exp2);
         } else {
             // The output value will be a rational. Canonicalisation will be needed.
-            rop._get_den() <<= nint_abs(exp2);
+            rop._get_den() <<= detail::nint_abs(exp2);
             canonicalise(rop);
         }
         return true;
     }
-    template <typename T, enable_if_t<is_rational<T>::value, int> = 0>
+    template <typename T, detail::enable_if_t<detail::is_rational<T>::value, int> = 0>
     T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
@@ -1901,7 +1906,7 @@ private:
         return rop;
     }
     // C++ floating-point.
-    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    template <typename T, detail::enable_if_t<std::is_floating_point<T>::value, int> = 0>
     T dispatch_conversion() const
     {
         if (std::is_same<T, float>::value) {
@@ -1917,7 +1922,7 @@ private:
     template <typename T>
     [[noreturn]] void raise_overflow_error() const
     {
-        throw std::overflow_error("Conversion of the real " + to_string() + " to the type '" + demangle<T>()
+        throw std::overflow_error("Conversion of the real " + to_string() + " to the type '" + detail::demangle<T>()
                                   + "' results in overflow");
     }
     // Unsigned integrals, excluding bool.
@@ -1934,19 +1939,21 @@ private:
             ::mpfr_clear_erangeflag();
             // If the value is positive, and the target type has a range greater than unsigned long,
             // we will attempt the conversion again via integer.
-            if (nl_max<T>() > nl_max<unsigned long>() && sgn() > 0) {
+            if (detail::nl_max<T>() > detail::nl_max<unsigned long>() && sgn() > 0) {
                 return mppp::get(rop, static_cast<integer<2>>(*this));
             }
             return false;
         }
-        if (candidate <= nl_max<T>()) {
+        if (candidate <= detail::nl_max<T>()) {
             rop = static_cast<T>(candidate);
             return true;
         }
         return false;
     }
     template <typename T,
-              enable_if_t<conjunction<negation<std::is_same<bool, T>>, is_integral<T>, is_unsigned<T>>::value, int> = 0>
+              detail::enable_if_t<detail::conjunction<detail::negation<std::is_same<bool, T>>, detail::is_integral<T>,
+                                                      detail::is_unsigned<T>>::value,
+                                  int> = 0>
     T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
@@ -1959,7 +1966,7 @@ private:
         return rop;
     }
     // bool.
-    template <typename T, enable_if_t<std::is_same<bool, T>::value, int> = 0>
+    template <typename T, detail::enable_if_t<std::is_same<bool, T>::value, int> = 0>
     T dispatch_conversion() const
     {
         // NOTE: in C/C++ the conversion of NaN to bool gives true:
@@ -1978,18 +1985,19 @@ private:
             ::mpfr_clear_erangeflag();
             // If the target type has a range greater than long,
             // we will attempt the conversion again via integer.
-            if (nl_min<T>() < nl_min<long>() && nl_max<T>() > nl_max<long>()) {
+            if (detail::nl_min<T>() < detail::nl_min<long>() && detail::nl_max<T>() > detail::nl_max<long>()) {
                 return mppp::get(rop, static_cast<integer<2>>(*this));
             }
             return false;
         }
-        if (candidate >= nl_min<T>() && candidate <= nl_max<T>()) {
+        if (candidate >= detail::nl_min<T>() && candidate <= detail::nl_max<T>()) {
             rop = static_cast<T>(candidate);
             return true;
         }
         return false;
     }
-    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
+    template <typename T,
+              detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
     T dispatch_conversion() const
     {
         if (mppp_unlikely(!number_p())) {
@@ -2002,7 +2010,7 @@ private:
         return rop;
     }
 #if defined(MPPP_WITH_QUADMATH)
-    template <typename T, enable_if_t<std::is_same<real128, T>::value, int> = 0>
+    template <typename T, detail::enable_if_t<std::is_same<real128, T>::value, int> = 0>
     T dispatch_conversion() const
     {
         // Handle the special cases first.
@@ -2043,10 +2051,11 @@ private:
         // NOTE: we have read a full limb in the line above, so mp_bits_per_limb bits. If mp_bits_per_limb > 113,
         // then the constructor of real128 truncated the input limb value to 113 bits of precision, so effectively
         // we have read 113 bits only in such a case.
-        unsigned read_bits = c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits());
+        unsigned read_bits = detail::c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits());
         while (nlimbs && read_bits < real128_sig_digits()) {
             // Number of bits to be read from the current limb. Either mp_bits_per_limb or less.
-            const unsigned rbits = c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits() - read_bits);
+            const unsigned rbits
+                = detail::c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits() - read_bits);
             // Shift up by rbits.
             // NOTE: cast to int is safe, as rbits is no larger than mp_bits_per_limb which is
             // representable by int.
@@ -2110,7 +2119,7 @@ private:
         if (!number_p()) {
             return false;
         }
-        MPPP_MAYBE_TLS mpz_raii mpz;
+        MPPP_MAYBE_TLS detail::mpz_raii mpz;
         // Truncate the value when converting to integer.
         ::mpfr_get_z(&mpz.m_mpz, &m_mpfr, MPFR_RNDZ);
         rop = &mpz.m_mpz;
@@ -2129,7 +2138,8 @@ private:
         b = !zero_p();
         return true;
     }
-    template <typename T, enable_if_t<conjunction<is_integral<T>, is_unsigned<T>>::value, int> = 0>
+    template <typename T,
+              detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>>::value, int> = 0>
     bool dispatch_get(T &n) const
     {
         if (!number_p()) {
@@ -2137,7 +2147,8 @@ private:
         }
         return uint_conversion(n);
     }
-    template <typename T, enable_if_t<conjunction<is_integral<T>, is_signed<T>>::value, int> = 0>
+    template <typename T,
+              detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_signed<T>>::value, int> = 0>
     bool dispatch_get(T &n) const
     {
         if (!number_p()) {
@@ -2145,7 +2156,7 @@ private:
         }
         return sint_conversion(n);
     }
-    template <typename T, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    template <typename T, detail::enable_if_t<std::is_floating_point<T>::value, int> = 0>
     bool dispatch_get(T &x) const
     {
         x = static_cast<T>(*this);
@@ -2202,7 +2213,7 @@ public:
     std::string to_string(int base = 10) const
     {
         std::ostringstream oss;
-        mpfr_to_stream(&m_mpfr, oss, base);
+        detail::mpfr_to_stream(&m_mpfr, oss, base);
         return oss.str();
     }
     /// In-place square root.
@@ -2302,7 +2313,7 @@ public:
      */
     real &lgamma()
     {
-        real_lgamma_wrapper(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        detail::real_lgamma_wrapper(&m_mpfr, &m_mpfr, MPFR_RNDN);
         return *this;
     }
     /// Check if the value is an integer.
@@ -2324,7 +2335,7 @@ public:
      */
     real &trunc()
     {
-        check_real_trunc_arg(*this);
+        detail::check_real_trunc_arg(*this);
         ::mpfr_trunc(&m_mpfr, &m_mpfr);
         return *this;
     }
@@ -2336,7 +2347,7 @@ private:
 // Double check that real is a standard layout class.
 static_assert(std::is_standard_layout<real>::value, "real is not a standard layout class.");
 
-inline namespace detail
+namespace detail
 {
 
 // Implementation of the trunc() argument checker.
@@ -2349,24 +2360,24 @@ inline void check_real_trunc_arg(const real &r)
 } // namespace detail
 
 template <typename T, typename U>
-using are_real_op_types
-    = disjunction<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>,
-                  conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<uncvref_t<U>>>,
-                  conjunction<std::is_same<real, uncvref_t<U>>, is_real_interoperable<uncvref_t<T>>>>;
+using are_real_op_types = detail::disjunction<
+    detail::conjunction<std::is_same<real, detail::uncvref_t<T>>, std::is_same<real, detail::uncvref_t<U>>>,
+    detail::conjunction<std::is_same<real, detail::uncvref_t<T>>, is_real_interoperable<detail::uncvref_t<U>>>,
+    detail::conjunction<std::is_same<real, detail::uncvref_t<U>>, is_real_interoperable<detail::uncvref_t<T>>>>;
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 concept bool RealOpTypes = are_real_op_types<T, U>::value;
 #else
-using real_op_types_enabler = enable_if_t<are_real_op_types<T, U>::value, int>;
+using real_op_types_enabler = detail::enable_if_t<are_real_op_types<T, U>::value, int>;
 #endif
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool RealCompoundOpTypes = RealOpTypes<T, U> && !std::is_const<unref_t<T>>::value;
+concept bool RealCompoundOpTypes = RealOpTypes<T, U> && !std::is_const<detail::unref_t<T>>::value;
 #else
-using real_compound_op_types_enabler
-    = enable_if_t<conjunction<are_real_op_types<T, U>, negation<std::is_const<unref_t<T>>>>::value, int>;
+using real_compound_op_types_enabler = detail::enable_if_t<
+    detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value, int>;
 #endif
 
 /// Destructively set the precision of a \link mppp::real real\endlink.
@@ -2419,7 +2430,7 @@ inline mpfr_prec_t get_prec(const real &r)
     return r.get_prec();
 }
 
-inline namespace detail
+namespace detail
 {
 
 template <typename... Args>
@@ -2434,9 +2445,9 @@ using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &
 
 template <typename... Args>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool RealSetArgs = is_detected<real_set_t, Args...>::value;
+concept bool RealSetArgs = detail::is_detected<detail::real_set_t, Args...>::value;
 #else
-using real_set_args_enabler = enable_if_t<is_detected<real_set_t, Args...>::value, int>;
+using real_set_args_enabler = detail::enable_if_t<detail::is_detected<detail::real_set_t, Args...>::value, int>;
 #endif
 
 #endif
@@ -2601,7 +2612,7 @@ inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
     if (mppp_unlikely(!r.number_p())) {
         throw std::domain_error("Cannot extract the significand and the exponent of a non-finite real");
     }
-    MPPP_MAYBE_TLS mpz_raii m;
+    MPPP_MAYBE_TLS detail::mpz_raii m;
     ::mpfr_clear_erangeflag();
     auto retval = ::mpfr_get_z_2exp(&m.m_mpz, r.get_mpfr_t());
     // LCOV_EXCL_START
@@ -2617,7 +2628,7 @@ inline mpfr_exp_t get_z_2exp(integer<SSize> &n, const real &r)
 
 /** @} */
 
-inline namespace detail
+namespace detail
 {
 
 #if !defined(MPPP_DOXYGEN_INVOKED)
@@ -2828,7 +2839,7 @@ template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
 inline real &add(real &rop, T &&a, U &&b)
 {
-    return mpfr_nary_op(0, ::mpfr_add, rop, std::forward<T>(a), std::forward<U>(b));
+    return detail::mpfr_nary_op(0, ::mpfr_add, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 /// Ternary \link mppp::real real\endlink subtraction.
@@ -2849,7 +2860,7 @@ template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
 inline real &sub(real &rop, T &&a, U &&b)
 {
-    return mpfr_nary_op(0, ::mpfr_sub, rop, std::forward<T>(a), std::forward<U>(b));
+    return detail::mpfr_nary_op(0, ::mpfr_sub, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 /// Ternary \link mppp::real real\endlink multiplication.
@@ -2870,7 +2881,7 @@ template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
 inline real &mul(real &rop, T &&a, U &&b)
 {
-    return mpfr_nary_op(0, ::mpfr_mul, rop, std::forward<T>(a), std::forward<U>(b));
+    return detail::mpfr_nary_op(0, ::mpfr_mul, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 /// Ternary \link mppp::real real\endlink division.
@@ -2891,7 +2902,7 @@ template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
 inline real &div(real &rop, T &&a, U &&b)
 {
-    return mpfr_nary_op(0, ::mpfr_div, rop, std::forward<T>(a), std::forward<U>(b));
+    return detail::mpfr_nary_op(0, ::mpfr_div, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
 /// Quaternary \link mppp::real real\endlink fused multiply–add.
@@ -2913,7 +2924,7 @@ template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 #endif
 inline real &fma(real &rop, T &&a, U &&b, V &&c)
 {
-    return mpfr_nary_op(0, ::mpfr_fma, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
+    return detail::mpfr_nary_op(0, ::mpfr_fma, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
 /// Ternary \link mppp::real real\endlink fused multiply–add.
@@ -2936,7 +2947,7 @@ template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 #endif
 inline real fma(T &&a, U &&b, V &&c)
 {
-    return mpfr_nary_op_return(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
+    return detail::mpfr_nary_op_return(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
 /// Quaternary \link mppp::real real\endlink fused multiply–sub.
@@ -2958,7 +2969,7 @@ template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 #endif
 inline real &fms(real &rop, T &&a, U &&b, V &&c)
 {
-    return mpfr_nary_op(0, ::mpfr_fms, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
+    return detail::mpfr_nary_op(0, ::mpfr_fms, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
 /// Ternary \link mppp::real real\endlink fused multiply–sub.
@@ -2981,7 +2992,7 @@ template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
 #endif
 inline real fms(T &&a, U &&b, V &&c)
 {
-    return mpfr_nary_op_return(0, ::mpfr_fms, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
+    return detail::mpfr_nary_op_return(0, ::mpfr_fms, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
 /// Unary negation for \link mppp::real real\endlink.
@@ -2997,7 +3008,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real neg(T &&x)
 #endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_neg, std::forward<decltype(x)>(x));
+    return detail::mpfr_nary_op_return(0, ::mpfr_neg, std::forward<decltype(x)>(x));
 }
 
 /// Binary negation for \link mppp::real real\endlink.
@@ -3016,7 +3027,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real neg(real &rop, T &&x)
 #endif
 {
-    return mpfr_nary_op(0, ::mpfr_neg, rop, std::forward<decltype(x)>(x));
+    return detail::mpfr_nary_op(0, ::mpfr_neg, rop, std::forward<decltype(x)>(x));
 }
 
 /// Unary absolute value for \link mppp::real real\endlink.
@@ -3032,7 +3043,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real abs(T &&x)
 #endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_abs, std::forward<decltype(x)>(x));
+    return detail::mpfr_nary_op_return(0, ::mpfr_abs, std::forward<decltype(x)>(x));
 }
 
 /// Binary absolute value for \link mppp::real real\endlink.
@@ -3051,7 +3062,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real abs(real &rop, T &&x)
 #endif
 {
-    return mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<decltype(x)>(x));
+    return detail::mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<decltype(x)>(x));
 }
 
 /** @} */
@@ -3279,7 +3290,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &sqrt(real &rop, T &&op)
 {
-    return mpfr_nary_op(0, ::mpfr_sqrt, rop, std::forward<T>(op));
+    return detail::mpfr_nary_op(0, ::mpfr_sqrt, rop, std::forward<T>(op));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -3289,7 +3300,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real sqrt(T &&r)
 {
-    return mpfr_nary_op_return(0, ::mpfr_sqrt, std::forward<T>(r));
+    return detail::mpfr_nary_op_return(0, ::mpfr_sqrt, std::forward<T>(r));
 }
 
 // Reciprocal square root.
@@ -3300,7 +3311,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &rec_sqrt(real &rop, T &&op)
 {
-    return mpfr_nary_op(0, ::mpfr_rec_sqrt, rop, std::forward<T>(op));
+    return detail::mpfr_nary_op(0, ::mpfr_rec_sqrt, rop, std::forward<T>(op));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -3310,7 +3321,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real rec_sqrt(T &&r)
 {
-    return mpfr_nary_op_return(0, ::mpfr_rec_sqrt, std::forward<T>(r));
+    return detail::mpfr_nary_op_return(0, ::mpfr_rec_sqrt, std::forward<T>(r));
 }
 
 // Cubic root.
@@ -3321,7 +3332,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real &cbrt(real &rop, T &&op)
 {
-    return mpfr_nary_op(0, ::mpfr_cbrt, rop, std::forward<T>(op));
+    return detail::mpfr_nary_op(0, ::mpfr_cbrt, rop, std::forward<T>(op));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -3331,7 +3342,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real cbrt(T &&r)
 {
-    return mpfr_nary_op_return(0, ::mpfr_cbrt, std::forward<T>(r));
+    return detail::mpfr_nary_op_return(0, ::mpfr_cbrt, std::forward<T>(r));
 }
 
 #if MPFR_VERSION_MAJOR >= 4
@@ -3345,7 +3356,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real &rootn_ui(real &rop, T &&op, unsigned long k)
 {
     auto rootn_ui_wrapper = [k](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_rootn_ui(r, o, k, rnd); };
-    return mpfr_nary_op(0, rootn_ui_wrapper, rop, std::forward<T>(op));
+    return detail::mpfr_nary_op(0, rootn_ui_wrapper, rop, std::forward<T>(op));
 }
 
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -3357,7 +3368,7 @@ inline real rootn_ui(T &&r, unsigned long k)
 {
     auto rootn_ui_wrapper
         = [k](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_rootn_ui(rop, op, k, rnd); };
-    return mpfr_nary_op_return(0, rootn_ui_wrapper, std::forward<T>(r));
+    return detail::mpfr_nary_op_return(0, rootn_ui_wrapper, std::forward<T>(r));
 }
 
 #endif
@@ -3385,17 +3396,17 @@ template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
 inline real &pow(real &rop, T &&op1, U &&op2)
 {
-    return mpfr_nary_op(0, ::mpfr_pow, rop, std::forward<T>(op1), std::forward<U>(op2));
+    return detail::mpfr_nary_op(0, ::mpfr_pow, rop, std::forward<T>(op1), std::forward<U>(op2));
 }
 
-inline namespace detail
+namespace detail
 {
 
 template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
 inline real dispatch_pow(T &&op1, U &&op2)
 {
-    return mpfr_nary_op_return(0, ::mpfr_pow, std::forward<T>(op1), std::forward<U>(op2));
+    return detail::mpfr_nary_op_return(0, ::mpfr_pow, std::forward<T>(op1), std::forward<U>(op2));
 }
 
 template <typename T, typename U,
@@ -3445,7 +3456,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real pow(T &&op1, U &&op2)
 #endif
 {
-    return dispatch_pow(std::forward<decltype(op1)>(op1), std::forward<decltype(op2)>(op2));
+    return detail::dispatch_pow(std::forward<decltype(op1)>(op1), std::forward<decltype(op2)>(op2));
 }
 
 /** @} */
@@ -3472,7 +3483,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real &sin(real &rop, T &&op)
 #endif
 {
-    return mpfr_nary_op(0, ::mpfr_sin, rop, std::forward<decltype(op)>(op));
+    return detail::mpfr_nary_op(0, ::mpfr_sin, rop, std::forward<decltype(op)>(op));
 }
 
 /// Unary \link mppp::real real\endlink sine.
@@ -3492,7 +3503,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real sin(T &&r)
 #endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_sin, std::forward<decltype(r)>(r));
+    return detail::mpfr_nary_op_return(0, ::mpfr_sin, std::forward<decltype(r)>(r));
 }
 
 /// Binary \link mppp::real real\endlink cosine.
@@ -3513,7 +3524,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real &cos(real &rop, T &&op)
 #endif
 {
-    return mpfr_nary_op(0, ::mpfr_cos, rop, std::forward<decltype(op)>(op));
+    return detail::mpfr_nary_op(0, ::mpfr_cos, rop, std::forward<decltype(op)>(op));
 }
 
 /// Unary \link mppp::real real\endlink cosine.
@@ -3533,7 +3544,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real cos(T &&r)
 #endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_cos, std::forward<decltype(r)>(r));
+    return detail::mpfr_nary_op_return(0, ::mpfr_cos, std::forward<decltype(r)>(r));
 }
 
 /** @} */
@@ -3560,7 +3571,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real &exp(real &rop, T &&op)
 #endif
 {
-    return mpfr_nary_op(0, ::mpfr_exp, rop, std::forward<decltype(op)>(op));
+    return detail::mpfr_nary_op(0, ::mpfr_exp, rop, std::forward<decltype(op)>(op));
 }
 
 /// Unary \link mppp::real real\endlink exponential.
@@ -3580,7 +3591,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real exp(T &&r)
 #endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_exp, std::forward<decltype(r)>(r));
+    return detail::mpfr_nary_op_return(0, ::mpfr_exp, std::forward<decltype(r)>(r));
 }
 
 /** @} */
@@ -3607,7 +3618,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real &gamma(real &rop, T &&op)
 #endif
 {
-    return mpfr_nary_op(0, ::mpfr_gamma, rop, std::forward<decltype(op)>(op));
+    return detail::mpfr_nary_op(0, ::mpfr_gamma, rop, std::forward<decltype(op)>(op));
 }
 
 /// Unary \link mppp::real real\endlink Gamma function.
@@ -3627,7 +3638,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real gamma(T &&r)
 #endif
 {
-    return mpfr_nary_op_return(0, ::mpfr_gamma, std::forward<decltype(r)>(r));
+    return detail::mpfr_nary_op_return(0, ::mpfr_gamma, std::forward<decltype(r)>(r));
 }
 
 /// Binary \link mppp::real real\endlink logarithm of the absolute value of the Gamma function.
@@ -3648,7 +3659,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real &lgamma(real &rop, T &&op)
 #endif
 {
-    return mpfr_nary_op(0, real_lgamma_wrapper, rop, std::forward<decltype(op)>(op));
+    return detail::mpfr_nary_op(0, detail::real_lgamma_wrapper, rop, std::forward<decltype(op)>(op));
 }
 
 /// Unary \link mppp::real real\endlink logarithm of the absolute value of the Gamma function.
@@ -3668,7 +3679,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real lgamma(T &&r)
 #endif
 {
-    return mpfr_nary_op_return(0, real_lgamma_wrapper, std::forward<decltype(r)>(r));
+    return detail::mpfr_nary_op_return(0, detail::real_lgamma_wrapper, std::forward<decltype(r)>(r));
 }
 
 /** @} */
@@ -3699,13 +3710,13 @@ inline real lgamma(T &&r)
  */
 inline std::ostream &operator<<(std::ostream &os, const real &r)
 {
-    mpfr_to_stream(r.get_mpfr_t(), os, 10);
+    detail::mpfr_to_stream(r.get_mpfr_t(), os, 10);
     return os;
 }
 
 /** @} */
 
-inline namespace detail
+namespace detail
 {
 
 template <typename F>
@@ -3714,10 +3725,10 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
     ::mpfr_prec_t prec;
     if (p) {
         if (mppp_unlikely(!real_prec_check(p))) {
-            throw std::invalid_argument("Cannot init a real constant with a precision of " + mppp::to_string(p)
+            throw std::invalid_argument("Cannot init a real constant with a precision of " + detail::to_string(p)
                                         + ": the value must be either zero or between "
-                                        + mppp::to_string(real_prec_min()) + " and "
-                                        + mppp::to_string(real_prec_max()));
+                                        + detail::to_string(real_prec_min()) + " and "
+                                        + detail::to_string(real_prec_max()));
         }
         prec = p;
     } else {
@@ -3757,7 +3768,7 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
  */
 inline real real_pi(::mpfr_prec_t p = 0)
 {
-    return real_constant(::mpfr_const_pi, p);
+    return detail::real_constant(::mpfr_const_pi, p);
 }
 
 /// Set \link mppp::real real\endlink to \f$\pi\f$.
@@ -3812,8 +3823,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real &trunc(real &rop, T &&op)
 #endif
 {
-    check_real_trunc_arg(op);
-    return mpfr_nary_op_nornd(0, ::mpfr_trunc, rop, std::forward<decltype(op)>(op));
+    detail::check_real_trunc_arg(op);
+    return detail::mpfr_nary_op_nornd(0, ::mpfr_trunc, rop, std::forward<decltype(op)>(op));
 }
 
 /// Unary \link mppp::real real\endlink truncation.
@@ -3835,8 +3846,8 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real trunc(T &&r)
 #endif
 {
-    check_real_trunc_arg(r);
-    return mpfr_nary_op_return_nornd(0, ::mpfr_trunc, std::forward<decltype(r)>(r));
+    detail::check_real_trunc_arg(r);
+    return detail::mpfr_nary_op_return_nornd(0, ::mpfr_trunc, std::forward<decltype(r)>(r));
 }
 
 /** @} */
@@ -3865,7 +3876,7 @@ inline real operator+(T &&r)
     return std::forward<decltype(r)>(r);
 }
 
-inline namespace detail
+namespace detail
 {
 
 template <typename T, typename U,
@@ -3928,7 +3939,7 @@ inline real operator+(T &&a, U &&b)
     return dispatch_binary_add(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
-inline namespace detail
+namespace detail
 {
 
 template <typename T, typename U,
@@ -4039,7 +4050,7 @@ template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &a, U &&b)
 #endif
 {
-    dispatch_in_place_add(a, std::forward<decltype(b)>(b));
+    detail::dispatch_in_place_add(a, std::forward<decltype(b)>(b));
     return a;
 }
 
@@ -4093,7 +4104,7 @@ inline real operator-(T &&r)
     return retval;
 }
 
-inline namespace detail
+namespace detail
 {
 
 template <typename T, typename U,
@@ -4153,7 +4164,7 @@ inline real operator-(T &&a, U &&b)
     return dispatch_binary_sub(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
-inline namespace detail
+namespace detail
 {
 
 template <typename T, typename U,
@@ -4236,11 +4247,11 @@ template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &a, U &&b)
 #endif
 {
-    dispatch_in_place_sub(a, std::forward<decltype(b)>(b));
+    detail::dispatch_in_place_sub(a, std::forward<decltype(b)>(b));
     return a;
 }
 
-inline namespace detail
+namespace detail
 {
 
 template <typename T, typename U,
@@ -4328,7 +4339,7 @@ inline real operator*(T &&a, U &&b)
     return dispatch_binary_mul(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
-inline namespace detail
+namespace detail
 {
 
 template <typename T, typename U,
@@ -4415,7 +4426,7 @@ inline T &operator*=(T &a, U &&b)
     return a;
 }
 
-inline namespace detail
+namespace detail
 {
 
 template <typename T, typename U,
@@ -4475,7 +4486,7 @@ inline real operator/(T &&a, U &&b)
     return dispatch_binary_div(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
-inline namespace detail
+namespace detail
 {
 
 template <typename T, typename U,
@@ -4562,7 +4573,7 @@ inline T &operator/=(T &a, U &&b)
     return a;
 }
 
-inline namespace detail
+namespace detail
 {
 
 // Common dispatch functions for comparison operators involving real.
@@ -4624,7 +4635,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &a, const U &b)
 #endif
 {
-    return dispatch_real_comparison(::mpfr_equal_p, a, b);
+    return detail::dispatch_real_comparison(::mpfr_equal_p, a, b);
 }
 
 /// Inequality operator involving \link mppp::real real\endlink.

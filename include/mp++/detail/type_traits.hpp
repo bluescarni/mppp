@@ -17,7 +17,7 @@
 namespace mppp
 {
 
-inline namespace detail
+namespace detail
 {
 
 // A bunch of useful utilities from C++14/C++17.
