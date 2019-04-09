@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     
-    <title>Input and output &#8212; mp++ 0.13 documentation</title>
+    <title>Input and output &#8212; mp++ 0.14 documentation</title>
 
     <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -200,34 +200,27 @@ Show Source
         
   <div class="section" id="input-and-output">
 <h1>Input and output<a class="headerlink" href="#input-and-output" title="Permalink to this headline">¶</a></h1>
-<p>All of mp++’s multiprecision classes support stream insertion and extraction. E.g., values can be printed
-to screen in the canonical C++ way:</p>
+<p>All of mp++’s multiprecision classes support stream insertion:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>        <span class="c1">// &quot;42&quot;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">rat_t</span><span class="p">{</span><span class="o">-</span><span class="mi">6</span><span class="o">/</span><span class="mi">7</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>      <span class="c1">// &quot;-6/7&quot;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">real128</span><span class="p">{</span><span class="s">&quot;1.1&quot;</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>   <span class="c1">// &quot;1.10000000000000000000000000000000008e+00&quot;</span>
 <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">real</span><span class="p">{</span><span class="s">&quot;1.3&quot;</span><span class="p">,</span> <span class="mi">150</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span> <span class="c1">// &quot;1.3000000000000000000000000000000000000000000006&quot;</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">A current limitation of all stream insertion operators is that they ignore any formatting flag that may be set in the stream
-object. This limitation will be lifted in the future.</p>
-</div>
-<p>Stream extraction is equivalent to construction from string:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">istringstream</span> <span class="n">iss</span><span class="p">;</span>
+<p>Starting from mp++ 0.14, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>
+honour the format flags in output streams:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iomanip&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;ios&gt;</span><span class="cp"></span>
 
-<span class="n">int_t</span> <span class="n">n</span><span class="p">;</span>
-<span class="n">iss</span><span class="p">.</span><span class="n">str</span><span class="p">(</span><span class="s">&quot;123&quot;</span><span class="p">);</span>
-<span class="n">iss</span> <span class="o">&gt;&gt;</span> <span class="n">n</span><span class="p">;</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">123</span><span class="p">);</span>
-<span class="n">iss</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
-
-<span class="n">rat_t</span> <span class="n">q</span><span class="p">;</span>
-<span class="n">iss</span><span class="p">.</span><span class="n">str</span><span class="p">(</span><span class="s">&quot;1/3&quot;</span><span class="p">);</span>
-<span class="n">iss</span> <span class="o">&gt;&gt;</span> <span class="n">q</span><span class="p">;</span>
-<span class="n">assert</span><span class="p">((</span><span class="n">q</span> <span class="o">==</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">}));</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">hex</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">showbase</span> <span class="o">&lt;&lt;</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span> <span class="c1">// &quot;0x2a&quot;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">oct</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">showbase</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">showpos</span>
+          <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setw</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setfill</span><span class="p">(</span><span class="sc">&#39;*&#39;</span><span class="p">)</span>
+          <span class="o">&lt;&lt;</span> <span class="n">int_t</span><span class="p">{</span><span class="mi">42</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>                              <span class="c1">// &quot;******+052&quot;</span>
+<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">hex</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">showbase</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">uppercase</span>
+          <span class="o">&lt;&lt;</span> <span class="n">rat_t</span><span class="p">{</span><span class="mi">227191947ll</span><span class="p">,</span> <span class="mi">13</span><span class="p">}</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>                 <span class="c1">// &quot;0XD8AAC8B/0XD&quot;</span>
 </pre></div>
 </div>
+<p>In future versions of mp++, the floating-point classes will also honour the format flags in output streams.</p>
 <p>All of mp++’s multiprecision classes also provide <code class="docutils literal notranslate"><span class="pre">to_string()</span></code> member functions that convert the multiprecision
 values into string representations (see, e.g., <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer9to_stringEi" title="mppp::integer::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::to_string()</span></code></a>, <a class="reference internal" href="rational.html#_CPPv4NK4mppp8rational9to_stringEi" title="mppp::rational::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::to_string()</span></code></a>,
 etc.). These member functions always return an “exact” string representation of the multiprecision value: feeding back

@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     
-    <title>Quadruple-precision floats &#8212; mp++ 0.13 documentation</title>
+    <title>Quadruple-precision floats &#8212; mp++ 0.14 documentation</title>
 
     <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -1793,6 +1793,34 @@ after the conversion of one of the operands to <a class="reference internal" hre
 </dd></dl>
 
 </div>
+<div class="section" id="floating-point-manipulation">
+<span id="real128-fpmanip"></span><h3>Floating-point manipulation<a class="headerlink" href="#floating-point-manipulation" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="_CPPv49nextafterRKN4mppp7real128ERKN4mppp7real128E">
+<span id="_CPPv39nextafterRKN4mppp7real128ERKN4mppp7real128E"></span><span id="_CPPv29nextafterRKN4mppp7real128ERKN4mppp7real128E"></span><span id="nextafter__mppp::real128CR.mppp::real128CR"></span>mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descname">nextafter</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>from</em>, <em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>to</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49nextafterRKN4mppp7real128ERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified">New in version 0.14.</span></p>
+</div>
+<p>This function returns the next representable value of <em>from</em> in the direction of <em>to</em>.</p>
+<p>If <em>from</em> equals to <em>to</em>, <em>to</em> is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>from</strong> – the <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> whose next representable value will be returned.</li>
+<li><strong>to</strong> – the direction of the next representable value.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the next representable value of <em>from</em> in the direction of <em>to</em>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="input-output">
 <span id="real128-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
@@ -1827,32 +1855,9 @@ library if precise and forward-compatible control on the printing format is need
 </p>
 </dd></dl>
 
-<dl class="function">
-<dt id="_CPPv4N4mppprsERNSt7istreamER7real128">
-<span id="_CPPv3N4mppprsERNSt7istreamER7real128"></span><span id="_CPPv2N4mppprsERNSt7istreamER7real128"></span><span id="mppp::rshift-operator__isR.real128R"></span><span class="target" id="group__real128__io_1ga13d0b74a5d7c3c8441939f0813c27b2d"></span>std::istream &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span>std::istream &amp;<em>is</em>, <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppprsERNSt7istreamER7real128" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Input stream operator. </p>
-<p>This operator is equivalent to extracting a line from the stream and assigning it to <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">is</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">is</span></code>: the input stream. </li>
-<li><code class="docutils literal notranslate"><span class="pre">x</span></code>: the <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a> to which the string extracted from the stream will be assigned.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1real128"><span class="std std-ref">real128</span></a>’s assignment operator from string. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
 </div>
 <div class="section" id="other">
-<span id="real128-operators"></span><h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
+<h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="_CPPv4N4mppp4hashERKN4mppp7real128E">
 <span id="_CPPv3N4mppp4hashERKN4mppp7real128E"></span><span id="_CPPv2N4mppp4hashERKN4mppp7real128E"></span><span id="mppp::hash__mppp::real128CR"></span>std::size_t <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">hash</code><span class="sig-paren">(</span><em class="property">const</em> mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4hashERKN4mppp7real128E" title="Permalink to this definition">¶</a><br /></dt>
@@ -1877,7 +1882,7 @@ guarantees that <code class="docutils literal notranslate"><span class="pre">x</
 </div>
 </div>
 <div class="section" id="mathematical-operators">
-<h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
+<span id="real128-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="_CPPv4N4mpppplE7real128">
 <span id="_CPPv3N4mpppplE7real128"></span><span id="_CPPv2N4mpppplE7real128"></span><span id="mppp::add-operator__real128CE"></span><span class="target" id="group__real128__operators_1ga11aa474412513c25bcaa56fa9df53864"></span><em class="property">constexpr</em> <a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator+</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mpppplE7real128" title="Permalink to this definition">¶</a><br /></dt>
@@ -3117,6 +3122,7 @@ from the quadmath library.</p>
 <li><a class="reference internal" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
 <li><a class="reference internal" href="#gamma-functions">Gamma functions</a></li>
 <li><a class="reference internal" href="#other-special-functions">Other special functions</a></li>
+<li><a class="reference internal" href="#floating-point-manipulation">Floating-point manipulation</a></li>
 <li><a class="reference internal" href="#input-output">Input/Output</a></li>
 <li><a class="reference internal" href="#other">Other</a></li>
 </ul>

@@ -281,8 +281,19 @@ Roots
 Input/Output
 ~~~~~~~~~~~~
 
-.. doxygengroup:: integer_io
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> std::ostream &mppp::operator<<(std::ostream &os, const mppp::integer<SSize> &n)
+
+   Stream insertion operator.
+
+   This function will direct to the output stream *os* the input :cpp:class:`~mppp::integer` *n*.
+
+   :param os: the output stream.
+   :param n: the input :cpp:class:`~mppp::integer`.
+
+   :return: a reference to *os*.
+
+   :exception std\:\:overflow_error: in case of (unlikely) overflow errors.
+   :exception unspecified: any exception raised by the public interface of ``std::ostream`` or by memory allocation errors.
 
 .. _integer_s11n:
 

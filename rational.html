@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     
-    <title>Multiprecision rationals &#8212; mp++ 0.13 documentation</title>
+    <title>Multiprecision rationals &#8212; mp++ 0.14 documentation</title>
 
     <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -1395,50 +1395,31 @@ only in a few special cases (e.g., unitary base, zero exponent, etc.).</p>
 <div class="section" id="input-output">
 <span id="rational-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERK8rationalI5SSizeE">
-<span id="_CPPv3I_NSt6size_tEEN4mppplsERNSt7ostreamERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppplsERNSt7ostreamERK8rationalI5SSizeE"></span><span class="target" id="group__rational__io_1ga921345f6ebee5dd32dad109bebe469d6"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />std::ostream &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span>std::ostream &amp;<em>os</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERK7integerI5SSizeE" title="mppp::operator&lt;&lt;::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Output stream operator. </p>
-<p>This operator will print to the stream <code class="docutils literal notranslate"><span class="pre">os</span></code> the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> <code class="docutils literal notranslate"><span class="pre">q</span></code> in base 10.
-The printing format is described in <a class="reference internal" href="#_CPPv4NK4mppp8rational9to_stringEi" title="mppp::rational::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::to_string()</span></code></a>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">os</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">os</span></code>: the target stream. </li>
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input rational.</li>
+<dt id="_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp8rationalI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppplsERNSt7ostreamERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppplsERNSt7ostreamERKN4mppp8rationalI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />std::ostream &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span>std::ostream &amp;<em>os</em>, <em class="property">const</em> mppp::rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp7integerI5SSizeEE" title="mppp::operator&lt;&lt;::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Stream insertion operator.</p>
+<p>This function will direct to the output stream <em>os</em> the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> <em>q</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>os</strong> – the output stream.</li>
+<li><strong>q</strong> – the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</li>
 </ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1rational_1a021f2a3687c0cf9a56c3484a514776e9"><span class="std std-ref">mppp::rational::to_string()</span></a>. </li>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a reference to <em>os</em>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Throws:</th><td class="field-body"><ul class="first last simple">
+<li><strong>std::overflow_error</strong> – in case of (unlikely) overflow errors.</li>
+<li><strong>unspecified</strong> – any exception raised by the public interface of <code class="docutils literal notranslate"><span class="pre">std::ostream</span></code> or by memory allocation errors.</li>
 </ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv4I_NSt6size_tEEN4mppprsERNSt7istreamERNSt7istreamER8rationalI5SSizeE">
-<span id="_CPPv3I_NSt6size_tEEN4mppprsERNSt7istreamER8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppprsERNSt7istreamER8rationalI5SSizeE"></span><span class="target" id="group__rational__io_1gae10c345ac27825e91c56afdf16298cb9"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />std::istream &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span>std::istream &amp;<em>is</em>, rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppprsERNSt7istreamERNSt7istreamER7integerI5SSizeE" title="mppp::operator&gt;&gt;::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppprsERNSt7istreamERNSt7istreamER8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Input stream operator. </p>
-<p>This operator is equivalent to extracting a line from the stream and assigning it to <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">is</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">is</span></code>: the input stream. </li>
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational to which the string extracted from the stream will be assigned.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>’s assignment operator from string. </li>
-</ul>
-</dd>
-</dl>
-</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

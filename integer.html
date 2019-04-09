@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     
-    <title>Multiprecision integers &#8212; mp++ 0.13 documentation</title>
+    <title>Multiprecision integers &#8212; mp++ 0.14 documentation</title>
 
     <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -2703,50 +2703,31 @@ with <span class="math notranslate nohighlight">\(b&gt;1\)</span>, such that <em
 <div class="section" id="input-output">
 <span id="integer-io"></span><h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERK7integerI5SSizeE">
-<span id="_CPPv3I_NSt6size_tEEN4mppplsERNSt7ostreamERK7integerI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppplsERNSt7ostreamERK7integerI5SSizeE"></span><span class="target" id="group__integer__io_1ga90771c4de2dd8ad755de2227ef6e893e"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />std::ostream &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span>std::ostream &amp;<em>os</em>, <em class="property">const</em> integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERK7integerI5SSizeE" title="mppp::operator&lt;&lt;::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Output stream operator. </p>
-<p>This operator will print to the stream <code class="docutils literal notranslate"><span class="pre">os</span></code> the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> <code class="docutils literal notranslate"><span class="pre">n</span></code> in base 10. Internally it uses
-the <a class="reference internal" href="#_CPPv4NK4mppp7integer9to_stringEi" title="mppp::integer::to_string"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::to_string()</span></code></a> method.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">os</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">os</span></code>: the target stream. </li>
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: the input integer.</li>
+<dt id="_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppplsERNSt7ostreamERKN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppplsERNSt7ostreamERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />std::ostream &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span>std::ostream &amp;<em>os</em>, <em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp7integerI5SSizeEE" title="mppp::operator&lt;&lt;::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Stream insertion operator.</p>
+<p>This function will direct to the output stream <em>os</em> the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> <em>n</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>os</strong> – the output stream.</li>
+<li><strong>n</strong> – the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</li>
 </ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1integer_1a44da76950f17f77a05e95e1f1581266c"><span class="std std-ref">integer::to_string()</span></a>. </li>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a reference to <em>os</em>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Throws:</th><td class="field-body"><ul class="first last simple">
+<li><strong>std::overflow_error</strong> – in case of (unlikely) overflow errors.</li>
+<li><strong>unspecified</strong> – any exception raised by the public interface of <code class="docutils literal notranslate"><span class="pre">std::ostream</span></code> or by memory allocation errors.</li>
 </ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv4I_NSt6size_tEEN4mppprsERNSt7istreamERNSt7istreamER7integerI5SSizeE">
-<span id="_CPPv3I_NSt6size_tEEN4mppprsERNSt7istreamER7integerI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppprsERNSt7istreamER7integerI5SSizeE"></span><span class="target" id="group__integer__io_1gaaae96c4c6dac642c2fffcb9169b27670"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />std::istream &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span>std::istream &amp;<em>is</em>, integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppprsERNSt7istreamERNSt7istreamER7integerI5SSizeE" title="mppp::operator&gt;&gt;::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppprsERNSt7istreamERNSt7istreamER7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Input stream operator. </p>
-<p>This operator is equivalent to extracting a line from the stream and assigning it to <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">is</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">is</span></code>: the input stream. </li>
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: the integer to which the string extracted from the stream will be assigned.</li>
-</ul>
-</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>’s assignment operator from string. </li>
-</ul>
-</dd>
-</dl>
-</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -3208,7 +3189,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
 <dl class="function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppplsE7integerI5SSizeERK7integerI5SSizeE24CppIntegralInteroperable">
-<span id="_CPPv3I_NSt6size_tEEN4mppplsERK7integerI5SSizeE24CppIntegralInteroperable"></span><span id="_CPPv2I_NSt6size_tEEN4mppplsERK7integerI5SSizeE24CppIntegralInteroperable"></span><span class="target" id="group__integer__operators_1ga9a06a8b20d10c3663ef753ea5f7bd439"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERK7integerI5SSizeE" title="mppp::operator&lt;&lt;::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span><em class="property">const</em> integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERK7integerI5SSizeE" title="mppp::operator&lt;&lt;::SSize">SSize</a>&gt; &amp;<em>n</em>, <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable">CppIntegralInteroperable</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppplsE7integerI5SSizeERK7integerI5SSizeE24CppIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3I_NSt6size_tEEN4mppplsERK7integerI5SSizeE24CppIntegralInteroperable"></span><span id="_CPPv2I_NSt6size_tEEN4mppplsERK7integerI5SSizeE24CppIntegralInteroperable"></span><span class="target" id="group__integer__operators_1ga9a06a8b20d10c3663ef753ea5f7bd439"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp7integerI5SSizeEE" title="mppp::operator&lt;&lt;::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span><em class="property">const</em> integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp7integerI5SSizeEE" title="mppp::operator&lt;&lt;::SSize">SSize</a>&gt; &amp;<em>n</em>, <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable">CppIntegralInteroperable</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppplsE7integerI5SSizeERK7integerI5SSizeE24CppIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary left shift operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -3252,7 +3233,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
 <dl class="function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppprsE7integerI5SSizeERK7integerI5SSizeE24CppIntegralInteroperable">
-<span id="_CPPv3I_NSt6size_tEEN4mppprsERK7integerI5SSizeE24CppIntegralInteroperable"></span><span id="_CPPv2I_NSt6size_tEEN4mppprsERK7integerI5SSizeE24CppIntegralInteroperable"></span><span class="target" id="group__integer__operators_1gaf64dc03eb9f14dc19995befcfb490025"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppprsERNSt7istreamERNSt7istreamER7integerI5SSizeE" title="mppp::operator&gt;&gt;::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span><em class="property">const</em> integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppprsERNSt7istreamERNSt7istreamER7integerI5SSizeE" title="mppp::operator&gt;&gt;::SSize">SSize</a>&gt; &amp;<em>n</em>, <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable">CppIntegralInteroperable</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppprsE7integerI5SSizeERK7integerI5SSizeE24CppIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3I_NSt6size_tEEN4mppprsERK7integerI5SSizeE24CppIntegralInteroperable"></span><span id="_CPPv2I_NSt6size_tEEN4mppprsERK7integerI5SSizeE24CppIntegralInteroperable"></span><span class="target" id="group__integer__operators_1gaf64dc03eb9f14dc19995befcfb490025"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppprsE7integerI5SSizeERK7integerI5SSizeE24CppIntegralInteroperable" title="mppp::operator&gt;&gt;::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;&gt;</code><span class="sig-paren">(</span><em class="property">const</em> integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppprsE7integerI5SSizeERK7integerI5SSizeE24CppIntegralInteroperable" title="mppp::operator&gt;&gt;::SSize">SSize</a>&gt; &amp;<em>n</em>, <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable">CppIntegralInteroperable</a> <em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppprsE7integerI5SSizeERK7integerI5SSizeE24CppIntegralInteroperable" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary right shift operator. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
