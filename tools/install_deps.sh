@@ -35,10 +35,6 @@ if [[ "${MPPP_BUILD}" != DebugGCC48DebugGMP* && "${MPPP_BUILD}" != Coverage32GCC
         conda_pkgs="$conda_pkgs boost-cpp"
     fi
 
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-        conda_pkgs="$conda_pkgs clangdev"
-    fi
-
     conda create -q -p $deps_dir -y $conda_pkgs
     source activate $deps_dir
 fi
