@@ -115,7 +115,7 @@ inline std::string typeid_name_wrap()
     return typeid(T).name();
 }
 
-#if defined(MPPP_HAVE_GCC_INT128) && defined(__apple_build_version__)
+#if defined(MPPP_HAVE_GCC_INT128) && defined(__APPLE__)
 
 // NOTE: it seems like on OSX typeid() is not working properly for 128-bit ints, hence
 // we re-implement the functionality via the wrapper. Here we use the type names
