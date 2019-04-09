@@ -71,7 +71,7 @@ using is_cpp_floating_point_interoperable
     = detail::conjunction<std::is_same<detail::remove_cv_t<T>, T>, std::is_floating_point<T>
 #if !defined(MPPP_WITH_MPFR)
                           ,
-                          negation<std::is_same<T, long double>>
+                          detail::negation<std::is_same<T, long double>>
 #endif
                           >;
 
