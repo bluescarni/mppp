@@ -32,16 +32,11 @@ include(CheckCXXCompilerFlag)
 # Assemble the flags.
 set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
 set(MPPP_CXX_FLAGS_RELEASE ${YACMA_CXX_FLAGS})
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND YACMA_COMPILER_IS_CLANGXX)
-  message(STATUS "Clang compiler on OSX detected, setting the standard library to 'libc++'.")
-  list(APPEND MPPP_CXX_FLAGS_DEBUG "-stdlib=libc++")
-  list(APPEND MPPP_CXX_FLAGS_RELEASE "-stdlib=libc++")
-endif()
 if(YACMA_COMPILER_IS_MSVC)
   # Disable the idiotic minmax macros on MSVC, some annoying warnings,
-  # and enable the bigobj option.
-  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
-  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
+  # and enable the bigobj option. Enable also strict conformance mode.
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj" "/permissive-")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj" "/permissive-")
   if(YACMA_COMPILER_IS_CLANGXX)
     # clang-cl emits various warnings from GMP/MPFR, let's just silence them.
     # NOTE: at one point in the recent past, MSVC added an options similar to GCC's isystem:
@@ -77,8 +72,39 @@ if(YACMA_COMPILER_IS_GNUCXX)
     check_cxx_compiler_flag("-fconcepts" MPPP_COMPILER_SUPPORTS_CONCEPTS)
 endif()
 
-# Setup of the mp++ interface library.
-add_library(mp++ INTERFACE)
+# Initial setup of the mp++ target.
+set(MPPP_SRC_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/demangle.cpp"
+)
+
+# Setup of the mp++ library.
+add_library(mp++ SHARED "${MPPP_SRC_FILES}")
+set_property(TARGET mp++ PROPERTY VERSION "${mp++_VERSION_MAJOR}.${mp++_VERSION_MINOR}")
+set_property(TARGET mp++ PROPERTY SOVERSION 0 )
+set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
+target_compile_options(mp++ PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
+set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
+set_target_properties(mp++ PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
+# NOTE: for clang-cl, cmake tries to set -std=c++11 here, which makes
+# it error out. Disable it as MSVC 2015 is implicitly C++14 anyway.
+if(NOT (YACMA_COMPILER_IS_MSVC AND YACMA_COMPILER_IS_CLANGXX))
+    # Let's setup the target C++ standard, but only if the user did not provide it manually.
+    if(NOT CMAKE_CXX_STANDARD)
+        if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
+            # NOTE: the idea here is that we want to use C++14 if the compilers supports
+            # concepts (as variable concepts are essentially template variables).
+            set_property(TARGET mp++ PROPERTY CXX_STANDARD 14)
+        else()
+            set_property(TARGET mp++ PROPERTY CXX_STANDARD 11)
+        endif()
+    endif()
+    set_property(TARGET mp++ PROPERTY CXX_STANDARD_REQUIRED YES)
+    set_property(TARGET mp++ PROPERTY CXX_EXTENSIONS NO)
+endif()
+target_include_directories(mp++ PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
 
 # Find GMP first of all. We will make mp++ link to the imported
 # target later, because of linker sensitivity to the linking order
@@ -88,7 +114,7 @@ find_package(GMP REQUIRED)
 # Optional dependency on MPFR.
 if(MPPP_WITH_MPFR)
     find_package(MPFR REQUIRED)
-    target_link_libraries(mp++ INTERFACE MPFR::MPFR)
+    target_link_libraries(mp++ PUBLIC MPFR::MPFR)
     set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
 
@@ -101,26 +127,20 @@ if(MPPP_WITH_QUADMATH)
     endif()
     unset(_MPPP_FLOAT128_EXISTS)
     find_package(Quadmath REQUIRED)
-    target_link_libraries(mp++ INTERFACE Quadmath::quadmath)
+    target_link_libraries(mp++ PUBLIC Quadmath::quadmath)
     set(MPPP_ENABLE_QUADMATH "#define MPPP_WITH_QUADMATH")
 endif()
 
 # Mandatory dependency on GMP.
 # NOTE: depend on GMP *after* optionally depending on MPFR, as the order
 # of the libraries matters on some platforms.
-target_link_libraries(mp++ INTERFACE GMP::GMP)
+target_link_libraries(mp++ PUBLIC GMP::GMP)
 
 # Depend on DbgHelp on MSVC, for the demangling support.
 if(YACMA_COMPILER_IS_MSVC)
     find_package(DbgHelp REQUIRED)
-    target_link_libraries(mp++ INTERFACE DbgHelp::DbgHelp)
+    target_link_libraries(mp++ PUBLIC DbgHelp::DbgHelp)
 endif()
-
-# Finish setting up the mp++ interface target.
-target_include_directories(mp++ INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
 
 # Configure config.hpp.
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in" "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" @ONLY)
@@ -151,12 +171,13 @@ install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION lib/cmake/mp++)
 # Take care of versioning.
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" VERSION ${mp++_VERSION}
-	COMPATIBILITY SameMajorVersion)
+	COMPATIBILITY ExactVersion)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATION "lib/cmake/mp++")
 
 # Installation of the header files.
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" DESTINATION include)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" DESTINATION include/mp++)
+install(TARGETS mp++ DESTINATION lib)
 
 # This is just a simple counter variable, internal use only.
 set(_MPPP_TEST_NUM "0")
