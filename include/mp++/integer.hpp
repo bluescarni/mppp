@@ -3348,16 +3348,17 @@ template <std::size_t SSize>
 struct is_integer<integer<SSize>> : std::true_type {
 };
 
+} // namespace detail
+
 template <typename T, typename U>
-using are_integer_op_types = is_detected<integer_common_t, T, U>;
+using are_integer_op_types = detail::is_detected<detail::integer_common_t, T, U>;
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
 concept bool IntegerOpTypes = are_integer_op_types<T, U>::value;
 #else
-using integer_op_types_enabler = enable_if_t<are_integer_op_types<T, U>::value, int>;
+using integer_op_types_enabler = detail::enable_if_t<are_integer_op_types<T, U>::value, int>;
 #endif
-} // namespace detail
 
 template <typename T, typename U>
 using are_integer_integral_op_types
@@ -8036,7 +8037,7 @@ inline detail::integer_common_t<T, U> operator+(const T &op1, const U &op2)
 template <typename T>
 inline auto &operator+=(IntegerOpTypes<T> &rop, const T &op)
 #else
-template <typename T, typename U, detail::integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &rop, const U &op)
 #endif
 {
@@ -8210,7 +8211,7 @@ inline detail::integer_common_t<T, U> operator-(const T &op1, const U &op2)
 template <typename T>
 inline auto &operator-=(IntegerOpTypes<T> &rop, const T &op)
 #else
-template <typename T, typename U, detail::integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &rop, const U &op)
 #endif
 {
@@ -8357,7 +8358,7 @@ inline detail::integer_common_t<T, U> operator*(const T &op1, const U &op2)
 template <typename T>
 inline auto &operator*=(IntegerOpTypes<T> &rop, const T &op)
 #else
-template <typename T, typename U, detail::integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &rop, const U &op)
 #endif
 {
@@ -8521,7 +8522,7 @@ inline detail::integer_common_t<T, U> operator/(const T &n, const U &d)
 template <typename T>
 inline auto &operator/=(IntegerOpTypes<T> &rop, const T &op)
 #else
-template <typename T, typename U, detail::integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &rop, const U &op)
 #endif
 {
@@ -8789,7 +8790,7 @@ inline bool dispatch_less_than(T x, const integer<SSize> &a)
 template <typename T>
 inline bool operator==(const IntegerOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &op1, const U &op2)
 #endif
 {
@@ -8807,7 +8808,7 @@ inline bool operator==(const T &op1, const U &op2)
 template <typename T>
 inline bool operator!=(const IntegerOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &op1, const U &op2)
 #endif
 {
@@ -8825,7 +8826,7 @@ inline bool operator!=(const T &op1, const U &op2)
 template <typename T>
 inline bool operator<(const IntegerOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &op1, const U &op2)
 #endif
 {
@@ -8843,7 +8844,7 @@ inline bool operator<(const T &op1, const U &op2)
 template <typename T>
 inline bool operator<=(const IntegerOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &op1, const U &op2)
 #endif
 {
@@ -8861,7 +8862,7 @@ inline bool operator<=(const T &op1, const U &op2)
 template <typename T>
 inline bool operator>(const IntegerOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &op1, const U &op2)
 #endif
 {
@@ -8879,7 +8880,7 @@ inline bool operator>(const T &op1, const U &op2)
 template <typename T>
 inline bool operator>=(const IntegerOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &op1, const U &op2)
 #endif
 {

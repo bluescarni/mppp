@@ -1149,17 +1149,6 @@ struct rational_common_type<T, rational<SSize>, enable_if_t<is_cpp_floating_poin
 template <typename T, typename U>
 using rational_common_t = typename rational_common_type<T, U>::type;
 
-// Implementation of the rational op types concept, used in various operators.
-template <typename T, typename U>
-using are_rational_op_types = is_detected<rational_common_t, T, U>;
-
-template <typename T, typename U>
-#if defined(MPPP_HAVE_CONCEPTS)
-concept bool RationalOpTypes = are_rational_op_types<T, U>::value;
-#else
-using rational_op_types_enabler = enable_if_t<are_rational_op_types<T, U>::value, int>;
-#endif
-
 // Implementation of binary add/sub. The NewRop flag indicates that
 // rop is a def-cted rational distinct from op1 and op2.
 template <bool AddOrSub, bool NewRop, std::size_t SSize>
@@ -1266,6 +1255,17 @@ inline void addsub_impl(rational<SSize> &rop, const rational<SSize> &op1, const 
     }
 }
 } // namespace detail
+
+// Implementation of the rational op types concept, used in various operators.
+template <typename T, typename U>
+using are_rational_op_types = detail::is_detected<detail::rational_common_t, T, U>;
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+concept bool RationalOpTypes = are_rational_op_types<T, U>::value;
+#else
+using rational_op_types_enabler = detail::enable_if_t<are_rational_op_types<T, U>::value, int>;
+#endif
 
 /** @defgroup rational_conversion rational_conversion
  *  @{
@@ -1963,7 +1963,7 @@ inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
 template <typename T>
 inline auto &operator+=(RationalOpTypes<T> &rop, const T &op)
 #else
-template <typename T, typename U, detail::rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &rop, const U &op)
 #endif
 {
@@ -2155,7 +2155,7 @@ inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
 template <typename T>
 inline auto &operator-=(RationalOpTypes<T> &rop, const T &op)
 #else
-template <typename T, typename U, detail::rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &rop, const U &op)
 #endif
 {
@@ -2352,7 +2352,7 @@ inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
 template <typename T>
 inline auto &operator*=(RationalOpTypes<T> &rop, const T &op)
 #else
-template <typename T, typename U, detail::rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &rop, const U &op)
 #endif
 {
@@ -2564,7 +2564,7 @@ inline void dispatch_in_place_div(T &rop, const rational<SSize> &op)
 template <typename T>
 inline auto &operator/=(RationalOpTypes<T> &rop, const T &op)
 #else
-template <typename T, typename U, detail::rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &rop, const U &op)
 #endif
 {
@@ -2617,7 +2617,7 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 template <typename T>
 inline bool operator==(const RationalOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &op1, const U &op2)
 #endif
 {
@@ -2635,7 +2635,7 @@ inline bool operator==(const T &op1, const U &op2)
 template <typename T>
 inline bool operator!=(const RationalOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &op1, const U &op2)
 #endif
 {
@@ -2750,7 +2750,7 @@ inline bool dispatch_less_than(T x, const rational<SSize> &a)
 template <typename T>
 inline bool operator<(const RationalOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &op1, const U &op2)
 #endif
 {
@@ -2768,7 +2768,7 @@ inline bool operator<(const T &op1, const U &op2)
 template <typename T>
 inline bool operator<=(const RationalOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &op1, const U &op2)
 #endif
 {
@@ -2786,7 +2786,7 @@ inline bool operator<=(const T &op1, const U &op2)
 template <typename T>
 inline bool operator>(const RationalOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &op1, const U &op2)
 #endif
 {
@@ -2804,7 +2804,7 @@ inline bool operator>(const T &op1, const U &op2)
 template <typename T>
 inline bool operator>=(const RationalOpTypes<T> &op1, const T &op2)
 #else
-template <typename T, typename U, detail::rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &op1, const U &op2)
 #endif
 {
