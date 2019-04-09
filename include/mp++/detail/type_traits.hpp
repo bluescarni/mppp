@@ -108,15 +108,6 @@ struct negation : std::integral_constant<bool, !B::value> {
 #endif
 
 // Small helpers, like C++14.
-#if MPPP_CPLUSPLUS >= 201402L
-
-using std::enable_if_t;
-using std::remove_cv_t;
-using std::remove_extent_t;
-using std::remove_pointer_t;
-
-#else
-
 template <bool B, typename T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
 
@@ -128,8 +119,6 @@ using remove_extent_t = typename std::remove_extent<T>::type;
 
 template <typename T>
 using remove_pointer_t = typename std::remove_pointer<T>::type;
-
-#endif
 
 // Some handy aliases.
 template <typename T>
