@@ -3703,27 +3703,6 @@ inline std::ostream &operator<<(std::ostream &os, const real &r)
     return os;
 }
 
-/// Input stream operator for \link mppp::real real\endlink objects.
-/**
- * \rststar
- * This operator is equivalent to extracting a line from the stream and assigning it to ``x``.
- * \endrststar
- *
- * @param is the input stream.
- * @param x the \link mppp::real real\endlink to which the string extracted from the stream will be assigned.
- *
- * @return a reference to \p is.
- *
- * @throws unspecified any exception thrown by \link mppp::real real\endlink's assignment operator from string.
- */
-inline std::istream &operator>>(std::istream &is, real &x)
-{
-    MPPP_MAYBE_TLS std::string tmp_str;
-    std::getline(is, tmp_str);
-    x = tmp_str;
-    return is;
-}
-
 /** @} */
 
 inline namespace detail

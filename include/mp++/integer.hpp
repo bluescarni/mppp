@@ -21,11 +21,13 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <functional>
 #include <initializer_list>
 #include <ios>
 #include <iostream>
 #include <limits>
+#include <locale>
 #include <new>
 #include <stdexcept>
 #include <string>
@@ -334,7 +336,7 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
     const auto size_base = ::mpz_sizeinbase(mpz, base);
     // LCOV_EXCL_START
     if (mppp_unlikely(size_base > nl_max<std::size_t>() - 2u)) {
-        throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
+        throw std::overflow_error("Too many digits in the conversion of mpz_t to string");
     }
     // LCOV_EXCL_STOP
     // Total max size is the size in base plus an optional sign and the null terminator.
@@ -344,7 +346,7 @@ inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base
     // Overflow check.
     // LCOV_EXCL_START
     if (mppp_unlikely(total_size > nl_max<std::vector<char>::size_type>())) {
-        throw std::overflow_error("Too many digits in the conversion of mpz_t to string.");
+        throw std::overflow_error("Too many digits in the conversion of mpz_t to string");
     }
     // LCOV_EXCL_STOP
     out.resize(static_cast<std::vector<char>::size_type>(total_size));
@@ -2294,7 +2296,7 @@ public:
     {
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
-            throw std::overflow_error("Conversion of the integer " + to_string() + " to the type '" + demangle<T>()
+            throw std::overflow_error("The conversion of the integer " + to_string() + " to the type '" + demangle<T>()
                                       + "' results in overflow");
         }
         return std::move(retval.second);
@@ -7001,7 +7003,7 @@ inline unsigned long integer_exp_to_ulong(const T &exp)
     static_assert(!std::is_same<T, bool>::value, "Cannot use the bool type in make_unsigned_t.");
     if (mppp_unlikely(static_cast<make_unsigned_t<T>>(exp) > nl_max<unsigned long>())) {
         throw std::overflow_error("Cannot convert the integral value " + mppp::to_string(exp)
-                                  + " to unsigned long: the value is too large.");
+                                  + " to unsigned long: the value is too large");
     }
     return static_cast<unsigned long>(exp);
 }
@@ -7023,7 +7025,7 @@ inline unsigned long integer_exp_to_ulong(const integer<SSize> &exp)
     } catch (const std::overflow_error &) {
         // Rewrite the error message.
         throw std::overflow_error("Cannot convert the integral value " + exp.to_string()
-                                  + " to unsigned long: the value is too large.");
+                                  + " to unsigned long: the value is too large");
     }
 }
 
@@ -7521,53 +7523,177 @@ inline bool perfect_power_p(const integer<SSize> &n)
     return ::mpz_perfect_power_p(n.get_mpz_view()) != 0;
 }
 
-/** @defgroup integer_io integer_io
- *  @{
- */
+inline namespace detail
+{
 
-/// Output stream operator.
-/**
- * \rststar
- * This operator will print to the stream ``os`` the :cpp:class:`~mppp::integer` ``n`` in base 10. Internally it uses
- * the :cpp:func:`mppp::integer::to_string()` method.
- * \endrststar
- *
- * @param os the target stream.
- * @param n the input integer.
- *
- * @return a reference to \p os.
- *
- * @throws unspecified any exception thrown by integer::to_string().
- */
+// Helper to get the base from a stream's flags.
+inline int stream_flags_to_base(std::ios_base::fmtflags flags)
+{
+    switch (flags & std::ios_base::basefield) {
+        case std::ios_base::dec:
+            return 10;
+        case std::ios_base::hex:
+            return 16;
+        case std::ios_base::oct:
+            return 8;
+        default:
+            // NOTE: in case more than one base
+            // flag is set, or no base flags are set,
+            // just use 10.
+            return 10;
+    }
+}
+
+// Helper to get the fill type from a stream's flags.
+inline int stream_flags_to_fill(std::ios_base::fmtflags flags)
+{
+    switch (flags & std::ios_base::adjustfield) {
+        case std::ios_base::left:
+            return 1;
+        case std::ios_base::right:
+            return 2;
+        case std::ios_base::internal:
+            return 3;
+        default:
+            // NOTE: assume right fill if no fill is set,
+            // or if multiple values are set.
+            return 2;
+    }
+}
+
+} // namespace detail
+
+// Output stream operator.
 template <std::size_t SSize>
 inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
 {
-    return os << n.to_string();
-}
+    // Get the stream width.
+    const auto width = os.width();
 
-/// Input stream operator.
-/**
- * \rststar
- * This operator is equivalent to extracting a line from the stream and assigning it to ``n``.
- * \endrststar
- *
- * @param is the input stream.
- * @param n the integer to which the string extracted from the stream will be assigned.
- *
- * @return a reference to \p is.
- *
- * @throws unspecified any exception thrown by \link mppp::integer integer\endlink's assignment operator from string.
- */
-template <std::size_t SSize>
-inline std::istream &operator>>(std::istream &is, integer<SSize> &n)
-{
-    MPPP_MAYBE_TLS std::string tmp_str;
-    std::getline(is, tmp_str);
-    n = tmp_str;
-    return is;
-}
+    // Fetch the stream's flags.
+    const auto flags = os.flags();
 
-/** @} */
+    // Start by figuring out the base.
+    const auto base = stream_flags_to_base(flags);
+
+    // Determine the fill type.
+    const auto fill = stream_flags_to_fill(flags);
+
+    // Cache.
+    const auto n_sgn = n.sgn();
+
+    // Should we prefix the base? Do it only if:
+    // - the number is nonzero,
+    // - the showbase flag is set,
+    // - the base is not 10.
+    const bool with_base_prefix = n_sgn != 0 && (flags & std::ios_base::showbase) != 0 && base != 10;
+
+    // Uppercase?
+    const bool uppercase = (flags & std::ios_base::uppercase) != 0;
+
+    // Write out to a temporary vector in the required base. This will produce
+    // a representation in the required base, with no base prefix and no
+    // extra '+' for nonnegative integers.
+    MPPP_MAYBE_TLS std::vector<char> tmp;
+    mpz_to_str(tmp, n.get_mpz_view(), base);
+    // NOTE: tmp contains the terminator, and it might be
+    // larger than needed. Make sure to shrink it so that
+    // the last element is the terminator.
+    tmp.resize(static_cast<decltype(tmp.size())>(std::strlen(tmp.data())) + 1u);
+
+    if (n_sgn == -1) {
+        // Negative number.
+        if (with_base_prefix) {
+            // If we need the base prefix, we will have to add the base after the minus sign.
+            assert(tmp[0] == '-');
+            if (base == 16) {
+                constexpr std::array<char, 2> hex_prefix = {{'0', 'x'}};
+                tmp.insert(tmp.begin() + 1, hex_prefix.begin(), hex_prefix.end());
+            } else {
+                tmp.insert(tmp.begin() + 1, '0');
+            }
+        }
+    } else {
+        // Nonnegative number. We will be prepending up to 3 characters to the number
+        // representation:
+        // - 1 or 2 for the base prefix ('0' for octal, '0x'/'0X' for hex),
+        // - the '+' sign, if requested.
+        const bool with_plus = (flags & std::ios_base::showpos) != 0;
+        std::array<char, 3> prep_buffer;
+        const auto prep_n = [&prep_buffer, with_plus, with_base_prefix, base]() -> std::size_t {
+            std::size_t ret = 0;
+            if (with_plus) {
+                prep_buffer[ret++] = '+';
+            }
+            if (with_base_prefix) {
+                prep_buffer[ret++] = '0';
+                if (base == 16) {
+                    prep_buffer[ret++] = 'x';
+                }
+            }
+            return ret;
+        }();
+        // Prepend the additional characters.
+        tmp.insert(tmp.begin(), prep_buffer.data(), prep_buffer.data() + prep_n);
+    }
+
+    // Apply a final toupper() transformation in base 16, if needed,
+    // but do it before doing the filling in order to avoid
+    // uppercasing the fill character.
+    if (base == 16 && uppercase) {
+        const auto &cloc = std::locale::classic();
+        for (decltype(tmp.size()) i = 0; i < tmp.size() - 1u; ++i) {
+            if (std::isalpha(tmp[i], cloc)) {
+                tmp[i] = std::toupper(tmp[i], cloc);
+            }
+        }
+    }
+
+    // Compute the total size of the number
+    // representation (i.e., without fill characters).
+    // NOTE: -1 because of the terminator.
+    const auto final_size = tmp.size() - 1u;
+
+    // We are going to do the filling
+    // only if the stream width is larger
+    // than the total size of the number.
+    if (width >= 0 && make_unsigned(width) > final_size) {
+        // Compute how much fill we need.
+        const auto fill_size = safe_cast<decltype(tmp.size())>(make_unsigned(width) - final_size);
+        // Get the fill character.
+        const auto fill_char = os.fill();
+        switch (fill) {
+            case 1:
+                // Left fill: fill characters at the end.
+                tmp.insert(tmp.end() - 1, fill_size, fill_char);
+                break;
+            case 2:
+                // Right fill: fill characters at the beginning.
+                tmp.insert(tmp.begin(), fill_size, fill_char);
+                break;
+            case 3: {
+                // Internal fill: the fill characters are always after the sign (if present)
+                // and the base prefix (if present).
+                auto delta = static_cast<int>(tmp[0] == '+' || tmp[0] == '-');
+                if (with_base_prefix) {
+                    delta += 1 + static_cast<int>(base == 16);
+                }
+                tmp.insert(tmp.begin() + delta, fill_size, fill_char);
+                break;
+            }
+        }
+    }
+
+    // Write out the unformatted data.
+    os.write(tmp.data(), safe_cast<std::streamsize>(tmp.size() - 1u));
+
+    // Reset the stream width to zero, like the operator<<() does for builtin types.
+    // https://en.cppreference.com/w/cpp/io/manip/setw
+    // Do it here so we ensure we don't alter the state of the stream until the very end.
+    os.width(0);
+
+    return os;
+}
 
 /** @defgroup integer_s11n integer_s11n
  *  @{

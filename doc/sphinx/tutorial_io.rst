@@ -1,8 +1,7 @@
 Input and output
 ================
 
-All of mp++'s multiprecision classes support stream insertion and extraction. E.g., values can be printed
-to screen in the canonical C++ way:
+All of mp++'s multiprecision classes support stream insertion:
 
 .. code-block:: c++
 
@@ -11,27 +10,22 @@ to screen in the canonical C++ way:
    std::cout << real128{"1.1"} << '\n';   // "1.10000000000000000000000000000000008e+00"
    std::cout << real{"1.3", 150} << '\n'; // "1.3000000000000000000000000000000000000000000006"
 
-.. note::
-
-   A current limitation of all stream insertion operators is that they ignore any formatting flag that may be set in the stream
-   object. This limitation will be lifted in the future.
-
-Stream extraction is equivalent to construction from string:
+Starting from mp++ 0.14, :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
+honour the format flags in output streams:
 
 .. code-block:: c++
 
-   std::istringstream iss;
+   #include <iomanip>
+   #include <ios>
 
-   int_t n;
-   iss.str("123");
-   iss >> n;
-   assert(n == 123);
-   iss.clear();
+   std::cout << std::hex << std::showbase << int_t{42} << '\n'; // "0x2a"
+   std::cout << std::oct << std::showbase << std::showpos
+             << std::setw(10) << std::setfill('*')
+             << int_t{42} << '\n';                              // "******+052"
+   std::cout << std::hex << std::showbase << std::uppercase
+             << rat_t{227191947ll, 13} << '\n';                 // "0XD8AAC8B/0XD"
 
-   rat_t q;
-   iss.str("1/3");
-   iss >> q;
-   assert((q == rat_t{1, 3}));
+In future versions of mp++, the floating-point classes will also honour the format flags in output streams.
 
 All of mp++'s multiprecision classes also provide ``to_string()`` member functions that convert the multiprecision
 values into string representations (see, e.g., :cpp:func:`mppp::integer::to_string()`, :cpp:func:`mppp::rational::to_string()`,

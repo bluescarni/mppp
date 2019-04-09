@@ -4,16 +4,25 @@ Changelog
 0.14 (unreleased)
 -----------------
 
+New
+~~~
+
+- :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational` now respect the format
+  flags in output streams (`#161 <https://github.com/bluescarni/mppp/pull/161>`__).
+
 Changes
 ~~~~~~~
 
 - Various improvements to the benchmarks (`#166 <https://github.com/bluescarni/mppp/pull/166>`__).
+- **BREAKING**: the input stream operators have been removed from all classes
+  (`#161 <https://github.com/bluescarni/mppp/pull/161>`__).
 
 Fix
 ~~~
 
 - Fix an issue in the build system when compiling the unit tests in release mode with MSVC (`#164 <https://github.com/bluescarni/mppp/pull/164>`__).
 - Fixes for the demangler on OSX when 128-bit integers are involved (`#163 <https://github.com/bluescarni/mppp/pull/163>`__).
+- Fix a build issue on OSX when the compiler is not Xcode (`#161 <https://github.com/bluescarni/mppp/pull/161>`__).
 
 0.13 (2019-03-13)
 -----------------

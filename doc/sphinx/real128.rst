@@ -156,6 +156,24 @@ Other special functions
 .. doxygengroup:: real128_miscfuncts
    :content-only:
 
+.. _real128_fpmanip:
+
+Floating-point manipulation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: mppp::real128 nextafter(const mppp::real128 &from, const mppp::real128 &to)
+
+   .. versionadded:: 0.14
+
+   This function returns the next representable value of *from* in the direction of *to*.
+
+   If *from* equals to *to*, *to* is returned.
+
+   :param from: the :cpp:class:`~mppp::real128` whose next representable value will be returned.
+   :param to: the direction of the next representable value.
+
+   :return: the next representable value of *from* in the direction of *to*.
+
 .. _real128_io:
 
 Input/Output
@@ -163,8 +181,6 @@ Input/Output
 
 .. doxygengroup:: real128_io
    :content-only:
-
-.. _real128_operators:
 
 Other
 ~~~~~
@@ -181,6 +197,8 @@ Other
    :param x: the argument.
 
    :return: a hash value for *x*.
+
+.. _real128_operators:
 
 Mathematical operators
 ----------------------

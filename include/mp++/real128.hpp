@@ -141,6 +141,8 @@ using real128_op_types_enabler
 // - the constructor from integer *may* be implemented in a faster way by reading directly the hi/lo parts
 //   and writing them to the ieee union (instead right now we are using __float128 arithmetics and quadmath
 //   functions). Make sure to benchmark first though...
+// - initial code for stream formatting at 687b86d9380a534048f62aac3815c31b094e52d2. The problem to be
+//   solved is the segfault in MinGW.
 
 /// Quadruple-precision floating-point class.
 /**
@@ -1306,27 +1308,6 @@ inline std::ostream &operator<<(std::ostream &os, const real128 &x)
     return os;
 }
 
-/// Input stream operator.
-/**
- * \rststar
- * This operator is equivalent to extracting a line from the stream and assigning it to ``x``.
- * \endrststar
- *
- * @param is the input stream.
- * @param x the \link mppp::real128 real128\endlink to which the string extracted from the stream will be assigned.
- *
- * @return a reference to \p is.
- *
- * @throws unspecified any exception thrown by \link mppp::real128 real128\endlink's assignment operator from string.
- */
-inline std::istream &operator>>(std::istream &is, real128 &x)
-{
-    MPPP_MAYBE_TLS std::string tmp_str;
-    std::getline(is, tmp_str);
-    x = tmp_str;
-    return is;
-}
-
 /** @} */
 
 /** @defgroup real128_comparison real128_comparison
@@ -1784,6 +1765,12 @@ inline real128 erf(real128 x)
 }
 
 /** @} */
+
+// Next real128 from 'from' to 'to'.
+inline real128 nextafter(const real128 &from, const real128 &to)
+{
+    return real128{::nextafterq(from.m_value, to.m_value)};
+}
 
 /** @defgroup real128_operators real128_operators
  *  @{
