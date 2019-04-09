@@ -7378,7 +7378,7 @@ inline void sqrt_impl(integer<SSize> &rop, const integer<SSize> &n)
 template <std::size_t SSize>
 inline integer<SSize> &sqrt(integer<SSize> &rop, const integer<SSize> &n)
 {
-    sqrt_impl(rop, n);
+    detail::sqrt_impl(rop, n);
     return rop;
 }
 
@@ -7387,7 +7387,7 @@ template <std::size_t SSize>
 inline integer<SSize> sqrt(const integer<SSize> &n)
 {
     integer<SSize> retval;
-    sqrt_impl(retval, n);
+    detail::sqrt_impl(retval, n);
     return retval;
 }
 

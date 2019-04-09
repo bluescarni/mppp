@@ -36,7 +36,7 @@ struct gcd_tester {
     {
         using integer = integer<S::value>;
         // Start with zeroes.
-        mpz_raii m1, m2, m3;
+        detail::mpz_raii m1, m2, m3;
         integer n1, n2, n3;
         REQUIRE(gcd(n2, n3) == 0);
         REQUIRE(gcd(n1, n2, n3) == 0);
@@ -95,7 +95,7 @@ struct gcd_tester {
         REQUIRE((lex_cast(gcd(n2, n3)) == lex_cast(m1)));
         // Random testing.
         std::uniform_int_distribution<int> sdist(0, 1), mdist(1, 3);
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
@@ -104,7 +104,7 @@ struct gcd_tester {
                 }
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m2.m_mpz, &m2.m_mpz);
                     n2.neg();
@@ -115,7 +115,7 @@ struct gcd_tester {
                 }
                 random_integer(tmp, y, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (sdist(rng)) {
                     ::mpz_neg(&m3.m_mpz, &m3.m_mpz);
                     n3.neg();

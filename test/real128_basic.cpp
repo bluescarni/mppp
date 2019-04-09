@@ -47,8 +47,8 @@ static int ntries = 1000;
 
 static std::mt19937 rng;
 
-static constexpr auto delta64 = nl_digits<std::uint_least64_t>() - 64;
-static constexpr auto delta49 = nl_digits<std::uint_least64_t>() - 49;
+static constexpr auto delta64 = detail::nl_digits<std::uint_least64_t>() - 64;
+static constexpr auto delta49 = detail::nl_digits<std::uint_least64_t>() - 49;
 
 TEST_CASE("real128 constructors")
 {

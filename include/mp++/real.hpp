@@ -2657,6 +2657,12 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &) {}
 // NOTE: we need 2 overloads for this, as we cannot extract a non-const pointer from
 // arg0 if arg0 is a const ref.
 template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int> = 0>
+void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&... );
+
+template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int> = 0>
+void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&... );
+
+template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int>>
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
 {
     // arg0 is not a non-const rvalue ref, we won't be able to steal from it regardless. Just
@@ -2665,7 +2671,7 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &
     mpfr_nary_op_check_steal(p, std::forward<Args>(args)...);
 }
 
-template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int> = 0>
+template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int>>
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)
 {
     const auto prec0 = arg0.get_prec();
@@ -3936,7 +3942,7 @@ inline real operator+(T &&a, U &&b)
     // NOTE: we use forward + decltype here in order to accommodate the signature
     // when using concepts. It's equivalent to the usual perfect forwarding:
     // https://stackoverflow.com/questions/23321028/is-any-difference-between-stdforwardt-and-stdforwarddecltypet
-    return dispatch_binary_add(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
+    return detail::dispatch_binary_add(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
 namespace detail
@@ -4161,7 +4167,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator-(T &&a, U &&b)
 #endif
 {
-    return dispatch_binary_sub(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
+    return detail::dispatch_binary_sub(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
 namespace detail
@@ -4336,7 +4342,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator*(T &&a, U &&b)
 #endif
 {
-    return dispatch_binary_mul(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
+    return detail::dispatch_binary_mul(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
 namespace detail
@@ -4422,7 +4428,7 @@ template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &a, U &&b)
 #endif
 {
-    dispatch_in_place_mul(a, std::forward<decltype(b)>(b));
+    detail::dispatch_in_place_mul(a, std::forward<decltype(b)>(b));
     return a;
 }
 
@@ -4483,7 +4489,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator/(T &&a, U &&b)
 #endif
 {
-    return dispatch_binary_div(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
+    return detail::dispatch_binary_div(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
 }
 
 namespace detail
@@ -4569,7 +4575,7 @@ template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &a, U &&b)
 #endif
 {
-    dispatch_in_place_div(a, std::forward<decltype(b)>(b));
+    detail::dispatch_in_place_div(a, std::forward<decltype(b)>(b));
     return a;
 }
 
@@ -4712,7 +4718,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &a, const U &b)
 #endif
 {
-    return dispatch_real_comparison(::mpfr_greater_p, a, b);
+    return detail::dispatch_real_comparison(::mpfr_greater_p, a, b);
 }
 
 /// Greater-than or equal operator involving \link mppp::real real\endlink.
@@ -4749,7 +4755,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &a, const U &b)
 #endif
 {
-    return dispatch_real_comparison(::mpfr_greaterequal_p, a, b);
+    return detail::dispatch_real_comparison(::mpfr_greaterequal_p, a, b);
 }
 
 /// Less-than operator involving \link mppp::real real\endlink.
@@ -4788,7 +4794,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &a, const U &b)
 #endif
 {
-    return dispatch_real_comparison(::mpfr_less_p, a, b);
+    return detail::dispatch_real_comparison(::mpfr_less_p, a, b);
 }
 
 /// Less-than or equal operator involving \link mppp::real real\endlink.
@@ -4825,7 +4831,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &a, const U &b)
 #endif
 {
-    return dispatch_real_comparison(::mpfr_lessequal_p, a, b);
+    return detail::dispatch_real_comparison(::mpfr_lessequal_p, a, b);
 }
 
 /** @} */

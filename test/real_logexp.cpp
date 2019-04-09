@@ -18,12 +18,12 @@ TEST_CASE("real exp")
 {
     real r0{0};
     r0.exp();
-    REQUIRE(r0.get_prec() == real_deduce_precision(0));
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(r0 == 1);
     real rop;
     r0 = real{0};
     REQUIRE(exp(rop, r0) == 1);
-    REQUIRE(rop.get_prec() == real_deduce_precision(0));
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(exp(r0) == 1);
     REQUIRE(exp(std::move(r0)) == 1);
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);

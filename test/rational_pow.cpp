@@ -40,7 +40,7 @@ template <typename T, typename U>
 using pow_t = decltype(pow(std::declval<const T &>(), std::declval<const U &>()));
 
 template <typename T, typename U>
-using has_pow = is_detected<pow_t, T, U>;
+using has_pow = detail::is_detected<pow_t, T, U>;
 
 static inline void mpq_pow(::mpq_t rop, const ::mpq_t base, long exp)
 {
@@ -77,7 +77,7 @@ struct pow_tester {
         REQUIRE((!has_pow<std::string, rational>::value));
         REQUIRE((!has_pow<rational, std::string>::value));
         // Start with all zeroes.
-        mpq_raii m1, m2;
+        detail::mpq_raii m1, m2;
         rational n1, n2, ret;
         REQUIRE((std::is_same<rational, decltype(pow(n1, n2))>::value));
         ret = pow(n1, n2);
@@ -85,7 +85,7 @@ struct pow_tester {
         REQUIRE((lex_cast(ret) == lex_cast(m1)));
         REQUIRE(ret.get_num().is_static());
         REQUIRE(ret.get_den().is_static());
-        mpq_raii tmp;
+        detail::mpq_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         std::uniform_int_distribution<long> edist(-20, 20);
         // Run a variety of tests with operands with x number of limbs.

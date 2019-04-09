@@ -2999,7 +2999,7 @@ template <std::size_t SSize, typename T, rational_integral_interoperable_enabler
 inline rational<SSize> binomial(const rational<SSize> &x, const T &y)
 #endif
 {
-    return rational_binomial_impl(x, y);
+    return detail::rational_binomial_impl(x, y);
 }
 
 /** @} */
@@ -3118,7 +3118,7 @@ template <typename T, typename U>
 inline detail::rational_common_t<T, U> pow(const T &base, const U &exp)
 #endif
 {
-    return pow_impl(base, exp);
+    return detail::pow_impl(base, exp);
 }
 
 /** @} */

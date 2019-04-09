@@ -1534,7 +1534,7 @@ template <typename T, typename U, real128_op_types_enabler<T, U> = 0>
 inline real128 pow(const T &x, const U &y)
 #endif
 {
-    return dispatch_pow(x, y);
+    return detail::dispatch_pow(x, y);
 }
 
 /** @} */
@@ -2037,7 +2037,7 @@ template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr real128 operator-(const T &x, const U &y)
 #endif
 {
-    return dispatch_sub(x, y);
+    return detail::dispatch_sub(x, y);
 }
 
 namespace detail
@@ -2074,7 +2074,7 @@ template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline real128 operator-(const T &x, const U &y)
 #endif
 {
-    return dispatch_sub(x, y);
+    return detail::dispatch_sub(x, y);
 }
 
 namespace detail
@@ -2119,7 +2119,7 @@ template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 inline MPPP_CONSTEXPR_14 T &operator-=(T &x, const U &y)
 #endif
 {
-    dispatch_in_place_sub(x, y);
+    detail::dispatch_in_place_sub(x, y);
     return x;
 }
 
@@ -2157,7 +2157,7 @@ template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &x, const U &y)
 #endif
 {
-    dispatch_in_place_sub(x, y);
+    detail::dispatch_in_place_sub(x, y);
     return x;
 }
 
@@ -2320,7 +2320,7 @@ template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 inline MPPP_CONSTEXPR_14 T &operator*=(T &x, const U &y)
 #endif
 {
-    dispatch_in_place_mul(x, y);
+    detail::dispatch_in_place_mul(x, y);
     return x;
 }
 
@@ -2358,7 +2358,7 @@ template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &x, const U &y)
 #endif
 {
-    dispatch_in_place_mul(x, y);
+    detail::dispatch_in_place_mul(x, y);
     return x;
 }
 
@@ -2480,7 +2480,7 @@ template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 inline MPPP_CONSTEXPR_14 T &operator/=(T &x, const U &y)
 #endif
 {
-    dispatch_in_place_div(x, y);
+    detail::dispatch_in_place_div(x, y);
     return x;
 }
 
@@ -2518,7 +2518,7 @@ template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &x, const U &y)
 #endif
 {
-    dispatch_in_place_div(x, y);
+    detail::dispatch_in_place_div(x, y);
     return x;
 }
 
@@ -2815,7 +2815,7 @@ template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr bool operator<=(const T &x, const U &y)
 #endif
 {
-    return dispatch_lte(x, y);
+    return detail::dispatch_lte(x, y);
 }
 
 namespace detail
@@ -2860,7 +2860,7 @@ template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &x, const U &y)
 #endif
 {
-    return dispatch_lte(x, y);
+    return detail::dispatch_lte(x, y);
 }
 
 namespace detail
@@ -3003,7 +3003,7 @@ template <typename T, typename U, real128_cpp_op_types_enabler<T, U> = 0>
 constexpr bool operator>=(const T &x, const U &y)
 #endif
 {
-    return dispatch_gte(x, y);
+    return detail::dispatch_gte(x, y);
 }
 
 namespace detail
@@ -3048,7 +3048,7 @@ template <typename T, typename U, real128_mppp_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &x, const U &y)
 #endif
 {
-    return dispatch_gte(x, y);
+    return detail::dispatch_gte(x, y);
 }
 
 /** @} */

@@ -41,7 +41,7 @@ struct cache_tester {
         auto random_xy = [&flag](unsigned x) {
             auto checker = [&flag]() {
 #if defined(MPPP_HAVE_THREAD_LOCAL)
-                const auto &mpzc = get_mpz_alloc_cache();
+                const auto &mpzc = detail::get_mpz_alloc_cache();
                 for (auto s : mpzc.sizes) {
                     if (s) {
                         flag.store(false);
@@ -52,7 +52,7 @@ struct cache_tester {
             std::mt19937 rng;
             rng.seed(x);
             std::uniform_int_distribution<int> sdist(0, 1);
-            mpz_raii tmp;
+            detail::mpz_raii tmp;
             std::vector<integer> v_int;
             for (int i = 0; i < ntries; ++i) {
                 random_integer(tmp, x, rng);

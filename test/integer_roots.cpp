@@ -38,7 +38,7 @@ struct sqrt_tester {
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
-        mpz_raii m1, m2;
+        detail::mpz_raii m1, m2;
         integer n1, n2;
         ::mpz_sqrt(&m1.m_mpz, &m2.m_mpz);
         REQUIRE(&sqrt(n1, n2) == &n1);
@@ -109,7 +109,7 @@ struct sqrt_tester {
         REQUIRE_THROWS_PREDICATE(n2.sqrt(), std::domain_error, [](const std::domain_error &ex) {
             return std::string(ex.what()) == "Cannot compute the integer square root of the negative number -3";
         });
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {
@@ -120,7 +120,7 @@ struct sqrt_tester {
                 }
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m2.m_mpz, &tmp.m_mpz);
-                n2 = integer(mpz_to_str(&tmp.m_mpz));
+                n2 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (n2.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n2.promote();
@@ -132,7 +132,7 @@ struct sqrt_tester {
                 n2.sqrt();
                 REQUIRE((lex_cast(n2) == lex_cast(m1)));
                 // Overlap.
-                n2 = integer(mpz_to_str(&m2.m_mpz));
+                n2 = integer(detail::mpz_to_str(&m2.m_mpz));
                 ::mpz_sqrt(&m2.m_mpz, &m2.m_mpz);
                 sqrt(n2, n2);
                 REQUIRE((lex_cast(n2) == lex_cast(m2)));
@@ -178,7 +178,7 @@ struct sqrtrem_tester {
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
-        mpz_raii m1, m2, m3;
+        detail::mpz_raii m1, m2, m3;
         integer n1, n2, n3;
         ::mpz_sqrtrem(&m1.m_mpz, &m2.m_mpz, &m3.m_mpz);
         sqrtrem(n1, n2, n3);
@@ -238,7 +238,7 @@ struct sqrtrem_tester {
                        == "When performing an integer square root with remainder, the result 'rop' and the "
                           "remainder 'rem' must be distinct objects";
             });
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {
@@ -252,7 +252,7 @@ struct sqrtrem_tester {
                 }
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (n3.is_static() && sdist(rng)) {
                     // Promote sometimes, if possible.
                     n3.promote();
@@ -268,7 +268,7 @@ struct sqrtrem_tester {
                 REQUIRE((lex_cast(n3) == lex_cast(m3)));
                 // Argument overlaps with rem.
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 ::mpz_sqrtrem(&m1.m_mpz, &m3.m_mpz, &m3.m_mpz);
                 sqrtrem(n1, n3, n3);
                 REQUIRE((lex_cast(n1) == lex_cast(m1)));
@@ -335,7 +335,7 @@ struct perfect_square_p_tester {
         REQUIRE(!perfect_square_p(integer{-4}));
         REQUIRE(!perfect_square_p(integer{-25}));
 
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         integer n;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.

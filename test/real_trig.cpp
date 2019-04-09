@@ -20,23 +20,23 @@ TEST_CASE("real sin cos")
 {
     real r0{0};
     r0.sin();
-    REQUIRE(r0.get_prec() == real_deduce_precision(0));
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(r0.zero_p());
     real rop;
     REQUIRE(sin(rop, r0).zero_p());
-    REQUIRE(rop.get_prec() == real_deduce_precision(0));
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(sin(r0).zero_p());
     REQUIRE(sin(std::move(r0)).zero_p());
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
     r0 = real{0};
     r0.cos();
-    REQUIRE(r0.get_prec() == real_deduce_precision(0));
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(r0 == 1);
     rop = real{};
     r0 = real{0};
     REQUIRE(cos(rop, r0) == 1);
-    REQUIRE(rop.get_prec() == real_deduce_precision(0));
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(cos(r0) == 1);
     REQUIRE(cos(std::move(r0)) == 1);
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);

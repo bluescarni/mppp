@@ -21,7 +21,7 @@
 
 using namespace mppp;
 
-template <typename T, enable_if_t<is_string_type<T>::value, int> = 0>
+template <typename T, detail::enable_if_t<is_string_type<T>::value, int> = 0>
 void check_dispatch(const T &s)
 {
     std::ostringstream o;
