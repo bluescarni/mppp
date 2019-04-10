@@ -177,7 +177,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATIO
 # Installation of the header files.
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" DESTINATION include)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" DESTINATION include/mp++)
-install(TARGETS mp++ DESTINATION lib)
+install(TARGETS mp++ LIBRARY DESTINATION lib)
 
 # This is just a simple counter variable, internal use only.
 set(_MPPP_TEST_NUM "0")

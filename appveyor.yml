@@ -108,22 +108,32 @@ build_script:
 - if [%BUILD_TYPE%]==[MinGW] mingw32-make -j2 VERBOSE=1
 
 test_script:
+# NOTE: ensure the PATH variable contains the path to the mp++ dll,
+# otherwise the tests will fail to run.
+
+- if [%BUILD_TYPE%]==[MSVC15_32] set PATH=%PATH%;%CD%\Debug
 - if [%BUILD_TYPE%]==[MSVC15_32] ctest -V -C Debug -E pybind11
 - if [%BUILD_TYPE%]==[MSVC15_32] ctest -V -C Release -R pybind11
 
+- if [%BUILD_TYPE%]==[MSVC17_32] set PATH=%PATH%;%CD%\Debug
 - if [%BUILD_TYPE%]==[MSVC17_32] ctest -V -C Debug -E pybind11
 - if [%BUILD_TYPE%]==[MSVC17_32] ctest -V -C Release -R pybind11
 
+- if [%BUILD_TYPE%]==[MSVC15_64] set PATH=%PATH%;%CD%\Debug
 - if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Debug -E pybind11
 - if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Release -R pybind11
 
+- if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%PATH%;%CD%\Debug
 - if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Debug -E pybind11
 - if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Release -R pybind11
 
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] set PATH=%PATH%;%CD%\Debug
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] ctest -V
 
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] set PATH=%PATH%;%CD%\Debug
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] ctest -V
 
+- if [%BUILD_TYPE%]==[MinGW] set PATH=%PATH%;%CD%
 - if [%BUILD_TYPE%]==[MinGW] ctest -V
 
 # Enable this to be able to login to the build worker. You can use the
