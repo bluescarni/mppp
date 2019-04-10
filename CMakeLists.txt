@@ -75,6 +75,7 @@ endif()
 # List of source files.
 set(MPPP_SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/demangle.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/integer.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/utils.cpp"
 )
 

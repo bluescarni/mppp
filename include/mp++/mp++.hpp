@@ -11,6 +11,7 @@
 
 #include <mp++/config.hpp>
 
+#include <mp++/demangle.hpp>
 #include <mp++/exceptions.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>

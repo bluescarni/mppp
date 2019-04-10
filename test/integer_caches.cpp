@@ -41,7 +41,7 @@ struct cache_tester {
         auto random_xy = [&flag](unsigned x) {
             auto checker = [&flag]() {
 #if defined(MPPP_HAVE_THREAD_LOCAL)
-                const auto &mpzc = detail::get_mpz_alloc_cache();
+                const auto &mpzc = detail::mpz_alloc_cache_inst;
                 for (auto s : mpzc.sizes) {
                     if (s) {
                         flag.store(false);
