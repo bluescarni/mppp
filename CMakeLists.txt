@@ -75,6 +75,7 @@ endif()
 # List of source files.
 set(MPPP_SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/demangle.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/utils.cpp"
 )
 
 if(MPPP_WITH_QUADMATH)
@@ -82,7 +83,10 @@ if(MPPP_WITH_QUADMATH)
 endif()
 
 if(MPPP_WITH_MPFR)
-    set(MPPP_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/real.cpp" "${MPPP_SRC_FILES}")
+    set(MPPP_SRC_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/real.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/mpfr.cpp"
+        "${MPPP_SRC_FILES}")
 endif()
 
 # Setup of the mp++ library.
