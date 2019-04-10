@@ -7,10 +7,14 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <algorithm>
+#include <atomic>
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <type_traits>
+#include <utility>
 
 #include <mp++/config.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -23,6 +27,39 @@ namespace mppp
 
 namespace detail
 {
+
+namespace
+{
+
+// Some misc tests to check that the mpfr struct conforms to our expectations.
+struct expected_mpfr_struct_t {
+    ::mpfr_prec_t _mpfr_prec;
+    ::mpfr_sign_t _mpfr_sign;
+    ::mpfr_exp_t _mpfr_exp;
+    ::mp_limb_t *_mpfr_d;
+};
+
+static_assert(sizeof(expected_mpfr_struct_t) == sizeof(mpfr_struct_t) && offsetof(mpfr_struct_t, _mpfr_prec) == 0u
+                  && offsetof(mpfr_struct_t, _mpfr_sign) == offsetof(expected_mpfr_struct_t, _mpfr_sign)
+                  && offsetof(mpfr_struct_t, _mpfr_exp) == offsetof(expected_mpfr_struct_t, _mpfr_exp)
+                  && offsetof(mpfr_struct_t, _mpfr_d) == offsetof(expected_mpfr_struct_t, _mpfr_d)
+                  && std::is_same<::mp_limb_t *, decltype(std::declval<mpfr_struct_t>()._mpfr_d)>::value,
+              "Invalid mpfr_t struct layout and/or MPFR types.");
+
+#if MPPP_CPLUSPLUS >= 201703L
+
+// If we have C++17, we can use structured bindings to test the layout of mpfr_struct_t
+// and its members' types.
+constexpr void test_mpfr_struct_t()
+{
+    auto [prec, sign, exp, ptr] = mpfr_struct_t{};
+    static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
+    ignore(prec, sign, exp, ptr);
+}
+
+#endif
+
+} // namespace
 
 void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 {
@@ -110,6 +147,20 @@ void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
         os << z_exp;
     }
 }
+
+// NOTE: the use of ATOMIC_VAR_INIT ensures that the initialisation of default_prec
+// is constant initialisation:
+//
+// http://en.cppreference.com/w/cpp/atomic/ATOMIC_VAR_INIT
+//
+// This essentially means that this initialisation happens before other types of
+// static initialisation:
+//
+// http://en.cppreference.com/w/cpp/language/initialization
+//
+// This ensures that static reals, which are subject to dynamic initialization, are initialised
+// when this variable has already been constructed, and thus access to it will be safe.
+std::atomic<::mpfr_prec_t> default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
 
 } // namespace detail
 

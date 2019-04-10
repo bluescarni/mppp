@@ -53,34 +53,6 @@ namespace mppp
 namespace detail
 {
 
-// Some misc tests to check that the mpfr struct conforms to our expectations.
-struct expected_mpfr_struct_t {
-    ::mpfr_prec_t _mpfr_prec;
-    ::mpfr_sign_t _mpfr_sign;
-    ::mpfr_exp_t _mpfr_exp;
-    ::mp_limb_t *_mpfr_d;
-};
-
-static_assert(sizeof(expected_mpfr_struct_t) == sizeof(mpfr_struct_t) && offsetof(mpfr_struct_t, _mpfr_prec) == 0u
-                  && offsetof(mpfr_struct_t, _mpfr_sign) == offsetof(expected_mpfr_struct_t, _mpfr_sign)
-                  && offsetof(mpfr_struct_t, _mpfr_exp) == offsetof(expected_mpfr_struct_t, _mpfr_exp)
-                  && offsetof(mpfr_struct_t, _mpfr_d) == offsetof(expected_mpfr_struct_t, _mpfr_d)
-                  && std::is_same<::mp_limb_t *, decltype(std::declval<mpfr_struct_t>()._mpfr_d)>::value,
-              "Invalid mpfr_t struct layout and/or MPFR types.");
-
-#if MPPP_CPLUSPLUS >= 201703L
-
-// If we have C++17, we can use structured bindings to test the layout of mpfr_struct_t
-// and its members' types.
-constexpr void test_mpfr_struct_t()
-{
-    auto [prec, sign, exp, ptr] = mpfr_struct_t{};
-    static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
-    ignore(prec, sign, exp, ptr);
-}
-
-#endif
-
 // Clamp the precision between the min and max allowed values. This is used in the generic constructor/assignment
 // operator.
 constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
@@ -198,24 +170,10 @@ struct real_constants {
         ::mpfr_set_ui_2exp(&retval.first, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
         return retval;
     }
-    // Default precision value.
-    static std::atomic<::mpfr_prec_t> default_prec;
 };
 
-// NOTE: the use of ATOMIC_VAR_INIT ensures that the initialisation of default_prec
-// is constant initialisation:
-//
-// http://en.cppreference.com/w/cpp/atomic/ATOMIC_VAR_INIT
-//
-// This essentially means that this initialisation happens before other types of
-// static initialisation:
-//
-// http://en.cppreference.com/w/cpp/language/initialization
-//
-// This ensures that static reals, which are subject to dynamic initialization, are initialised
-// when this variable has already been constructed, and thus access to it will be safe.
-template <typename T>
-std::atomic<::mpfr_prec_t> real_constants<T>::default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
+// Default precision value.
+MPPP_PUBLIC extern std::atomic<::mpfr_prec_t> default_prec;
 
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
@@ -286,7 +244,7 @@ using cvr_real_enabler
  */
 inline mpfr_prec_t real_get_default_prec()
 {
-    return detail::real_constants<>::default_prec.load(std::memory_order_relaxed);
+    return detail::default_prec.load(std::memory_order_relaxed);
 }
 
 /// Set the default precision for \link mppp::real real\endlink objects.
@@ -309,7 +267,7 @@ inline void real_set_default_prec(::mpfr_prec_t p)
                                     + ": the value must be either zero or between " + detail::to_string(real_prec_min())
                                     + " and " + detail::to_string(real_prec_max()));
     }
-    detail::real_constants<>::default_prec.store(p, std::memory_order_relaxed);
+    detail::default_prec.store(p, std::memory_order_relaxed);
 }
 
 /// Reset the default precision for \link mppp::real real\endlink objects.
@@ -323,7 +281,7 @@ inline void real_set_default_prec(::mpfr_prec_t p)
  */
 inline void real_reset_default_prec()
 {
-    detail::real_constants<>::default_prec.store(0);
+    detail::default_prec.store(0);
 }
 
 namespace detail
