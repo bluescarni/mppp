@@ -127,10 +127,10 @@ test_script:
 - if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Debug -E pybind11
 - if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Release -R pybind11
 
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] set PATH=%PATH%;%CD%\Debug
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] set PATH=%PATH%;%CD%
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] ctest -V
 
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] set PATH=%PATH%;%CD%\Debug
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] set PATH=%PATH%;%CD%
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] ctest -V
 
 - if [%BUILD_TYPE%]==[MinGW] set PATH=%PATH%;%CD%
