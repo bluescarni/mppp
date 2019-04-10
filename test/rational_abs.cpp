@@ -36,7 +36,7 @@ struct abs_tester {
     {
         using rational = rational<S::value>;
         // Start with all zeroes.
-        mpq_raii m1, m2;
+        detail::mpq_raii m1, m2;
         rational n1, n2;
         ::mpq_abs(&m1.m_mpq, &m2.m_mpq);
         REQUIRE(&abs(n1, n2) == &n1);
@@ -49,8 +49,8 @@ struct abs_tester {
         REQUIRE(n1.get_num().is_static());
         REQUIRE(n1.get_den().is_static());
         REQUIRE((lex_cast(abs(n1)) == lex_cast(m1)));
-        mpq_raii tmp;
-        mpz_raii num, den;
+        detail::mpq_raii tmp;
+        detail::mpz_raii num, den;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {

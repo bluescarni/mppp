@@ -38,7 +38,7 @@ struct fac_tester {
     {
         using integer = integer<S::value>;
         // Start with all zeroes.
-        mpz_raii m1;
+        detail::mpz_raii m1;
         integer n1;
         ::mpz_fac_ui(&m1.m_mpz, 0);
         fac_ui(n1, 0);
@@ -74,7 +74,7 @@ struct fac_tester {
                    == "The value 1000001 is too large to be used as input for the factorial "
                       "function (the maximum allowed value is 1000000)";
         });
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         std::uniform_int_distribution<unsigned long> udist(0u, 100u);
         for (int i = 0; i < ntries; ++i) {

@@ -42,10 +42,10 @@ template <typename T, typename U>
 using inequal_t = decltype(std::declval<const T &>() != std::declval<const U &>());
 
 template <typename T, typename U>
-using is_eq_comparable = std::integral_constant<bool, std::is_same<detected_t<equal_t, T, U>, bool>::value>;
+using is_eq_comparable = std::integral_constant<bool, std::is_same<detail::detected_t<equal_t, T, U>, bool>::value>;
 
 template <typename T, typename U>
-using is_ineq_comparable = std::integral_constant<bool, std::is_same<detected_t<inequal_t, T, U>, bool>::value>;
+using is_ineq_comparable = std::integral_constant<bool, std::is_same<detail::detected_t<inequal_t, T, U>, bool>::value>;
 
 TEST_CASE("real128 equality")
 {
@@ -136,7 +136,7 @@ template <typename T, typename U>
 using lt_t = decltype(std::declval<const T &>() < std::declval<const U &>());
 
 template <typename T, typename U>
-using is_lt_comparable = std::integral_constant<bool, std::is_same<detected_t<lt_t, T, U>, bool>::value>;
+using is_lt_comparable = std::integral_constant<bool, std::is_same<detail::detected_t<lt_t, T, U>, bool>::value>;
 
 TEST_CASE("real128 lt")
 {
@@ -212,7 +212,7 @@ template <typename T, typename U>
 using lte_t = decltype(std::declval<const T &>() <= std::declval<const U &>());
 
 template <typename T, typename U>
-using is_lte_comparable = std::integral_constant<bool, std::is_same<detected_t<lte_t, T, U>, bool>::value>;
+using is_lte_comparable = std::integral_constant<bool, std::is_same<detail::detected_t<lte_t, T, U>, bool>::value>;
 
 TEST_CASE("real128 lte")
 {
@@ -263,7 +263,7 @@ template <typename T, typename U>
 using gt_t = decltype(std::declval<const T &>() > std::declval<const U &>());
 
 template <typename T, typename U>
-using is_gt_comparable = std::integral_constant<bool, std::is_same<detected_t<gt_t, T, U>, bool>::value>;
+using is_gt_comparable = std::integral_constant<bool, std::is_same<detail::detected_t<gt_t, T, U>, bool>::value>;
 
 TEST_CASE("real128 gt")
 {
@@ -339,7 +339,7 @@ template <typename T, typename U>
 using gte_t = decltype(std::declval<const T &>() >= std::declval<const U &>());
 
 template <typename T, typename U>
-using is_gte_comparable = std::integral_constant<bool, std::is_same<detected_t<gte_t, T, U>, bool>::value>;
+using is_gte_comparable = std::integral_constant<bool, std::is_same<detail::detected_t<gte_t, T, U>, bool>::value>;
 
 TEST_CASE("real128 gte")
 {

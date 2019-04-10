@@ -36,7 +36,7 @@ struct inv_tester {
     {
         using rational = rational<S::value>;
         // Start with all zeroes.
-        mpq_raii m1, m2;
+        detail::mpq_raii m1, m2;
         rational n1, n2;
         REQUIRE_THROWS_PREDICATE(inv(n1, n2), zero_division_error, [](const zero_division_error &ex) {
             return std::string(ex.what()) == "Cannot invert a zero rational";
@@ -56,8 +56,8 @@ struct inv_tester {
         n2.inv();
         REQUIRE((lex_cast(n2) == lex_cast(m1)));
         REQUIRE((std::is_same<rational &, decltype(n2.inv())>::value));
-        mpq_raii tmp;
-        mpz_raii num, den;
+        detail::mpq_raii tmp;
+        detail::mpz_raii num, den;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {

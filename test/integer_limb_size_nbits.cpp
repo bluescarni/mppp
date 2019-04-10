@@ -16,15 +16,15 @@ using namespace mppp;
 
 TEST_CASE("limb_size_nbits")
 {
-    REQUIRE(limb_size_nbits(1) == 1u);
-    REQUIRE(limb_size_nbits(2) == 2u);
-    REQUIRE(limb_size_nbits(3) == 2u);
-    REQUIRE(limb_size_nbits(4) == 3u);
-    REQUIRE(limb_size_nbits(::mp_limb_t(1) << (GMP_NUMB_BITS - 1)) == GMP_NUMB_BITS);
-    REQUIRE(limb_size_nbits(::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) == GMP_NUMB_BITS - 1);
-    REQUIRE(limb_size_nbits((::mp_limb_t(1) << (GMP_NUMB_BITS - 1)) + 1) == GMP_NUMB_BITS);
-    REQUIRE(limb_size_nbits(::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) == GMP_NUMB_BITS - 1);
-    REQUIRE(limb_size_nbits((::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) + 1) == GMP_NUMB_BITS - 1);
+    REQUIRE(detail::limb_size_nbits(1) == 1u);
+    REQUIRE(detail::limb_size_nbits(2) == 2u);
+    REQUIRE(detail::limb_size_nbits(3) == 2u);
+    REQUIRE(detail::limb_size_nbits(4) == 3u);
+    REQUIRE(detail::limb_size_nbits(::mp_limb_t(1) << (GMP_NUMB_BITS - 1)) == GMP_NUMB_BITS);
+    REQUIRE(detail::limb_size_nbits(::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) == GMP_NUMB_BITS - 1);
+    REQUIRE(detail::limb_size_nbits((::mp_limb_t(1) << (GMP_NUMB_BITS - 1)) + 1) == GMP_NUMB_BITS);
+    REQUIRE(detail::limb_size_nbits(::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) == GMP_NUMB_BITS - 1);
+    REQUIRE(detail::limb_size_nbits((::mp_limb_t(1) << (GMP_NUMB_BITS - 2)) + 1) == GMP_NUMB_BITS - 1);
     // Test the GMP implementation, which we do not cover in the CI.
     ::mp_limb_t l = 1;
     REQUIRE(static_cast<unsigned>(::mpn_sizeinbase(&l, 1, 2)) == 1u);

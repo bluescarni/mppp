@@ -40,10 +40,10 @@ template <typename T, typename U>
 using inplace_divvv_t = decltype(std::declval<T &>() /= std::declval<const U &>());
 
 template <typename T, typename U>
-using is_divisible = is_detected<divvv_t, T, U>;
+using is_divisible = detail::is_detected<divvv_t, T, U>;
 
 template <typename T, typename U>
-using is_divisible_inplace = is_detected<inplace_divvv_t, T, U>;
+using is_divisible_inplace = detail::is_detected<inplace_divvv_t, T, U>;
 
 struct div_tester {
     template <typename S>
@@ -178,9 +178,9 @@ struct div_tester {
             REQUIRE((std::is_same<int &, decltype(n /= rational{-4})>::value));
             n /= rational{-5, 2};
             REQUIRE((lex_cast(n) == "1"));
-            n = nl_max<int>();
+            n = detail::nl_max<int>();
             REQUIRE_THROWS_AS(n /= (rational{1, 2}), std::overflow_error);
-            n = nl_min<int>();
+            n = detail::nl_min<int>();
             REQUIRE_THROWS_AS(n /= (rational{1, 2}), std::overflow_error);
         }
         {

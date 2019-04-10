@@ -41,10 +41,10 @@ template <typename T, typename U>
 using inplace_add_t = decltype(std::declval<T &>() += std::declval<const U &>());
 
 template <typename T, typename U>
-using is_addable = is_detected<add_t, T, U>;
+using is_addable = detail::is_detected<add_t, T, U>;
 
 template <typename T, typename U>
-using is_addable_inplace = is_detected<inplace_add_t, T, U>;
+using is_addable_inplace = detail::is_detected<inplace_add_t, T, U>;
 
 struct add_tester {
     template <typename S>
@@ -143,9 +143,9 @@ struct add_tester {
             REQUIRE((std::is_same<int &, decltype(n += rational{-4})>::value));
             n += rational{-5, 2};
             REQUIRE((lex_cast(n) == "-1"));
-            n = nl_max<int>();
+            n = detail::nl_max<int>();
             REQUIRE_THROWS_AS(n += rational{1}, std::overflow_error);
-            n = nl_min<int>();
+            n = detail::nl_min<int>();
             REQUIRE_THROWS_AS(n += rational{-1}, std::overflow_error);
         }
         {
@@ -208,10 +208,10 @@ template <typename T, typename U>
 using inplace_sub_t = decltype(std::declval<T &>() -= std::declval<const U &>());
 
 template <typename T, typename U>
-using is_subtractable = is_detected<sub_t, T, U>;
+using is_subtractable = detail::is_detected<sub_t, T, U>;
 
 template <typename T, typename U>
-using is_subtractable_inplace = is_detected<inplace_sub_t, T, U>;
+using is_subtractable_inplace = detail::is_detected<inplace_sub_t, T, U>;
 
 struct sub_tester {
     template <typename S>
@@ -310,9 +310,9 @@ struct sub_tester {
             REQUIRE((std::is_same<int &, decltype(n -= rational{-4})>::value));
             n -= rational{-5, 2};
             REQUIRE((lex_cast(n) == "11"));
-            n = nl_max<int>();
+            n = detail::nl_max<int>();
             REQUIRE_THROWS_AS(n -= rational{-1}, std::overflow_error);
-            n = nl_min<int>();
+            n = detail::nl_min<int>();
             REQUIRE_THROWS_AS(n -= rational{1}, std::overflow_error);
         }
         {
@@ -375,10 +375,10 @@ template <typename T, typename U>
 using inplace_mul_t = decltype(std::declval<T &>() *= std::declval<const U &>());
 
 template <typename T, typename U>
-using is_multipliable = is_detected<mul_t, T, U>;
+using is_multipliable = detail::is_detected<mul_t, T, U>;
 
 template <typename T, typename U>
-using is_multipliable_inplace = is_detected<inplace_mul_t, T, U>;
+using is_multipliable_inplace = detail::is_detected<inplace_mul_t, T, U>;
 
 struct mul_tester {
     template <typename S>
@@ -480,9 +480,9 @@ struct mul_tester {
             REQUIRE((std::is_same<int &, decltype(n *= rational{-4})>::value));
             n *= rational{-5, 2};
             REQUIRE((lex_cast(n) == "15"));
-            n = nl_max<int>();
+            n = detail::nl_max<int>();
             REQUIRE_THROWS_AS(n *= rational{2}, std::overflow_error);
-            n = nl_min<int>();
+            n = detail::nl_min<int>();
             REQUIRE_THROWS_AS(n *= rational{2}, std::overflow_error);
         }
         {

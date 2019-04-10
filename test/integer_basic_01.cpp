@@ -78,7 +78,7 @@ struct int_ctor_tester {
             REQUIRE(lex_cast(Int(0)) == lex_cast(integer{Int(0)}));
             REQUIRE(lex_cast(Int(42)) == lex_cast(integer{Int(42)}));
             REQUIRE(lex_cast(Int(-42)) == lex_cast(integer{Int(-42)}));
-            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
+            auto constexpr min = detail::nl_min<Int>(), max = detail::nl_max<Int>();
             REQUIRE(lex_cast(min) == lex_cast(integer{min}));
             REQUIRE(lex_cast(max) == lex_cast(integer{max}));
             std::atomic<bool> fail(false);
@@ -134,7 +134,7 @@ struct int_ass_tester {
             n0 = Int(0);
             REQUIRE(n0 == 0);
             REQUIRE(n0.is_static());
-            auto constexpr min = nl_min<Int>(), max = nl_max<Int>();
+            auto constexpr min = detail::nl_min<Int>(), max = detail::nl_max<Int>();
             n0 = min;
             REQUIRE(n0 == min);
             n0 = max;

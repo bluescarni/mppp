@@ -46,10 +46,10 @@ template <typename T, typename U>
 using inplace_divvv_t = decltype(std::declval<T &>() /= std::declval<const U &>());
 
 template <typename T, typename U>
-using is_divisible = is_detected<divvv_t, T, U>;
+using is_divisible = detail::is_detected<divvv_t, T, U>;
 
 template <typename T, typename U>
-using is_divisible_inplace = is_detected<inplace_divvv_t, T, U>;
+using is_divisible_inplace = detail::is_detected<inplace_divvv_t, T, U>;
 
 struct div_tester {
     template <typename S>

@@ -80,7 +80,7 @@ constexpr ::mpfr_prec_t real_prec_max()
 // The MPFR structure underlying mpfr_t.
 using mpfr_struct_t = std::remove_extent<::mpfr_t>::type;
 
-inline namespace detail
+namespace detail
 {
 
 // Paranoia checks.

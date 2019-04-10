@@ -50,8 +50,8 @@ struct hash_tester {
         n1._get_num().demote();
         REQUIRE((hash(n1) == orig_h));
         REQUIRE((hasher(n1) == orig_h));
-        mpq_raii tmp;
-        mpz_raii num, den;
+        detail::mpq_raii tmp;
+        detail::mpz_raii num, den;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {

@@ -36,7 +36,7 @@ struct neg_tester {
     {
         using rational = rational<S::value>;
         // Start with all zeroes.
-        mpq_raii m1, m2;
+        detail::mpq_raii m1, m2;
         rational n1, n2;
         ::mpq_neg(&m1.m_mpq, &m2.m_mpq);
         REQUIRE(&neg(n1, n2) == &n1);
@@ -45,7 +45,7 @@ struct neg_tester {
         n1.neg();
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         REQUIRE((lex_cast(neg(n1)) == lex_cast(m1)));
-        mpq_raii tmp;
+        detail::mpq_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {

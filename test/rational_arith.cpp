@@ -37,7 +37,7 @@ struct add_tester {
     {
         using rational = rational<S::value>;
         // Start with all zeroes.
-        mpq_raii m1, m2, m3;
+        detail::mpq_raii m1, m2, m3;
         rational n1, n2, n3;
         REQUIRE(&add(n1, n2, n3) == &n1);
         ::mpq_add(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
@@ -49,7 +49,7 @@ struct add_tester {
         REQUIRE(n2.get_den().is_static());
         REQUIRE(n3.get_num().is_static());
         REQUIRE(n3.get_den().is_static());
-        mpq_raii tmp;
+        detail::mpq_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
@@ -112,7 +112,7 @@ struct add_tester {
                 // Tests with integral arguments.
                 auto n2_copy(n2);
                 auto n3_copy(n3);
-                mpq_raii m2_copy, m3_copy;
+                detail::mpq_raii m2_copy, m3_copy;
                 ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
                 ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
@@ -209,7 +209,7 @@ struct sub_tester {
     {
         using rational = rational<S::value>;
         // Start with all zeroes.
-        mpq_raii m1, m2, m3;
+        detail::mpq_raii m1, m2, m3;
         rational n1, n2, n3;
         REQUIRE(&sub(n1, n2, n3) == &n1);
         ::mpq_sub(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
@@ -221,7 +221,7 @@ struct sub_tester {
         REQUIRE(n2.get_den().is_static());
         REQUIRE(n3.get_num().is_static());
         REQUIRE(n3.get_den().is_static());
-        mpq_raii tmp;
+        detail::mpq_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
@@ -284,7 +284,7 @@ struct sub_tester {
                 // Tests with integral arguments.
                 auto n2_copy(n2);
                 auto n3_copy(n3);
-                mpq_raii m2_copy, m3_copy;
+                detail::mpq_raii m2_copy, m3_copy;
                 ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
                 ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
@@ -384,7 +384,7 @@ struct mul_tester {
     {
         using rational = rational<S::value>;
         // Start with all zeroes.
-        mpq_raii m1, m2, m3;
+        detail::mpq_raii m1, m2, m3;
         rational n1, n2, n3;
         REQUIRE(&mul(n1, n2, n3) == &n1);
         ::mpq_mul(&m1.m_mpq, &m2.m_mpq, &m3.m_mpq);
@@ -396,7 +396,7 @@ struct mul_tester {
         REQUIRE(n2.get_den().is_static());
         REQUIRE(n3.get_num().is_static());
         REQUIRE(n3.get_den().is_static());
-        mpq_raii tmp;
+        detail::mpq_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
@@ -459,7 +459,7 @@ struct mul_tester {
                 // Tests with integral arguments.
                 auto n2_copy(n2);
                 auto n3_copy(n3);
-                mpq_raii m2_copy, m3_copy;
+                detail::mpq_raii m2_copy, m3_copy;
                 ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
                 ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;
@@ -533,7 +533,7 @@ struct div_tester {
     inline void operator()(const S &) const
     {
         using rational = rational<S::value>;
-        mpq_raii m1, m2, m3;
+        detail::mpq_raii m1, m2, m3;
         rational n1, n2, n3;
         // Some zero testing.
         REQUIRE_THROWS_PREDICATE(div(n1, n2, n3), zero_division_error, [](const zero_division_error &ex) {
@@ -562,7 +562,7 @@ struct div_tester {
         REQUIRE(n2.get_den().is_static());
         REQUIRE(n3.get_num().is_static());
         REQUIRE(n3.get_den().is_static());
-        mpq_raii tmp;
+        detail::mpq_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x and y number of limbs.
         auto random_xy = [&](unsigned x, unsigned y) {
@@ -639,7 +639,7 @@ struct div_tester {
                 // Tests with integral arguments.
                 auto n2_copy(n2);
                 auto n3_copy(n3);
-                mpq_raii m2_copy, m3_copy;
+                detail::mpq_raii m2_copy, m3_copy;
                 ::mpq_set(&m2_copy.m_mpq, &m2.m_mpq);
                 ::mpq_set(&m3_copy.m_mpq, &m3.m_mpq);
                 n2_copy._get_den() = 1;

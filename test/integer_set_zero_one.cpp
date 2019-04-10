@@ -37,7 +37,7 @@ struct set_zero_tester {
         using integer = integer<S::value>;
         // Start with zero.
         integer n1;
-        mpz_raii m1;
+        detail::mpz_raii m1;
         REQUIRE((std::is_same<integer &, decltype(n1.set_zero())>::value));
         n1.set_zero().set_zero();
         REQUIRE(n1.is_zero());
@@ -55,7 +55,7 @@ struct set_zero_tester {
         n1.set_zero().set_zero();
         REQUIRE(n1.is_zero());
         REQUIRE(n1.is_static());
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {
@@ -97,7 +97,7 @@ struct set_one_tester {
         using integer = integer<S::value>;
         // Start with zero.
         integer n1;
-        mpz_raii m1;
+        detail::mpz_raii m1;
         REQUIRE((std::is_same<integer &, decltype(n1.set_one())>::value));
         REQUIRE((std::is_same<integer &, decltype(n1.set_negative_one())>::value));
         n1.set_one().set_one();
@@ -125,7 +125,7 @@ struct set_one_tester {
         n1.set_negative_one().set_negative_one();
         REQUIRE(n1.is_negative_one());
         REQUIRE(n1.is_static());
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         // Run a variety of tests with operands with x number of limbs.
         auto random_xy = [&](unsigned x) {

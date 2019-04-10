@@ -36,7 +36,7 @@ struct divexact_tester {
     {
         using integer = integer<S::value>;
         // Start with zeroes.
-        mpz_raii m1, m2, m3;
+        detail::mpz_raii m1, m2, m3;
         integer n1, n2, n3;
         ::mpz_set_si(&m3.m_mpz, 1);
         n3 = integer(1);
@@ -85,7 +85,7 @@ struct divexact_tester {
         REQUIRE((lex_cast(divexact(n2, n3)) == lex_cast(m1)));
         // Random testing.
         std::uniform_int_distribution<int> sdist(0, 1), mdist(1, 3);
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         auto random_xy = [&](unsigned x) {
             for (int i = 0; i < ntries; ++i) {
                 if (sdist(rng) && sdist(rng) && sdist(rng)) {
@@ -94,7 +94,7 @@ struct divexact_tester {
                 }
                 random_integer(tmp, x, rng);
                 ::mpz_set(&m3.m_mpz, &tmp.m_mpz);
-                n3 = integer(mpz_to_str(&tmp.m_mpz));
+                n3 = integer(detail::mpz_to_str(&tmp.m_mpz));
                 if (n3.sgn() == 0) {
                     continue;
                 }

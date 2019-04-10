@@ -32,7 +32,7 @@ struct probab_prime_p_tester {
     inline void operator()(const S &) const
     {
         using integer = integer<S::value>;
-        mpz_raii m1;
+        detail::mpz_raii m1;
         integer n1;
         REQUIRE((probab_prime_p(n1) == ::mpz_probab_prime_p(&m1.m_mpz, 25)));
         REQUIRE((n1.probab_prime_p() == ::mpz_probab_prime_p(&m1.m_mpz, 25)));

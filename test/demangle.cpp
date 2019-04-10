@@ -26,51 +26,51 @@ using namespace mppp;
 
 TEST_CASE("demangle")
 {
-    std::cout << demangle<std::string>() << '\n';
-    std::cout << demangle<int>() << '\n';
-    std::cout << demangle<const int>() << '\n';
-    std::cout << demangle<const volatile int>() << '\n';
-    std::cout << demangle<volatile int>() << '\n';
-    std::cout << demangle<long double>() << '\n';
-    std::cout << demangle<std::vector<std::vector<float>>>() << '\n';
-    std::cout << demangle<integer<1>>() << '\n';
-    std::cout << demangle<rational<2>>() << '\n';
-    std::cout << demangle<rational<2> &>() << '\n';
-    std::cout << demangle<rational<2> const>() << '\n';
-    std::cout << demangle<rational<2> const &>() << '\n';
-    std::cout << demangle<rational<2> *>() << '\n';
-    std::cout << demangle<const rational<2> *>() << '\n';
-    std::cout << demangle<const rational<2> *const>() << '\n';
-    std::cout << demangle<const rational<2> *const &>() << '\n';
-    std::cout << demangle<void>() << '\n';
-    std::cout << demangle<void const>() << '\n';
-    std::cout << demangle<void volatile>() << '\n';
-    std::cout << demangle<void volatile const>() << '\n';
+    std::cout << detail::demangle<std::string>() << '\n';
+    std::cout << detail::demangle<int>() << '\n';
+    std::cout << detail::demangle<const int>() << '\n';
+    std::cout << detail::demangle<const volatile int>() << '\n';
+    std::cout << detail::demangle<volatile int>() << '\n';
+    std::cout << detail::demangle<long double>() << '\n';
+    std::cout << detail::demangle<std::vector<std::vector<float>>>() << '\n';
+    std::cout << detail::demangle<integer<1>>() << '\n';
+    std::cout << detail::demangle<rational<2>>() << '\n';
+    std::cout << detail::demangle<rational<2> &>() << '\n';
+    std::cout << detail::demangle<rational<2> const>() << '\n';
+    std::cout << detail::demangle<rational<2> const &>() << '\n';
+    std::cout << detail::demangle<rational<2> *>() << '\n';
+    std::cout << detail::demangle<const rational<2> *>() << '\n';
+    std::cout << detail::demangle<const rational<2> *const>() << '\n';
+    std::cout << detail::demangle<const rational<2> *const &>() << '\n';
+    std::cout << detail::demangle<void>() << '\n';
+    std::cout << detail::demangle<void const>() << '\n';
+    std::cout << detail::demangle<void volatile>() << '\n';
+    std::cout << detail::demangle<void volatile const>() << '\n';
 #if defined(MPPP_HAVE_GCC_INT128)
-    std::cout << demangle<__int128_t>() << '\n';
-    std::cout << demangle<__int128_t *>() << '\n';
-    std::cout << demangle<__int128_t const *>() << '\n';
-    std::cout << demangle<__int128_t const *const>() << '\n';
-    std::cout << demangle<__uint128_t>() << '\n';
-    std::cout << demangle<__uint128_t *>() << '\n';
-    std::cout << demangle<__uint128_t const *>() << '\n';
-    std::cout << demangle<__uint128_t const *const>() << '\n';
-    std::cout << demangle<const __int128_t>() << '\n';
-    std::cout << demangle<const __uint128_t>() << '\n';
-    std::cout << demangle<__int128_t &>() << '\n';
-    std::cout << demangle<__uint128_t &>() << '\n';
-    std::cout << demangle<__int128_t &&>() << '\n';
-    std::cout << demangle<__uint128_t &&>() << '\n';
-    std::cout << demangle<const __int128_t &>() << '\n';
-    std::cout << demangle<const __uint128_t &>() << '\n';
-    std::cout << demangle<std::vector<__int128_t>>() << '\n';
+    std::cout << detail::demangle<__int128_t>() << '\n';
+    std::cout << detail::demangle<__int128_t *>() << '\n';
+    std::cout << detail::demangle<__int128_t const *>() << '\n';
+    std::cout << detail::demangle<__int128_t const *const>() << '\n';
+    std::cout << detail::demangle<__uint128_t>() << '\n';
+    std::cout << detail::demangle<__uint128_t *>() << '\n';
+    std::cout << detail::demangle<__uint128_t const *>() << '\n';
+    std::cout << detail::demangle<__uint128_t const *const>() << '\n';
+    std::cout << detail::demangle<const __int128_t>() << '\n';
+    std::cout << detail::demangle<const __uint128_t>() << '\n';
+    std::cout << detail::demangle<__int128_t &>() << '\n';
+    std::cout << detail::demangle<__uint128_t &>() << '\n';
+    std::cout << detail::demangle<__int128_t &&>() << '\n';
+    std::cout << detail::demangle<__uint128_t &&>() << '\n';
+    std::cout << detail::demangle<const __int128_t &>() << '\n';
+    std::cout << detail::demangle<const __uint128_t &>() << '\n';
+    std::cout << detail::demangle<std::vector<__int128_t>>() << '\n';
 #endif
 
     // Couple of multithreaded tests.
     auto t_func = []() -> std::string {
         std::string tmp;
         for (auto i = 0; i < 100; ++i) {
-            tmp += demangle<std::vector<std::vector<float>>>();
+            tmp += detail::demangle<std::vector<std::vector<float>>>();
         }
         return tmp;
     };
@@ -93,6 +93,6 @@ TEST_CASE("demangle")
     // Test the string view overload.
     const auto tname = typeid(int).name();
     const std::string_view sv(tname);
-    REQUIRE(demangle(sv) == demangle(tname));
+    REQUIRE(detail::demangle(sv) == detail::demangle(tname));
 #endif
 }

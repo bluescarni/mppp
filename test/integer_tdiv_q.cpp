@@ -35,7 +35,7 @@ struct tdiv_q_tester {
     inline void operator()(const S &) const
     {
         using integer = integer<S::value>;
-        mpz_raii m1, m3, m4;
+        detail::mpz_raii m1, m3, m4;
         integer n1, n3, n4;
         // A few simple tests to start.
         n3 = integer(12);
@@ -62,7 +62,7 @@ struct tdiv_q_tester {
         ::mpz_tdiv_q(&m1.m_mpz, &m3.m_mpz, &m4.m_mpz);
         REQUIRE((lex_cast(n1) == lex_cast(m1)));
         // Random testing.
-        mpz_raii tmp;
+        detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
         auto random_xy = [&](unsigned x, unsigned y) {
             for (int i = 0; i < ntries; ++i) {
