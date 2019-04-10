@@ -251,7 +251,7 @@ constexpr __uint128_t nl_min<__uint128_t>()
 template <>
 constexpr __int128_t nl_max<__int128_t>()
 {
-    return (((__int128_t(1) << 126) - 1) << 1) + 1;
+    return static_cast<__int128_t>((__uint128_t(1) << 127u) - 1u);
 }
 
 template <>

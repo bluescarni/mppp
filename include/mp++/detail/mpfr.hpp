@@ -12,7 +12,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <limits>
-#include <memory>
 #include <mpfr.h>
 #include <type_traits>
 
@@ -114,9 +113,6 @@ struct mpfr_raii {
     }
     mpfr_struct_t m_mpfr;
 };
-
-// Smart pointer to handle the string output from mpfr.
-using smart_mpfr_str = std::unique_ptr<char, void (*)(char *)>;
 
 // A couple of sanity checks when constructing temporary mpfrs/mpfs from long double.
 static_assert(std::numeric_limits<long double>::max_digits10 < nl_max<int>() / 4, "Overflow error.");

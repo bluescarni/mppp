@@ -11,14 +11,12 @@
 
 #include <cstdint>
 #include <iostream>
+
 // NOTE: extern "C" is already included in quadmath.h since GCC 4.8:
 // https://stackoverflow.com/questions/13780219/link-libquadmath-with-c-on-linux
 #include <quadmath.h>
-#include <stdexcept>
-#include <string>
 
-#include <mp++/config.hpp>
-#include <mp++/detail/utils.hpp>
+#include <mp++/detail/visibility.hpp>
 
 namespace mppp
 {
@@ -60,41 +58,10 @@ union ieee_float128 {
     ieee_t i_eee;
 };
 
-inline void float128_stream(std::ostream &os, const __float128 &x)
-{
-    char buf[100];
-    // NOTE: 36 decimal digits ensures that reading back the string always produces the same value.
-    // https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
-    // We use 35 because the precision field in printf()-like functions refers to the number
-    // of digits to the right of the decimal point, and we have one digit to the left of
-    // the decimal point due to the scientific notation.
-    const auto n = ::quadmath_snprintf(buf, sizeof(buf), "%.35Qe", x);
-    // LCOV_EXCL_START
-    if (mppp_unlikely(n < 0)) {
-        throw std::runtime_error("A call to quadmath_snprintf() failed: a negative exit status of " + to_string(n)
-                                 + " was returned");
-    }
-    if (mppp_unlikely(unsigned(n) >= sizeof(buf))) {
-        throw std::runtime_error("A call to quadmath_snprintf() failed: the exit status " + to_string(n)
-                                 + " is not less than the size of the internal buffer " + to_string(sizeof(buf)));
-    }
-    // LCOV_EXCL_STOP
-    os << &buf[0];
-}
+MPPP_PUBLIC void float128_stream(std::ostream &, const __float128 &);
 
-inline __float128 str_to_float128(const char *s)
-{
-    char *endptr;
-    auto retval = ::strtoflt128(s, &endptr);
-    if (mppp_unlikely(endptr == s || *endptr != '\0')) {
-        // NOTE: the first condition handles an empty string.
-        // endptr will point to the first character in the string which
-        // did not contribute to the construction of retval.
-        throw std::invalid_argument("The string '" + std::string(s)
-                                    + "' does not represent a valid quadruple-precision floating-point value");
-    }
-    return retval;
-}
+MPPP_PUBLIC __float128 str_to_float128(const char *);
+
 } // namespace detail
 } // namespace mppp
 

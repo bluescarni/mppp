@@ -77,6 +77,14 @@ set(MPPP_SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/demangle.cpp"
 )
 
+if(MPPP_WITH_QUADMATH)
+    set(MPPP_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/quadmath.cpp" "${MPPP_SRC_FILES}")
+endif()
+
+if(MPPP_WITH_MPFR)
+    set(MPPP_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/real.cpp" "${MPPP_SRC_FILES}")
+endif()
+
 # Setup of the mp++ library.
 add_library(mp++ SHARED "${MPPP_SRC_FILES}")
 set_property(TARGET mp++ PROPERTY VERSION "${mp++_VERSION_MAJOR}.${mp++_VERSION_MINOR}")
