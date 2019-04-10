@@ -15,6 +15,8 @@ New
 Changes
 ~~~~~~~
 
+- mp++ does not depend on the DbgHelp library on Windows any more
+  (`#169 <https://github.com/bluescarni/mppp/pull/169>`__).
 - **BREAKING**: mp++ has now a compiled component. In order to use mp++, you will now have to
   both include the mp++ headers **and** link to the mp++ library
   (`#169 <https://github.com/bluescarni/mppp/pull/169>`__).
