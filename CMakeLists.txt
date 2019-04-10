@@ -154,10 +154,13 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" DESTINATION include
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" DESTINATION include/mp++)
 
 # Installation of the library.
-install(TARGETS mp++ ARCHIVE DESTINATION lib LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
+install(TARGETS mp++
+    EXPORT mp++_export
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+)
 
-# Setup of the export.
-install(TARGETS mp++ EXPORT mp++_export)
 # Setup of the optional deps.
 set(_MPPP_CONFIG_OPTIONAL_DEPS)
 if(MPPP_WITH_MPFR)
