@@ -101,6 +101,17 @@ inline std::size_t get_mpz_size(const ::mpz_t n)
     return (n->_mp_size >= 0) ? static_cast<std::size_t>(n->_mp_size) : static_cast<std::size_t>(nint_abs(n->_mp_size));
 }
 
+#if defined(_MSC_VER) && defined(__clang__)
+
+// NOTE: clang-cl gives a deprecation warning
+// here due to the fact that the dllexported
+// cache class is missing a copy assignment
+// operator. Not sure what to make of it.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
+
+#endif
+
 // Structure for caching allocated arrays of limbs.
 // NOTE: needs to be public for testing purposes.
 struct MPPP_PUBLIC mpz_alloc_cache {
@@ -116,7 +127,6 @@ struct MPPP_PUBLIC mpz_alloc_cache {
     // NOTE: this will zero initialise recursively both members: we will
     // have all nullptrs in the caches, and all cache sizes will be zeroes.
     constexpr mpz_alloc_cache() : caches(), sizes() {}
-    mpz_alloc_cache &operator=(const mpz_alloc_cache &) = default;
     // Clear the cache, deallocating all the data in the arrays.
     void clear() noexcept;
     ~mpz_alloc_cache()
@@ -124,6 +134,12 @@ struct MPPP_PUBLIC mpz_alloc_cache {
         clear();
     }
 };
+
+#if defined(_MSC_VER) && defined(__clang__)
+
+#pragma clang diagnostic pop
+
+#endif
 
 #if defined(MPPP_HAVE_THREAD_LOCAL)
 
