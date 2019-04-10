@@ -11,7 +11,6 @@
 
 #include <mp++/config.hpp>
 
-#include <mp++/demangle.hpp>
 #include <mp++/exceptions.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
@@ -21,5 +20,6 @@
 #if defined(MPPP_WITH_QUADMATH)
 #include <mp++/real128.hpp>
 #endif
+#include <mp++/type_name.hpp>
 
 #endif

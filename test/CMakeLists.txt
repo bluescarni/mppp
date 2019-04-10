@@ -141,6 +141,6 @@ if(MPPP_TEST_PYBIND11)
   add_subdirectory(pybind11)
 endif()
 
-ADD_MPPP_TESTCASE(demangle)
+ADD_MPPP_TESTCASE(type_name)
 ADD_MPPP_TESTCASE(utils)
 ADD_MPPP_TESTCASE(type_traits)

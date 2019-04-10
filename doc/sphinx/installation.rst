@@ -28,8 +28,6 @@ mp++ has the following dependencies:
 
 * the `GMP <https://gmplib.org/>`__ library, **mandatory** (GMP 5 and later versions are supported,
   the `MPIR <http://mpir.org/>`__ fork of GMP can also be used);
-* on Windows only, the Debug Help (``DbgHelp``) library,
-  **mandatory** (used to enable more informative error messages). The ``DbgHelp`` library is typically included in the operating system;
 * the `GNU MPFR <https://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support for the ``long double`` type (MPFR 3 or a later version is required);
 * the `quadmath library <https://gcc.gnu.org/onlinedocs/libquadmath/>`__ from GCC, *optional*, used
@@ -146,7 +144,6 @@ if both MPFR and quadmath support are enabled, the compilation command on a mode
 The full list of libraries that need to be linked when using mp++ is the following:
 
 * the GMP library (or the MPIR fork), always required (``-lgmp`` on most Unix-like systems);
-* on Windows only, the ``DbgHelp`` library, always required;
 * the MPFR library, required only if mp++ was configured with the ``MPPP_WITH_MPFR`` option (``-lmpfr`` on most Unix-like systems);
 * the quadmath library, required only if mp++ was configured with the ``MPPP_WITH_QUADMATH`` option (``-lquadmath`` with GCC,
   with clang it might be necessary to provide the full path to the library).

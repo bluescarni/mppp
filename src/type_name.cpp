@@ -15,22 +15,9 @@
 #include <cxxabi.h>
 #include <memory>
 
-#elif defined(_MSC_VER)
-
-// Disable some warnings for MSVC.
-#pragma warning(push)
-#pragma warning(disable : 4091)
-
-#include <mutex>
-
-// clang-format off
-#include <Windows.h>
-#include <Dbghelp.h>
-// clang-format on
-
 #endif
 
-#include <mp++/demangle.hpp>
+#include <mp++/type_name.hpp>
 
 namespace mppp
 {
@@ -52,23 +39,9 @@ std::string demangle_from_typeid(const char *s)
 
     // NOTE: return the original string if demangling fails.
     return res ? std::string(res.get()) : std::string(s);
-#elif defined(_MSC_VER)
-    // NOTE: the Windows function for demangling is not thread safe, we will have
-    // to protect it with a mutex.
-    // https://msdn.microsoft.com/ru-ru/library/windows/desktop/ms681400(v=vs.85).aspx
-    // Local static init is thread safe in C++11.
-    static std::mutex mut;
-    char undecorated_name[1024];
-    auto und_name = static_cast<::PSTR>(undecorated_name);
-    auto size = static_cast<::DWORD>(sizeof(undecorated_name));
-    const auto ret = [s, und_name, size]() {
-        std::lock_guard<std::mutex> lock{mut};
-        return ::UnDecorateSymbolName(s, und_name, size, UNDNAME_COMPLETE);
-    }();
-    // Nonzero retval means success. Otherwise, return the mangled name.
-    return ret ? std::string(undecorated_name) : std::string(s);
 #else
     // If no demangling is available, just return the mangled name.
+    // NOTE: MSVC already returns the demangled name from typeid.
     return std::string(s);
 #endif
 }
@@ -76,9 +49,3 @@ std::string demangle_from_typeid(const char *s)
 } // namespace detail
 
 } // namespace mppp
-
-#if defined(_MSC_VER)
-
-#pragma warning(pop)
-
-#endif

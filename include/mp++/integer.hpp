@@ -40,9 +40,9 @@
 #include <vector>
 
 #include <mp++/concepts.hpp>
-#include <mp++/demangle.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
+#include <mp++/type_name.hpp>
 #if defined(MPPP_WITH_MPFR)
 #include <mp++/detail/mpfr.hpp>
 #endif
@@ -2136,7 +2136,7 @@ public:
     {
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
-            throw std::overflow_error("The conversion of the integer " + to_string() + " to the type '" + demangle<T>()
+            throw std::overflow_error("The conversion of the integer " + to_string() + " to the type '" + type_name<T>()
                                       + "' results in overflow");
         }
         return std::move(retval.second);

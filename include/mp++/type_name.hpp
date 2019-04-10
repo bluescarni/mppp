@@ -6,8 +6,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#ifndef MPPP_DEMANGLE_HPP
-#define MPPP_DEMANGLE_HPP
+#ifndef MPPP_TYPE_NAME_HPP
+#define MPPP_TYPE_NAME_HPP
 
 #include <string>
 #include <type_traits>
@@ -76,8 +76,9 @@ inline std::string demangle_impl<__uint128_t const *>()
 
 } // namespace detail
 
+// Determine the name of the type T at runtime.
 template <typename T>
-inline std::string demangle()
+inline std::string type_name()
 {
     // Get the demangled name without cvref.
     auto ret = detail::demangle_impl<typename std::remove_cv<typename std::remove_reference<T>::type>::type>();

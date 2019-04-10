@@ -7,7 +7,7 @@ Changelog
 New
 ~~~
 
-- The :cpp:func:`~mppp::demangle()` function is now part of the public API
+- The :cpp:func:`~mppp::type_name()` function is now part of the public API
   (`#169 <https://github.com/bluescarni/mppp/pull/169>`__).
 - :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational` now respect the format
   flags in output streams (`#161 <https://github.com/bluescarni/mppp/pull/161>`__).

@@ -24,7 +24,6 @@
 #include <utility>
 #include <vector>
 
-#include <mp++/demangle.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
@@ -34,6 +33,7 @@
 #if defined(MPPP_WITH_QUADMATH)
 #include <mp++/real128.hpp>
 #endif
+#include <mp++/type_name.hpp>
 
 #include "test_utils.hpp"
 
@@ -1240,7 +1240,7 @@ struct int_conv_tester {
                                      return ex.what()
                                             == "Conversion of the real "
                                                    + real{int_t{detail::nl_max<T>()} + 1}.to_string() + " to the type '"
-                                                   + demangle<T>() + "' results in overflow";
+                                                   + type_name<T>() + "' results in overflow";
                                  });
         REQUIRE((!real{int_t{detail::nl_max<T>()} + 1}.get(rop)));
         REQUIRE(!get(rop, real{int_t{detail::nl_max<T>()} + 1}));
@@ -1250,7 +1250,7 @@ struct int_conv_tester {
                                      return ex.what()
                                             == "Conversion of the real "
                                                    + real{int_t{detail::nl_min<T>()} - 1}.to_string() + " to the type '"
-                                                   + demangle<T>() + "' results in overflow";
+                                                   + type_name<T>() + "' results in overflow";
                                  });
         REQUIRE((!real{int_t{detail::nl_min<T>()} - 1}.get(rop)));
         REQUIRE(!get(rop, real{int_t{detail::nl_min<T>()} - 1}));

@@ -78,7 +78,7 @@ endif()
 
 # List of source files.
 set(MPPP_SRC_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/demangle.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/type_name.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/integer.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/utils.cpp"
 )
@@ -153,12 +153,6 @@ endif()
 # of the libraries matters on some platforms.
 target_link_libraries(mp++ PUBLIC GMP::GMP)
 
-# Depend on DbgHelp on MSVC, for the demangling support.
-if(YACMA_COMPILER_IS_MSVC)
-    find_package(DbgHelp REQUIRED)
-    target_link_libraries(mp++ PUBLIC DbgHelp::DbgHelp)
-endif()
-
 # Configure config.hpp.
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in" "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" @ONLY)
 
@@ -190,9 +184,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRE
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" DESTINATION "lib/cmake/mp++")
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMPFR.cmake"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindQuadmath.cmake" DESTINATION "lib/cmake/mp++")
-if(YACMA_COMPILER_IS_MSVC)
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindDbgHelp.cmake" DESTINATION "lib/cmake/mp++")
-endif()
 install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION lib/cmake/mp++)
 # Take care of versioning.
 include(CMakePackageConfigHelpers)

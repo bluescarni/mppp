@@ -18,9 +18,9 @@
 #include <type_traits>
 #include <utility>
 
-#include <mp++/demangle.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/visibility.hpp>
+#include <mp++/type_name.hpp>
 
 namespace mppp
 {
@@ -199,7 +199,7 @@ inline
     return retval.first ? retval.second
                         : throw std::overflow_error(
                             "Error while trying to negate the unsigned integral value " + to_string(n)
-                            + ": the result does not fit in the range of the target type '" + demangle<T>() + "'");
+                            + ": the result does not fit in the range of the target type '" + type_name<T>() + "'");
 }
 
 // Safe casting functionality between integral types. It will throw if the conversion overflows the range
@@ -212,7 +212,7 @@ constexpr T safe_cast(const U &n)
                ? static_cast<T>(n)
                : throw std::overflow_error(
                    "Error in the safe conversion between unsigned integral types: the input value " + to_string(n)
-                   + " does not fit in the range of the target type '" + demangle<T>() + "'");
+                   + " does not fit in the range of the target type '" + type_name<T>() + "'");
 }
 
 template <typename T, typename U,
@@ -223,7 +223,7 @@ constexpr T safe_cast(const U &n)
                ? static_cast<T>(n)
                : throw std::overflow_error(
                    "Error in the safe conversion between signed integral types: the input value " + to_string(n)
-                   + " does not fit in the range of the target type '" + demangle<T>() + "'");
+                   + " does not fit in the range of the target type '" + type_name<T>() + "'");
 }
 
 template <typename T, typename U,
@@ -235,7 +235,7 @@ constexpr T safe_cast(const U &n)
                : throw std::overflow_error("Error in the safe conversion from a signed integral type to an unsigned "
                                            "integral type: the input value "
                                            + to_string(n) + " does not fit in the range of the target type '"
-                                           + demangle<T>() + "'");
+                                           + type_name<T>() + "'");
 }
 
 template <typename T, typename U,
@@ -247,7 +247,7 @@ constexpr T safe_cast(const U &n)
                : throw std::overflow_error("Error in the safe conversion from an unsigned integral type to a signed "
                                            "integral type: the input value "
                                            + to_string(n) + " does not fit in the range of the target type '"
-                                           + demangle<T>() + "'");
+                                           + type_name<T>() + "'");
 }
 
 // Helper to ignore unused variables.
