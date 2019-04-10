@@ -116,6 +116,7 @@ struct MPPP_PUBLIC mpz_alloc_cache {
     // NOTE: this will zero initialise recursively both members: we will
     // have all nullptrs in the caches, and all cache sizes will be zeroes.
     constexpr mpz_alloc_cache() : caches(), sizes() {}
+    mpz_alloc_cache &operator=(const mpz_alloc_cache &) = default;
     // Clear the cache, deallocating all the data in the arrays.
     void clear() noexcept;
     ~mpz_alloc_cache()
