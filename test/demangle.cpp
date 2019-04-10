@@ -90,11 +90,4 @@ TEST_CASE("demangle")
     t4.join();
     t5.join();
     t6.join();
-
-#if MPPP_CPLUSPLUS >= 201703L
-    // Test the string view overload.
-    const auto tname = typeid(int).name();
-    const std::string_view sv(tname);
-    REQUIRE(demangle(sv) == demangle(tname));
-#endif
 }
