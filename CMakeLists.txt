@@ -34,9 +34,9 @@ set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
 set(MPPP_CXX_FLAGS_RELEASE ${YACMA_CXX_FLAGS})
 if(YACMA_COMPILER_IS_MSVC)
   # Disable the idiotic minmax macros on MSVC, some annoying warnings,
-  # and enable the bigobj option. Enable also strict conformance mode.
-  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj" "/permissive-")
-  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj" "/permissive-")
+  # and enable the bigobj option.
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
   if(YACMA_COMPILER_IS_CLANGXX)
     # clang-cl emits various warnings from GMP/MPFR, let's just silence them.
     # NOTE: at one point in the recent past, MSVC added an options similar to GCC's isystem:
@@ -50,6 +50,10 @@ if(YACMA_COMPILER_IS_MSVC)
     list(APPEND MPPP_CXX_FLAGS_DEBUG ${_MPPP_CLANG_CL_DISABLED_WARNINGS})
     list(APPEND MPPP_CXX_FLAGS_RELEASE ${_MPPP_CLANG_CL_DISABLED_WARNINGS})
     unset(_MPPP_CLANG_CL_DISABLED_WARNINGS)
+  else()
+    # Enable strict conformance mode, but only for MSVC, not clang-cl.
+    list(APPEND MPPP_CXX_FLAGS_DEBUG "/permissive-")
+    list(APPEND MPPP_CXX_FLAGS_RELEASE "/permissive-")
   endif()
 endif()
 if(YACMA_COMPILER_IS_INTELXX)
