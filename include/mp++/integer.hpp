@@ -158,7 +158,10 @@ struct MPPP_PUBLIC mpz_alloc_cache {
 // NOTE: because the ctor of mpz_alloc_cache is constexpr,
 // then the init of this thread_local variable will happen
 // before any dynamic initialisation.
-MPPP_PUBLIC extern thread_local mpz_alloc_cache mpz_alloc_cache_inst;
+#if !defined(_MSC_VER)
+MPPP_PUBLIC
+#endif
+extern thread_local mpz_alloc_cache mpz_alloc_cache_inst;
 
 #endif
 
