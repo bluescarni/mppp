@@ -126,42 +126,9 @@ struct MPPP_PUBLIC mpz_alloc_cache {
 
 #if defined(MPPP_HAVE_THREAD_LOCAL)
 
-// Thread local allocation cache.
-// NOTE: some link/notes regarding thread_local:
-// - thread_local alone also implies "static":
-//   http://eel.is/c++draft/dcl.stc
-//   https://stackoverflow.com/questions/22794382/are-c11-thread-local-variables-automatically-static
-// - all variables declared thread_local have "thread storage duration", that is,
-//   they live for the duration of the thread: http://eel.is/c++draft/basic.stc.thread
-// - there are 2 ways variables with thread storage duration may be initialised:
-//   - static initialisation, which is possible for constexpr-like entities:
-//     http://eel.is/c++draft/basic.start.static
-//     Note that it says: "Constant initialization is performed if a variable or temporary object with static or thread
-//     storage duration is initialized by a constant initializer for the entity". So it seems like block-scope
-//     variables with thread storage duration will be initialised as part of constant initialisation at thread startup,
-//     if possible. See also the cppreference page:
-//     https://en.cppreference.com/w/cpp/language/storage_duration#Static_local_variables
-//     (here it is talking about static local variables, but it should apply also to thread_local variables
-//     as indicated here: https://en.cppreference.com/w/cpp/language/initialization).
-//   - dynamic initialisation otherwise, meaning that the variable is initialised the first time control
-//     passes through its declaration:
-//     http://eel.is/c++draft/stmt.dcl#4
-// - destruction of objects with thread storage duration happens before the destruction of objects with
-//   static storage duration:
-//   http://eel.is/c++draft/basic.start.term#2
-// - "All static initialization strongly happens before any dynamic initialization.":
-//   http://eel.is/c++draft/basic.start#static-2
-// - "If the completion of the constructor or dynamic initialization of an object with thread storage duration is
-//   sequenced before that of another, the completion of the destructor of the second is sequenced before the initiation
-//   of the destructor of the first." (that is, objects are destroyed in reverse with respect to construction order):
-//   http://eel.is/c++draft/basic.start.term#3
-// NOTE: because the ctor of mpz_alloc_cache is constexpr,
-// then the init of this thread_local variable will happen
-// before any dynamic initialisation.
-#if !defined(_MSC_VER)
-MPPP_PUBLIC
-#endif
-extern thread_local mpz_alloc_cache mpz_alloc_cache_inst;
+// Get a reference to the thread-local mpz allocation
+// cache. Used only for debugging.
+MPPP_PUBLIC mpz_alloc_cache &get_thread_local_mpz_cache();
 
 #endif
 
@@ -7727,12 +7694,7 @@ inline std::size_t hash(const integer<SSize> &n)
  * It is safe to call this function concurrently from different threads.
  * \endrststar
  */
-inline void free_integer_caches()
-{
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-    detail::mpz_alloc_cache_inst.clear();
-#endif
-}
+MPPP_PUBLIC void free_integer_caches();
 
 /** @} */
 
