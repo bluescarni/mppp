@@ -173,7 +173,7 @@ struct real_constants {
 };
 
 // Default precision value.
-MPPP_PUBLIC extern std::atomic<::mpfr_prec_t> default_prec;
+MPPP_PUBLIC extern std::atomic<::mpfr_prec_t> real_default_prec;
 
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
@@ -244,7 +244,7 @@ using cvr_real_enabler
  */
 inline mpfr_prec_t real_get_default_prec()
 {
-    return detail::default_prec.load(std::memory_order_relaxed);
+    return detail::real_default_prec.load(std::memory_order_relaxed);
 }
 
 /// Set the default precision for \link mppp::real real\endlink objects.
@@ -267,7 +267,7 @@ inline void real_set_default_prec(::mpfr_prec_t p)
                                     + ": the value must be either zero or between " + detail::to_string(real_prec_min())
                                     + " and " + detail::to_string(real_prec_max()));
     }
-    detail::default_prec.store(p, std::memory_order_relaxed);
+    detail::real_default_prec.store(p, std::memory_order_relaxed);
 }
 
 /// Reset the default precision for \link mppp::real real\endlink objects.
@@ -281,7 +281,7 @@ inline void real_set_default_prec(::mpfr_prec_t p)
  */
 inline void real_reset_default_prec()
 {
-    detail::default_prec.store(0, std::memory_order_relaxed);
+    detail::real_default_prec.store(0, std::memory_order_relaxed);
 }
 
 namespace detail

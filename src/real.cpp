@@ -160,7 +160,7 @@ void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 //
 // This ensures that static reals, which are subject to dynamic initialization, are initialised
 // when this variable has already been constructed, and thus access to it will be safe.
-std::atomic<::mpfr_prec_t> default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
+std::atomic<::mpfr_prec_t> real_default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
 
 } // namespace detail
 

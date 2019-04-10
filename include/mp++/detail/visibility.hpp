@@ -11,6 +11,10 @@
 
 // Convenience macros for visibility attributes. Mostly insipred by:
 // https://gcc.gnu.org/wiki/Visibility
+// We check first for Windows, where we assume every compiler
+// knows dllexport/dllimport. On other platforms, we use the GCC-like
+// syntax for GCC, clang and ICC. Otherwise, we leave MPPP_PUBLIC
+// empty.
 #if defined(_WIN32) || defined(__CYGWIN__)
 
 #if defined(mppp_EXPORTS)
@@ -23,9 +27,13 @@
 
 #endif
 
-#else
+#elif defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
 
 #define MPPP_PUBLIC __attribute__((visibility("default")))
+
+#else
+
+#define MPPP_PUBLIC
 
 #endif
 
