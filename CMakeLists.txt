@@ -72,7 +72,7 @@ if(YACMA_COMPILER_IS_GNUCXX)
     check_cxx_compiler_flag("-fconcepts" MPPP_COMPILER_SUPPORTS_CONCEPTS)
 endif()
 
-# Initial setup of the mp++ target.
+# List of source files.
 set(MPPP_SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/demangle.cpp"
 )

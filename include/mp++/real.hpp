@@ -34,7 +34,7 @@
 #include <vector>
 
 #include <mp++/concepts.hpp>
-#include <mp++/detail/demangle.hpp>
+#include <mp++/demangle.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
@@ -1922,7 +1922,7 @@ private:
     template <typename T>
     [[noreturn]] void raise_overflow_error() const
     {
-        throw std::overflow_error("Conversion of the real " + to_string() + " to the type '" + detail::demangle<T>()
+        throw std::overflow_error("Conversion of the real " + to_string() + " to the type '" + demangle<T>()
                                   + "' results in overflow");
     }
     // Unsigned integrals, excluding bool.
@@ -2657,10 +2657,10 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &) {}
 // NOTE: we need 2 overloads for this, as we cannot extract a non-const pointer from
 // arg0 if arg0 is a const ref.
 template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int> = 0>
-void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&... );
+void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
 
 template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int> = 0>
-void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&... );
+void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
 
 template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int>>
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)

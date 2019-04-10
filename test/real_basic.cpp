@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-#include <mp++/detail/demangle.hpp>
+#include <mp++/demangle.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
@@ -321,24 +321,24 @@ TEST_CASE("real constructors")
         (real{std::string{"12"}, -1, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string(
-                          "Cannot construct a real from a string in base -1: the base must either be zero or in "
-                          "the [2,62] range");
+                       "Cannot construct a real from a string in base -1: the base must either be zero or in "
+                       "the [2,62] range");
         });
 #if MPPP_CPLUSPLUS >= 201703L
     REQUIRE_THROWS_PREDICATE(
         (real{std::string_view{"12"}, -1, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string(
-                          "Cannot construct a real from a string in base -1: the base must either be zero or in "
-                          "the [2,62] range");
+                       "Cannot construct a real from a string in base -1: the base must either be zero or in "
+                       "the [2,62] range");
         });
 #endif
     REQUIRE_THROWS_PREDICATE(
         (real{std::string{"12"}, 80, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string(
-                          "Cannot construct a real from a string in base 80: the base must either be zero or in "
-                          "the [2,62] range");
+                       "Cannot construct a real from a string in base 80: the base must either be zero or in "
+                       "the [2,62] range");
         });
     real_reset_default_prec();
     REQUIRE_THROWS_PREDICATE((real{"12", 10, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -1004,15 +1004,15 @@ TEST_CASE("real assignment")
         r8.set(std::string{"4.321e3"}, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base -1: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base -1: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE_THROWS_PREDICATE(
         r8.set(std::string{"4.321e3"}, 65), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base 65: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base 65: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     REQUIRE_THROWS_PREDICATE(r8.set(std::string{"hell-o"}), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -1048,15 +1048,15 @@ TEST_CASE("real assignment")
         r8.set(vc.data() + 1, vc.data() + 5, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base -1: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base -1: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE_THROWS_PREDICATE(
         r8.set(vc.data() + 1, vc.data() + 5, 65), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base 65: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base 65: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE_THROWS_PREDICATE(
         r8.set(vc.data(), vc.data() + 5), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -1088,15 +1088,15 @@ TEST_CASE("real assignment")
         r8.set(std::string_view{"4.321e3"}, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base -1: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base -1: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE_THROWS_PREDICATE(
         r8.set(std::string_view{"4.321e3"}, 65), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base 65: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base 65: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     REQUIRE_THROWS_PREDICATE(
@@ -1240,7 +1240,7 @@ struct int_conv_tester {
                                      return ex.what()
                                             == "Conversion of the real "
                                                    + real{int_t{detail::nl_max<T>()} + 1}.to_string() + " to the type '"
-                                                   + detail::demangle<T>() + "' results in overflow";
+                                                   + demangle<T>() + "' results in overflow";
                                  });
         REQUIRE((!real{int_t{detail::nl_max<T>()} + 1}.get(rop)));
         REQUIRE(!get(rop, real{int_t{detail::nl_max<T>()} + 1}));
@@ -1250,7 +1250,7 @@ struct int_conv_tester {
                                      return ex.what()
                                             == "Conversion of the real "
                                                    + real{int_t{detail::nl_min<T>()} - 1}.to_string() + " to the type '"
-                                                   + detail::demangle<T>() + "' results in overflow";
+                                                   + demangle<T>() + "' results in overflow";
                                  });
         REQUIRE((!real{int_t{detail::nl_min<T>()} - 1}.get(rop)));
         REQUIRE(!get(rop, real{int_t{detail::nl_min<T>()} - 1}));

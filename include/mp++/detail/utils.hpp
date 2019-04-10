@@ -26,7 +26,7 @@
 #include <typeinfo>
 #include <utility>
 
-#include <mp++/detail/demangle.hpp>
+#include <mp++/demangle.hpp>
 #include <mp++/detail/type_traits.hpp>
 
 namespace mppp
@@ -206,8 +206,8 @@ inline
     const auto retval = unsigned_to_nsigned<T>(n);
     return retval.first ? retval.second
                         : throw std::overflow_error(
-                              "Error while trying to negate the unsigned integral value " + to_string(n)
-                              + ": the result does not fit in the range of the target type '" + demangle<T>() + "'");
+                            "Error while trying to negate the unsigned integral value " + to_string(n)
+                            + ": the result does not fit in the range of the target type '" + demangle<T>() + "'");
 }
 
 // Safe casting functionality between integral types. It will throw if the conversion overflows the range
@@ -219,8 +219,8 @@ constexpr T safe_cast(const U &n)
     return n <= nl_max<T>()
                ? static_cast<T>(n)
                : throw std::overflow_error(
-                     "Error in the safe conversion between unsigned integral types: the input value " + to_string(n)
-                     + " does not fit in the range of the target type '" + demangle<T>() + "'");
+                   "Error in the safe conversion between unsigned integral types: the input value " + to_string(n)
+                   + " does not fit in the range of the target type '" + demangle<T>() + "'");
 }
 
 template <typename T, typename U,
@@ -230,8 +230,8 @@ constexpr T safe_cast(const U &n)
     return (n <= nl_max<T>() && n >= nl_min<T>())
                ? static_cast<T>(n)
                : throw std::overflow_error(
-                     "Error in the safe conversion between signed integral types: the input value " + to_string(n)
-                     + " does not fit in the range of the target type '" + demangle<T>() + "'");
+                   "Error in the safe conversion between signed integral types: the input value " + to_string(n)
+                   + " does not fit in the range of the target type '" + demangle<T>() + "'");
 }
 
 template <typename T, typename U,

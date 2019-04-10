@@ -32,7 +32,7 @@
 #include <vector>
 
 #include <mp++/concepts.hpp>
-#include <mp++/detail/demangle.hpp>
+#include <mp++/demangle.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #if defined(MPPP_WITH_MPFR)
@@ -802,8 +802,8 @@ public:
     {
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
-            throw std::overflow_error("Conversion of the rational " + to_string() + " to the type '"
-                                      + detail::demangle<T>() + "' results in overflow");
+            throw std::overflow_error("Conversion of the rational " + to_string() + " to the type '" + demangle<T>()
+                                      + "' results in overflow");
         }
         return std::move(retval.second);
     }
