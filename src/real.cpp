@@ -13,14 +13,19 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
 #include <mp++/config.hpp>
+#include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
+#if defined(MPPP_WITH_QUADMATH)
+#include <mp++/real128.hpp>
+#endif
 
 namespace mppp
 {
@@ -163,5 +168,130 @@ void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 std::atomic<::mpfr_prec_t> real_default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
 
 } // namespace detail
+
+#if defined(MPPP_WITH_QUADMATH)
+
+void real::assign_real128(const real128 &x)
+{
+    // Get the IEEE repr. of x.
+    const auto t = x.get_ieee();
+    // A utility function to write the significand of x
+    // as a big integer inside m_mpfr.
+    auto write_significand = [this, &t]() {
+        // The 4 32-bits part of the significand, from most to least
+        // significant digits.
+        const auto p1 = std::get<2>(t) >> 32;
+        const auto p2 = std::get<2>(t) % (1ull << 32);
+        const auto p3 = std::get<3>(t) >> 32;
+        const auto p4 = std::get<3>(t) % (1ull << 32);
+        // Build the significand, from most to least significant.
+        // NOTE: unsigned long is guaranteed to be at least 32 bit.
+        ::mpfr_set_ui(&this->m_mpfr, static_cast<unsigned long>(p1), MPFR_RNDN);
+        ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
+        ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p2), MPFR_RNDN);
+        ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
+        ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p3), MPFR_RNDN);
+        ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
+        ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p4), MPFR_RNDN);
+    };
+    // Check if the significand is zero.
+    const bool sig_zero = !std::get<2>(t) && !std::get<3>(t);
+    if (std::get<1>(t) == 0u) {
+        // Zero or subnormal numbers.
+        if (sig_zero) {
+            // Zero.
+            ::mpfr_set_zero(&m_mpfr, 1);
+        } else {
+            // Subnormal.
+            write_significand();
+            ::mpfr_div_2ui(&m_mpfr, &m_mpfr, 16382ul + 112ul, MPFR_RNDN);
+        }
+    } else if (std::get<1>(t) == 32767u) {
+        // NaN or inf.
+        if (sig_zero) {
+            // inf.
+            ::mpfr_set_inf(&m_mpfr, 1);
+        } else {
+            // NaN.
+            ::mpfr_set_nan(&m_mpfr);
+        }
+    } else {
+        // Write the significand into this.
+        write_significand();
+        // Add the hidden bit on top.
+        const auto r_2_112 = detail::real_constants<>::get_2_112();
+        ::mpfr_add(&m_mpfr, &m_mpfr, &r_2_112.first, MPFR_RNDN);
+        // Multiply by 2 raised to the adjusted exponent.
+        ::mpfr_mul_2si(&m_mpfr, &m_mpfr, static_cast<long>(std::get<1>(t)) - (16383l + 112), MPFR_RNDN);
+    }
+    if (std::get<0>(t)) {
+        // Negate if the sign bit is set.
+        ::mpfr_neg(&m_mpfr, &m_mpfr, MPFR_RNDN);
+    }
+}
+
+real128 real::convert_to_real128() const
+{
+    // Handle the special cases first.
+    if (nan_p()) {
+        return real128_nan();
+    }
+    // NOTE: the number 2**18 = 262144 is chosen so that it's amply outside the exponent
+    // range of real128 (a 15 bit value with some offset) but well within the
+    // range of long (around +-2**31 guaranteed by the standard).
+    //
+    // NOTE: the reason why we do these checks with large positive and negative exponents
+    // is that they ensure we can safely convert _mpfr_exp to long later.
+    if (inf_p() || m_mpfr._mpfr_exp > (1l << 18)) {
+        return sgn() > 0 ? real128_inf() : -real128_inf();
+    }
+    if (zero_p() || m_mpfr._mpfr_exp < -(1l << 18)) {
+        // Preserve the signedness of zero.
+        return signbit() ? -real128{} : real128{};
+    }
+    // NOTE: this is similar to the code in real128.hpp for the constructor from integer,
+    // with some modification due to the different padding in MPFR vs GMP (see below).
+    const auto prec = get_prec();
+    // Number of limbs in this.
+    auto nlimbs = prec / ::mp_bits_per_limb + static_cast<bool>(prec % ::mp_bits_per_limb);
+    assert(nlimbs != 0);
+    // NOTE: in MPFR the most significant (nonzero) bit of the significand
+    // is always at the high end of the most significand limb. In other words,
+    // MPFR pads the multiprecision significand on the right, the opposite
+    // of GMP integers (which have padding on the left, i.e., in the top limb).
+    //
+    // NOTE: contrary to real128, the MPFR format does not have a hidden bit on top.
+    //
+    // Init retval with the highest limb.
+    //
+    // NOTE: MPFR does not support nail builds in GMP, so we don't have to worry about that.
+    real128 retval{m_mpfr._mpfr_d[--nlimbs]};
+    // Init the number of read bits.
+    // NOTE: we have read a full limb in the line above, so mp_bits_per_limb bits. If mp_bits_per_limb > 113,
+    // then the constructor of real128 truncated the input limb value to 113 bits of precision, so effectively
+    // we have read 113 bits only in such a case.
+    unsigned read_bits = detail::c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits());
+    while (nlimbs && read_bits < real128_sig_digits()) {
+        // Number of bits to be read from the current limb. Either mp_bits_per_limb or less.
+        const unsigned rbits
+            = detail::c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits() - read_bits);
+        // Shift up by rbits.
+        // NOTE: cast to int is safe, as rbits is no larger than mp_bits_per_limb which is
+        // representable by int.
+        retval = scalbn(retval, static_cast<int>(rbits));
+        // Add the next limb, removing lower bits if they are not to be read.
+        retval += m_mpfr._mpfr_d[--nlimbs] >> (static_cast<unsigned>(::mp_bits_per_limb) - rbits);
+        // Update the number of read bits.
+        // NOTE: due to the definition of rbits, read_bits can never reach past real128_sig_digits().
+        // Hence, this addition can never overflow (as sig_digits is unsigned itself).
+        read_bits += rbits;
+    }
+    // NOTE: from earlier we know the exponent is well within the range of long, and read_bits
+    // cannot be larger than 113.
+    retval = scalbln(retval, static_cast<long>(m_mpfr._mpfr_exp) - static_cast<long>(read_bits));
+    return sgn() > 0 ? retval : -retval;
+}
+
+#endif
 
 } // namespace mppp
