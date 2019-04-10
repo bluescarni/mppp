@@ -60,7 +60,7 @@ constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
     return real_prec_check(p) ? p : (p < real_prec_min() ? real_prec_min() : real_prec_max());
 }
 
-// Helper function to print an mpfr to stream in base 10.
+// Helper function to print an mpfr to stream in a given base.
 MPPP_PUBLIC void mpfr_to_stream(const ::mpfr_t, std::ostream &, int);
 
 #if !defined(MPPP_DOXYGEN_INVOKED)
@@ -281,7 +281,7 @@ inline void real_set_default_prec(::mpfr_prec_t p)
  */
 inline void real_reset_default_prec()
 {
-    detail::default_prec.store(0);
+    detail::default_prec.store(0, std::memory_order_relaxed);
 }
 
 namespace detail
