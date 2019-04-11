@@ -51,9 +51,12 @@ if(YACMA_COMPILER_IS_MSVC)
     list(APPEND MPPP_CXX_FLAGS_RELEASE ${_MPPP_CLANG_CL_DISABLED_WARNINGS})
     unset(_MPPP_CLANG_CL_DISABLED_WARNINGS)
   endif()
-  # Enable strict conformance mode, if supported
+  # Enable strict conformance mode, if supported.
+  set(CMAKE_REQUIRED_QUIET TRUE)
   check_cxx_compiler_flag("/permissive-" _MPPP_MSVC_SUPPORTS_STRICT_CONFORMANCE)
+  unset(CMAKE_REQUIRED_QUIET)
   if(_MPPP_MSVC_SUPPORTS_STRICT_CONFORMANCE)
+    message(STATUS "The '/permissive-' flag is supported, enabling it.")
     list(APPEND MPPP_CXX_FLAGS_DEBUG "/permissive-")
     list(APPEND MPPP_CXX_FLAGS_RELEASE "/permissive-")
   endif()
