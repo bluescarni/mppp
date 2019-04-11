@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     
-    <title>Reference &#8212; mp++ 0.14 documentation</title>
+    <title>Utility functions &#8212; mp++ 0.14 documentation</title>
 
     <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,15 +25,16 @@
     <script type="text/javascript" src="_static/sphinx_materialdesign_theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Macros and definitions" href="definitions.html" />
-    <link rel="prev" title="Extra: integration with pybind11" href="tutorial_pybind11.html" /> 
+    <link rel="next" title="Benchmarks" href="benchmarks.html" />
+    <link rel="prev" title="Multiprecision floats" href="real.html" /> 
   </head>
 <body>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-drawer"><header class="mdl-layout__header mdl-layout__header--waterfall ">
     <div class="mdl-layout__header-row">
         
         <nav class="mdl-navigation breadcrumb">
-            <a class="mdl-navigation__link is-active">Reference</a>
+            <a class="mdl-navigation__link" href="reference.html">Reference</a><i class="material-icons">navigate_next</i>
+            <a class="mdl-navigation__link is-active">Utility functions</a>
         </nav>
         <div class="mdl-layout-spacer"></div>
         <nav class="mdl-navigation">
@@ -56,7 +57,7 @@
         
 <a id="button-show-source"
     class="mdl-button mdl-js-button mdl-button--icon"
-    href="_sources/reference.rst.txt" rel="nofollow">
+    href="_sources/utilities.rst.txt" rel="nofollow">
 <i class="material-icons">code</i>
 </a>
 <div class="mdl-tooltip" data-mdl-for="button-show-source">
@@ -112,7 +113,7 @@ Show Source
 <li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Reference</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
@@ -121,7 +122,7 @@ Show Source
 <li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Utility functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
@@ -171,7 +172,7 @@ Show Source
 <li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Reference</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
@@ -180,7 +181,7 @@ Show Source
 <li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Utility functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
@@ -199,23 +200,33 @@ Show Source
     <div class="document">
         <div class="page-content">
         
-  <div class="section" id="reference">
-<span id="id1"></span><h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
-<p>The following subsections contain the detailed documentation of all of mp++’s public classes and functions.
-Before perusing the C++ reference, users are encouraged to first go through the <a class="reference internal" href="tutorial.html#tutorial"><span class="std std-ref">tutorial</span></a>.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="definitions.html">Macros and definitions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="namespaces.html">Namespaces</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="concepts.html">Common concepts</a></li>
-<li class="toctree-l1"><a class="reference internal" href="integer.html">Multiprecision integers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
-<li class="toctree-l1"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utility functions</a></li>
-</ul>
+  <div class="section" id="utility-functions">
+<h1>Utility functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="_CPPv4I0EN4mppp9type_nameENSt6stringEv">
+<span id="_CPPv3I0EN4mppp9type_nameEv"></span><span id="_CPPv2I0EN4mppp9type_nameEv"></span>template&lt;typename <code class="descname">T</code>&gt;<br />std::string <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">type_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mppp9type_nameENSt6stringEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This function will return a string representation
+for the name of the input type <code class="docutils literal notranslate"><span class="pre">T</span></code>.</p>
+<p>If supported by the
+current platform/compiler combination, the returned string
+will be a human-readable (i.e., demangled) identifier. Otherwise,
+a string based on <code class="docutils literal notranslate"><span class="pre">typeid(T).name()</span></code> will be returned.</p>
+<p>Example:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">type_name</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="o">*&gt;</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span> <span class="c1">// Prints &quot;std::string const*&quot; on Linux.</span>
+</pre></div>
 </div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a string representation for the type <code class="docutils literal notranslate"><span class="pre">T</span></code>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Throws:</th><td class="field-body"><strong>unspecified</strong> – any exception raised by memory allocation failures.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 
 
@@ -227,18 +238,18 @@ Before perusing the C++ reference, users are encouraged to first go through the 
 
       <div class="clearer"></div>
     </div><div class="pagenation">
-     <a id="button-prev" href="tutorial_pybind11.html" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored" role="botton" accesskey="P">
+     <a id="button-prev" href="real.html" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored" role="botton" accesskey="P">
          <i class="pagenation-arrow-L material-icons">arrow_back</i>
          <div class="pagenation-text">
             <span class="pagenation-direction">Previous</span>
-            <div>Extra: integration with pybind11</div>
+            <div>Multiprecision floats</div>
          </div>
      </a>
-     <a id="button-next" href="definitions.html" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored" role="botton" accesskey="N">
+     <a id="button-next" href="benchmarks.html" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored" role="botton" accesskey="N">
         <i class="pagenation-arrow-R material-icons">arrow_forward</i>
         <div class="pagenation-text">
             <span class="pagenation-direction">Next</span>
-            <div>Macros and definitions</div>
+            <div>Benchmarks</div>
         </div>
      </a>
   </div>
@@ -250,7 +261,7 @@ Before perusing the C++ reference, users are encouraged to first go through the 
         <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>

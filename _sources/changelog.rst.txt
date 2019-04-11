@@ -7,12 +7,19 @@ Changelog
 New
 ~~~
 
+- The :cpp:func:`~mppp::type_name()` function is now part of the public API
+  (`#169 <https://github.com/bluescarni/mppp/pull/169>`__).
 - :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational` now respect the format
   flags in output streams (`#161 <https://github.com/bluescarni/mppp/pull/161>`__).
 
 Changes
 ~~~~~~~
 
+- mp++ does not depend on the DbgHelp library on Windows any more
+  (`#169 <https://github.com/bluescarni/mppp/pull/169>`__).
+- **BREAKING**: mp++ has now a compiled component. In order to use mp++, you will now have to
+  both include the mp++ headers **and** link to the mp++ library
+  (`#169 <https://github.com/bluescarni/mppp/pull/169>`__).
 - Various improvements to the benchmarks (`#166 <https://github.com/bluescarni/mppp/pull/166>`__).
 - **BREAKING**: the input stream operators have been removed from all classes
   (`#161 <https://github.com/bluescarni/mppp/pull/161>`__).

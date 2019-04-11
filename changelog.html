@@ -120,6 +120,7 @@ Show Source
 <li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
@@ -178,6 +179,7 @@ Show Source
 <li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
@@ -203,6 +205,8 @@ Show Source
 <div class="section" id="new">
 <h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>The <a class="reference internal" href="utilities.html#_CPPv4I0EN4mppp9type_nameENSt6stringEv" title="mppp::type_name"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">type_name()</span></code></a> function is now part of the public API
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/169">#169</a>).</li>
 <li><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> now respect the format
 flags in output streams (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/161">#161</a>).</li>
 </ul>
@@ -210,6 +214,11 @@ flags in output streams (<a class="reference external" href="https://github.com/
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>mp++ does not depend on the DbgHelp library on Windows any more
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/169">#169</a>).</li>
+<li><strong>BREAKING</strong>: mp++ has now a compiled component. In order to use mp++, you will now have to
+both include the mp++ headers <strong>and</strong> link to the mp++ library
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/169">#169</a>).</li>
 <li>Various improvements to the benchmarks (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/166">#166</a>).</li>
 <li><strong>BREAKING</strong>: the input stream operators have been removed from all classes
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/161">#161</a>).</li>

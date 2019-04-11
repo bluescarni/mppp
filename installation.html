@@ -121,6 +121,7 @@ Show Source
 <li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
@@ -179,6 +180,7 @@ Show Source
 <li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a><ul>
@@ -201,34 +203,39 @@ Show Source
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>mp++ is written in modern C++, and it requires a compiler able to understand at least C++11
-(mp++ will also use some features from C++14 and C++17, if supported by the compiler). mp++ is known to run
-on the following setups:</p>
+<p>mp++ is written in modern C++, and it requires a compiler able to understand
+at least C++11 (mp++ will also use some features from C++14 and C++17,
+if supported by the compiler). mp++ is known to run on the following setups:</p>
 <ul class="simple">
 <li>GCC 4.8 and later versions on GNU/Linux 32/64-bit,</li>
 <li>Clang 3.8 and later versions on GNU/Linux 64-bit,</li>
 <li>MSVC 2015 and later versions on Windows 32/64-bit,</li>
-<li>Clang 4 and later versions on Windows 32/64-bit (with the <code class="docutils literal notranslate"><span class="pre">clang-cl</span></code> driver for MSVC),</li>
-<li>MinGW GCC 6 on Windows 64-bit,</li>
+<li>Clang 4 and later versions on Windows 32/64-bit
+(with the <code class="docutils literal notranslate"><span class="pre">clang-cl</span></code> driver for MSVC),</li>
+<li>MinGW GCC 8 on Windows 64-bit,</li>
 <li>Clang on OSX 64-bit (Xcode 6.4 and later),</li>
 <li>Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).</li>
 </ul>
-<p>mp++ has been written, tested and benchmarked on x86 processors, but it does not contain any architecture-specific code
-and thus it should run on any architecture supported by GMP (as long as a decent C++11 compiler is available).
-mp++ does use compiler-specific functionality (e.g., 128-bit <a class="reference external" href="https://gcc.gnu.org/onlinedocs/gcc/_005f_005fint128.html">integers</a>
-or intrinsics on 64-bit architectures) for the implementation of fast integer arithmetics. If such functionality is not available, mp++
+<p>mp++ has been written, tested and benchmarked on x86 processors, but it does
+not contain any architecture-specific code
+and thus it should run on any architecture supported by GMP
+(as long as a decent C++11 compiler is available).
+mp++ does use compiler-specific functionality
+(e.g., 128-bit <a class="reference external" href="https://gcc.gnu.org/onlinedocs/gcc/_005f_005fint128.html">integers</a>
+or intrinsics on 64-bit architectures) for the implementation of
+fast integer arithmetics. If such functionality is not available, mp++
 will fall back to GMP’s <code class="docutils literal notranslate"><span class="pre">mpn_</span></code> functions.</p>
 <p>mp++ has the following dependencies:</p>
 <ul class="simple">
 <li>the <a class="reference external" href="https://gmplib.org/">GMP</a> library, <strong>mandatory</strong> (GMP 5 and later versions are supported,
 the <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP can also be used);</li>
-<li>on Windows only, the Debug Help (<code class="docutils literal notranslate"><span class="pre">DbgHelp</span></code>) library,
-<strong>mandatory</strong> (used to enable more informative error messages). The <code class="docutils literal notranslate"><span class="pre">DbgHelp</span></code> library is typically included in the operating system;</li>
 <li>the <a class="reference external" href="https://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library, <em>optional</em>, used in the implementation
-of the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class and for providing support for the <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> type (MPFR 3 or a later version is required);</li>
+of the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class and for providing support
+for the <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> type (MPFR 3 or a later version is required);</li>
 <li>the <a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/">quadmath library</a> from GCC, <em>optional</em>, used
-in the implementation of the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class (typically, the quadmath library
-is part of GCC and it does not need to be installed separately);</li>
+in the implementation of the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class
+(typically, the quadmath library is part of GCC and it does not need to
+be installed separately);</li>
 <li>the <a class="reference external" href="https://www.boost.org/">Boost</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a> libraries, <em>optional</em>, currently used
 only in the benchmarking suite.</li>
 </ul>
@@ -238,33 +245,47 @@ installing from source (the minimum required version is 3.3).</p>
 <div class="section" id="installation-from-source">
 <h2>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this headline">¶</a></h2>
 <p>Source releases of mp++ can be downloaded from <a class="reference external" href="https://github.com/bluescarni/mppp/releases">github</a>. Once in the source tree
-of mp++, you can use <code class="docutils literal notranslate"><span class="pre">cmake</span></code> to configure the build to your liking (e.g., enabling optional features, customizing the installation
+of mp++, you can use <code class="docutils literal notranslate"><span class="pre">cmake</span></code> to configure the build to your liking
+(e.g., enabling optional features, customizing the installation
 path, etc.). The available configuration options are:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code>: enable features relying on the GNU MPFR library (off by default),</li>
-<li><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code>: enable features relying on the quadmath library (off by default),</li>
+<li><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code>: enable features relying on the GNU
+MPFR library (off by default),</li>
+<li><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code>: enable features relying on the
+quadmath library (off by default),</li>
 <li><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_TESTS</span></code>: build the test suite (off by default),</li>
 <li><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_BENCHMARKS</span></code>: build the benchmarking suite (off by default).</li>
 </ul>
-<p>Note that the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option, at this time, is available only using GCC (all the supported versions) and Clang
-(since version 3.9). When using Clang, it is still necessary to link to the quadmath library from GCC.</p>
-<p>To build mp++, you can run the following CMake command from the build directory:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ cmake --build .
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option, at this time, is available only
+using GCC (all the supported versions) and Clang
+(since version 3.9). When using Clang, it is still necessary to link to the
+quadmath library from GCC.</p>
+<p>To build mp++, you can run the following CMake command from the
+build directory:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> cmake --build .
 </pre></div>
 </div>
-<p>Since mp++ is a header-only library (although with compiled dependencies), there’s no compilation step, unless the tests or the benchmarks are being built.
-To install mp++, you can use the following CMake command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ cmake  --build . --target install
+<p>To install mp++, you can use the following CMake command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> cmake  --build . --target install
 </pre></div>
 </div>
-<p>The installation command will copy the mp++ headers to the <code class="docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX</span></code> directory, in the <code class="docutils literal notranslate"><span class="pre">include</span></code> subdirectory.</p>
-<p>If you enabled the <code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_TESTS</span></code> option, you can run the test suite with the following command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ cmake  --build . --target test
+<p>The installation command will copy the mp++ headers and library to the
+<code class="docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX</span></code> directory.</p>
+<p>If you enabled the <code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_TESTS</span></code> option, you can run the test suite
+with the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> cmake  --build . --target <span class="nb">test</span>
 </pre></div>
 </div>
-<p>If you enabled the <code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_BENCHMARKS</span></code> option, you can run the benchmark suite with the following command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ cmake  --build . --target benchmark
+<p>If you enabled the <code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_BENCHMARKS</span></code> option, you can run the benchmark
+suite with the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> cmake  --build . --target benchmark
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">On Windows, in order to execute the test or the benchmark suite you have to ensure that the
+<code class="docutils literal notranslate"><span class="pre">PATH</span></code> variable includes the directory that contains the mp++
+DLL (otherwise the tests will fail to run).</p>
 </div>
 </div>
 <div class="section" id="installation-via-conda">
@@ -272,20 +293,22 @@ To install mp++, you can use the following CMake command:</p>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 0.2.</span></p>
 </div>
-<p>mp++ is available in the <a class="reference external" href="https://conda.io/docs/">conda</a> package manager from the
+<p>mp++ is available in the <a class="reference external" href="https://conda.io/en/latest/">conda</a> package manager from the
 <a class="reference external" href="https://conda-forge.org/">conda-forge</a> channel. Packages for Linux 64-bit, Windows 32/64-bit
-and OSX 64-bit are available. In order to install mp++ via conda, you just need to add <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> to the channels:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ conda config --add channels conda-forge
-$ conda install mppp
+and OSX 64-bit are available. In order to install mp++ via conda, you just need
+to add <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> to the channels:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> conda config --add channels conda-forge
+<span class="gp">$</span> conda install mppp
 </pre></div>
 </div>
 <p>(note that the <a class="reference external" href="https://anaconda.org/conda-forge/mppp">conda package</a> for mp++ is named <code class="docutils literal notranslate"><span class="pre">mppp</span></code> rather than <code class="docutils literal notranslate"><span class="pre">mp++</span></code>)</p>
-<p>Please refer to the <a class="reference external" href="https://conda.io/docs/">conda documentation</a> for instructions on how to setup and manage
+<p>Please refer to the <a class="reference external" href="https://conda.io/en/latest/">conda documentation</a> for instructions on how to setup and manage
 your conda installation.</p>
 </div>
 <div class="section" id="checking-the-installation">
 <h2>Checking the installation<a class="headerlink" href="#checking-the-installation" title="Permalink to this headline">¶</a></h2>
-<p>You can test the installation of mp++ with the following simple <code class="docutils literal notranslate"><span class="pre">main.cpp</span></code> program:</p>
+<p>You can test the installation of mp++ with the following
+simple <code class="docutils literal notranslate"><span class="pre">main.cpp</span></code> program:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;mp++/mp++.hpp&gt;</span><span class="cp"></span>
 
@@ -298,17 +321,20 @@ your conda installation.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>If mp++ is installed in a standard prefix, on a typical GNU/Linux system you can compile this example with the following command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ g++ -std=c++11 main.cpp -lgmp
+<p>If mp++ is installed in a standard prefix, on a typical GNU/Linux
+system you can compile this example with the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 main.cpp -lmp++ -lgmp
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The <code class="docutils literal notranslate"><span class="pre">-std=c++11</span></code> flag is not necessary if your GCC version is recent enough (i.e., for GCC 6 and later).</p>
 </div>
-<p>If you installed mp++ with optional features enabled, you will need to link the required libraries as well. For instance,
-if both MPFR and quadmath support are enabled, the compilation command on a modern GNU/Linux system will be something like:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ g++ -std=c++11 main.cpp -lquadmath -lmpfr -lgmp
+<p>If you installed mp++ with optional features enabled, you will
+need to link the required libraries as well. For instance,
+if both MPFR and quadmath support are enabled, the compilation
+command on a modern GNU/Linux system will be something like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> g++ -std<span class="o">=</span>c++11 main.cpp -lmp++ -lquadmath -lmpfr -lgmp
 </pre></div>
 </div>
 <div class="admonition note">
@@ -317,29 +343,39 @@ if both MPFR and quadmath support are enabled, the compilation command on a mode
 internal debug checks at runtime which carry a large performance penalty. Users are advised
 to always define <code class="docutils literal notranslate"><span class="pre">NDEBUG</span></code> when compiling code using mp++ in <code class="docutils literal notranslate"><span class="pre">Release</span></code> builds.</p>
 </div>
-<p>The full list of libraries that need to be linked when using mp++ is the following:</p>
+<p>The full list of libraries that need to be linked when
+using mp++ is the following:</p>
 <ul class="simple">
-<li>the GMP library (or the MPIR fork), always required (<code class="docutils literal notranslate"><span class="pre">-lgmp</span></code> on most Unix-like systems);</li>
-<li>on Windows only, the <code class="docutils literal notranslate"><span class="pre">DbgHelp</span></code> library, always required;</li>
-<li>the MPFR library, required only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option (<code class="docutils literal notranslate"><span class="pre">-lmpfr</span></code> on most Unix-like systems);</li>
-<li>the quadmath library, required only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option (<code class="docutils literal notranslate"><span class="pre">-lquadmath</span></code> with GCC,
+<li>the GMP library (or the MPIR fork), always required
+(<code class="docutils literal notranslate"><span class="pre">-lgmp</span></code> on most Unix-like systems);</li>
+<li>the MPFR library, required only if mp++ was configured with
+the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option (<code class="docutils literal notranslate"><span class="pre">-lmpfr</span></code> on most Unix-like systems);</li>
+<li>the quadmath library, required only if mp++ was configured with the
+<code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option (<code class="docutils literal notranslate"><span class="pre">-lquadmath</span></code> with GCC,
 with clang it might be necessary to provide the full path to the library).</li>
 </ul>
-<p>If you are using CMake, it’s highly recommended to make use of the config-file package provided with mp++ rather
-than locating and linking manually the required dependencies (see the next section).</p>
+<p>If you are using CMake, it’s highly recommended to make use of the config-file
+package provided with mp++ rather
+than locating and linking manually the required dependencies
+(see the next section).</p>
 </div>
 <div class="section" id="including-mp-in-your-project-via-cmake">
 <h2>Including mp++ in your project via CMake<a class="headerlink" href="#including-mp-in-your-project-via-cmake" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
 <p><span class="versionmodified">New in version 0.2.</span></p>
 </div>
-<p>As a part of the mp++ installation, a group of CMake files is installed into <code class="docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX/lib/cmake/mp++</span></code>.
+<p>As a part of the mp++ installation, a group of CMake files is installed into
+<code class="docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX/lib/cmake/mp++</span></code>.
 This bundle, which is known in the CMake lingo as a <a class="reference external" href="https://cmake.org/cmake/help/v3.3/manual/cmake-packages.7.html">config-file package</a>,
-facilitates the detection and use of mp++ from other CMake-based projects. mp++’s config-file package, once loaded, provides
-an imported target called <code class="docutils literal notranslate"><span class="pre">mp++::mp++</span></code> which encapsulates all the information necessary to use mp++. That is, linking to
-<code class="docutils literal notranslate"><span class="pre">mp++::mp++</span></code> ensures that mp++’s include directories are added to the include path of the compiler, and that the libraries
+facilitates the detection and use of mp++ from other CMake-based projects.
+mp++’s config-file package, once loaded, provides
+an imported target called <code class="docutils literal notranslate"><span class="pre">mp++::mp++</span></code> which encapsulates all the information
+necessary to use mp++. That is, linking to
+<code class="docutils literal notranslate"><span class="pre">mp++::mp++</span></code> ensures that mp++’s include directories are added to the include
+path of the compiler, and that the libraries
 on which mp++ depends (e.g., GMP) are brought into the link chain.</p>
-<p>For instance, a <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file for the simple <code class="docutils literal notranslate"><span class="pre">main.cpp</span></code> program presented earlier may look like this:</p>
+<p>For instance, a <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file for the simple <code class="docutils literal notranslate"><span class="pre">main.cpp</span></code>
+program presented earlier may look like this:</p>
 <div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="c"># mp++ needs at least CMake 3.3.</span>
 <span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.3.0</span><span class="p">)</span>
 
@@ -363,19 +399,33 @@ on which mp++ depends (e.g., GMP) are brought into the link chain.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="platform-specific-notes">
-<h2>Platform-specific notes<a class="headerlink" href="#platform-specific-notes" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="freebsd">
-<h3>FreeBSD<a class="headerlink" href="#freebsd" title="Permalink to this headline">¶</a></h3>
-<p>On FreeBSD, the <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> overloads of some mathematical functions (such as <code class="docutils literal notranslate"><span class="pre">std::pow()</span></code>) are currently implemented in
-<code class="docutils literal notranslate"><span class="pre">double</span></code> precision. Additionally, if the arguments to such mathematical functions are compile-time constants, the compiler
-<em>may</em> decide (depending on the optimisation level) to actually compute the result at compile time using full <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> precision.
-This behaviour can lead to subtle inconsistencies, and it results in one test case from the mp++ test suite failing on FreeBSD.</p>
+<div class="section" id="compiler-and-platform-specific-notes">
+<h2>Compiler and platform specific notes<a class="headerlink" href="#compiler-and-platform-specific-notes" title="Permalink to this headline">¶</a></h2>
+<p>Visual Studio:</p>
+<ul class="simple">
+<li>When using Visual Studio, the mp++ library is compiled
+with the <code class="docutils literal notranslate"><span class="pre">NOMINMAX</span></code> definition and with the <code class="docutils literal notranslate"><span class="pre">/permissive-</span></code>
+compiler flag. If you intend to use mp++ in conjunction with other
+libraries, you should ensure that the <code class="docutils literal notranslate"><span class="pre">NOMINMAX</span></code> definition
+and the <code class="docutils literal notranslate"><span class="pre">/permissive-</span></code> flag are also used for the compilation
+of these libraries.</li>
+</ul>
+<p>FreeBSD:</p>
+<ul>
+<li><p class="first">On FreeBSD, the <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> overloads of some mathematical functions
+(such as <code class="docutils literal notranslate"><span class="pre">std::pow()</span></code>) are currently implemented in
+<code class="docutils literal notranslate"><span class="pre">double</span></code> precision. Additionally, if the arguments to such mathematical
+functions are compile-time constants, the compiler
+<em>may</em> decide (depending on the optimisation level) to actually compute the
+result at compile time using full <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> precision.
+This behaviour can lead to subtle inconsistencies, and it results in one
+test case from the mp++ test suite failing on FreeBSD.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference external" href="https://github.com/bluescarni/mppp/issues/132">https://github.com/bluescarni/mppp/issues/132</a></p>
 </div>
-</div>
+</li>
+</ul>
 </div>
 </div>
 
@@ -394,10 +444,7 @@ This behaviour can lead to subtle inconsistencies, and it results in one test ca
 <li><a class="reference internal" href="#installation-via-conda">Installation via conda</a></li>
 <li><a class="reference internal" href="#checking-the-installation">Checking the installation</a></li>
 <li><a class="reference internal" href="#including-mp-in-your-project-via-cmake">Including mp++ in your project via CMake</a></li>
-<li><a class="reference internal" href="#platform-specific-notes">Platform-specific notes</a><ul>
-<li><a class="reference internal" href="#freebsd">FreeBSD</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#compiler-and-platform-specific-notes">Compiler and platform specific notes</a></li>
 </ul>
 </li>
 </ul>
