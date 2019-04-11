@@ -20,5 +20,6 @@
 #if defined(MPPP_WITH_QUADMATH)
 #include <mp++/real128.hpp>
 #endif
+#include <mp++/type_name.hpp>
 
 #endif

@@ -28,57 +28,29 @@
 #if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <mp++/concepts.hpp>
-#include <mp++/detail/demangle.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
+#include <mp++/detail/visibility.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #if defined(MPPP_WITH_QUADMATH)
 #include <mp++/real128.hpp>
 #endif
+#include <mp++/type_name.hpp>
 
 namespace mppp
 {
 
 namespace detail
 {
-
-// Some misc tests to check that the mpfr struct conforms to our expectations.
-struct expected_mpfr_struct_t {
-    ::mpfr_prec_t _mpfr_prec;
-    ::mpfr_sign_t _mpfr_sign;
-    ::mpfr_exp_t _mpfr_exp;
-    ::mp_limb_t *_mpfr_d;
-};
-
-static_assert(sizeof(expected_mpfr_struct_t) == sizeof(mpfr_struct_t) && offsetof(mpfr_struct_t, _mpfr_prec) == 0u
-                  && offsetof(mpfr_struct_t, _mpfr_sign) == offsetof(expected_mpfr_struct_t, _mpfr_sign)
-                  && offsetof(mpfr_struct_t, _mpfr_exp) == offsetof(expected_mpfr_struct_t, _mpfr_exp)
-                  && offsetof(mpfr_struct_t, _mpfr_d) == offsetof(expected_mpfr_struct_t, _mpfr_d)
-                  && std::is_same<::mp_limb_t *, decltype(std::declval<mpfr_struct_t>()._mpfr_d)>::value,
-              "Invalid mpfr_t struct layout and/or MPFR types.");
-
-#if MPPP_CPLUSPLUS >= 201703L
-
-// If we have C++17, we can use structured bindings to test the layout of mpfr_struct_t
-// and its members' types.
-constexpr void test_mpfr_struct_t()
-{
-    auto [prec, sign, exp, ptr] = mpfr_struct_t{};
-    static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
-    ignore(prec, sign, exp, ptr);
-}
-
-#endif
 
 // Clamp the precision between the min and max allowed values. This is used in the generic constructor/assignment
 // operator.
@@ -87,93 +59,8 @@ constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
     return real_prec_check(p) ? p : (p < real_prec_min() ? real_prec_min() : real_prec_max());
 }
 
-// Helper function to print an mpfr to stream in base 10.
-inline void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
-{
-    // All chars potentially used by MPFR for representing the digits up to base 62, sorted.
-    constexpr char all_chars[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    // Check the base.
-    if (mppp_unlikely(base < 2 || base > 62)) {
-        throw std::invalid_argument("Cannot convert a real to a string in base " + detail::to_string(base)
-                                    + ": the base must be in the [2,62] range");
-    }
-    // Special values first.
-    if (mpfr_nan_p(r)) {
-        // NOTE: up to base 16 we can use nan, inf, etc., but with larger
-        // bases we have to use the syntax with @.
-        os << (base <= 16 ? "nan" : "@nan@");
-        return;
-    }
-    if (mpfr_inf_p(r)) {
-        if (mpfr_sgn(r) < 0) {
-            os << '-';
-        }
-        os << (base <= 16 ? "inf" : "@inf@");
-        return;
-    }
-
-    // Get the string fractional representation via the MPFR function,
-    // and wrap it into a smart pointer.
-    ::mpfr_exp_t exp(0);
-    smart_mpfr_str str(::mpfr_get_str(nullptr, &exp, base, 0, r, MPFR_RNDN), ::mpfr_free_str);
-    // LCOV_EXCL_START
-    if (mppp_unlikely(!str)) {
-        throw std::runtime_error("Error in the conversion of a real to string: the call to mpfr_get_str() failed");
-    }
-    // LCOV_EXCL_STOP
-
-    // Print the string, inserting a decimal point after the first digit.
-    bool dot_added = false;
-    for (auto cptr = str.get(); *cptr != '\0'; ++cptr) {
-        os << (*cptr);
-        if (!dot_added) {
-            if (base <= 10) {
-                // For bases up to 10, we can use the followig guarantee
-                // from the standard:
-                // http://stackoverflow.com/questions/13827180/char-ascii-relation
-                // """
-                // The mapping of integer values for characters does have one guarantee given
-                // by the Standard: the values of the decimal digits are contiguous.
-                // (i.e., '1' - '0' == 1, ... '9' - '0' == 9)
-                // """
-                // http://eel.is/c++draft/lex.charset#3
-                if (*cptr >= '0' && *cptr <= '9') {
-                    os << '.';
-                    dot_added = true;
-                }
-            } else {
-                // For bases larger than 10, we do a binary search among all the allowed characters.
-                // NOTE: we need to search into the whole all_chars array (instead of just up to all_chars
-                // + base) because apparently mpfr_get_str() seems to ignore lower/upper case when the base
-                // is small enough (e.g., it uses 'a' instead of 'A' when printing in base 11).
-                // NOTE: the range needs to be sizeof() - 1 because sizeof() also includes the terminator.
-                if (std::binary_search(all_chars, all_chars + (sizeof(all_chars) - 1u), *cptr)) {
-                    os << '.';
-                    dot_added = true;
-                }
-            }
-        }
-    }
-    assert(dot_added);
-
-    // Adjust the exponent. Do it in multiprec in order to avoid potential overflow.
-    integer<1> z_exp{exp};
-    --z_exp;
-    const auto exp_sgn = z_exp.sgn();
-    if (exp_sgn && !mpfr_zero_p(r)) {
-        // Add the exponent at the end of the string, if both the value and the exponent
-        // are nonzero.
-        // NOTE: for bases greater than 10 we need '@' for the exponent, rather than 'e' or 'E'.
-        // https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-        os << (base <= 10 ? 'e' : '@');
-        if (exp_sgn == 1) {
-            // Add extra '+' if the exponent is positive, for consistency with
-            // real128's string format (and possibly other formats too?).
-            os << '+';
-        }
-        os << z_exp;
-    }
-}
+// Helper function to print an mpfr to stream in a given base.
+MPPP_PUBLIC void mpfr_to_stream(const ::mpfr_t, std::ostream &, int);
 
 #if !defined(MPPP_DOXYGEN_INVOKED)
 
@@ -282,24 +169,10 @@ struct real_constants {
         ::mpfr_set_ui_2exp(&retval.first, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
         return retval;
     }
-    // Default precision value.
-    static std::atomic<::mpfr_prec_t> default_prec;
 };
 
-// NOTE: the use of ATOMIC_VAR_INIT ensures that the initialisation of default_prec
-// is constant initialisation:
-//
-// http://en.cppreference.com/w/cpp/atomic/ATOMIC_VAR_INIT
-//
-// This essentially means that this initialisation happens before other types of
-// static initialisation:
-//
-// http://en.cppreference.com/w/cpp/language/initialization
-//
-// This ensures that static reals, which are subject to dynamic initialization, are initialised
-// when this variable has already been constructed, and thus access to it will be safe.
-template <typename T>
-std::atomic<::mpfr_prec_t> real_constants<T>::default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0));
+// Default precision value.
+MPPP_PUBLIC extern std::atomic<::mpfr_prec_t> real_default_prec;
 
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
@@ -370,7 +243,7 @@ using cvr_real_enabler
  */
 inline mpfr_prec_t real_get_default_prec()
 {
-    return detail::real_constants<>::default_prec.load(std::memory_order_relaxed);
+    return detail::real_default_prec.load(std::memory_order_relaxed);
 }
 
 /// Set the default precision for \link mppp::real real\endlink objects.
@@ -393,7 +266,7 @@ inline void real_set_default_prec(::mpfr_prec_t p)
                                     + ": the value must be either zero or between " + detail::to_string(real_prec_min())
                                     + " and " + detail::to_string(real_prec_max()));
     }
-    detail::real_constants<>::default_prec.store(p, std::memory_order_relaxed);
+    detail::real_default_prec.store(p, std::memory_order_relaxed);
 }
 
 /// Reset the default precision for \link mppp::real real\endlink objects.
@@ -407,7 +280,7 @@ inline void real_set_default_prec(::mpfr_prec_t p)
  */
 inline void real_reset_default_prec()
 {
-    detail::real_constants<>::default_prec.store(0);
+    detail::real_default_prec.store(0, std::memory_order_relaxed);
 }
 
 namespace detail
@@ -569,7 +442,7 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
  * it is possible to use transparently the MPFR API with :cpp:class:`~mppp::real` objects.
  * \endrststar
  */
-class real
+class MPPP_PUBLIC real
 {
 #if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends, for accessing the non-checking prec setting funcs.
@@ -839,64 +712,7 @@ private:
     }
     // NOTE: split this off from the dispatch_construction() overload, so we can re-use it in the
     // generic assignment.
-    void assign_real128(const real128 &x)
-    {
-        // Get the IEEE repr. of x.
-        const auto t = x.get_ieee();
-        // A utility function to write the significand of x
-        // as a big integer inside m_mpfr.
-        auto write_significand = [this, &t]() {
-            // The 4 32-bits part of the significand, from most to least
-            // significant digits.
-            const auto p1 = std::get<2>(t) >> 32;
-            const auto p2 = std::get<2>(t) % (1ull << 32);
-            const auto p3 = std::get<3>(t) >> 32;
-            const auto p4 = std::get<3>(t) % (1ull << 32);
-            // Build the significand, from most to least significant.
-            // NOTE: unsigned long is guaranteed to be at least 32 bit.
-            ::mpfr_set_ui(&this->m_mpfr, static_cast<unsigned long>(p1), MPFR_RNDN);
-            ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
-            ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p2), MPFR_RNDN);
-            ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
-            ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p3), MPFR_RNDN);
-            ::mpfr_mul_2ui(&this->m_mpfr, &this->m_mpfr, 32ul, MPFR_RNDN);
-            ::mpfr_add_ui(&this->m_mpfr, &this->m_mpfr, static_cast<unsigned long>(p4), MPFR_RNDN);
-        };
-        // Check if the significand is zero.
-        const bool sig_zero = !std::get<2>(t) && !std::get<3>(t);
-        if (std::get<1>(t) == 0u) {
-            // Zero or subnormal numbers.
-            if (sig_zero) {
-                // Zero.
-                ::mpfr_set_zero(&m_mpfr, 1);
-            } else {
-                // Subnormal.
-                write_significand();
-                ::mpfr_div_2ui(&m_mpfr, &m_mpfr, 16382ul + 112ul, MPFR_RNDN);
-            }
-        } else if (std::get<1>(t) == 32767u) {
-            // NaN or inf.
-            if (sig_zero) {
-                // inf.
-                ::mpfr_set_inf(&m_mpfr, 1);
-            } else {
-                // NaN.
-                ::mpfr_set_nan(&m_mpfr);
-            }
-        } else {
-            // Write the significand into this.
-            write_significand();
-            // Add the hidden bit on top.
-            const auto r_2_112 = detail::real_constants<>::get_2_112();
-            ::mpfr_add(&m_mpfr, &m_mpfr, &r_2_112.first, MPFR_RNDN);
-            // Multiply by 2 raised to the adjusted exponent.
-            ::mpfr_mul_2si(&m_mpfr, &m_mpfr, static_cast<long>(std::get<1>(t)) - (16383l + 112), MPFR_RNDN);
-        }
-        if (std::get<0>(t)) {
-            // Negate if the sign bit is set.
-            ::mpfr_neg(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        }
-    }
+    void assign_real128(const real128 &);
 #endif
 
 public:
@@ -1922,7 +1738,7 @@ private:
     template <typename T>
     [[noreturn]] void raise_overflow_error() const
     {
-        throw std::overflow_error("Conversion of the real " + to_string() + " to the type '" + detail::demangle<T>()
+        throw std::overflow_error("Conversion of the real " + to_string() + " to the type '" + type_name<T>()
                                   + "' results in overflow");
     }
     // Unsigned integrals, excluding bool.
@@ -2013,65 +1829,9 @@ private:
     template <typename T, detail::enable_if_t<std::is_same<real128, T>::value, int> = 0>
     T dispatch_conversion() const
     {
-        // Handle the special cases first.
-        if (nan_p()) {
-            return real128_nan();
-        }
-        // NOTE: the number 2**18 = 262144 is chosen so that it's amply outside the exponent
-        // range of real128 (a 15 bit value with some offset) but well within the
-        // range of long (around +-2**31 guaranteed by the standard).
-        //
-        // NOTE: the reason why we do these checks with large positive and negative exponents
-        // is that they ensure we can safely convert _mpfr_exp to long later.
-        if (inf_p() || m_mpfr._mpfr_exp > (1l << 18)) {
-            return sgn() > 0 ? real128_inf() : -real128_inf();
-        }
-        if (zero_p() || m_mpfr._mpfr_exp < -(1l << 18)) {
-            // Preserve the signedness of zero.
-            return signbit() ? -real128{} : real128{};
-        }
-        // NOTE: this is similar to the code in real128.hpp for the constructor from integer,
-        // with some modification due to the different padding in MPFR vs GMP (see below).
-        const auto prec = get_prec();
-        // Number of limbs in this.
-        auto nlimbs = prec / ::mp_bits_per_limb + static_cast<bool>(prec % ::mp_bits_per_limb);
-        assert(nlimbs != 0);
-        // NOTE: in MPFR the most significant (nonzero) bit of the significand
-        // is always at the high end of the most significand limb. In other words,
-        // MPFR pads the multiprecision significand on the right, the opposite
-        // of GMP integers (which have padding on the left, i.e., in the top limb).
-        //
-        // NOTE: contrary to real128, the MPFR format does not have a hidden bit on top.
-        //
-        // Init retval with the highest limb.
-        //
-        // NOTE: MPFR does not support nail builds in GMP, so we don't have to worry about that.
-        real128 retval{m_mpfr._mpfr_d[--nlimbs]};
-        // Init the number of read bits.
-        // NOTE: we have read a full limb in the line above, so mp_bits_per_limb bits. If mp_bits_per_limb > 113,
-        // then the constructor of real128 truncated the input limb value to 113 bits of precision, so effectively
-        // we have read 113 bits only in such a case.
-        unsigned read_bits = detail::c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits());
-        while (nlimbs && read_bits < real128_sig_digits()) {
-            // Number of bits to be read from the current limb. Either mp_bits_per_limb or less.
-            const unsigned rbits
-                = detail::c_min(static_cast<unsigned>(::mp_bits_per_limb), real128_sig_digits() - read_bits);
-            // Shift up by rbits.
-            // NOTE: cast to int is safe, as rbits is no larger than mp_bits_per_limb which is
-            // representable by int.
-            retval = scalbn(retval, static_cast<int>(rbits));
-            // Add the next limb, removing lower bits if they are not to be read.
-            retval += m_mpfr._mpfr_d[--nlimbs] >> (static_cast<unsigned>(::mp_bits_per_limb) - rbits);
-            // Update the number of read bits.
-            // NOTE: due to the definition of rbits, read_bits can never reach past real128_sig_digits().
-            // Hence, this addition can never overflow (as sig_digits is unsigned itself).
-            read_bits += rbits;
-        }
-        // NOTE: from earlier we know the exponent is well within the range of long, and read_bits
-        // cannot be larger than 113.
-        retval = scalbln(retval, static_cast<long>(m_mpfr._mpfr_exp) - static_cast<long>(read_bits));
-        return sgn() > 0 ? retval : -retval;
+        return convert_to_real128();
     }
+    real128 convert_to_real128() const;
 #endif
 
 public:
@@ -2657,10 +2417,10 @@ inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &) {}
 // NOTE: we need 2 overloads for this, as we cannot extract a non-const pointer from
 // arg0 if arg0 is a const ref.
 template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int> = 0>
-void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&... );
+void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
 
 template <typename Arg0, typename... Args, enable_if_t<is_ncrvr<Arg0 &&>::value, int> = 0>
-void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&... );
+void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &, Arg0 &&, Args &&...);
 
 template <typename Arg0, typename... Args, enable_if_t<!is_ncrvr<Arg0 &&>::value, int>>
 inline void mpfr_nary_op_check_steal(std::pair<real *, ::mpfr_prec_t> &p, Arg0 &&arg0, Args &&... args)

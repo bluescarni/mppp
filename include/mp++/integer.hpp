@@ -40,14 +40,15 @@
 #include <vector>
 
 #include <mp++/concepts.hpp>
-#include <mp++/detail/demangle.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
+#include <mp++/type_name.hpp>
 #if defined(MPPP_WITH_MPFR)
 #include <mp++/detail/mpfr.hpp>
 #endif
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
+#include <mp++/detail/visibility.hpp>
 #include <mp++/exceptions.hpp>
 
 // Compiler configuration.
@@ -93,56 +94,6 @@ enum class integer_bitcnt_t : ::mp_bitcnt_t {};
 
 namespace detail
 {
-// Some misc tests to check that the mpz struct conforms to our expectations.
-// This is crucial for the implementation of the union integer type.
-struct expected_mpz_struct_t {
-    mpz_alloc_t _mp_alloc;
-    mpz_size_t _mp_size;
-    ::mp_limb_t *_mp_d;
-};
-
-static_assert(sizeof(expected_mpz_struct_t) == sizeof(mpz_struct_t) && std::is_standard_layout<mpz_struct_t>::value
-                  && std::is_standard_layout<expected_mpz_struct_t>::value && offsetof(mpz_struct_t, _mp_alloc) == 0u
-                  && offsetof(mpz_struct_t, _mp_size) == offsetof(expected_mpz_struct_t, _mp_size)
-                  && offsetof(mpz_struct_t, _mp_d) == offsetof(expected_mpz_struct_t, _mp_d)
-                  && std::is_same<::mp_limb_t *, decltype(std::declval<mpz_struct_t>()._mp_d)>::value &&
-                  // mp_bitcnt_t is used in shift operators, so we double-check it is an unsigned integral. If it is not
-                  // we might end up shifting by negative values, which is UB.
-                  std::is_integral<::mp_bitcnt_t>::value && std::is_unsigned<::mp_bitcnt_t>::value &&
-                  // The mpn functions accept sizes as ::mp_size_t, but we generally represent sizes as mpz_size_t.
-                  // We need then to make sure we can always cast safely mpz_size_t to ::mp_size_t. Inspection
-                  // of the gmp.h header seems to indicate that mpz_size_t is never larger than ::mp_size_t.
-                  // NOTE: since mp_size_t is the size type used by mpn functions, it is expected that it cannot
-                  // have smaller range than mpz_size_t, otherwise mpz_t would contain numbers too large to be
-                  // used as arguments in the mpn functions.
-                  nl_min<mpz_size_t>() >= nl_min<::mp_size_t>() && nl_max<mpz_size_t>() <= nl_max<::mp_size_t>(),
-              "Invalid mpz_t struct layout and/or GMP types.");
-
-#if MPPP_CPLUSPLUS >= 201703L
-
-// If we have C++17, we can use structured bindings to test the layout of mpz_struct_t
-// and its members' types.
-constexpr bool test_mpz_struct_t()
-{
-    // NOTE: if mpz_struct_t has more or fewer members, this will result
-    // in a compile-time error.
-    auto [alloc, size, ptr] = mpz_struct_t{};
-    ignore(alloc, size, ptr);
-    return std::is_same<decltype(alloc), mpz_alloc_t>::value && std::is_same<decltype(size), mpz_size_t>::value
-           && std::is_same<decltype(ptr), ::mp_limb_t *>::value;
-}
-
-static_assert(test_mpz_struct_t(), "The mpz_struct_t does not have the expected layout.");
-
-#endif
-
-// The reason we are asserting this is the following: in a few places we are using the wrap-around property
-// of unsigned arithmetics, but if mp_limb_t is a narrow unsigned type (e.g., unsigned short or unsigned char)
-// then there could be a promotion to other types triggered by the standard integral promotions,
-// and the wrap around behaviour would not be there any more. This is just a theoretical concern at the moment.
-static_assert(disjunction<std::is_same<::mp_limb_t, unsigned long>, std::is_same<::mp_limb_t, unsigned long long>,
-                          std::is_same<::mp_limb_t, unsigned>>::value,
-              "Invalid type for mp_limb_t.");
 
 // Small helper to get the size in limbs from an mpz_t. Will return zero if n is zero.
 inline std::size_t get_mpz_size(const ::mpz_t n)
@@ -150,8 +101,20 @@ inline std::size_t get_mpz_size(const ::mpz_t n)
     return (n->_mp_size >= 0) ? static_cast<std::size_t>(n->_mp_size) : static_cast<std::size_t>(nint_abs(n->_mp_size));
 }
 
+#if defined(_MSC_VER) && defined(__clang__)
+
+// NOTE: clang-cl gives a deprecation warning
+// here due to the fact that the dllexported
+// cache class is missing a copy assignment
+// operator. Not sure what to make of it.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
+
+#endif
+
 // Structure for caching allocated arrays of limbs.
-struct mpz_alloc_cache {
+// NOTE: needs to be public for testing purposes.
+struct MPPP_PUBLIC mpz_alloc_cache {
     // Arrays up to this size will be cached.
     static constexpr std::size_t max_size = 10;
     // Max number of arrays to cache for each size.
@@ -163,122 +126,31 @@ struct mpz_alloc_cache {
     // NOTE: use round brackets init for the usual GCC 4.8 workaround.
     // NOTE: this will zero initialise recursively both members: we will
     // have all nullptrs in the caches, and all cache sizes will be zeroes.
-    mpz_alloc_cache() : caches(), sizes() {}
+    constexpr mpz_alloc_cache() : caches(), sizes() {}
     // Clear the cache, deallocating all the data in the arrays.
-    void clear() noexcept
-    {
-#if !defined(NDEBUG)
-        std::cout << "Cleaning up the mpz alloc cache." << std::endl;
-#endif
-        // Get the GMP free() function.
-        void (*ffp)(void *, std::size_t) = nullptr;
-        ::mp_get_memory_functions(nullptr, nullptr, &ffp);
-        assert(ffp != nullptr);
-        for (std::size_t i = 0; i < max_size; ++i) {
-            // Free all the limbs arrays allocated for this size.
-            for (std::size_t j = 0; j < sizes[i]; ++j) {
-                ffp(static_cast<void *>(caches[i][j]), i + 1u);
-            }
-            // Reset the number of limbs array present in this
-            // cache entry.
-            sizes[i] = 0u;
-        }
-    }
+    void clear() noexcept;
     ~mpz_alloc_cache()
     {
         clear();
     }
 };
 
+#if defined(_MSC_VER) && defined(__clang__)
+
+#pragma clang diagnostic pop
+
+#endif
+
 #if defined(MPPP_HAVE_THREAD_LOCAL)
 
-// Getter for the thread local allocation cache.
-// NOTE: static objects inside inline functions always refer to the same
-// object in different TUs:
-// https://stackoverflow.com/questions/32172137/local-static-thread-local-variables-of-inline-functions
-// NOTE: some link/notes regarding thread_local:
-// - thread_local alone also implies "static":
-//   http://eel.is/c++draft/dcl.stc
-//   https://stackoverflow.com/questions/22794382/are-c11-thread-local-variables-automatically-static
-// - all variables declared thread_local have "thread storage duration", that is,
-//   they live for the duration of the thread: http://eel.is/c++draft/basic.stc.thread
-// - there are 2 ways variables with thread storage duration may be initialised:
-//   - static initialisation, which is possible for constexpr-like entities:
-//     http://eel.is/c++draft/basic.start.static
-//     Note that it says: "Constant initialization is performed if a variable or temporary object with static or thread
-//     storage duration is initialized by a constant initializer for the entity". So it seems like block-scope
-//     variables with thread storage duration will be initialised as part of constant initialisation at thread startup,
-//     if possible. See also the cppreference page:
-//     https://en.cppreference.com/w/cpp/language/storage_duration#Static_local_variables
-//     (here it is talking about static local variables, but it should apply also to thread_local variables
-//     as indicated here: https://en.cppreference.com/w/cpp/language/initialization).
-//   - dynamic initialisation otherwise, meaning that the variable is initialised the first time control
-//     passes through its declaration:
-//     http://eel.is/c++draft/stmt.dcl#4
-// - destruction of objects with thread storage duration happens before the destruction of objects with
-//   static storage duration:
-//   http://eel.is/c++draft/basic.start.term#2
-// - "All static initialization strongly happens before any dynamic initialization.":
-//   http://eel.is/c++draft/basic.start#static-2
-// - "If the completion of the constructor or dynamic initialization of an object with thread storage duration is
-//   sequenced before that of another, the completion of the destructor of the second is sequenced before the initiation
-//   of the destructor of the first." (that is, objects are destroyed in reverse with respect to construction order):
-//   http://eel.is/c++draft/basic.start.term#3
-inline mpz_alloc_cache &get_mpz_alloc_cache()
-{
-    thread_local mpz_alloc_cache mpzc;
-    return mpzc;
-}
-
-// Implementation of the init of an mpz from cache.
-inline bool mpz_init_from_cache_impl(mpz_struct_t &rop, std::size_t nlimbs)
-{
-    auto &mpzc = get_mpz_alloc_cache();
-    if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {
-        // LCOV_EXCL_START
-        if (mppp_unlikely(nlimbs > make_unsigned(nl_max<mpz_alloc_t>()))) {
-            std::abort();
-        }
-        // LCOV_EXCL_STOP
-        const auto idx = nlimbs - 1u;
-        rop._mp_alloc = static_cast<mpz_alloc_t>(nlimbs);
-        rop._mp_size = 0;
-        rop._mp_d = mpzc.caches[idx][mpzc.sizes[idx] - 1u];
-        --mpzc.sizes[idx];
-        return true;
-    }
-    return false;
-}
+// Get a reference to the thread-local mpz allocation
+// cache. Used only for debugging.
+MPPP_PUBLIC mpz_alloc_cache &get_thread_local_mpz_cache();
 
 #endif
 
 // Helper function to init an mpz to zero with nlimbs preallocated limbs.
-inline void mpz_init_nlimbs(mpz_struct_t &rop, std::size_t nlimbs)
-{
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-    if (!mpz_init_from_cache_impl(rop, nlimbs)) {
-#endif
-        // LCOV_EXCL_START
-        // A bit of horrid overflow checking.
-        if (mppp_unlikely(nlimbs > nl_max<std::size_t>() / unsigned(GMP_NUMB_BITS))) {
-            // NOTE: here we are doing what GMP does in case of memory allocation errors. It does not make much sense
-            // to do anything else, as long as GMP does not provide error recovery.
-            std::abort();
-        }
-        // LCOV_EXCL_STOP
-        const auto nbits = static_cast<std::size_t>(unsigned(GMP_NUMB_BITS) * nlimbs);
-        // LCOV_EXCL_START
-        if (mppp_unlikely(nbits > nl_max<::mp_bitcnt_t>())) {
-            std::abort();
-        }
-        // LCOV_EXCL_STOP
-        // NOTE: nbits == 0 is allowed.
-        ::mpz_init2(&rop, static_cast<::mp_bitcnt_t>(nbits));
-        assert(make_unsigned_t<mpz_alloc_t>(rop._mp_alloc) >= nlimbs);
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-    }
-#endif
-}
+MPPP_PUBLIC void mpz_init_nlimbs(mpz_struct_t &, std::size_t);
 
 // Small helper to determine how many GMP limbs we need to fit nbits bits.
 constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
@@ -289,38 +161,10 @@ constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
 // Helper function to init an mpz to zero with enough space for nbits bits. The
 // nlimbs parameter must be consistent with the nbits parameter (it will be computed
 // outside this function).
-inline void mpz_init_nbits(mpz_struct_t &rop, ::mp_bitcnt_t nbits, std::size_t nlimbs)
-{
-    // Check nlimbs.
-    assert(nlimbs == nbits_to_nlimbs(nbits));
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-    if (!mpz_init_from_cache_impl(rop, nlimbs)) {
-#endif
-        ignore(nlimbs);
-        // NOTE: nbits == 0 is allowed.
-        ::mpz_init2(&rop, nbits);
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-    }
-#endif
-}
+MPPP_PUBLIC void mpz_init_nbits(mpz_struct_t &, ::mp_bitcnt_t, std::size_t);
 
 // Thin wrapper around mpz_clear(): will add entry to cache if possible instead of clearing.
-inline void mpz_clear_wrap(mpz_struct_t &m)
-{
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-    auto &mpzc = get_mpz_alloc_cache();
-    const auto ualloc = make_unsigned(m._mp_alloc);
-    if (ualloc && ualloc <= mpzc.max_size && mpzc.sizes[ualloc - 1u] < mpzc.max_entries) {
-        const auto idx = ualloc - 1u;
-        mpzc.caches[idx][mpzc.sizes[idx]] = m._mp_d;
-        ++mpzc.sizes[idx];
-    } else {
-#endif
-        ::mpz_clear(&m);
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-    }
-#endif
-}
+MPPP_PUBLIC void mpz_clear_wrap(mpz_struct_t &);
 
 // Combined init+set.
 inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
@@ -330,28 +174,7 @@ inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
 }
 
 // Convert an mpz to a string in a specific base, to be written into out.
-inline void mpz_to_str(std::vector<char> &out, const mpz_struct_t *mpz, int base = 10)
-{
-    assert(base >= 2 && base <= 62);
-    const auto size_base = ::mpz_sizeinbase(mpz, base);
-    // LCOV_EXCL_START
-    if (mppp_unlikely(size_base > nl_max<std::size_t>() - 2u)) {
-        throw std::overflow_error("Too many digits in the conversion of mpz_t to string");
-    }
-    // LCOV_EXCL_STOP
-    // Total max size is the size in base plus an optional sign and the null terminator.
-    const auto total_size = size_base + 2u;
-    // NOTE: possible improvement: use a null allocator to avoid initing the chars each time
-    // we resize up.
-    // Overflow check.
-    // LCOV_EXCL_START
-    if (mppp_unlikely(total_size > nl_max<std::vector<char>::size_type>())) {
-        throw std::overflow_error("Too many digits in the conversion of mpz_t to string");
-    }
-    // LCOV_EXCL_STOP
-    out.resize(static_cast<std::vector<char>::size_type>(total_size));
-    ::mpz_get_str(out.data(), base, mpz);
-}
+MPPP_PUBLIC void mpz_to_str(std::vector<char> &, const mpz_struct_t *, int = 10);
 
 // Convenience overload for the above.
 inline std::string mpz_to_str(const mpz_struct_t *mpz, int base = 10)
@@ -2313,8 +2136,8 @@ public:
     {
         auto retval = dispatch_conversion<T>();
         if (mppp_unlikely(!retval.first)) {
-            throw std::overflow_error("The conversion of the integer " + to_string() + " to the type '"
-                                      + detail::demangle<T>() + "' results in overflow");
+            throw std::overflow_error("The conversion of the integer " + to_string() + " to the type '" + type_name<T>()
+                                      + "' results in overflow");
         }
         return std::move(retval.second);
     }
@@ -7888,12 +7711,7 @@ inline std::size_t hash(const integer<SSize> &n)
  * It is safe to call this function concurrently from different threads.
  * \endrststar
  */
-inline void free_integer_caches()
-{
-#if defined(MPPP_HAVE_THREAD_LOCAL)
-    detail::get_mpz_alloc_cache().clear();
-#endif
-}
+MPPP_PUBLIC void free_integer_caches();
 
 /** @} */
 
