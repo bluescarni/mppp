@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.3.0)
 
-project(mp++ VERSION 0.14 LANGUAGES CXX C)
+project(mp++ VERSION 0.15 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
@@ -50,11 +50,14 @@ if(YACMA_COMPILER_IS_MSVC)
     list(APPEND MPPP_CXX_FLAGS_DEBUG ${_MPPP_CLANG_CL_DISABLED_WARNINGS})
     list(APPEND MPPP_CXX_FLAGS_RELEASE ${_MPPP_CLANG_CL_DISABLED_WARNINGS})
     unset(_MPPP_CLANG_CL_DISABLED_WARNINGS)
-  else()
-    # Enable strict conformance mode, but only for MSVC, not clang-cl.
+  endif()
+  # Enable strict conformance mode, if supported
+  check_cxx_compiler_flag("/permissive-" _MPPP_MSVC_SUPPORTS_STRICT_CONFORMANCE)
+  if(_MPPP_MSVC_SUPPORTS_STRICT_CONFORMANCE)
     list(APPEND MPPP_CXX_FLAGS_DEBUG "/permissive-")
     list(APPEND MPPP_CXX_FLAGS_RELEASE "/permissive-")
   endif()
+  unset(_MPPP_MSVC_SUPPORTS_STRICT_CONFORMANCE)
 endif()
 if(YACMA_COMPILER_IS_INTELXX)
   # NOTE: on MSVC we use the push/pop pragmas, but they do not seem to work on Intel (the pragmas
@@ -97,7 +100,7 @@ endif()
 # Setup of the mp++ library.
 add_library(mp++ SHARED "${MPPP_SRC_FILES}")
 set_property(TARGET mp++ PROPERTY VERSION "${mp++_VERSION_MAJOR}.${mp++_VERSION_MINOR}")
-set_property(TARGET mp++ PROPERTY SOVERSION 0 )
+set_property(TARGET mp++ PROPERTY SOVERSION 1)
 set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
 target_compile_options(mp++ PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
 set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
