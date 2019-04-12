@@ -143,7 +143,8 @@ namespace
 //   http://eel.is/c++draft/basic.start.term#3
 // NOTE: because the ctor of mpz_alloc_cache is constexpr,
 // then the init of this thread_local variable will happen
-// before any dynamic initialisation.
+// before any dynamic initialisation:
+// https://en.cppreference.com/w/cpp/language/constant_initialization
 thread_local mpz_alloc_cache mpz_alloc_cache_inst;
 
 // Implementation of the init of an mpz from cache.
