@@ -232,7 +232,8 @@ Compiler and platform specific notes
 Visual Studio:
 
 * When using Visual Studio, the mp++ library is compiled
-  with the ``NOMINMAX`` definition and with the ``/permissive-``
+  with the ``NOMINMAX`` definition and, if supported,
+  with the ``/permissive-``
   compiler flag. If you intend to use mp++ in conjunction with other
   libraries, you should ensure that the ``NOMINMAX`` definition
   and the ``/permissive-`` flag are also used for the compilation
