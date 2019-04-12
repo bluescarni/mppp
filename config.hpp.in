@@ -21,28 +21,24 @@
 
 // Compiler configuration.
 
-// NOTE: check for MSVC first, as clang-cl does define both __clang__ and _MSC_VER,
-// and we want to configure it as MSVC.
-#if defined(_MSC_VER)
+#if defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
 
-// clang-cl supports __builtin_expect().
-#if defined(__clang__)
+// NOTE: GCC, clang (including clang-cl) and the Intel compiler support
+// __builtin_expect() and __restrict.
 #define mppp_likely(x) __builtin_expect(static_cast<bool>(x), 1)
 #define mppp_unlikely(x) __builtin_expect(static_cast<bool>(x), 0)
-#else
+#define MPPP_RESTRICT __restrict
+
+#elif defined(_MSC_VER)
+
+// NOTE: MSVC (without clang-cl) only supports __restrict.
 #define mppp_likely(x) (x)
 #define mppp_unlikely(x) (x)
-#endif
-#define MPPP_RESTRICT __restrict
-
-#elif defined(__clang__) || defined(__GNUC__) || defined(__INTEL_COMPILER)
-
-#define mppp_likely(x) __builtin_expect(static_cast<bool>(x), 1)
-#define mppp_unlikely(x) __builtin_expect(static_cast<bool>(x), 0)
 #define MPPP_RESTRICT __restrict
 
 #else
 
+// Otherwise, disable both __builtin_expect() and __restrict.
 #define mppp_likely(x) (x)
 #define mppp_unlikely(x) (x)
 #define MPPP_RESTRICT
