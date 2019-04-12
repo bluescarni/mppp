@@ -1055,30 +1055,6 @@ constexpr std::size_t rational<SSize>::ssize;
 namespace detail
 {
 
-// Some misc tests to check that the mpq struct conforms to our expectations.
-struct expected_mpq_struct_t {
-    mpz_struct_t _mp_num;
-    mpz_struct_t _mp_den;
-};
-
-static_assert(sizeof(expected_mpq_struct_t) == sizeof(mpq_struct_t)
-                  && offsetof(mpq_struct_t, _mp_num) == offsetof(expected_mpq_struct_t, _mp_num)
-                  && offsetof(mpq_struct_t, _mp_den) == offsetof(expected_mpq_struct_t, _mp_den),
-              "Invalid mpq_t struct layout.");
-
-#if MPPP_CPLUSPLUS >= 201703L
-
-constexpr bool test_mpq_struct_t()
-{
-    auto [num, den] = mpq_struct_t{};
-    ignore(num, den);
-    return std::is_same<decltype(num), mpz_struct_t>::value && std::is_same<decltype(den), mpz_struct_t>::value;
-}
-
-static_assert(test_mpq_struct_t(), "The mpq_struct_t does not have the expected layout.");
-
-#endif
-
 // Let's keep the view machinery private for now, as it suffers from the potential aliasing
 // issues described in the mpz_view documentation. In this case, we have to fill in a shallow mpq_struct
 // in any case, as the rational class is not backed by a regular mpq_t. We could then have aliasing
