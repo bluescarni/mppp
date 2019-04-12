@@ -5,9 +5,6 @@ branches:
     - /pr\/.+/
 
 environment:
-  global:
-    PLATFORMTOOLSET: "v140"
-
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       BUILD_TYPE: MSVC17_32
