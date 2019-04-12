@@ -84,8 +84,9 @@ endif()
 
 # List of source files.
 set(MPPP_SRC_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/type_name.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/integer.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/rational.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/type_name.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/utils.cpp"
 )
 
