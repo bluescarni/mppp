@@ -239,7 +239,7 @@ Roots
 
    :return: the cubic root of *r*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &rootn_ui(mppp::real &rop, T &&op, unsigned long k)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::rootn_ui(mppp::real &rop, T &&op, unsigned long k)
 
    .. versionadded:: 0.12
 
@@ -263,7 +263,7 @@ Roots
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real rootn_ui(T &&r, unsigned long k)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::rootn_ui(T &&r, unsigned long k)
 
    .. versionadded:: 0.12
 
@@ -307,7 +307,46 @@ Trigonometry
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp2(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp10(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::expm1(mppp::real &rop, T &&op)
 
+   Binary exponentials.
+
+   These functions will set *rop* to, respectively,
+
+   * ``e**op``,
+   * ``2**op``,
+   * ``10**op``,
+   * ``e**op-1``.
+
+   The precision of the result will be equal to the precision of *op*.
+
+   :param rop: the return value.
+   :param op: the exponent.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real exp(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real exp2(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real exp10(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real expm1(T &&r)
+
+   Unary exponentials.
+
+   These functions will return, respectively,
+
+   * ``e**r``,
+   * ``2**r``,
+   * ``10**r``,
+   * ``e**r-1``.
+
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the exponent.
+
+   :return: the exponential of *r*.
 
 .. _real_gamma:
 

@@ -1946,14 +1946,35 @@ public:
     {
         return self_mpfr_unary(::mpfr_exp);
     }
+    /// In-place base-2 exponential.
+    /**
+     * This method will set ``this`` to ``2**this``.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
     real &exp2()
     {
         return self_mpfr_unary(::mpfr_exp2);
     }
+    /// In-place base-10 exponential.
+    /**
+     * This method will set ``this`` to ``10**this``.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
     real &exp10()
     {
         return self_mpfr_unary(::mpfr_exp10);
     }
+    /// In-place exponential minus 1.
+    /**
+     * This method will set ``this`` to its exponential minus one.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
     real &expm1()
     {
         return self_mpfr_unary(::mpfr_expm1);
