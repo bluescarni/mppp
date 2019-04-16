@@ -91,3 +91,81 @@ TEST_CASE("real expm1")
     r0.expm1();
     REQUIRE(r0 == exp(real{4}) - 1);
 }
+
+TEST_CASE("real log")
+{
+    real r0{1};
+    r0.log();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 0);
+    real rop;
+    r0 = real{1};
+    REQUIRE(log(rop, r0) == 0);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(log(r0) == 0);
+    REQUIRE(log(std::move(r0)) == 0);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+}
+
+TEST_CASE("real log2")
+{
+    real r0{1};
+    r0.log2();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 0);
+    real rop;
+    r0 = real{1};
+    REQUIRE(log2(rop, r0) == 0);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(log2(r0) == 0);
+    REQUIRE(log2(std::move(r0)) == 0);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+
+    REQUIRE(log2(real{4}) == 2);
+    REQUIRE(log2(real{-4}).nan_p());
+    r0 = real{4};
+    r0.log2();
+    REQUIRE(r0 == 2);
+}
+
+TEST_CASE("real log10")
+{
+    real r0{1};
+    r0.log10();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 0);
+    real rop;
+    r0 = real{1};
+    REQUIRE(log10(rop, r0) == 0);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(log10(r0) == 0);
+    REQUIRE(log10(std::move(r0)) == 0);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+
+    REQUIRE(log10(real{100}) == 2);
+    REQUIRE(log10(real{-100}).nan_p());
+    r0 = real{100};
+    r0.log10();
+    REQUIRE(r0 == 2);
+}
+
+TEST_CASE("real log1p")
+{
+    real r0{0};
+    r0.log1p();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 0);
+    real rop;
+    r0 = real{0};
+    REQUIRE(log1p(rop, r0) == 0);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(log1p(r0) == 0);
+    REQUIRE(log1p(std::move(r0)) == 0);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+
+    REQUIRE(log1p(real{99}) == log(real{100}));
+    REQUIRE(log1p(real{-99}).nan_p());
+    r0 = real{99};
+    r0.log1p();
+    REQUIRE(r0 == log(real{100}));
+}

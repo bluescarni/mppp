@@ -348,6 +348,47 @@ Logarithms and exponentials
 
    :return: the exponential of *r*.
 
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log2(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log10(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log1p(mppp::real &rop, T &&op)
+
+   Binary logarithms.
+
+   These functions will set *rop* to, respectively,
+
+   * ``log(op)``,
+   * ``log2(op)``,
+   * ``log10(op)``,
+   * ``log(1+op)``.
+
+   The precision of the result will be equal to the precision of *op*.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real log(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real log2(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real log10(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real log1p(T &&r)
+
+   Unary logarithms.
+
+   These functions will return, respectively,
+
+   * ``log(r)``,
+   * ``log2(r)``,
+   * ``log10(r)``,
+   * ``log(1+op)``.
+
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the operand.
+
+   :return: the logarithm of *r*.
+
 .. _real_gamma:
 
 Gamma functions

@@ -1979,6 +1979,50 @@ public:
     {
         return self_mpfr_unary(::mpfr_expm1);
     }
+    /// In-place logarithm.
+    /**
+     * This method will set ``this`` to its logarithm.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &log()
+    {
+        return self_mpfr_unary(::mpfr_log);
+    }
+    /// In-place base-2 logarithm.
+    /**
+     * This method will set ``this`` to its base-2 logarithm.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &log2()
+    {
+        return self_mpfr_unary(::mpfr_log2);
+    }
+    /// In-place base-10 logarithm.
+    /**
+     * This method will set ``this`` to its base-10 logarithm.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &log10()
+    {
+        return self_mpfr_unary(::mpfr_log10);
+    }
+    /// In-place augmented logarithm.
+    /**
+     * This method will set ``this`` the logarithm of ``this + 1``.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &log1p()
+    {
+        return self_mpfr_unary(::mpfr_log1p);
+    }
     /// In-place Gamma function.
     /**
      * This method will set ``this`` to its Gamma function.
@@ -3241,6 +3285,8 @@ inline real cos(T &&r)
 
 /** @} */
 
+// Exponentials and logarithms.
+
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -3319,6 +3365,86 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real expm1(T &&r)
 {
     return detail::mpfr_nary_op_return(0, ::mpfr_expm1, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &log(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_log, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real log(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_log, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &log2(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_log2, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real log2(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_log2, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &log10(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_log10, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real log10(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_log10, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &log1p(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_log1p, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real log1p(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_log1p, std::forward<T>(r));
 }
 
 /** @defgroup real_gamma real_gamma
