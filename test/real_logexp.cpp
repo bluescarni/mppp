@@ -45,6 +45,9 @@ TEST_CASE("real exp2")
 
     REQUIRE(exp2(real{4}) == 16);
     REQUIRE(exp2(real{-4}) == 1 / exp2(real{4}));
+    r0 = real{4};
+    r0.exp2();
+    REQUIRE(r0 == 16);
 }
 
 TEST_CASE("real exp10")
@@ -63,6 +66,9 @@ TEST_CASE("real exp10")
 
     REQUIRE(exp10(real{4}) == 10000);
     REQUIRE(exp10(real{-4}) == 1 / exp10(real{4}));
+    r0 = real{4};
+    r0.exp10();
+    REQUIRE(r0 == 10000);
 }
 
 TEST_CASE("real expm1")
@@ -81,4 +87,7 @@ TEST_CASE("real expm1")
 
     REQUIRE(expm1(real{4}) == exp(real{4}) - 1);
     REQUIRE(expm1(real{-4}) == exp(real{-4}) - 1);
+    r0 = real{4};
+    r0.expm1();
+    REQUIRE(r0 == exp(real{4}) - 1);
 }
