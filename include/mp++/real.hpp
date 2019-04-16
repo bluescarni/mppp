@@ -195,6 +195,7 @@ inline void real_lgamma_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t)
 // A small helper to check the input of the trunc() overloads,
 // only fwd declaration (implementation below).
 void check_real_trunc_arg(const real &);
+
 } // namespace detail
 
 // Fwd declare swap.
@@ -632,14 +633,11 @@ private:
         return detail::real_dd_prec(x);
     }
     // Construction from FPs.
-    // Alias for the MPFR assignment functions from FP types.
-    template <typename T>
-    using fp_a_ptr = int (*)(::mpfr_t, T, ::mpfr_rnd_t);
-    template <typename T>
-    void dispatch_fp_construction(fp_a_ptr<T> ptr, const T &x, ::mpfr_prec_t p)
+    template <typename Func, typename T>
+    void dispatch_fp_construction(const Func &func, const T &x, ::mpfr_prec_t p)
     {
         ::mpfr_init2(&m_mpfr, compute_init_precision(p, x));
-        ptr(&m_mpfr, x, MPFR_RNDN);
+        func(&m_mpfr, x, MPFR_RNDN);
     }
     void dispatch_construction(const float &x, ::mpfr_prec_t p)
     {
@@ -1014,13 +1012,13 @@ public:
 
 private:
     // Assignment from FPs.
-    template <bool SetPrec, typename T>
-    void dispatch_fp_assignment(fp_a_ptr<T> ptr, const T &x)
+    template <bool SetPrec, typename Func, typename T>
+    void dispatch_fp_assignment(const Func &func, const T &x)
     {
         if (SetPrec) {
             set_prec_impl<false>(detail::real_dd_prec(x));
         }
-        ptr(&m_mpfr, x, MPFR_RNDN);
+        func(&m_mpfr, x, MPFR_RNDN);
     }
     template <bool SetPrec>
     void dispatch_assignment(const float &x)
@@ -1573,6 +1571,19 @@ public:
     {
         return mpfr_get_prec(&m_mpfr);
     }
+
+private:
+    // Pointer to a unary MPFR function.
+    using mpfr_unary_fptr = decltype(::mpfr_neg) *;
+    // Wrapper to apply the input unary function to this with
+    // MPFR_RNDN rounding mode. Returns a reference to this.
+    real &self_mpfr_unary(mpfr_unary_fptr fptr)
+    {
+        fptr(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
+
+public:
     /// Negate in-place.
     /**
      * This method will set ``this`` to ``-this``.
@@ -1581,8 +1592,7 @@ public:
      */
     real &neg()
     {
-        ::mpfr_neg(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_neg);
     }
     /// In-place absolute value.
     /**
@@ -1592,8 +1602,7 @@ public:
      */
     real &abs()
     {
-        ::mpfr_abs(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_abs);
     }
 
 private:
@@ -1985,8 +1994,7 @@ public:
      */
     real &sqrt()
     {
-        ::mpfr_sqrt(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_sqrt);
     }
     /// In-place reciprocal square root.
     /**
@@ -2001,8 +2009,7 @@ public:
      */
     real &rec_sqrt()
     {
-        ::mpfr_rec_sqrt(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_rec_sqrt);
     }
     /// In-place cubic root.
     /**
@@ -2013,8 +2020,7 @@ public:
      */
     real &cbrt()
     {
-        ::mpfr_cbrt(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_cbrt);
     }
     /// In-place sine.
     /**
@@ -2025,8 +2031,7 @@ public:
      */
     real &sin()
     {
-        ::mpfr_sin(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_sin);
     }
     /// In-place cosine.
     /**
@@ -2037,8 +2042,7 @@ public:
      */
     real &cos()
     {
-        ::mpfr_cos(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_cos);
     }
     /// In-place exponential.
     /**
@@ -2049,23 +2053,19 @@ public:
      */
     real &exp()
     {
-        ::mpfr_exp(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_exp);
     }
     real &exp2()
     {
-        ::mpfr_exp2(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_exp2);
     }
     real &exp10()
     {
-        ::mpfr_exp10(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_exp10);
     }
     real &expm1()
     {
-        ::mpfr_expm1(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_expm1);
     }
     /// In-place Gamma function.
     /**
@@ -2076,8 +2076,7 @@ public:
      */
     real &gamma()
     {
-        ::mpfr_gamma(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_gamma);
     }
     /// In-place logarithm of the absolute value of the Gamma function.
     /**
