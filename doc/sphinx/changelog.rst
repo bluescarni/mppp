@@ -4,14 +4,22 @@ Changelog
 0.15 (unreleased)
 -----------------
 
+New
+~~~
+
+- Implement the logarithm/exponential functions for :cpp:class:`~mppp::real`
+  (`#172 <https://github.com/bluescarni/mppp/pull/172>`__).
+
 Changes
 ~~~~~~~
 
-- Continue moving code from the headers into the compiled library (`#170 <https://github.com/bluescarni/mppp/pull/170>`__).
+- Continue moving code from the headers into the compiled library (`#170 <https://github.com/bluescarni/mppp/pull/170>`__,
+  `#172 <https://github.com/bluescarni/mppp/pull/172>`__).
 
 Fix
 ~~~
 
+- Various build system and documentation improvements (`#172 <https://github.com/bluescarni/mppp/pull/172>`__).
 - Fix a warning when building mp++ with older MSVC versions (`#170 <https://github.com/bluescarni/mppp/pull/170>`__).
 
 0.14 (2019-04-11)
