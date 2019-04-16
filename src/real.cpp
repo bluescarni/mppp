@@ -66,40 +66,6 @@ constexpr void test_mpfr_struct_t()
 
 #endif
 
-// Shortcut for the size of the real_2_112 constant. We just need
-// 1 bit of precision for this, but make sure we don't go outside
-// the allowed precision range.
-constexpr ::mpfr_prec_t size_real_2_112 = clamp_mpfr_prec(1);
-
-// A bare real with static memory allocation, represented as
-// an mpfr_struct_t paired to storage for the limbs.
-template <::mpfr_prec_t Prec>
-using static_real = std::pair<mpfr_struct_t,
-                              // Use std::array as storage for the limbs.
-                              std::array<::mp_limb_t, mpfr_custom_get_size(Prec) / sizeof(::mp_limb_t)
-                                                          + mpfr_custom_get_size(Prec) % sizeof(::mp_limb_t)>>;
-
-// Create a static real with value 2**112. This represents the "hidden bit"
-// of the significand of a quadruple-precision FP.
-// NOTE: this could be instantiated as a global static instead of being re-computed every time.
-// However, since this is not constexpr, there's a high risk of static order initialization screwups
-// (e.g., if initing a static real from a real128), so for the time being let's keep things basic.
-// We can determine in the future if we can make this constexpr somehow and have a 2**112 instance
-// inited during constant initialization.
-static static_real<size_real_2_112> get_real_2_112()
-{
-    // NOTE: pair's def ctor value-inits the members: everything in retval is zeroed out.
-    static_real<size_real_2_112> retval;
-    // Init the limbs first, as indicated by the mpfr docs.
-    mpfr_custom_init(retval.second.data(), size_real_2_112);
-    // Do the custom init with a zero value, exponent 0 (unused), precision matching the previous call,
-    // and the limbs storage pointer.
-    mpfr_custom_init_set(&retval.first, MPFR_ZERO_KIND, 0, size_real_2_112, retval.second.data());
-    // Set the actual value.
-    ::mpfr_set_ui_2exp(&retval.first, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
-    return retval;
-}
-
 } // namespace
 
 void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
@@ -284,6 +250,51 @@ void real::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
 }
 
 #if defined(MPPP_WITH_QUADMATH)
+
+namespace detail
+{
+
+// Some private machinery for the interaction between real and real128.
+namespace
+{
+
+// Shortcut for the size of the real_2_112 constant. We just need
+// 1 bit of precision for this, but make sure we don't go outside
+// the allowed precision range.
+constexpr ::mpfr_prec_t size_real_2_112 = clamp_mpfr_prec(1);
+
+// A bare real with static memory allocation, represented as
+// an mpfr_struct_t paired to storage for the limbs.
+template <::mpfr_prec_t Prec>
+using static_real = std::pair<mpfr_struct_t,
+                              // Use std::array as storage for the limbs.
+                              std::array<::mp_limb_t, mpfr_custom_get_size(Prec) / sizeof(::mp_limb_t)
+                                                          + mpfr_custom_get_size(Prec) % sizeof(::mp_limb_t)>>;
+
+// Create a static real with value 2**112. This represents the "hidden bit"
+// of the significand of a quadruple-precision FP.
+// NOTE: this could be instantiated as a global static instead of being re-computed every time.
+// However, since this is not constexpr, there's a high risk of static order initialization screwups
+// (e.g., if initing a static real from a real128), so for the time being let's keep things basic.
+// We can determine in the future if we can make this constexpr somehow and have a 2**112 instance
+// inited during constant initialization.
+static static_real<size_real_2_112> get_real_2_112()
+{
+    // NOTE: pair's def ctor value-inits the members: everything in retval is zeroed out.
+    static_real<size_real_2_112> retval;
+    // Init the limbs first, as indicated by the mpfr docs.
+    mpfr_custom_init(retval.second.data(), size_real_2_112);
+    // Do the custom init with a zero value, exponent 0 (unused), precision matching the previous call,
+    // and the limbs storage pointer.
+    mpfr_custom_init_set(&retval.first, MPFR_ZERO_KIND, 0, size_real_2_112, retval.second.data());
+    // Set the actual value.
+    ::mpfr_set_ui_2exp(&retval.first, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
+    return retval;
+}
+
+} // namespace
+
+} // namespace detail
 
 void real::assign_real128(const real128 &x)
 {
