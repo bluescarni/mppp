@@ -28,3 +28,57 @@ TEST_CASE("real exp")
     REQUIRE(exp(std::move(r0)) == 1);
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
+
+TEST_CASE("real exp2")
+{
+    real r0{0};
+    r0.exp2();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 1);
+    real rop;
+    r0 = real{0};
+    REQUIRE(exp2(rop, r0) == 1);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(exp2(r0) == 1);
+    REQUIRE(exp2(std::move(r0)) == 1);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+
+    REQUIRE(exp2(real{4}) == 16);
+    REQUIRE(exp2(real{-4}) == 1 / exp2(real{4}));
+}
+
+TEST_CASE("real exp10")
+{
+    real r0{0};
+    r0.exp10();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 1);
+    real rop;
+    r0 = real{0};
+    REQUIRE(exp10(rop, r0) == 1);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(exp10(r0) == 1);
+    REQUIRE(exp10(std::move(r0)) == 1);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+
+    REQUIRE(exp10(real{4}) == 10000);
+    REQUIRE(exp10(real{-4}) == 1 / exp10(real{4}));
+}
+
+TEST_CASE("real expm1")
+{
+    real r0{0};
+    r0.expm1();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 0);
+    real rop;
+    r0 = real{0};
+    REQUIRE(expm1(rop, r0) == 0);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(expm1(r0) == 0);
+    REQUIRE(expm1(std::move(r0)) == 0);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+
+    REQUIRE(expm1(real{4}) == exp(real{4}) - 1);
+    REQUIRE(expm1(real{-4}) == exp(real{-4}) - 1);
+}

@@ -307,8 +307,7 @@ Trigonometry
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. doxygengroup:: real_logexp
-   :content-only:
+
 
 .. _real_gamma:
 

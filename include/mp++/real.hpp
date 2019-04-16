@@ -2052,6 +2052,21 @@ public:
         ::mpfr_exp(&m_mpfr, &m_mpfr, MPFR_RNDN);
         return *this;
     }
+    real &exp2()
+    {
+        ::mpfr_exp2(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
+    real &exp10()
+    {
+        ::mpfr_exp10(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
+    real &expm1()
+    {
+        ::mpfr_expm1(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
     /// In-place Gamma function.
     /**
      * This method will set ``this`` to its Gamma function.
@@ -3315,52 +3330,85 @@ inline real cos(T &&r)
 
 /** @} */
 
-/** @defgroup real_logexp real_logexp
- *  @{
- */
-
-/// Binary \link mppp::real real\endlink exponential.
-/**
- * This function will compute the exponential of ``op`` and store it
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real &exp(real &rop, CvrReal &&op)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
+#endif
 inline real &exp(real &rop, T &&op)
-#endif
 {
-    return detail::mpfr_nary_op(0, ::mpfr_exp, rop, std::forward<decltype(op)>(op));
+    return detail::mpfr_nary_op(0, ::mpfr_exp, rop, std::forward<T>(op));
 }
 
-/// Unary \link mppp::real real\endlink exponential.
-/**
- * This function will compute and return the exponential of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * @param r the operand.
- *
- * @return the exponential of \p r.
- */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real exp(CvrReal &&r)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real exp(T &&r)
 #endif
+inline real exp(T &&r)
 {
-    return detail::mpfr_nary_op_return(0, ::mpfr_exp, std::forward<decltype(r)>(r));
+    return detail::mpfr_nary_op_return(0, ::mpfr_exp, std::forward<T>(r));
 }
 
-/** @} */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &exp2(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_exp2, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real exp2(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_exp2, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &exp10(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_exp10, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real exp10(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_exp10, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &expm1(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_expm1, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real expm1(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_expm1, std::forward<T>(r));
+}
 
 /** @defgroup real_gamma real_gamma
  *  @{
