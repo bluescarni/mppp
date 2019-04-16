@@ -503,63 +503,8 @@ public:
         // Mark the other as moved-from.
         other.m_mpfr._mpfr_d = nullptr;
     }
-    /// Constructor from a special value, sign and precision.
-    /**
-     * \rststar
-     * This constructor will initialise ``this`` with one of the special values
-     * specified by the :cpp:type:`~mppp::real_kind` enum. The precision of ``this``
-     * will be ``p``. If ``p`` is zero, the precision will be set to the default
-     * precision (as indicated by :cpp:func:`~mppp::real_get_default_prec()`).
-     *
-     * If ``k`` is not NaN, the sign bit will be set to positive if ``sign``
-     * is nonnegative, negative otherwise.
-     * \endrststar
-     *
-     * @param k the desired special value.
-     * @param sign the desired sign for \p this.
-     * @param p the desired precision for \p this.
-     *
-     * @throws std::invalid_argument if \p p is not within the bounds established by
-     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink,
-     * or if \p p is zero but no default precision has been set.
-     */
-    explicit real(real_kind k, int sign, ::mpfr_prec_t p)
-    {
-        ::mpfr_prec_t prec;
-        if (p) {
-            prec = check_init_prec(p);
-        } else {
-            const auto dp = real_get_default_prec();
-            if (mppp_unlikely(!dp)) {
-                throw std::invalid_argument("Cannot init a real with an automatically-deduced precision if "
-                                            "the global default precision has not been set");
-            }
-            prec = dp;
-        }
-        ::mpfr_init2(&m_mpfr, prec);
-        // NOTE: handle all cases explicitly, in order to avoid
-        // compiler warnings.
-        switch (k) {
-            case real_kind::nan:
-                break;
-            case real_kind::inf:
-                set_inf(sign);
-                break;
-            case real_kind::zero:
-                set_zero(sign);
-                break;
-            default:
-                // Clean up before throwing.
-                ::mpfr_clear(&m_mpfr);
-                using kind_cast_t = std::underlying_type<::mpfr_kind_t>::type;
-                throw std::invalid_argument(
-                    "The 'real_kind' value passed to the constructor of a real ("
-                    + std::to_string(static_cast<kind_cast_t>(k)) + ") is not one of the three allowed values ('nan'="
-                    + std::to_string(static_cast<kind_cast_t>(real_kind::nan))
-                    + ", 'inf'=" + std::to_string(static_cast<kind_cast_t>(real_kind::inf))
-                    + " and 'zero'=" + std::to_string(static_cast<kind_cast_t>(real_kind::zero)) + ")");
-        }
-    }
+    // Constructor from a special value, sign and precision.
+    explicit real(real_kind k, int, ::mpfr_prec_t);
     /// Constructor from a special value and precision.
     /**
      * This constructor is equivalent to the constructor from a special value, sign and precision
@@ -727,25 +672,7 @@ public:
     }
 
 private:
-    void construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
-    {
-        if (mppp_unlikely(base && (base < 2 || base > 62))) {
-            throw std::invalid_argument("Cannot construct a real from a string in base " + detail::to_string(base)
-                                        + ": the base must either be zero or in the [2,62] range");
-        }
-        const ::mpfr_prec_t prec = p ? check_init_prec(p) : real_get_default_prec();
-        if (mppp_unlikely(!prec)) {
-            throw std::invalid_argument("Cannot construct a real from a string if the precision is not explicitly "
-                                        "specified and no default precision has been set");
-        }
-        ::mpfr_init2(&m_mpfr, prec);
-        const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
-        if (mppp_unlikely(ret == -1)) {
-            ::mpfr_clear(&m_mpfr);
-            throw std::invalid_argument(std::string{"The string '"} + s + "' does not represent a valid real in base "
-                                        + detail::to_string(base));
-        }
-    }
+    void construct_from_c_string(const char *, int, ::mpfr_prec_t);
     explicit real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
     {
         construct_from_c_string(s, base, p);
