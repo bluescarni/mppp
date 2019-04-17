@@ -16,11 +16,10 @@
 #include <utility>
 #include <vector>
 
-#include "simple_timer.hpp"
 #include "constStrings.hpp"
+#include "simple_timer.hpp"
 
 #include <boost/format.hpp>
-
 
 #if defined(MPPP_BENCHMARK_BOOST)
 #include <boost/multiprecision/cpp_int.hpp>
@@ -125,7 +124,7 @@ int main()
             for (auto i = 0ul; i < size; ++i) {
                 ret += p.first[i] * p.second[i];
             }
-            std::cout << static_cast<std::int_least64_t>(ret) << '\n';
+            std::cout << " / " << static_cast<std::int_least64_t>(ret);
             s += "['int128','operation'," + std::to_string(st2.elapsed()) + "],";
             std::cout << operRuntime;
         }
