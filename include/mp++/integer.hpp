@@ -11,11 +11,12 @@
 
 #include <mp++/config.hpp>
 
+// NOTE: cinttypes comes from the std::abs() include mess:
+// http://en.cppreference.com/w/cpp/numeric/math/abs
+
 #include <algorithm>
 #include <array>
 #include <cassert>
-// NOTE: this comes from the std::abs() include mess:
-// http://en.cppreference.com/w/cpp/numeric/math/abs
 #include <cinttypes>
 #include <cmath>
 #include <cstddef>
@@ -29,25 +30,27 @@
 #include <new>
 #include <stdexcept>
 #include <string>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
+#if MPPP_CPLUSPLUS >= 201703L
+#include <string_view>
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
-#if defined(MPPP_WITH_MPFR)
-#include <mp++/detail/mpfr.hpp>
-#endif
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/detail/visibility.hpp>
 #include <mp++/exceptions.hpp>
 #include <mp++/type_name.hpp>
+
+#if defined(MPPP_WITH_MPFR)
+#include <mp++/detail/mpfr.hpp>
+#endif
 
 // Compiler configuration.
 // NOTE: check for MSVC first, as clang-cl does define both __clang__ and _MSC_VER,
@@ -268,23 +271,6 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
 #endif
 }
 
-// This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
-// If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
-// little helper in order to avoid compiler warnings.
-template <typename T, enable_if_t<(GMP_NUMB_BITS < nl_constants<T>::digits), int> = 0>
-inline void u_checked_rshift(T &n)
-{
-    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
-    n >>= GMP_NUMB_BITS;
-}
-
-template <typename T, enable_if_t<(GMP_NUMB_BITS >= nl_constants<T>::digits), int> = 0>
-inline void u_checked_rshift(T &)
-{
-    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
-    assert(false);
-}
-
 // Machinery for the conversion of a large uint to a limb array.
 
 // Definition of the limb array type.
@@ -306,6 +292,23 @@ struct limb_array_t_ {
 template <typename T>
 using limb_array_t = typename limb_array_t_<T>::type;
 
+// This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
+// If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
+// little helper in order to avoid compiler warnings.
+template <typename T>
+inline void u_checked_rshift(T &n, const std::true_type &)
+{
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
+    n >>= GMP_NUMB_BITS;
+}
+
+template <typename T>
+inline void u_checked_rshift(T &, const std::false_type &)
+{
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
+    assert(false);
+}
+
 // Convert a large unsigned integer into a limb array, and return the effective size.
 // n must be > GMP_NUMB_MAX.
 template <typename T>
@@ -315,15 +318,16 @@ inline std::size_t uint_to_limb_array(limb_array_t<T> &rop, T n)
     assert(n > GMP_NUMB_MAX);
     // We can assign the first two limbs directly, as we know n > GMP_NUMB_MAX.
     rop[0] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
-    u_checked_rshift(n);
+    constexpr auto dispatcher = std::integral_constant<bool, (GMP_NUMB_BITS < nl_constants<T>::digits)>{};
+    u_checked_rshift(n, dispatcher);
     assert(n);
     rop[1] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
-    u_checked_rshift(n);
+    u_checked_rshift(n, dispatcher);
     std::size_t size = 2;
     // NOTE: currently this code is hit only on 32-bit archs with 64-bit integers,
     // and we have no nail builds: we cannot go past 2 limbs size.
     // LCOV_EXCL_START
-    for (; n; ++size, u_checked_rshift(n)) {
+    for (; n; ++size, u_checked_rshift(n, dispatcher)) {
         rop[size] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
     }
     // LCOV_EXCL_STOP
@@ -547,7 +551,7 @@ struct static_int {
     // we will have UB due to the const_cast use.
     mpz_struct_t get_mpz_view() const
     {
-        return {_mp_alloc, _mp_size, const_cast<::mp_limb_t *>(m_limbs.data())};
+        return mpz_struct_t{_mp_alloc, _mp_size, const_cast<::mp_limb_t *>(m_limbs.data())};
     }
     mpz_alloc_t _mp_alloc = s_alloc;
     mpz_size_t _mp_size;
