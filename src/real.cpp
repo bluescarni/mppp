@@ -7,12 +7,14 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <cassert>
 #include <cstddef>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -169,7 +171,130 @@ std::atomic<::mpfr_prec_t> real_default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0))
 
 } // namespace detail
 
+/// Constructor from a special value, sign and precision.
+/**
+ * \rststar
+ * This constructor will initialise ``this`` with one of the special values
+ * specified by the :cpp:type:`~mppp::real_kind` enum. The precision of ``this``
+ * will be ``p``. If ``p`` is zero, the precision will be set to the default
+ * precision (as indicated by :cpp:func:`~mppp::real_get_default_prec()`).
+ *
+ * If ``k`` is not NaN, the sign bit will be set to positive if ``sign``
+ * is nonnegative, negative otherwise.
+ * \endrststar
+ *
+ * @param k the desired special value.
+ * @param sign the desired sign for \p this.
+ * @param p the desired precision for \p this.
+ *
+ * @throws std::invalid_argument if \p p is not within the bounds established by
+ * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink,
+ * or if \p p is zero but no default precision has been set.
+ */
+real::real(real_kind k, int sign, ::mpfr_prec_t p)
+{
+    ::mpfr_prec_t prec;
+    if (p) {
+        prec = check_init_prec(p);
+    } else {
+        const auto dp = real_get_default_prec();
+        if (mppp_unlikely(!dp)) {
+            throw std::invalid_argument("Cannot init a real with an automatically-deduced precision if "
+                                        "the global default precision has not been set");
+        }
+        prec = dp;
+    }
+    ::mpfr_init2(&m_mpfr, prec);
+    // NOTE: handle all cases explicitly, in order to avoid
+    // compiler warnings.
+    switch (k) {
+        case real_kind::nan:
+            break;
+        case real_kind::inf:
+            set_inf(sign);
+            break;
+        case real_kind::zero:
+            set_zero(sign);
+            break;
+        default:
+            // Clean up before throwing.
+            ::mpfr_clear(&m_mpfr);
+            using kind_cast_t = std::underlying_type<::mpfr_kind_t>::type;
+            throw std::invalid_argument(
+                "The 'real_kind' value passed to the constructor of a real ("
+                + std::to_string(static_cast<kind_cast_t>(k)) + ") is not one of the three allowed values ('nan'="
+                + std::to_string(static_cast<kind_cast_t>(real_kind::nan))
+                + ", 'inf'=" + std::to_string(static_cast<kind_cast_t>(real_kind::inf))
+                + " and 'zero'=" + std::to_string(static_cast<kind_cast_t>(real_kind::zero)) + ")");
+    }
+}
+
+void real::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
+{
+    if (mppp_unlikely(base && (base < 2 || base > 62))) {
+        throw std::invalid_argument("Cannot construct a real from a string in base " + detail::to_string(base)
+                                    + ": the base must either be zero or in the [2,62] range");
+    }
+    const ::mpfr_prec_t prec = p ? check_init_prec(p) : real_get_default_prec();
+    if (mppp_unlikely(!prec)) {
+        throw std::invalid_argument("Cannot construct a real from a string if the precision is not explicitly "
+                                    "specified and no default precision has been set");
+    }
+    ::mpfr_init2(&m_mpfr, prec);
+    const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
+    if (mppp_unlikely(ret == -1)) {
+        ::mpfr_clear(&m_mpfr);
+        throw std::invalid_argument(std::string{"The string '"} + s + "' does not represent a valid real in base "
+                                    + detail::to_string(base));
+    }
+}
+
 #if defined(MPPP_WITH_QUADMATH)
+
+namespace detail
+{
+
+// Some private machinery for the interaction between real and real128.
+namespace
+{
+
+// Shortcut for the size of the real_2_112 constant. We just need
+// 1 bit of precision for this, but make sure we don't go outside
+// the allowed precision range.
+constexpr ::mpfr_prec_t size_real_2_112 = clamp_mpfr_prec(1);
+
+// A bare real with static memory allocation, represented as
+// an mpfr_struct_t paired to storage for the limbs.
+template <::mpfr_prec_t Prec>
+using static_real = std::pair<mpfr_struct_t,
+                              // Use std::array as storage for the limbs.
+                              std::array<::mp_limb_t, mpfr_custom_get_size(Prec) / sizeof(::mp_limb_t)
+                                                          + mpfr_custom_get_size(Prec) % sizeof(::mp_limb_t)>>;
+
+// Create a static real with value 2**112. This represents the "hidden bit"
+// of the significand of a quadruple-precision FP.
+// NOTE: this could be instantiated as a global static instead of being re-computed every time.
+// However, since this is not constexpr, there's a high risk of static order initialization screwups
+// (e.g., if initing a static real from a real128), so for the time being let's keep things basic.
+// We can determine in the future if we can make this constexpr somehow and have a 2**112 instance
+// inited during constant initialization.
+static static_real<size_real_2_112> get_real_2_112()
+{
+    // NOTE: pair's def ctor value-inits the members: everything in retval is zeroed out.
+    static_real<size_real_2_112> retval;
+    // Init the limbs first, as indicated by the mpfr docs.
+    mpfr_custom_init(retval.second.data(), size_real_2_112);
+    // Do the custom init with a zero value, exponent 0 (unused), precision matching the previous call,
+    // and the limbs storage pointer.
+    mpfr_custom_init_set(&retval.first, MPFR_ZERO_KIND, 0, size_real_2_112, retval.second.data());
+    // Set the actual value.
+    ::mpfr_set_ui_2exp(&retval.first, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
+    return retval;
+}
+
+} // namespace
+
+} // namespace detail
 
 void real::assign_real128(const real128 &x)
 {
@@ -219,7 +344,7 @@ void real::assign_real128(const real128 &x)
         // Write the significand into this.
         write_significand();
         // Add the hidden bit on top.
-        const auto r_2_112 = detail::real_constants<>::get_2_112();
+        const auto r_2_112 = detail::get_real_2_112();
         ::mpfr_add(&m_mpfr, &m_mpfr, &r_2_112.first, MPFR_RNDN);
         // Multiply by 2 raised to the adjusted exponent.
         ::mpfr_mul_2si(&m_mpfr, &m_mpfr, static_cast<long>(std::get<1>(t)) - (16383l + 112), MPFR_RNDN);

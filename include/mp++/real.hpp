@@ -14,7 +14,6 @@
 #if defined(MPPP_WITH_MPFR)
 
 #include <algorithm>
-#include <array>
 #include <atomic>
 #include <cassert>
 #include <cmath>
@@ -136,41 +135,6 @@ inline ::mpfr_prec_t real_deduce_precision(const real128 &)
 
 #endif
 
-template <typename = void>
-struct real_constants {
-    // A bare real with static memory allocation, represented as
-    // an mpfr_struct_t paired to storage for the limbs.
-    template <::mpfr_prec_t Prec>
-    using static_real = std::pair<mpfr_struct_t,
-                                  // Use std::array as storage for the limbs.
-                                  std::array<::mp_limb_t, mpfr_custom_get_size(Prec) / sizeof(::mp_limb_t)
-                                                              + mpfr_custom_get_size(Prec) % sizeof(::mp_limb_t)>>;
-    // Shortcut for the size of the real_2_112 constant. We just need
-    // 1 bit of precision for this, but make sure we don't go outside
-    // the allowed precision range.
-    static const ::mpfr_prec_t size_2_112 = clamp_mpfr_prec(1);
-    // Create a static real with value 2**112. This represents the "hidden bit"
-    // of the significand of a quadruple-precision FP.
-    // NOTE: this could be instantiated as a global static instead of being re-computed every time.
-    // However, since this is not constexpr, there's a high risk of static order initialization screwups
-    // (e.g., if initing a static real from a real128), so for the time being let's keep things basic.
-    // We can determine in the future if we can make this constexpr somehow and have a 2**112 instance
-    // inited during constant initialization.
-    static static_real<size_2_112> get_2_112()
-    {
-        // NOTE: pair's def ctor value-inits the members: everything in retval is zeroed out.
-        static_real<size_2_112> retval;
-        // Init the limbs first, as indicated by the mpfr docs.
-        mpfr_custom_init(retval.second.data(), size_2_112);
-        // Do the custom init with a zero value, exponent 0 (unused), precision matching the previous call,
-        // and the limbs storage pointer.
-        mpfr_custom_init_set(&retval.first, MPFR_ZERO_KIND, 0, size_2_112, retval.second.data());
-        // Set the actual value.
-        ::mpfr_set_ui_2exp(&retval.first, 1ul, static_cast<::mpfr_exp_t>(112), MPFR_RNDN);
-        return retval;
-    }
-};
-
 // Default precision value.
 MPPP_PUBLIC extern std::atomic<::mpfr_prec_t> real_default_prec;
 
@@ -195,6 +159,7 @@ inline void real_lgamma_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t)
 // A small helper to check the input of the trunc() overloads,
 // only fwd declaration (implementation below).
 void check_real_trunc_arg(const real &);
+
 } // namespace detail
 
 // Fwd declare swap.
@@ -538,63 +503,8 @@ public:
         // Mark the other as moved-from.
         other.m_mpfr._mpfr_d = nullptr;
     }
-    /// Constructor from a special value, sign and precision.
-    /**
-     * \rststar
-     * This constructor will initialise ``this`` with one of the special values
-     * specified by the :cpp:type:`~mppp::real_kind` enum. The precision of ``this``
-     * will be ``p``. If ``p`` is zero, the precision will be set to the default
-     * precision (as indicated by :cpp:func:`~mppp::real_get_default_prec()`).
-     *
-     * If ``k`` is not NaN, the sign bit will be set to positive if ``sign``
-     * is nonnegative, negative otherwise.
-     * \endrststar
-     *
-     * @param k the desired special value.
-     * @param sign the desired sign for \p this.
-     * @param p the desired precision for \p this.
-     *
-     * @throws std::invalid_argument if \p p is not within the bounds established by
-     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink,
-     * or if \p p is zero but no default precision has been set.
-     */
-    explicit real(real_kind k, int sign, ::mpfr_prec_t p)
-    {
-        ::mpfr_prec_t prec;
-        if (p) {
-            prec = check_init_prec(p);
-        } else {
-            const auto dp = real_get_default_prec();
-            if (mppp_unlikely(!dp)) {
-                throw std::invalid_argument("Cannot init a real with an automatically-deduced precision if "
-                                            "the global default precision has not been set");
-            }
-            prec = dp;
-        }
-        ::mpfr_init2(&m_mpfr, prec);
-        // NOTE: handle all cases explicitly, in order to avoid
-        // compiler warnings.
-        switch (k) {
-            case real_kind::nan:
-                break;
-            case real_kind::inf:
-                set_inf(sign);
-                break;
-            case real_kind::zero:
-                set_zero(sign);
-                break;
-            default:
-                // Clean up before throwing.
-                ::mpfr_clear(&m_mpfr);
-                using kind_cast_t = std::underlying_type<::mpfr_kind_t>::type;
-                throw std::invalid_argument(
-                    "The 'real_kind' value passed to the constructor of a real ("
-                    + std::to_string(static_cast<kind_cast_t>(k)) + ") is not one of the three allowed values ('nan'="
-                    + std::to_string(static_cast<kind_cast_t>(real_kind::nan))
-                    + ", 'inf'=" + std::to_string(static_cast<kind_cast_t>(real_kind::inf))
-                    + " and 'zero'=" + std::to_string(static_cast<kind_cast_t>(real_kind::zero)) + ")");
-        }
-    }
+    // Constructor from a special value, sign and precision.
+    explicit real(real_kind k, int, ::mpfr_prec_t);
     /// Constructor from a special value and precision.
     /**
      * This constructor is equivalent to the constructor from a special value, sign and precision
@@ -632,14 +542,11 @@ private:
         return detail::real_dd_prec(x);
     }
     // Construction from FPs.
-    // Alias for the MPFR assignment functions from FP types.
-    template <typename T>
-    using fp_a_ptr = int (*)(::mpfr_t, T, ::mpfr_rnd_t);
-    template <typename T>
-    void dispatch_fp_construction(fp_a_ptr<T> ptr, const T &x, ::mpfr_prec_t p)
+    template <typename Func, typename T>
+    void dispatch_fp_construction(const Func &func, const T &x, ::mpfr_prec_t p)
     {
         ::mpfr_init2(&m_mpfr, compute_init_precision(p, x));
-        ptr(&m_mpfr, x, MPFR_RNDN);
+        func(&m_mpfr, x, MPFR_RNDN);
     }
     void dispatch_construction(const float &x, ::mpfr_prec_t p)
     {
@@ -765,25 +672,7 @@ public:
     }
 
 private:
-    void construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
-    {
-        if (mppp_unlikely(base && (base < 2 || base > 62))) {
-            throw std::invalid_argument("Cannot construct a real from a string in base " + detail::to_string(base)
-                                        + ": the base must either be zero or in the [2,62] range");
-        }
-        const ::mpfr_prec_t prec = p ? check_init_prec(p) : real_get_default_prec();
-        if (mppp_unlikely(!prec)) {
-            throw std::invalid_argument("Cannot construct a real from a string if the precision is not explicitly "
-                                        "specified and no default precision has been set");
-        }
-        ::mpfr_init2(&m_mpfr, prec);
-        const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
-        if (mppp_unlikely(ret == -1)) {
-            ::mpfr_clear(&m_mpfr);
-            throw std::invalid_argument(std::string{"The string '"} + s + "' does not represent a valid real in base "
-                                        + detail::to_string(base));
-        }
-    }
+    void construct_from_c_string(const char *, int, ::mpfr_prec_t);
     explicit real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
     {
         construct_from_c_string(s, base, p);
@@ -1014,13 +903,13 @@ public:
 
 private:
     // Assignment from FPs.
-    template <bool SetPrec, typename T>
-    void dispatch_fp_assignment(fp_a_ptr<T> ptr, const T &x)
+    template <bool SetPrec, typename Func, typename T>
+    void dispatch_fp_assignment(const Func &func, const T &x)
     {
         if (SetPrec) {
             set_prec_impl<false>(detail::real_dd_prec(x));
         }
-        ptr(&m_mpfr, x, MPFR_RNDN);
+        func(&m_mpfr, x, MPFR_RNDN);
     }
     template <bool SetPrec>
     void dispatch_assignment(const float &x)
@@ -1573,6 +1462,19 @@ public:
     {
         return mpfr_get_prec(&m_mpfr);
     }
+
+private:
+    // Pointer to a unary MPFR function.
+    using mpfr_unary_fptr = decltype(::mpfr_neg) *;
+    // Wrapper to apply the input unary function to this with
+    // MPFR_RNDN rounding mode. Returns a reference to this.
+    real &self_mpfr_unary(mpfr_unary_fptr fptr)
+    {
+        fptr(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        return *this;
+    }
+
+public:
     /// Negate in-place.
     /**
      * This method will set ``this`` to ``-this``.
@@ -1581,8 +1483,7 @@ public:
      */
     real &neg()
     {
-        ::mpfr_neg(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_neg);
     }
     /// In-place absolute value.
     /**
@@ -1592,8 +1493,7 @@ public:
      */
     real &abs()
     {
-        ::mpfr_abs(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_abs);
     }
 
 private:
@@ -1985,8 +1885,7 @@ public:
      */
     real &sqrt()
     {
-        ::mpfr_sqrt(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_sqrt);
     }
     /// In-place reciprocal square root.
     /**
@@ -2001,8 +1900,7 @@ public:
      */
     real &rec_sqrt()
     {
-        ::mpfr_rec_sqrt(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_rec_sqrt);
     }
     /// In-place cubic root.
     /**
@@ -2013,8 +1911,7 @@ public:
      */
     real &cbrt()
     {
-        ::mpfr_cbrt(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_cbrt);
     }
     /// In-place sine.
     /**
@@ -2025,8 +1922,7 @@ public:
      */
     real &sin()
     {
-        ::mpfr_sin(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_sin);
     }
     /// In-place cosine.
     /**
@@ -2037,8 +1933,7 @@ public:
      */
     real &cos()
     {
-        ::mpfr_cos(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_cos);
     }
     /// In-place exponential.
     /**
@@ -2049,8 +1944,84 @@ public:
      */
     real &exp()
     {
-        ::mpfr_exp(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_exp);
+    }
+    /// In-place base-2 exponential.
+    /**
+     * This method will set ``this`` to ``2**this``.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &exp2()
+    {
+        return self_mpfr_unary(::mpfr_exp2);
+    }
+    /// In-place base-10 exponential.
+    /**
+     * This method will set ``this`` to ``10**this``.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &exp10()
+    {
+        return self_mpfr_unary(::mpfr_exp10);
+    }
+    /// In-place exponential minus 1.
+    /**
+     * This method will set ``this`` to its exponential minus one.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &expm1()
+    {
+        return self_mpfr_unary(::mpfr_expm1);
+    }
+    /// In-place logarithm.
+    /**
+     * This method will set ``this`` to its logarithm.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &log()
+    {
+        return self_mpfr_unary(::mpfr_log);
+    }
+    /// In-place base-2 logarithm.
+    /**
+     * This method will set ``this`` to its base-2 logarithm.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &log2()
+    {
+        return self_mpfr_unary(::mpfr_log2);
+    }
+    /// In-place base-10 logarithm.
+    /**
+     * This method will set ``this`` to its base-10 logarithm.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &log10()
+    {
+        return self_mpfr_unary(::mpfr_log10);
+    }
+    /// In-place augmented logarithm.
+    /**
+     * This method will set ``this`` the logarithm of ``this + 1``.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &log1p()
+    {
+        return self_mpfr_unary(::mpfr_log1p);
     }
     /// In-place Gamma function.
     /**
@@ -2061,8 +2032,7 @@ public:
      */
     real &gamma()
     {
-        ::mpfr_gamma(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
+        return self_mpfr_unary(::mpfr_gamma);
     }
     /// In-place logarithm of the absolute value of the Gamma function.
     /**
@@ -3315,52 +3285,167 @@ inline real cos(T &&r)
 
 /** @} */
 
-/** @defgroup real_logexp real_logexp
- *  @{
- */
+// Exponentials and logarithms.
 
-/// Binary \link mppp::real real\endlink exponential.
-/**
- * This function will compute the exponential of ``op`` and store it
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real &exp(real &rop, CvrReal &&op)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
+#endif
 inline real &exp(real &rop, T &&op)
-#endif
 {
-    return detail::mpfr_nary_op(0, ::mpfr_exp, rop, std::forward<decltype(op)>(op));
+    return detail::mpfr_nary_op(0, ::mpfr_exp, rop, std::forward<T>(op));
 }
 
-/// Unary \link mppp::real real\endlink exponential.
-/**
- * This function will compute and return the exponential of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * @param r the operand.
- *
- * @return the exponential of \p r.
- */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real exp(CvrReal &&r)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real exp(T &&r)
 #endif
+inline real exp(T &&r)
 {
-    return detail::mpfr_nary_op_return(0, ::mpfr_exp, std::forward<decltype(r)>(r));
+    return detail::mpfr_nary_op_return(0, ::mpfr_exp, std::forward<T>(r));
 }
 
-/** @} */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &exp2(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_exp2, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real exp2(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_exp2, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &exp10(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_exp10, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real exp10(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_exp10, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &expm1(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_expm1, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real expm1(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_expm1, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &log(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_log, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real log(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_log, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &log2(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_log2, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real log2(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_log2, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &log10(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_log10, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real log10(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_log10, std::forward<T>(r));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &log1p(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_log1p, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real log1p(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_log1p, std::forward<T>(r));
+}
 
 /** @defgroup real_gamma real_gamma
  *  @{
