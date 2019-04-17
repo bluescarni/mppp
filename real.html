@@ -386,7 +386,7 @@ destruction and copy/move assignment. After re-assignment, <code class="docutils
 
 <dl class="function">
 <dt id="_CPPv4N4mppp4real4realE9real_kindi11mpfr_prec_t">
-<span id="_CPPv3N4mppp4real4realE9real_kindi11mpfr_prec_t"></span><span id="_CPPv2N4mppp4real4realE9real_kindi11mpfr_prec_t"></span><span id="mppp::real::real__real_kind.i.mpfr_prec_t"></span><span class="target" id="classmppp_1_1real_1ad1323716fea2ecdccbf144059ba812b0"></span><code class="descname">real</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4mppp9real_kindE" title="mppp::real_kind">real_kind</a> <em>k</em>, int <em>sign</em>, <a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4realE9real_kindi11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N4mppp4real4realE9real_kindi11mpfr_prec_t"></span><span id="_CPPv2N4mppp4real4realE9real_kindi11mpfr_prec_t"></span><span id="mppp::real::real__real_kind.i.mpfr_prec_t"></span><span class="target" id="classmppp_1_1real_1a66838ee519a596a9d5e92076e20496a0"></span><code class="descname">real</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4mppp9real_kindE" title="mppp::real_kind">real_kind</a> <em>k</em>, int <em>sign</em>, <a class="reference internal" href="#_CPPv411mpfr_prec_t" title="mpfr_prec_t">mpfr_prec_t</a> <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4realE9real_kindi11mpfr_prec_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from a special value, sign and precision. </p>
 <p><p>This constructor will initialise <code class="docutils literal notranslate"><span class="pre">this</span></code> with one of the special values
 specified by the <a class="reference internal" href="#_CPPv4N4mppp9real_kindE" title="mppp::real_kind"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">real_kind</span></code></a> enum. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code>
@@ -1386,6 +1386,90 @@ to produce exactly the original value when used in one of the constructors from 
 <span id="_CPPv3N4mppp4real3expEv"></span><span id="_CPPv2N4mppp4real3expEv"></span><span id="mppp::real::exp"></span><span class="target" id="classmppp_1_1real_1a0ea90069f7ef16853cec454aef1b2c7c"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">exp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real3expEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place exponential. </p>
 <p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its exponential. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N4mppp4real4exp2Ev">
+<span id="_CPPv3N4mppp4real4exp2Ev"></span><span id="_CPPv2N4mppp4real4exp2Ev"></span><span id="mppp::real::exp2"></span><span class="target" id="classmppp_1_1real_1abd74d58bf1b4869cef792665b9ba79f2"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">exp2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4exp2Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place base-2 exponential. </p>
+<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <code class="docutils literal notranslate"><span class="pre">2**this</span></code>. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N4mppp4real5exp10Ev">
+<span id="_CPPv3N4mppp4real5exp10Ev"></span><span id="_CPPv2N4mppp4real5exp10Ev"></span><span id="mppp::real::exp10"></span><span class="target" id="classmppp_1_1real_1a909cbe5a6d3b517aadbe6512cd6e0fd8"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">exp10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real5exp10Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place base-10 exponential. </p>
+<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <code class="docutils literal notranslate"><span class="pre">10**this</span></code>. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N4mppp4real5expm1Ev">
+<span id="_CPPv3N4mppp4real5expm1Ev"></span><span id="_CPPv2N4mppp4real5expm1Ev"></span><span id="mppp::real::expm1"></span><span class="target" id="classmppp_1_1real_1aaac6c01badc4e4817a94d0dd1f44f1ab"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">expm1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real5expm1Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place exponential minus 1. </p>
+<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its exponential minus one. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N4mppp4real3logEv">
+<span id="_CPPv3N4mppp4real3logEv"></span><span id="_CPPv2N4mppp4real3logEv"></span><span id="mppp::real::log"></span><span class="target" id="classmppp_1_1real_1afbf2df281284dd0ae7632e73a0f9bb69"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real3logEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place logarithm. </p>
+<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its logarithm. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N4mppp4real4log2Ev">
+<span id="_CPPv3N4mppp4real4log2Ev"></span><span id="_CPPv2N4mppp4real4log2Ev"></span><span id="mppp::real::log2"></span><span class="target" id="classmppp_1_1real_1a5642219680ef61ba06e0fed71a5e14eb"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">log2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real4log2Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place base-2 logarithm. </p>
+<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its base-2 logarithm. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N4mppp4real5log10Ev">
+<span id="_CPPv3N4mppp4real5log10Ev"></span><span id="_CPPv2N4mppp4real5log10Ev"></span><span id="mppp::real::log10"></span><span class="target" id="classmppp_1_1real_1a90192f4ed1639dc84d498377d987c687"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">log10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real5log10Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place base-10 logarithm. </p>
+<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its base-10 logarithm. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4N4mppp4real5log1pEv">
+<span id="_CPPv3N4mppp4real5log1pEv"></span><span id="_CPPv2N4mppp4real5log1pEv"></span><span id="mppp::real::log1p"></span><span class="target" id="classmppp_1_1real_1a24ae46e3372da62279511fd930a6208d"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">log1p</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp4real5log1pEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>In-place augmented logarithm. </p>
+<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> the logarithm of <code class="docutils literal notranslate"><span class="pre">this</span> <span class="pre">+</span> <span class="pre">1</span></code>. The precision of <code class="docutils literal notranslate"><span class="pre">this</span></code> will not be altered.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
@@ -2484,8 +2568,8 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv4I_N4mppp7CvrRealEE8rootn_uiRN4mppp4realERN4mppp4realERR1Tm">
-<span id="_CPPv3I_N4mppp7CvrRealEE8rootn_uiRN4mppp4realERR1Tm"></span><span id="_CPPv2I_N4mppp7CvrRealEE8rootn_uiRN4mppp4realERR1Tm"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descname">rootn_ui</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEE8rootn_uiRN4mppp4realERN4mppp4realERR1Tm" title="rootn_ui::T">T</a> &amp;&amp;<em>op</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEE8rootn_uiRN4mppp4realERN4mppp4realERR1Tm" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp8rootn_uiERN4mppp4realERN4mppp4realERR1Tm">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp8rootn_uiERN4mppp4realERR1Tm"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp8rootn_uiERN4mppp4realERR1Tm"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rootn_ui</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp8rootn_uiERN4mppp4realERN4mppp4realERR1Tm" title="mppp::rootn_ui::T">T</a> &amp;&amp;<em>op</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp8rootn_uiERN4mppp4realERN4mppp4realERR1Tm" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified">New in version 0.12.</span></p>
 </div>
@@ -2520,8 +2604,8 @@ the same sign as <em>op</em> if <em>k</em> is odd, and positive if <em>k</em> is
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv4I_N4mppp7CvrRealEE8rootn_uiN4mppp4realERR1Tm">
-<span id="_CPPv3I_N4mppp7CvrRealEE8rootn_uiRR1Tm"></span><span id="_CPPv2I_N4mppp7CvrRealEE8rootn_uiRR1Tm"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descname">rootn_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEE8rootn_uiRN4mppp4realERN4mppp4realERR1Tm" title="rootn_ui::T">T</a> &amp;&amp;<em>r</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEE8rootn_uiN4mppp4realERR1Tm" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp8rootn_uiEN4mppp4realERR1Tm">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp8rootn_uiERR1Tm"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp8rootn_uiERR1Tm"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">rootn_ui</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp8rootn_uiERN4mppp4realERN4mppp4realERR1Tm" title="mppp::rootn_ui::T">T</a> &amp;&amp;<em>r</em>, unsigned long <em>k</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp8rootn_uiEN4mppp4realERR1Tm" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified">New in version 0.12.</span></p>
 </div>
@@ -2683,38 +2767,169 @@ operand to be converted.</p>
 <div class="section" id="logarithms-and-exponentials">
 <span id="real-logexp"></span><h3>Logarithms and exponentials<a class="headerlink" href="#logarithms-and-exponentials" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="_CPPv4N4mppp3expER4realRR7CvrReal">
-<span id="_CPPv3N4mppp3expER4realRR7CvrReal"></span><span id="_CPPv2N4mppp3expER4realRR7CvrReal"></span><span id="mppp::exp__realR.CvrRealRR"></span><span class="target" id="group__real__logexp_1ga5bdfba6a98e6470005e2e5b3127bc90d"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">exp</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3expER4realRR7CvrReal" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> exponential. </p>
-<p>This function will compute the exponential of <code class="docutils literal notranslate"><span class="pre">op</span></code> and store it into <code class="docutils literal notranslate"><span class="pre">rop</span></code>. The precision of the result will be equal to the precision of <code class="docutils literal notranslate"><span class="pre">op</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op</span></code>: the operand.</li>
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp3expERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp3expERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp3expERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">exp</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3expERN4mppp4realERN4mppp4realERR1T" title="mppp::exp::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3expERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp4exp2ERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp4exp2ERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp4exp2ERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">exp2</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp4exp2ERN4mppp4realERN4mppp4realERR1T" title="mppp::exp2::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp4exp2ERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp5exp10ERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp5exp10ERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp5exp10ERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">exp10</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp5exp10ERN4mppp4realERN4mppp4realERR1T" title="mppp::exp10::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp5exp10ERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp5expm1ERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp5expm1ERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp5expm1ERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">expm1</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp5expm1ERN4mppp4realERN4mppp4realERR1T" title="mppp::expm1::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp5expm1ERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary exponentials.</p>
+<p>These functions will set <em>rop</em> to, respectively,</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">e**op</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">2**op</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">10**op</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">e**op-1</span></code>.</li>
 </ul>
-</dd>
-</dl>
-</p>
+<p>The precision of the result will be equal to the precision of <em>op</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the return value.</li>
+<li><strong>op</strong> – the exponent.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv4N4mppp3expERR7CvrReal">
-<span id="_CPPv3N4mppp3expERR7CvrReal"></span><span id="_CPPv2N4mppp3expERR7CvrReal"></span><span id="mppp::exp__CvrRealRR"></span><span class="target" id="group__real__logexp_1gaae11201c0ae3e9a2c8cec54d7c7831b8"></span><a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">exp</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp3expERR7CvrReal" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Unary <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a> exponential. </p>
-<p>This function will compute and return the exponential of <code class="docutils literal notranslate"><span class="pre">r</span></code>. The precision of the result will be equal to the precision of <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>the exponential of <code class="docutils literal notranslate"><span class="pre">r</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">r</span></code>: the operand.</li>
+<dt id="_CPPv4I_N4mppp7CvrRealEE3expN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEE3expRR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEE3expRR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descname">exp</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEE3expN4mppp4realERR1T" title="exp::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEE3expN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEE4exp2N4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEE4exp2RR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEE4exp2RR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descname">exp2</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEE4exp2N4mppp4realERR1T" title="exp2::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEE4exp2N4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEE5exp10N4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEE5exp10RR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEE5exp10RR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descname">exp10</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEE5exp10N4mppp4realERR1T" title="exp10::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEE5exp10N4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEE5expm1N4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEE5expm1RR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEE5expm1RR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descname">expm1</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEE5expm1N4mppp4realERR1T" title="expm1::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEE5expm1N4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Unary exponentials.</p>
+<p>These functions will return, respectively,</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">e**r</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">2**r</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">10**r</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">e**r-1</span></code>.</li>
 </ul>
-</dd>
-</dl>
-</p>
+<p>The precision of the result will be equal to the precision of <em>r</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> – the exponent.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the exponential of <em>r</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp3logERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp3logERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp3logERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3logERN4mppp4realERN4mppp4realERR1T" title="mppp::log::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3logERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp4log2ERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp4log2ERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp4log2ERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log2</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp4log2ERN4mppp4realERN4mppp4realERR1T" title="mppp::log2::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp4log2ERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp5log10ERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp5log10ERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp5log10ERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log10</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp5log10ERN4mppp4realERN4mppp4realERR1T" title="mppp::log10::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp5log10ERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp5log1pERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp5log1pERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp5log1pERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">log1p</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp5log1pERN4mppp4realERN4mppp4realERR1T" title="mppp::log1p::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp5log1pERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary logarithms.</p>
+<p>These functions will set <em>rop</em> to, respectively,</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">log(op)</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">log2(op)</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">log10(op)</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">log(1+op)</span></code>.</li>
+</ul>
+<p>The precision of the result will be equal to the precision of <em>op</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rop</strong> – the return value.</li>
+<li><strong>op</strong> – the operand.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a reference to <em>rop</em>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEE3logN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEE3logRR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEE3logRR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descname">log</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEE3logN4mppp4realERR1T" title="log::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEE3logN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEE4log2N4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEE4log2RR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEE4log2RR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descname">log2</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEE4log2N4mppp4realERR1T" title="log2::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEE4log2N4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEE5log10N4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEE5log10RR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEE5log10RR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descname">log10</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEE5log10N4mppp4realERR1T" title="log10::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEE5log10N4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEE5log1pN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEE5log1pRR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEE5log1pRR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="descname">log1p</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEE5log1pN4mppp4realERR1T" title="log1p::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEE5log1pN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Unary logarithms.</p>
+<p>These functions will return, respectively,</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">log(r)</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">log2(r)</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">log10(r)</span></code>,</li>
+<li><code class="docutils literal notranslate"><span class="pre">log(1+op)</span></code>.</li>
+</ul>
+<p>The precision of the result will be equal to the precision of <em>r</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>r</strong> – the operand.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the logarithm of <em>r</em>.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
