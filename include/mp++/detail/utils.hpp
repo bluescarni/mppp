@@ -9,8 +9,6 @@
 #ifndef MPPP_DETAIL_UTILS_HPP
 #define MPPP_DETAIL_UTILS_HPP
 
-#include <mp++/config.hpp>
-
 #include <cassert>
 #include <limits>
 #include <stdexcept>
@@ -18,6 +16,7 @@
 #include <type_traits>
 #include <utility>
 
+#include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/visibility.hpp>
 #include <mp++/type_name.hpp>

@@ -10,9 +10,10 @@
 #define MPPP_DETAIL_GMP_HPP
 
 #include <cassert>
-#include <gmp.h>
 #include <type_traits>
 #include <utility>
+
+#include <gmp.h>
 
 #if __GNU_MP_VERSION < 5
 
