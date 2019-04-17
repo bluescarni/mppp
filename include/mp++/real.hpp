@@ -24,12 +24,13 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#if MPPP_CPLUSPLUS >= 201703L
+#include <string_view>
+#endif
 
 #include <mp++/concepts.hpp>
 #include <mp++/detail/fwd_decl.hpp>
@@ -40,10 +41,11 @@
 #include <mp++/detail/visibility.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
+#include <mp++/type_name.hpp>
+
 #if defined(MPPP_WITH_QUADMATH)
 #include <mp++/real128.hpp>
 #endif
-#include <mp++/type_name.hpp>
 
 namespace mppp
 {

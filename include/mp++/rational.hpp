@@ -20,25 +20,27 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <type_traits>
 #include <utility>
 #include <vector>
 
+#if MPPP_CPLUSPLUS >= 201703L
+#include <string_view>
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
-#if defined(MPPP_WITH_MPFR)
-#include <mp++/detail/mpfr.hpp>
-#endif
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/detail/visibility.hpp>
 #include <mp++/exceptions.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/type_name.hpp>
+
+#if defined(MPPP_WITH_MPFR)
+#include <mp++/detail/mpfr.hpp>
+#endif
 
 namespace mppp
 {

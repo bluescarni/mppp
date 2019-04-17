@@ -13,10 +13,11 @@
 
 #include <cstddef>
 #include <string>
+#include <type_traits>
+
 #if MPPP_CPLUSPLUS >= 201703L
 #include <string_view>
 #endif
-#include <type_traits>
 
 #include <mp++/detail/type_traits.hpp>
 
