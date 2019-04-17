@@ -5550,7 +5550,9 @@ inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, 
         // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
         return 0;
     }
-    const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize));
+    // NOTE: reduce the value of the comparison to the [-1, 1] range, so that
+    // if we need to negate it below we ensure not to run into overflows.
+    const int cmp_abs = integral_sign(::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize)));
     // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
     return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
 }
