@@ -8969,36 +8969,47 @@ inline T &operator^=(T &rop, const U &op)
 
 /** @} */
 
+namespace detail
+{
+
+// Swap u1 and u2. u1 must be static, u2 must be dynamic.
+template <std::size_t SSize>
+inline void integer_swap_static_dynamic(integer_union<SSize> &u1, integer_union<SSize> &u2) noexcept
+{
+    using s_storage = typename integer_union<SSize>::s_storage;
+    using d_storage = typename integer_union<SSize>::d_storage;
+
+    assert(u1.is_static());
+    assert(!u2.is_static());
+
+    // Copy the static in temp storage.
+    const auto n1_copy(u1.g_st());
+    // Destroy the static.
+    u1.g_st().~s_storage();
+    // Construct the dynamic struct, shallow-copying from n2.
+    ::new (static_cast<void *>(&u1.m_dy)) d_storage(u2.g_dy());
+    // Re-create n2 as a static copying from n1_copy.
+    u2.g_dy().~d_storage();
+    ::new (static_cast<void *>(&u2.m_st)) s_storage(n1_copy);
+}
+
+} // namespace detail
+
 template <std::size_t SSize>
 inline void swap(integer<SSize> &n1, integer<SSize> &n2) noexcept
 {
     auto &u1 = n1._get_union();
     auto &u2 = n2._get_union();
 
-    using s_storage = typename detail::unref_t<decltype(u1)>::s_storage;
-    using d_storage = typename detail::unref_t<decltype(u1)>::d_storage;
-
     const bool s1 = u1.is_static(), s2 = u2.is_static();
     if (s1 && s2) {
         // Self swap is fine, handled in the static.
         u1.g_st().swap(u2.g_st());
     } else if (s1 && !s2) {
-        // Copy the static in temp storage.
-        auto n1_copy(u1.g_st());
-        // Destroy the static.
-        u1.g_st().~s_storage();
-        // Construct the dynamic struct, shallow-copying from n2.
-        ::new (static_cast<void *>(&u1.m_dy)) d_storage(u2.g_dy());
-        // Re-create n2 as a static copying from n1_copy.
-        u2.g_dy().~d_storage();
-        ::new (static_cast<void *>(&u2.m_st)) s_storage(n1_copy);
+        detail::integer_swap_static_dynamic(u1, u2);
     } else if (!s1 && s2) {
         // Mirror of the above.
-        auto n2_copy(u2.g_st());
-        u2.g_st().~s_storage();
-        ::new (static_cast<void *>(&u2.m_dy)) d_storage(u1.g_dy());
-        u1.g_dy().~d_storage();
-        ::new (static_cast<void *>(&u1.m_st)) s_storage(n2_copy);
+        detail::integer_swap_static_dynamic(u2, u1);
     } else {
         // Swap with other. Self swap is fine, mpz_swap() can have
         // aliasing arguments.
