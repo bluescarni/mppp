@@ -39,8 +39,8 @@ struct swap_tester {
         detail::mpz_raii tmp;
         std::uniform_int_distribution<int> sdist(0, 1);
 
-        auto random_x = [&](unsigned x) {
-            integer n1, n2;
+        auto random_xy = [&](unsigned x, unsigned y) {
+            integer n1, n2, n1_copy, n2_copy;
 
             for (int i = 0; i < ntries; ++i) {
                 // Reset ops every once in a while.
@@ -54,7 +54,7 @@ struct swap_tester {
                 // Create randoms.
                 random_integer(tmp, x, rng);
                 n1 = &tmp.m_mpz;
-                random_integer(tmp, x, rng);
+                random_integer(tmp, y, rng);
                 n2 = &tmp.m_mpz;
 
                 // Promote sometimes, if possible.
@@ -65,12 +65,9 @@ struct swap_tester {
                     n2.promote();
                 }
 
-                // Check staticness.
-                const auto s1 = n1.is_static();
-                const auto s2 = n2.is_static();
-
                 // Create copies.
-                const auto n1_copy(n1), n2_copy(n2);
+                n1_copy = n1;
+                n2_copy = n2;
 
                 // Do the swap.
                 swap(n1, n2);
@@ -79,18 +76,34 @@ struct swap_tester {
                 REQUIRE(n1 == n2_copy);
 
                 // Check staticness is preserved.
-                REQUIRE(s1 == n2.is_static());
-                REQUIRE(s2 == n1.is_static());
+                REQUIRE(n1_copy.is_static() == n2.is_static());
+                REQUIRE(n2_copy.is_static() == n1.is_static());
             };
         };
 
-        random_x(0);
-        random_x(1);
-        random_x(2);
-        random_x(3);
-        random_x(4);
-        random_x(5);
-        random_x(6);
+        random_xy(0, 1);
+        random_xy(1, 1);
+
+        random_xy(0, 2);
+        random_xy(1, 2);
+        random_xy(2, 1);
+        random_xy(2, 2);
+
+        random_xy(0, 3);
+        random_xy(1, 3);
+        random_xy(2, 3);
+        random_xy(3, 1);
+        random_xy(3, 2);
+        random_xy(3, 3);
+
+        random_xy(0, 4);
+        random_xy(1, 4);
+        random_xy(2, 4);
+        random_xy(3, 4);
+        random_xy(4, 1);
+        random_xy(4, 2);
+        random_xy(4, 3);
+        random_xy(4, 4);
     }
 };
 
