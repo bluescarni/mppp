@@ -1,6 +1,14 @@
 version: 2
 
 jobs:
+  cosmic_gcc8_debuggmp:
+    docker:
+    - image: circleci/buildpack-deps:cosmic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_cosmic_gcc8_debuggmp.sh
   bionic_gcc7_coverage:
     docker:
     - image: circleci/buildpack-deps:bionic
@@ -38,6 +46,7 @@ workflows:
   version: 2
   all_builds:
     jobs:
+    - cosmic_gcc8_debuggmp
     - bionic_gcc7_coverage
     - cosmic_gcc8_coverage
     - cosmic_clang7_asan
