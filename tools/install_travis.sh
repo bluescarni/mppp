@@ -6,7 +6,7 @@ set -x
 # Exit on error.
 set -e
 
-if [[ "${MPPP_BUILD}" != DebugGCC48DebugGMP && "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
+if [[ "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
     export deps_dir=$HOME/local
     export PATH="$HOME/miniconda/bin:$PATH"
     export PATH="$deps_dir/bin:$PATH"
@@ -31,39 +31,6 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
     make -j2 VERBOSE=1;
     ctest -V;
-elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMP" ]]; then
-    # Download and compile locally GMP in debug mode.
-    wget https://gmplib.org/download/gmp/gmp-6.1.2.tar.bz2;
-    tar xjvf gmp-6.1.2.tar.bz2;
-    cd gmp-6.1.2;
-    CXX=g++-4.8 CC=gcc-4.8 ./configure --enable-shared --disable-static --enable-assert --enable-alloca=debug --disable-assembly CFLAGS="-g -fsanitize=address" --prefix=/home/travis/.local;
-    make -j2;
-    make install;
-    cd ..;
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_WITH_QUADMATH=yes -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" -DCMAKE_PREFIX_PATH=/home/travis/.local ../;
-    make -j2 VERBOSE=1;
-    ctest -V;
-elif [[ "${MPPP_BUILD}" == "DebugGCC48DebugGMPUnstable" ]]; then
-    # Download and compile locally the latest GMP in debug mode.
-    hg clone https://gmplib.org/repo/gmp/ gmp_unstable;
-    cd gmp_unstable;
-    ./.bootstrap
-    CXX=g++-4.8 CC=gcc-4.8 ./configure --disable-shared --enable-assert --enable-alloca=debug --disable-assembly CFLAGS="-g -fsanitize=address";
-    make -j2;
-    cd ..;
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp_unstable -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp_unstable/.libs/libgmp.a ../;
-    make -j2 VERBOSE=1;
-    ctest -V;
-elif [[ "${MPPP_BUILD}" == "CoverageGCC5" ]]; then
-    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_CXX_STANDARD=14 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_TEST_PYBIND11=yes -DPYBIND11_PYTHON_VERSION=2.7 -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage" -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM} ../;
-    make -j2 VERBOSE=1;
-    ctest -V;
-    bash <(curl -s https://codecov.io/bash) -x gcov-5;
-elif [[ "${MPPP_BUILD}" == "CoverageGCC7" ]]; then
-    CXX=g++-7 CC=gcc-7 cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_TEST_PYBIND11=yes -DPYBIND11_PYTHON_VERSION=3.6 -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="--coverage -fconcepts -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC" -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM} ../;
-    make -j2 VERBOSE=1;
-    ctest -V;
-    bash <(curl -s https://codecov.io/bash) -x gcov-7;
 elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     wget ftp://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.bz2;
     tar xjvf gmp-6.1.2.tar.bz2;
@@ -75,14 +42,6 @@ elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-6;
-elif [[ "${MPPP_BUILD}" == "DebugClang39" ]]; then
-    CXX=clang++-3.9 CC=clang-3.9 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DQuadmath_INCLUDE_DIR=/usr/lib/gcc/x86_64-linux-gnu/7/include -DQuadmath_LIBRARY=/usr/lib/gcc/x86_64-linux-gnu/7/libquadmath.so ../;
-    make -j2 VERBOSE=1;
-    ctest -V;
-elif [[ "${MPPP_BUILD}" == "ReleaseClang38" ]]; then
-    CXX=clang++-3.8 CC=clang-3.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
-    make -j2 VERBOSE=1;
-    ctest -V;
 elif [[ "${MPPP_BUILD}" == "OSXDebug" ]]; then
     CXX=clang++ CC=clang cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
     make -j2 VERBOSE=1;
