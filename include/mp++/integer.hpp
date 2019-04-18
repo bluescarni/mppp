@@ -8403,10 +8403,67 @@ inline bool dispatch_equality(T x, const integer<SSize> &a)
 }
 
 // Less-than operator.
-template <std::size_t SSize>
-inline bool dispatch_less_than(const integer<SSize> &a, const integer<SSize> &b)
+
+// 1-limb specialisation.
+inline bool static_less_than(const static_int<1> &op1, const static_int<1> &op2)
 {
-    return cmp(a, b) < 0;
+    const auto size1 = op1._mp_size, size2 = op2._mp_size;
+
+    // Compare sizes.
+    if (size1 < size2) {
+        return true;
+    }
+    if (size1 > size2) {
+        return false;
+    }
+
+    // Sizes are equal, compare the only limb.
+    const auto l1 = op1.m_limbs[0] & GMP_NUMB_MASK;
+    const auto l2 = op2.m_limbs[0] & GMP_NUMB_MASK;
+
+    const auto lt = l1 < l2;
+    const auto gt = l1 > l2;
+
+    // NOTE: as usual, this branchless formulation is slightly
+    // better for signed ints, slightly worse for unsigned
+    // (wrt an if statement).
+    return (size1 >= 0 && lt) || (size1 < 0 && gt);
+}
+
+// mpn implementation.
+template <std::size_t SSize>
+inline bool static_less_than(const static_int<SSize> &n1, const static_int<SSize> &n2)
+{
+    const auto size1 = n1._mp_size, size2 = n2._mp_size;
+
+    // Compare sizes.
+    if (size1 < size2) {
+        return true;
+    }
+    if (size1 > size2) {
+        return false;
+    }
+
+    // The two sizes are equal, compare the absolute values.
+    if (size1) {
+        const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
+        return (size1 >= 0 && cmp_abs < 0) || (size1 < 0 && cmp_abs > 0);
+    }
+    // Both operands are zero.
+    // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
+    // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
+    return false;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_less_than(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool s1 = op1.is_static(), s2 = op2.is_static();
+    if (mppp_likely(s1 && s2)) {
+        return static_less_than(op1._get_union().g_st(), op2._get_union().g_st());
+    }
+
+    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) < 0;
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
