@@ -8433,6 +8433,24 @@ inline bool dispatch_equality(T x, const integer<SSize> &a)
 // 1-limb specialisation.
 inline bool static_less_than(const static_int<1> &op1, const static_int<1> &op2)
 {
+    // const auto size1 = op1._mp_size, size2 = op2._mp_size;
+    // const auto sign1 = size1 >= 0, sign2 = size2 >= 0;
+
+    // if (sign1 == sign2) {
+    //     // op1 and op2 have the same sign. If both are
+    //     // non-negative, then we compare the absolute values.
+    //     // If they are both negative, we reverse-compare
+    //     // the absolute values.
+    //     const auto l1 = op1.m_limbs[0] & GMP_NUMB_MASK;
+    //     const auto l2 = op2.m_limbs[0] & GMP_NUMB_MASK;
+
+    //     return (sign1 && l1 < l2) || (!sign1 && l1 > l2);
+    // } else {
+    //     // The signs of op1 and op2 differ. op1 is less-than
+    //     // op2 only if op1 is negative.
+    //     return size1 < size2;
+    // }
+
     const auto size1 = op1._mp_size, size2 = op2._mp_size;
 
     // Compare sizes.
