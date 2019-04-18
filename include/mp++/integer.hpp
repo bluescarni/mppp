@@ -499,6 +499,32 @@ struct static_int {
         // Just forward to the copy assignment.
         return operator=(other);
     }
+    // Swap primitive.
+    void swap(static_int &other) noexcept
+    {
+        if (SSize <= opt_size) {
+            // In this case, we know other's upper limbs are properly zeroed out.
+            // NOTE: self swap of std::array should be fine.
+            std::swap(_mp_size, other._mp_size);
+            std::swap(m_limbs, other.m_limbs);
+        } else {
+            // Otherwise, we must avoid reading from uninited limbs.
+            // Copy over the limbs of this to temp storage.
+            limbs_type tmp;
+            const auto asize1 = abs_size();
+            copy_limbs_no(m_limbs.data(), m_limbs.data() + asize1, tmp.data());
+
+            // Copy over the limbs of other to this.
+            // NOTE: potential overlap here.
+            copy_limbs(other.m_limbs.data(), other.m_limbs.data() + other.abs_size(), m_limbs.data());
+
+            // Copy over the limbs in temp storage to other.
+            copy_limbs_no(tmp.data(), tmp.data() + asize1, other.m_limbs.data());
+
+            // Swap the sizes.
+            std::swap(_mp_size, other._mp_size);
+        }
+    }
 #ifdef __MINGW32__
 
 #pragma GCC diagnostic push
@@ -8942,6 +8968,44 @@ inline T &operator^=(T &rop, const U &op)
 }
 
 /** @} */
+
+template <std::size_t SSize>
+inline void swap(integer<SSize> &n1, integer<SSize> &n2) noexcept
+{
+    auto &u1 = n1._get_union();
+    auto &u2 = n2._get_union();
+
+    using s_storage = typename detail::unref_t<decltype(u1)>::s_storage;
+    using d_storage = typename detail::unref_t<decltype(u1)>::d_storage;
+
+    const bool s1 = u1.is_static(), s2 = u2.is_static();
+    if (s1 && s2) {
+        // Self swap is fine, handled in the static.
+        u1.g_st().swap(u2.g_st());
+    } else if (s1 && !s2) {
+        // Copy the static in temp storage.
+        auto n1_copy(u1.g_st());
+        // Destroy the static.
+        u1.g_st().~s_storage();
+        // Construct the dynamic struct, shallow-copying from n2.
+        ::new (static_cast<void *>(&u1.m_dy)) d_storage(u2.g_dy());
+        // Re-create n2 as a static copying from n1_copy.
+        u2.g_dy().~d_storage();
+        ::new (static_cast<void *>(&u2.m_st)) s_storage(n1_copy);
+    } else if (!s1 && s2) {
+        // Mirror of the above.
+        auto n2_copy(u2.g_st());
+        u2.g_st().~s_storage();
+        ::new (static_cast<void *>(&u2.m_dy)) d_storage(u1.g_dy());
+        u1.g_dy().~d_storage();
+        ::new (static_cast<void *>(&u1.m_st)) s_storage(n2_copy);
+    } else {
+        // Swap with other. Self swap is fine, mpz_swap() can have
+        // aliasing arguments.
+        ::mpz_swap(&u1.g_dy(), &u2.g_dy());
+    }
+}
+
 } // namespace mppp
 
 namespace std
