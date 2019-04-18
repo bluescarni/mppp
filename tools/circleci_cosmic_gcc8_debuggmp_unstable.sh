@@ -7,7 +7,7 @@ set -x
 set -e
 
 # Core deps.
-sudo apt-get install build-essential cmake mercurial
+sudo apt-get install build-essential cmake mercurial autoconf bison texinfo
 
 # Create the build dir and cd into it.
 mkdir build
