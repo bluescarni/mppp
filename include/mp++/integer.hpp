@@ -5528,13 +5528,9 @@ inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n,
 namespace detail
 {
 
-// Selection of the algorithm for static cmp.
-template <typename SInt>
-using integer_static_cmp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
-
 // mpn implementation.
 template <std::size_t SSize>
-inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 0> &)
+inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2)
 {
     if (n1._mp_size < n2._mp_size) {
         return -1;
@@ -5544,22 +5540,22 @@ inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, 
     }
     // The two sizes are equal, compare the absolute values.
     const auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
-    if (asize == 0) {
-        // Both operands are zero.
-        // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
-        // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
-        return 0;
+    if (asize != 0) {
+        // NOTE: reduce the value of the comparison to the [-1, 1] range, so that
+        // if we need to negate it below we ensure not to run into overflows.
+        const int cmp_abs
+            = integral_sign(::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize)));
+        // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
+        return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
     }
-    // NOTE: reduce the value of the comparison to the [-1, 1] range, so that
-    // if we need to negate it below we ensure not to run into overflows.
-    const int cmp_abs = integral_sign(::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize)));
-    // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
-    return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
+    // Both operands are zero.
+    // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
+    // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
+    return 0;
 }
 
 // 1-limb optimisation.
-template <std::size_t SSize>
-inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 1> &)
+inline int static_cmp(const static_int<1> &n1, const static_int<1> &n2)
 {
     if (n1._mp_size < n2._mp_size) {
         return -1;
@@ -5575,8 +5571,7 @@ inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, 
 }
 
 // 2-limb optimisation.
-template <std::size_t SSize>
-inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 2> &)
+inline int static_cmp(const static_int<2> &n1, const static_int<2> &n2)
 {
     if (n1._mp_size < n2._mp_size) {
         return -1;
@@ -5611,8 +5606,7 @@ inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
 {
     const bool s1 = op1.is_static(), s2 = op2.is_static();
     if (mppp_likely(s1 && s2)) {
-        return static_cmp(op1._get_union().g_st(), op2._get_union().g_st(),
-                          detail::integer_static_cmp_algo<detail::static_int<SSize>>{});
+        return static_cmp(op1._get_union().g_st(), op2._get_union().g_st());
     }
     return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
 }
