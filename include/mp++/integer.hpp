@@ -6633,16 +6633,10 @@ inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op
 namespace detail
 {
 
-// Selection of the algorithm for static GCD:
-// - for 1 limb, we have a specialised implementation using mpn_gcd_1(), available everywhere,
-// - otherwise we just use the mpn/mpz functions.
-template <typename SInt>
-using integer_static_gcd_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : 0>;
-
 // mpn/mpz implementation.
 template <std::size_t SSize>
 inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
-                            mpz_size_t asize1, mpz_size_t asize2, const std::integral_constant<int, 0> &)
+                            mpz_size_t asize1, mpz_size_t asize2)
 {
     // NOTE: performance testing indicates that, even if mpz_gcd() does special casing
     // for zeroes and 1-limb values, it is still worth it to repeat the special casing
@@ -6694,9 +6688,8 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 }
 
 // 1-limb optimization.
-template <std::size_t SSize>
-inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
-                            mpz_size_t asize1, mpz_size_t asize2, const std::integral_constant<int, 1> &)
+inline void static_gcd_impl(static_int<1> &rop, const static_int<1> &op1, const static_int<1> &op2, mpz_size_t asize1,
+                            mpz_size_t asize2)
 {
     // Handle the special cases first.
     if (asize1 == 0) {
@@ -6737,9 +6730,8 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 template <std::size_t SSize>
 inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
-    static_gcd_impl(rop, op1, op2, std::abs(op1._mp_size), std::abs(op2._mp_size),
-                    integer_static_gcd_algo<static_int<SSize>>{});
-    if (integer_static_gcd_algo<static_int<SSize>>::value == 0) {
+    static_gcd_impl(rop, op1, op2, std::abs(op1._mp_size), std::abs(op2._mp_size));
+    if (SSize > 1u) {
         // If we used the generic function, zero the unused limbs on top (if necessary).
         // NOTE: as usual, potential of mpn/mpz use on optimised size (e.g., with 2-limb
         // static ints we are currently invoking mpz_gcd() - this could produce a result
