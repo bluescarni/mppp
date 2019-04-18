@@ -7,17 +7,16 @@ set -x
 set -e
 
 # Core deps.
-sudo apt-get install build-essential cmake wget
+sudo apt-get install build-essential cmake mercurial
 
 # Create the build dir and cd into it.
 mkdir build
 cd build
 
-# Download and compile locally GMP in debug mode.
-GMP_VERSION="6.1.2"
-wget https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2 -O gmp.tar.bz2
-tar xjvf gmp.tar.bz2
-cd gmp-${GMP_VERSION}
+# Download and compile locally the latest GMP in debug mode.
+hg clone https://gmplib.org/repo/gmp/ gmp_unstable
+cd gmp_unstable
+./.bootstrap
 ./configure --enable-shared --disable-static --enable-assert --enable-alloca=debug --disable-assembly CFLAGS="-g -fsanitize=address" --prefix=/home/circleci/.local
 make -j2
 make install
