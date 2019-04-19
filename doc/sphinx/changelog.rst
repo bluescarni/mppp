@@ -9,7 +9,6 @@ New
 
 - Add CircleCI to the continuous integration pipeline
   (`#173 <https://github.com/bluescarni/mppp/pull/173>`__).
-
 - Implement the logarithm/exponential functions for :cpp:class:`~mppp::real`
   (`#172 <https://github.com/bluescarni/mppp/pull/172>`__).
 
