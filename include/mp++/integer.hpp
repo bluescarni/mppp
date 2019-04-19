@@ -5566,7 +5566,7 @@ inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2)
     }
     // The two sizes are equal, compare the absolute values.
     const auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
-    if (asize != 0) {
+    if (asize) {
         // NOTE: reduce the value of the comparison to the [-1, 1] range, so that
         // if we need to negate it below we ensure not to run into overflows.
         const int cmp_abs
@@ -8425,27 +8425,15 @@ inline bool dispatch_equality(T x, const integer<SSize> &a)
 // 1-limb specialisation.
 inline bool static_less_than(const static_int<1> &op1, const static_int<1> &op2)
 {
-    // const auto size1 = op1._mp_size, size2 = op2._mp_size;
-    // const auto sign1 = size1 >= 0, sign2 = size2 >= 0;
-
-    // if (sign1 == sign2) {
-    //     // op1 and op2 have the same sign. If both are
-    //     // non-negative, then we compare the absolute values.
-    //     // If they are both negative, we reverse-compare
-    //     // the absolute values.
-    //     const auto l1 = op1.m_limbs[0] & GMP_NUMB_MASK;
-    //     const auto l2 = op2.m_limbs[0] & GMP_NUMB_MASK;
-
-    //     return (sign1 && l1 < l2) || (!sign1 && l1 > l2);
-    // } else {
-    //     // The signs of op1 and op2 differ. op1 is less-than
-    //     // op2 only if op1 is negative.
-    //     return size1 < size2;
-    // }
+    // NOTE: an implementation with 1 branch less and similar performance
+    // is available at fdb84f57027ebf579a380f07501435eb17fd6db1.
 
     const auto size1 = op1._mp_size, size2 = op2._mp_size;
 
     // Compare sizes.
+    // NOTE: under the assumption that we have positive/negative
+    // integers with equal probability, it makes sense to check
+    // for the sizes first.
     if (size1 < size2) {
         return true;
     }

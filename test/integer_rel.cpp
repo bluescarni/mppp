@@ -30,8 +30,23 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 
 static std::mt19937 rng;
 
-static inline bool check_cmp(int c1, int c2)
+template <std::size_t SSize>
+static inline bool check_cmp(const integer<SSize> &a, const integer<SSize> &b, int c2)
 {
+    const auto c1 = cmp(a, b);
+
+    // Check that the result of cmp is
+    // consistent with the operators.
+    if (c1 < 0 && !(a < b)) {
+        return false;
+    }
+    if (c1 == 0 && (a != b)) {
+        return false;
+    }
+    if (c1 > 0 && !(a > b)) {
+        return false;
+    }
+
     if (c1 < 0) {
         return c2 < 0;
     }
@@ -49,7 +64,7 @@ struct cmp_tester {
         // Start with all zeroes.
         detail::mpz_raii m1, m2;
         integer n1, n2;
-        REQUIRE(check_cmp(cmp(n1, n2), ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
+        REQUIRE(check_cmp(n1, n2, ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
         REQUIRE(n1.is_static());
         REQUIRE(n2.is_static());
         detail::mpz_raii tmp;
@@ -79,9 +94,9 @@ struct cmp_tester {
                     // Promote sometimes, if possible.
                     n2.promote();
                 }
-                REQUIRE(check_cmp(cmp(n1, n2), ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
-                REQUIRE(check_cmp(cmp(n1, n1), ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
-                REQUIRE(check_cmp(cmp(n2, n2), ::mpz_cmp(&m2.m_mpz, &m2.m_mpz)));
+                REQUIRE(check_cmp(n1, n2, ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
+                REQUIRE(check_cmp(n1, n1, ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
+                REQUIRE(check_cmp(n2, n2, ::mpz_cmp(&m2.m_mpz, &m2.m_mpz)));
                 REQUIRE((n1 == n1));
                 REQUIRE((n2 == n2));
                 if (::mpz_cmp(&m1.m_mpz, &m2.m_mpz)) {
@@ -94,9 +109,9 @@ struct cmp_tester {
                 if (sdist(rng) && n2.is_static()) {
                     n2.promote();
                 }
-                REQUIRE(check_cmp(cmp(n1, n2), ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
+                REQUIRE(check_cmp(n1, n2, ::mpz_cmp(&m1.m_mpz, &m2.m_mpz)));
                 // Overlap.
-                REQUIRE(check_cmp(cmp(n1, n1), ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
+                REQUIRE(check_cmp(n1, n1, ::mpz_cmp(&m1.m_mpz, &m1.m_mpz)));
             }
         };
 
