@@ -7,7 +7,7 @@ set -x
 set -e
 
 # Core deps.
-sudo apt-get install build-essential cmake libgmp-dev libmpfr-dev curl python-pybind11
+sudo apt-get install build-essential cmake libgmp-dev libmpfr-dev curl python-pybind11 python-dev
 
 # Create the build dir and cd into it.
 mkdir build
