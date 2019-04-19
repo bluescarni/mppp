@@ -1521,69 +1521,88 @@ convenience/generic overloads is provided as well.</p>
 <div class="section" id="assignment">
 <span id="integer-assignment"></span><h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="_CPPv4I_NSt6size_tEEN4mppp8set_zeroER7integerI5SSizeER7integerI5SSizeE">
-<span id="_CPPv3I_NSt6size_tEEN4mppp8set_zeroER7integerI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp8set_zeroER7integerI5SSizeE"></span><span class="target" id="group__integer__assignment_1gacccbd69c9b9e8f70fcef59a6180e27be"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8set_zeroER7integerI5SSizeER7integerI5SSizeE" title="mppp::set_zero::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">set_zero</code><span class="sig-paren">(</span>integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8set_zeroER7integerI5SSizeER7integerI5SSizeE" title="mppp::set_zero::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp8set_zeroER7integerI5SSizeER7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Set to zero. </p>
-<p>After calling this function, the storage type of <code class="docutils literal notranslate"><span class="pre">n</span></code> will be static and its value will be zero.</p>
-<p><div class="admonition note">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp8set_zeroERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppp8set_zeroERN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp8set_zeroERN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8set_zeroERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::set_zero::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">set_zero</code><span class="sig-paren">(</span>mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8set_zeroERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::set_zero::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp8set_zeroERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Set to zero.</p>
+<p>After calling this function, the storage type of <em>n</em> will be static and its value will be zero.</p>
+<div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This is a specialised higher-performance alternative to the assignment operator.</p>
 </div>
-</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">n</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: the assignment argument.</li>
-</ul>
-</dd>
-</dl>
-</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> – the argument.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a reference to <em>n</em>.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv4I_NSt6size_tEEN4mppp7set_oneER7integerI5SSizeER7integerI5SSizeE">
-<span id="_CPPv3I_NSt6size_tEEN4mppp7set_oneER7integerI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp7set_oneER7integerI5SSizeE"></span><span class="target" id="group__integer__assignment_1ga96ce89a6e6888d83fab3ec2e48f93571"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7set_oneER7integerI5SSizeER7integerI5SSizeE" title="mppp::set_one::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">set_one</code><span class="sig-paren">(</span>integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7set_oneER7integerI5SSizeER7integerI5SSizeE" title="mppp::set_one::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp7set_oneER7integerI5SSizeER7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Set to one. </p>
-<p>After calling this function, the storage type of <code class="docutils literal notranslate"><span class="pre">n</span></code> will be static and its value will be one.</p>
-<p><div class="admonition note">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp7set_oneERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppp7set_oneERN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp7set_oneERN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7set_oneERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::set_one::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">set_one</code><span class="sig-paren">(</span>mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7set_oneERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::set_one::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp7set_oneERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Set to one.</p>
+<p>After calling this function, the storage type of <em>n</em> will be static and its value will be one.</p>
+<div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This is a specialised higher-performance alternative to the assignment operator.</p>
 </div>
-</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">n</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: the assignment argument.</li>
-</ul>
-</dd>
-</dl>
-</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> – the argument.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a reference to <em>n</em>.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv4I_NSt6size_tEEN4mppp16set_negative_oneER7integerI5SSizeER7integerI5SSizeE">
-<span id="_CPPv3I_NSt6size_tEEN4mppp16set_negative_oneER7integerI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp16set_negative_oneER7integerI5SSizeE"></span><span class="target" id="group__integer__assignment_1gacce348bd63fceb59c9cf4d4b844ccabe"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp16set_negative_oneER7integerI5SSizeER7integerI5SSizeE" title="mppp::set_negative_one::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">set_negative_one</code><span class="sig-paren">(</span>integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp16set_negative_oneER7integerI5SSizeER7integerI5SSizeE" title="mppp::set_negative_one::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp16set_negative_oneER7integerI5SSizeER7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Set to minus one. </p>
-<p>After calling this function, the storage type of <code class="docutils literal notranslate"><span class="pre">n</span></code> will be static and its value will be minus one.</p>
-<p><div class="admonition note">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp16set_negative_oneERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppp16set_negative_oneERN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp16set_negative_oneERN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp16set_negative_oneERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::set_negative_one::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">set_negative_one</code><span class="sig-paren">(</span>mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp16set_negative_oneERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::set_negative_one::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp16set_negative_oneERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Set to minus one.</p>
+<p>After calling this function, the storage type of <em>n</em> will be static and its value will be minus one.</p>
+<div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This is a specialised higher-performance alternative to the assignment operator.</p>
 </div>
-</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">n</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: the assignment argument.</li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> – the argument.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a reference to <em>n</em>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppp4swapERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp4swapERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />void <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">swap</code><span class="sig-paren">(</span>mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::swap::SSize">SSize</a>&gt; &amp;<em>n1</em>, mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::swap::SSize">SSize</a>&gt; &amp;<em>n2</em><span class="sig-paren">)</span> <em class="property">noexcept</em><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified">New in version 0.15.</span></p>
+</div>
+<p>Swap.</p>
+<p>This function will efficiently swap the values of <em>n1</em> and <em>n2</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>n1</strong> – the first argument.</li>
+<li><strong>n2</strong> – the second argument.</li>
 </ul>
-</dd>
-</dl>
-</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

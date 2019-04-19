@@ -214,6 +214,13 @@ Show Source
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li>Implement a specialised version of the <code class="docutils literal notranslate"><span class="pre">swap()</span></code> primitive
+for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/174">#174</a>).</li>
+<li>Improve the implementation of the less than/greater than operators for
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>. Together with the <code class="docutils literal notranslate"><span class="pre">swap()</span></code> improvements,
+this change leads to a ~9% decrease in runtime for the <code class="docutils literal notranslate"><span class="pre">integer1_sort_signed</span></code>
+benchmark (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/174">#174</a>).</li>
 <li>Continue moving code from the headers into the compiled library (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/170">#170</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/172">#172</a>).</li>
 </ul>

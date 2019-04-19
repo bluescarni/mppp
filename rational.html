@@ -990,6 +990,31 @@ not support concepts).</p>
 <p>Much of the functionality of the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> class is exposed via plain functions. These functions
 mimic the <a class="reference external" href="https://gmplib.org/manual/Rational-Number-Functions.html">GMP API</a> where appropriate, but a variety of
 convenience/generic overloads is provided as well.</p>
+<div class="section" id="assignment">
+<span id="rational-assignment"></span><h3>Assignment<a class="headerlink" href="#assignment" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppp4swapERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp4swapERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />void <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">swap</code><span class="sig-paren">(</span>mppp::rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::swap::SSize">SSize</a>&gt; &amp;<em>q1</em>, mppp::rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::swap::SSize">SSize</a>&gt; &amp;<em>q2</em><span class="sig-paren">)</span> <em class="property">noexcept</em><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified">New in version 0.15.</span></p>
+</div>
+<p>Swap.</p>
+<p>This function will efficiently swap the values of <em>q1</em> and <em>q2</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>q1</strong> – the first argument.</li>
+<li><strong>q2</strong> – the second argument.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="conversion">
 <span id="rational-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
@@ -1917,6 +1942,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <li><a class="reference internal" href="#the-rational-class">The <code class="docutils literal notranslate"><span class="pre">rational</span></code> class</a></li>
 <li><a class="reference internal" href="#concepts">Concepts</a></li>
 <li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#assignment">Assignment</a></li>
 <li><a class="reference internal" href="#conversion">Conversion</a></li>
 <li><a class="reference internal" href="#arithmetic">Arithmetic</a></li>
 <li><a class="reference internal" href="#comparison">Comparison</a></li>

@@ -9,13 +9,19 @@ New
 
 - Add CircleCI to the continuous integration pipeline
   (`#173 <https://github.com/bluescarni/mppp/pull/173>`__).
-
 - Implement the logarithm/exponential functions for :cpp:class:`~mppp::real`
   (`#172 <https://github.com/bluescarni/mppp/pull/172>`__).
 
 Changes
 ~~~~~~~
 
+- Implement a specialised version of the ``swap()`` primitive
+  for :cpp:class:`~mppp::integer` and
+  :cpp:class:`~mppp::rational` (`#174 <https://github.com/bluescarni/mppp/pull/174>`__).
+- Improve the implementation of the less than/greater than operators for
+  :cpp:class:`~mppp::integer`. Together with the ``swap()`` improvements,
+  this change leads to a ~9% decrease in runtime for the ``integer1_sort_signed``
+  benchmark (`#174 <https://github.com/bluescarni/mppp/pull/174>`__).
 - Continue moving code from the headers into the compiled library (`#170 <https://github.com/bluescarni/mppp/pull/170>`__,
   `#172 <https://github.com/bluescarni/mppp/pull/172>`__).
 
