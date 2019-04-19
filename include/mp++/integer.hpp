@@ -1018,6 +1018,8 @@ void nextprime_impl(integer<SSize> &, const integer<SSize> &);
 // - perhaps we should consider adding new overloads to functions which return more than one value
 //   (e.g., tdiv_qr(), sqrtrem(), etc.). At this time we have only the GMP-style overload, perhaps
 //   we could have an overload that returns the two values as tuple/pair/array.
+// - the lt/gt static implementations could be specialised for 2-limbs integers. But we need to have
+//   benchmarks before doing it.
 
 // NOTE: about the nails:
 // - whenever we need to read the *numerical value* of a limb (e.g., in our optimised primitives),
@@ -3046,71 +3048,75 @@ const char integer<SSize>::bl_data_errmsg[]
     = "Invalid data detected in the binary deserialisation of an integer: the most "
       "significant limb of the value cannot be zero";
 
-/** @defgroup integer_assignment integer_assignment
- *  @{
- */
+namespace detail
+{
 
-/// Set to zero.
-/**
- * After calling this function, the storage type of \p n will be static and its value will be zero.
- *
- * \rststar
- * .. note::
- *
- *   This is a specialised higher-performance alternative to the assignment operator.
- * \endrststar
- *
- * @param n the assignment argument.
- *
- * @return a reference to \p n.
- */
+// Swap u1 and u2. u1 must be static, u2 must be dynamic.
+template <std::size_t SSize>
+inline void integer_swap_static_dynamic(integer_union<SSize> &u1, integer_union<SSize> &u2) noexcept
+{
+    using s_storage = typename integer_union<SSize>::s_storage;
+    using d_storage = typename integer_union<SSize>::d_storage;
+
+    assert(u1.is_static());
+    assert(!u2.is_static());
+
+    // Copy the static in temp storage.
+    const auto n1_copy(u1.g_st());
+    // Destroy the static.
+    u1.g_st().~s_storage();
+    // Construct the dynamic struct, shallow-copying from n2.
+    ::new (static_cast<void *>(&u1.m_dy)) d_storage(u2.g_dy());
+    // Re-create n2 as a static copying from n1_copy.
+    u2.g_dy().~d_storage();
+    ::new (static_cast<void *>(&u2.m_st)) s_storage(n1_copy);
+}
+
+} // namespace detail
+
+// Swap.
+template <std::size_t SSize>
+inline void swap(integer<SSize> &n1, integer<SSize> &n2) noexcept
+{
+    auto &u1 = n1._get_union();
+    auto &u2 = n2._get_union();
+
+    const bool s1 = u1.is_static(), s2 = u2.is_static();
+    if (s1 && s2) {
+        // Self swap is fine, handled in the static.
+        u1.g_st().swap(u2.g_st());
+    } else if (s1 && !s2) {
+        detail::integer_swap_static_dynamic(u1, u2);
+    } else if (!s1 && s2) {
+        // Mirror of the above.
+        detail::integer_swap_static_dynamic(u2, u1);
+    } else {
+        // Swap with other. Self swap is fine, mpz_swap() can have
+        // aliasing arguments.
+        ::mpz_swap(&u1.g_dy(), &u2.g_dy());
+    }
+}
+
+// Set to zero.
 template <std::size_t SSize>
 inline integer<SSize> &set_zero(integer<SSize> &n)
 {
     return n.set_zero();
 }
 
-/// Set to one.
-/**
- * After calling this function, the storage type of \p n will be static and its value will be one.
- *
- * \rststar
- * .. note::
- *
- *   This is a specialised higher-performance alternative to the assignment operator.
- * \endrststar
- *
- * @param n the assignment argument.
- *
- * @return a reference to \p n.
- */
+// Set to one.
 template <std::size_t SSize>
 inline integer<SSize> &set_one(integer<SSize> &n)
 {
     return n.set_one();
 }
 
-/// Set to minus one.
-/**
- * After calling this function, the storage type of \p n will be static and its value will be minus one.
- *
- * \rststar
- * .. note::
- *
- *   This is a specialised higher-performance alternative to the assignment operator.
- * \endrststar
- *
- * @param n the assignment argument.
- *
- * @return a reference to \p n.
- */
+// Set to minus one.
 template <std::size_t SSize>
 inline integer<SSize> &set_negative_one(integer<SSize> &n)
 {
     return n.set_negative_one();
 }
-
-/** @} */
 
 /** @defgroup integer_conversion integer_conversion
  *  @{
@@ -9012,54 +9018,6 @@ inline T &operator^=(T &rop, const U &op)
 }
 
 /** @} */
-
-namespace detail
-{
-
-// Swap u1 and u2. u1 must be static, u2 must be dynamic.
-template <std::size_t SSize>
-inline void integer_swap_static_dynamic(integer_union<SSize> &u1, integer_union<SSize> &u2) noexcept
-{
-    using s_storage = typename integer_union<SSize>::s_storage;
-    using d_storage = typename integer_union<SSize>::d_storage;
-
-    assert(u1.is_static());
-    assert(!u2.is_static());
-
-    // Copy the static in temp storage.
-    const auto n1_copy(u1.g_st());
-    // Destroy the static.
-    u1.g_st().~s_storage();
-    // Construct the dynamic struct, shallow-copying from n2.
-    ::new (static_cast<void *>(&u1.m_dy)) d_storage(u2.g_dy());
-    // Re-create n2 as a static copying from n1_copy.
-    u2.g_dy().~d_storage();
-    ::new (static_cast<void *>(&u2.m_st)) s_storage(n1_copy);
-}
-
-} // namespace detail
-
-template <std::size_t SSize>
-inline void swap(integer<SSize> &n1, integer<SSize> &n2) noexcept
-{
-    auto &u1 = n1._get_union();
-    auto &u2 = n2._get_union();
-
-    const bool s1 = u1.is_static(), s2 = u2.is_static();
-    if (s1 && s2) {
-        // Self swap is fine, handled in the static.
-        u1.g_st().swap(u2.g_st());
-    } else if (s1 && !s2) {
-        detail::integer_swap_static_dynamic(u1, u2);
-    } else if (!s1 && s2) {
-        // Mirror of the above.
-        detail::integer_swap_static_dynamic(u2, u1);
-    } else {
-        // Swap with other. Self swap is fine, mpz_swap() can have
-        // aliasing arguments.
-        ::mpz_swap(&u1.g_dy(), &u2.g_dy());
-    }
-}
 
 } // namespace mppp
 

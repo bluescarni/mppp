@@ -1054,6 +1054,14 @@ constexpr std::size_t rational<SSize>::ssize;
 
 #endif
 
+// Swap.
+template <std::size_t SSize>
+inline void swap(rational<SSize> &q1, rational<SSize> &q2) noexcept
+{
+    swap(q1._get_num(), q2._get_num());
+    swap(q1._get_den(), q2._get_den());
+}
+
 namespace detail
 {
 
@@ -2978,13 +2986,6 @@ inline std::size_t hash(const rational<SSize> &q)
 }
 
 /** @} */
-
-template <std::size_t SSize>
-inline void swap(rational<SSize> &q1, rational<SSize> &q2) noexcept
-{
-    swap(q1._get_num(), q2._get_num());
-    swap(q1._get_den(), q2._get_den());
-}
 
 } // namespace mppp
 

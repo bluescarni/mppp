@@ -94,8 +94,58 @@ convenience/generic overloads is provided as well.
 Assignment
 ~~~~~~~~~~
 
-.. doxygengroup:: integer_assignment
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::set_zero(mppp::integer<SSize> &n)
+
+   Set to zero.
+
+   After calling this function, the storage type of *n* will be static and its value will be zero.
+
+   .. note::
+
+      This is a specialised higher-performance alternative to the assignment operator.
+
+   :param n: the argument.
+
+   :return: a reference to *n*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::set_one(mppp::integer<SSize> &n)
+
+   Set to one.
+
+   After calling this function, the storage type of *n* will be static and its value will be one.
+
+   .. note::
+
+      This is a specialised higher-performance alternative to the assignment operator.
+
+   :param n: the argument.
+
+   :return: a reference to *n*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::set_negative_one(mppp::integer<SSize> &n)
+
+   Set to minus one.
+
+   After calling this function, the storage type of *n* will be static and its value will be minus one.
+
+   .. note::
+
+      This is a specialised higher-performance alternative to the assignment operator.
+
+   :param n: the argument.
+
+   :return: a reference to *n*.
+
+.. cpp:function:: template <std::size_t SSize> void mppp::swap(mppp::integer<SSize> &n1, mppp::integer<SSize> &n2) noexcept
+
+   .. versionadded:: 0.15
+
+   Swap.
+
+   This function will efficiently swap the values of *n1* and *n2*.
+
+   :param n1: the first argument.
+   :param n2: the second argument.
 
 .. _integer_conversion:
 
