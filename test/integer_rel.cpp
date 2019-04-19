@@ -40,7 +40,7 @@ static inline bool check_cmp(const integer<SSize> &a, const integer<SSize> &b, i
     if (c1 < 0 && !(a < b)) {
         return false;
     }
-    if (c1 == 0 && (a != b)) {
+    if (c1 == 0 && ((a != b) || !(a == b))) {
         return false;
     }
     if (c1 > 0 && !(a > b)) {
