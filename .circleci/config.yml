@@ -1,0 +1,62 @@
+version: 2
+
+jobs:
+  bionic_gcc7_coverage:
+    docker:
+    - image: circleci/buildpack-deps:bionic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_bionic_gcc7_coverage.sh
+  cosmic_gcc8_coverage:
+    docker:
+    - image: circleci/buildpack-deps:cosmic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_cosmic_gcc8_coverage.sh
+  cosmic_clang7_asan:
+    docker:
+    - image: circleci/buildpack-deps:cosmic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_cosmic_clang7_asan.sh
+  bionic_clang6_ubsan:
+    docker:
+    - image: circleci/buildpack-deps:bionic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_bionic_clang6_ubsan.sh
+  cosmic_clang7_debuggmp_unstable:
+    docker:
+    - image: circleci/buildpack-deps:cosmic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_cosmic_clang7_debuggmp_unstable.sh
+  cosmic_clang7_debuggmp:
+    docker:
+    - image: circleci/buildpack-deps:cosmic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_cosmic_clang7_debuggmp.sh
+
+workflows:
+  version: 2
+  all_builds:
+    jobs:
+    - bionic_gcc7_coverage
+    - cosmic_gcc8_coverage
+    - cosmic_clang7_asan
+    - bionic_clang6_ubsan
+    - cosmic_clang7_debuggmp_unstable
+    - cosmic_clang7_debuggmp
