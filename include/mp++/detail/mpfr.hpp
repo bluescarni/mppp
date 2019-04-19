@@ -10,8 +10,9 @@
 #define MPPP_DETAIL_MPFR_HPP
 
 #include <limits>
-#include <mpfr.h>
 #include <type_traits>
+
+#include <mpfr.h>
 
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/type_traits.hpp>

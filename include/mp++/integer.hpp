@@ -11,11 +11,12 @@
 
 #include <mp++/config.hpp>
 
+// NOTE: cinttypes comes from the std::abs() include mess:
+// http://en.cppreference.com/w/cpp/numeric/math/abs
+
 #include <algorithm>
 #include <array>
 #include <cassert>
-// NOTE: this comes from the std::abs() include mess:
-// http://en.cppreference.com/w/cpp/numeric/math/abs
 #include <cinttypes>
 #include <cmath>
 #include <cstddef>
@@ -29,25 +30,27 @@
 #include <new>
 #include <stdexcept>
 #include <string>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
+#if MPPP_CPLUSPLUS >= 201703L
+#include <string_view>
+#endif
+
 #include <mp++/concepts.hpp>
 #include <mp++/detail/fwd_decl.hpp>
 #include <mp++/detail/gmp.hpp>
-#if defined(MPPP_WITH_MPFR)
-#include <mp++/detail/mpfr.hpp>
-#endif
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/detail/visibility.hpp>
 #include <mp++/exceptions.hpp>
 #include <mp++/type_name.hpp>
+
+#if defined(MPPP_WITH_MPFR)
+#include <mp++/detail/mpfr.hpp>
+#endif
 
 // Compiler configuration.
 // NOTE: check for MSVC first, as clang-cl does define both __clang__ and _MSC_VER,
@@ -268,23 +271,6 @@ inline unsigned limb_size_nbits(::mp_limb_t l)
 #endif
 }
 
-// This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
-// If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
-// little helper in order to avoid compiler warnings.
-template <typename T, enable_if_t<(GMP_NUMB_BITS < nl_constants<T>::digits), int> = 0>
-inline void u_checked_rshift(T &n)
-{
-    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
-    n >>= GMP_NUMB_BITS;
-}
-
-template <typename T, enable_if_t<(GMP_NUMB_BITS >= nl_constants<T>::digits), int> = 0>
-inline void u_checked_rshift(T &)
-{
-    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
-    assert(false);
-}
-
 // Machinery for the conversion of a large uint to a limb array.
 
 // Definition of the limb array type.
@@ -306,6 +292,23 @@ struct limb_array_t_ {
 template <typename T>
 using limb_array_t = typename limb_array_t_<T>::type;
 
+// This is a small utility function to shift down the unsigned integer n by GMP_NUMB_BITS.
+// If GMP_NUMB_BITS is not smaller than the bit size of T, then an assertion will fire. We need this
+// little helper in order to avoid compiler warnings.
+template <typename T>
+inline void u_checked_rshift(T &n, const std::true_type &)
+{
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
+    n >>= GMP_NUMB_BITS;
+}
+
+template <typename T>
+inline void u_checked_rshift(T &, const std::false_type &)
+{
+    static_assert(is_integral<T>::value && is_unsigned<T>::value, "Invalid type.");
+    assert(false);
+}
+
 // Convert a large unsigned integer into a limb array, and return the effective size.
 // n must be > GMP_NUMB_MAX.
 template <typename T>
@@ -315,15 +318,16 @@ inline std::size_t uint_to_limb_array(limb_array_t<T> &rop, T n)
     assert(n > GMP_NUMB_MAX);
     // We can assign the first two limbs directly, as we know n > GMP_NUMB_MAX.
     rop[0] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
-    u_checked_rshift(n);
+    constexpr auto dispatcher = std::integral_constant<bool, (GMP_NUMB_BITS < nl_constants<T>::digits)>{};
+    u_checked_rshift(n, dispatcher);
     assert(n);
     rop[1] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
-    u_checked_rshift(n);
+    u_checked_rshift(n, dispatcher);
     std::size_t size = 2;
     // NOTE: currently this code is hit only on 32-bit archs with 64-bit integers,
     // and we have no nail builds: we cannot go past 2 limbs size.
     // LCOV_EXCL_START
-    for (; n; ++size, u_checked_rshift(n)) {
+    for (; n; ++size, u_checked_rshift(n, dispatcher)) {
         rop[size] = static_cast<::mp_limb_t>(n & GMP_NUMB_MASK);
     }
     // LCOV_EXCL_STOP
@@ -495,6 +499,32 @@ struct static_int {
         // Just forward to the copy assignment.
         return operator=(other);
     }
+    // Swap primitive.
+    void swap(static_int &other) noexcept
+    {
+        if (SSize <= opt_size) {
+            // In this case, we know other's upper limbs are properly zeroed out.
+            // NOTE: self swap of std::array should be fine.
+            std::swap(_mp_size, other._mp_size);
+            std::swap(m_limbs, other.m_limbs);
+        } else {
+            // Otherwise, we must avoid reading from uninited limbs.
+            // Copy over the limbs of this to temp storage.
+            limbs_type tmp;
+            const auto asize1 = abs_size();
+            copy_limbs_no(m_limbs.data(), m_limbs.data() + asize1, tmp.data());
+
+            // Copy over the limbs of other to this.
+            // NOTE: potential overlap here.
+            copy_limbs(other.m_limbs.data(), other.m_limbs.data() + other.abs_size(), m_limbs.data());
+
+            // Copy over the limbs in temp storage to other.
+            copy_limbs_no(tmp.data(), tmp.data() + asize1, other.m_limbs.data());
+
+            // Swap the sizes.
+            std::swap(_mp_size, other._mp_size);
+        }
+    }
 #ifdef __MINGW32__
 
 #pragma GCC diagnostic push
@@ -547,7 +577,7 @@ struct static_int {
     // we will have UB due to the const_cast use.
     mpz_struct_t get_mpz_view() const
     {
-        return {_mp_alloc, _mp_size, const_cast<::mp_limb_t *>(m_limbs.data())};
+        return mpz_struct_t{_mp_alloc, _mp_size, const_cast<::mp_limb_t *>(m_limbs.data())};
     }
     mpz_alloc_t _mp_alloc = s_alloc;
     mpz_size_t _mp_size;
@@ -988,6 +1018,8 @@ void nextprime_impl(integer<SSize> &, const integer<SSize> &);
 // - perhaps we should consider adding new overloads to functions which return more than one value
 //   (e.g., tdiv_qr(), sqrtrem(), etc.). At this time we have only the GMP-style overload, perhaps
 //   we could have an overload that returns the two values as tuple/pair/array.
+// - the lt/gt static implementations could be specialised for 2-limbs integers. But we need to have
+//   benchmarks before doing it.
 
 // NOTE: about the nails:
 // - whenever we need to read the *numerical value* of a limb (e.g., in our optimised primitives),
@@ -3016,71 +3048,75 @@ const char integer<SSize>::bl_data_errmsg[]
     = "Invalid data detected in the binary deserialisation of an integer: the most "
       "significant limb of the value cannot be zero";
 
-/** @defgroup integer_assignment integer_assignment
- *  @{
- */
+namespace detail
+{
 
-/// Set to zero.
-/**
- * After calling this function, the storage type of \p n will be static and its value will be zero.
- *
- * \rststar
- * .. note::
- *
- *   This is a specialised higher-performance alternative to the assignment operator.
- * \endrststar
- *
- * @param n the assignment argument.
- *
- * @return a reference to \p n.
- */
+// Swap u1 and u2. u1 must be static, u2 must be dynamic.
+template <std::size_t SSize>
+inline void integer_swap_static_dynamic(integer_union<SSize> &u1, integer_union<SSize> &u2) noexcept
+{
+    using s_storage = typename integer_union<SSize>::s_storage;
+    using d_storage = typename integer_union<SSize>::d_storage;
+
+    assert(u1.is_static());
+    assert(!u2.is_static());
+
+    // Copy the static in temp storage.
+    const auto n1_copy(u1.g_st());
+    // Destroy the static.
+    u1.g_st().~s_storage();
+    // Construct the dynamic struct, shallow-copying from n2.
+    ::new (static_cast<void *>(&u1.m_dy)) d_storage(u2.g_dy());
+    // Re-create n2 as a static copying from n1_copy.
+    u2.g_dy().~d_storage();
+    ::new (static_cast<void *>(&u2.m_st)) s_storage(n1_copy);
+}
+
+} // namespace detail
+
+// Swap.
+template <std::size_t SSize>
+inline void swap(integer<SSize> &n1, integer<SSize> &n2) noexcept
+{
+    auto &u1 = n1._get_union();
+    auto &u2 = n2._get_union();
+
+    const bool s1 = u1.is_static(), s2 = u2.is_static();
+    if (s1 && s2) {
+        // Self swap is fine, handled in the static.
+        u1.g_st().swap(u2.g_st());
+    } else if (s1 && !s2) {
+        detail::integer_swap_static_dynamic(u1, u2);
+    } else if (!s1 && s2) {
+        // Mirror of the above.
+        detail::integer_swap_static_dynamic(u2, u1);
+    } else {
+        // Swap with other. Self swap is fine, mpz_swap() can have
+        // aliasing arguments.
+        ::mpz_swap(&u1.g_dy(), &u2.g_dy());
+    }
+}
+
+// Set to zero.
 template <std::size_t SSize>
 inline integer<SSize> &set_zero(integer<SSize> &n)
 {
     return n.set_zero();
 }
 
-/// Set to one.
-/**
- * After calling this function, the storage type of \p n will be static and its value will be one.
- *
- * \rststar
- * .. note::
- *
- *   This is a specialised higher-performance alternative to the assignment operator.
- * \endrststar
- *
- * @param n the assignment argument.
- *
- * @return a reference to \p n.
- */
+// Set to one.
 template <std::size_t SSize>
 inline integer<SSize> &set_one(integer<SSize> &n)
 {
     return n.set_one();
 }
 
-/// Set to minus one.
-/**
- * After calling this function, the storage type of \p n will be static and its value will be minus one.
- *
- * \rststar
- * .. note::
- *
- *   This is a specialised higher-performance alternative to the assignment operator.
- * \endrststar
- *
- * @param n the assignment argument.
- *
- * @return a reference to \p n.
- */
+// Set to minus one.
 template <std::size_t SSize>
 inline integer<SSize> &set_negative_one(integer<SSize> &n)
 {
     return n.set_negative_one();
 }
-
-/** @} */
 
 /** @defgroup integer_conversion integer_conversion
  *  @{
@@ -5524,13 +5560,9 @@ inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n,
 namespace detail
 {
 
-// Selection of the algorithm for static cmp.
-template <typename SInt>
-using integer_static_cmp_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : (SInt::s_size == 2 ? 2 : 0)>;
-
 // mpn implementation.
 template <std::size_t SSize>
-inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 0> &)
+inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2)
 {
     if (n1._mp_size < n2._mp_size) {
         return -1;
@@ -5540,20 +5572,22 @@ inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, 
     }
     // The two sizes are equal, compare the absolute values.
     const auto asize = n1._mp_size >= 0 ? n1._mp_size : -n1._mp_size;
-    if (asize == 0) {
-        // Both operands are zero.
-        // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
-        // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
-        return 0;
+    if (asize) {
+        // NOTE: reduce the value of the comparison to the [-1, 1] range, so that
+        // if we need to negate it below we ensure not to run into overflows.
+        const int cmp_abs
+            = integral_sign(::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize)));
+        // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
+        return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
     }
-    const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(asize));
-    // If the values are non-negative, return the comparison of the absolute values, otherwise invert it.
-    return (n1._mp_size >= 0) ? cmp_abs : -cmp_abs;
+    // Both operands are zero.
+    // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
+    // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
+    return 0;
 }
 
 // 1-limb optimisation.
-template <std::size_t SSize>
-inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 1> &)
+inline int static_cmp(const static_int<1> &n1, const static_int<1> &n2)
 {
     if (n1._mp_size < n2._mp_size) {
         return -1;
@@ -5569,8 +5603,7 @@ inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, 
 }
 
 // 2-limb optimisation.
-template <std::size_t SSize>
-inline int static_cmp(const static_int<SSize> &n1, const static_int<SSize> &n2, const std::integral_constant<int, 2> &)
+inline int static_cmp(const static_int<2> &n1, const static_int<2> &n2)
 {
     if (n1._mp_size < n2._mp_size) {
         return -1;
@@ -5605,8 +5638,7 @@ inline int cmp(const integer<SSize> &op1, const integer<SSize> &op2)
 {
     const bool s1 = op1.is_static(), s2 = op2.is_static();
     if (mppp_likely(s1 && s2)) {
-        return static_cmp(op1._get_union().g_st(), op2._get_union().g_st(),
-                          detail::integer_static_cmp_algo<detail::static_int<SSize>>{});
+        return static_cmp(op1._get_union().g_st(), op2._get_union().g_st());
     }
     return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view());
 }
@@ -6607,16 +6639,10 @@ inline integer<SSize> &bitwise_xor(integer<SSize> &rop, const integer<SSize> &op
 namespace detail
 {
 
-// Selection of the algorithm for static GCD:
-// - for 1 limb, we have a specialised implementation using mpn_gcd_1(), available everywhere,
-// - otherwise we just use the mpn/mpz functions.
-template <typename SInt>
-using integer_static_gcd_algo = std::integral_constant<int, SInt::s_size == 1 ? 1 : 0>;
-
 // mpn/mpz implementation.
 template <std::size_t SSize>
 inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
-                            mpz_size_t asize1, mpz_size_t asize2, const std::integral_constant<int, 0> &)
+                            mpz_size_t asize1, mpz_size_t asize2)
 {
     // NOTE: performance testing indicates that, even if mpz_gcd() does special casing
     // for zeroes and 1-limb values, it is still worth it to repeat the special casing
@@ -6668,9 +6694,8 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 }
 
 // 1-limb optimization.
-template <std::size_t SSize>
-inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2,
-                            mpz_size_t asize1, mpz_size_t asize2, const std::integral_constant<int, 1> &)
+inline void static_gcd_impl(static_int<1> &rop, const static_int<1> &op1, const static_int<1> &op2, mpz_size_t asize1,
+                            mpz_size_t asize2)
 {
     // Handle the special cases first.
     if (asize1 == 0) {
@@ -6711,9 +6736,8 @@ inline void static_gcd_impl(static_int<SSize> &rop, const static_int<SSize> &op1
 template <std::size_t SSize>
 inline void static_gcd(static_int<SSize> &rop, const static_int<SSize> &op1, const static_int<SSize> &op2)
 {
-    static_gcd_impl(rop, op1, op2, std::abs(op1._mp_size), std::abs(op2._mp_size),
-                    integer_static_gcd_algo<static_int<SSize>>{});
-    if (integer_static_gcd_algo<static_int<SSize>>::value == 0) {
+    static_gcd_impl(rop, op1, op2, std::abs(op1._mp_size), std::abs(op2._mp_size));
+    if (SSize > 1u) {
         // If we used the generic function, zero the unused limbs on top (if necessary).
         // NOTE: as usual, potential of mpn/mpz use on optimised size (e.g., with 2-limb
         // static ints we are currently invoking mpz_gcd() - this could produce a result
@@ -8403,10 +8427,73 @@ inline bool dispatch_equality(T x, const integer<SSize> &a)
 }
 
 // Less-than operator.
-template <std::size_t SSize>
-inline bool dispatch_less_than(const integer<SSize> &a, const integer<SSize> &b)
+
+// 1-limb specialisation.
+inline bool static_less_than(const static_int<1> &op1, const static_int<1> &op2)
 {
-    return cmp(a, b) < 0;
+    // NOTE: an implementation with 1 branch less and similar performance
+    // is available at fdb84f57027ebf579a380f07501435eb17fd6db1.
+
+    const auto size1 = op1._mp_size, size2 = op2._mp_size;
+
+    // Compare sizes.
+    // NOTE: under the assumption that we have positive/negative
+    // integers with equal probability, it makes sense to check
+    // for the sizes first.
+    if (size1 < size2) {
+        return true;
+    }
+    if (size1 > size2) {
+        return false;
+    }
+
+    // Sizes are equal, compare the only limb.
+    const auto l1 = op1.m_limbs[0] & GMP_NUMB_MASK;
+    const auto l2 = op2.m_limbs[0] & GMP_NUMB_MASK;
+
+    const auto lt = l1 < l2;
+    const auto gt = l1 > l2;
+
+    // NOTE: as usual, this branchless formulation is slightly
+    // better for signed ints, slightly worse for unsigned
+    // (wrt an if statement).
+    return (size1 >= 0 && lt) || (size1 < 0 && gt);
+}
+
+// mpn implementation.
+template <std::size_t SSize>
+inline bool static_less_than(const static_int<SSize> &n1, const static_int<SSize> &n2)
+{
+    const auto size1 = n1._mp_size, size2 = n2._mp_size;
+
+    // Compare sizes.
+    if (size1 < size2) {
+        return true;
+    }
+    if (size1 > size2) {
+        return false;
+    }
+
+    // The two sizes are equal, compare the absolute values.
+    if (size1) {
+        const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
+        return (size1 >= 0 && cmp_abs < 0) || (size1 < 0 && cmp_abs > 0);
+    }
+    // Both operands are zero.
+    // NOTE: we do this special casing in order to avoid calling mpn_cmp() on zero operands. It seems to
+    // work, but the official GMP docs say one is not supposed to call mpn functions on zero operands.
+    return false;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_less_than(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool s1 = op1.is_static(), s2 = op2.is_static();
+    if (mppp_likely(s1 && s2)) {
+        return static_less_than(op1._get_union().g_st(), op2._get_union().g_st());
+    }
+
+    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) < 0;
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
@@ -8428,10 +8515,56 @@ template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_inter
 bool dispatch_less_than(T, const integer<SSize> &);
 
 // Greater-than operator.
-template <std::size_t SSize>
-inline bool dispatch_greater_than(const integer<SSize> &a, const integer<SSize> &b)
+
+// NOTE: this is essentially the same as static_less_than.
+inline bool static_greater_than(const static_int<1> &op1, const static_int<1> &op2)
 {
-    return cmp(a, b) > 0;
+    const auto size1 = op1._mp_size, size2 = op2._mp_size;
+
+    if (size1 > size2) {
+        return true;
+    }
+    if (size1 < size2) {
+        return false;
+    }
+
+    const auto l1 = op1.m_limbs[0] & GMP_NUMB_MASK;
+    const auto l2 = op2.m_limbs[0] & GMP_NUMB_MASK;
+
+    const auto lt = l1 < l2;
+    const auto gt = l1 > l2;
+
+    return (size1 >= 0 && gt) || (size1 < 0 && lt);
+}
+
+template <std::size_t SSize>
+inline bool static_greater_than(const static_int<SSize> &n1, const static_int<SSize> &n2)
+{
+    const auto size1 = n1._mp_size, size2 = n2._mp_size;
+
+    if (size1 > size2) {
+        return true;
+    }
+    if (size1 < size2) {
+        return false;
+    }
+
+    if (size1) {
+        const int cmp_abs = ::mpn_cmp(n1.m_limbs.data(), n2.m_limbs.data(), static_cast<::mp_size_t>(std::abs(size1)));
+        return (size1 >= 0 && cmp_abs > 0) || (size1 < 0 && cmp_abs < 0);
+    }
+    return false;
+}
+
+template <std::size_t SSize>
+inline bool dispatch_greater_than(const integer<SSize> &op1, const integer<SSize> &op2)
+{
+    const bool s1 = op1.is_static(), s2 = op2.is_static();
+    if (mppp_likely(s1 && s2)) {
+        return static_greater_than(op1._get_union().g_st(), op2._get_union().g_st());
+    }
+
+    return ::mpz_cmp(op1.get_mpz_view(), op2.get_mpz_view()) > 0;
 }
 
 template <typename T, std::size_t SSize, enable_if_t<is_cpp_integral_interoperable<T>::value, int> = 0>
@@ -8885,6 +9018,7 @@ inline T &operator^=(T &rop, const U &op)
 }
 
 /** @} */
+
 } // namespace mppp
 
 namespace std

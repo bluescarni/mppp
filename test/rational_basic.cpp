@@ -732,6 +732,21 @@ struct copy_move_tester {
         REQUIRE(q.get_den().is_one());
         REQUIRE(q.get_num().is_static());
         REQUIRE(q.get_den().is_static());
+
+        // Do some minimal testing for swapping as well.
+        q = 0;
+        q2 = 1;
+        swap(q2, q2);
+        REQUIRE(q2 == 1);
+        swap(q, q2);
+        REQUIRE(q == 1);
+        REQUIRE(q2 == 0);
+        q = "4/5";
+        q2 = "-3/7";
+        swap(q, q2);
+        REQUIRE(q == rational{-3, 7});
+        REQUIRE(q2 == rational{4, 5});
+        REQUIRE(noexcept(swap(q, q2)));
     }
 };
 

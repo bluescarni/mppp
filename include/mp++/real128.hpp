@@ -21,12 +21,13 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <tuple>
 #include <type_traits>
 #include <vector>
+
+#if MPPP_CPLUSPLUS >= 201703L
+#include <string_view>
+#endif
 
 #include <mp++/concepts.hpp>
 #include <mp++/detail/gmp.hpp>

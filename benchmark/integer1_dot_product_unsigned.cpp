@@ -16,8 +16,8 @@
 #include <utility>
 #include <vector>
 
-#include "simple_timer.hpp"
 #include "constStrings.hpp"
+#include "simple_timer.hpp"
 
 #include <boost/format.hpp>
 
@@ -124,7 +124,7 @@ int main()
             for (auto i = 0ul; i < size; ++i) {
                 ret += p.first[i] * p.second[i];
             }
-            std::cout << static_cast<std::uint_least64_t>(ret) << '\n';
+            std::cout << " / " << static_cast<std::uint_least64_t>(ret);
             s += "['uint128','operation'," + std::to_string(st2.elapsed()) + "],";
             std::cout << operRuntime;
         }
