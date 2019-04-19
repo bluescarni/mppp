@@ -69,7 +69,11 @@ struct swap_tester {
                 n1_copy = n1;
                 n2_copy = n2;
 
-                // Do the swap.
+                // Self swap first.
+                swap(n1, n1);
+                REQUIRE(n1 == n1_copy);
+
+                // n1-n2 swap.
                 swap(n1, n2);
 
                 REQUIRE(n2 == n1_copy);
@@ -104,6 +108,9 @@ struct swap_tester {
         random_xy(4, 2);
         random_xy(4, 3);
         random_xy(4, 4);
+
+        integer n1, n2;
+        REQUIRE(noexcept(swap(n1, n2)));
     }
 };
 

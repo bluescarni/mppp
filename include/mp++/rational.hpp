@@ -1011,7 +1011,7 @@ public:
         if (mppp_unlikely(is_zero())) {
             throw zero_division_error("Cannot invert a zero rational");
         }
-        std::swap(m_num, m_den);
+        swap(m_num, m_den);
         detail::fix_den_sign(*this);
         return *this;
     }
@@ -1433,7 +1433,7 @@ inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, co
         // Set rop to 1/rop by swapping num/den.
         // NOTE: we already checked that op2 is nonzero, so inverting it
         // does not yield division by zero.
-        std::swap(rop._get_num(), rop._get_den());
+        swap(rop._get_num(), rop._get_den());
         // Fix den sign.
         detail::fix_den_sign(rop);
         // Multiply by op1.
@@ -2978,6 +2978,14 @@ inline std::size_t hash(const rational<SSize> &q)
 }
 
 /** @} */
+
+template <std::size_t SSize>
+inline void swap(rational<SSize> &q1, rational<SSize> &q2) noexcept
+{
+    swap(q1._get_num(), q2._get_num());
+    swap(q1._get_den(), q2._get_den());
+}
+
 } // namespace mppp
 
 namespace std
