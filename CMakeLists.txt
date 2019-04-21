@@ -195,7 +195,7 @@ install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION lib/cmake/mp++)
 # Take care of versioning.
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" VERSION ${mp++_VERSION}
-	COMPATIBILITY ExactVersion)
+	COMPATIBILITY SameMajorVersion)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATION "lib/cmake/mp++")
 
 # This is just a simple counter variable, internal use only.
