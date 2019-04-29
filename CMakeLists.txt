@@ -25,6 +25,7 @@ option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability w
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
 mark_as_advanced(MPPP_TEST_PYBIND11)
+option(MPPP_BUILD_STATIC_LIBRARY "Build mp++ as a static library, instead of dynamic." OFF)
 
 include(YACMACompilerLinkerSettings)
 include(CheckCXXCompilerFlag)
@@ -101,14 +102,22 @@ if(MPPP_WITH_MPFR)
         "${MPPP_SRC_FILES}")
 endif()
 
-# Setup of the mp++ library.
-add_library(mp++ SHARED "${MPPP_SRC_FILES}")
-set_property(TARGET mp++ PROPERTY VERSION "${mp++_VERSION_MAJOR}.${mp++_VERSION_MINOR}")
-set_property(TARGET mp++ PROPERTY SOVERSION 1)
-set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
+if(MPPP_BUILD_STATIC_LIBRARY)
+    # Setup of the mp++ static library.
+    set(MPPP_STATIC_BUILD "#define MPPP_STATIC_BUILD")
+    add_library(mp++ STATIC "${MPPP_SRC_FILES}")
+else()
+    # Setup of the mp++ shared library.
+    add_library(mp++ SHARED "${MPPP_SRC_FILES}")
+    set_property(TARGET mp++ PROPERTY VERSION "${mp++_VERSION_MAJOR}.${mp++_VERSION_MINOR}")
+    set_property(TARGET mp++ PROPERTY SOVERSION 1)
+    set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
+    set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
+    set_target_properties(mp++ PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
+endif()
+
+# Setup common to both the shared and static variants.
 target_compile_options(mp++ PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
-set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
-set_target_properties(mp++ PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
 # NOTE: for clang-cl, cmake tries to set -std=c++11 here, which makes
 # it error out. Disable it as MSVC 2015 is implicitly C++14 anyway.
 if(NOT (YACMA_COMPILER_IS_MSVC AND YACMA_COMPILER_IS_CLANGXX))
