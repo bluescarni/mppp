@@ -72,6 +72,7 @@ matrix:
           - texlive-xetex
           - lmodern
           - latexmk
+          - fonts-freefont-ttf
     - env: MPPP_BUILD="OSXDebug"
       os: osx
       osx_image: xcode6.4
