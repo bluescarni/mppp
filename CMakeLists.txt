@@ -104,6 +104,7 @@ endif()
 
 if(MPPP_BUILD_STATIC_LIBRARY)
     # Setup of the mp++ static library.
+    message(STATUS "mp++ will be built as a static library.")
     set(MPPP_STATIC_BUILD "#define MPPP_STATIC_BUILD")
     add_library(mp++ STATIC "${MPPP_SRC_FILES}")
 else()
