@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Add the possibility to build mp++ as a static library
+  (`#176 <https://github.com/bluescarni/mppp/pull/176>`__).
 - Add CircleCI to the continuous integration pipeline
   (`#173 <https://github.com/bluescarni/mppp/pull/173>`__).
 - Implement the logarithm/exponential functions for :cpp:class:`~mppp::real`
