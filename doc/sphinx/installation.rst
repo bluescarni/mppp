@@ -244,8 +244,8 @@ Visual Studio:
 * When building mp++ as a static library, MSVC's static runtime will
   be used (instead of the dynamic runtime). One can force the use
   of the dynamic runtime when building mp++ as a static library by
-  turning on the ``MPPP_BUILD_STATIC_WITH_DYNAMIC_MSVC_RUNTIME`` advanced
-  CMake option.
+  turning on the ``MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME``
+  advanced CMake option.
 
 FreeBSD:
 
