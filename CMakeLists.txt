@@ -30,7 +30,7 @@ option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (e
 mark_as_advanced(MPPP_TEST_PYBIND11)
 option(MPPP_BUILD_STATIC_LIBRARY "Build mp++ as a static library, instead of dynamic." OFF)
 
-if(YACMA_COMPILER_IS_MSVC)
+if(YACMA_COMPILER_IS_MSVC AND MPPP_BUILD_STATIC_LIBRARY)
     option(MPPP_BUILD_STATIC_WITH_DYNAMIC_MSVC_RUNTIME "Link to the dynamic MSVC runtime when building mp++ as a static library." OFF)
     mark_as_advanced(MPPP_BUILD_STATIC_WITH_DYNAMIC_MSVC_RUNTIME)
 endif()
