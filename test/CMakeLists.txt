@@ -21,22 +21,18 @@ function(ADD_MPPP_TESTCASE arg1)
   add_executable(${arg1} ${arg1}.cpp)
   target_link_libraries(${arg1} mp++ Threads::Threads)
   target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
-  # NOTE: for clang-cl, cmake tries to set -std=c++11 here, which makes
-  # it error out. Disable it as MSVC 2015 is implicitly C++14 anyway.
-  if(NOT (YACMA_COMPILER_IS_MSVC AND YACMA_COMPILER_IS_CLANGXX))
-    # Let's setup the target C++ standard, but only if the user did not provide it manually.
-    if(NOT CMAKE_CXX_STANDARD)
-      if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
-        # NOTE: the idea here is that we want to use C++14 if the compilers supports
-        # concepts (as variable concepts are essentially template variables).
-        set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 14)
-      else()
-        set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 11)
-      endif()
+  # Let's setup the target C++ standard, but only if the user did not provide it manually.
+  if(NOT CMAKE_CXX_STANDARD)
+    if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
+      # NOTE: the idea here is that we want to use C++14 if the compilers supports
+      # concepts (as variable concepts are essentially template variables).
+      set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 14)
+    else()
+      set_property(TARGET ${arg1} PROPERTY CXX_STANDARD 11)
     endif()
-    set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
-    set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
   endif()
+  set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
+  set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
   # Visibility settings.
   set_target_properties(${arg1} PROPERTIES CXX_VISIBILITY_PRESET hidden)
   set_target_properties(${arg1} PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
