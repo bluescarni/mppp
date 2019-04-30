@@ -12,7 +12,7 @@ environment:
     #   BUILD_TYPE: MSVC17_64
     # - BUILD_TYPE: MSVC15_32
     # - BUILD_TYPE: MSVC15_64
-    - BUILD_TYPE: MSVC15_clang_32
+    # - BUILD_TYPE: MSVC15_clang_32
     - BUILD_TYPE: MSVC15_clang_64
     # - BUILD_TYPE: MinGW
     #   TEST_NSPLIT: "2"
@@ -48,14 +48,14 @@ install:
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] set PATH=C:\Miniconda36\Scripts;%PATH%
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] conda config --add channels conda-forge --force
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] conda create -y --name mppp cmake ninja clangdev mpir mpfr
+- if [%BUILD_TYPE%]==[MSVC15_clang_32] conda create -y --name mppp cmake ninja mpir mpfr
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] call activate mppp
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] clang-cl -v
 - if [%BUILD_TYPE%]==[MSVC15_clang_32] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --add channels conda-forge --force
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda create -y --name mppp cmake ninja clangdev mpir mpfr
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda create -y --name mppp cmake ninja mpir mpfr
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call activate mppp
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] clang-cl -v
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
