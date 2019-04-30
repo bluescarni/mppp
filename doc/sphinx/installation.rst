@@ -234,18 +234,23 @@ Compiler and platform specific notes
 
 Visual Studio:
 
-* When using Visual Studio, the mp++ library is compiled
+* The mp++ library is compiled
   with the ``NOMINMAX`` definition and, if supported,
   with the ``/permissive-``
   compiler flag. If you intend to use mp++ in conjunction with other
   libraries, you should ensure that the ``NOMINMAX`` definition
   and the ``/permissive-`` flag are also used for the compilation
   of these libraries.
+* When building mp++ as a static library, MSVC's static runtime will
+  be used (instead of the dynamic runtime). One can force the use
+  of the dynamic runtime when building mp++ as a static library by
+  turning on the ``MPPP_BUILD_STATIC_WITH_DYNAMIC_MSVC_RUNTIME`` advanced
+  CMake option.
 
 FreeBSD:
 
-* On FreeBSD, the ``long double`` overloads of some mathematical functions
-  (such as ``std::pow()``) are currently implemented in
+* The ``long double`` overloads of some mathematical functions
+  (such as ``std::pow()``) may be implemented in
   ``double`` precision. Additionally, if the arguments to such mathematical
   functions are compile-time constants, the compiler
   *may* decide (depending on the optimisation level) to actually compute the
