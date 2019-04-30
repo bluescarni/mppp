@@ -14,6 +14,9 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
+include(YACMACompilerLinkerSettings)
+include(CheckCXXCompilerFlag)
+
 # The build options.
 option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
@@ -27,8 +30,10 @@ option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (e
 mark_as_advanced(MPPP_TEST_PYBIND11)
 option(MPPP_BUILD_STATIC_LIBRARY "Build mp++ as a static library, instead of dynamic." OFF)
 
-include(YACMACompilerLinkerSettings)
-include(CheckCXXCompilerFlag)
+if(YACMA_COMPILER_IS_MSVC)
+    option(MPPP_BUILD_STATIC_WITH_DYNAMIC_MSVC_RUNTIME "Link to the dynamic MSVC runtime when building mp++ as a static library." OFF)
+    mark_as_advanced(MPPP_BUILD_STATIC_WITH_DYNAMIC_MSVC_RUNTIME)
+endif()
 
 # Assemble the flags.
 set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
@@ -82,6 +87,30 @@ if(YACMA_COMPILER_IS_GNUCXX)
     # This is just a hackish way of detecting concepts, need to revisit once
     # more compilers support them.
     check_cxx_compiler_flag("-fconcepts" MPPP_COMPILER_SUPPORTS_CONCEPTS)
+endif()
+
+# Explanation: on MSVC, when building static libraries, it is good practice to link
+# to the static runtime. CMake, however, is hard-coded to link to the dynamic runtime,
+# Hence we hackishly replace the /MD flag with /MT. This is the approach suggested
+# in the CMake FAQ:
+#
+# https://gitlab.kitware.com/cmake/community/wikis/FAQ#how-can-i-build-my-msvc-application-with-a-static-runtime
+#
+# Note that at one point CMake added the possiblity to set this as a target property,
+# so in the future we should definitely migrate to that approach:
+#
+# https://cmake.org/cmake/help/git-master/prop_tgt/MSVC_RUNTIME_LIBRARY.html
+#
+# NOTE: the MPPP_BUILD_STATIC_WITH_DYNAMIC_MSVC_RUNTIME option overrides this choice
+# and keeps the dynamic runtime. This can be needed in specific rare situations.
+if(YACMA_COMPILER_IS_MSVC AND MPPP_BUILD_STATIC_LIBRARY AND NOT MPPP_BUILD_STATIC_WITH_DYNAMIC_MSVC_RUNTIME)
+    foreach(flag_var
+            CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+            CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+        if(${flag_var} MATCHES "/MD")
+            string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+        endif()
+    endforeach()
 endif()
 
 # List of source files.

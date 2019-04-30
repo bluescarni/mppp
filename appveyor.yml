@@ -6,24 +6,24 @@ branches:
 
 environment:
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      BUILD_TYPE: MSVC17_32
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      BUILD_TYPE: MSVC17_64
-    - BUILD_TYPE: MSVC15_32
-    - BUILD_TYPE: MSVC15_64
+    # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    #   BUILD_TYPE: MSVC17_32
+    # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    #   BUILD_TYPE: MSVC17_64
+    # - BUILD_TYPE: MSVC15_32
+    # - BUILD_TYPE: MSVC15_64
     - BUILD_TYPE: MSVC15_clang_32
     - BUILD_TYPE: MSVC15_clang_64
-    - BUILD_TYPE: MinGW
-      TEST_NSPLIT: "2"
-      SPLIT_TEST_NUM: "0"
-      COMPILER: MinGW
-      PLATFORM: x64
-    - BUILD_TYPE: MinGW
-      TEST_NSPLIT: "2"
-      SPLIT_TEST_NUM: "1"
-      COMPILER: MinGW
-      PLATFORM: x64
+    # - BUILD_TYPE: MinGW
+    #   TEST_NSPLIT: "2"
+    #   SPLIT_TEST_NUM: "0"
+    #   COMPILER: MinGW
+    #   PLATFORM: x64
+    # - BUILD_TYPE: MinGW
+    #   TEST_NSPLIT: "2"
+    #   SPLIT_TEST_NUM: "1"
+    #   COMPILER: MinGW
+    #   PLATFORM: x64
 
 install:
 - if [%BUILD_TYPE%]==[MSVC15_32] set PATH=C:\Miniconda36\Scripts;%PATH%
