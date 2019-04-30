@@ -47,7 +47,8 @@ if(YACMA_COMPILER_IS_MSVC)
     list(APPEND _MPPP_CLANG_CL_DISABLED_WARNINGS
         "-Wno-deprecated-dynamic-exception-spec"
         "-Wno-old-style-cast"
-        "-Wno-sign-conversion")
+        "-Wno-sign-conversion"
+        "-Wno-reserved-id-macro")
     list(APPEND MPPP_CXX_FLAGS_DEBUG ${_MPPP_CLANG_CL_DISABLED_WARNINGS})
     list(APPEND MPPP_CXX_FLAGS_RELEASE ${_MPPP_CLANG_CL_DISABLED_WARNINGS})
     unset(_MPPP_CLANG_CL_DISABLED_WARNINGS)
