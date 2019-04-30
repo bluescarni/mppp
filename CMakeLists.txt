@@ -90,7 +90,7 @@ if(YACMA_COMPILER_IS_GNUCXX)
 endif()
 
 # Explanation: on MSVC, when building static libraries, it is good practice to link
-# to the static runtime. CMake, however, is hard-coded to link to the dynamic runtime,
+# to the static runtime. CMake, however, is hard-coded to link to the dynamic runtime.
 # Hence we hackishly replace the /MD flag with /MT. This is the approach suggested
 # in the CMake FAQ:
 #
