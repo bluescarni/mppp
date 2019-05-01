@@ -12,7 +12,6 @@ environment:
       BUILD_TYPE: MSVC17_64
     - BUILD_TYPE: MSVC15_32
     - BUILD_TYPE: MSVC15_64
-    - BUILD_TYPE: MSVC15_clang_32
     - BUILD_TYPE: MSVC15_clang_64
     - BUILD_TYPE: MinGW
       TEST_NSPLIT: "2"
@@ -46,16 +45,9 @@ install:
 - if [%BUILD_TYPE%]==[MSVC17_64] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath
 - if [%BUILD_TYPE%]==[MSVC17_64] call activate mppp
 
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] set PATH=C:\Miniconda36\Scripts;%PATH%
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] conda config --add channels conda-forge --force
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] conda create -y --name mppp cmake ninja "clangdev<6" mpir mpfr
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] call activate mppp
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] clang-cl -v
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
-
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] conda config --add channels conda-forge --force
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda create -y --name mppp cmake ninja "clangdev<6" mpir mpfr
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] conda create -y --name mppp cmake ninja mpir mpfr
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call activate mppp
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] clang-cl -v
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
@@ -94,10 +86,7 @@ build_script:
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_TEST_PYBIND11=yes -DCMAKE_CXX_STANDARD=17
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Release --target pybind11_test_01
 
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] cmake --build . -- -v
-
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes
+- if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake .. -GNinja -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_BUILD_STATIC_LIBRARY=yes
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] cmake --build . -- -v
 
 - if [%BUILD_TYPE%]==[MinGW] if [%PLATFORM%]==[x64] cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Os -fconcepts" -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=YES -DMPPP_WITH_QUADMATH=yes -DGMP_INCLUDE_DIR=C:/local/include -DGMP_LIBRARY=C:/local/lib/libgmp.a -DMPFR_INCLUDE_DIR=C:/local/include -DMPFR_LIBRARY=C:/local/lib/libmpfr.a -DMPPP_TEST_NSPLIT=%TEST_NSPLIT% -DMPPP_TEST_SPLIT_NUM=%SPLIT_TEST_NUM% ..
@@ -132,10 +121,7 @@ test_script:
 - if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%OLD_PATH%;%CD%\Release
 - if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Release -R pybind11
 
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] set PATH=%PATH%;%CD%
-- if [%BUILD_TYPE%]==[MSVC15_clang_32] ctest -V
-
-- if [%BUILD_TYPE%]==[MSVC15_clang_64] set PATH=%PATH%;%CD%
+# NOTE: no need to alter the PATH, static library build.
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] ctest -V
 
 - if [%BUILD_TYPE%]==[MinGW] set PATH=%PATH%;%CD%

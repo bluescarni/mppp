@@ -34,3 +34,10 @@ Macros and definitions
 
    This name is defined if mp++ detects the presence of the GCC-style 128-bit integers
    ``__int128_t`` and ``__uint128_t``, available on some compiler/platform combinations.
+
+.. c:macro:: MPPP_STATIC_BUILD
+
+   .. versionadded:: 0.15
+
+   This name is defined if mp++ was built as a static library, instead of a dynamic
+   library (see the :ref:`installation instructions <installation>`).

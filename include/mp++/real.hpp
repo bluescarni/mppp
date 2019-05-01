@@ -262,6 +262,7 @@ inline ::mpfr_prec_t real_dd_prec(const T &x)
     // Return default precision if nonzero, otherwise return the clamped deduced precision.
     return dp ? dp : clamp_mpfr_prec(real_deduce_precision(x));
 }
+
 } // namespace detail
 
 // Doxygen gets confused by this.
@@ -845,18 +846,8 @@ public:
      * @param x the ``mpfr_t`` that will be moved.
      */
     explicit real(::mpfr_t &&x) : m_mpfr(*x) {}
-    /// Destructor.
-    /**
-     * The destructor will free any resource held by the internal ``mpfr_t`` instance.
-     */
-    ~real()
-    {
-        if (m_mpfr._mpfr_d) {
-            // The object is not moved-from, destroy it.
-            assert(detail::real_prec_check(get_prec()));
-            ::mpfr_clear(&m_mpfr);
-        }
-    }
+    // Destructor.
+    ~real();
     /// Copy assignment operator.
     /**
      * The operator will deep-copy \p other into \p this.
@@ -2089,6 +2080,7 @@ inline void check_real_trunc_arg(const real &r)
         throw std::domain_error("Cannot truncate a NaN value");
     }
 }
+
 } // namespace detail
 
 template <typename T, typename U>

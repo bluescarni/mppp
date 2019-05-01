@@ -76,7 +76,11 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     echo "Sphinx ran successfully";
     # Run the latex build as well. We don't check for stderr output here,
     # as the command turns out to be quite chatty.
-    make latexpdf;
+    # NOTE: drop the latex build for the time being, as it stopped
+    # working after a sphinx update. I think the issue is the outdated
+    # latex packages available on travis. Maybe we can try to bring it back
+    # if/when we move this build to circleci.
+    # make latexpdf;
     if [[ "${TRAVIS_PULL_REQUEST}" != "false" ]]; then
         echo "Testing a pull request, the generated documentation will not be uploaded.";
         exit 0;

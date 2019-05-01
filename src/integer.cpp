@@ -148,7 +148,7 @@ namespace
 thread_local mpz_alloc_cache mpz_alloc_cache_inst;
 
 // Implementation of the init of an mpz from cache.
-static bool mpz_init_from_cache_impl(mpz_struct_t &rop, std::size_t nlimbs)
+bool mpz_init_from_cache_impl(mpz_struct_t &rop, std::size_t nlimbs)
 {
     auto &mpzc = mpz_alloc_cache_inst;
     if (nlimbs && nlimbs <= mpzc.max_size && mpzc.sizes[nlimbs - 1u]) {

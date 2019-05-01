@@ -14,6 +14,9 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
+include(YACMACompilerLinkerSettings)
+include(CheckCXXCompilerFlag)
+
 # The build options.
 option(MPPP_BUILD_TESTS "Build unit tests." OFF)
 option(MPPP_BUILD_BENCHMARKS "Build benchmarks." OFF)
@@ -25,18 +28,20 @@ option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability w
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
 mark_as_advanced(MPPP_TEST_PYBIND11)
+option(MPPP_BUILD_STATIC_LIBRARY "Build mp++ as a static library, instead of dynamic." OFF)
 
-include(YACMACompilerLinkerSettings)
-include(CheckCXXCompilerFlag)
+if(YACMA_COMPILER_IS_MSVC AND MPPP_BUILD_STATIC_LIBRARY)
+    option(MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME "Link to the dynamic MSVC runtime when building mp++ as a static library." OFF)
+    mark_as_advanced(MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME)
+endif()
 
 # Assemble the flags.
 set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
 set(MPPP_CXX_FLAGS_RELEASE ${YACMA_CXX_FLAGS})
 if(YACMA_COMPILER_IS_MSVC)
-  # Disable the idiotic minmax macros on MSVC, some annoying warnings,
-  # and enable the bigobj option.
-  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
-  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/wd4459" "/wd4127" "/bigobj")
+  # On both cl and clang-cl, disable the idiotic minmax macros and enable the bigobj option.
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/bigobj")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/bigobj")
   if(YACMA_COMPILER_IS_CLANGXX)
     # clang-cl emits various warnings from GMP/MPFR, let's just silence them.
     # NOTE: at one point in the recent past, MSVC added an options similar to GCC's isystem:
@@ -44,12 +49,56 @@ if(YACMA_COMPILER_IS_MSVC)
     # We probably just need to wait for this to be picked up by CMake/clang-cl. Let's
     # revisit the issue in the future.
     list(APPEND _MPPP_CLANG_CL_DISABLED_WARNINGS
+        "-Wno-unused-variable"
+        "-Wno-inconsistent-dllimport"
+        "-Wno-unknown-pragmas"
+        "-Wno-unused-parameter"
+        "-Wno-sign-compare"
+        "-Wno-deprecated-declarations"
         "-Wno-deprecated-dynamic-exception-spec"
         "-Wno-old-style-cast"
-        "-Wno-sign-conversion")
+        "-Wno-sign-conversion"
+        "-Wno-non-virtual-dtor"
+        "-Wno-deprecated"
+        "-Wno-shadow"
+        "-Wno-shorten-64-to-32"
+        "-Wno-reserved-id-macro"
+        "-Wno-undef"
+        "-Wno-c++98-compat-pedantic"
+        "-Wno-documentation-unknown-command"
+        "-Wno-zero-as-null-pointer-constant"
+        "-Wno-language-extension-token"
+        "-Wno-gnu-anonymous-struct"
+        "-Wno-nested-anon-types"
+        "-Wno-documentation"
+        "-Wno-comma"
+        "-Wno-nonportable-system-include-path"
+        "-Wno-global-constructors"
+        "-Wno-redundant-parens"
+        "-Wno-exit-time-destructors"
+        "-Wno-missing-noreturn"
+        "-Wno-switch-enum"
+        "-Wno-covered-switch-default"
+        "-Wno-float-equal"
+        "-Wno-double-promotion"
+        "-Wno-microsoft-enum-value"
+        "-Wno-missing-prototypes"
+        "-Wno-implicit-fallthrough"
+        "-Wno-format-nonliteral"
+        "-Wno-cast-qual"
+        "-Wno-disabled-macro-expansion"
+        "-Wno-unused-private-field"
+        "-Wno-unused-template"
+        "-Wno-unused-macros"
+        "-Wno-extra-semi-stmt"
+        "-Wno-c++98-compat")
     list(APPEND MPPP_CXX_FLAGS_DEBUG ${_MPPP_CLANG_CL_DISABLED_WARNINGS})
     list(APPEND MPPP_CXX_FLAGS_RELEASE ${_MPPP_CLANG_CL_DISABLED_WARNINGS})
     unset(_MPPP_CLANG_CL_DISABLED_WARNINGS)
+  else()
+    # Same as above, disable some cl warnings.
+    list(APPEND MPPP_CXX_FLAGS_DEBUG "/wd4459" "/wd4127")
+    list(APPEND MPPP_CXX_FLAGS_RELEASE "/wd4459" "/wd4127")
   endif()
   # Enable strict conformance mode, if supported.
   set(CMAKE_REQUIRED_QUIET TRUE)
@@ -82,6 +131,30 @@ if(YACMA_COMPILER_IS_GNUCXX)
     check_cxx_compiler_flag("-fconcepts" MPPP_COMPILER_SUPPORTS_CONCEPTS)
 endif()
 
+# Explanation: on MSVC, when building static libraries, it is good practice to link
+# to the static runtime. CMake, however, is hard-coded to link to the dynamic runtime.
+# Hence we hackishly replace the /MD flag with /MT. This is the approach suggested
+# in the CMake FAQ:
+#
+# https://gitlab.kitware.com/cmake/community/wikis/FAQ#how-can-i-build-my-msvc-application-with-a-static-runtime
+#
+# Note that at one point CMake added the possiblity to set this as a target property,
+# so in the future we should definitely migrate to that approach:
+#
+# https://cmake.org/cmake/help/git-master/prop_tgt/MSVC_RUNTIME_LIBRARY.html
+#
+# NOTE: the MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME option overrides this choice
+# and keeps the dynamic runtime. This can be needed in specific rare situations.
+if(YACMA_COMPILER_IS_MSVC AND MPPP_BUILD_STATIC_LIBRARY AND NOT MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME)
+    foreach(flag_var
+            CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+            CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+        if(${flag_var} MATCHES "/MD")
+            string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+        endif()
+    endforeach()
+endif()
+
 # List of source files.
 set(MPPP_SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/integer.cpp"
@@ -97,34 +170,38 @@ endif()
 if(MPPP_WITH_MPFR)
     set(MPPP_SRC_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/real.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/mpfr.cpp"
         "${MPPP_SRC_FILES}")
 endif()
 
-# Setup of the mp++ library.
-add_library(mp++ SHARED "${MPPP_SRC_FILES}")
-set_property(TARGET mp++ PROPERTY VERSION "${mp++_VERSION_MAJOR}.${mp++_VERSION_MINOR}")
-set_property(TARGET mp++ PROPERTY SOVERSION 1)
-set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
-target_compile_options(mp++ PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
-set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
-set_target_properties(mp++ PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
-# NOTE: for clang-cl, cmake tries to set -std=c++11 here, which makes
-# it error out. Disable it as MSVC 2015 is implicitly C++14 anyway.
-if(NOT (YACMA_COMPILER_IS_MSVC AND YACMA_COMPILER_IS_CLANGXX))
-    # Let's setup the target C++ standard, but only if the user did not provide it manually.
-    if(NOT CMAKE_CXX_STANDARD)
-        if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
-            # NOTE: the idea here is that we want to use C++14 if the compilers supports
-            # concepts (as variable concepts are essentially template variables).
-            set_property(TARGET mp++ PROPERTY CXX_STANDARD 14)
-        else()
-            set_property(TARGET mp++ PROPERTY CXX_STANDARD 11)
-        endif()
-    endif()
-    set_property(TARGET mp++ PROPERTY CXX_STANDARD_REQUIRED YES)
-    set_property(TARGET mp++ PROPERTY CXX_EXTENSIONS NO)
+if(MPPP_BUILD_STATIC_LIBRARY)
+    # Setup of the mp++ static library.
+    message(STATUS "mp++ will be built as a static library.")
+    set(MPPP_STATIC_BUILD "#define MPPP_STATIC_BUILD")
+    add_library(mp++ STATIC "${MPPP_SRC_FILES}")
+else()
+    # Setup of the mp++ shared library.
+    add_library(mp++ SHARED "${MPPP_SRC_FILES}")
+    set_property(TARGET mp++ PROPERTY VERSION "${mp++_VERSION_MAJOR}.${mp++_VERSION_MINOR}")
+    set_property(TARGET mp++ PROPERTY SOVERSION 1)
+    set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
+    set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
+    set_target_properties(mp++ PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
 endif()
+
+# Setup common to both the shared and static variants.
+target_compile_options(mp++ PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
+# Let's setup the target C++ standard, but only if the user did not provide it manually.
+if(NOT CMAKE_CXX_STANDARD)
+    if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
+        # NOTE: the idea here is that we want to use C++14 if the compilers supports
+        # concepts (as variable concepts are essentially template variables).
+        set_property(TARGET mp++ PROPERTY CXX_STANDARD 14)
+    else()
+        set_property(TARGET mp++ PROPERTY CXX_STANDARD 11)
+    endif()
+endif()
+set_property(TARGET mp++ PROPERTY CXX_STANDARD_REQUIRED YES)
+set_property(TARGET mp++ PROPERTY CXX_EXTENSIONS NO)
 target_include_directories(mp++ PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>

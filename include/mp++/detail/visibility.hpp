@@ -9,6 +9,16 @@
 #ifndef MPPP_DETAIL_VISIBILITY_HPP
 #define MPPP_DETAIL_VISIBILITY_HPP
 
+#include <mp++/config.hpp>
+
+// The visibility setup makes sense only for shared
+// library builds.
+#if defined(MPPP_STATIC_BUILD)
+
+#define MPPP_PUBLIC
+
+#else
+
 // Convenience macros for visibility attributes. Mostly insipred by:
 // https://gcc.gnu.org/wiki/Visibility
 // We check first for Windows, where we assume every compiler
@@ -34,6 +44,8 @@
 #else
 
 #define MPPP_PUBLIC
+
+#endif
 
 #endif
 

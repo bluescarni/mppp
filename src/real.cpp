@@ -11,6 +11,7 @@
 #include <atomic>
 #include <cassert>
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -278,7 +279,7 @@ using static_real = std::pair<mpfr_struct_t,
 // (e.g., if initing a static real from a real128), so for the time being let's keep things basic.
 // We can determine in the future if we can make this constexpr somehow and have a 2**112 instance
 // inited during constant initialization.
-static static_real<size_real_2_112> get_real_2_112()
+static_real<size_real_2_112> get_real_2_112()
 {
     // NOTE: pair's def ctor value-inits the members: everything in retval is zeroed out.
     static_real<size_real_2_112> retval;
@@ -418,5 +419,66 @@ real128 real::convert_to_real128() const
 }
 
 #endif
+
+namespace detail
+{
+
+namespace
+{
+
+// Machinery to call automatically mpfr_free_cache() at program shutdown.
+extern "C" {
+
+// NOTE: the cleanup function should have C linkage, as it will be passed to atexit()
+// which is a function from the C standard library.
+void mpfr_cleanup_function()
+{
+#if !defined(NDEBUG)
+    // NOTE: functions registered with atexit() may be called concurrently.
+    // Access to cout from concurrent threads is safe as long as the
+    // cout object is synchronized to the underlying C stream:
+    // https://stackoverflow.com/questions/6374264/is-cout-synchronized-thread-safe
+    // http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio
+    // By default, this is the case, but in theory someone might have changed
+    // the sync setting on cout by the time we execute the following line.
+    // However, we print only in debug mode, so it should not be too much of a problem
+    // in practice.
+    std::cout << "Cleaning up MPFR caches." << std::endl;
+#endif
+    ::mpfr_free_cache();
+}
+}
+
+// Define and instantiate a cleanup functor.
+struct mpfr_cleanup {
+    mpfr_cleanup()
+    {
+        std::atexit(mpfr_cleanup_function);
+    }
+};
+
+const mpfr_cleanup cleanup_inst;
+
+} // namespace
+
+} // namespace detail
+
+/// Destructor.
+/**
+ * The destructor will free any resource held by the internal ``mpfr_t`` instance.
+ */
+real::~real()
+{
+    // NOTE: make sure we "use" the cleanup instantiation functor,
+    // so that the compiler is forced to invoke its constructor.
+    // This ensures that, as long as at least one real is created, the mpfr_free_cache()
+    // function is called on shutdown.
+    detail::ignore(&detail::cleanup_inst);
+    if (m_mpfr._mpfr_d) {
+        // The object is not moved-from, destroy it.
+        assert(detail::real_prec_check(get_prec()));
+        ::mpfr_clear(&m_mpfr);
+    }
+}
 
 } // namespace mppp
