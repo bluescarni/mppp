@@ -2,8 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -12,10 +11,10 @@
 
     <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/notosanscjkjp.css" />
-    <link rel="stylesheet" type="text/css" href="_static/roboto.css" />
-    <link rel="stylesheet" type="text/css" href="_static/material-design-lite-1.3.0/material.blue_grey-indigo.min.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx_materialdesign_theme.css" />
+    <link rel="stylesheet" href="_static/notosanscjkjp.css" type="text/css" />
+    <link rel="stylesheet" href="_static/roboto.css" type="text/css" />
+    <link rel="stylesheet" href="_static/material-design-lite-1.3.0/material.blue_grey-indigo.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx_materialdesign_theme.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
@@ -217,9 +216,9 @@ use cases.</p>
 <p>In addition to the <a class="reference internal" href="tutorial_commonops.html#tutorial-commonops"><span class="std std-ref">common operators</span></a> available for all of mp++’s multiprecision classes,
 <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> supports the following additional operators:</p>
 <ul class="simple">
-<li>the modulo operator <code class="docutils literal notranslate"><span class="pre">%</span></code>, which computes the remainder of integer division,</li>
-<li>the bitshifting operators <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>,</li>
-<li>the bitwise logical operators <code class="docutils literal notranslate"><span class="pre">~</span></code>, <code class="docutils literal notranslate"><span class="pre">&amp;</span></code>, <code class="docutils literal notranslate"><span class="pre">|</span></code> and <code class="docutils literal notranslate"><span class="pre">^</span></code>.</li>
+<li><p>the modulo operator <code class="docutils literal notranslate"><span class="pre">%</span></code>, which computes the remainder of integer division,</p></li>
+<li><p>the bitshifting operators <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>,</p></li>
+<li><p>the bitwise logical operators <code class="docutils literal notranslate"><span class="pre">~</span></code>, <code class="docutils literal notranslate"><span class="pre">&amp;</span></code>, <code class="docutils literal notranslate"><span class="pre">|</span></code> and <code class="docutils literal notranslate"><span class="pre">^</span></code>.</p></li>
 </ul>
 <p>In addition to the binary versions of these operators, the in-place versions are also available. Lower level ternary
 primitives (e.g., <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp8mul_2expER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="mppp::mul_2exp"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mul_2exp()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp11tdiv_q_2expER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE11mp_bitcnt_t" title="mppp::tdiv_q_2exp"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">tdiv_q_2exp()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp11bitwise_iorER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::bitwise_ior"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">bitwise_ior()</span></code></a>, etc.)
@@ -231,17 +230,17 @@ operators behave as-if <code class="xref cpp cpp-class docutils literal notransl
 a sign-magnitude representation is used instead).</p>
 <p>Among the features specific to <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> we find:</p>
 <ul class="simple">
-<li>specialised arithmetic primitives (fused multiply-add/sub, addition/subtraction with C++ unsigned
-integrals, …),</li>
-<li>prime numbers functions (<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp14probab_prime_pEiRK7integerI5SSizeEi" title="mppp::probab_prime_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">probab_prime_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp9nextprimeER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::nextprime"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">nextprime()</span></code></a>, …),</li>
-<li>parity detection (<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6even_pEbRK7integerI5SSizeE" title="mppp::even_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">even_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp5odd_pEbRK7integerI5SSizeE" title="mppp::odd_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">odd_p()</span></code></a>),</li>
-<li>several additional <a class="reference internal" href="integer.html#integer-division"><span class="std std-ref">division functions</span></a>,</li>
-<li><a class="reference internal" href="integer.html#integer-ntheory"><span class="std std-ref">number-theoretic functions</span></a> (GCD, factorial, binomial coefficient, …),</li>
-<li>integer <a class="reference internal" href="integer.html#integer-roots"><span class="std std-ref">roots</span></a> and <a class="reference internal" href="integer.html#integer-exponentiation"><span class="std std-ref">exponentiation</span></a>,</li>
-<li>hashing (including a <a class="reference internal" href="integer.html#integer-std-specialisations"><span class="std std-ref">specialisation</span></a> of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code>, so that it is possible to use
-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> in standard unordered containers out of the box),</li>
-<li>binary <a class="reference internal" href="#tutorial-integer-s11n"><span class="std std-ref">serialisation</span></a>,</li>
-<li>various utility functions (detect size in bits/limbs, detect and/or promote/demote storage type, …).</li>
+<li><p>specialised arithmetic primitives (fused multiply-add/sub, addition/subtraction with C++ unsigned
+integrals, …),</p></li>
+<li><p>prime numbers functions (<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp14probab_prime_pEiRK7integerI5SSizeEi" title="mppp::probab_prime_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">probab_prime_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp9nextprimeER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::nextprime"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">nextprime()</span></code></a>, …),</p></li>
+<li><p>parity detection (<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6even_pEbRK7integerI5SSizeE" title="mppp::even_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">even_p()</span></code></a>, <a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp5odd_pEbRK7integerI5SSizeE" title="mppp::odd_p"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">odd_p()</span></code></a>),</p></li>
+<li><p>several additional <a class="reference internal" href="integer.html#integer-division"><span class="std std-ref">division functions</span></a>,</p></li>
+<li><p><a class="reference internal" href="integer.html#integer-ntheory"><span class="std std-ref">number-theoretic functions</span></a> (GCD, factorial, binomial coefficient, …),</p></li>
+<li><p>integer <a class="reference internal" href="integer.html#integer-roots"><span class="std std-ref">roots</span></a> and <a class="reference internal" href="integer.html#integer-exponentiation"><span class="std std-ref">exponentiation</span></a>,</p></li>
+<li><p>hashing (including a <a class="reference internal" href="integer.html#integer-std-specialisations"><span class="std std-ref">specialisation</span></a> of <code class="docutils literal notranslate"><span class="pre">std::hash</span></code>, so that it is possible to use
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> in standard unordered containers out of the box),</p></li>
+<li><p>binary <a class="reference internal" href="#tutorial-integer-s11n"><span class="std std-ref">serialisation</span></a>,</p></li>
+<li><p>various utility functions (detect size in bits/limbs, detect and/or promote/demote storage type, …).</p></li>
 </ul>
 <p>Many of these features, which are documented in detail in the <a class="reference internal" href="integer.html#integer-reference"><span class="std std-ref">integer reference</span></a>, are available
 in multiple overloads, often both as free and member functions.</p>
@@ -250,8 +249,8 @@ in multiple overloads, often both as free and member functions.</p>
 <p><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> provides a variety of ways for interfacing with the <a class="reference external" href="https://gmplib.org/">GMP</a> library.
 There are a few reasons why one would want to use <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> in conjunction with the GMP API, such as:</p>
 <ul class="simple">
-<li>the necessity of using functions from the GMP API which have not (yet) been wrapped/implemented by mp++,</li>
-<li>passing data from/to mp++ to/from another GMP-based multiprecision library.</li>
+<li><p>the necessity of using functions from the GMP API which have not (yet) been wrapped/implemented by mp++,</p></li>
+<li><p>passing data from/to mp++ to/from another GMP-based multiprecision library.</p></li>
 </ul>
 <p>To start with, <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> is constructible and assignable from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> objects:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">mpz_t</span> <span class="n">m</span><span class="p">;</span>
@@ -314,7 +313,7 @@ The documentation of the two functions explains in detail some of the potential 
 <div class="section" id="serialisation">
 <span id="tutorial-integer-s11n"></span><h2>Serialisation<a class="headerlink" href="#serialisation" title="Permalink to this headline">¶</a></h2>
 <div class="versionadded">
-<p><span class="versionmodified">New in version 0.7.</span></p>
+<p><span class="versionmodified added">New in version 0.7.</span></p>
 </div>
 <p>mp++ provides a simple <a class="reference internal" href="integer.html#integer-s11n"><span class="std std-ref">API for the (de)serialisation</span></a> of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> objects
 into/from memory buffers and C++ streams. Possible uses of the serialisation API include persistence (e.g.,
@@ -386,12 +385,12 @@ the <a class="reference internal" href="integer.html#_CPPv4NK4mppp7integer11bina
 </div>
 <p>A couple of important points about the serialisation API need to be emphasised:</p>
 <ul class="simple">
-<li>although mp++ does run some consistency checks during deserialisation, the API is not built to protect
-against maliciously-crafted data. Users are thus advised not to load data from untrusted sources;</li>
-<li>the current binary serialisation format is compiler, platform and architecture specific, it is not portable
+<li><p>although mp++ does run some consistency checks during deserialisation, the API is not built to protect
+against maliciously-crafted data. Users are thus advised not to load data from untrusted sources;</p></li>
+<li><p>the current binary serialisation format is compiler, platform and architecture specific, it is not portable
 and it might be subject to changes in future versions of mp++. Users are thus advised not to use
 the binary serialisation format for long-term persistence or as a data exchange format: for such
-purposes, it is better to use the string representation of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> objects.</li>
+purposes, it is better to use the string representation of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> objects.</p></li>
 </ul>
 </div>
 </div>
@@ -451,7 +450,7 @@ purposes, it is better to use the string representation of <code class="xref cpp
 
     <div class="mdl-mini-footer__right-section">
         <div>&copy; Copyright 2016-2019, Francesco Biscani.</div>
-      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 2.0.1 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
 </footer>
         </main>

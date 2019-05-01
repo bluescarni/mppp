@@ -2,8 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -12,10 +11,10 @@
 
     <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/notosanscjkjp.css" />
-    <link rel="stylesheet" type="text/css" href="_static/roboto.css" />
-    <link rel="stylesheet" type="text/css" href="_static/material-design-lite-1.3.0/material.blue_grey-indigo.min.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx_materialdesign_theme.css" />
+    <link rel="stylesheet" href="_static/notosanscjkjp.css" type="text/css" />
+    <link rel="stylesheet" href="_static/roboto.css" type="text/css" />
+    <link rel="stylesheet" href="_static/material-design-lite-1.3.0/material.blue_grey-indigo.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx_materialdesign_theme.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
@@ -203,7 +202,7 @@ Show Source
   <div class="section" id="multiprecision-rationals">
 <span id="rational-reference"></span><h1>Multiprecision rationals<a class="headerlink" href="#multiprecision-rationals" title="Permalink to this headline">¶</a></h1>
 <div class="versionadded">
-<p><span class="versionmodified">New in version 0.3.</span></p>
+<p><span class="versionmodified added">New in version 0.3.</span></p>
 </div>
 <p><em>#include &lt;mp++/rational.hpp&gt;</em></p>
 <div class="section" id="the-rational-class">
@@ -216,8 +215,8 @@ Show Source
 <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integers</span></code> with static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code> as the numerator and denominator.
 Rational numbers are represented in the usual canonical form:</p>
 <ul class="simple">
-<li>numerator and denominator are coprime,</li>
-<li>the denominator is always strictly positive.</li>
+<li><p>numerator and denominator are coprime,</p></li>
+<li><p>the denominator is always strictly positive.</p></li>
 </ul>
 <p>This class has the look and feel of a C++ builtin type: it can interact with most of C++’s integral and
 floating-point primitive types (see the <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> concept for the full list)
@@ -316,10 +315,9 @@ denominator.</p>
 <span id="_CPPv3N4mppp8rational8rationalERR8rational"></span><span id="_CPPv2N4mppp8rational8rationalERR8rational"></span><span id="mppp::rational::rational__rationalRR"></span><span class="target" id="classmppp_1_1rational_1a661283f4c927e4567f96a0caff80889e"></span><code class="descname">rational</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N4mppp8rational8rationalEv" title="mppp::rational::rational">rational</a> &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational8rationalERR8rational" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Move constructor. </p>
 <p>The move constructor will leave <code class="docutils literal notranslate"><span class="pre">other</span></code> in an unspecified but valid state.</p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">other</span></code>: the construction argument. </li>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">other</span></code>: the construction argument. </p></li>
 </ul>
 </dd>
 </dl>
@@ -330,17 +328,16 @@ denominator.</p>
 <dt id="_CPPv4N4mppp8rational8rationalERR24RationalCvrInteroperableI5SSizeE">
 <span id="_CPPv3N4mppp8rational8rationalERR24RationalCvrInteroperableI5SSizeE"></span><span id="_CPPv2N4mppp8rational8rationalERR24RationalCvrInteroperableI5SSizeE"></span><span id="mppp::rational::rational__RationalCvrInteroperable:SSize:RR"></span><span class="target" id="classmppp_1_1rational_1abdfc71943e4e7bc452dff2404920b2cf"></span><code class="descname">rational</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp24RationalCvrInteroperableE" title="mppp::RationalCvrInteroperable">RationalCvrInteroperable</a>&lt;SSize&gt; &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational8rationalERR24RationalCvrInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic constructor. </p>
-<p>This constructor will initialize a rational with the value <code class="docutils literal notranslate"><span class="pre">x</span></code>. The construction will fail if <code class="docutils literal notranslate"><span class="pre">x</span></code>
+<p><p>This constructor will initialize a rational with the value <code class="docutils literal notranslate"><span class="pre">x</span></code>. The construction will fail if <code class="docutils literal notranslate"><span class="pre">x</span></code>
 is a non-finite floating-point value.</p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">x</span></code>: the value that will be used to initialize <code class="docutils literal notranslate"><span class="pre">this</span></code>.</li>
+</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">x</span></code>: the value that will be used to initialize <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a non-finite floating-point value. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a non-finite floating-point value. </p></li>
 </ul>
 </dd>
 </dl>
@@ -357,23 +354,21 @@ numerator, while <code class="docutils literal notranslate"><span class="pre">d<
 (the default), then <a class="reference internal" href="#_CPPv4N4mppp8rational12canonicaliseEv" title="mppp::rational::canonicalise"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">canonicalise()</span></code></a> will be called after the construction
 of numerator and denominator.</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">If this constructor is called with <code class="docutils literal notranslate"><span class="pre">make_canonical</span></code> set to <code class="docutils literal notranslate"><span class="pre">false</span></code>, it will be the user’s responsibility
+<p class="admonition-title">Warning</p>
+<p>If this constructor is called with <code class="docutils literal notranslate"><span class="pre">make_canonical</span></code> set to <code class="docutils literal notranslate"><span class="pre">false</span></code>, it will be the user’s responsibility
 to ensure that <code class="docutils literal notranslate"><span class="pre">this</span></code> is canonicalised before using it with other mp++ functions. Failure to do
 so will result in undefined behaviour.</p>
 </div>
 </p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: the numerator. </li>
-<li><code class="docutils literal notranslate"><span class="pre">d</span></code>: the denominator. </li>
-<li><code class="docutils literal notranslate"><span class="pre">make_canonical</span></code>: if <code class="docutils literal notranslate"><span class="pre">true</span></code>, the rational will be canonicalised after the construction of numerator and denominator.</li>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n</span></code>: the numerator. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d</span></code>: the denominator. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make_canonical</span></code>: if <code class="docutils literal notranslate"><span class="pre">true</span></code>, the rational will be canonicalised after the construction of numerator and denominator.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the denominator is zero. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the denominator is zero. </p></li>
 </ul>
 </dd>
 </dl>
@@ -384,22 +379,21 @@ so will result in undefined behaviour.</p>
 <dt id="_CPPv4N4mppp8rational8rationalERK10StringTypei">
 <span id="_CPPv3N4mppp8rational8rationalERK10StringTypei"></span><span id="_CPPv2N4mppp8rational8rationalERK10StringTypei"></span><span id="mppp::rational::rational__StringTypeCR.i"></span><span class="target" id="classmppp_1_1rational_1ad5a95ae60b68d8ef18566766a72b8ccc"></span><code class="descname">rational</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10StringTypeE" title="mppp::StringType">StringType</a> &amp;<em>s</em>, int <em>base</em> = 10<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational8rationalERK10StringTypei" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor from string. </p>
-<p>This constructor will initialize <code class="docutils literal notranslate"><span class="pre">this</span></code> from the <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">StringType</span></code></a> <code class="docutils literal notranslate"><span class="pre">s</span></code>, which must represent
+<p><p>This constructor will initialize <code class="docutils literal notranslate"><span class="pre">this</span></code> from the <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10StringTypeE" title="mppp::StringType"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">StringType</span></code></a> <code class="docutils literal notranslate"><span class="pre">s</span></code>, which must represent
 a rational value in base <code class="docutils literal notranslate"><span class="pre">base</span></code>. The expected format is either a numerator-denominator pair separated
 by the division operator <code class="docutils literal notranslate"><span class="pre">/</span></code>, or just a numerator (in which case the denominator will be set to one).
 The format for numerator and denominator is described in the documentation of the constructor from string
 of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">s</span></code>: the input string. </li>
-<li><code class="docutils literal notranslate"><span class="pre">base</span></code>: the base used in the string representation.</li>
+</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">s</span></code>: the input string. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">base</span></code>: the base used in the string representation.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the denominator is zero. </li>
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the string constructor of <a class="reference internal" href="integer.html#classmppp_1_1integer"><span class="std std-ref">mppp::integer</span></a>, or by memory errors in standard containers. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the denominator is zero. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the string constructor of <a class="reference internal" href="integer.html#classmppp_1_1integer"><span class="std std-ref">mppp::integer</span></a>, or by memory errors in standard containers. </p></li>
 </ul>
 </dd>
 </dl>
@@ -412,17 +406,15 @@ of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pr
 <dd><p>Constructor from range of characters. </p>
 <p>This constructor will initialise <code class="docutils literal notranslate"><span class="pre">this</span></code> from the content of the input half-open range, which is interpreted as the string representation of a rational in base <code class="docutils literal notranslate"><span class="pre">base</span></code>.</p>
 <p>Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and invoke the constructor from string.</p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">begin</span></code>: the begin of the input range. </li>
-<li><code class="docutils literal notranslate"><span class="pre">end</span></code>: the end of the input range. </li>
-<li><code class="docutils literal notranslate"><span class="pre">base</span></code>: the base used in the string representation.</li>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">begin</span></code>: the begin of the input range. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">end</span></code>: the end of the input range. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">base</span></code>: the base used in the string representation.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string, or by memory errors in standard containers. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string, or by memory errors in standard containers. </p></li>
 </ul>
 </dd>
 </dl>
@@ -435,15 +427,14 @@ of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pr
 <dd><p>Constructor from <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code>. </p>
 <p>This constructor will initialise the numerator of <code class="docutils literal notranslate"><span class="pre">this</span></code> with the input GMP integer <code class="docutils literal notranslate"><span class="pre">n</span></code>, and the denominator to 1.</p>
 <p><div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">It is the user’s responsibility to ensure that <code class="docutils literal notranslate"><span class="pre">n</span></code> has been correctly initialized. Calling this constructor
+<p class="admonition-title">Warning</p>
+<p>It is the user’s responsibility to ensure that <code class="docutils literal notranslate"><span class="pre">n</span></code> has been correctly initialized. Calling this constructor
 with an uninitialized <code class="docutils literal notranslate"><span class="pre">n</span></code> results in undefined behaviour.</p>
 </div>
 </p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: the input GMP integer. </li>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n</span></code>: the input GMP integer. </p></li>
 </ul>
 </dd>
 </dl>
@@ -456,17 +447,16 @@ with an uninitialized <code class="docutils literal notranslate"><span class="pr
 <dd><p>Copy constructor from <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code>. </p>
 <p>This constructor will initialise the numerator and denominator of <code class="docutils literal notranslate"><span class="pre">this</span></code> with those of the GMP rational <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
 <p><div class="admonition warning">
-<p class="first admonition-title">Warning</p>
+<p class="admonition-title">Warning</p>
 <p>It is the user’s responsibility to ensure that <code class="docutils literal notranslate"><span class="pre">q</span></code> has been correctly initialized. Calling this constructor
 with an uninitialized <code class="docutils literal notranslate"><span class="pre">q</span></code> results in undefined behaviour.</p>
-<p class="last">This constructor will <strong>not</strong>
+<p>This constructor will <strong>not</strong>
 canonicalise <code class="docutils literal notranslate"><span class="pre">this</span></code>: numerator and denominator are constructed as-is from <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
 </div>
 </p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input GMP rational. </li>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input GMP rational. </p></li>
 </ul>
 </dd>
 </dl>
@@ -479,24 +469,23 @@ canonicalise <code class="docutils literal notranslate"><span class="pre">this</
 <dd><p>Move constructor from <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code>. </p>
 <p>This constructor will move the numerator and denominator of the GMP rational <code class="docutils literal notranslate"><span class="pre">q</span></code> into <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <p><div class="admonition warning">
-<p class="first admonition-title">Warning</p>
+<p class="admonition-title">Warning</p>
 <p>It is the user’s responsibility to ensure that <code class="docutils literal notranslate"><span class="pre">q</span></code> has been correctly initialized. Calling this constructor
 with an uninitialized <code class="docutils literal notranslate"><span class="pre">q</span></code> results in undefined behaviour.</p>
 <p>This constructor will <strong>not</strong>
 canonicalise <code class="docutils literal notranslate"><span class="pre">this</span></code>: numerator and denominator are constructed as-is from <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
-<p class="last">The user must ensure that, after construction, <code class="docutils literal notranslate"><span class="pre">mpq_clear()</span></code> is never
+<p>The user must ensure that, after construction, <code class="docutils literal notranslate"><span class="pre">mpq_clear()</span></code> is never
 called on <code class="docutils literal notranslate"><span class="pre">q</span></code>: the resources previously owned by <code class="docutils literal notranslate"><span class="pre">q</span></code> are now owned by <code class="docutils literal notranslate"><span class="pre">this</span></code>, which
 will take care of releasing them when the destructor is called.</p>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.</p>
+<p class="admonition-title">Note</p>
+<p>Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.</p>
 </div>
 </p>
-<p><dl class="docutils">
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input GMP rational. </li>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input GMP rational. </p></li>
 </ul>
 </dd>
 </dl>
@@ -507,9 +496,9 @@ will take care of releasing them when the destructor is called.</p>
 <dt id="_CPPv4N4mppp8rationalaSERK8rational">
 <span id="_CPPv3N4mppp8rationalaSERK8rational"></span><span id="_CPPv2N4mppp8rationalaSERK8rational"></span><span id="mppp::rational::assign-operator__rationalCR"></span><span class="target" id="classmppp_1_1rational_1a8349e8c65433dd7c1104210fd5c3f2a8"></span>rational &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> rational&amp;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rationalaSERK8rational" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Defaulted copy-assignment operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -519,12 +508,11 @@ will take care of releasing them when the destructor is called.</p>
 <span id="_CPPv3N4mppp8rationalaSERR8rational"></span><span id="_CPPv2N4mppp8rationalaSERR8rational"></span><span id="mppp::rational::assign-operator__rationalRR"></span><span class="target" id="classmppp_1_1rational_1a7d55e28c994cad3507b140d2af952d7a"></span>rational &amp;<code class="descname">operator=</code><span class="sig-paren">(</span>rational &amp;&amp;<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rationalaSERR8rational" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Defaulted move assignment operator. </p>
 <p>After the assignment, <code class="docutils literal notranslate"><span class="pre">other</span></code> is left in an unspecified but valid state.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">other</span></code>: the assignment argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">other</span></code>: the assignment argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -535,18 +523,17 @@ will take care of releasing them when the destructor is called.</p>
 <dt id="_CPPv4N4mppp8rationalaSERR24RationalCvrInteroperableI5SSizeE">
 <span id="_CPPv3N4mppp8rationalaSERR24RationalCvrInteroperableI5SSizeE"></span><span id="_CPPv2N4mppp8rationalaSERR24RationalCvrInteroperableI5SSizeE"></span><span id="mppp::rational::assign-operator__RationalCvrInteroperable:SSize:RR"></span><span class="target" id="classmppp_1_1rational_1a053de90620dcf4f43d1bcbfa06613f16"></span>rational &amp;<code class="descname">operator=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp24RationalCvrInteroperableE" title="mppp::RationalCvrInteroperable">RationalCvrInteroperable</a>&lt;SSize&gt; &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rationalaSERR24RationalCvrInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic assignment operator. </p>
-<p>This operator will assign <code class="docutils literal notranslate"><span class="pre">x</span></code> to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">x</span></code>: the assignment argument.</li>
+<p><p>This operator will assign <code class="docutils literal notranslate"><span class="pre">x</span></code> to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">x</span></code>: the assignment argument.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the generic constructor of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">mppp::rational</span></a>. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the generic constructor of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">mppp::rational</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -563,17 +550,15 @@ will take care of releasing them when the destructor is called.</p>
 </div>
 <p>That is, a temporary rational is constructed from <code class="docutils literal notranslate"><span class="pre">s</span></code> and it is then move-assigned to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">s</span></code>: the string that will be used for the assignment.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">s</span></code>: the string that will be used for the assignment.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the constructor from string. </p></li>
 </ul>
 </dd>
 </dl>
@@ -587,21 +572,20 @@ will take care of releasing them when the destructor is called.</p>
 <p><p>This assignment operator will copy into the numerator of <code class="docutils literal notranslate"><span class="pre">this</span></code> the value of the GMP integer <code class="docutils literal notranslate"><span class="pre">n</span></code>,
 and it will set the denominator to 1 via <a class="reference internal" href="integer.html#_CPPv4N4mppp7integer7set_oneEv" title="mppp::integer::set_one"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::set_one()</span></code></a>.</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
+<p class="admonition-title">Warning</p>
 <p>It is the user’s responsibility to ensure that <code class="docutils literal notranslate"><span class="pre">n</span></code> has been correctly initialized. Calling this operator
 with an uninitialized <code class="docutils literal notranslate"><span class="pre">n</span></code> results in undefined behaviour.</p>
-<p class="last">No aliasing is allowed:
+<p>No aliasing is allowed:
 the data in <code class="docutils literal notranslate"><span class="pre">n</span></code> must be completely distinct from the data in <code class="docutils literal notranslate"><span class="pre">this</span></code> (e.g., if <code class="docutils literal notranslate"><span class="pre">n</span></code> is an <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> of
 the numerator of <code class="docutils literal notranslate"><span class="pre">this</span></code> then it might point to internal data of <code class="docutils literal notranslate"><span class="pre">this</span></code>, and the behaviour of this operator
 will thus be undefined).</p>
 </div>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">n</span></code>: the input GMP integer.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n</span></code>: the input GMP integer.</p></li>
 </ul>
 </dd>
 </dl>
@@ -614,21 +598,20 @@ will thus be undefined).</p>
 <dd><p>Copy assignment from <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code>. </p>
 <p>This assignment operator will copy into <code class="docutils literal notranslate"><span class="pre">this</span></code> the value of the GMP rational <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
 <p><div class="admonition warning">
-<p class="first admonition-title">Warning</p>
+<p class="admonition-title">Warning</p>
 <p>It is the user’s responsibility to ensure that <code class="docutils literal notranslate"><span class="pre">q</span></code> has been correctly initialized. Calling this operator
 with an uninitialized <code class="docutils literal notranslate"><span class="pre">q</span></code> results in undefined behaviour.</p>
 <p>This operator will <strong>not</strong> canonicalise
 the assigned value: numerator and denominator are assigned as-is from <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
-<p class="last">No aliasing is allowed:
+<p>No aliasing is allowed:
 the data in <code class="docutils literal notranslate"><span class="pre">q</span></code> must be completely distinct from the data in <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </div>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input GMP rational.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input GMP rational.</p></li>
 </ul>
 </dd>
 </dl>
@@ -641,28 +624,27 @@ the data in <code class="docutils literal notranslate"><span class="pre">q</span
 <dd><p>Move assignment from <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code>. </p>
 <p>This assignment operator will move the GMP rational <code class="docutils literal notranslate"><span class="pre">q</span></code> into <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <p><div class="admonition warning">
-<p class="first admonition-title">Warning</p>
+<p class="admonition-title">Warning</p>
 <p>It is the user’s responsibility to ensure that <code class="docutils literal notranslate"><span class="pre">q</span></code> has been correctly initialized. Calling this operator
 with an uninitialized <code class="docutils literal notranslate"><span class="pre">q</span></code> results in undefined behaviour.</p>
 <p>This operator will <strong>not</strong> canonicalise
 the assigned value: numerator and denominator are assigned as-is from <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
 <p>No aliasing is allowed:
 the data in <code class="docutils literal notranslate"><span class="pre">q</span></code> must be completely distinct from the data in <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
-<p class="last">The user must ensure that, after the assignment, <code class="docutils literal notranslate"><span class="pre">mpq_clear()</span></code> is never
+<p>The user must ensure that, after the assignment, <code class="docutils literal notranslate"><span class="pre">mpq_clear()</span></code> is never
 called on <code class="docutils literal notranslate"><span class="pre">q</span></code>: the resources previously owned by <code class="docutils literal notranslate"><span class="pre">q</span></code> are now owned by <code class="docutils literal notranslate"><span class="pre">this</span></code>, which
 will take care of releasing them when the destructor is called.</p>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Due to a compiler bug, this operator is not available on Microsoft Visual Studio.</p>
+<p class="admonition-title">Note</p>
+<p>Due to a compiler bug, this operator is not available on Microsoft Visual Studio.</p>
 </div>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input GMP rational.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input GMP rational.</p></li>
 </ul>
 </dd>
 </dl>
@@ -673,21 +655,20 @@ will take care of releasing them when the destructor is called.</p>
 <dt id="_CPPv4NK4mppp8rational9to_stringEi">
 <span id="_CPPv3NK4mppp8rational9to_stringEi"></span><span id="_CPPv2NK4mppp8rational9to_stringEi"></span><span id="mppp::rational::to_string__iC"></span><span class="target" id="classmppp_1_1rational_1a021f2a3687c0cf9a56c3484a514776e9"></span>std::string <code class="descname">to_string</code><span class="sig-paren">(</span>int <em>base</em> = 10<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp8rational9to_stringEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Convert to string. </p>
-<p>This operator will return a string representation of <code class="docutils literal notranslate"><span class="pre">this</span></code> in base <code class="docutils literal notranslate"><span class="pre">base</span></code>.
+<p><p>This operator will return a string representation of <code class="docutils literal notranslate"><span class="pre">this</span></code> in base <code class="docutils literal notranslate"><span class="pre">base</span></code>.
 The string format consists of the numerator, followed by the division operator <code class="docutils literal notranslate"><span class="pre">/</span></code> and the
 denominator, but only if the denominator is not unitary. Otherwise, only the numerator will be
 represented in the returned string.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a string representation for <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">base</span></code>: the desired base for the string representation.</li>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a string representation for <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">base</span></code>: the desired base for the string representation.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="integer.html#classmppp_1_1integer_1a44da76950f17f77a05e95e1f1581266c"><span class="std std-ref">mppp::integer::to_string()</span></a>. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="integer.html#classmppp_1_1integer_1a44da76950f17f77a05e95e1f1581266c"><span class="std std-ref">mppp::integer::to_string()</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -698,18 +679,18 @@ represented in the returned string.</p>
 <dt id="_CPPv4I_21RationalInteroperableI5SSizeEENK4mppp8rationalcv1TEv">
 <span id="_CPPv3I_21RationalInteroperableI5SSizeEENK4mppp8rationalcv1TEv"></span><span id="_CPPv2I_21RationalInteroperableI5SSizeEENK4mppp8rationalcv1TEv"></span><span class="target" id="classmppp_1_1rational_1a4d76f611aad75ce3a8c867ae42f24610"></span>template&lt;<a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable">RationalInteroperable</a>&lt;SSize&gt; <code class="descname">T</code>&gt;<br /><code class="descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_21RationalInteroperableI5SSizeEENK4mppp8rationalcv1TEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic conversion operator. </p>
-<p>This operator will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalInteroperable</span></code></a> type.
+<p><p>This operator will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalInteroperable</span></code></a> type.
 Conversion to <code class="docutils literal notranslate"><span class="pre">bool</span></code> yields <code class="docutils literal notranslate"><span class="pre">false</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero,
 <code class="docutils literal notranslate"><span class="pre">true</span></code> otherwise. Conversion to other integral types and to <a class="reference internal" href="#_CPPv4N4mppp8rational5int_tE" title="mppp::rational::int_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">int_t</span></code></a>
 yields the result of the truncated division of the numerator by the denominator, if representable by the target
 <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalInteroperable</span></code></a> type. Conversion to floating-point types might yield inexact values and
 infinities.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to the target type.</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">std::overflow_error</span></code>: if the target type is an integral type and the value of <code class="docutils literal notranslate"><span class="pre">this</span></code> cannot be represented by it. </li>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to the target type.</p>
+</dd>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">std::overflow_error</span></code>: if the target type is an integral type and the value of <code class="docutils literal notranslate"><span class="pre">this</span></code> cannot be represented by it. </p></li>
 </ul>
 </dd>
 </dl>
@@ -720,17 +701,17 @@ infinities.</p>
 <dt id="_CPPv4I_21RationalInteroperableI5SSizeEENK4mppp8rational3getEbR1T">
 <span id="_CPPv3I_21RationalInteroperableI5SSizeEENK4mppp8rational3getER1T"></span><span id="_CPPv2I_21RationalInteroperableI5SSizeEENK4mppp8rational3getER1T"></span><span class="target" id="classmppp_1_1rational_1a730c27b91be7344fcafe04219e65a1a0"></span>template&lt;<a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable">RationalInteroperable</a>&lt;SSize&gt; <code class="descname">T</code>&gt;<br />bool <code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_21RationalInteroperableI5SSizeEENK4mppp8rational3getEbR1T" title="mppp::rational::get::T">T</a> &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_21RationalInteroperableI5SSizeEENK4mppp8rational3getEbR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic conversion method. </p>
-<p>This method, similarly to the conversion operator, will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a
+<p><p>This method, similarly to the conversion operator, will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a
 <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalInteroperable</span></code></a> type, storing the result of the conversion into <code class="docutils literal notranslate"><span class="pre">rop</span></code>. Differently
 from the conversion operator, this method does not raise any exception: if the conversion is successful, the
 method will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the method will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails,
 <code class="docutils literal notranslate"><span class="pre">rop</span></code> will not be altered.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">rop</span></code> is a C++ integral which cannot represent the truncated value of <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the variable which will store the result of the conversion.</li>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">rop</span></code> is a C++ integral which cannot represent the truncated value of <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the variable which will store the result of the conversion.</p></li>
 </ul>
 </dd>
 </dl>
@@ -741,9 +722,9 @@ method will return <code class="docutils literal notranslate"><span class="pre">
 <dt id="_CPPv4NK4mppp8rational7get_numEv">
 <span id="_CPPv3NK4mppp8rational7get_numEv"></span><span id="_CPPv2NK4mppp8rational7get_numEv"></span><span id="mppp::rational::get_numC"></span><span class="target" id="classmppp_1_1rational_1a3fac026998f425baaba7857b7fa36142"></span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">get_num</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp8rational7get_numEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Const numerator getter. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a const reference to the numerator. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a const reference to the numerator. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -752,9 +733,9 @@ method will return <code class="docutils literal notranslate"><span class="pre">
 <dt id="_CPPv4NK4mppp8rational7get_denEv">
 <span id="_CPPv3NK4mppp8rational7get_denEv"></span><span id="_CPPv2NK4mppp8rational7get_denEv"></span><span id="mppp::rational::get_denC"></span><span class="target" id="classmppp_1_1rational_1ae46a3d8422ca21e9c74894bb0708400d"></span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">get_den</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp8rational7get_denEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Const denominator getter. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a const reference to the denominator. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a const reference to the denominator. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -764,14 +745,14 @@ method will return <code class="docutils literal notranslate"><span class="pre">
 <span id="_CPPv3N4mppp8rational8_get_numEv"></span><span id="_CPPv2N4mppp8rational8_get_numEv"></span><span id="mppp::rational::_get_num"></span><span class="target" id="classmppp_1_1rational_1ae1636a4008f72bf3f213efaa53f566fa"></span><a class="reference internal" href="#_CPPv4N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">_get_num</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational8_get_numEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Mutable numerator getter. </p>
 <p><div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">It is the user’s responsibility to ensure that, after changing the numerator
+<p class="admonition-title">Warning</p>
+<p>It is the user’s responsibility to ensure that, after changing the numerator
 via this getter, the rational is kept in canonical form.</p>
 </div>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a mutable reference to the numerator. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a mutable reference to the numerator. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -781,14 +762,14 @@ via this getter, the rational is kept in canonical form.</p>
 <span id="_CPPv3N4mppp8rational8_get_denEv"></span><span id="_CPPv2N4mppp8rational8_get_denEv"></span><span id="mppp::rational::_get_den"></span><span class="target" id="classmppp_1_1rational_1a13af65c8e1a50afbc54171e7850a0b28"></span><a class="reference internal" href="#_CPPv4N4mppp8rational5int_tE" title="mppp::rational::int_t">int_t</a> &amp;<code class="descname">_get_den</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational8_get_denEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Mutable denominator getter. </p>
 <p><div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">It is the user’s responsibility to ensure that, after changing the denominator
+<p class="admonition-title">Warning</p>
+<p>It is the user’s responsibility to ensure that, after changing the denominator
 via this getter, the rational is kept in canonical form.</p>
 </div>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a mutable reference to the denominator. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a mutable reference to the denominator. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -800,9 +781,9 @@ via this getter, the rational is kept in canonical form.</p>
 <p><p>This method will put <code class="docutils literal notranslate"><span class="pre">this</span></code> in canonical form. In particular, this method
 will make sure that:</p>
 <ul class="simple">
-<li>the numerator and denominator are coprime (dividing them by their GCD,
-if necessary),</li>
-<li>the denominator is strictly positive.</li>
+<li><p>the numerator and denominator are coprime (dividing them by their GCD,
+if necessary),</p></li>
+<li><p>the denominator is strictly positive.</p></li>
 </ul>
 <p>In general, it is not necessary to call explicitly this method, as the public
 API of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> ensures that rationals are kept in canonical
@@ -810,14 +791,14 @@ form. Calling this method, however, might be necessary if the numerator and/or d
 are modified manually, or when constructing/assigning from non-canonical <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code>
 values.</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Calling this method with on a rational with null denominator will result in undefined
+<p class="admonition-title">Warning</p>
+<p>Calling this method with on a rational with null denominator will result in undefined
 behaviour.</p>
 </div>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -826,9 +807,9 @@ behaviour.</p>
 <dt id="_CPPv4NK4mppp8rational12is_canonicalEv">
 <span id="_CPPv3NK4mppp8rational12is_canonicalEv"></span><span id="_CPPv2NK4mppp8rational12is_canonicalEv"></span><span id="mppp::rational::is_canonicalC"></span><span class="target" id="classmppp_1_1rational_1a11304a33649064627ab816dc036c60b0"></span>bool <code class="descname">is_canonical</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp8rational12is_canonicalEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Check canonical form. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is the canonical form for rational numbers, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is the canonical form for rational numbers, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -837,9 +818,9 @@ behaviour.</p>
 <dt id="_CPPv4NK4mppp8rational3sgnEv">
 <span id="_CPPv3NK4mppp8rational3sgnEv"></span><span id="_CPPv2NK4mppp8rational3sgnEv"></span><span id="mppp::rational::sgnC"></span><span class="target" id="classmppp_1_1rational_1a6fe27d7aba70926eae73a2d02cd2b73c"></span>int <code class="descname">sgn</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp8rational3sgnEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Sign. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>0 if <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero, 1 if <code class="docutils literal notranslate"><span class="pre">this</span></code> is positive, -1 if <code class="docutils literal notranslate"><span class="pre">this</span></code> is negative. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>0 if <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero, 1 if <code class="docutils literal notranslate"><span class="pre">this</span></code> is positive, -1 if <code class="docutils literal notranslate"><span class="pre">this</span></code> is negative. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -849,9 +830,9 @@ behaviour.</p>
 <span id="_CPPv3N4mppp8rational3negEv"></span><span id="_CPPv2N4mppp8rational3negEv"></span><span id="mppp::rational::neg"></span><span class="target" id="classmppp_1_1rational_1a3a1169a57c6e89978eab94a32a6cedeb"></span>rational &amp;<code class="descname">neg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational3negEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Negate in-place. </p>
 <p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <code class="docutils literal notranslate"><span class="pre">-this</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -861,9 +842,9 @@ behaviour.</p>
 <span id="_CPPv3N4mppp8rational3absEv"></span><span id="_CPPv2N4mppp8rational3absEv"></span><span id="mppp::rational::abs"></span><span class="target" id="classmppp_1_1rational_1ae7c09653e4309bc03f5605c2748684be"></span>rational &amp;<code class="descname">abs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational3absEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place absolute value. </p>
 <p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its absolute value.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -873,12 +854,11 @@ behaviour.</p>
 <span id="_CPPv3N4mppp8rational3invEv"></span><span id="_CPPv2N4mppp8rational3invEv"></span><span id="mppp::rational::inv"></span><span class="target" id="classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"></span>rational &amp;<code class="descname">inv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational3invEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place inversion. </p>
 <p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its inverse.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero. </li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+</dd>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero. </p></li>
 </ul>
 </dd>
 </dl>
@@ -889,9 +869,9 @@ behaviour.</p>
 <dt id="_CPPv4NK4mppp8rational7is_zeroEv">
 <span id="_CPPv3NK4mppp8rational7is_zeroEv"></span><span id="_CPPv2NK4mppp8rational7is_zeroEv"></span><span id="mppp::rational::is_zeroC"></span><span class="target" id="classmppp_1_1rational_1a9b63b700ec9a9569055b26a314d0be6e"></span>bool <code class="descname">is_zero</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp8rational7is_zeroEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if the value is zero. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if the value represented by <code class="docutils literal notranslate"><span class="pre">this</span></code> is 0, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the value represented by <code class="docutils literal notranslate"><span class="pre">this</span></code> is 0, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -900,9 +880,9 @@ behaviour.</p>
 <dt id="_CPPv4NK4mppp8rational6is_oneEv">
 <span id="_CPPv3NK4mppp8rational6is_oneEv"></span><span id="_CPPv2NK4mppp8rational6is_oneEv"></span><span id="mppp::rational::is_oneC"></span><span class="target" id="classmppp_1_1rational_1a79ab8ba6ed09f53ee0b6d5238c711e97"></span>bool <code class="descname">is_one</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp8rational6is_oneEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if the value is one. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if the value represented by <code class="docutils literal notranslate"><span class="pre">this</span></code> is 1, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the value represented by <code class="docutils literal notranslate"><span class="pre">this</span></code> is 1, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -911,9 +891,9 @@ behaviour.</p>
 <dt id="_CPPv4NK4mppp8rational15is_negative_oneEv">
 <span id="_CPPv3NK4mppp8rational15is_negative_oneEv"></span><span id="_CPPv2NK4mppp8rational15is_negative_oneEv"></span><span id="mppp::rational::is_negative_oneC"></span><span class="target" id="classmppp_1_1rational_1aa0d419df3c3d55582c48be8879dd0edf"></span>bool <code class="descname">is_negative_one</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp8rational15is_negative_oneEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if the value is minus one. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if the value represented by <code class="docutils literal notranslate"><span class="pre">this</span></code> is -1, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the value represented by <code class="docutils literal notranslate"><span class="pre">this</span></code> is -1, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
 </dl>
 </p>
 </dd></dl>
@@ -955,8 +935,8 @@ satisfies <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21Rati
 <span id="_CPPv3I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE"></span><span id="_CPPv2I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE"></span>template&lt;typename <code class="descname">T</code>, std::size_t <code class="descname">SSize</code>&gt;<br /><em class="property">concept </em><code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">RationalIntegralInteroperable</code><a class="headerlink" href="#_CPPv4I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if either:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppIntegralInteroperable</span></code></a>, or</li>
-<li><code class="docutils literal notranslate"><span class="pre">T</span></code> is an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> with static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code>.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp24CppIntegralInteroperableE" title="mppp::CppIntegralInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppIntegralInteroperable</span></code></a>, or</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> is an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> with static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code>.</p></li>
 </ul>
 <p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">is_rational_integral_interoperable</span></code> is also available (even if the compiler does
 not support concepts).</p>
@@ -976,9 +956,9 @@ satisfies <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp29Rati
 generic binary <a class="reference internal" href="#rational-operators"><span class="std std-ref">operators</span></a> and <a class="reference internal" href="#rational-functions"><span class="std std-ref">functions</span></a>
 involving <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>. Specifically, the concept will be <code class="docutils literal notranslate"><span class="pre">true</span></code> if either:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code> are both <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> with the same static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code>, or</li>
-<li>one type is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> and the other is a <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalInteroperable</span></code></a>
-type.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code> are both <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> with the same static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code>, or</p></li>
+<li><p>one type is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> and the other is a <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalInteroperable</span></code></a>
+type.</p></li>
 </ul>
 <p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">are_rational_op_types</span></code> is also available (even if the compiler does
 not support concepts).</p>
@@ -996,22 +976,18 @@ convenience/generic overloads is provided as well.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp4swapERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp4swapERN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />void <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">swap</code><span class="sig-paren">(</span>mppp::rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::swap::SSize">SSize</a>&gt; &amp;<em>q1</em>, mppp::rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEE" title="mppp::swap::SSize">SSize</a>&gt; &amp;<em>q2</em><span class="sig-paren">)</span> <em class="property">noexcept</em><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp4swapEvRN4mppp8rationalI5SSizeEERN4mppp8rationalI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="versionadded">
-<p><span class="versionmodified">New in version 0.15.</span></p>
+<p><span class="versionmodified added">New in version 0.15.</span></p>
 </div>
 <p>Swap.</p>
 <p>This function will efficiently swap the values of <em>q1</em> and <em>q2</em>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>q1</strong> – the first argument.</li>
-<li><strong>q2</strong> – the second argument.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q1</strong> – the first argument.</p></li>
+<li><p><strong>q2</strong> – the second argument.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -1021,18 +997,18 @@ convenience/generic overloads is provided as well.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3getEbR21RationalInteroperableI5SSizeERK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3getER21RationalInteroperableI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3getER21RationalInteroperableI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__conversion_1ga51ae2eae8afb440e5f9f73380617127b"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable">RationalInteroperable</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3getEbR16CppInteroperableRK7integerI5SSizeE" title="mppp::get::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3getEbR16CppInteroperableRK7integerI5SSizeE" title="mppp::get::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3getEbR21RationalInteroperableI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic conversion function for <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p>
-<p>This function will convert the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> <code class="docutils literal notranslate"><span class="pre">q</span></code> to a
+<p><p>This function will convert the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> <code class="docutils literal notranslate"><span class="pre">q</span></code> to a
 <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalInteroperable</span></code></a> type, storing the result of the conversion into <code class="docutils literal notranslate"><span class="pre">rop</span></code>.
 If the conversion is successful, the function
 will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails, <code class="docutils literal notranslate"><span class="pre">rop</span></code> will
 not be altered.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">rop</span></code> is a C++ integral which cannot represent the truncated value of <code class="docutils literal notranslate"><span class="pre">q</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the variable which will store the result of the conversion. </li>
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>.</li>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">rop</span></code> is a C++ integral which cannot represent the truncated value of <code class="docutils literal notranslate"><span class="pre">q</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the variable which will store the result of the conversion. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the input <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1047,14 +1023,13 @@ not be altered.</p>
 <span id="_CPPv3I_NSt6size_tEEN4mppp3addER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3addER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1ga7780b3612cc51022facafba0e80eca14"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3addER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::add::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">add</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3addER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::add::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3addER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::add::SSize">SSize</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3addER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::add::SSize">SSize</a>&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3addER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary addition. </p>
 <p>This function will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">+</span> <span class="pre">op2</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1066,14 +1041,13 @@ not be altered.</p>
 <span id="_CPPv3I_NSt6size_tEEN4mppp3subER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3subER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1ga609517e962b2b3d92cf2b289108e9c74"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3subER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::sub::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sub</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3subER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::sub::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3subER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::sub::SSize">SSize</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3subER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::sub::SSize">SSize</a>&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3subER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary subtraction. </p>
 <p>This function will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">-</span> <span class="pre">op2</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1085,14 +1059,13 @@ not be altered.</p>
 <span id="_CPPv3I_NSt6size_tEEN4mppp3mulER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3mulER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1ga799b6c26f371c3b1179c4ad555e9a013"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3mulER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::mul::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">mul</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3mulER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::mul::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3mulER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::mul::SSize">SSize</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3mulER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeERK7integerI5SSizeE" title="mppp::mul::SSize">SSize</a>&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3mulER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary multiplication. </p>
 <p>This function will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">*</span> <span class="pre">op2</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1104,19 +1077,17 @@ not be altered.</p>
 <span id="_CPPv3I_NSt6size_tEEN4mppp3divER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3divER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1ga3fefed2599efd9e05b57df78246266d5"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3divER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="mppp::div::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">div</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3divER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="mppp::div::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3divER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="mppp::div::SSize">SSize</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3divER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="mppp::div::SSize">SSize</a>&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3divER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ternary division. </p>
 <p>This function will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">/</span> <span class="pre">op2</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second argument.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal notranslate"><span class="pre">op2</span></code> is zero. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal notranslate"><span class="pre">op2</span></code> is zero. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1128,13 +1099,12 @@ not be altered.</p>
 <span id="_CPPv3I_NSt6size_tEEN4mppp3negER8rationalI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3negER8rationalI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1ga8335212f0436d2290bfe383a7f3f24cd"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">neg</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3negER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary negation. </p>
 <p>This method will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to <code class="docutils literal notranslate"><span class="pre">-q</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational that will be negated.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational that will be negated.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1145,12 +1115,11 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3negE8rationalI5SSizeERK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3negERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3negERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1ga6908b8c5b5fb967edb6d95fc0fdb1bf1"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">neg</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3negE8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Unary negation. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">-q</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational that will be negated.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">-q</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational that will be negated.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1162,13 +1131,12 @@ not be altered.</p>
 <span id="_CPPv3I_NSt6size_tEEN4mppp3absER8rationalI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3absER8rationalI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1gab40b144532752d54c892e19d6458e2e3"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3absER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::abs::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">abs</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3absER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::abs::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3absER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::abs::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3absER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary absolute value. </p>
 <p>This function will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to the absolute value of <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1179,12 +1147,11 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3absE8rationalI5SSizeERK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3absERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3absERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1ga0adbcf55e25ae3a8ab6abdb1acd779e3"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3absER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::abs::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">abs</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3absER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::abs::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3absE8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Unary absolute value. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>the absolute value of <code class="docutils literal notranslate"><span class="pre">q</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>the absolute value of <code class="docutils literal notranslate"><span class="pre">q</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1196,18 +1163,16 @@ not be altered.</p>
 <span id="_CPPv3I_NSt6size_tEEN4mppp3invER8rationalI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3invER8rationalI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1ga20c632c5e57e595b8a0ac1361572b817"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3invER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeE" title="mppp::inv::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">inv</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3invER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeE" title="mppp::inv::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3invER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeE" title="mppp::inv::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3invER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary inversion. </p>
 <p>This function will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to the inverse of <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </li>
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the argument.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"><span class="std std-ref">mppp::rational::inv()</span></a>. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"><span class="std std-ref">mppp::rational::inv()</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1218,17 +1183,15 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3invE8rationalI5SSizeERK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3invERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3invERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1ga50aeaad94352dc9d0ba5f13818f3e717"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3invER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeE" title="mppp::inv::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">inv</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3invER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeE" title="mppp::inv::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3invE8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Unary inversion. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>the inverse of <code class="docutils literal notranslate"><span class="pre">q</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>the inverse of <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the argument.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"><span class="std std-ref">mppp::rational::inv()</span></a>. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by <a class="reference internal" href="#classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"><span class="std std-ref">mppp::rational::inv()</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1242,13 +1205,12 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK8rationalI5SSizeERK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3cmpERK8rationalI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3cmpERK8rationalI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__comparison_1gaa70907f2459776e8b922a5bfc0bbed68"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />int <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK7integerI5SSizeERK7integerI5SSizeE" title="mppp::cmp::SSize">SSize</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK7integerI5SSizeERK7integerI5SSizeE" title="mppp::cmp::SSize">SSize</a>&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Comparison function for rationals. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">0</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">==</span> <span class="pre">op2</span></code>, a negative value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;</span> <span class="pre">op2</span></code>, a positive value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;</span> <span class="pre">op2</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">==</span> <span class="pre">op2</span></code>, a negative value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;</span> <span class="pre">op2</span></code>, a positive value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;</span> <span class="pre">op2</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1259,13 +1221,12 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK8rationalI5SSizeERK7integerI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3cmpERK8rationalI5SSizeERK7integerI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3cmpERK8rationalI5SSizeERK7integerI5SSizeE"></span><span class="target" id="group__rational__comparison_1ga95607f7de9084fc9b5875441ca8aaaf5"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />int <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK7integerI5SSizeERK7integerI5SSizeE" title="mppp::cmp::SSize">SSize</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> integer&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK7integerI5SSizeERK7integerI5SSizeE" title="mppp::cmp::SSize">SSize</a>&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK8rationalI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Comparison function for rational/integer arguments. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">0</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">==</span> <span class="pre">op2</span></code>, a negative value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;</span> <span class="pre">op2</span></code>, a positive value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;</span> <span class="pre">op2</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">==</span> <span class="pre">op2</span></code>, a negative value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;</span> <span class="pre">op2</span></code>, a positive value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;</span> <span class="pre">op2</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1276,13 +1237,12 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK7integerI5SSizeERK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3cmpERK7integerI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3cmpERK7integerI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__comparison_1ga1b704f0153b089b5d833025cbf958f1f"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />int <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">cmp</code><span class="sig-paren">(</span><em class="property">const</em> integer&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK7integerI5SSizeERK7integerI5SSizeE" title="mppp::cmp::SSize">SSize</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK7integerI5SSizeERK7integerI5SSizeE" title="mppp::cmp::SSize">SSize</a>&gt; &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3cmpEiRK7integerI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Comparison function for integer/rational arguments. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">0</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">==</span> <span class="pre">op2</span></code>, a negative value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;</span> <span class="pre">op2</span></code>, a positive value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;</span> <span class="pre">op2</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">==</span> <span class="pre">op2</span></code>, a negative value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;</span> <span class="pre">op2</span></code>, a positive value if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;</span> <span class="pre">op2</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1293,12 +1253,11 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3sgnEiRK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3sgnERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3sgnERK8rationalI5SSizeE"></span><span class="target" id="group__rational__comparison_1gacbbf14408a3f0bbaf2ba0c313ec31b06"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />int <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">sgn</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3sgnEiRK7integerI5SSizeE" title="mppp::sgn::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3sgnEiRK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Sign function. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>0 if <code class="docutils literal notranslate"><span class="pre">q</span></code> is zero, 1 if <code class="docutils literal notranslate"><span class="pre">q</span></code> is positive, -1 if <code class="docutils literal notranslate"><span class="pre">q</span></code> is negative. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational whose sign will be computed.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>0 if <code class="docutils literal notranslate"><span class="pre">q</span></code> is zero, 1 if <code class="docutils literal notranslate"><span class="pre">q</span></code> is positive, -1 if <code class="docutils literal notranslate"><span class="pre">q</span></code> is negative. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational whose sign will be computed.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1309,12 +1268,11 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp6is_oneEbRK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp6is_oneERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp6is_oneERK8rationalI5SSizeE"></span><span class="target" id="group__rational__comparison_1gafdb16c343943c5c7752d3f898fc4a8fc"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">is_one</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp6is_oneEbRK7integerI5SSizeE" title="mppp::is_one::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp6is_oneEbRK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if a rational is one. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">q</span></code> is 1, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational to be tested.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">q</span></code> is 1, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational to be tested.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1325,12 +1283,11 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp15is_negative_oneEbRK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp15is_negative_oneERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp15is_negative_oneERK8rationalI5SSizeE"></span><span class="target" id="group__rational__comparison_1gadf78f52c66b921788910db9aa4527732"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">is_negative_one</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp15is_negative_oneEbRK7integerI5SSizeE" title="mppp::is_negative_one::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp15is_negative_oneEbRK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if a rational is minus one. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">q</span></code> is -1, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational to be tested.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">q</span></code> is -1, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational to be tested.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1341,12 +1298,11 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp7is_zeroEbRK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp7is_zeroERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp7is_zeroERK8rationalI5SSizeE"></span><span class="target" id="group__rational__comparison_1gaf7125fea843a943692e7c34f242332a4"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">is_zero</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp7is_zeroEbRK7integerI5SSizeE" title="mppp::is_zero::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp7is_zeroEbRK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if a rational is zero. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">q</span></code> is 0, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational to be tested.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">q</span></code> is 0, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational to be tested.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1357,28 +1313,27 @@ not be altered.</p>
 <div class="section" id="number-theoretic-functions">
 <span id="rational-ntheory"></span><h3>Number theoretic functions<a class="headerlink" href="#number-theoretic-functions" title="Permalink to this headline">¶</a></h3>
 <div class="versionadded">
-<p><span class="versionmodified">New in version 0.8.</span></p>
+<p><span class="versionmodified added">New in version 0.8.</span></p>
 </div>
 <dl class="function">
 <dt id="_CPPv4I_NSt6size_tEEN4mppp8binomialE8rationalI5SSizeERK8rationalI5SSizeERK29RationalIntegralInteroperableI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp8binomialERK8rationalI5SSizeERK29RationalIntegralInteroperableI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp8binomialERK8rationalI5SSizeERK29RationalIntegralInteroperableI5SSizeE"></span><span class="target" id="group__rational__ntheory_1ga88b383a89dd00c8565379f6bedf8689c"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8binomialE8rationalI5SSizeERK8rationalI5SSizeERK29RationalIntegralInteroperableI5SSizeE" title="mppp::binomial::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">binomial</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8binomialE8rationalI5SSizeERK8rationalI5SSizeERK29RationalIntegralInteroperableI5SSizeE" title="mppp::binomial::SSize">SSize</a>&gt; &amp;<em>x</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp29RationalIntegralInteroperableE" title="mppp::RationalIntegralInteroperable">RationalIntegralInteroperable</a>&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp8binomialE8rationalI5SSizeERK8rationalI5SSizeERK29RationalIntegralInteroperableI5SSizeE" title="mppp::binomial::SSize">SSize</a>&gt; &amp;<em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp8binomialE8rationalI5SSizeERK8rationalI5SSizeERK29RationalIntegralInteroperableI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binomial coefficient for <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p>
-<p>This function will compute the binomial coefficient <span class="math notranslate nohighlight">\({x \choose y}\)</span>. If <code class="docutils literal notranslate"><span class="pre">x</span></code>
+<p><p>This function will compute the binomial coefficient <span class="math notranslate nohighlight">\({x \choose y}\)</span>. If <code class="docutils literal notranslate"><span class="pre">x</span></code>
 represents an integral value, the calculation is forwarded to the implementation of
 the binomial coefficient for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>. Otherwise, an implementation
 based on the falling factorial is employed.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><span class="math notranslate nohighlight">\( {x \choose y} \)</span>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">x</span></code>: the top value. </li>
-<li><code class="docutils literal notranslate"><span class="pre">y</span></code>: the bottom value.</li>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><span class="math notranslate nohighlight">\( {x \choose y} \)</span>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">x</span></code>: the top value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">y</span></code>: the bottom value.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the implementation of the binomial coefficient for <a class="reference internal" href="integer.html#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the implementation of the binomial coefficient for <a class="reference internal" href="integer.html#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1399,19 +1354,17 @@ floating-point value. Otherwise, the result will be a <code class="xref cpp cpp-
 of numerator and denominator. Thus, if <code class="docutils literal notranslate"><span class="pre">exp</span></code> is a rational value, the exponentiation will be successful
 only in a few special cases (e.g., unitary base, zero exponent, etc.).</p>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">base**exp</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">base</span></code>: the base. </li>
-<li><code class="docutils literal notranslate"><span class="pre">exp</span></code>: the exponent.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">base**exp</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">base</span></code>: the base. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exp</span></code>: the exponent.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if floating-point types are not involved, <code class="docutils literal notranslate"><span class="pre">base</span></code> is zero and <code class="docutils literal notranslate"><span class="pre">exp</span></code> is negative. </li>
-<li><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if floating-point types are not involved and <code class="docutils literal notranslate"><span class="pre">exp</span></code> is a rational value (except in a handful of special cases). </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if floating-point types are not involved, <code class="docutils literal notranslate"><span class="pre">base</span></code> is zero and <code class="docutils literal notranslate"><span class="pre">exp</span></code> is negative. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if floating-point types are not involved and <code class="docutils literal notranslate"><span class="pre">exp</span></code> is a rational value (except in a handful of special cases). </p></li>
 </ul>
 </dd>
 </dl>
@@ -1426,27 +1379,23 @@ only in a few special cases (e.g., unitary base, zero exponent, etc.).</p>
 <span id="_CPPv3I_NSt6size_tEEN4mppplsERNSt7ostreamERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppplsERNSt7ostreamERKN4mppp8rationalI5SSizeEE"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />std::ostream &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;&lt;</code><span class="sig-paren">(</span>std::ostream &amp;<em>os</em>, <em class="property">const</em> mppp::rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp7integerI5SSizeEE" title="mppp::operator&lt;&lt;::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppplsERNSt7ostreamERNSt7ostreamERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Stream insertion operator.</p>
 <p>This function will direct to the output stream <em>os</em> the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> <em>q</em>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>os</strong> – the output stream.</li>
-<li><strong>q</strong> – the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>os</strong> – the output stream.</p></li>
+<li><p><strong>q</strong> – the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a reference to <em>os</em>.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Throws:</th><td class="field-body"><ul class="first last simple">
-<li><strong>std::overflow_error</strong> – in case of (unlikely) overflow errors.</li>
-<li><strong>unspecified</strong> – any exception raised by the public interface of <code class="docutils literal notranslate"><span class="pre">std::ostream</span></code> or by memory allocation errors.</li>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a reference to <em>os</em>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>std::overflow_error</strong> – in case of (unlikely) overflow errors.</p></li>
+<li><p><strong>unspecified</strong> – any exception raised by the public interface of <code class="docutils literal notranslate"><span class="pre">std::ostream</span></code> or by memory allocation errors.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -1456,14 +1405,14 @@ only in a few special cases (e.g., unitary base, zero exponent, etc.).</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp12canonicaliseER8rationalI5SSizeER8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp12canonicaliseER8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp12canonicaliseER8rationalI5SSizeE"></span><span class="target" id="group__rational__other_1ga79e4c68ac1c2aa6fd4cc8557f2b478d1"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp12canonicaliseER8rationalI5SSizeER8rationalI5SSizeE" title="mppp::canonicalise::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">canonicalise</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp12canonicaliseER8rationalI5SSizeER8rationalI5SSizeE" title="mppp::canonicalise::SSize">SSize</a>&gt; &amp;<em>rop</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp12canonicaliseER8rationalI5SSizeER8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Canonicalise. </p>
-<p>This function will put <code class="docutils literal notranslate"><span class="pre">rop</span></code> in canonical form. Internally, this function will employ
+<p><p>This function will put <code class="docutils literal notranslate"><span class="pre">rop</span></code> in canonical form. Internally, this function will employ
 <a class="reference internal" href="#_CPPv4N4mppp8rational12canonicaliseEv" title="mppp::rational::canonicalise"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::rational::canonicalise()</span></code></a>.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the rational that will be canonicalised.</li>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the rational that will be canonicalised.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1478,12 +1427,11 @@ only in a few special cases (e.g., unitary base, zero exponent, etc.).</p>
 <p>A <a class="reference internal" href="#rational-std-specialisations"><span class="std std-ref">specialisation</span></a> of the standard <code class="docutils literal notranslate"><span class="pre">std::hash</span></code> functor is also provided, so
 that it is possible to use <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> in standard unordered associative containers out of the box.</p>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a hash value for <code class="docutils literal notranslate"><span class="pre">q</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational whose hash value will be computed.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a hash value for <code class="docutils literal notranslate"><span class="pre">q</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational whose hash value will be computed.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1500,12 +1448,11 @@ is typically built on top of basic <a class="reference internal" href="#rational
 <dt id="_CPPv4I_NSt6size_tEEN4mpppplE8rationalI5SSizeERK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mpppplERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mpppplERK8rationalI5SSizeE"></span><span class="target" id="group__rational__operators_1gaddf7e296ae7c8541ba70c7327f7441b8"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppplE7integerI5SSizeERK7integerI5SSizeE" title="mppp::operator+::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppplE7integerI5SSizeERK7integerI5SSizeE" title="mppp::operator+::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mpppplE8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Identity operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a copy of <code class="docutils literal notranslate"><span class="pre">q</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational that will be copied.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a copy of <code class="docutils literal notranslate"><span class="pre">q</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational that will be copied.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1518,18 +1465,17 @@ is typically built on top of basic <a class="reference internal" href="#rational
 <dd><p>Binary addition operator. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</li>
-<li>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
+type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p></li>
 </ul>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">+</span> <span class="pre">op2</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first summand. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second summand.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">+</span> <span class="pre">op2</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first summand. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second summand.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1540,18 +1486,16 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I0EN4mppppLERDaR15RationalOpTypesI1TERK1T">
 <span id="_CPPv3I0EN4mppppLER15RationalOpTypesI1TERK1T"></span><span id="_CPPv2I0EN4mppppLER15RationalOpTypesI1TERK1T"></span><span class="target" id="group__rational__operators_1gae60da1cde131baae8e1d47a9a87477de"></span>template&lt;typename <code class="descname">T</code>&gt;<br />auto &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator+=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I0EN4mppppLERDaR14IntegerOpTypesI1TERK1T" title="mppp::operator+=::T">T</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I0EN4mppppLERDaR14IntegerOpTypesI1TERK1T" title="mppp::operator+=::T">T</a> &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mppppLERDaR15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place addition operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the augend. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op</span></code>: the addend.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the augend. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op</span></code>: the addend.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1563,12 +1507,11 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <span id="_CPPv3I_NSt6size_tEEN4mpppppER8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mpppppER8rationalI5SSizeE"></span><span class="target" id="group__rational__operators_1ga1b73db55b20bf91dc0c70d24fb9d1911"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppppER7integerI5SSizeER7integerI5SSizeE" title="mppp::operator++::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator++</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppppER7integerI5SSizeER7integerI5SSizeE" title="mppp::operator++::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mpppppER8rationalI5SSizeER8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Prefix increment for <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p>
 <p>This operator will increment <code class="docutils literal notranslate"><span class="pre">q</span></code> by one.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">q</span></code> after the increment. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a> that will be increased.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">q</span></code> after the increment. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a> that will be increased.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1580,12 +1523,11 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <span id="_CPPv3I_NSt6size_tEEN4mpppppER8rationalI5SSizeEi"></span><span id="_CPPv2I_NSt6size_tEEN4mpppppER8rationalI5SSizeEi"></span><span class="target" id="group__rational__operators_1gae3b02ecb9a980e8e8c515716bb6b0053"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppppER7integerI5SSizeER7integerI5SSizeE" title="mppp::operator++::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator++</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppppER7integerI5SSizeER7integerI5SSizeE" title="mppp::operator++::SSize">SSize</a>&gt; &amp;<em>q</em>, int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mpppppE8rationalI5SSizeER8rationalI5SSizeEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Suffix increment for <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p>
 <p>This operator will increment <code class="docutils literal notranslate"><span class="pre">q</span></code> by one and return a copy of <code class="docutils literal notranslate"><span class="pre">q</span></code> as it was before the increment.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a copy of <code class="docutils literal notranslate"><span class="pre">q</span></code> before the increment. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a> that will be increased.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a copy of <code class="docutils literal notranslate"><span class="pre">q</span></code> before the increment. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a> that will be increased.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1596,12 +1538,11 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I_NSt6size_tEEN4mpppmiE8rationalI5SSizeERK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mpppmiERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mpppmiERK8rationalI5SSizeE"></span><span class="target" id="group__rational__operators_1ga26ea5e90afe2b592de66cdb889576916"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppmiE7integerI5SSizeERK7integerI5SSizeE" title="mppp::operator-::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppmiE7integerI5SSizeERK7integerI5SSizeE" title="mppp::operator-::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mpppmiE8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Negated copy. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a negated copy of <code class="docutils literal notranslate"><span class="pre">q</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational that will be negated.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a negated copy of <code class="docutils literal notranslate"><span class="pre">q</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the rational that will be negated.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1614,18 +1555,17 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dd><p>Binary subtraction operator. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</li>
-<li>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
+type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p></li>
 </ul>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">-</span> <span class="pre">op2</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first operand. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second operand.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">-</span> <span class="pre">op2</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first operand. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second operand.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1636,18 +1576,16 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I0EN4mpppmIERDaR15RationalOpTypesI1TERK1T">
 <span id="_CPPv3I0EN4mpppmIER15RationalOpTypesI1TERK1T"></span><span id="_CPPv2I0EN4mpppmIER15RationalOpTypesI1TERK1T"></span><span class="target" id="group__rational__operators_1ga6c65cd106a88c218a1f058de4d3daf8b"></span>template&lt;typename <code class="descname">T</code>&gt;<br />auto &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator-=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I0EN4mpppmIERDaR14IntegerOpTypesI1TERK1T" title="mppp::operator-=::T">T</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I0EN4mpppmIERDaR14IntegerOpTypesI1TERK1T" title="mppp::operator-=::T">T</a> &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mpppmIERDaR15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place subtraction operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the minuend. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op</span></code>: the subtrahend.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the minuend. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op</span></code>: the subtrahend.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1659,12 +1597,11 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <span id="_CPPv3I_NSt6size_tEEN4mpppmmER8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mpppmmER8rationalI5SSizeE"></span><span class="target" id="group__rational__operators_1ga2febc7aea01353921fbcf18ccb3b0b73"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppmmER7integerI5SSizeER7integerI5SSizeE" title="mppp::operator--::SSize">SSize</a>&gt; &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator--</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppmmER7integerI5SSizeER7integerI5SSizeE" title="mppp::operator--::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mpppmmER8rationalI5SSizeER8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Prefix decrement for <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p>
 <p>This operator will decrement <code class="docutils literal notranslate"><span class="pre">q</span></code> by one.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">q</span></code> after the decrement. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a> that will be decreased.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">q</span></code> after the decrement. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a> that will be decreased.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1676,12 +1613,11 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <span id="_CPPv3I_NSt6size_tEEN4mpppmmER8rationalI5SSizeEi"></span><span id="_CPPv2I_NSt6size_tEEN4mpppmmER8rationalI5SSizeEi"></span><span class="target" id="group__rational__operators_1ga4b48c2720b97f3f18c0c90d5fb854c2b"></span>template&lt;std::size_t <code class="descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppmmER7integerI5SSizeER7integerI5SSizeE" title="mppp::operator--::SSize">SSize</a>&gt; <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator--</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mpppmmER7integerI5SSizeER7integerI5SSizeE" title="mppp::operator--::SSize">SSize</a>&gt; &amp;<em>q</em>, int<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mpppmmE8rationalI5SSizeER8rationalI5SSizeEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Suffix decrement for <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p>
 <p>This operator will decrement <code class="docutils literal notranslate"><span class="pre">q</span></code> by one and return a copy of <code class="docutils literal notranslate"><span class="pre">q</span></code> as it was before the decrement.</p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a copy of <code class="docutils literal notranslate"><span class="pre">q</span></code> before the decrement. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">q</span></code>: the <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a> that will be decreased.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a copy of <code class="docutils literal notranslate"><span class="pre">q</span></code> before the decrement. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">q</span></code>: the <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a> that will be decreased.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1694,18 +1630,17 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dd><p>Binary multiplication operator. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</li>
-<li>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
+type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p></li>
 </ul>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">*</span> <span class="pre">op2</span></code>. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first factor. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second factor.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">*</span> <span class="pre">op2</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the first factor. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the second factor.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1716,18 +1651,16 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I0EN4mpppmLERDaR15RationalOpTypesI1TERK1T">
 <span id="_CPPv3I0EN4mpppmLER15RationalOpTypesI1TERK1T"></span><span id="_CPPv2I0EN4mpppmLER15RationalOpTypesI1TERK1T"></span><span class="target" id="group__rational__operators_1ga4d3e8172f7bdc650331eaa8c167e5518"></span>template&lt;typename <code class="descname">T</code>&gt;<br />auto &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator*=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I0EN4mpppmLERDaR14IntegerOpTypesI1TERK1T" title="mppp::operator*=::T">T</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I0EN4mpppmLERDaR14IntegerOpTypesI1TERK1T" title="mppp::operator*=::T">T</a> &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mpppmLERDaR15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place multiplication operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the multiplicand. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op</span></code>: the multiplicator.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the multiplicand. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op</span></code>: the multiplicator.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1740,23 +1673,21 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dd><p>Binary division operator. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</li>
-<li>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
+type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p></li>
 </ul>
 </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">/</span> <span class="pre">op2</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the dividend. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the divisor.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">/</span> <span class="pre">op2</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: the dividend. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: the divisor.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the division does not involve floating-point types and <code class="docutils literal notranslate"><span class="pre">op2</span></code> is zero. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if the division does not involve floating-point types and <code class="docutils literal notranslate"><span class="pre">op2</span></code> is zero. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1767,19 +1698,17 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I0EN4mpppdVERDaR15RationalOpTypesI1TERK1T">
 <span id="_CPPv3I0EN4mpppdVER15RationalOpTypesI1TERK1T"></span><span id="_CPPv2I0EN4mpppdVER15RationalOpTypesI1TERK1T"></span><span class="target" id="group__rational__operators_1ga65c2963da8562f1594ba38cffcb7ca00"></span>template&lt;typename <code class="descname">T</code>&gt;<br />auto &amp;<code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator/=</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I0EN4mpppdVERDaR14IntegerOpTypesI1TERK1T" title="mppp::operator/=::T">T</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I0EN4mpppdVERDaR14IntegerOpTypesI1TERK1T" title="mppp::operator/=::T">T</a> &amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mpppdVERDaR15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place division operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the dividend. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op</span></code>: the divisor.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the dividend. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op</span></code>: the divisor.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal notranslate"><span class="pre">op</span></code> is zero and only integral types are involved in the division. </li>
-<li><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </li>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><a class="reference internal" href="exceptions.html#structmppp_1_1zero__division__error"><span class="std std-ref"><span class="pre">zero_division_error</span></span></a></code>: if <code class="docutils literal notranslate"><span class="pre">op</span></code> is zero and only integral types are involved in the division. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1790,13 +1719,12 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I0EN4mpppeqEbRK15RationalOpTypesI1TERK1T">
 <span id="_CPPv3I0EN4mpppeqERK15RationalOpTypesI1TERK1T"></span><span id="_CPPv2I0EN4mpppeqERK15RationalOpTypesI1TERK1T"></span><span class="target" id="group__rational__operators_1ga4609a7a0765b79a1b251a7dd0d4bc0d8"></span>template&lt;typename <code class="descname">T</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I0EN4mpppeqEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator==::T">T</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I0EN4mpppeqEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator==::T">T</a> &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mpppeqEbRK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Equality operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">==</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">==</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1807,13 +1735,12 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I0EN4mpppneEbRK15RationalOpTypesI1TERK1T">
 <span id="_CPPv3I0EN4mpppneERK15RationalOpTypesI1TERK1T"></span><span id="_CPPv2I0EN4mpppneERK15RationalOpTypesI1TERK1T"></span><span class="target" id="group__rational__operators_1gaf206baf1ba3717bbf2fe757e12975f21"></span>template&lt;typename <code class="descname">T</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I0EN4mpppneEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator!=::T">T</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I0EN4mpppneEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator!=::T">T</a> &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mpppneEbRK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Inequality operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">!=</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">!=</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1824,13 +1751,12 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I0EN4mpppltEbRK15RationalOpTypesI1TERK1T">
 <span id="_CPPv3I0EN4mpppltERK15RationalOpTypesI1TERK1T"></span><span id="_CPPv2I0EN4mpppltERK15RationalOpTypesI1TERK1T"></span><span class="target" id="group__rational__operators_1gaac215569ab58d96faf914420a64fa158"></span>template&lt;typename <code class="descname">T</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I0EN4mpppltEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator&lt;::T">T</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I0EN4mpppltEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator&lt;::T">T</a> &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mpppltEbRK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Less-than operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1841,13 +1767,12 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I0EN4mpppleEbRK15RationalOpTypesI1TERK1T">
 <span id="_CPPv3I0EN4mpppleERK15RationalOpTypesI1TERK1T"></span><span id="_CPPv2I0EN4mpppleERK15RationalOpTypesI1TERK1T"></span><span class="target" id="group__rational__operators_1ga15159b8e0c476e1eb60401d4efa161c1"></span>template&lt;typename <code class="descname">T</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&lt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I0EN4mpppleEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator&lt;=::T">T</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I0EN4mpppleEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator&lt;=::T">T</a> &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mpppleEbRK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Less-than or equal operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;=</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;=</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1858,13 +1783,12 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I0EN4mpppgtEbRK15RationalOpTypesI1TERK1T">
 <span id="_CPPv3I0EN4mpppgtERK15RationalOpTypesI1TERK1T"></span><span id="_CPPv2I0EN4mpppgtERK15RationalOpTypesI1TERK1T"></span><span class="target" id="group__rational__operators_1gab8d3194c2fdf1659612cb158b4c3ed6d"></span>template&lt;typename <code class="descname">T</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I0EN4mpppgtEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator&gt;::T">T</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I0EN4mpppgtEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator&gt;::T">T</a> &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mpppgtEbRK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Greater-than operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1875,13 +1799,12 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dt id="_CPPv4I0EN4mpppgeEbRK15RationalOpTypesI1TERK1T">
 <span id="_CPPv3I0EN4mpppgeERK15RationalOpTypesI1TERK1T"></span><span id="_CPPv2I0EN4mpppgeERK15RationalOpTypesI1TERK1T"></span><span class="target" id="group__rational__operators_1ga2c6d27856d25b9cede3e0917eec68231"></span>template&lt;typename <code class="descname">T</code>&gt;<br />bool <code class="descclassname">mppp<code class="descclassname">::</code></code><code class="descname">operator&gt;=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes">RationalOpTypes</a>&lt;<a class="reference internal" href="integer.html#_CPPv4I0EN4mpppgeEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator&gt;=::T">T</a>&gt; &amp;<em>op1</em>, <em class="property">const</em> <a class="reference internal" href="integer.html#_CPPv4I0EN4mpppgeEbRK14IntegerOpTypesI1TERK1T" title="mppp::operator&gt;=::T">T</a> &amp;<em>op2</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN4mpppgeEbRK15RationalOpTypesI1TERK1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Greater-than or equal operator. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;=</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </li>
-<li><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</li>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;=</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">op1</span></code>: first argument. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op2</span></code>: second argument.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1906,22 +1829,20 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dd></dd></dl>
 
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The <a class="reference internal" href="#_CPPv4NSt4hashIN4mppp8rationalI5SSizeEEE13argument_typeE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::argument_type"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">argument_type</span></code></a> and <a class="reference internal" href="#_CPPv4NSt4hashIN4mppp8rationalI5SSizeEEE11result_typeE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::result_type"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">result_type</span></code></a> type aliases are defined only until C++14.</p>
+<p class="admonition-title">Note</p>
+<p>The <a class="reference internal" href="#_CPPv4NSt4hashIN4mppp8rationalI5SSizeEEE13argument_typeE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::argument_type"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">argument_type</span></code></a> and <a class="reference internal" href="#_CPPv4NSt4hashIN4mppp8rationalI5SSizeEEE11result_typeE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::result_type"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">result_type</span></code></a> type aliases are defined only until C++14.</p>
 </div>
 <dl class="function">
 <dt id="_CPPv4NKSt4hashIN4mppp8rationalI5SSizeEEEclERKN4mppp8rationalI5SSizeEE">
 <span id="_CPPv3NKSt4hashIN4mppp8rationalI5SSizeEEEclERKN4mppp8rationalI5SSizeEE"></span><span id="_CPPv2NKSt4hashIN4mppp8rationalI5SSizeEEEclERKN4mppp8rationalI5SSizeEE"></span><span id="std::hash:mppp::rational:SSize::::call-operator__mppp::rational:SSize:CRC"></span>std::size_t <code class="descname">operator()</code><span class="sig-paren">(</span><em class="property">const</em> mppp::rational&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEENSt4hashIN4mppp8rationalI5SSizeEEEE" title="std::hash&lt;mppp::rational&lt;SSize&gt;&gt;::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NKSt4hashIN4mppp8rationalI5SSizeEEEclERKN4mppp8rationalI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> – the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::rational</span></code>.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a hash value for <em>q</em>.</td>
-</tr>
-</tbody>
-</table>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> – the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::rational</span></code>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a hash value for <em>q</em>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1997,7 +1918,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
     <div class="mdl-mini-footer__right-section">
         <div>&copy; Copyright 2016-2019, Francesco Biscani.</div>
-      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 2.0.1 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
 </footer>
         </main>

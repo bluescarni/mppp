@@ -2,8 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -12,10 +11,10 @@
 
     <link rel="stylesheet" href="_static/material-icons.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/notosanscjkjp.css" />
-    <link rel="stylesheet" type="text/css" href="_static/roboto.css" />
-    <link rel="stylesheet" type="text/css" href="_static/material-design-lite-1.3.0/material.blue_grey-indigo.min.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinx_materialdesign_theme.css" />
+    <link rel="stylesheet" href="_static/notosanscjkjp.css" type="text/css" />
+    <link rel="stylesheet" href="_static/roboto.css" type="text/css" />
+    <link rel="stylesheet" href="_static/material-design-lite-1.3.0/material.blue_grey-indigo.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx_materialdesign_theme.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
@@ -215,9 +214,9 @@ in order to identify the location of these files.</p>
 <p>As a thin wrapper, <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> adds a few extra features
 on top of what <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> already provides. Specifically, <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>:</p>
 <ul class="simple">
-<li>can interact with the other mp++ classes,</li>
-<li>can be constructed from string-like objects,</li>
-<li>supports the standard C++ <code class="docutils literal notranslate"><span class="pre">iostream</span></code> facilities.</li>
+<li><p>can interact with the other mp++ classes,</p></li>
+<li><p>can be constructed from string-like objects,</p></li>
+<li><p>supports the standard C++ <code class="docutils literal notranslate"><span class="pre">iostream</span></code> facilities.</p></li>
 </ul>
 <p>Like <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>, <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> is a
 <a class="reference external" href="https://en.cppreference.com/w/cpp/named_req/LiteralType">literal type</a>, and thus it can be used
@@ -227,14 +226,14 @@ for <a class="reference internal" href="real128.html#_CPPv410__float128" title="
 <p>In addition to the features common to all mp++ classes, the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> API provides
 a few additional capabilities:</p>
 <ul>
-<li><p class="first">construction/conversion from/to <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>:</p>
+<li><p>construction/conversion from/to <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a>:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span> <span class="n">r</span><span class="p">{</span><span class="n">__float128</span><span class="p">(</span><span class="mi">42</span><span class="p">)};</span>                <span class="c1">// Construction from a __float128.</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">r</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
 <span class="n">assert</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">__float128</span><span class="o">&gt;</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span> <span class="c1">// Conversion to __float128.</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">direct access to the internal <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> instance (via the public <a class="reference internal" href="real128.html#_CPPv4N4mppp7real1287m_valueE" title="mppp::real128::m_value"><code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">m_value</span></code></a>
+<li><p>direct access to the internal <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> instance (via the public <a class="reference internal" href="real128.html#_CPPv4N4mppp7real1287m_valueE" title="mppp::real128::m_value"><code class="xref cpp cpp-member docutils literal notranslate"><span class="pre">m_value</span></code></a>
 data member):</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">real128</span> <span class="n">r</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
 <span class="n">r</span><span class="p">.</span><span class="n">m_value</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>                 <span class="c1">// Modify directly the internal __float128 member.</span>
@@ -245,7 +244,7 @@ data member):</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">a variety of mathematical <a class="reference internal" href="real128.html#real128-functions"><span class="std std-ref">functions</span></a> wrapping the
+<li><p>a variety of mathematical <a class="reference internal" href="real128.html#real128-functions"><span class="std std-ref">functions</span></a> wrapping the
 <a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/Math-Library-Routines.html#Math-Library-Routines">libquadmath library routines</a>.
 Note that the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> function names drop the suffix <code class="docutils literal notranslate"><span class="pre">q</span></code> appearing in the names of the libquadmath routines, and, as usual
 in mp++, they are supposed to be found via ADL. Member function overloads for the unary functions are also available:</p>
@@ -271,12 +270,9 @@ in mp++, they are supposed to be found via ADL. Member function overloads for th
 </pre></div>
 </div>
 </li>
-<li><p class="first">NaN-friendly hashing and comparison functions, for use in standard algorithms and containers;</p>
-</li>
-<li><p class="first">a <a class="reference internal" href="real128.html#real128-std-specs"><span class="std std-ref">specialisation</span></a> of the <code class="docutils literal notranslate"><span class="pre">std::numeric_limits</span></code> class template;</p>
-</li>
-<li><p class="first">a selection of quadruple-precision compile-time <a class="reference internal" href="real128.html#real128-constants"><span class="std std-ref">mathematical constants</span></a>.</p>
-</li>
+<li><p>NaN-friendly hashing and comparison functions, for use in standard algorithms and containers;</p></li>
+<li><p>a <a class="reference internal" href="real128.html#real128-std-specs"><span class="std std-ref">specialisation</span></a> of the <code class="docutils literal notranslate"><span class="pre">std::numeric_limits</span></code> class template;</p></li>
+<li><p>a selection of quadruple-precision compile-time <a class="reference internal" href="real128.html#real128-constants"><span class="std std-ref">mathematical constants</span></a>.</p></li>
 </ul>
 <p>The <a class="reference internal" href="real128.html#real128-reference"><span class="std std-ref">real128 reference</span></a> contains the detailed description of all the features
 provided by <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
@@ -324,7 +320,7 @@ provided by <a class="reference internal" href="real128.html#_CPPv4N4mppp7real12
 
     <div class="mdl-mini-footer__right-section">
         <div>&copy; Copyright 2016-2019, Francesco Biscani.</div>
-      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.8.5 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 2.0.1 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
 </footer>
         </main>

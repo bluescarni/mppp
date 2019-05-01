@@ -59,7 +59,9 @@ path, etc.). The available configuration options are:
 * ``MPPP_WITH_QUADMATH``: enable features relying on the
   quadmath library (off by default),
 * ``MPPP_BUILD_TESTS``: build the test suite (off by default),
-* ``MPPP_BUILD_BENCHMARKS``: build the benchmarking suite (off by default).
+* ``MPPP_BUILD_BENCHMARKS``: build the benchmarking suite (off by default),
+* ``MPPP_BUILD_STATIC_LIBRARY``: build mp++ as a static library, instead
+  of a dynamic library (off by default).
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
 using GCC (all the supported versions) and Clang
@@ -98,7 +100,8 @@ suite with the following command:
 
 .. note::
 
-   On Windows, in order to execute the test or the benchmark suite you have to ensure that the
+   On Windows, and if mp++ is built as a shared library (the default),
+   in order to execute the test or the benchmark suite you have to ensure that the
    ``PATH`` variable includes the directory that contains the mp++
    DLL (otherwise the tests will fail to run).
 
@@ -109,8 +112,8 @@ Installation via conda
 .. versionadded:: 0.2
 
 mp++ is available in the `conda <https://conda.io/en/latest/>`__ package manager from the
-`conda-forge <https://conda-forge.org/>`__ channel. Packages for Linux 64-bit, Windows 32/64-bit
-and OSX 64-bit are available. In order to install mp++ via conda, you just need
+`conda-forge <https://conda-forge.org/>`__ channel. Packages for Linux, Windows
+and OSX are available. In order to install mp++ via conda, you just need
 to add ``conda-forge`` to the channels:
 
 .. code-block:: console
@@ -231,18 +234,23 @@ Compiler and platform specific notes
 
 Visual Studio:
 
-* When using Visual Studio, the mp++ library is compiled
+* The mp++ library is compiled
   with the ``NOMINMAX`` definition and, if supported,
   with the ``/permissive-``
   compiler flag. If you intend to use mp++ in conjunction with other
   libraries, you should ensure that the ``NOMINMAX`` definition
   and the ``/permissive-`` flag are also used for the compilation
   of these libraries.
+* When building mp++ as a static library, MSVC's static runtime will
+  be used (instead of the dynamic runtime). One can force the use
+  of the dynamic runtime when building mp++ as a static library by
+  turning on the ``MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME``
+  advanced CMake option.
 
 FreeBSD:
 
-* On FreeBSD, the ``long double`` overloads of some mathematical functions
-  (such as ``std::pow()``) are currently implemented in
+* The ``long double`` overloads of some mathematical functions
+  (such as ``std::pow()``) may be implemented in
   ``double`` precision. Additionally, if the arguments to such mathematical
   functions are compile-time constants, the compiler
   *may* decide (depending on the optimisation level) to actually compute the
