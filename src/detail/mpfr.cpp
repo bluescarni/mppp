@@ -49,7 +49,11 @@ struct mpfr_cleanup {
     }
 };
 
+// LCOV_EXCL_START
+
 const mpfr_cleanup mpfr_cleanup_inst;
+
+// LCOV_EXCL_STOP
 
 } // namespace
 
