@@ -279,7 +279,7 @@ using static_real = std::pair<mpfr_struct_t,
 // (e.g., if initing a static real from a real128), so for the time being let's keep things basic.
 // We can determine in the future if we can make this constexpr somehow and have a 2**112 instance
 // inited during constant initialization.
-static static_real<size_real_2_112> get_real_2_112()
+static_real<size_real_2_112> get_real_2_112()
 {
     // NOTE: pair's def ctor value-inits the members: everything in retval is zeroed out.
     static_real<size_real_2_112> retval;

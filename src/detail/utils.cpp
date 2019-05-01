@@ -33,7 +33,7 @@ namespace
 
 // Implementation of to_string() for 128bit integers.
 template <std::size_t N>
-static char *to_string_impl(char (&output)[N], __uint128_t n)
+char *to_string_impl(char (&output)[N], __uint128_t n)
 {
     // Max 128 uint value needs 39 digits in base 10, plus the terminator.
     static_assert(N >= 40u,
