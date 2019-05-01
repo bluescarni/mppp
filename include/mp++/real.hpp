@@ -262,6 +262,9 @@ inline ::mpfr_prec_t real_dd_prec(const T &x)
     // Return default precision if nonzero, otherwise return the clamped deduced precision.
     return dp ? dp : clamp_mpfr_prec(real_deduce_precision(x));
 }
+
+void cleanup_getter();
+
 } // namespace detail
 
 // Doxygen gets confused by this.
@@ -419,6 +422,7 @@ class MPPP_PUBLIC real
     friend real detail::mpfr_nary_op_return_impl(::mpfr_prec_t, const F &, Arg0 &&, Args &&...);
     template <typename F>
     friend real detail::real_constant(const F &, ::mpfr_prec_t);
+    friend void detail::cleanup_getter();
 #endif
     // Utility function to check the precision upon init.
     static ::mpfr_prec_t check_init_prec(::mpfr_prec_t p)
@@ -851,6 +855,8 @@ public:
      */
     ~real()
     {
+        //detail::cleanup_getter();
+        detail::ignore(&s_cleanup);
         if (m_mpfr._mpfr_d) {
             // The object is not moved-from, destroy it.
             assert(detail::real_prec_check(get_prec()));
@@ -2073,6 +2079,12 @@ public:
     }
 
 private:
+    struct mpfr_cleanup {
+        mpfr_cleanup();
+    };
+    static const mpfr_cleanup s_cleanup;
+
+private:
     mpfr_struct_t m_mpfr;
 };
 
@@ -2081,6 +2093,12 @@ static_assert(std::is_standard_layout<real>::value, "real is not a standard layo
 
 namespace detail
 {
+
+// inline void cleanup_getter()
+// {
+//     auto ptr = &real::s_cleanup;
+//     ignore(ptr);
+// }
 
 // Implementation of the trunc() argument checker.
 inline void check_real_trunc_arg(const real &r)

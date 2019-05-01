@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/real.hpp>
 
 namespace mppp
 {
@@ -42,21 +43,15 @@ static void mpfr_cleanup_function()
 }
 }
 
-struct mpfr_cleanup {
-    mpfr_cleanup()
-    {
-        std::atexit(mpfr_cleanup_function);
-    }
-};
-
-// LCOV_EXCL_START
-
-const mpfr_cleanup mpfr_cleanup_inst;
-
-// LCOV_EXCL_STOP
-
 } // namespace
 
 } // namespace detail
+
+real::mpfr_cleanup::mpfr_cleanup()
+{
+    std::atexit(detail::mpfr_cleanup_function);
+}
+
+const real::mpfr_cleanup real::s_cleanup;
 
 } // namespace mppp
