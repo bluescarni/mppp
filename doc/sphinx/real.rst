@@ -299,8 +299,61 @@ Exponentiation
 Trigonometry
 ~~~~~~~~~~~~
 
-.. doxygengroup:: real_trig
-   :content-only:
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sin(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cos(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tan(mppp::real &rop, T &&op)
+
+   Binary basic trigonometric functions.
+
+   These functions will set *rop* to, respectively, the sine, cosine and tangent of *op*.
+   The precision of the result will be equal to the precision of *op*.
+
+   :param rop: the return value.
+   :param op: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real sin(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real cos(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real tan(T &&r)
+
+   Unary basic trigonometric functions.
+
+   These functions will return, respectively, the sine, cosine and tangent of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the argument.
+
+   :return: the sine, cosine or tangent of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::asin(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::acos(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::atan(mppp::real &rop, T &&op)
+
+   Binary basic inverse trigonometric functions.
+
+   These functions will set *rop* to, respectively, the arcsine, arccosine and
+   arctangent of *op*.
+   The precision of the result will be equal to the precision of *op*.
+
+   :param rop: the return value.
+   :param op: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real asin(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real acos(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real atan(T &&r)
+
+   Unary basic inverse trigonometric functions.
+
+   These functions will return, respectively, the arcsine, arccosine and
+   arctangent of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the argument.
+
+   :return: the arcsine, arccosine or arctangent of *r*.
 
 .. _real_logexp:
 

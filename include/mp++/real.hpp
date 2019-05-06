@@ -1457,13 +1457,12 @@ public:
     }
 
 private:
-    // Pointer to a unary MPFR function.
-    using mpfr_unary_fptr = decltype(::mpfr_neg) *;
-    // Wrapper to apply the input unary function to this with
+    // Wrapper to apply the input unary MPFR function to this with
     // MPFR_RNDN rounding mode. Returns a reference to this.
-    real &self_mpfr_unary(mpfr_unary_fptr fptr)
+    template <typename T>
+    real &self_mpfr_unary(T &&f)
     {
-        fptr(&m_mpfr, &m_mpfr, MPFR_RNDN);
+        std::forward<T>(f)(&m_mpfr, &m_mpfr, MPFR_RNDN);
         return *this;
     }
 
@@ -1927,6 +1926,50 @@ public:
     real &cos()
     {
         return self_mpfr_unary(::mpfr_cos);
+    }
+    /// In-place tangent.
+    /**
+     * This method will set ``this`` to its tangent.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &tan()
+    {
+        return self_mpfr_unary(::mpfr_tan);
+    }
+    /// In-place arccosine.
+    /**
+     * This method will set ``this`` to its arccosine.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &acos()
+    {
+        return self_mpfr_unary(::mpfr_acos);
+    }
+    /// In-place arcsine.
+    /**
+     * This method will set ``this`` to its arcsine.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &asin()
+    {
+        return self_mpfr_unary(::mpfr_asin);
+    }
+    /// In-place arctangent.
+    /**
+     * This method will set ``this`` to its arctangent.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &atan()
+    {
+        return self_mpfr_unary(::mpfr_atan);
     }
     /// In-place exponential.
     /**
@@ -3010,70 +3053,41 @@ inline bool real_gt(const real &a, const real &b)
 
 /** @} */
 
-#if !defined(MPPP_DOXYGEN_INVOKED)
+// These are helper macros to reduce typing when dealing with the common case
+// of exposing MPFR functions with a single argument (both variants with retval
+// and with return).
+#define MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(fname)                                                                        \
+    inline real &fname(real &rop, T &&op)                                                                              \
+    {                                                                                                                  \
+        return detail::mpfr_nary_op(0, ::mpfr_##fname, rop, std::forward<T>(op));                                      \
+    }
+
+#define MPPP_REAL_MPFR_UNARY_RETURN_IMPL(fname)                                                                        \
+    inline real fname(T &&r)                                                                                           \
+    {                                                                                                                  \
+        return detail::mpfr_nary_op_return(0, ::mpfr_##fname, std::forward<T>(r));                                     \
+    }
+
+#if defined(MPPP_HAVE_CONCEPTS)
+#define MPPP_REAL_MPFR_UNARY_HEADER template <CvrReal T>
+#else
+#define MPPP_REAL_MPFR_UNARY_HEADER template <typename T, cvr_real_enabler<T> = 0>
+#endif
+
+#define MPPP_REAL_MPFR_UNARY_RETVAL(fname) MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(fname)
+#define MPPP_REAL_MPFR_UNARY_RETURN(fname) MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETURN_IMPL(fname)
 
 // Square root.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &sqrt(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_sqrt, rop, std::forward<T>(op));
-}
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real sqrt(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_sqrt, std::forward<T>(r));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(sqrt)
+MPPP_REAL_MPFR_UNARY_RETURN(sqrt)
 
 // Reciprocal square root.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &rec_sqrt(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_rec_sqrt, rop, std::forward<T>(op));
-}
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real rec_sqrt(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_rec_sqrt, std::forward<T>(r));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(rec_sqrt)
+MPPP_REAL_MPFR_UNARY_RETURN(rec_sqrt)
 
 // Cubic root.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &cbrt(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_cbrt, rop, std::forward<T>(op));
-}
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real cbrt(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_cbrt, std::forward<T>(r));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(cbrt)
+MPPP_REAL_MPFR_UNARY_RETURN(cbrt)
 
 #if MPFR_VERSION_MAJOR >= 4
 
@@ -3101,7 +3115,6 @@ inline real rootn_ui(T &&r, unsigned long k)
     return detail::mpfr_nary_op_return(0, rootn_ui_wrapper, std::forward<T>(r));
 }
 
-#endif
 #endif
 
 /** @defgroup real_exponentiation real_exponentiation
@@ -3191,255 +3204,57 @@ inline real pow(T &&op1, U &&op2)
 
 /** @} */
 
-/** @defgroup real_trig real_trig
- *  @{
- */
+// Trigonometric functions.
 
-/// Binary \link mppp::real real\endlink sine.
-/**
- * This function will compute the sine of ``op`` and store it
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-inline real &sin(real &rop, CvrReal &&op)
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-inline real &sin(real &rop, T &&op)
-#endif
-{
-    return detail::mpfr_nary_op(0, ::mpfr_sin, rop, std::forward<decltype(op)>(op));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(sin)
+MPPP_REAL_MPFR_UNARY_RETURN(sin)
 
-/// Unary \link mppp::real real\endlink sine.
-/**
- * This function will compute and return the sine of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * @param r the operand.
- *
- * @return the sine of \p r.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-inline real sin(CvrReal &&r)
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-inline real sin(T &&r)
-#endif
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_sin, std::forward<decltype(r)>(r));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(cos)
+MPPP_REAL_MPFR_UNARY_RETURN(cos)
 
-/// Binary \link mppp::real real\endlink cosine.
-/**
- * This function will compute the cosine of ``op`` and store it
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-inline real &cos(real &rop, CvrReal &&op)
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-inline real &cos(real &rop, T &&op)
-#endif
-{
-    return detail::mpfr_nary_op(0, ::mpfr_cos, rop, std::forward<decltype(op)>(op));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(tan)
+MPPP_REAL_MPFR_UNARY_RETURN(tan)
 
-/// Unary \link mppp::real real\endlink cosine.
-/**
- * This function will compute and return the cosine of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * @param r the operand.
- *
- * @return the cosine of \p r.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-inline real cos(CvrReal &&r)
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-inline real cos(T &&r)
-#endif
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_cos, std::forward<decltype(r)>(r));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(asin)
+MPPP_REAL_MPFR_UNARY_RETURN(asin)
 
-/** @} */
+MPPP_REAL_MPFR_UNARY_RETVAL(acos)
+MPPP_REAL_MPFR_UNARY_RETURN(acos)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(atan)
+MPPP_REAL_MPFR_UNARY_RETURN(atan)
 
 // Exponentials and logarithms.
 
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &exp(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_exp, rop, std::forward<T>(op));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(exp)
+MPPP_REAL_MPFR_UNARY_RETURN(exp)
 
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real exp(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_exp, std::forward<T>(r));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(exp2)
+MPPP_REAL_MPFR_UNARY_RETURN(exp2)
 
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &exp2(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_exp2, rop, std::forward<T>(op));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(exp10)
+MPPP_REAL_MPFR_UNARY_RETURN(exp10)
 
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real exp2(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_exp2, std::forward<T>(r));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(expm1)
+MPPP_REAL_MPFR_UNARY_RETURN(expm1)
 
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &exp10(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_exp10, rop, std::forward<T>(op));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(log)
+MPPP_REAL_MPFR_UNARY_RETURN(log)
 
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real exp10(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_exp10, std::forward<T>(r));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(log2)
+MPPP_REAL_MPFR_UNARY_RETURN(log2)
 
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &expm1(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_expm1, rop, std::forward<T>(op));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(log10)
+MPPP_REAL_MPFR_UNARY_RETURN(log10)
 
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real expm1(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_expm1, std::forward<T>(r));
-}
+MPPP_REAL_MPFR_UNARY_RETVAL(log1p)
+MPPP_REAL_MPFR_UNARY_RETURN(log1p)
 
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &log(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_log, rop, std::forward<T>(op));
-}
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real log(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_log, std::forward<T>(r));
-}
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &log2(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_log2, rop, std::forward<T>(op));
-}
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real log2(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_log2, std::forward<T>(r));
-}
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &log10(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_log10, rop, std::forward<T>(op));
-}
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real log10(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_log10, std::forward<T>(r));
-}
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real &log1p(real &rop, T &&op)
-{
-    return detail::mpfr_nary_op(0, ::mpfr_log1p, rop, std::forward<T>(op));
-}
-
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real log1p(T &&r)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_log1p, std::forward<T>(r));
-}
+#undef MPPP_REAL_MPFR_UNARY_RETURN
+#undef MPPP_REAL_MPFR_UNARY_RETVAL
+#undef MPPP_REAL_MPFR_UNARY_HEADER
+#undef MPPP_REAL_MPFR_UNARY_RETURN_IMPL
+#undef MPPP_REAL_MPFR_UNARY_RETVAL_IMPL
 
 /** @defgroup real_gamma real_gamma
  *  @{

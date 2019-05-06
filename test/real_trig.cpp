@@ -40,4 +40,52 @@ TEST_CASE("real sin cos")
     REQUIRE(cos(r0) == 1);
     REQUIRE(cos(std::move(r0)) == 1);
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+
+    r0 = real{0};
+    r0.tan();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 0);
+    rop = real{1};
+    r0 = real{0};
+    REQUIRE(tan(rop, r0) == 0);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(tan(r0) == 0);
+    REQUIRE(tan(std::move(r0)) == 0);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+
+    r0 = real{0};
+    r0.asin();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 0);
+    rop = real{1};
+    r0 = real{0};
+    REQUIRE(asin(rop, r0) == 0);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(asin(r0) == 0);
+    REQUIRE(asin(std::move(r0)) == 0);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+
+    r0 = real{0};
+    r0.acos();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == real_pi(r0.get_prec()) / 2);
+    rop = real{1};
+    r0 = real{0};
+    REQUIRE(acos(rop, r0) == real_pi(r0.get_prec()) / 2);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(acos(r0) == real_pi(r0.get_prec()) / 2);
+    REQUIRE(acos(std::move(r0)) == real_pi(r0.get_prec()) / 2);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+
+    r0 = real{1};
+    r0.atan();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == real_pi(r0.get_prec()) / 4);
+    rop = real{2};
+    r0 = real{1};
+    REQUIRE(atan(rop, r0) == real_pi(r0.get_prec()) / 4);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(atan(r0) == real_pi(r0.get_prec()) / 4);
+    REQUIRE(atan(std::move(r0)) == real_pi(r0.get_prec()) / 4);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
