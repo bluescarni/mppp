@@ -17,6 +17,10 @@ New
 Changes
 ~~~~~~~
 
+- The MPFR cleanup function ``mpfr_free_cache()`` is now called
+  at the end of every thread which creates at least
+  one :cpp:class:`~mppp::real` object
+  (`#180 <https://github.com/bluescarni/mppp/pull/180>`__).
 - Implement a specialised version of the ``swap()`` primitive
   for :cpp:class:`~mppp::integer` and
   :cpp:class:`~mppp::rational` (`#174 <https://github.com/bluescarni/mppp/pull/174>`__).
