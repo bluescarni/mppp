@@ -19,7 +19,7 @@
 
 #else
 
-// Convenience macros for visibility attributes. Mostly insipred by:
+// Convenience macros for visibility attributes. Mostly inspired by:
 // https://gcc.gnu.org/wiki/Visibility
 // We check first for Windows, where we assume every compiler
 // knows dllexport/dllimport. On other platforms, we use the GCC-like
