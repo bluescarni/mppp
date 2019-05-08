@@ -234,10 +234,8 @@ Compiler and platform specific notes
 
 Visual Studio:
 
-* The mp++ library is compiled
-  with the ``NOMINMAX``, ``UNICODE`` and ``_UNICODE`` definitions and,
-  if supported, with the ``/permissive-``
-  compiler flag.
+* The mp++ library is compiled with the ``NOMINMAX`` definition, and,
+  if supported, with the ``/permissive-`` compiler flag.
 * When building mp++ as a static library, MSVC's static runtime will
   be used (instead of the dynamic runtime). One can force the use
   of the dynamic runtime when building mp++ as a static library by

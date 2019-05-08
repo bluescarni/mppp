@@ -40,10 +40,8 @@ set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
 set(MPPP_CXX_FLAGS_RELEASE ${YACMA_CXX_FLAGS})
 if(YACMA_COMPILER_IS_MSVC)
   # On both cl and clang-cl, disable the idiotic minmax macros and enable the bigobj option.
-  # Also, enable unicode support. See:
-  # https://stackoverflow.com/questions/7953025/why-both-unicode-and-unicode
-  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/bigobj" "-DUNICODE" "-D_UNICODE")
-  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/bigobj" "-DUNICODE" "-D_UNICODE")
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/bigobj")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/bigobj")
   if(YACMA_COMPILER_IS_CLANGXX)
     # clang-cl emits various warnings from GMP/MPFR, let's just silence them.
     # NOTE: at one point in the recent past, MSVC added an options similar to GCC's isystem:
