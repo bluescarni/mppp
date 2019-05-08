@@ -45,6 +45,7 @@ Fix
 - The :cpp:class:`~mppp::zero_division_error` exception is now correctly
   marked as visible
   (`#180 <https://github.com/bluescarni/mppp/pull/180>`__).
+- Add a workaround for a ``clang-cl`` bug (`#179 <https://github.com/bluescarni/mppp/pull/179>`__).
 - Various build system and documentation improvements (`#172 <https://github.com/bluescarni/mppp/pull/172>`__).
 - Fix a warning when building mp++ with older MSVC versions (`#170 <https://github.com/bluescarni/mppp/pull/170>`__).
 
