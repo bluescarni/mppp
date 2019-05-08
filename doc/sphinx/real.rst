@@ -302,10 +302,14 @@ Trigonometry
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sin(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cos(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tan(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sec(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::csc(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cot(mppp::real &rop, T &&op)
 
    Binary basic trigonometric functions.
 
-   These functions will set *rop* to, respectively, the sine, cosine and tangent of *op*.
+   These functions will set *rop* to, respectively, the sine, cosine, tangent, secant,
+   cosecant and cotangent of *op*.
    The precision of the result will be equal to the precision of *op*.
 
    :param rop: the return value.
@@ -313,18 +317,35 @@ Trigonometry
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real sin(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real cos(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real tan(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sin(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cos(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tan(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sec(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::csc(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cot(T &&r)
 
    Unary basic trigonometric functions.
 
-   These functions will return, respectively, the sine, cosine and tangent of *r*.
+   These functions will return, respectively, the sine, cosine, tangent,
+   secant, cosecant and cotangent of *r*.
    The precision of the result will be equal to the precision of *r*.
 
    :param r: the argument.
 
-   :return: the sine, cosine or tangent of *r*.
+   :return: the sine, cosine, tangent, secant, cosecant or cotangent of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T> void mppp::sin_cos(mppp::real &sop, mppp::real &cop, T &&op)
+
+   Simultaneous sine and cosine.
+
+   This function will set *sop* and *cop* respectively to the sine and cosine of *op*.
+   *sop* and *cop* must be distinct objects.
+
+   :param sop: the sine return value.
+   :param cop: the cosine return value.
+   :param op: the operand.
+
+   :exception std\:\:invalid_argument: if *sop* and *cop* are the same object.
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::asin(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::acos(mppp::real &rop, T &&op)
@@ -341,9 +362,9 @@ Trigonometry
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real asin(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real acos(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real atan(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::asin(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::acos(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::atan(T &&r)
 
    Unary basic inverse trigonometric functions.
 
@@ -354,6 +375,39 @@ Trigonometry
    :param r: the argument.
 
    :return: the arcsine, arccosine or arctangent of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::atan2(mppp::real &rop, T &&y, U &&x)
+
+   Ternary arctangent-2.
+
+   This function will set *rop* to the arctangent-2 of *y* and *x*.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param y: the sine argument.
+   :param x: the cosine argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::atan2(T &&y, U &&x)
+
+   Binary arctangent-2.
+
+   This function will compute and return the arctangent-2 of *y* and *x*.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
+   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
+   either the default precision, if set, or it is automatically deduced depending on the type
+   and value of the operand to be converted.
+
+   :param y: the sine argument.
+   :param x: the cosine argument.
+
+   :return: the arctangent-2 of *y* and *x*.
+
+   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. _real_logexp:
 
@@ -381,10 +435,10 @@ Logarithms and exponentials
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real exp(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real exp2(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real exp10(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real expm1(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp2(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp10(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::expm1(T &&r)
 
    Unary exponentials.
 
@@ -422,10 +476,10 @@ Logarithms and exponentials
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real log(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real log2(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real log10(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real log1p(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log2(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log10(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log1p(T &&r)
 
    Unary logarithms.
 

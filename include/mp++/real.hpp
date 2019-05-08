@@ -1938,6 +1938,39 @@ public:
     {
         return self_mpfr_unary(::mpfr_tan);
     }
+    /// In-place secant.
+    /**
+     * This method will set ``this`` to its secant.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &sec()
+    {
+        return self_mpfr_unary(::mpfr_sec);
+    }
+    /// In-place cosecant.
+    /**
+     * This method will set ``this`` to its cosecant.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &csc()
+    {
+        return self_mpfr_unary(::mpfr_csc);
+    }
+    /// In-place cotangent.
+    /**
+     * This method will set ``this`` to its cotangent.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &cot()
+    {
+        return self_mpfr_unary(::mpfr_cot);
+    }
     /// In-place arccosine.
     /**
      * This method will set ``this`` to its arccosine.
@@ -2590,6 +2623,30 @@ inline real mpfr_nary_op_return_nornd(::mpfr_prec_t min_prec, const F &f, Arg0 &
 #endif
 } // namespace detail
 
+// These are helper macros to reduce typing when dealing with the common case
+// of exposing MPFR functions with a single argument (both variants with retval
+// and with return).
+#define MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(fname)                                                                        \
+    inline real &fname(real &rop, T &&op)                                                                              \
+    {                                                                                                                  \
+        return detail::mpfr_nary_op(0, ::mpfr_##fname, rop, std::forward<T>(op));                                      \
+    }
+
+#define MPPP_REAL_MPFR_UNARY_RETURN_IMPL(fname)                                                                        \
+    inline real fname(T &&r)                                                                                           \
+    {                                                                                                                  \
+        return detail::mpfr_nary_op_return(0, ::mpfr_##fname, std::forward<T>(r));                                     \
+    }
+
+#if defined(MPPP_HAVE_CONCEPTS)
+#define MPPP_REAL_MPFR_UNARY_HEADER template <CvrReal T>
+#else
+#define MPPP_REAL_MPFR_UNARY_HEADER template <typename T, cvr_real_enabler<T> = 0>
+#endif
+
+#define MPPP_REAL_MPFR_UNARY_RETVAL(fname) MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(fname)
+#define MPPP_REAL_MPFR_UNARY_RETURN(fname) MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETURN_IMPL(fname)
+
 /** @defgroup real_arithmetic real_arithmetic
  *  @{
  */
@@ -3053,30 +3110,6 @@ inline bool real_gt(const real &a, const real &b)
 
 /** @} */
 
-// These are helper macros to reduce typing when dealing with the common case
-// of exposing MPFR functions with a single argument (both variants with retval
-// and with return).
-#define MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(fname)                                                                        \
-    inline real &fname(real &rop, T &&op)                                                                              \
-    {                                                                                                                  \
-        return detail::mpfr_nary_op(0, ::mpfr_##fname, rop, std::forward<T>(op));                                      \
-    }
-
-#define MPPP_REAL_MPFR_UNARY_RETURN_IMPL(fname)                                                                        \
-    inline real fname(T &&r)                                                                                           \
-    {                                                                                                                  \
-        return detail::mpfr_nary_op_return(0, ::mpfr_##fname, std::forward<T>(r));                                     \
-    }
-
-#if defined(MPPP_HAVE_CONCEPTS)
-#define MPPP_REAL_MPFR_UNARY_HEADER template <CvrReal T>
-#else
-#define MPPP_REAL_MPFR_UNARY_HEADER template <typename T, cvr_real_enabler<T> = 0>
-#endif
-
-#define MPPP_REAL_MPFR_UNARY_RETVAL(fname) MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(fname)
-#define MPPP_REAL_MPFR_UNARY_RETURN(fname) MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETURN_IMPL(fname)
-
 // Square root.
 MPPP_REAL_MPFR_UNARY_RETVAL(sqrt)
 MPPP_REAL_MPFR_UNARY_RETURN(sqrt)
@@ -3169,6 +3202,7 @@ inline real dispatch_pow(const T &x, U &&a)
     tmp = x;
     return dispatch_pow(tmp, std::forward<U>(a));
 }
+
 } // namespace detail
 
 /// Binary \link mppp::real real\endlink exponentiation.
@@ -3215,6 +3249,15 @@ MPPP_REAL_MPFR_UNARY_RETURN(cos)
 MPPP_REAL_MPFR_UNARY_RETVAL(tan)
 MPPP_REAL_MPFR_UNARY_RETURN(tan)
 
+MPPP_REAL_MPFR_UNARY_RETVAL(sec)
+MPPP_REAL_MPFR_UNARY_RETURN(sec)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(csc)
+MPPP_REAL_MPFR_UNARY_RETURN(csc)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(cot)
+MPPP_REAL_MPFR_UNARY_RETURN(cot)
+
 MPPP_REAL_MPFR_UNARY_RETVAL(asin)
 MPPP_REAL_MPFR_UNARY_RETURN(asin)
 
@@ -3223,6 +3266,91 @@ MPPP_REAL_MPFR_UNARY_RETURN(acos)
 
 MPPP_REAL_MPFR_UNARY_RETVAL(atan)
 MPPP_REAL_MPFR_UNARY_RETURN(atan)
+
+// sin and cos at the same time.
+// NOTE: we don't have the machinery to steal resources
+// for multiple retvals, thus we do a manual implementation
+// of this function. We keep the signature with CvrReal
+// for consistency with the other functions.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline void sin_cos(real &sop, real &cop, T &&op)
+{
+    if (mppp_unlikely(&sop == &cop)) {
+        throw std::invalid_argument(
+            "In the real sin_cos() function, the return values 'sop' and 'cop' must be distinct objects");
+    }
+
+    // Set the precision of sop and cop to the
+    // precision of op.
+    const auto op_prec = op.get_prec();
+    // NOTE: use prec_round() to avoid issues in case
+    // sop/cop overlap with op.
+    sop.prec_round(op_prec);
+    cop.prec_round(op_prec);
+
+    // Run the mpfr function.
+    ::mpfr_sin_cos(sop._get_mpfr_t(), cop._get_mpfr_t(), op.get_mpfr_t(), MPFR_RNDN);
+}
+
+// Ternary atan2.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &atan2(real &rop, T &&y, U &&x)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_atan2, rop, std::forward<T>(y), std::forward<U>(x));
+}
+
+namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_atan2(T &&y, U &&x)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_atan2, std::forward<T>(y), std::forward<U>(x));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+inline real dispatch_atan2(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_atan2(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_atan2(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_atan2(tmp, std::forward<U>(a));
+}
+
+} // namespace detail
+
+// Binary atan2.
+#if defined(MPPP_HAVE_CONCEPTS)
+// NOTE: written like this, the constraint is equivalent
+// to: requires RealOpTypes<U, T>.
+template <typename T, RealOpTypes<T> U>
+#else
+// NOTE: we flip around T and U in the enabler to keep
+// it consistent with the concept above.
+template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+#endif
+inline real atan2(T &&y, U &&x)
+{
+    return detail::dispatch_atan2(std::forward<T>(y), std::forward<U>(x));
+}
 
 // Exponentials and logarithms.
 

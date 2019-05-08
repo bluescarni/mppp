@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Finish exposing all the trigonometric functions from the MPFR API
+  for :cpp:class:`~mppp::real`
+  (`#180 <https://github.com/bluescarni/mppp/pull/180>`__).
 - Add the possibility to build mp++ as a static library
   (`#176 <https://github.com/bluescarni/mppp/pull/176>`__).
 - Add CircleCI to the continuous integration pipeline
@@ -26,7 +29,8 @@ Changes
   :cpp:class:`~mppp::rational` (`#174 <https://github.com/bluescarni/mppp/pull/174>`__).
 - Improve the implementation of the less than/greater than operators for
   :cpp:class:`~mppp::integer`. Together with the ``swap()`` improvements,
-  this change leads to a ~9% decrease in runtime for the ``integer1_sort_signed``
+  this change leads to a ~9% decrease in runtime for the
+  ``integer1_sort_signed``
   benchmark (`#174 <https://github.com/bluescarni/mppp/pull/174>`__).
 - Continue moving code from the headers into the compiled library (`#170 <https://github.com/bluescarni/mppp/pull/170>`__,
   `#172 <https://github.com/bluescarni/mppp/pull/172>`__).
