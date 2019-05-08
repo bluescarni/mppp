@@ -1605,8 +1605,8 @@ inline rational<SSize> inv(const rational<SSize> &q)
 namespace detail
 {
 
-MPPP_PUBLIC std::ostream &rational_stream_operator_impl(std::ostream &, const mpz_struct_t *, const mpz_struct_t *, int,
-                                                        bool);
+MPPP_DLL_PUBLIC std::ostream &rational_stream_operator_impl(std::ostream &, const mpz_struct_t *, const mpz_struct_t *,
+                                                            int, bool);
 
 }
 

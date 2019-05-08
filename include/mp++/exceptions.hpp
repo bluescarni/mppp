@@ -11,21 +11,18 @@
 
 #include <stdexcept>
 
+#include <mp++/detail/visibility.hpp>
+
 namespace mppp
 {
 
-/// Exception to signal division by zero.
-/**
- * \rststar
- * This exception inherits all members (including constructors) from
- * `std::domain_error <https://en.cppreference.com/w/cpp/error/domain_error>`_. It will be thrown
- * when a division by zero involving a multiprecision class is attempted, and the type of the result cannot
- * represent infinities.
- * \endrststar
- */
-struct zero_division_error final : std::domain_error {
+// Exception to signal division by zero.
+class MPPP_DLL_PUBLIC_INLINE_CLASS zero_division_error final : public std::domain_error
+{
+public:
     using std::domain_error::domain_error;
 };
+
 } // namespace mppp
 
 #endif

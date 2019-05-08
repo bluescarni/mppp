@@ -11,7 +11,6 @@
 #include <atomic>
 #include <cassert>
 #include <cstddef>
-#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -26,6 +25,7 @@
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
+
 #if defined(MPPP_WITH_QUADMATH)
 #include <mp++/real128.hpp>
 #endif
@@ -426,38 +426,48 @@ namespace detail
 namespace
 {
 
-// Machinery to call automatically mpfr_free_cache() at program shutdown.
-extern "C" {
+// NOTE: the cleanup machinery relies on a correct implementation
+// of the thread_local keyword. If that is not available, we'll
+// just skip the cleanup step altogether, which may result
+// in "memory leaks" being reported by sanitizers and valgrind.
+#if defined(MPPP_HAVE_THREAD_LOCAL)
 
-// NOTE: the cleanup function should have C linkage, as it will be passed to atexit()
-// which is a function from the C standard library.
-void mpfr_cleanup_function()
-{
-#if !defined(NDEBUG)
-    // NOTE: functions registered with atexit() may be called concurrently.
-    // Access to cout from concurrent threads is safe as long as the
-    // cout object is synchronized to the underlying C stream:
-    // https://stackoverflow.com/questions/6374264/is-cout-synchronized-thread-safe
-    // http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio
-    // By default, this is the case, but in theory someone might have changed
-    // the sync setting on cout by the time we execute the following line.
-    // However, we print only in debug mode, so it should not be too much of a problem
-    // in practice.
-    std::cout << "Cleaning up MPFR caches." << std::endl;
-#endif
-    ::mpfr_free_cache();
-}
-}
-
-// Define and instantiate a cleanup functor.
+// A cleanup functor that will call mpfr_free_cache()
+// on destruction.
+// NOTE: MPFR 4 added more granular functions for cache freeing,
+// maybe in the future we can start using them.
 struct mpfr_cleanup {
-    mpfr_cleanup()
+    // NOTE: marking the ctor constexpr ensures that the initialisation
+    // of objects of this class with static storage duration is sequenced
+    // before the dynamic initialisation of objects with static storage
+    // duration:
+    // https://en.cppreference.com/w/cpp/language/constant_initialization
+    // This essentially means that we are sure that mpfr_free_cache()
+    // will be called after the destruction of any static real object
+    // (because real doesn't have a constexpr constructor and thus
+    // static reals are destroyed before static objects of this class).
+    constexpr mpfr_cleanup() {}
+    ~mpfr_cleanup()
     {
-        std::atexit(mpfr_cleanup_function);
+#if !defined(NDEBUG)
+        // NOTE: Access to cout from concurrent threads is safe as long as the
+        // cout object is synchronized to the underlying C stream:
+        // https://stackoverflow.com/questions/6374264/is-cout-synchronized-thread-safe
+        // http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio
+        // By default, this is the case, but in theory someone might have changed
+        // the sync setting on cout by the time we execute the following line.
+        // However, we print only in debug mode, so it should not be too much of a problem
+        // in practice.
+        std::cout << "Cleaning up MPFR caches." << std::endl;
+#endif
+        ::mpfr_free_cache();
     }
 };
 
-const mpfr_cleanup cleanup_inst;
+// Instantiate a cleanup object for each thread.
+thread_local const mpfr_cleanup cleanup_inst;
+
+#endif
 
 } // namespace
 
@@ -469,11 +479,13 @@ const mpfr_cleanup cleanup_inst;
  */
 real::~real()
 {
+#if defined(MPPP_HAVE_THREAD_LOCAL)
     // NOTE: make sure we "use" the cleanup instantiation functor,
     // so that the compiler is forced to invoke its constructor.
     // This ensures that, as long as at least one real is created, the mpfr_free_cache()
     // function is called on shutdown.
     detail::ignore(&detail::cleanup_inst);
+#endif
     if (m_mpfr._mpfr_d) {
         // The object is not moved-from, destroy it.
         assert(detail::real_prec_check(get_prec()));

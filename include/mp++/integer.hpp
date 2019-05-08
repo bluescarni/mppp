@@ -115,7 +115,7 @@ inline std::size_t get_mpz_size(const ::mpz_t n)
 
 // Structure for caching allocated arrays of limbs.
 // NOTE: needs to be public for testing purposes.
-struct MPPP_PUBLIC mpz_alloc_cache {
+struct MPPP_DLL_PUBLIC mpz_alloc_cache {
     // Arrays up to this size will be cached.
     static constexpr std::size_t max_size = 10;
     // Max number of arrays to cache for each size.
@@ -146,12 +146,12 @@ struct MPPP_PUBLIC mpz_alloc_cache {
 
 // Get a reference to the thread-local mpz allocation
 // cache. Used only for debugging.
-MPPP_PUBLIC mpz_alloc_cache &get_thread_local_mpz_cache();
+MPPP_DLL_PUBLIC mpz_alloc_cache &get_thread_local_mpz_cache();
 
 #endif
 
 // Helper function to init an mpz to zero with nlimbs preallocated limbs.
-MPPP_PUBLIC void mpz_init_nlimbs(mpz_struct_t &, std::size_t);
+MPPP_DLL_PUBLIC void mpz_init_nlimbs(mpz_struct_t &, std::size_t);
 
 // Small helper to determine how many GMP limbs we need to fit nbits bits.
 constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
@@ -162,10 +162,10 @@ constexpr ::mp_bitcnt_t nbits_to_nlimbs(::mp_bitcnt_t nbits)
 // Helper function to init an mpz to zero with enough space for nbits bits. The
 // nlimbs parameter must be consistent with the nbits parameter (it will be computed
 // outside this function).
-MPPP_PUBLIC void mpz_init_nbits(mpz_struct_t &, ::mp_bitcnt_t, std::size_t);
+MPPP_DLL_PUBLIC void mpz_init_nbits(mpz_struct_t &, ::mp_bitcnt_t, std::size_t);
 
 // Thin wrapper around mpz_clear(): will add entry to cache if possible instead of clearing.
-MPPP_PUBLIC void mpz_clear_wrap(mpz_struct_t &);
+MPPP_DLL_PUBLIC void mpz_clear_wrap(mpz_struct_t &);
 
 // Combined init+set.
 inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
@@ -175,7 +175,7 @@ inline void mpz_init_set_nlimbs(mpz_struct_t &m0, const mpz_struct_t &m1)
 }
 
 // Convert an mpz to a string in a specific base, to be written into out.
-MPPP_PUBLIC void mpz_to_str(std::vector<char> &, const mpz_struct_t *, int = 10);
+MPPP_DLL_PUBLIC void mpz_to_str(std::vector<char> &, const mpz_struct_t *, int = 10);
 
 // Convenience overload for the above.
 inline std::string mpz_to_str(const mpz_struct_t *mpz, int base = 10)
@@ -7429,7 +7429,7 @@ inline int stream_flags_to_fill(std::ios_base::fmtflags flags)
     }
 }
 
-MPPP_PUBLIC std::ostream &integer_stream_operator_impl(std::ostream &, const mpz_struct_t *, int);
+MPPP_DLL_PUBLIC std::ostream &integer_stream_operator_impl(std::ostream &, const mpz_struct_t *, int);
 
 } // namespace detail
 
@@ -7610,7 +7610,7 @@ inline std::size_t hash(const integer<SSize> &n)
  * It is safe to call this function concurrently from different threads.
  * \endrststar
  */
-MPPP_PUBLIC void free_integer_caches();
+MPPP_DLL_PUBLIC void free_integer_caches();
 
 /** @} */
 

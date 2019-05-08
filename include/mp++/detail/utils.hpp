@@ -79,8 +79,8 @@ inline std::string to_string(const T &x)
 
 #if defined(MPPP_HAVE_GCC_INT128)
 
-MPPP_PUBLIC std::string to_string(__uint128_t);
-MPPP_PUBLIC std::string to_string(__int128_t);
+MPPP_DLL_PUBLIC std::string to_string(__uint128_t);
+MPPP_DLL_PUBLIC std::string to_string(__int128_t);
 
 #endif
 

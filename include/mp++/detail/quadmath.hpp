@@ -58,9 +58,9 @@ union ieee_float128 {
     ieee_t i_eee;
 };
 
-MPPP_PUBLIC void float128_stream(std::ostream &, const __float128 &);
+MPPP_DLL_PUBLIC void float128_stream(std::ostream &, const __float128 &);
 
-MPPP_PUBLIC __float128 str_to_float128(const char *);
+MPPP_DLL_PUBLIC __float128 str_to_float128(const char *);
 
 } // namespace detail
 } // namespace mppp
