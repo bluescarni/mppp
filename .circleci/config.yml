@@ -65,6 +65,7 @@ workflows:
     - bionic_gcc7_coverage
     - cosmic_gcc8_coverage
     - cosmic_clang7_asan
+    - cosmic_clang7_tsan
     - bionic_clang6_ubsan
     - cosmic_clang7_debuggmp_unstable
     - cosmic_clang7_debuggmp
