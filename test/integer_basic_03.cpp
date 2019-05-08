@@ -13,24 +13,27 @@
 #include <atomic>
 #include <cmath>
 #include <cstddef>
-#include <gmp.h>
 #include <ios>
 #include <iostream>
 #include <limits>
-#include <mp++/detail/type_traits.hpp>
-#include <mp++/integer.hpp>
 #include <random>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#include <gmp.h>
+
+#if MPPP_CPLUSPLUS >= 201703L
+#include <string_view>
+#endif
+
+#include <mp++/detail/type_traits.hpp>
+#include <mp++/integer.hpp>
 
 #include "test_utils.hpp"
 
@@ -704,3 +707,16 @@ TEST_CASE("binary s11n")
 {
     tuple_for_each(sizes{}, binary_s11n_tester{});
 }
+
+#if MPPP_CPLUSPLUS >= 201703L
+
+TEST_CASE("integer nts")
+{
+    REQUIRE(std::is_nothrow_swappable_v<integer<1>>);
+    REQUIRE(std::is_nothrow_swappable_v<integer<2>>);
+    REQUIRE(std::is_nothrow_swappable_v<integer<6>>);
+    REQUIRE(std::is_nothrow_swappable_v<integer<10>>);
+    REQUIRE(std::is_nothrow_swappable_v<integer<15>>);
+}
+
+#endif

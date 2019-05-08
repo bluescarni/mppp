@@ -325,24 +325,24 @@ TEST_CASE("real constructors")
         (real{std::string{"12"}, -1, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string(
-                          "Cannot construct a real from a string in base -1: the base must either be zero or in "
-                          "the [2,62] range");
+                       "Cannot construct a real from a string in base -1: the base must either be zero or in "
+                       "the [2,62] range");
         });
 #if MPPP_CPLUSPLUS >= 201703L
     REQUIRE_THROWS_PREDICATE(
         (real{std::string_view{"12"}, -1, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string(
-                          "Cannot construct a real from a string in base -1: the base must either be zero or in "
-                          "the [2,62] range");
+                       "Cannot construct a real from a string in base -1: the base must either be zero or in "
+                       "the [2,62] range");
         });
 #endif
     REQUIRE_THROWS_PREDICATE(
         (real{std::string{"12"}, 80, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string(
-                          "Cannot construct a real from a string in base 80: the base must either be zero or in "
-                          "the [2,62] range");
+                       "Cannot construct a real from a string in base 80: the base must either be zero or in "
+                       "the [2,62] range");
         });
     real_reset_default_prec();
     REQUIRE_THROWS_PREDICATE((real{"12", 10, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -1008,15 +1008,15 @@ TEST_CASE("real assignment")
         r8.set(std::string{"4.321e3"}, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base -1: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base -1: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE_THROWS_PREDICATE(
         r8.set(std::string{"4.321e3"}, 65), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base 65: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base 65: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     REQUIRE_THROWS_PREDICATE(r8.set(std::string{"hell-o"}), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -1052,15 +1052,15 @@ TEST_CASE("real assignment")
         r8.set(vc.data() + 1, vc.data() + 5, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base -1: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base -1: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE_THROWS_PREDICATE(
         r8.set(vc.data() + 1, vc.data() + 5, 65), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base 65: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base 65: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE_THROWS_PREDICATE(
         r8.set(vc.data(), vc.data() + 5), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -1092,15 +1092,15 @@ TEST_CASE("real assignment")
         r8.set(std::string_view{"4.321e3"}, -1), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base -1: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base -1: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE_THROWS_PREDICATE(
         r8.set(std::string_view{"4.321e3"}, 65), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
                    == std::string{
-                          "Cannot assign a real from a string in base 65: the base must either be zero or in the "
-                          "[2,62] range"};
+                       "Cannot assign a real from a string in base 65: the base must either be zero or in the "
+                       "[2,62] range"};
         });
     REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1235) == 0);
     REQUIRE_THROWS_PREDICATE(
@@ -1617,3 +1617,12 @@ TEST_CASE("real mt cleanup")
     t3.join();
     t4.join();
 }
+
+#if MPPP_CPLUSPLUS >= 201703L
+
+TEST_CASE("real nts")
+{
+    REQUIRE(std::is_nothrow_swappable_v<real>);
+}
+
+#endif
