@@ -405,21 +405,29 @@ program presented earlier may look like this:</p>
 <h2>Compiler and platform specific notes<a class="headerlink" href="#compiler-and-platform-specific-notes" title="Permalink to this headline">¶</a></h2>
 <p>Visual Studio:</p>
 <ul class="simple">
-<li><p>The mp++ library is compiled
-with the <code class="docutils literal notranslate"><span class="pre">NOMINMAX</span></code> definition and, if supported,
-with the <code class="docutils literal notranslate"><span class="pre">/permissive-</span></code>
-compiler flag. If you intend to use mp++ in conjunction with other
-libraries, you should ensure that the <code class="docutils literal notranslate"><span class="pre">NOMINMAX</span></code> definition
-and the <code class="docutils literal notranslate"><span class="pre">/permissive-</span></code> flag are also used for the compilation
-of these libraries.</p></li>
+<li><p>The mp++ library is compiled with the <code class="docutils literal notranslate"><span class="pre">NOMINMAX</span></code> definition, and,
+if supported, with the <code class="docutils literal notranslate"><span class="pre">/permissive-</span></code> compiler flag.</p></li>
 <li><p>When building mp++ as a static library, MSVC’s static runtime will
 be used (instead of the dynamic runtime). One can force the use
 of the dynamic runtime when building mp++ as a static library by
 turning on the <code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME</span></code>
 advanced CMake option.</p></li>
 </ul>
+<p>MinGW:</p>
+<ul class="simple">
+<li><p>Due to a compiler bug in the implementation of <code class="docutils literal notranslate"><span class="pre">thread_local</span></code>
+storage <a class="footnote-reference brackets" href="#mingw-tls" id="id2">1</a>,
+certain multi-threading performance optimisations are disabled
+when compiling with MinGW.</p></li>
+</ul>
+<p>OSX:</p>
+<ul class="simple">
+<li><p>When using older versions of Xcode, performance in multi-threading
+scenarios might be reduced due to lack of support for the C++11
+<code class="docutils literal notranslate"><span class="pre">thread_local</span></code> feature.</p></li>
+</ul>
 <p>FreeBSD:</p>
-<ul>
+<ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> overloads of some mathematical functions
 (such as <code class="docutils literal notranslate"><span class="pre">std::pow()</span></code>) may be implemented in
 <code class="docutils literal notranslate"><span class="pre">double</span></code> precision. Additionally, if the arguments to such mathematical
@@ -427,13 +435,17 @@ functions are compile-time constants, the compiler
 <em>may</em> decide (depending on the optimisation level) to actually compute the
 result at compile time using full <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> precision.
 This behaviour can lead to subtle inconsistencies, and it results in one
-test case from the mp++ test suite failing on FreeBSD.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference external" href="https://github.com/bluescarni/mppp/issues/132">https://github.com/bluescarni/mppp/issues/132</a></p>
-</div>
-</li>
+test case from the mp++ test suite failing on FreeBSD <a class="footnote-reference brackets" href="#freebsd-mppp-bug" id="id3">2</a>.</p></li>
 </ul>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="mingw-tls"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
+<dd><p><a class="reference external" href="https://sourceforge.net/p/mingw-w64/bugs/445/">https://sourceforge.net/p/mingw-w64/bugs/445/</a></p>
+</dd>
+<dt class="label" id="freebsd-mppp-bug"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
+<dd><p><a class="reference external" href="https://github.com/bluescarni/mppp/issues/132">https://github.com/bluescarni/mppp/issues/132</a></p>
+</dd>
+</dl>
 </div>
 </div>
 

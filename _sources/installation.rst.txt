@@ -234,18 +234,26 @@ Compiler and platform specific notes
 
 Visual Studio:
 
-* The mp++ library is compiled
-  with the ``NOMINMAX`` definition and, if supported,
-  with the ``/permissive-``
-  compiler flag. If you intend to use mp++ in conjunction with other
-  libraries, you should ensure that the ``NOMINMAX`` definition
-  and the ``/permissive-`` flag are also used for the compilation
-  of these libraries.
+* The mp++ library is compiled with the ``NOMINMAX`` definition, and,
+  if supported, with the ``/permissive-`` compiler flag.
 * When building mp++ as a static library, MSVC's static runtime will
   be used (instead of the dynamic runtime). One can force the use
   of the dynamic runtime when building mp++ as a static library by
   turning on the ``MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME``
   advanced CMake option.
+
+MinGW:
+
+* Due to a compiler bug in the implementation of ``thread_local``
+  storage [#mingw_tls]_,
+  certain multi-threading performance optimisations are disabled
+  when compiling with MinGW.
+
+OSX:
+
+* When using older versions of Xcode, performance in multi-threading
+  scenarios might be reduced due to lack of support for the C++11
+  ``thread_local`` feature.
 
 FreeBSD:
 
@@ -256,8 +264,9 @@ FreeBSD:
   *may* decide (depending on the optimisation level) to actually compute the
   result at compile time using full ``long double`` precision.
   This behaviour can lead to subtle inconsistencies, and it results in one
-  test case from the mp++ test suite failing on FreeBSD.
+  test case from the mp++ test suite failing on FreeBSD [#freebsd_mppp_bug]_.
 
-  .. seealso::
+.. rubric:: Footnotes
 
-     https://github.com/bluescarni/mppp/issues/132
+.. [#mingw_tls] https://sourceforge.net/p/mingw-w64/bugs/445/
+.. [#freebsd_mppp_bug] https://github.com/bluescarni/mppp/issues/132
