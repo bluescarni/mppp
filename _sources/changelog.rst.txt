@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Finish exposing all the trigonometric functions from the MPFR API
+  for :cpp:class:`~mppp::real`
+  (`#180 <https://github.com/bluescarni/mppp/pull/180>`__).
 - Add the possibility to build mp++ as a static library
   (`#176 <https://github.com/bluescarni/mppp/pull/176>`__).
 - Add CircleCI to the continuous integration pipeline
@@ -17,12 +20,17 @@ New
 Changes
 ~~~~~~~
 
+- The MPFR cleanup function ``mpfr_free_cache()`` is now called
+  at the end of every thread which creates at least
+  one :cpp:class:`~mppp::real` object
+  (`#180 <https://github.com/bluescarni/mppp/pull/180>`__).
 - Implement a specialised version of the ``swap()`` primitive
   for :cpp:class:`~mppp::integer` and
   :cpp:class:`~mppp::rational` (`#174 <https://github.com/bluescarni/mppp/pull/174>`__).
 - Improve the implementation of the less than/greater than operators for
   :cpp:class:`~mppp::integer`. Together with the ``swap()`` improvements,
-  this change leads to a ~9% decrease in runtime for the ``integer1_sort_signed``
+  this change leads to a ~9% decrease in runtime for the
+  ``integer1_sort_signed``
   benchmark (`#174 <https://github.com/bluescarni/mppp/pull/174>`__).
 - Continue moving code from the headers into the compiled library (`#170 <https://github.com/bluescarni/mppp/pull/170>`__,
   `#172 <https://github.com/bluescarni/mppp/pull/172>`__).
@@ -30,6 +38,9 @@ Changes
 Fix
 ~~~
 
+- The :cpp:class:`~mppp::zero_division_error` exception is now correctly
+  marked as visible
+  (`#180 <https://github.com/bluescarni/mppp/pull/180>`__).
 - Various build system and documentation improvements (`#172 <https://github.com/bluescarni/mppp/pull/172>`__).
 - Fix a warning when building mp++ with older MSVC versions (`#170 <https://github.com/bluescarni/mppp/pull/170>`__).
 

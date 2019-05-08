@@ -204,6 +204,9 @@ Show Source
 <div class="section" id="new">
 <h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p>Finish exposing all the trigonometric functions from the MPFR API
+for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/180">#180</a>).</p></li>
 <li><p>Add the possibility to build mp++ as a static library
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/176">#176</a>).</p></li>
 <li><p>Add CircleCI to the continuous integration pipeline
@@ -215,12 +218,17 @@ Show Source
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p>The MPFR cleanup function <code class="docutils literal notranslate"><span class="pre">mpfr_free_cache()</span></code> is now called
+at the end of every thread which creates at least
+one <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> object
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/180">#180</a>).</p></li>
 <li><p>Implement a specialised version of the <code class="docutils literal notranslate"><span class="pre">swap()</span></code> primitive
 for <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and
 <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/174">#174</a>).</p></li>
 <li><p>Improve the implementation of the less than/greater than operators for
 <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>. Together with the <code class="docutils literal notranslate"><span class="pre">swap()</span></code> improvements,
-this change leads to a ~9% decrease in runtime for the <code class="docutils literal notranslate"><span class="pre">integer1_sort_signed</span></code>
+this change leads to a ~9% decrease in runtime for the
+<code class="docutils literal notranslate"><span class="pre">integer1_sort_signed</span></code>
 benchmark (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/174">#174</a>).</p></li>
 <li><p>Continue moving code from the headers into the compiled library (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/170">#170</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/172">#172</a>).</p></li>
@@ -229,6 +237,9 @@ benchmark (<a class="reference external" href="https://github.com/bluescarni/mpp
 <div class="section" id="fix">
 <h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p>The <a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">zero_division_error</span></code></a> exception is now correctly
+marked as visible
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/180">#180</a>).</p></li>
 <li><p>Various build system and documentation improvements (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/172">#172</a>).</p></li>
 <li><p>Fix a warning when building mp++ with older MSVC versions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/170">#170</a>).</p></li>
 </ul>
