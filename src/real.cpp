@@ -434,6 +434,8 @@ namespace
 
 // A cleanup functor that will call mpfr_free_cache()
 // on destruction.
+// NOTE: MPFR 4 added more granular functions for cache freeing,
+// maybe in the future we can start using them.
 struct mpfr_cleanup {
     // NOTE: marking the ctor constexpr ensures that the initialisation
     // of objects of this class with static storage duration is sequenced
