@@ -121,7 +121,7 @@ struct fp_ass_tester {
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
                     integer n1;
-                    if (sdist(rng)) {
+                    if (sdist(eng)) {
                         n1.promote();
                     }
                     auto tmp = dist(eng);
