@@ -17,6 +17,7 @@
 
 #define MPPP_DLL_PUBLIC
 #define MPPP_DLL_LOCAL
+#define MPPP_DLL_PUBLIC_INLINE_CLASS
 
 #else
 
