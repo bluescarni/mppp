@@ -218,6 +218,8 @@ for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mpp
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p>Update the internal copy of Catch to the latest version, 2.7.2
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/181">#181</a>).</p></li>
 <li><p>The MPFR cleanup function <code class="docutils literal notranslate"><span class="pre">mpfr_free_cache()</span></code> is now called
 at the end of every thread which creates at least
 one <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> object
@@ -237,9 +239,12 @@ benchmark (<a class="reference external" href="https://github.com/bluescarni/mpp
 <div class="section" id="fix">
 <h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p>Fix two race conditions in the testing code
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/181">#181</a>).</p></li>
 <li><p>The <a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">zero_division_error</span></code></a> exception is now correctly
 marked as visible
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/180">#180</a>).</p></li>
+<li><p>Add a workaround for a <code class="docutils literal notranslate"><span class="pre">clang-cl</span></code> bug (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/179">#179</a>).</p></li>
 <li><p>Various build system and documentation improvements (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/172">#172</a>).</p></li>
 <li><p>Fix a warning when building mp++ with older MSVC versions (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/170">#170</a>).</p></li>
 </ul>
