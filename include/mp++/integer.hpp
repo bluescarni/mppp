@@ -2837,7 +2837,10 @@ public:
      */
     std::size_t binary_load(const char *src)
     {
-#if MPPP_CPLUSPLUS >= 201703L
+        // NOTE: disable the use of structured bindings
+        // on MSVC altogether, due to this clang-cl issue:
+        // https://bugs.llvm.org/show_bug.cgi?id=41745
+#if MPPP_CPLUSPLUS >= 201703L && !defined(_MSC_VER)
         const auto [size, asize] = bl_read_size_asize(src);
 #else
         detail::mpz_size_t size;
@@ -2862,7 +2865,7 @@ private:
         }
         // Size in bytes of the limbs portion of the data.
         const auto lsize = src.size() - sizeof(detail::mpz_size_t);
-#if MPPP_CPLUSPLUS >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L && !defined(_MSC_VER)
         const auto [size, asize] = bl_read_size_asize(src.data());
 #else
         detail::mpz_size_t size;
