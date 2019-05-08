@@ -20,6 +20,8 @@ New
 Changes
 ~~~~~~~
 
+- Update the internal copy of Catch to the latest version, 2.7.2
+  (`#181 <https://github.com/bluescarni/mppp/pull/181>`__).
 - The MPFR cleanup function ``mpfr_free_cache()`` is now called
   at the end of every thread which creates at least
   one :cpp:class:`~mppp::real` object
@@ -38,9 +40,12 @@ Changes
 Fix
 ~~~
 
+- Fix two race conditions in the testing code
+  (`#181 <https://github.com/bluescarni/mppp/pull/181>`__).
 - The :cpp:class:`~mppp::zero_division_error` exception is now correctly
   marked as visible
   (`#180 <https://github.com/bluescarni/mppp/pull/180>`__).
+- Add a workaround for a ``clang-cl`` bug (`#179 <https://github.com/bluescarni/mppp/pull/179>`__).
 - Various build system and documentation improvements (`#172 <https://github.com/bluescarni/mppp/pull/172>`__).
 - Fix a warning when building mp++ with older MSVC versions (`#170 <https://github.com/bluescarni/mppp/pull/170>`__).
 

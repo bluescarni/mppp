@@ -62,8 +62,6 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
 // is launched it will be inited with a different seed.
 static std::mt19937::result_type mt_rng_seed(0u);
 
-static std::mt19937 rng;
-
 struct no_const {
 };
 
@@ -150,7 +148,7 @@ struct int_ass_tester {
                 std::mt19937 eng(static_cast<std::mt19937::result_type>(n + mt_rng_seed));
                 for (auto i = 0; i < ntries; ++i) {
                     integer n1;
-                    if (sdist(rng)) {
+                    if (sdist(eng)) {
                         n1.promote();
                     }
                     auto tmp = static_cast<Int>(dist(eng));
