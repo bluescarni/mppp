@@ -22,7 +22,7 @@ namespace mppp
 namespace detail
 {
 
-MPPP_PUBLIC std::string demangle_from_typeid(const char *);
+MPPP_DLL_PUBLIC std::string demangle_from_typeid(const char *);
 
 template <typename T>
 inline std::string demangle_impl()

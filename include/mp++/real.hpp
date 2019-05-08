@@ -61,7 +61,7 @@ constexpr ::mpfr_prec_t clamp_mpfr_prec(::mpfr_prec_t p)
 }
 
 // Helper function to print an mpfr to stream in a given base.
-MPPP_PUBLIC void mpfr_to_stream(const ::mpfr_t, std::ostream &, int);
+MPPP_DLL_PUBLIC void mpfr_to_stream(const ::mpfr_t, std::ostream &, int);
 
 #if !defined(MPPP_DOXYGEN_INVOKED)
 
@@ -138,7 +138,7 @@ inline ::mpfr_prec_t real_deduce_precision(const real128 &)
 #endif
 
 // Default precision value.
-MPPP_PUBLIC extern std::atomic<::mpfr_prec_t> real_default_prec;
+MPPP_DLL_PUBLIC extern std::atomic<::mpfr_prec_t> real_default_prec;
 
 // Fwd declare for friendship.
 template <bool, typename F, typename Arg0, typename... Args>
@@ -410,7 +410,7 @@ enum class real_kind : std::underlying_type<::mpfr_kind_t>::type {
  * it is possible to use transparently the MPFR API with :cpp:class:`~mppp::real` objects.
  * \endrststar
  */
-class MPPP_PUBLIC real
+class MPPP_DLL_PUBLIC real
 {
 #if !defined(MPPP_DOXYGEN_INVOKED)
     // Make friends, for accessing the non-checking prec setting funcs.

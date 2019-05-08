@@ -11,6 +11,8 @@
 
 #include <stdexcept>
 
+#include <mp++/detail/visibility.hpp>
+
 namespace mppp
 {
 
@@ -23,9 +25,10 @@ namespace mppp
  * represent infinities.
  * \endrststar
  */
-struct zero_division_error final : std::domain_error {
+struct MPPP_DLL_PUBLIC_INLINE_CLASS zero_division_error final : std::domain_error {
     using std::domain_error::domain_error;
 };
+
 } // namespace mppp
 
 #endif
