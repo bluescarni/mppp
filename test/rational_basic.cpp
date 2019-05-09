@@ -7,28 +7,31 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <mp++/config.hpp>
-#include <mp++/detail/type_traits.hpp>
-#include <mp++/integer.hpp>
-#include <mp++/rational.hpp>
 
 #include <atomic>
 #include <cmath>
 #include <cstddef>
-#include <gmp.h>
 #include <iostream>
 #include <limits>
 #include <random>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#if MPPP_CPLUSPLUS >= 201703L
+#include <string_view>
+#endif
+
+#include <gmp.h>
+
+#include <mp++/detail/type_traits.hpp>
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
 
 #include "test_utils.hpp"
 
@@ -1313,3 +1316,16 @@ TEST_CASE("stream")
 {
     tuple_for_each(sizes{}, stream_tester{});
 }
+
+#if MPPP_CPLUSPLUS >= 201703L
+
+TEST_CASE("rational nts")
+{
+    REQUIRE(std::is_nothrow_swappable_v<rational<1>>);
+    REQUIRE(std::is_nothrow_swappable_v<rational<2>>);
+    REQUIRE(std::is_nothrow_swappable_v<rational<6>>);
+    REQUIRE(std::is_nothrow_swappable_v<rational<10>>);
+    REQUIRE(std::is_nothrow_swappable_v<rational<15>>);
+}
+
+#endif

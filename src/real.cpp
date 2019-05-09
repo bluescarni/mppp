@@ -432,10 +432,10 @@ namespace
 // in "memory leaks" being reported by sanitizers and valgrind.
 #if defined(MPPP_HAVE_THREAD_LOCAL)
 
+#if MPFR_VERSION_MAJOR < 4
+
 // A cleanup functor that will call mpfr_free_cache()
 // on destruction.
-// NOTE: MPFR 4 added more granular functions for cache freeing,
-// maybe in the future we can start using them.
 struct mpfr_cleanup {
     // NOTE: marking the ctor constexpr ensures that the initialisation
     // of objects of this class with static storage duration is sequenced
@@ -467,6 +467,42 @@ struct mpfr_cleanup {
 // Instantiate a cleanup object for each thread.
 thread_local const mpfr_cleanup cleanup_inst;
 
+#else
+
+// NOTE: in MPFR >= 4, there are both local caches and thread-specific caches.
+// Thus, we use two cleanup functors, one thread local and one global.
+
+struct mpfr_tl_cleanup {
+    constexpr mpfr_tl_cleanup() {}
+    ~mpfr_tl_cleanup()
+    {
+#if !defined(NDEBUG)
+        std::cout << "Cleaning up thread local MPFR caches." << std::endl;
+#endif
+        ::mpfr_free_cache2(MPFR_FREE_LOCAL_CACHE);
+    }
+};
+
+struct mpfr_global_cleanup {
+    constexpr mpfr_global_cleanup() {}
+    ~mpfr_global_cleanup()
+    {
+#if !defined(NDEBUG)
+        std::cout << "Cleaning up global MPFR caches." << std::endl;
+#endif
+        ::mpfr_free_cache2(MPFR_FREE_GLOBAL_CACHE);
+    }
+};
+
+thread_local const mpfr_tl_cleanup tl_cleanup_inst;
+// NOTE: because the destruction of thread-local objects
+// always happens before the destruction of objects with
+// static storage duration, the global cleanup will always
+// be performed after thread-local cleanup.
+const mpfr_global_cleanup global_cleanup_inst;
+
+#endif
+
 #endif
 
 } // namespace
@@ -480,11 +516,16 @@ thread_local const mpfr_cleanup cleanup_inst;
 real::~real()
 {
 #if defined(MPPP_HAVE_THREAD_LOCAL)
+#if MPFR_VERSION_MAJOR < 4
     // NOTE: make sure we "use" the cleanup instantiation functor,
     // so that the compiler is forced to invoke its constructor.
     // This ensures that, as long as at least one real is created, the mpfr_free_cache()
     // function is called on shutdown.
     detail::ignore(&detail::cleanup_inst);
+#else
+    detail::ignore(&detail::tl_cleanup_inst);
+    detail::ignore(&detail::global_cleanup_inst);
+#endif
 #endif
     if (m_mpfr._mpfr_d) {
         // The object is not moved-from, destroy it.
