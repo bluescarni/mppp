@@ -20,6 +20,10 @@ New
 Changes
 ~~~~~~~
 
+- When compiled with MPFR version 4 or later, mp++ now ensures that
+  thread-local and global caches are freed separately at thread exit
+  and program shutdown
+  (`#182 <https://github.com/bluescarni/mppp/pull/182>`__).
 - Update the internal copy of Catch to the latest version, 2.7.2
   (`#181 <https://github.com/bluescarni/mppp/pull/181>`__).
 - The MPFR cleanup function ``mpfr_free_cache()`` is now called
