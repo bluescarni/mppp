@@ -29,6 +29,9 @@ option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the rea
 option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
 mark_as_advanced(MPPP_TEST_PYBIND11)
 option(MPPP_BUILD_STATIC_LIBRARY "Build mp++ as a static library, instead of dynamic." OFF)
+if(YACMA_COMPILER_IS_MSVC)
+    option(MPPP_MSVC_UNICODE "Enable Unicode solutions for MSVC." OFF)
+endif()
 
 if(YACMA_COMPILER_IS_MSVC AND MPPP_BUILD_STATIC_LIBRARY)
     option(MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME "Link to the dynamic MSVC runtime when building mp++ as a static library." OFF)
@@ -42,6 +45,12 @@ if(YACMA_COMPILER_IS_MSVC)
   # On both cl and clang-cl, disable the idiotic minmax macros and enable the bigobj option.
   list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/bigobj")
   list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/bigobj")
+  if(MPPP_MSVC_UNICODE)
+    # NOTE: Unicode solutions for MSVC can be enabled through
+    # these definitions.
+    list(APPEND MPPP_CXX_FLAGS_DEBUG "-DUNICODE" "-D_UNICODE")
+    list(APPEND MPPP_CXX_FLAGS_RELEASE "-DUNICODE" "-D_UNICODE")
+  endif()
   if(YACMA_COMPILER_IS_CLANGXX)
     # clang-cl emits various warnings from GMP/MPFR, let's just silence them.
     # NOTE: at one point in the recent past, MSVC added an options similar to GCC's isystem:

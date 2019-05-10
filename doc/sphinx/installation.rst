@@ -61,7 +61,9 @@ path, etc.). The available configuration options are:
 * ``MPPP_BUILD_TESTS``: build the test suite (off by default),
 * ``MPPP_BUILD_BENCHMARKS``: build the benchmarking suite (off by default),
 * ``MPPP_BUILD_STATIC_LIBRARY``: build mp++ as a static library, instead
-  of a dynamic library (off by default).
+  of a dynamic library (off by default),
+* ``MPPP_MSVC_UNICODE``: enable Unicode solutions for MSVC (available only
+  when using MSVC, off by default).
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
 using GCC (all the supported versions) and Clang
@@ -236,6 +238,8 @@ Visual Studio:
 
 * The mp++ library is compiled with the ``NOMINMAX`` definition, and,
   if supported, with the ``/permissive-`` compiler flag.
+* If the ``MPPP_MSVC_UNICODE`` CMake option is enabled, the mp++ library
+  is compiled with the ``UNICODE`` and ``_UNICODE`` definitions.
 * When building mp++ as a static library, MSVC's static runtime will
   be used (instead of the dynamic runtime). One can force the use
   of the dynamic runtime when building mp++ as a static library by
