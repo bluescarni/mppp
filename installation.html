@@ -255,7 +255,9 @@ quadmath library (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_TESTS</span></code>: build the test suite (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_BENCHMARKS</span></code>: build the benchmarking suite (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_STATIC_LIBRARY</span></code>: build mp++ as a static library, instead
-of a dynamic library (off by default).</p></li>
+of a dynamic library (off by default),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MPPP_MSVC_UNICODE</span></code>: enable Unicode solutions for MSVC (available only
+when using MSVC, off by default).</p></li>
 </ul>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option, at this time, is available only
 using GCC (all the supported versions) and Clang
@@ -407,6 +409,8 @@ program presented earlier may look like this:</p>
 <ul class="simple">
 <li><p>The mp++ library is compiled with the <code class="docutils literal notranslate"><span class="pre">NOMINMAX</span></code> definition, and,
 if supported, with the <code class="docutils literal notranslate"><span class="pre">/permissive-</span></code> compiler flag.</p></li>
+<li><p>If the <code class="docutils literal notranslate"><span class="pre">MPPP_MSVC_UNICODE</span></code> CMake option is enabled, the mp++ library
+is compiled with the <code class="docutils literal notranslate"><span class="pre">UNICODE</span></code> and <code class="docutils literal notranslate"><span class="pre">_UNICODE</span></code> definitions.</p></li>
 <li><p>When building mp++ as a static library, MSVC’s static runtime will
 be used (instead of the dynamic runtime). One can force the use
 of the dynamic runtime when building mp++ as a static library by
