@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Add the possibility of generating Unicode MSVC solutions
+  (`#183 <https://github.com/bluescarni/mppp/pull/183>`__).
 - Finish exposing all the trigonometric functions from the MPFR API
   for :cpp:class:`~mppp::real`
   (`#180 <https://github.com/bluescarni/mppp/pull/180>`__).
