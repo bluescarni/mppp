@@ -2004,6 +2004,42 @@ public:
     {
         return self_mpfr_unary(::mpfr_atan);
     }
+    real &cosh()
+    {
+        return self_mpfr_unary(::mpfr_cosh);
+    }
+    real &sinh()
+    {
+        return self_mpfr_unary(::mpfr_sinh);
+    }
+    real &tanh()
+    {
+        return self_mpfr_unary(::mpfr_tanh);
+    }
+    real &sech()
+    {
+        return self_mpfr_unary(::mpfr_sech);
+    }
+    real &csch()
+    {
+        return self_mpfr_unary(::mpfr_csch);
+    }
+    real &coth()
+    {
+        return self_mpfr_unary(::mpfr_coth);
+    }
+    real &acosh()
+    {
+        return self_mpfr_unary(::mpfr_acosh);
+    }
+    real &asinh()
+    {
+        return self_mpfr_unary(::mpfr_asinh);
+    }
+    real &atanh()
+    {
+        return self_mpfr_unary(::mpfr_atanh);
+    }
     /// In-place exponential.
     /**
      * This method will set ``this`` to its exponential.
@@ -3351,6 +3387,35 @@ inline real atan2(T &&y, U &&x)
 {
     return detail::dispatch_atan2(std::forward<T>(y), std::forward<U>(x));
 }
+
+// Hyperbolic functions.
+
+MPPP_REAL_MPFR_UNARY_RETVAL(sinh)
+MPPP_REAL_MPFR_UNARY_RETURN(sinh)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(cosh)
+MPPP_REAL_MPFR_UNARY_RETURN(cosh)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(tanh)
+MPPP_REAL_MPFR_UNARY_RETURN(tanh)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(sech)
+MPPP_REAL_MPFR_UNARY_RETURN(sech)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(csch)
+MPPP_REAL_MPFR_UNARY_RETURN(csch)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(coth)
+MPPP_REAL_MPFR_UNARY_RETURN(coth)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(asinh)
+MPPP_REAL_MPFR_UNARY_RETURN(asinh)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(acosh)
+MPPP_REAL_MPFR_UNARY_RETURN(acosh)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(atanh)
+MPPP_REAL_MPFR_UNARY_RETURN(atanh)
 
 // Exponentials and logarithms.
 
