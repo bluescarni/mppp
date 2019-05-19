@@ -339,7 +339,8 @@ Trigonometry
    Simultaneous sine and cosine.
 
    This function will set *sop* and *cop* respectively to the sine and cosine of *op*.
-   *sop* and *cop* must be distinct objects.
+   *sop* and *cop* must be distinct objects. The precision of *sop* and *rop* will be set to the
+   precision of *op*.
 
    :param sop: the sine return value.
    :param cop: the cosine return value.
@@ -408,6 +409,89 @@ Trigonometry
    :return: the arctangent-2 of *y* and *x*.
 
    :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+
+.. _real_hyper:
+
+Hyperbolic functions
+~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sinh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cosh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tanh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sech(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::csch(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::coth(mppp::real &rop, T &&op)
+
+   Binary basic hyperbolic functions.
+
+   These functions will set *rop* to, respectively, the hyperbolic sine, cosine, tangent, secant,
+   cosecant and cotangent of *op*.
+   The precision of the result will be equal to the precision of *op*.
+
+   :param rop: the return value.
+   :param op: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sinh(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cosh(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tanh(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sech(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::csch(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::coth(T &&r)
+
+   Unary basic hyperbolic functions.
+
+   These functions will return, respectively, the hyperbolic sine, cosine, tangent,
+   secant, cosecant and cotangent of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the argument.
+
+   :return: the hyperbolic sine, cosine, tangent, secant, cosecant or cotangent of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T> void mppp::sinh_cosh(mppp::real &sop, mppp::real &cop, T &&op)
+
+   Simultaneous hyperbolic sine and cosine.
+
+   This function will set *sop* and *cop* respectively to the hyperbolic sine and cosine of *op*.
+   *sop* and *cop* must be distinct objects. The precision of *sop* and *rop* will be set to the
+   precision of *op*.
+
+   :param sop: the hyperbolic sine return value.
+   :param cop: the hyperbolic cosine return value.
+   :param op: the operand.
+
+   :exception std\:\:invalid_argument: if *sop* and *cop* are the same object.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::asinh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::acosh(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::atanh(mppp::real &rop, T &&op)
+
+   Binary basic inverse hyperbolic functions.
+
+   These functions will set *rop* to, respectively, the inverse hyperbolic sine, cosine and
+   tangent of *op*.
+   The precision of the result will be equal to the precision of *op*.
+
+   :param rop: the return value.
+   :param op: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::asinh(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::acosh(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::atanh(T &&r)
+
+   Unary basic inverse hyperbolic functions.
+
+   These functions will return, respectively, the inverse hyperbolic sine, cosine and
+   tangent of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the argument.
+
+   :return: the inverse hyperbolic sine, cosine or tangent of *r*.
 
 .. _real_logexp:
 

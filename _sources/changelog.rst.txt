@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Expose the hyperbolic functions from the MPFR API
+  for :cpp:class:`~mppp::real`
+  (`#184 <https://github.com/bluescarni/mppp/pull/184>`__).
 - Add the possibility of generating Unicode MSVC solutions
   (`#183 <https://github.com/bluescarni/mppp/pull/183>`__).
 - Finish exposing all the trigonometric functions from the MPFR API
