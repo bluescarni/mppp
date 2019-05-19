@@ -128,36 +128,36 @@ TEST_CASE("real hyper")
     REQUIRE(atanh(std::move(r0)) == 0);
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 
-    // sin_cos.
+    // sinh_cosh.
     real sop{1, detail::real_deduce_precision(0) * 2}, cop{2, detail::real_deduce_precision(0) * 3};
     REQUIRE(sop.get_prec() != detail::real_deduce_precision(0));
     REQUIRE(cop.get_prec() != detail::real_deduce_precision(0));
-    sin_cos(sop, cop, real{32});
+    sinh_cosh(sop, cop, real{32});
     REQUIRE(sop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(cop.get_prec() == detail::real_deduce_precision(0));
-    REQUIRE(sop == sin(real{32}));
-    REQUIRE(cop == cos(real{32}));
+    REQUIRE(sop == sinh(real{32}));
+    REQUIRE(cop == cosh(real{32}));
 
-    REQUIRE_THROWS_PREDICATE(sin_cos(sop, sop, real{32}), std::invalid_argument, [](const std::invalid_argument &ex) {
+    REQUIRE_THROWS_PREDICATE(sinh_cosh(sop, sop, real{32}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == std::string{
-                   "In the real sin_cos() function, the return values 'sop' and 'cop' must be distinct objects"};
+                      "In the real sinh_cosh() function, the return values 'sop' and 'cop' must be distinct objects"};
     });
 
     // Try with overlapping op/sop and op/cop.
     sop = real{1, detail::real_deduce_precision(0) * 2};
     cop = real{2, detail::real_deduce_precision(0) * 3};
-    sin_cos(sop, cop, sop);
+    sinh_cosh(sop, cop, sop);
     REQUIRE(sop.get_prec() == detail::real_deduce_precision(0) * 2);
     REQUIRE(cop.get_prec() == detail::real_deduce_precision(0) * 2);
-    REQUIRE(sop == sin(real{1, detail::real_deduce_precision(0) * 2}));
-    REQUIRE(cop == cos(real{1, detail::real_deduce_precision(0) * 2}));
+    REQUIRE(sop == sinh(real{1, detail::real_deduce_precision(0) * 2}));
+    REQUIRE(cop == cosh(real{1, detail::real_deduce_precision(0) * 2}));
 
     sop = real{1, detail::real_deduce_precision(0) * 2};
     cop = real{2, detail::real_deduce_precision(0) * 3};
-    sin_cos(sop, cop, cop);
+    sinh_cosh(sop, cop, cop);
     REQUIRE(sop.get_prec() == detail::real_deduce_precision(0) * 3);
     REQUIRE(cop.get_prec() == detail::real_deduce_precision(0) * 3);
-    REQUIRE(sop == sin(real{2, detail::real_deduce_precision(0) * 3}));
-    REQUIRE(cop == cos(real{2, detail::real_deduce_precision(0) * 3}));
+    REQUIRE(sop == sinh(real{2, detail::real_deduce_precision(0) * 3}));
+    REQUIRE(cop == cosh(real{2, detail::real_deduce_precision(0) * 3}));
 }
