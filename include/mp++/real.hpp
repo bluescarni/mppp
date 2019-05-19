@@ -1571,6 +1571,15 @@ private:
     template <std::size_t SSize>
     bool rational_conversion(rational<SSize> &rop) const
     {
+#if MPFR_VERSION_MAJOR >= 4
+        MPPP_MAYBE_TLS detail::mpq_raii mpq;
+        // NOTE: we already checked outside
+        // that rop is a finite number, hence
+        // this function cannot fail.
+        ::mpfr_get_q(&mpq.m_mpq, &m_mpfr);
+        rop = &mpq.m_mpq;
+        return true;
+#else
         // Clear the range error flag before attempting the conversion.
         ::mpfr_clear_erangeflag();
         // NOTE: this call can fail if the exponent of this is very close to the upper/lower limits of the exponent
@@ -1598,6 +1607,7 @@ private:
             canonicalise(rop);
         }
         return true;
+#endif
     }
     template <typename T, detail::enable_if_t<detail::is_rational<T>::value, int> = 0>
     T dispatch_conversion() const
