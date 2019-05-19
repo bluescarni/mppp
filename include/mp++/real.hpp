@@ -1571,6 +1571,15 @@ private:
     template <std::size_t SSize>
     bool rational_conversion(rational<SSize> &rop) const
     {
+#if MPFR_VERSION_MAJOR >= 4
+        MPPP_MAYBE_TLS detail::mpq_raii mpq;
+        // NOTE: we already checked outside
+        // that rop is a finite number, hence
+        // this function cannot fail.
+        ::mpfr_get_q(&mpq.m_mpq, &m_mpfr);
+        rop = &mpq.m_mpq;
+        return true;
+#else
         // Clear the range error flag before attempting the conversion.
         ::mpfr_clear_erangeflag();
         // NOTE: this call can fail if the exponent of this is very close to the upper/lower limits of the exponent
@@ -1598,6 +1607,7 @@ private:
             canonicalise(rop);
         }
         return true;
+#endif
     }
     template <typename T, detail::enable_if_t<detail::is_rational<T>::value, int> = 0>
     T dispatch_conversion() const
@@ -2003,6 +2013,105 @@ public:
     real &atan()
     {
         return self_mpfr_unary(::mpfr_atan);
+    }
+    /// In-place hyperbolic cosine.
+    /**
+     * This method will set ``this`` to its hyperbolic cosine.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &cosh()
+    {
+        return self_mpfr_unary(::mpfr_cosh);
+    }
+    /// In-place hyperbolic sine.
+    /**
+     * This method will set ``this`` to its hyperbolic sine.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &sinh()
+    {
+        return self_mpfr_unary(::mpfr_sinh);
+    }
+    /// In-place hyperbolic tangent.
+    /**
+     * This method will set ``this`` to its hyperbolic tangent.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &tanh()
+    {
+        return self_mpfr_unary(::mpfr_tanh);
+    }
+    /// In-place hyperbolic secant.
+    /**
+     * This method will set ``this`` to its hyperbolic secant.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &sech()
+    {
+        return self_mpfr_unary(::mpfr_sech);
+    }
+    /// In-place hyperbolic cosecant.
+    /**
+     * This method will set ``this`` to its hyperbolic cosecant.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &csch()
+    {
+        return self_mpfr_unary(::mpfr_csch);
+    }
+    /// In-place hyperbolic cotangent.
+    /**
+     * This method will set ``this`` to its hyperbolic cotangent.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &coth()
+    {
+        return self_mpfr_unary(::mpfr_coth);
+    }
+    /// In-place inverse hyperbolic cosine.
+    /**
+     * This method will set ``this`` to its inverse hyperbolic cosine.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &acosh()
+    {
+        return self_mpfr_unary(::mpfr_acosh);
+    }
+    /// In-place inverse hyperbolic sine.
+    /**
+     * This method will set ``this`` to its inverse hyperbolic sine.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &asinh()
+    {
+        return self_mpfr_unary(::mpfr_asinh);
+    }
+    /// In-place inverse hyperbolic tangent.
+    /**
+     * This method will set ``this`` to its inverse hyperbolic tangent.
+     * The precision of ``this`` will not be altered.
+     *
+     * @return a reference to ``this``.
+     */
+    real &atanh()
+    {
+        return self_mpfr_unary(::mpfr_atanh);
     }
     /// In-place exponential.
     /**
@@ -3350,6 +3459,64 @@ template <typename T, typename U, real_op_types_enabler<U, T> = 0>
 inline real atan2(T &&y, U &&x)
 {
     return detail::dispatch_atan2(std::forward<T>(y), std::forward<U>(x));
+}
+
+// Hyperbolic functions.
+
+MPPP_REAL_MPFR_UNARY_RETVAL(sinh)
+MPPP_REAL_MPFR_UNARY_RETURN(sinh)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(cosh)
+MPPP_REAL_MPFR_UNARY_RETURN(cosh)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(tanh)
+MPPP_REAL_MPFR_UNARY_RETURN(tanh)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(sech)
+MPPP_REAL_MPFR_UNARY_RETURN(sech)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(csch)
+MPPP_REAL_MPFR_UNARY_RETURN(csch)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(coth)
+MPPP_REAL_MPFR_UNARY_RETURN(coth)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(asinh)
+MPPP_REAL_MPFR_UNARY_RETURN(asinh)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(acosh)
+MPPP_REAL_MPFR_UNARY_RETURN(acosh)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(atanh)
+MPPP_REAL_MPFR_UNARY_RETURN(atanh)
+
+// sinh and cosh at the same time.
+// NOTE: we don't have the machinery to steal resources
+// for multiple retvals, thus we do a manual implementation
+// of this function. We keep the signature with CvrReal
+// for consistency with the other functions.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline void sinh_cosh(real &sop, real &cop, T &&op)
+{
+    if (mppp_unlikely(&sop == &cop)) {
+        throw std::invalid_argument(
+            "In the real sinh_cosh() function, the return values 'sop' and 'cop' must be distinct objects");
+    }
+
+    // Set the precision of sop and cop to the
+    // precision of op.
+    const auto op_prec = op.get_prec();
+    // NOTE: use prec_round() to avoid issues in case
+    // sop/cop overlap with op.
+    sop.prec_round(op_prec);
+    cop.prec_round(op_prec);
+
+    // Run the mpfr function.
+    ::mpfr_sinh_cosh(sop._get_mpfr_t(), cop._get_mpfr_t(), op.get_mpfr_t(), MPFR_RNDN);
 }
 
 // Exponentials and logarithms.
