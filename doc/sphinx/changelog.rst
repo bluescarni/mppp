@@ -1,6 +1,15 @@
 Changelog
 =========
 
+0.16 (unreleased)
+-----------------
+
+Fix
+~~~
+
+- Properly set the version numbers for the mp++ dynamic library
+  (`#185 <https://github.com/bluescarni/mppp/pull/185>`__).
+
 0.15 (24-05-2019)
 -----------------
 
