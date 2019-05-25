@@ -8,7 +8,7 @@ Fix
 ~~~
 
 - Properly set the version numbers for the mp++ dynamic library
-  (`#185 <https://github.com/bluescarni/mppp/pull/185>`__).
+  (`#187 <https://github.com/bluescarni/mppp/pull/187>`__).
 
 0.15 (24-05-2019)
 -----------------
