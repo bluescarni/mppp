@@ -35,7 +35,7 @@
 #include <utility>
 #include <vector>
 
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
 #endif
 
@@ -1389,7 +1389,7 @@ private:
     };
     explicit integer(const ptag &, const char *s, int base) : m_int(s, base) {}
     explicit integer(const ptag &, const std::string &s, int base) : integer(s.c_str(), base) {}
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     explicit integer(const ptag &, const std::string_view &s, int base) : integer(s.data(), s.data() + s.size(), base)
     {
     }

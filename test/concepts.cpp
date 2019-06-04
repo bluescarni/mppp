@@ -10,11 +10,12 @@
 
 #include <mp++/concepts.hpp>
 #include <mp++/detail/type_traits.hpp>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <sstream>
 #include <string>
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+#include <string_view>
+#endif
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -117,7 +118,7 @@ TEST_CASE("concepts")
     REQUIRE(!is_string_type<char(&)[1]>::value);
     REQUIRE(is_string_type<const char[2]>::value);
     REQUIRE(!is_string_type<char(&&)[10]>::value);
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE(is_string_type<std::string_view>::value);
     REQUIRE(!is_string_type<std::string_view &>::value);
     REQUIRE(!is_string_type<const std::string_view &>::value);
@@ -134,7 +135,7 @@ TEST_CASE("concepts")
     char s2[] = "blab";
     check_dispatch(s2);
     check_dispatch(&s2[0]);
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     const std::string_view sv1{"bubbbbba"};
     check_dispatch(sv1);
     std::string_view sv2{"bubbbba"};

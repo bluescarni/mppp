@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
 #endif
 
@@ -250,7 +250,7 @@ TEST_CASE("real constructors")
     REQUIRE((real{std::string{"123"}, 111}.get_prec() == 111));
     real_reset_default_prec();
     REQUIRE((::mpfr_equal_p(real{std::string{"123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{"123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((real{std::string_view{"123"}, 10, 100}.get_prec() == 100));
     REQUIRE((::mpfr_equal_p(real{std::string_view{"123"}, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
@@ -259,24 +259,24 @@ TEST_CASE("real constructors")
     // Leading whitespaces are ok.
     REQUIRE((::mpfr_equal_p(real{"   123", 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"   123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{"   123"}, 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));
 #endif
     REQUIRE((real{"123", 10, 100}.get_prec() == 100));
     REQUIRE((real{std::string{"123"}, 10, 100}.get_prec() == 100));
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((real{std::string_view{"123"}, 10, 100}.get_prec() == 100));
 #endif
     REQUIRE((::mpfr_equal_p(real{"-1.23E2", 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"-1.23E2"}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{"-1.23E2"}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
 #endif
     if (std::numeric_limits<double>::radix == 2) {
         REQUIRE((::mpfr_equal_p(real{"5E-1", 10, 100}.get_mpfr_t(), real{.5}.get_mpfr_t())));
         REQUIRE((::mpfr_equal_p(real{"-25e-2", 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
         REQUIRE((::mpfr_equal_p(real{std::string{"-25e-2"}, 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
         REQUIRE((::mpfr_equal_p(real{std::string_view{"-25e-2"}, 10, 100}.get_mpfr_t(), real{-.25}.get_mpfr_t())));
 #endif
     }
@@ -290,7 +290,7 @@ TEST_CASE("real constructors")
     REQUIRE((real{std::string{"123"}}.get_prec() == 150));
     REQUIRE((::mpfr_equal_p(real{"-11120", 3, 0}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string{"-11120"}, 3, 0}.get_mpfr_t(), real{-123}.get_mpfr_t())));
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{"-11120"}, 3, 0}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string_view{"-123"}}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE((real{std::string_view{"-123"}}.get_prec() == 150));
@@ -306,7 +306,7 @@ TEST_CASE("real constructors")
     REQUIRE((real{"-inf", 10, 42}.inf_p()));
     REQUIRE((real{"inf", 10, 42}.sgn() > 0));
     REQUIRE((real{"-inf", 10, 42}.sgn() < 0));
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((
         ::mpfr_equal_p(real{std::string_view{"0x7B"}, int(0), ::mpfr_prec_t(0)}.get_mpfr_t(), real{123}.get_mpfr_t())));
 #endif
@@ -328,7 +328,7 @@ TEST_CASE("real constructors")
                        "Cannot construct a real from a string in base -1: the base must either be zero or in "
                        "the [2,62] range");
         });
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE_THROWS_PREDICATE(
         (real{std::string_view{"12"}, -1, 0}), std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
@@ -404,7 +404,7 @@ TEST_CASE("real constructors")
                    == std::string("Cannot construct a real from a string if the precision is not explicitly "
                                   "specified and no default precision has been set");
         });
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((::mpfr_equal_p(real{std::string_view{vc.data() + 2, 4}, 10, 100}.get_mpfr_t(), real{1234}.get_mpfr_t())));
     REQUIRE((::mpfr_equal_p(real{std::string_view{vc.data() + 1, 4}, 10, 100}.get_mpfr_t(), real{-123}.get_mpfr_t())));
     REQUIRE_THROWS_PREDICATE(
@@ -915,7 +915,7 @@ TEST_CASE("real assignment")
     REQUIRE_THROWS_PREDICATE(r8 = std::string("1223"), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what() == std::string("Cannot assign a string to a real if a default precision is not set");
     });
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE_THROWS_PREDICATE(r8 = std::string_view("1223"), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what() == std::string("Cannot assign a string to a real if a default precision is not set");
     });
@@ -929,7 +929,7 @@ TEST_CASE("real assignment")
     r8 = std::string{"1224"};
     REQUIRE(r8.get_prec() == 100);
     REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), 1224l) == 0);
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     r8.set_prec(150);
     r8 = std::string_view{"1224"};
     REQUIRE(r8.get_prec() == 100);
@@ -947,7 +947,7 @@ TEST_CASE("real assignment")
     });
     REQUIRE(r8.nan_p());
     r8 = 56;
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE_THROWS_PREDICATE(
         r8 = std::string_view{"hell-o"}, std::invalid_argument, [](const std::invalid_argument &ex) {
             return ex.what()
@@ -1077,7 +1077,7 @@ TEST_CASE("real assignment")
             return ex.what()
                    == std::string{"The string ',-12' cannot be interpreted as a floating-point value in base 0"};
         });
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     r8.set(std::string_view{"-4.321e3"});
     REQUIRE(::mpfr_cmp_si((r8).get_mpfr_t(), -4321) == 0);
     r8.set(std::string_view{"4.321e3"}, 0);
