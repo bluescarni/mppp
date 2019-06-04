@@ -58,12 +58,16 @@ static_assert(sizeof(expected_mpfr_struct_t) == sizeof(mpfr_struct_t) && offseto
 
 // If we have C++17, we can use structured bindings to test the layout of mpfr_struct_t
 // and its members' types.
-constexpr void test_mpfr_struct_t()
+constexpr bool test_mpfr_struct_t()
 {
     auto [prec, sign, exp, ptr] = mpfr_struct_t{};
     static_assert(std::is_same<decltype(ptr), ::mp_limb_t *>::value);
     ignore(prec, sign, exp, ptr);
+
+    return true;
 }
+
+static_assert(test_mpfr_struct_t());
 
 #endif
 
