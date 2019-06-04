@@ -11,9 +11,6 @@
 #include <mp++/rational.hpp>
 #include <mp++/type_name.hpp>
 
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <string>
 #include <thread>
 #include <typeinfo>

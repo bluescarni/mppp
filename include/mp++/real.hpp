@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
 #endif
 
@@ -681,7 +681,7 @@ private:
         construct_from_c_string(s, base, p);
     }
     explicit real(const ptag &, const std::string &s, int base, ::mpfr_prec_t p) : real(s.c_str(), base, p) {}
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     explicit real(const ptag &, const std::string_view &s, int base, ::mpfr_prec_t p)
         : real(s.data(), s.data() + s.size(), base, p)
     {
@@ -1046,7 +1046,7 @@ private:
     {
         return string_assignment(s.c_str());
     }
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     real &string_assignment(const std::string_view &s)
     {
         MPPP_MAYBE_TLS std::vector<char> buffer;
@@ -1198,7 +1198,7 @@ private:
     {
         return set(s.c_str(), base);
     }
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     real &set_impl(const std::string_view &s, int base)
     {
         return set(s.data(), s.data() + s.size(), base);

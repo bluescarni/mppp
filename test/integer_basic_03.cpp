@@ -28,7 +28,7 @@
 
 #include <gmp.h>
 
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
 #endif
 
@@ -230,7 +230,7 @@ struct string_ctor_tester {
         const char *cs = "-1234\0";
         REQUIRE((integer{cs, cs + 5} == -1234));
         REQUIRE((integer{cs, cs + 4} == -123));
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
         std::string_view sv = "-1234";
         REQUIRE((integer{sv} == -1234));
         REQUIRE((integer{std::string_view{sv.data(), 4u}} == -123));

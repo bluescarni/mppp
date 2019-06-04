@@ -20,13 +20,14 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <thread>
 #include <tuple>
 #include <type_traits>
 #include <utility>
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+#include <string_view>
+#endif
 
 #include "test_utils.hpp"
 
@@ -323,7 +324,7 @@ struct string_ass_tester {
         REQUIRE_THROWS_PREDICATE(n = "", std::invalid_argument, [](const std::invalid_argument &ia) {
             return std::string(ia.what()) == "The string '' is not a valid integer in base 10";
         });
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
         n = std::string_view(" -123 ");
         REQUIRE(n == -123);
         n = std::string_view("4563 ");

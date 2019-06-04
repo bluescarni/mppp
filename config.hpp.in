@@ -116,4 +116,19 @@
 
 #endif
 
+// Check if we have std::string_view available.
+// Older compilers might advertise C++17 support
+// without implementing all the necessary library
+// components - this is the case with MSVC 2015
+// and std::string_view.
+#if MPPP_CPLUSPLUS >= 201703L
+
+#if __has_include(<string_view>)
+
+#define MPPP_HAVE_STRING_VIEW
+
+#endif
+
+#endif
+
 #endif

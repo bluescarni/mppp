@@ -25,7 +25,7 @@
 #include <type_traits>
 #include <vector>
 
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
 #endif
 
@@ -399,7 +399,7 @@ private:
     };
     explicit real128(const ptag &, const char *s) : m_value(detail::str_to_float128(s)) {}
     explicit real128(const ptag &, const std::string &s) : real128(s.c_str()) {}
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     explicit real128(const ptag &, const std::string_view &s) : real128(s.data(), s.data() + s.size()) {}
 #endif
 public:

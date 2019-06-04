@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
 #endif
 
@@ -406,7 +406,7 @@ private:
         dispatch_c_string_ctor(s, base);
     }
     explicit rational(const ptag &, const std::string &s, int base) : rational(s.c_str(), base) {}
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     explicit rational(const ptag &, const std::string_view &s, int base) : rational(s.data(), s.data() + s.size(), base)
     {
     }
