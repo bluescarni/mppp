@@ -15,7 +15,7 @@
 #include <string>
 #include <type_traits>
 
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
 #endif
 
@@ -113,7 +113,7 @@ using is_string_type
                           // NOTE: detail::remove_cv_t does remove cv qualifiers from arrays.
                           detail::conjunction<std::is_array<detail::remove_cv_t<T>>,
                                               std::is_same<detail::remove_extent_t<detail::remove_cv_t<T>>, char>>
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
                           ,
                           std::is_same<detail::remove_cv_t<T>, std::string_view>
 #endif

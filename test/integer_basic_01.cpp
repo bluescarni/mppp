@@ -20,9 +20,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <thread>
 #include <tuple>
 #include <type_traits>

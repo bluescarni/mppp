@@ -26,12 +26,13 @@
 #include <random>
 #include <stdexcept>
 #include <string>
-#if MPPP_CPLUSPLUS >= 201703L
-#include <string_view>
-#endif
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+#include <string_view>
+#endif
 
 #include "test_utils.hpp"
 
@@ -205,7 +206,7 @@ TEST_CASE("real128 constructors")
             return std::string(ex.what())
                    == "The string '-1234 ' does not represent a valid quadruple-precision floating-point value";
         });
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     REQUIRE((real128{std::string_view{tmp_char + 6, 5}}.m_value == -1234));
     REQUIRE_THROWS_PREDICATE(
         (real128{std::string_view{tmp_char + 6, 6}}), std::invalid_argument, [](const std::invalid_argument &ex) {
@@ -251,7 +252,7 @@ TEST_CASE("real128 constructors")
     REQUIRE((ra.m_value == -123000));
     ra = std::string("1234");
     REQUIRE((ra.m_value == 1234));
-#if MPPP_CPLUSPLUS >= 201703L
+#if defined(MPPP_HAVE_STRING_VIEW)
     ra = std::string_view{tmp_char + 6, 5};
     REQUIRE((ra.m_value == -1234));
 #endif
