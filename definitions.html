@@ -207,54 +207,64 @@ Show Source
 <p><em>#include &lt;mp++/config.hpp&gt;</em></p>
 <dl class="macro">
 <dt id="c.MPPP_VERSION_STRING">
-<code class="descname">MPPP_VERSION_STRING</code><a class="headerlink" href="#c.MPPP_VERSION_STRING" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">MPPP_VERSION_STRING</code><a class="headerlink" href="#c.MPPP_VERSION_STRING" title="Permalink to this definition">¶</a></dt>
 <dd><p>This definition expands to a string literal containing the full version of the mp++ library
 (e.g., for version 0.6 this macro expands to <code class="docutils literal notranslate"><span class="pre">&quot;0.6&quot;</span></code>).</p>
 </dd></dl>
 
 <dl class="macro">
 <dt id="c.MPPP_VERSION_MAJOR">
-<code class="descname">MPPP_VERSION_MAJOR</code><a class="headerlink" href="#c.MPPP_VERSION_MAJOR" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">MPPP_VERSION_MAJOR</code><a class="headerlink" href="#c.MPPP_VERSION_MAJOR" title="Permalink to this definition">¶</a></dt>
 <dd><p>This definition expands to an integral literal corresponding to the major mp++ version (e.g.,
 for version 0.6, this macro expands to <code class="docutils literal notranslate"><span class="pre">0</span></code>).</p>
 </dd></dl>
 
 <dl class="macro">
 <dt id="c.MPPP_VERSION_MINOR">
-<code class="descname">MPPP_VERSION_MINOR</code><a class="headerlink" href="#c.MPPP_VERSION_MINOR" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">MPPP_VERSION_MINOR</code><a class="headerlink" href="#c.MPPP_VERSION_MINOR" title="Permalink to this definition">¶</a></dt>
 <dd><p>This definition expands to an integral literal corresponding to the minor mp++ version (e.g.,
 for version 0.6, this macro expands to <code class="docutils literal notranslate"><span class="pre">6</span></code>).</p>
 </dd></dl>
 
 <dl class="macro">
 <dt id="c.MPPP_WITH_QUADMATH">
-<code class="descname">MPPP_WITH_QUADMATH</code><a class="headerlink" href="#c.MPPP_WITH_QUADMATH" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">MPPP_WITH_QUADMATH</code><a class="headerlink" href="#c.MPPP_WITH_QUADMATH" title="Permalink to this definition">¶</a></dt>
 <dd><p>This name is defined if mp++ was configured with support for the quadmath library
 (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
 </dd></dl>
 
 <dl class="macro">
 <dt id="c.MPPP_WITH_MPFR">
-<code class="descname">MPPP_WITH_MPFR</code><a class="headerlink" href="#c.MPPP_WITH_MPFR" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">MPPP_WITH_MPFR</code><a class="headerlink" href="#c.MPPP_WITH_MPFR" title="Permalink to this definition">¶</a></dt>
 <dd><p>This name is defined if mp++ was configured with support for the MPFR library
 (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
 </dd></dl>
 
 <dl class="macro">
 <dt id="c.MPPP_HAVE_GCC_INT128">
-<code class="descname">MPPP_HAVE_GCC_INT128</code><a class="headerlink" href="#c.MPPP_HAVE_GCC_INT128" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">MPPP_HAVE_GCC_INT128</code><a class="headerlink" href="#c.MPPP_HAVE_GCC_INT128" title="Permalink to this definition">¶</a></dt>
 <dd><p>This name is defined if mp++ detects the presence of the GCC-style 128-bit integers
 <code class="docutils literal notranslate"><span class="pre">__int128_t</span></code> and <code class="docutils literal notranslate"><span class="pre">__uint128_t</span></code>, available on some compiler/platform combinations.</p>
 </dd></dl>
 
 <dl class="macro">
 <dt id="c.MPPP_STATIC_BUILD">
-<code class="descname">MPPP_STATIC_BUILD</code><a class="headerlink" href="#c.MPPP_STATIC_BUILD" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">MPPP_STATIC_BUILD</code><a class="headerlink" href="#c.MPPP_STATIC_BUILD" title="Permalink to this definition">¶</a></dt>
 <dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 0.15.</span></p>
 </div>
 <p>This name is defined if mp++ was built as a static library, instead of a dynamic
 library (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.MPPP_HAVE_STRING_VIEW">
+<code class="sig-name descname">MPPP_HAVE_STRING_VIEW</code><a class="headerlink" href="#c.MPPP_HAVE_STRING_VIEW" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.17.</span></p>
+</div>
+<p>This name is defined if mp++ detects the availability of the <code class="docutils literal notranslate"><span class="pre">std::string_view</span></code>
+class.</p>
 </dd></dl>
 
 </div>
@@ -301,7 +311,7 @@ library (see the <a class="reference internal" href="installation.html#installat
 
     <div class="mdl-mini-footer__right-section">
         <div>&copy; Copyright 2016-2019, Francesco Biscani.</div>
-      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 2.0.1 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
+      <div>Generated by <a href="http://sphinx.pocoo.org/">Sphinx</a> 2.1.0 using <a href="https://github.com/myyasuda/sphinx_materialdesign_theme">sphinx_materialdesign_theme</a>.</div>
     </div>
 </footer>
         </main>
