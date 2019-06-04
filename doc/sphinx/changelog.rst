@@ -4,6 +4,13 @@ Changelog
 0.17 (unreleased)
 -----------------
 
+New
+~~~
+
+- Expose the gamma functions from the MPFR API
+  for :cpp:class:`~mppp::real`
+  (`#188 <https://github.com/bluescarni/mppp/pull/188>`__).
+
 0.16 (25-05-2019)
 -----------------
 
