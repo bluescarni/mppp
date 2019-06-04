@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.3.0)
 
-project(mp++ VERSION 0.16 LANGUAGES CXX C)
+project(mp++ VERSION 0.17 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
@@ -190,8 +190,8 @@ if(MPPP_BUILD_STATIC_LIBRARY)
 else()
     # Setup of the mp++ shared library.
     add_library(mp++ SHARED "${MPPP_SRC_FILES}")
-    set_property(TARGET mp++ PROPERTY VERSION "2.0")
-    set_property(TARGET mp++ PROPERTY SOVERSION 2)
+    set_property(TARGET mp++ PROPERTY VERSION "3.0")
+    set_property(TARGET mp++ PROPERTY SOVERSION 3)
     set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
     set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
     set_target_properties(mp++ PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
