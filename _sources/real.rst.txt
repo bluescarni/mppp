@@ -585,8 +585,91 @@ Logarithms and exponentials
 Gamma functions
 ~~~~~~~~~~~~~~~
 
-.. doxygengroup:: real_gamma
-   :content-only:
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::gamma(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::lngamma(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::lgamma(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::digamma(mppp::real &rop, T &&op)
+
+   Binary gamma functions.
+
+   These functions will set *rop* to, respectively,
+
+   * :math:`\Gamma\left(op\right)`,
+   * :math:`\ln\Gamma\left(op\right)`,
+   * :math:`\ln\left|\Gamma\left(op\right)\right|`,
+   * :math:`\psi\left(op\right)`.
+
+   The precision of the result will be equal to the precision of *op*.
+
+   :param rop: the return value.
+   :param op: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::gamma(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::lngamma(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::lgamma(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::digamma(T &&r)
+
+   Unary gamma functions.
+
+   These functions will return, respectively,
+
+   * :math:`\Gamma\left(r\right)`,
+   * :math:`\ln\Gamma\left(r\right)`,
+   * :math:`\ln\left|\Gamma\left(r\right)\right|`,
+   * :math:`\psi\left(r\right)`.
+
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the argument.
+
+   :return: the Gamma function, logarithm of the Gamma function,
+     logarithm of the absolute value of the Gamma function, or the
+     Digamma function of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::gamma_inc(mppp::real &rop, T &&x, U &&y)
+
+   .. versionadded:: 0.17
+
+   Ternary incomplete Gamma function.
+
+   This function will set *rop* to the upper incomplete Gamma function of *x* and *y*.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   .. note::
+      This function is available from MPFR 4 onwards.
+
+   :param rop: the return value.
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::gamma_inc(T &&x, U &&y)
+
+   .. versionadded:: 0.17
+
+   Binary incomplete Gamma function.
+
+   This function will compute and return the upper incomplete Gamma function of *x* and *y*.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
+   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
+   either the default precision, if set, or it is automatically deduced depending on the type
+   and value of the operand to be converted.
+
+   .. note::
+      This function is available from MPFR 4 onwards.
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the upper incomplete Gamma function of *x* and *y*
+
+   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. _real_intrem:
 
