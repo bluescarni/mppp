@@ -9,6 +9,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+#include <mp++/detail/mpfr.hpp>
+#include <mp++/integer.hpp>
 #include <mp++/real.hpp>
 #include <utility>
 
@@ -45,3 +47,82 @@ TEST_CASE("real lgamma")
     REQUIRE(lgamma(std::move(r0)) == 0);
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
+
+TEST_CASE("real lngamma")
+{
+    real r0{1};
+    r0.lngamma();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 0);
+    real rop;
+    r0 = real{1};
+    REQUIRE(lngamma(rop, r0) == 0);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(lngamma(r0) == 0);
+    REQUIRE(lngamma(std::move(r0)) == 0);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+}
+
+TEST_CASE("real digamma")
+{
+    real r0{2};
+    r0.digamma();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(abs(r0 - (digamma(real{3}) - 1 / real{2})) < 1E-8);
+    real rop;
+    r0 = real{2};
+    REQUIRE(abs(digamma(rop, r0) - (digamma(real{3}) - 1 / real{2})) < 1E-8);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    r0 = real{2};
+    REQUIRE(abs(digamma(r0) - (digamma(real{3}) - 1 / real{2})) < 1E-8);
+    REQUIRE(abs(digamma(std::move(r0)) - (digamma(real{3}) - 1 / real{2})) < 1E-8);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+}
+
+#if MPFR_VERSION_MAJOR >= 4
+
+TEST_CASE("real gamma_inc")
+{
+    real r0{12, 450};
+    gamma_inc(r0, real{4}, real{5});
+    REQUIRE(abs(r0 - (3 * gamma_inc(real{3}, real{5}) + pow(real{5}, 3) * exp(-real{5}))) < 1E-8);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    real tmp1{4}, tmp2{5};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    gamma_inc(r0, std::move(tmp1), tmp2);
+    REQUIRE(abs(r0 - (3 * gamma_inc(real{3}, real{5}) + pow(real{5}, 3) * exp(-real{5}))) < 1E-8);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp1 was swapped for r0.
+    REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
+    tmp1 = real{4};
+    tmp2 = real{5};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    gamma_inc(r0, tmp1, std::move(tmp2));
+    REQUIRE(abs(r0 - (3 * gamma_inc(real{3}, real{5}) + pow(real{5}, 3) * exp(-real{5}))) < 1E-8);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp2 was swapped for r0.
+    REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
+
+    // Some tests for the binary form too.
+    REQUIRE(abs(gamma_inc(real{4}, real{5}) - (3 * gamma_inc(real{3}, real{5}) + pow(real{5}, 3) * exp(-real{5})))
+            < 1E-8);
+    REQUIRE(gamma_inc(real{4, 20}, real{5, 30}).get_prec() == 30);
+    REQUIRE(gamma_inc(real{4}, 5.) == gamma_inc(real{4}, real{5.}));
+    REQUIRE(gamma_inc(5., real{4}) == gamma_inc(real{5.}, real{4}));
+    REQUIRE(gamma_inc(real{4}, 5) == gamma_inc(real{4}, real{5}));
+    REQUIRE(gamma_inc(5, real{4}) == gamma_inc(real{5}, real{4}));
+    REQUIRE(gamma_inc(-5., real{4}) == gamma_inc(real{-5.}, real{4}));
+    REQUIRE(gamma_inc(-5, real{4}) == gamma_inc(real{-5}, real{4}));
+    REQUIRE(gamma_inc(real{4}, integer<1>{5}) == gamma_inc(real{4}, real{integer<1>{5}}));
+    REQUIRE(gamma_inc(integer<1>{-5}, real{4}) == gamma_inc(real{integer<1>{-5}}, real{4}));
+    REQUIRE(gamma_inc(real{4, detail::real_deduce_precision(0.) / 2}, 5.).get_prec()
+            == detail::real_deduce_precision(0.));
+    REQUIRE(gamma_inc(4., real{5, detail::real_deduce_precision(0.) / 2}).get_prec()
+            == detail::real_deduce_precision(0.));
+    REQUIRE(gamma_inc(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(gamma_inc(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
+}
+
+#endif

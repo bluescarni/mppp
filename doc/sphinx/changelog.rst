@@ -1,6 +1,22 @@
 Changelog
 =========
 
+0.17 (unreleased)
+-----------------
+
+New
+~~~
+
+- Expose the gamma functions from the MPFR API
+  for :cpp:class:`~mppp::real`
+  (`#190 <https://github.com/bluescarni/mppp/pull/190>`__).
+
+Fix
+~~~
+
+- Fix C++17 builds with MSVC 2015
+  (`#191 <https://github.com/bluescarni/mppp/pull/191>`__).
+
 0.16 (25-05-2019)
 -----------------
 

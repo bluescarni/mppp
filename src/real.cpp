@@ -73,6 +73,22 @@ static_assert(test_mpfr_struct_t());
 
 } // namespace
 
+// Wrapper for calling mpfr_lgamma().
+void real_lgamma_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t)
+{
+    // NOTE: we ignore the sign for consistency with lgamma.
+    int signp;
+    ::mpfr_lgamma(rop, &signp, op, MPFR_RNDN);
+}
+
+// A small helper to check the input of the trunc() overloads.
+void real_check_trunc_arg(const real &r)
+{
+    if (mppp_unlikely(r.nan_p())) {
+        throw std::domain_error("Cannot truncate a NaN value");
+    }
+}
+
 void mpfr_to_stream(const ::mpfr_t r, std::ostream &os, int base)
 {
     // All chars potentially used by MPFR for representing the digits up to base 62, sorted.
@@ -536,6 +552,55 @@ real::~real()
         assert(detail::real_prec_check(get_prec()));
         ::mpfr_clear(&m_mpfr);
     }
+}
+
+/// In-place Gamma function.
+/**
+ * This method will set ``this`` to its Gamma function.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::gamma()
+{
+    return self_mpfr_unary(::mpfr_gamma);
+}
+
+/// In-place logarithm of the Gamma function.
+/**
+ * This method will set ``this`` to the logarithm of its Gamma function.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::lngamma()
+{
+    return self_mpfr_unary(::mpfr_lngamma);
+}
+
+/// In-place logarithm of the absolute value of the Gamma function.
+/**
+ * This method will set ``this`` to the logarithm of the absolute value of its Gamma function.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::lgamma()
+{
+    detail::real_lgamma_wrapper(&m_mpfr, &m_mpfr, MPFR_RNDN);
+    return *this;
+}
+
+/// In-place Digamma function.
+/**
+ * This method will set ``this`` to its Digamma function.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::digamma()
+{
+    return self_mpfr_unary(::mpfr_digamma);
 }
 
 } // namespace mppp

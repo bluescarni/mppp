@@ -127,12 +127,14 @@ inline ::mpfr_prec_t real_deduce_precision(const rational<SSize> &q)
 }
 
 #if defined(MPPP_WITH_QUADMATH)
+
 inline ::mpfr_prec_t real_deduce_precision(const real128 &)
 {
     // The significand precision in bits is 113 for real128. Let's double-check it.
     static_assert(real128_sig_digits() == 113u, "Invalid number of digits.");
     return 113;
 }
+
 #endif
 
 #endif
@@ -151,16 +153,10 @@ template <typename F>
 real real_constant(const F &, ::mpfr_prec_t);
 
 // Wrapper for calling mpfr_lgamma().
-inline void real_lgamma_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t)
-{
-    // NOTE: we ignore the sign for consistency with lgamma.
-    int signp;
-    ::mpfr_lgamma(rop, &signp, op, MPFR_RNDN);
-}
+MPPP_DLL_PUBLIC void real_lgamma_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t);
 
-// A small helper to check the input of the trunc() overloads,
-// only fwd declaration (implementation below).
-void check_real_trunc_arg(const real &);
+// A small helper to check the input of the trunc() overloads.
+MPPP_DLL_PUBLIC void real_check_trunc_arg(const real &);
 
 } // namespace detail
 
@@ -2201,29 +2197,14 @@ public:
     {
         return self_mpfr_unary(::mpfr_log1p);
     }
-    /// In-place Gamma function.
-    /**
-     * This method will set ``this`` to its Gamma function.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &gamma()
-    {
-        return self_mpfr_unary(::mpfr_gamma);
-    }
-    /// In-place logarithm of the absolute value of the Gamma function.
-    /**
-     * This method will set ``this`` to the logarithm of the absolute value of its Gamma function.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &lgamma()
-    {
-        detail::real_lgamma_wrapper(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
-    }
+    // In-place Gamma function.
+    real &gamma();
+    // In-place logarithm of the Gamma function.
+    real &lngamma();
+    // In-place logarithm of the absolute value of the Gamma function.
+    real &lgamma();
+    // In-place Digamma function.
+    real &digamma();
     /// Check if the value is an integer.
     /**
      * @return ``true`` if ``this`` represents an integer value, ``false`` otherwise.
@@ -2243,7 +2224,7 @@ public:
      */
     real &trunc()
     {
-        detail::check_real_trunc_arg(*this);
+        detail::real_check_trunc_arg(*this);
         ::mpfr_trunc(&m_mpfr, &m_mpfr);
         return *this;
     }
@@ -2254,19 +2235,6 @@ private:
 
 // Double check that real is a standard layout class.
 static_assert(std::is_standard_layout<real>::value, "real is not a standard layout class.");
-
-namespace detail
-{
-
-// Implementation of the trunc() argument checker.
-inline void check_real_trunc_arg(const real &r)
-{
-    if (mppp_unlikely(r.nan_p())) {
-        throw std::domain_error("Cannot truncate a NaN value");
-    }
-}
-
-} // namespace detail
 
 template <typename T, typename U>
 using are_real_op_types = detail::disjunction<
@@ -3423,7 +3391,7 @@ template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
 inline real dispatch_atan2(T &&y, U &&x)
 {
-    return detail::mpfr_nary_op_return(0, ::mpfr_atan2, std::forward<T>(y), std::forward<U>(x));
+    return mpfr_nary_op_return(0, ::mpfr_atan2, std::forward<T>(y), std::forward<U>(x));
 }
 
 template <typename T, typename U,
@@ -3545,99 +3513,104 @@ MPPP_REAL_MPFR_UNARY_RETURN(log10)
 MPPP_REAL_MPFR_UNARY_RETVAL(log1p)
 MPPP_REAL_MPFR_UNARY_RETURN(log1p)
 
+// Gamma functions.
+
+MPPP_REAL_MPFR_UNARY_RETVAL(gamma)
+MPPP_REAL_MPFR_UNARY_RETURN(gamma)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(lngamma)
+MPPP_REAL_MPFR_UNARY_RETURN(lngamma)
+
+// NOTE: for lgamma we have to spell out the full implementations,
+// since we are using a wrapper internally.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &lgamma(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, detail::real_lgamma_wrapper, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real lgamma(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, detail::real_lgamma_wrapper, std::forward<T>(r));
+}
+
+MPPP_REAL_MPFR_UNARY_RETVAL(digamma)
+MPPP_REAL_MPFR_UNARY_RETURN(digamma)
+
+#if MPFR_VERSION_MAJOR >= 4
+
+// Ternary gamma_inc.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &gamma_inc(real &rop, T &&x, U &&y)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_gamma_inc, rop, std::forward<T>(x), std::forward<U>(y));
+}
+
+namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_gamma_inc(T &&x, U &&y)
+{
+    return mpfr_nary_op_return(0, ::mpfr_gamma_inc, std::forward<T>(x), std::forward<U>(y));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+inline real dispatch_gamma_inc(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_gamma_inc(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_gamma_inc(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_gamma_inc(tmp, std::forward<U>(a));
+}
+
+} // namespace detail
+
+// Binary gamma_inc.
+#if defined(MPPP_HAVE_CONCEPTS)
+// NOTE: written like this, the constraint is equivalent
+// to: requires RealOpTypes<U, T>.
+template <typename T, RealOpTypes<T> U>
+#else
+// NOTE: we flip around T and U in the enabler to keep
+// it consistent with the concept above.
+template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+#endif
+inline real gamma_inc(T &&x, U &&y)
+{
+    return detail::dispatch_gamma_inc(std::forward<T>(x), std::forward<U>(y));
+}
+
+#endif
+
 #undef MPPP_REAL_MPFR_UNARY_RETURN
 #undef MPPP_REAL_MPFR_UNARY_RETVAL
 #undef MPPP_REAL_MPFR_UNARY_HEADER
 #undef MPPP_REAL_MPFR_UNARY_RETURN_IMPL
 #undef MPPP_REAL_MPFR_UNARY_RETVAL_IMPL
-
-/** @defgroup real_gamma real_gamma
- *  @{
- */
-
-/// Binary \link mppp::real real\endlink Gamma function.
-/**
- * This function will compute the Gamma function of ``op`` and store it
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-inline real &gamma(real &rop, CvrReal &&op)
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-inline real &gamma(real &rop, T &&op)
-#endif
-{
-    return detail::mpfr_nary_op(0, ::mpfr_gamma, rop, std::forward<decltype(op)>(op));
-}
-
-/// Unary \link mppp::real real\endlink Gamma function.
-/**
- * This function will compute and return the Gamma function of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * @param r the operand.
- *
- * @return the Gamma function of \p r.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-inline real gamma(CvrReal &&r)
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-inline real gamma(T &&r)
-#endif
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_gamma, std::forward<decltype(r)>(r));
-}
-
-/// Binary \link mppp::real real\endlink logarithm of the absolute value of the Gamma function.
-/**
- * This function will compute the logarithm of the absolute value of the Gamma function of ``op`` and store it
- * into ``rop``. The precision of the result will be equal to the precision
- * of ``op``.
- *
- * @param rop the return value.
- * @param op the operand.
- *
- * @return a reference to \p rop.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-inline real &lgamma(real &rop, CvrReal &&op)
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-inline real &lgamma(real &rop, T &&op)
-#endif
-{
-    return detail::mpfr_nary_op(0, detail::real_lgamma_wrapper, rop, std::forward<decltype(op)>(op));
-}
-
-/// Unary \link mppp::real real\endlink logarithm of the absolute value of the Gamma function.
-/**
- * This function will compute and return the logarithm of the absolute value of the Gamma function of ``r``.
- * The precision of the result will be equal to the precision
- * of ``r``.
- *
- * @param r the operand.
- *
- * @return the logarithm of the absolute value of the Gamma function of \p r.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-inline real lgamma(CvrReal &&r)
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-inline real lgamma(T &&r)
-#endif
-{
-    return detail::mpfr_nary_op_return(0, detail::real_lgamma_wrapper, std::forward<decltype(r)>(r));
-}
-
-/** @} */
 
 /** @defgroup real_io real_io
  *  @{
@@ -3778,7 +3751,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real &trunc(real &rop, T &&op)
 #endif
 {
-    detail::check_real_trunc_arg(op);
+    detail::real_check_trunc_arg(op);
     return detail::mpfr_nary_op_nornd(0, ::mpfr_trunc, rop, std::forward<decltype(op)>(op));
 }
 
@@ -3801,7 +3774,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real trunc(T &&r)
 #endif
 {
-    detail::check_real_trunc_arg(r);
+    detail::real_check_trunc_arg(r);
     return detail::mpfr_nary_op_return_nornd(0, ::mpfr_trunc, std::forward<decltype(r)>(r));
 }
 
