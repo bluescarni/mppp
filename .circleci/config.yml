@@ -9,6 +9,14 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_bionic_gcc7_coverage.sh
+  bionic_gcc7_relwithdebinfo:
+    docker:
+    - image: circleci/buildpack-deps:bionic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_bionic_gcc7_relwithdebinfo.sh
   cosmic_gcc8_coverage:
     docker:
     - image: circleci/buildpack-deps:cosmic
@@ -63,6 +71,7 @@ workflows:
   all_builds:
     jobs:
     - bionic_gcc7_coverage
+    - bionic_gcc7_relwithdebinfo
     - cosmic_gcc8_coverage
     - cosmic_clang7_asan
     - cosmic_clang7_tsan
