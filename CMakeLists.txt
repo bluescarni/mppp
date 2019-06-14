@@ -38,6 +38,29 @@ if(YACMA_COMPILER_IS_MSVC AND MPPP_BUILD_STATIC_LIBRARY)
     mark_as_advanced(MPPP_BUILD_STATIC_LIBRARY_WITH_DYNAMIC_MSVC_RUNTIME)
 endif()
 
+# NOTE: on Unix systems, the correct library installation path
+# could be something other than just "lib", such as "lib64",
+# "lib32", etc., depending on platform/configuration. Apparently,
+# CMake provides this information via the GNUInstallDirs module.
+# Let's enable this for now on all Unixes except OSX.
+# NOTE: potentially, this could be applicable to Cygwin as well.
+#
+# https://cmake.org/cmake/help/v3.15/module/GNUInstallDirs.html
+# https://cmake.org/pipermail/cmake/2013-July/055375.html
+if(UNIX AND NOT APPLE)
+    include(GNUInstallDirs)
+    set(_MPPP_INSTALL_LIBDIR_DEFAULT "${CMAKE_INSTALL_LIBDIR}")
+else()
+    set(_MPPP_INSTALL_LIBDIR_DEFAULT "lib")
+endif()
+if(NOT MPPP_INSTALL_LIBDIR)
+	set(MPPP_INSTALL_LIBDIR "${_MPPP_INSTALL_LIBDIR_DEFAULT}" CACHE STRING
+        "Library installation directory."
+        FORCE)
+endif()
+mark_as_advanced(MPPP_INSTALL_LIBDIR)
+message(STATUS "Library installation directory: ${MPPP_INSTALL_LIBDIR}")
+
 # Assemble the flags.
 set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
 set(MPPP_CXX_FLAGS_RELEASE ${YACMA_CXX_FLAGS})
@@ -260,8 +283,8 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/mp++/config.hpp" DESTINATION 
 # Installation of the library.
 install(TARGETS mp++
     EXPORT mp++_export
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION "${MPPP_INSTALL_LIBDIR}"
+    ARCHIVE DESTINATION "${MPPP_INSTALL_LIBDIR}"
     RUNTIME DESTINATION bin
 )
 
@@ -274,15 +297,15 @@ if(MPPP_WITH_QUADMATH)
     set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(Quadmath REQUIRED)\n")
 endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" DESTINATION "lib/cmake/mp++")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMPFR.cmake"
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindQuadmath.cmake" DESTINATION "lib/cmake/mp++")
-install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION lib/cmake/mp++)
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindQuadmath.cmake" DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
+install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 # Take care of versioning.
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" VERSION ${mp++_VERSION}
 	COMPATIBILITY SameMajorVersion)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATION "lib/cmake/mp++")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 
 # This is just a simple counter variable, internal use only.
 set(_MPPP_TEST_NUM "0")
