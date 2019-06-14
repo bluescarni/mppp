@@ -603,4 +603,52 @@ real &real::digamma()
     return self_mpfr_unary(::mpfr_digamma);
 }
 
+/// In-place Bessel function of the first kind of order 0.
+/**
+ * This method will set ``this`` to its Bessel function of the first kind of order 0.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::j0()
+{
+    return self_mpfr_unary(::mpfr_j0);
+}
+
+/// In-place Bessel function of the first kind of order 1.
+/**
+ * This method will set ``this`` to its Bessel function of the first kind of order 1.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::j1()
+{
+    return self_mpfr_unary(::mpfr_j1);
+}
+
+/// In-place Bessel function of the second kind of order 0.
+/**
+ * This method will set ``this`` to its Bessel function of the second kind of order 0.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::y0()
+{
+    return self_mpfr_unary(::mpfr_y0);
+}
+
+/// In-place Bessel function of the second kind of order 1.
+/**
+ * This method will set ``this`` to its Bessel function of the second kind of order 1.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::y1()
+{
+    return self_mpfr_unary(::mpfr_y1);
+}
+
 } // namespace mppp

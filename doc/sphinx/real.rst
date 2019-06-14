@@ -671,6 +671,62 @@ Gamma functions
 
    :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
+.. _real_bessel:
+
+Bessel functions
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 0.17
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::j0(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::j1(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::jn(mppp::real &rop, long n, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::y0(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::y1(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::yn(mppp::real &rop, long n, T &&op)
+
+   Bessel functions.
+
+   These functions will set *rop* to, respectively,
+
+   * the Bessel function of the first kind of order 0 :math:`\left(J_0\right)` of *op*,
+   * the Bessel function of the first kind of order 1 :math:`\left(J_1\right)` of *op*,
+   * the Bessel function of the first kind of order *n* :math:`\left(J_n\right)` of *op*,
+   * the Bessel function of the second kind of order 0 :math:`\left(Y_0\right)` of *op*,
+   * the Bessel function of the second kind of order 1 :math:`\left(Y_1\right)` of *op*,
+   * the Bessel function of the second kind of order *n* :math:`\left(Y_n\right)` of *op*.
+
+   The precision of the result will be equal to the precision of *op*.
+
+   :param rop: the return value.
+   :param op: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::j0(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::j1(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::jn(long n, T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::y0(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::y1(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::yn(long n, T &&r)
+
+   Bessel functions.
+
+   These functions will return, respectively,
+
+   * the Bessel function of the first kind of order 0 :math:`\left(J_0\right)` of *r*,
+   * the Bessel function of the first kind of order 1 :math:`\left(J_1\right)` of *r*,
+   * the Bessel function of the first kind of order *n* :math:`\left(J_n\right)` of *r*,
+   * the Bessel function of the second kind of order 0 :math:`\left(Y_0\right)` of *r*,
+   * the Bessel function of the second kind of order 1 :math:`\left(Y_1\right)` of *r*,
+   * the Bessel function of the second kind of order *n* :math:`\left(Y_n\right)` of *r*.
+
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the argument.
+
+   :return: the Bessel function of *r*.
+
 .. _real_intrem:
 
 Integer and remainder related functions

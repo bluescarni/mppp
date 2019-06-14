@@ -6,22 +6,23 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
-
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <stdexcept>
+#include <utility>
+
+#include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real.hpp>
+
 #if defined(MPPP_WITH_QUADMATH)
 #include <mp++/real128.hpp>
 #endif
-#include <stdexcept>
-#include <utility>
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
@@ -521,6 +522,14 @@ TEST_CASE("real left in-place add")
     REQUIRE(r0.get_prec() == 5);
     real_reset_default_prec();
 #endif
+
+    // Check stealing move semantics.
+    r0 = real{42};
+    r1 = real{1, detail::real_deduce_precision(0) * 10};
+    r0 += std::move(r1);
+    REQUIRE(r0 == 43);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0) * 10);
+    REQUIRE(r1 == 42);
 }
 
 TEST_CASE("real right in-place add")
@@ -1176,6 +1185,14 @@ TEST_CASE("real left in-place sub")
     REQUIRE(r0.get_prec() == 5);
     real_reset_default_prec();
 #endif
+
+    // Check stealing move semantics.
+    r0 = real{42};
+    r1 = real{1, detail::real_deduce_precision(0) * 10};
+    r0 -= std::move(r1);
+    REQUIRE(r0 == 41);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0) * 10);
+    REQUIRE(r1 == 42);
 }
 
 TEST_CASE("real right in-place sub")
@@ -1815,6 +1832,14 @@ TEST_CASE("real left in-place mul")
     REQUIRE(r0.get_prec() == 5);
     real_reset_default_prec();
 #endif
+
+    // Check stealing move semantics.
+    r0 = real{42};
+    r1 = real{2, detail::real_deduce_precision(0) * 10};
+    r0 *= std::move(r1);
+    REQUIRE(r0 == 84);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0) * 10);
+    REQUIRE(r1 == 42);
 }
 
 TEST_CASE("real right in-place mul")
@@ -2453,6 +2478,14 @@ TEST_CASE("real left in-place div")
     REQUIRE(r0.get_prec() == 5);
     real_reset_default_prec();
 #endif
+
+    // Check stealing move semantics.
+    r0 = real{42};
+    r1 = real{2, detail::real_deduce_precision(0) * 10};
+    r0 /= std::move(r1);
+    REQUIRE(r0 == 21);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0) * 10);
+    REQUIRE(r1 == 42);
 }
 
 TEST_CASE("real right in-place div")
