@@ -221,7 +221,8 @@ else()
 endif()
 
 # Setup common to both the shared and static variants.
-target_compile_options(mp++ PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
+target_compile_options(mp++ PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>"
+    "$<$<CONFIG:RELWITHDEBINFO>:${MPPP_CXX_FLAGS_RELEASE}>")
 # Let's setup the target C++ standard, but only if the user did not provide it manually.
 if(NOT CMAKE_CXX_STANDARD)
     if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
