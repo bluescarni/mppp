@@ -2205,6 +2205,14 @@ public:
     real &lgamma();
     // In-place Digamma function.
     real &digamma();
+    // In-place Bessel function of the first kind of order 0.
+    real &j0();
+    // In-place Bessel function of the first kind of order 1.
+    real &j1();
+    // In-place Bessel function of the second kind of order 0.
+    real &y0();
+    // In-place Bessel function of the second kind of order 1.
+    real &y1();
     /// Check if the value is an integer.
     /**
      * @return ``true`` if ``this`` represents an integer value, ``false`` otherwise.
@@ -3605,6 +3613,66 @@ inline real gamma_inc(T &&x, U &&y)
 }
 
 #endif
+
+// Bessel functions.
+
+MPPP_REAL_MPFR_UNARY_RETVAL(j0)
+MPPP_REAL_MPFR_UNARY_RETURN(j0)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(j1)
+MPPP_REAL_MPFR_UNARY_RETURN(j1)
+
+// Bessel function of the first kind of order n.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &jn(real &rop, long n, T &&op)
+{
+    auto jn_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_jn(r, n, o, rnd); };
+    return detail::mpfr_nary_op(0, jn_wrapper, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real jn(long n, T &&r)
+{
+    auto jn_wrapper = [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_jn(rop, n, op, rnd); };
+    return detail::mpfr_nary_op_return(0, jn_wrapper, std::forward<T>(r));
+}
+
+MPPP_REAL_MPFR_UNARY_RETVAL(y0)
+MPPP_REAL_MPFR_UNARY_RETURN(y0)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(y1)
+MPPP_REAL_MPFR_UNARY_RETURN(y1)
+
+// Bessel function of the second kind of order n.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &yn(real &rop, long n, T &&op)
+{
+    auto yn_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_yn(r, n, o, rnd); };
+    return detail::mpfr_nary_op(0, yn_wrapper, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real yn(long n, T &&r)
+{
+    auto yn_wrapper = [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_yn(rop, n, op, rnd); };
+    return detail::mpfr_nary_op_return(0, yn_wrapper, std::forward<T>(r));
+}
 
 #undef MPPP_REAL_MPFR_UNARY_RETURN
 #undef MPPP_REAL_MPFR_UNARY_RETVAL
