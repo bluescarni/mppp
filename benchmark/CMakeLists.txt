@@ -28,7 +28,8 @@ function(ADD_MPPP_BENCHMARK arg1)
     target_compile_options(${arg1} PRIVATE "-DMPPP_BENCHMARK_FLINT")
   endif()
   target_include_directories(${arg1} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
-  target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
+  target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>"
+    "$<$<CONFIG:RELWITHDEBINFO>:${MPPP_CXX_FLAGS_RELEASE}>")
   # Let's setup the target C++ standard, but only if the user did not provide it manually.
   if(NOT CMAKE_CXX_STANDARD)
     if(MPPP_COMPILER_SUPPORTS_CONCEPTS)

@@ -20,7 +20,8 @@ function(ADD_MPPP_TESTCASE arg1)
   endif()
   add_executable(${arg1} ${arg1}.cpp)
   target_link_libraries(${arg1} mp++ Threads::Threads)
-  target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>")
+  target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>"
+    "$<$<CONFIG:RELWITHDEBINFO>:${MPPP_CXX_FLAGS_RELEASE}>")
   # Let's setup the target C++ standard, but only if the user did not provide it manually.
   if(NOT CMAKE_CXX_STANDARD)
     if(MPPP_COMPILER_SUPPORTS_CONCEPTS)

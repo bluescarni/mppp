@@ -1328,7 +1328,7 @@ public:
      * This constructor always initialises ``this`` to a non-negative value,
      * and it requires the most significant limb of ``p`` to be nonzero. It also requires
      * every member of the input array not to be greater than the ``GMP_NUMB_MAX`` GMP constant.
-     * If ``size`` is zero, ``this`` will be initialised to zero.
+     * If ``size`` is zero, ``this`` will be initialised to zero without ever dereferencing ``p``.
      *
      * .. seealso::
      *    https://gmplib.org/manual/Low_002dlevel-Functions.html#Low_002dlevel-Functions
