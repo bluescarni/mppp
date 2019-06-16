@@ -389,7 +389,7 @@ value bits in a limb (typically 64 or 32, depending on the platform).</p>
 <p>This constructor always initialises <code class="docutils literal notranslate"><span class="pre">this</span></code> to a non-negative value,
 and it requires the most significant limb of <code class="docutils literal notranslate"><span class="pre">p</span></code> to be nonzero. It also requires
 every member of the input array not to be greater than the <code class="docutils literal notranslate"><span class="pre">GMP_NUMB_MAX</span></code> GMP constant.
-If <code class="docutils literal notranslate"><span class="pre">size</span></code> is zero, <code class="docutils literal notranslate"><span class="pre">this</span></code> will be initialised to zero.</p>
+If <code class="docutils literal notranslate"><span class="pre">size</span></code> is zero, <code class="docutils literal notranslate"><span class="pre">this</span></code> will be initialised to zero without ever dereferencing <code class="docutils literal notranslate"><span class="pre">p</span></code>.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference external" href="https://gmplib.org/manual/Low_002dlevel-Functions.html#Low_002dlevel-Functions">https://gmplib.org/manual/Low_002dlevel-Functions.html#Low_002dlevel-Functions</a></p>
