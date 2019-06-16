@@ -54,9 +54,8 @@ else()
     set(_MPPP_INSTALL_LIBDIR_DEFAULT "lib")
 endif()
 if(NOT MPPP_INSTALL_LIBDIR)
-	set(MPPP_INSTALL_LIBDIR "${_MPPP_INSTALL_LIBDIR_DEFAULT}" CACHE STRING
-        "Library installation directory."
-        FORCE)
+    set(MPPP_INSTALL_LIBDIR "${_MPPP_INSTALL_LIBDIR_DEFAULT}" CACHE STRING
+        "Library installation directory." FORCE)
 endif()
 mark_as_advanced(MPPP_INSTALL_LIBDIR)
 message(STATUS "Library installation directory: ${MPPP_INSTALL_LIBDIR}")
