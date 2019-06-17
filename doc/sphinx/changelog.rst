@@ -7,6 +7,10 @@ Changelog
 New
 ~~~
 
+- Expose the Bessel functions from the MPFR API
+  for :cpp:class:`~mppp::real`
+  (`#192 <https://github.com/bluescarni/mppp/pull/192>`__).
+
 - Expose the gamma functions from the MPFR API
   for :cpp:class:`~mppp::real`
   (`#190 <https://github.com/bluescarni/mppp/pull/190>`__).
