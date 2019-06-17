@@ -135,6 +135,7 @@ if(MPPP_WITH_MPFR)
   ADD_MPPP_TESTCASE(real_get_set_z_2exp)
   ADD_MPPP_TESTCASE(real_trig)
   ADD_MPPP_TESTCASE(real_intrem)
+  ADD_MPPP_TESTCASE(real_other_specfunc)
 endif()
 
 if(MPPP_TEST_PYBIND11)
