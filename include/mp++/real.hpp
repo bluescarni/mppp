@@ -2213,6 +2213,16 @@ public:
     real &y0();
     // In-place Bessel function of the second kind of order 1.
     real &y1();
+    // In-place exponential integral.
+    real &eint();
+    // In-place dilogarithm.
+    real &li2();
+    // In-place Riemann Zeta function.
+    real &zeta();
+    // In-place error function.
+    real &erf();
+    // In-place complementary error function.
+    real &erfc();
     /// Check if the value is an integer.
     /**
      * @return ``true`` if ``this`` represents an integer value, ``false`` otherwise.
@@ -3673,6 +3683,19 @@ inline real yn(long n, T &&r)
     auto yn_wrapper = [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_yn(rop, n, op, rnd); };
     return detail::mpfr_nary_op_return(0, yn_wrapper, std::forward<T>(r));
 }
+
+// Other special functions.
+MPPP_REAL_MPFR_UNARY_RETVAL(eint)
+MPPP_REAL_MPFR_UNARY_RETURN(eint)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(li2)
+MPPP_REAL_MPFR_UNARY_RETURN(li2)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(zeta)
+MPPP_REAL_MPFR_UNARY_RETURN(zeta)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(erf)
+MPPP_REAL_MPFR_UNARY_RETURN(erfc)
 
 #undef MPPP_REAL_MPFR_UNARY_RETURN
 #undef MPPP_REAL_MPFR_UNARY_RETVAL
