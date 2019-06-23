@@ -3700,6 +3700,66 @@ MPPP_REAL_MPFR_UNARY_RETURN(erf)
 MPPP_REAL_MPFR_UNARY_RETVAL(erfc)
 MPPP_REAL_MPFR_UNARY_RETURN(erfc)
 
+#if MPFR_VERSION_MAJOR >= 4
+
+// Ternary beta.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &beta(real &rop, T &&x, U &&y)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_beta, rop, std::forward<T>(x), std::forward<U>(y));
+}
+
+namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_beta(T &&x, U &&y)
+{
+    return mpfr_nary_op_return(0, ::mpfr_beta, std::forward<T>(x), std::forward<U>(y));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+inline real dispatch_beta(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_beta(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_beta(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_beta(tmp, std::forward<U>(a));
+}
+
+} // namespace detail
+
+// Binary beta.
+#if defined(MPPP_HAVE_CONCEPTS)
+// NOTE: written like this, the constraint is equivalent
+// to: requires RealOpTypes<U, T>.
+template <typename T, RealOpTypes<T> U>
+#else
+// NOTE: we flip around T and U in the enabler to keep
+// it consistent with the concept above.
+template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+#endif
+inline real beta(T &&x, U &&y)
+{
+    return detail::dispatch_beta(std::forward<T>(x), std::forward<U>(y));
+}
+
+#endif
+
 #undef MPPP_REAL_MPFR_UNARY_RETURN
 #undef MPPP_REAL_MPFR_UNARY_RETVAL
 #undef MPPP_REAL_MPFR_UNARY_HEADER

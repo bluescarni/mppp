@@ -9,8 +9,10 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include <mp++/real.hpp>
 #include <utility>
+
+#include <mp++/detail/mpfr.hpp>
+#include <mp++/real.hpp>
 
 using namespace mppp;
 
@@ -88,3 +90,48 @@ TEST_CASE("real erfc")
     REQUIRE(abs(erfc(std::move(r0)) - 0.15729920705) < 1E-5);
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
+
+#if MPFR_VERSION_MAJOR >= 4
+
+TEST_CASE("real beta")
+{
+    real r0{12, 450};
+    beta(r0, real{4}, real{5});
+    REQUIRE(abs(r0 - gamma(real{4}) * gamma(real{5}) / gamma(real{9})) < 1E-8);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    real tmp1{4}, tmp2{5};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    beta(r0, std::move(tmp1), tmp2);
+    REQUIRE(abs(r0 - gamma(real{4}) * gamma(real{5}) / gamma(real{9})) < 1E-8);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp1 was swapped for r0.
+    REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
+    tmp1 = real{4};
+    tmp2 = real{5};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    beta(r0, tmp1, std::move(tmp2));
+    REQUIRE(abs(r0 - gamma(real{4}) * gamma(real{5}) / gamma(real{9})) < 1E-8);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp2 was swapped for r0.
+    REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
+
+    // Some tests for the binary form too.
+    REQUIRE(abs(beta(real{4}, real{5}) - gamma(real{4}) * gamma(real{5}) / gamma(real{9})) < 1E-8);
+    REQUIRE(beta(real{4, 20}, real{5, 30}).get_prec() == 30);
+    REQUIRE(beta(real{4}, 5.) == beta(real{4}, real{5.}));
+    REQUIRE(beta(5., real{4}) == beta(real{5.}, real{4}));
+    REQUIRE(beta(real{4}, 5) == beta(real{4}, real{5}));
+    REQUIRE(beta(5, real{4}) == beta(real{5}, real{4}));
+    REQUIRE(beta(-5., real{4}) == beta(real{-5.}, real{4}));
+    REQUIRE(beta(-5, real{4}) == beta(real{-5}, real{4}));
+    REQUIRE(beta(real{4}, integer<1>{5}) == beta(real{4}, real{integer<1>{5}}));
+    REQUIRE(beta(integer<1>{-5}, real{4}) == beta(real{integer<1>{-5}}, real{4}));
+    REQUIRE(beta(real{4, detail::real_deduce_precision(0.) / 2}, 5.).get_prec() == detail::real_deduce_precision(0.));
+    REQUIRE(beta(4., real{5, detail::real_deduce_precision(0.) / 2}).get_prec() == detail::real_deduce_precision(0.));
+    REQUIRE(beta(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(beta(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
+}
+
+#endif
