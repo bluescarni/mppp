@@ -135,3 +135,100 @@ TEST_CASE("real beta")
 }
 
 #endif
+
+TEST_CASE("real ai")
+{
+    real r0{0};
+    r0.ai();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(abs(r0 - 0.3550280538878172) < 1E-5);
+    real rop;
+    r0 = real{0};
+    REQUIRE(abs(ai(rop, r0) - 0.3550280538878172) < 1E-5);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(abs(ai(r0) - 0.3550280538878172) < 1E-5);
+    REQUIRE(abs(ai(std::move(r0)) - 0.3550280538878172) < 1E-5);
+    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+}
+
+TEST_CASE("real hypot")
+{
+    real r0{12, 450};
+    hypot(r0, real{4}, real{5});
+    REQUIRE(abs(r0 - 6.4031242374328485) < 1E-8);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    real tmp1{4}, tmp2{5};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    hypot(r0, std::move(tmp1), tmp2);
+    REQUIRE(abs(r0 - 6.4031242374328485) < 1E-8);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp1 was swapped for r0.
+    REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
+    tmp1 = real{4};
+    tmp2 = real{5};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    hypot(r0, tmp1, std::move(tmp2));
+    REQUIRE(abs(r0 - 6.4031242374328485) < 1E-8);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp2 was swapped for r0.
+    REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
+
+    // Some tests for the binary form too.
+    REQUIRE(abs(hypot(real{4}, real{5}) - 6.4031242374328485) < 1E-8);
+    REQUIRE(hypot(real{4, 20}, real{5, 30}).get_prec() == 30);
+    REQUIRE(hypot(real{4}, 5.) == hypot(real{4}, real{5.}));
+    REQUIRE(hypot(5., real{4}) == hypot(real{5.}, real{4}));
+    REQUIRE(hypot(real{4}, 5) == hypot(real{4}, real{5}));
+    REQUIRE(hypot(5, real{4}) == hypot(real{5}, real{4}));
+    REQUIRE(hypot(-5., real{4}) == hypot(real{-5.}, real{4}));
+    REQUIRE(hypot(-5, real{4}) == hypot(real{-5}, real{4}));
+    REQUIRE(hypot(real{4}, integer<1>{5}) == hypot(real{4}, real{integer<1>{5}}));
+    REQUIRE(hypot(integer<1>{-5}, real{4}) == hypot(real{integer<1>{-5}}, real{4}));
+    REQUIRE(hypot(real{4, detail::real_deduce_precision(0.) / 2}, 5.).get_prec() == detail::real_deduce_precision(0.));
+    REQUIRE(hypot(4., real{5, detail::real_deduce_precision(0.) / 2}).get_prec() == detail::real_deduce_precision(0.));
+    REQUIRE(hypot(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(hypot(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
+}
+
+TEST_CASE("real agm")
+{
+    real r0{12, 450};
+    agm(r0, real{1}, sqrt(real{2}));
+    REQUIRE(abs(r0 - 1.1981402945603952) < 1E-6);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    real tmp1{1}, tmp2{sqrt(real{2})};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    agm(r0, std::move(tmp1), tmp2);
+    REQUIRE(abs(r0 - 1.1981402945603952) < 1E-6);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp1 was swapped for r0.
+    REQUIRE(tmp1 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp1.get_prec() == detail::real_deduce_precision(0) / 2);
+    tmp1 = real{1};
+    tmp2 = real{sqrt(real{2})};
+    r0 = real{12, detail::real_deduce_precision(0) / 2};
+    agm(r0, tmp1, std::move(tmp2));
+    REQUIRE(abs(r0 - 1.1981402945603952) < 1E-6);
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // Check tmp2 was swapped for r0.
+    REQUIRE(tmp2 == real{12, detail::real_deduce_precision(0) / 2});
+    REQUIRE(tmp2.get_prec() == detail::real_deduce_precision(0) / 2);
+
+    // Some tests for the binary form too.
+    REQUIRE(abs(agm(real{1}, real{sqrt(real{2})}) - 1.1981402945603952) < 1E-6);
+    REQUIRE(agm(real{4, 20}, real{5, 30}).get_prec() == 30);
+    REQUIRE(agm(real{4}, 5.) == agm(real{4}, real{5.}));
+    REQUIRE(agm(5., real{4}) == agm(real{5.}, real{4}));
+    REQUIRE(agm(real{4}, 5) == agm(real{4}, real{5}));
+    REQUIRE(agm(5, real{4}) == agm(real{5}, real{4}));
+    REQUIRE(agm(5., real{4}) == agm(real{5.}, real{4}));
+    REQUIRE(agm(5, real{4}) == agm(real{5}, real{4}));
+    REQUIRE(agm(real{4}, integer<1>{5}) == agm(real{4}, real{integer<1>{5}}));
+    REQUIRE(agm(integer<1>{5}, real{4}) == agm(real{integer<1>{5}}, real{4}));
+    REQUIRE(agm(real{4, detail::real_deduce_precision(0.) / 2}, 5.).get_prec() == detail::real_deduce_precision(0.));
+    REQUIRE(agm(4., real{5, detail::real_deduce_precision(0.) / 2}).get_prec() == detail::real_deduce_precision(0.));
+    REQUIRE(agm(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(agm(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
+}

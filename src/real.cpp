@@ -711,4 +711,16 @@ real &real::erfc()
     return self_mpfr_unary(::mpfr_erfc);
 }
 
+/// In-place Airy function.
+/**
+ * This method will set ``this`` to its Airy function.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::ai()
+{
+    return self_mpfr_unary(::mpfr_ai);
+}
+
 } // namespace mppp
