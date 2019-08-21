@@ -172,14 +172,14 @@ using is_real_interoperable = detail::disjunction<is_cpp_interoperable<T>, detai
                                                   >;
 
 template <typename T>
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 MPP_CONCEPT_DECL RealInteroperable = is_real_interoperable<T>::value;
 
 #else
 using real_interoperable_enabler = detail::enable_if_t<is_real_interoperable<T>::value, int>;
 #endif
 
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
 MPP_CONCEPT_DECL CvrReal = std::is_same<detail::uncvref_t<T>, real>::value;
 #else
@@ -2370,7 +2370,7 @@ using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &
 #if !defined(MPPP_DOXYGEN_INVOKED)
 
 template <typename... Args>
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 MPP_CONCEPT_DECL RealSetArgs = detail::is_detected<detail::real_set_t, Args...>::value;
 #else
 using real_set_args_enabler = detail::enable_if_t<detail::is_detected<detail::real_set_t, Args...>::value, int>;
@@ -2770,7 +2770,7 @@ inline real mpfr_nary_op_return_nornd(::mpfr_prec_t min_prec, const F &f, Arg0 &
         return detail::mpfr_nary_op_return(0, ::mpfr_##fname, std::forward<T>(r));                                     \
     }
 
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #define MPPP_REAL_MPFR_UNARY_HEADER template <CvrReal T>
 #else
 #define MPPP_REAL_MPFR_UNARY_HEADER template <typename T, cvr_real_enabler<T> = 0>
@@ -2963,7 +2963,7 @@ inline real fms(T &&a, U &&b, V &&c)
  *
  * @return the negative of \p x.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 inline real neg(CvrReal &&x)
 #else
@@ -3008,7 +3008,7 @@ inline real neg(real &rop, T &&x)
  *
  * @return the absolute value of \p x.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 inline real abs(CvrReal &&x)
 #else
@@ -3032,7 +3032,7 @@ inline real abs(T &&x)
  *
  * @return a reference to \p rop.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 inline real &abs(real &rop, CvrReal &&x)
 #else
@@ -3884,7 +3884,7 @@ inline bool integer_p(const real &r)
  *
  * @throws std::domain_error if ``op`` is NaN.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 inline real &trunc(real &rop, CvrReal &&op)
 #else
@@ -4436,7 +4436,7 @@ inline real operator--(real &x, int)
  *
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
 inline real operator*(RealOpTypes<T> &&a, T &&b)
@@ -4527,7 +4527,7 @@ inline void dispatch_in_place_mul(T &x, U &&a)
  * @throws unspecified any exception thrown by the corresponding binary operator,
  * or by the generic conversion operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
 inline auto &operator*=(RealCompoundOpTypes<T> &a, T &&b)
@@ -4593,7 +4593,7 @@ inline real dispatch_binary_div(const T &x, U &&a)
  *
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
 inline real operator/(RealOpTypes<T> &&a, T &&b)
@@ -4684,7 +4684,7 @@ inline void dispatch_in_place_div(T &x, U &&a)
  * @throws unspecified any exception thrown by the corresponding binary operator,
  * or by the generic conversion operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
 inline auto &operator/=(RealCompoundOpTypes<T> &a, T &&b)
@@ -4755,7 +4755,7 @@ inline bool dispatch_real_comparison(const F &f, const real &a, const real &b)
  *
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
 inline bool operator==(const RealOpTypes<T> &a, const T &b)
@@ -4798,7 +4798,7 @@ inline bool operator==(const T &a, const U &b)
  *
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
 inline bool operator!=(const RealOpTypes<T> &a, const T &b)
@@ -4842,7 +4842,7 @@ inline bool operator!=(const T &a, const U &b)
  *
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
 inline bool operator>(const RealOpTypes<T> &a, const T &b)
@@ -4884,7 +4884,7 @@ inline bool operator>(const T &a, const U &b)
  *
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
 inline bool operator>=(const RealOpTypes<T> &a, const T &b)
@@ -4928,7 +4928,7 @@ inline bool operator>=(const T &a, const U &b)
  *
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
 inline bool operator<(const RealOpTypes<T> &a, const T &b)
@@ -4970,7 +4970,7 @@ inline bool operator<(const T &a, const U &b)
  *
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
-#if defined(MPPP_HAVE_CONCEPTS) 
+#if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
 inline bool operator<=(const RealOpTypes<T> T &a, const T &b)
