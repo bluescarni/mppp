@@ -79,6 +79,12 @@
 
 #define MPPP_HAVE_CONCEPTS
 
+#if defined(_MSC_VER)
+#define MPP_CONCEPT_DECL concept
+#else
+#define MPP_CONCEPT_DECL concept bool 
+#endif
+
 #endif
 
 // C++ standard setup.
