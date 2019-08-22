@@ -4973,7 +4973,7 @@ inline bool operator<(const T &a, const U &b)
 #if defined(MPPP_HAVE_CONCEPTS)
 #if !defined(_MSC_VER)
 template <typename T>
-inline bool operator<=(const RealOpTypes<T> T &a, const T &b)
+inline bool operator<=(const RealOpTypes<T> &a, const T &b)
 #else
 template <typename T, typename U> requires RealOpTypes<T, U>
 inline bool operator<=(const T &a, const U &b)
