@@ -50,7 +50,7 @@ using is_rational_interoperable = detail::disjunction<is_cpp_interoperable<T>, s
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS) 
-MPP_CONCEPT_DECL RationalInteroperable = is_rational_interoperable<T, SSize>::value;
+MPPP_CONCEPT_DECL RationalInteroperable = is_rational_interoperable<T, SSize>::value;
 #else
 using rational_interoperable_enabler = detail::enable_if_t<is_rational_interoperable<T, SSize>::value, int>;
 #endif
@@ -61,7 +61,7 @@ using is_rational_integral_interoperable
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS) 
-MPP_CONCEPT_DECL RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
+MPPP_CONCEPT_DECL RationalIntegralInteroperable = is_rational_integral_interoperable<T, SSize>::value;
 #else
 using rational_integral_interoperable_enabler
     = detail::enable_if_t<is_rational_integral_interoperable<T, SSize>::value, int>;
@@ -72,7 +72,7 @@ using is_rational_cvr_interoperable = is_rational_interoperable<detail::uncvref_
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS) 
-MPP_CONCEPT_DECL RationalCvrInteroperable = is_rational_cvr_interoperable<T, SSize>::value;
+MPPP_CONCEPT_DECL RationalCvrInteroperable = is_rational_cvr_interoperable<T, SSize>::value;
 #else
 using rational_cvr_interoperable_enabler = detail::enable_if_t<is_rational_cvr_interoperable<T, SSize>::value, int>;
 #endif
@@ -82,7 +82,7 @@ using is_rational_cvr_integral_interoperable = is_rational_integral_interoperabl
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS) 
-MPP_CONCEPT_DECL RationalCvrIntegralInteroperable = is_rational_cvr_integral_interoperable<T, SSize>::value;
+MPPP_CONCEPT_DECL RationalCvrIntegralInteroperable = is_rational_cvr_integral_interoperable<T, SSize>::value;
 #else
 using rational_cvr_integral_interoperable_enabler
     = detail::enable_if_t<is_rational_cvr_integral_interoperable<T, SSize>::value, int>;
@@ -1269,7 +1269,7 @@ using are_rational_op_types = detail::is_detected<detail::rational_common_t, T, 
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS) 
-MPP_CONCEPT_DECL RationalOpTypes = are_rational_op_types<T, U>::value;
+MPPP_CONCEPT_DECL RationalOpTypes = are_rational_op_types<T, U>::value;
 #else
 using rational_op_types_enabler = detail::enable_if_t<are_rational_op_types<T, U>::value, int>;
 #endif

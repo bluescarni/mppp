@@ -3240,7 +3240,7 @@ using are_integer_op_types = detail::is_detected<detail::integer_common_t, T, U>
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPP_CONCEPT_DECL IntegerOpTypes = are_integer_op_types<T, U>::value;
+MPPP_CONCEPT_DECL IntegerOpTypes = are_integer_op_types<T, U>::value;
 #else
 using integer_op_types_enabler = detail::enable_if_t<are_integer_op_types<T, U>::value, int>;
 #endif
@@ -3253,7 +3253,7 @@ using are_integer_integral_op_types
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPP_CONCEPT_DECL IntegerIntegralOpTypes = are_integer_integral_op_types<T, U>::value;
+MPPP_CONCEPT_DECL IntegerIntegralOpTypes = are_integer_integral_op_types<T, U>::value;
 #else
 using integer_integral_op_types_enabler = detail::enable_if_t<are_integer_integral_op_types<T, U>::value, int>;
 #endif
@@ -7547,14 +7547,14 @@ using has_integer_binary_load = is_detected<integer_binary_load_t, T, integer<SS
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPP_CONCEPT_DECL IntegerBinarySaveDest = detail::has_integer_binary_save<T, SSize>::value;
+MPPP_CONCEPT_DECL IntegerBinarySaveDest = detail::has_integer_binary_save<T, SSize>::value;
 #else
 using integer_binary_save_enabler = detail::enable_if_t<detail::has_integer_binary_save<T, SSize>::value, int>;
 #endif
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPP_CONCEPT_DECL IntegerBinaryLoadSrc = detail::has_integer_binary_load<T, SSize>::value;
+MPPP_CONCEPT_DECL IntegerBinaryLoadSrc = detail::has_integer_binary_load<T, SSize>::value;
 #else
 using integer_binary_load_enabler = detail::enable_if_t<detail::has_integer_binary_load<T, SSize>::value, int>;
 #endif

@@ -173,7 +173,7 @@ using is_real_interoperable = detail::disjunction<is_cpp_interoperable<T>, detai
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPP_CONCEPT_DECL RealInteroperable = is_real_interoperable<T>::value;
+MPPP_CONCEPT_DECL RealInteroperable = is_real_interoperable<T>::value;
 
 #else
 using real_interoperable_enabler = detail::enable_if_t<is_real_interoperable<T>::value, int>;
@@ -181,7 +181,7 @@ using real_interoperable_enabler = detail::enable_if_t<is_real_interoperable<T>:
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-MPP_CONCEPT_DECL CvrReal = std::is_same<detail::uncvref_t<T>, real>::value;
+MPPP_CONCEPT_DECL CvrReal = std::is_same<detail::uncvref_t<T>, real>::value;
 #else
 template <typename... Args>
 using cvr_real_enabler
@@ -2293,14 +2293,14 @@ using are_real_op_types = detail::disjunction<
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPP_CONCEPT_DECL RealOpTypes = are_real_op_types<T, U>::value;
+MPPP_CONCEPT_DECL RealOpTypes = are_real_op_types<T, U>::value;
 #else
 using real_op_types_enabler = detail::enable_if_t<are_real_op_types<T, U>::value, int>;
 #endif
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPP_CONCEPT_DECL RealCompoundOpTypes = RealOpTypes<T, U> && !std::is_const<detail::unref_t<T>>::value;
+MPPP_CONCEPT_DECL RealCompoundOpTypes = RealOpTypes<T, U> && !std::is_const<detail::unref_t<T>>::value;
 #else
 using real_compound_op_types_enabler = detail::enable_if_t<
     detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value, int>;
@@ -2371,7 +2371,7 @@ using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &
 
 template <typename... Args>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPP_CONCEPT_DECL RealSetArgs = detail::is_detected<detail::real_set_t, Args...>::value;
+MPPP_CONCEPT_DECL RealSetArgs = detail::is_detected<detail::real_set_t, Args...>::value;
 #else
 using real_set_args_enabler = detail::enable_if_t<detail::is_detected<detail::real_set_t, Args...>::value, int>;
 #endif
