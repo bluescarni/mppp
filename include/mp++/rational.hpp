@@ -332,12 +332,8 @@ public:
      * @throws std::domain_error if \p x is a non-finite floating-point value.
      */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-    explicit rational(RationalCvrInteroperable<SSize> &&x)
-#else
     template <typename T> requires RationalCvrInteroperable<T, SSize>
     explicit rational(T &&x)
-#endif
 #else
     template <typename T, rational_cvr_interoperable_enabler<T, SSize> = 0>
     explicit rational(T &&x)
@@ -369,11 +365,7 @@ public:
  * @throws zero_division_error if the denominator is zero.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-#if !defined(_MSC_VER)
-    template <RationalCvrIntegralInteroperable<SSize> T, RationalCvrIntegralInteroperable<SSize> U>
-#else
     template <typename T, typename U> requires (RationalCvrIntegralInteroperable<T, SSize> && RationalCvrIntegralInteroperable<U, SSize>)
-#endif
 #else
     template <typename T, typename U,
               detail::enable_if_t<detail::conjunction<is_rational_cvr_integral_interoperable<T, SSize>,
@@ -440,12 +432,8 @@ public:
      * memory errors in standard containers.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-#if !defined(_MSC_VER)
-    explicit rational(const StringType &s,
-#else
     template <StringType T>
     explicit rational(const T &s,
-#endif
 #else
     template <typename T, string_type_enabler<T> = 0>
     explicit rational(const T &s,
@@ -595,12 +583,8 @@ public:
      * @throws unspecified any exception thrown by the generic constructor of \link mppp::rational\endlink.
      */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-    rational &operator=(RationalCvrInteroperable<SSize> &&x)
-#else
     template <typename T> requires RationalCvrInteroperable<T, SSize>
     rational &operator=(T &&x)
-#endif
 #else
     template <typename T, rational_cvr_interoperable_enabler<T, SSize> = 0>
     rational &operator=(T &&x)
@@ -630,12 +614,8 @@ public:
      * @throws unspecified any exception thrown by the constructor from string.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-#if !defined(_MSC_VER)
-    rational &operator=(const StringType &s)
-#else
     template <StringType T>
     rational &operator=(const T &s)
-#endif
 #else
     template <typename T, string_type_enabler<T> = 0>
     rational &operator=(const T &s)
@@ -1295,13 +1275,8 @@ using rational_op_types_enabler = detail::enable_if_t<are_rational_op_types<T, U
  * a C++ integral which cannot represent the truncated value of ``q``.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-#if !defined(_MSC_VER)
-template <std::size_t SSize>
-inline bool get(RationalInteroperable<SSize> &rop, const rational<SSize> &q)
-#else
 template <typename T, std::size_t SSize> requires RationalInteroperable<T, SSize>
 inline bool get(T &rop, const rational<SSize> &q)
-#endif
 #else
 template <typename T, std::size_t SSize, rational_interoperable_enabler<T, SSize> = 0>
 inline bool get(T &rop, const rational<SSize> &q)
@@ -1748,13 +1723,8 @@ inline T dispatch_binary_add(T x, const rational<SSize> &op2)
  * @return <tt>op1 + op2</tt>.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline auto operator+(const RationalOpTypes<T> &op1, const T &op2)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline auto operator+(const T &op1, const U &op2)
-#endif
 #else
 template <typename T, typename U>
 inline detail::rational_common_t<T, U> operator+(const T &op1, const U &op2)
@@ -1813,13 +1783,8 @@ inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
  * by the conversion operator of \link mppp::rational rational\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline auto &operator+=(RationalOpTypes<T> &rop, const T &op)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline T &operator+=(T &rop, const U &op)
-#endif
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &rop, const U &op)
@@ -1950,13 +1915,8 @@ inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
  * @return <tt>op1 - op2</tt>.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-#if !defined(_MSC_VER)
-template <typename T>
-inline auto operator-(const RationalOpTypes<T> &op1, const T &op2)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline auto operator-(const T &op1, const U &op2)
-#endif
 #else
 template <typename T, typename U>
 inline detail::rational_common_t<T, U> operator-(const T &op1, const U &op2)
@@ -2015,13 +1975,8 @@ inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
  * by the conversion operator of \link mppp::rational rational\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline auto &operator-=(RationalOpTypes<T> &rop, const T &op)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline auto &operator-=(T &rop, const U &op)
-#endif
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &rop, const U &op)
@@ -2145,13 +2100,8 @@ inline T dispatch_binary_mul(T x, const rational<SSize> &op2)
  * @return <tt>op1 * op2</tt>.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline auto operator*(const RationalOpTypes<T> &op1, const T &op2)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline auto operator*(const T &op1, const U &op2)
-#endif
 #else
 template <typename T, typename U>
 inline detail::rational_common_t<T, U> operator*(const T &op1, const U &op2)
@@ -2222,13 +2172,8 @@ inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
  * by the conversion operator of \link mppp::rational rational\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if!defined(_MSC_VER)
-template <typename T>
-inline auto &operator*=(RationalOpTypes<T> &rop, const T &op)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline auto &operator*=(T &rop, const U &op)
-#endif
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &rop, const U &op)
@@ -2359,13 +2304,8 @@ inline T dispatch_binary_div(T x, const rational<SSize> &op2)
  * @throws zero_division_error if the division does not involve floating-point types and \p op2 is zero.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-#if !defined(_MSC_VER)
-template <typename T>
-inline auto operator/(const RationalOpTypes<T> &op1, const T &op2)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline auto operator/(const T &op1, const U &op2)
-#endif
 #else
 template <typename T, typename U>
 inline detail::rational_common_t<T, U> operator/(const T &op1, const U &op2)
@@ -2444,13 +2384,8 @@ inline void dispatch_in_place_div(T &rop, const rational<SSize> &op)
  * by the conversion operator of \link mppp::rational rational\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline auto &operator/=(RationalOpTypes<T> &rop, const T &op)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline auto &operator/=(T &rop, const U &op)
-#endif
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &rop, const U &op)
@@ -2502,13 +2437,8 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
  * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline bool operator==(const RationalOpTypes<T> &op1, const T &op2)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline bool operator==(const T &op1, const U &op2)
-#endif
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &op1, const U &op2)
@@ -2525,13 +2455,8 @@ inline bool operator==(const T &op1, const U &op2)
  * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline bool operator!=(const RationalOpTypes<T> &op1, const T &op2)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline bool operator!=(const T &op1, const U &op2)
-#endif
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &op1, const U &op2)
@@ -2645,13 +2570,8 @@ inline bool dispatch_less_than(T x, const rational<SSize> &a)
  * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline bool operator<(const RationalOpTypes<T> &op1, const T &op2)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline bool operator<(const T &op1, const U &op2)
-#endif
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &op1, const U &op2)
@@ -2668,13 +2588,8 @@ inline bool operator<(const T &op1, const U &op2)
  * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline bool operator<=(const RationalOpTypes<T> &op1, const T &op2)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline bool operator<=(const T &op1, const U &op2)
-#endif
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &op1, const U &op2)
@@ -2691,13 +2606,8 @@ inline bool operator<=(const T &op1, const U &op2)
  * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline bool operator>(const RationalOpTypes<T> &op1, const T &op2)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline bool operator>(const T &op1, const U &op2)
-#endif
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &op1, const U &op2)
@@ -2714,13 +2624,8 @@ inline bool operator>(const T &op1, const U &op2)
  * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS) 
-#if !defined(_MSC_VER)
-template <typename T>
-inline bool operator>=(const RationalOpTypes<T> &op1, const T &op2)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline bool operator>=(const T &op1, const U &op2)
-#endif
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &op1, const U &op2)
@@ -2910,13 +2815,8 @@ inline rational<SSize> rational_binomial_impl(const rational<SSize> &t, const T 
  * the binomial coefficient for \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-#if !defined(_MSC_VER)
-template <std::size_t SSize>
-inline rational<SSize> binomial(const rational<SSize> &x, const RationalIntegralInteroperable<SSize> &y)
-#else
 template <std::size_t SSize, typename T> requires RationalIntegralInteroperable<T, SSize>
 inline rational<SSize> binomial(const rational<SSize> &x, const T &y)
-#endif
 #else
 template <std::size_t SSize, typename T, rational_integral_interoperable_enabler<T, SSize> = 0>
 inline rational<SSize> binomial(const rational<SSize> &x, const T &y)
@@ -3034,13 +2934,8 @@ inline T pow_impl(const T &base, const rational<SSize> &exp)
  * in a handful of special cases).
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-#if !defined(_MSC_VER)
-template <typename T>
-inline auto pow(const RationalOpTypes<T> &base, const T &exp)
-#else
 template <typename T, typename U> requires RationalOpTypes<T, U>
 inline auto pow(const T &base, const U &exp)
-#endif
 #else
 template <typename T, typename U>
 inline detail::rational_common_t<T, U> pow(const T &base, const U &exp)
