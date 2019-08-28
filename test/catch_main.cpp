@@ -10,4 +10,5 @@
 // https://github.com/catchorg/Catch2/blob/master/docs/slow-compiles.md
 
 #define CATCH_CONFIG_MAIN
+#define DO_NOT_USE_WMAIN
 #include "catch.hpp"

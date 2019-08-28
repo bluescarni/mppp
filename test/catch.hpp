@@ -1703,7 +1703,7 @@ namespace Catch {
         }
     };
 
-#if defined(CATCH_CONFIG_CPP17_BYTE)
+#if defined(CATCH_CONFIG_CPP17_BYTE) && false
     template<>
     struct StringMaker<std::byte> {
         static std::string convert(std::byte value);
@@ -14424,7 +14424,7 @@ std::string StringMaker<wchar_t *>::convert(wchar_t * str) {
 }
 #endif
 
-#if defined(CATCH_CONFIG_CPP17_BYTE)
+#if defined(CATCH_CONFIG_CPP17_BYTE) && false
 #include <cstddef>
 std::string StringMaker<std::byte>::convert(std::byte value) {
     return ::Catch::Detail::stringify(std::to_integer<unsigned long long>(value));
