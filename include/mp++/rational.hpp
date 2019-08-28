@@ -578,7 +578,7 @@ public:
      *
      * @return a reference to ``this``.
      *
-     * @throws unspecified any exception thrown by the generic constructor of \link mppp::rational\endlink.
+     * @throws unspecified any exception thrown by the generic constructor.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
     rational &operator=(RationalCvrInteroperable<SSize> &&x)
