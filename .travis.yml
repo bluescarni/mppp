@@ -42,7 +42,7 @@ matrix:
           - gcc-6-multilib
           - g++-6
           - g++-6-multilib
-          - cmake3
+          - cmake
     - env: MPPP_BUILD="Coverage32GCC6" SPLIT_TEST_NUM="1" TEST_NSPLIT="2"
       compiler: gcc
       os: linux
@@ -57,7 +57,7 @@ matrix:
           - gcc-6-multilib
           - g++-6
           - g++-6-multilib
-          - cmake3
+          - cmake
     - env: MPPP_BUILD="Documentation"
       os: linux
       addons:

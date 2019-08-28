@@ -35,7 +35,7 @@ using is_cpp_integral_interoperable
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool CppIntegralInteroperable = is_cpp_integral_interoperable<T>::value;
+MPPP_CONCEPT_DECL CppIntegralInteroperable = is_cpp_integral_interoperable<T>::value;
 #else
 using cpp_integral_interoperable_enabler = detail::enable_if_t<is_cpp_integral_interoperable<T>::value, int>;
 #endif
@@ -47,7 +47,7 @@ using is_cpp_unsigned_integral_interoperable
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool CppUnsignedIntegralInteroperable = is_cpp_unsigned_integral_interoperable<T>::value;
+MPPP_CONCEPT_DECL CppUnsignedIntegralInteroperable = is_cpp_unsigned_integral_interoperable<T>::value;
 #else
 using cpp_unsigned_integral_interoperable_enabler
     = detail::enable_if_t<is_cpp_unsigned_integral_interoperable<T>::value, int>;
@@ -60,7 +60,7 @@ using is_cpp_signed_integral_interoperable
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool CppSignedIntegralInteroperable = is_cpp_signed_integral_interoperable<T>::value;
+MPPP_CONCEPT_DECL CppSignedIntegralInteroperable = is_cpp_signed_integral_interoperable<T>::value;
 #else
 using cpp_signed_integral_interoperable_enabler
     = detail::enable_if_t<is_cpp_signed_integral_interoperable<T>::value, int>;
@@ -78,7 +78,7 @@ using is_cpp_floating_point_interoperable
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool CppFloatingPointInteroperable = is_cpp_floating_point_interoperable<T>::value;
+MPPP_CONCEPT_DECL CppFloatingPointInteroperable = is_cpp_floating_point_interoperable<T>::value;
 #else
 using cpp_floating_point_interoperable_enabler
     = detail::enable_if_t<is_cpp_floating_point_interoperable<T>::value, int>;
@@ -90,7 +90,7 @@ using is_cpp_interoperable
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool CppInteroperable = is_cpp_interoperable<T>::value;
+MPPP_CONCEPT_DECL CppInteroperable = is_cpp_interoperable<T>::value;
 #else
 using cpp_interoperable_enabler = detail::enable_if_t<is_cpp_interoperable<T>::value, int>;
 #endif
@@ -121,7 +121,7 @@ using is_string_type
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool StringType = is_string_type<T>::value;
+MPPP_CONCEPT_DECL StringType = is_string_type<T>::value;
 #else
 using string_type_enabler = detail::enable_if_t<is_string_type<T>::value, int>;
 #endif
