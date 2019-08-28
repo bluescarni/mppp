@@ -173,14 +173,15 @@ using is_real_interoperable = detail::disjunction<is_cpp_interoperable<T>, detai
 
 template <typename T>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool RealInteroperable = is_real_interoperable<T>::value;
+MPPP_CONCEPT_DECL RealInteroperable = is_real_interoperable<T>::value;
+
 #else
 using real_interoperable_enabler = detail::enable_if_t<is_real_interoperable<T>::value, int>;
 #endif
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
-concept bool CvrReal = std::is_same<detail::uncvref_t<T>, real>::value;
+MPPP_CONCEPT_DECL CvrReal = std::is_same<detail::uncvref_t<T>, real>::value;
 #else
 template <typename... Args>
 using cvr_real_enabler
@@ -660,12 +661,11 @@ public:
      * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-    explicit real(const RealInteroperable &x,
+    template <RealInteroperable T>
 #else
     template <typename T, real_interoperable_enabler<T> = 0>
-    explicit real(const T &x,
 #endif
-                  ::mpfr_prec_t p = 0)
+    explicit real(const T &x, ::mpfr_prec_t p = 0)
     {
         dispatch_construction(x, p);
     }
@@ -713,13 +713,11 @@ public:
      * @throws unspecified any exception thrown by memory errors in standard containers.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-    explicit real(const StringType &s,
+    template <StringType T>
 #else
     template <typename T, string_type_enabler<T> = 0>
-    explicit real(const T &s,
 #endif
-                  int base, ::mpfr_prec_t p)
-        : real(ptag{}, s, base, p)
+    explicit real(const T &s, int base, ::mpfr_prec_t p) : real(ptag{}, s, base, p)
     {
     }
     /// Constructor from string and precision.
@@ -732,13 +730,11 @@ public:
      * @throws unspecified any exception thrown by the constructor from string, base and precision.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-    explicit real(const StringType &s,
+    template <StringType T>
 #else
     template <typename T, string_type_enabler<T> = 0>
-    explicit real(const T &s,
 #endif
-                  ::mpfr_prec_t p)
-        : real(s, 10, p)
+    explicit real(const T &s, ::mpfr_prec_t p) : real(s, 10, p)
     {
     }
     /// Constructor from string.
@@ -751,12 +747,11 @@ public:
      * @throws unspecified any exception thrown by the constructor from string, base and precision.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-    explicit real(const StringType &s)
+    template <StringType T>
 #else
     template <typename T, string_type_enabler<T> = 0>
-    explicit real(const T &s)
 #endif
-        : real(s, 10, 0)
+    explicit real(const T &s) : real(s, 10, 0)
     {
     }
     /// Constructor from range of characters, base and precision.
@@ -1001,11 +996,11 @@ public:
      * @throws std::overflow_error if an overflow occurs in the computation of the automatically-deduced precision.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-    real &operator=(const RealInteroperable &x)
+    template <RealInteroperable T>
 #else
     template <typename T, real_interoperable_enabler<T> = 0>
-    real &operator=(const T &x)
 #endif
+    real &operator=(const T &x)
     {
         dispatch_assignment<true>(x);
         return *this;
@@ -1072,11 +1067,11 @@ public:
      * @throws unspecified any exception thrown by memory allocation errors in standard containers.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-    real &operator=(const StringType &s)
+    template <StringType T>
 #else
     template <typename T, string_type_enabler<T> = 0>
-    real &operator=(const T &s)
 #endif
+    real &operator=(const T &s)
     {
         return string_assignment(s);
     }
@@ -1173,11 +1168,11 @@ public:
      * @return a reference to \p this.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-    real &set(const RealInteroperable &x)
+    template <RealInteroperable T>
 #else
     template <typename T, real_interoperable_enabler<T> = 0>
-    real &set(const T &x)
 #endif
+    real &set(const T &x)
     {
         dispatch_assignment<false>(x);
         return *this;
@@ -1232,12 +1227,11 @@ public:
      * allocation errors in standard containers.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-    real &set(const StringType &s,
+    template <StringType T>
 #else
     template <typename T, string_type_enabler<T> = 0>
-    real &set(const T &s,
 #endif
-              int base = 10)
+    real &set(const T &s, int base = 10)
     {
         return set_impl(s, base);
     }
@@ -2252,14 +2246,14 @@ using are_real_op_types = detail::disjunction<
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool RealOpTypes = are_real_op_types<T, U>::value;
+MPPP_CONCEPT_DECL RealOpTypes = are_real_op_types<T, U>::value;
 #else
 using real_op_types_enabler = detail::enable_if_t<are_real_op_types<T, U>::value, int>;
 #endif
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool RealCompoundOpTypes = RealOpTypes<T, U> && !std::is_const<detail::unref_t<T>>::value;
+MPPP_CONCEPT_DECL RealCompoundOpTypes = RealOpTypes<T, U> && !std::is_const<detail::unref_t<T>>::value;
 #else
 using real_compound_op_types_enabler = detail::enable_if_t<
     detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value, int>;
@@ -2330,7 +2324,7 @@ using real_set_t = decltype(std::declval<real &>().set(std::declval<const Args &
 
 template <typename... Args>
 #if defined(MPPP_HAVE_CONCEPTS)
-concept bool RealSetArgs = detail::is_detected<detail::real_set_t, Args...>::value;
+MPPP_CONCEPT_DECL RealSetArgs = detail::is_detected<detail::real_set_t, Args...>::value;
 #else
 using real_set_args_enabler = detail::enable_if_t<detail::is_detected<detail::real_set_t, Args...>::value, int>;
 #endif
@@ -2465,11 +2459,11 @@ inline void swap(real &a, real &b) noexcept
  * specified in the documentation of the conversion operator for \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline bool get(RealInteroperable &rop, const real &x)
+template <RealInteroperable T>
 #else
 template <typename T, real_interoperable_enabler<T> = 0>
-inline bool get(T &rop, const real &x)
 #endif
+inline bool get(T &rop, const real &x)
 {
     return x.get(rop);
 }
@@ -2917,11 +2911,11 @@ inline real fms(T &&a, U &&b, V &&c)
  * @return the negative of \p x.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real neg(CvrReal &&x)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real neg(T &&x)
 #endif
+inline real neg(T &&x)
 {
     return detail::mpfr_nary_op_return(0, ::mpfr_neg, std::forward<decltype(x)>(x));
 }
@@ -2936,11 +2930,11 @@ inline real neg(T &&x)
  * @return a reference to \p rop.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real &neg(real &rop, CvrReal &&x)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real neg(real &rop, T &&x)
 #endif
+inline real neg(real &rop, T &&x)
 {
     return detail::mpfr_nary_op(0, ::mpfr_neg, rop, std::forward<decltype(x)>(x));
 }
@@ -2952,11 +2946,11 @@ inline real neg(real &rop, T &&x)
  * @return the absolute value of \p x.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real abs(CvrReal &&x)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real abs(T &&x)
 #endif
+inline real abs(T &&x)
 {
     return detail::mpfr_nary_op_return(0, ::mpfr_abs, std::forward<decltype(x)>(x));
 }
@@ -2971,11 +2965,11 @@ inline real abs(T &&x)
  * @return a reference to \p rop.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real &abs(real &rop, CvrReal &&x)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real abs(real &rop, T &&x)
 #endif
+inline real abs(real &rop, T &&x)
 {
     return detail::mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<decltype(x)>(x));
 }
@@ -3311,8 +3305,8 @@ inline real dispatch_pow(const T &x, U &&a)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline real pow(RealOpTypes<T> &&op1, T &&op2)
+template <typename T, typename U>
+requires RealOpTypes<T, U> inline real pow(T &&op1, U &&op2)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real pow(T &&op1, U &&op2)
@@ -3813,11 +3807,11 @@ inline bool integer_p(const real &r)
  * @throws std::domain_error if ``op`` is NaN.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real &trunc(real &rop, CvrReal &&op)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real &trunc(real &rop, T &&op)
 #endif
+inline real &trunc(real &rop, T &&op)
 {
     detail::real_check_trunc_arg(op);
     return detail::mpfr_nary_op_nornd(0, ::mpfr_trunc, rop, std::forward<decltype(op)>(op));
@@ -3836,11 +3830,11 @@ inline real &trunc(real &rop, T &&op)
  * @throws std::domain_error if ``r`` is NaN.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real trunc(CvrReal &&r)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real trunc(T &&r)
 #endif
+inline real trunc(T &&r)
 {
     detail::real_check_trunc_arg(r);
     return detail::mpfr_nary_op_return_nornd(0, ::mpfr_trunc, std::forward<decltype(r)>(r));
@@ -3863,7 +3857,8 @@ inline real trunc(T &&r)
  * @return a copy of \p r.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real operator+(CvrReal &&r)
+template <CvrReal T>
+inline real operator+(T &&r)
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 inline real operator+(T &&r)
@@ -3922,8 +3917,8 @@ inline real dispatch_binary_add(const T &x, U &&a)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline real operator+(RealOpTypes<T> &&a, T &&b)
+template <typename T, typename U>
+requires RealOpTypes<T, U> inline real operator+(T &&a, U &&b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator+(T &&a, U &&b)
@@ -4039,8 +4034,8 @@ inline void dispatch_in_place_add(T &x, U &&a)
  * or by the generic conversion operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline auto &operator+=(RealCompoundOpTypes<T> &a, T &&b)
+template <typename T, typename U>
+requires RealCompoundOpTypes<T, U> inline auto &operator+=(T &a, U &&b)
 #else
 template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &a, U &&b)
@@ -4089,13 +4084,13 @@ inline real operator++(real &x, int)
  * @return a negated copy of \p r.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-inline real operator-(CvrReal &&r)
+template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
-inline real operator-(T &&r)
 #endif
+inline real operator-(T &&r)
 {
-    real retval{std::forward<decltype(r)>(r)};
+    real retval{std::forward<T>(r)};
     retval.neg();
     return retval;
 }
@@ -4150,8 +4145,8 @@ inline real dispatch_binary_sub(const T &x, U &&a)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline real operator-(RealOpTypes<T> &&a, T &&b)
+template <typename T, typename U>
+requires RealOpTypes<T, U> inline real operator-(T &&a, U &&b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator-(T &&a, U &&b)
@@ -4236,8 +4231,8 @@ inline void dispatch_in_place_sub(T &x, U &&a)
  * or by the generic conversion operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline auto &operator-=(RealCompoundOpTypes<T> &a, T &&b)
+template <typename T, typename U>
+requires RealCompoundOpTypes<T, U> inline auto &operator-=(T &a, U &&b)
 #else
 template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &a, U &&b)
@@ -4325,8 +4320,8 @@ inline real operator--(real &x, int)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline real operator*(RealOpTypes<T> &&a, T &&b)
+template <typename T, typename U>
+requires RealOpTypes<T, U> inline real operator*(T &&a, U &&b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator*(T &&a, U &&b)
@@ -4411,8 +4406,8 @@ inline void dispatch_in_place_mul(T &x, U &&a)
  * or by the generic conversion operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline auto &operator*=(RealCompoundOpTypes<T> &a, T &&b)
+template <typename T, typename U>
+requires RealCompoundOpTypes<T, U> inline auto &operator*=(T &a, U &&b)
 #else
 template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &a, U &&b)
@@ -4472,8 +4467,8 @@ inline real dispatch_binary_div(const T &x, U &&a)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline real operator/(RealOpTypes<T> &&a, T &&b)
+template <typename U, RealOpTypes<U> T>
+inline real operator/(T &&a, U &&b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator/(T &&a, U &&b)
@@ -4558,8 +4553,8 @@ inline void dispatch_in_place_div(T &x, U &&a)
  * or by the generic conversion operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline auto &operator/=(RealCompoundOpTypes<T> &a, T &&b)
+template <typename T, typename U>
+requires RealCompoundOpTypes<T, U> inline auto &operator/=(T &a, U &&b)
 #else
 template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &a, U &&b)
@@ -4624,8 +4619,8 @@ inline bool dispatch_real_comparison(const F &f, const real &a, const real &b)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline bool operator==(const RealOpTypes<T> &a, const T &b)
+template <typename T, typename U>
+requires RealOpTypes<T, U> inline bool operator==(const T &a, const U &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &a, const U &b)
@@ -4662,8 +4657,8 @@ inline bool operator==(const T &a, const U &b)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline bool operator!=(const RealOpTypes<T> &a, const T &b)
+template <typename T, typename U>
+requires RealOpTypes<T, U> inline bool operator!=(const T &a, const U &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &a, const U &b)
@@ -4701,8 +4696,8 @@ inline bool operator!=(const T &a, const U &b)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline bool operator>(const RealOpTypes<T> &a, const T &b)
+template <typename T, typename U>
+requires RealOpTypes<T, U> inline bool operator>(const T &a, const U &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &a, const U &b)
@@ -4738,8 +4733,8 @@ inline bool operator>(const T &a, const U &b)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline bool operator>=(const RealOpTypes<T> &a, const T &b)
+template <typename T, typename U>
+requires RealOpTypes<T, U> inline bool operator>=(const T &a, const U &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &a, const U &b)
@@ -4777,8 +4772,8 @@ inline bool operator>=(const T &a, const U &b)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline bool operator<(const RealOpTypes<T> &a, const T &b)
+template <typename T, typename U>
+requires RealOpTypes<T, U> inline bool operator<(const T &a, const U &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &a, const U &b)
@@ -4814,8 +4809,8 @@ inline bool operator<(const T &a, const U &b)
  * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T>
-inline bool operator<=(const RealOpTypes<T> &a, const T &b)
+template <typename T, typename U>
+requires RealOpTypes<T, U> inline bool operator<=(const T &a, const U &b)
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &a, const U &b)
