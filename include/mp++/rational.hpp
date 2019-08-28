@@ -584,9 +584,8 @@ public:
 #endif
     rational &operator=(T &&x)
     {
-        dispatch_assignment(
-            std::forward<decltype(x)>(x),
-            std::integral_constant<bool, is_rational_cvr_integral_interoperable<decltype(x), SSize>::value>{});
+        dispatch_assignment(std::forward<T>(x),
+                            std::integral_constant<bool, is_rational_cvr_integral_interoperable<T, SSize>::value>{});
         return *this;
     }
     /// Assignment from string.

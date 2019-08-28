@@ -2917,7 +2917,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real neg(T &&x)
 {
-    return detail::mpfr_nary_op_return(0, ::mpfr_neg, std::forward<decltype(x)>(x));
+    return detail::mpfr_nary_op_return(0, ::mpfr_neg, std::forward<T>(x));
 }
 
 /// Binary negation for \link mppp::real real\endlink.
@@ -2936,7 +2936,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real neg(real &rop, T &&x)
 {
-    return detail::mpfr_nary_op(0, ::mpfr_neg, rop, std::forward<decltype(x)>(x));
+    return detail::mpfr_nary_op(0, ::mpfr_neg, rop, std::forward<T>(x));
 }
 
 /// Unary absolute value for \link mppp::real real\endlink.
@@ -2952,7 +2952,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real abs(T &&x)
 {
-    return detail::mpfr_nary_op_return(0, ::mpfr_abs, std::forward<decltype(x)>(x));
+    return detail::mpfr_nary_op_return(0, ::mpfr_abs, std::forward<T>(x));
 }
 
 /// Binary absolute value for \link mppp::real real\endlink.
@@ -2971,7 +2971,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 #endif
 inline real abs(real &rop, T &&x)
 {
-    return detail::mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<decltype(x)>(x));
+    return detail::mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<T>(x));
 }
 
 /** @} */
@@ -3312,7 +3312,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real pow(T &&op1, U &&op2)
 #endif
 {
-    return detail::dispatch_pow(std::forward<decltype(op1)>(op1), std::forward<decltype(op2)>(op2));
+    return detail::dispatch_pow(std::forward<T>(op1), std::forward<U>(op2));
 }
 
 /** @} */
@@ -3814,7 +3814,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real &trunc(real &rop, T &&op)
 {
     detail::real_check_trunc_arg(op);
-    return detail::mpfr_nary_op_nornd(0, ::mpfr_trunc, rop, std::forward<decltype(op)>(op));
+    return detail::mpfr_nary_op_nornd(0, ::mpfr_trunc, rop, std::forward<T>(op));
 }
 
 /// Unary \link mppp::real real\endlink truncation.
@@ -3837,7 +3837,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real trunc(T &&r)
 {
     detail::real_check_trunc_arg(r);
-    return detail::mpfr_nary_op_return_nornd(0, ::mpfr_trunc, std::forward<decltype(r)>(r));
+    return detail::mpfr_nary_op_return_nornd(0, ::mpfr_trunc, std::forward<T>(r));
 }
 
 /** @} */
@@ -3864,7 +3864,7 @@ template <typename T, cvr_real_enabler<T> = 0>
 inline real operator+(T &&r)
 #endif
 {
-    return std::forward<decltype(r)>(r);
+    return std::forward<T>(r);
 }
 
 namespace detail
@@ -3924,10 +3924,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator+(T &&a, U &&b)
 #endif
 {
-    // NOTE: we use forward + decltype here in order to accommodate the signature
-    // when using concepts. It's equivalent to the usual perfect forwarding:
-    // https://stackoverflow.com/questions/23321028/is-any-difference-between-stdforwardt-and-stdforwarddecltypet
-    return detail::dispatch_binary_add(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
+    return detail::dispatch_binary_add(std::forward<T>(a), std::forward<U>(b));
 }
 
 namespace detail
@@ -4041,7 +4038,7 @@ template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &a, U &&b)
 #endif
 {
-    detail::dispatch_in_place_add(a, std::forward<decltype(b)>(b));
+    detail::dispatch_in_place_add(a, std::forward<U>(b));
     return a;
 }
 
@@ -4152,7 +4149,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator-(T &&a, U &&b)
 #endif
 {
-    return detail::dispatch_binary_sub(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
+    return detail::dispatch_binary_sub(std::forward<T>(a), std::forward<U>(b));
 }
 
 namespace detail
@@ -4238,7 +4235,7 @@ template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &a, U &&b)
 #endif
 {
-    detail::dispatch_in_place_sub(a, std::forward<decltype(b)>(b));
+    detail::dispatch_in_place_sub(a, std::forward<U>(b));
     return a;
 }
 
@@ -4327,7 +4324,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator*(T &&a, U &&b)
 #endif
 {
-    return detail::dispatch_binary_mul(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
+    return detail::dispatch_binary_mul(std::forward<T>(a), std::forward<U>(b));
 }
 
 namespace detail
@@ -4413,7 +4410,7 @@ template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &a, U &&b)
 #endif
 {
-    detail::dispatch_in_place_mul(a, std::forward<decltype(b)>(b));
+    detail::dispatch_in_place_mul(a, std::forward<U>(b));
     return a;
 }
 
@@ -4474,7 +4471,7 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 inline real operator/(T &&a, U &&b)
 #endif
 {
-    return detail::dispatch_binary_div(std::forward<decltype(a)>(a), std::forward<decltype(b)>(b));
+    return detail::dispatch_binary_div(std::forward<T>(a), std::forward<U>(b));
 }
 
 namespace detail
@@ -4560,7 +4557,7 @@ template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &a, U &&b)
 #endif
 {
-    detail::dispatch_in_place_div(a, std::forward<decltype(b)>(b));
+    detail::dispatch_in_place_div(a, std::forward<U>(b));
     return a;
 }
 
