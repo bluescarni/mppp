@@ -7,19 +7,18 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cstddef>
-#include <gmp.h>
 #include <random>
 #include <stdexcept>
 #include <string>
 #include <tuple>
 #include <type_traits>
 
+#include <gmp.h>
+
 #include <mp++/integer.hpp>
 
-#include "test_utils.hpp"
-
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 static int ntries = 1000;
 

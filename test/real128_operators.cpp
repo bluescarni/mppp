@@ -12,14 +12,13 @@
 
 #endif
 
+#include <type_traits>
+
 #include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
 
-#include <type_traits>
-
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 using namespace mppp;

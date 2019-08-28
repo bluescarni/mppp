@@ -1966,7 +1966,7 @@ inline T &operator+=(T &x, const U &y)
  */
 inline MPPP_CONSTEXPR_14 real128 &operator++(real128 &x)
 {
-    ++x.m_value;
+    x.m_value += 1;
     return x;
 }
 
@@ -2178,7 +2178,7 @@ inline T &operator-=(T &x, const U &y)
  */
 inline MPPP_CONSTEXPR_14 real128 &operator--(real128 &x)
 {
-    --x.m_value;
+    x.m_value -= 1;
     return x;
 }
 

@@ -17,10 +17,8 @@
 #include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 
-#include "test_utils.hpp"
-
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 static int ntries = 1000;
 

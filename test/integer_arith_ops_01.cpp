@@ -15,7 +15,6 @@
 #endif
 
 #include <cstddef>
-#include <gmp.h>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -23,14 +22,14 @@
 #include <type_traits>
 #include <utility>
 
+#include <gmp.h>
+
 #include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 
-#include "test_utils.hpp"
-
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 using namespace mppp;
 using namespace mppp_test;

@@ -11,11 +11,8 @@
 #include <atomic>
 #include <cmath>
 #include <cstddef>
-#include <gmp.h>
 #include <iostream>
 #include <limits>
-#include <mp++/detail/type_traits.hpp>
-#include <mp++/integer.hpp>
 #include <random>
 #include <sstream>
 #include <stdexcept>
@@ -29,10 +26,13 @@
 #include <string_view>
 #endif
 
-#include "test_utils.hpp"
+#include <gmp.h>
 
-#define CATCH_CONFIG_MAIN
+#include <mp++/detail/type_traits.hpp>
+#include <mp++/integer.hpp>
+
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 static int ntries = 1000;
 
