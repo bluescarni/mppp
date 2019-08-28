@@ -16,9 +16,7 @@
 
 #include <mp++/rational.hpp>
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-
 #include "test_utils.hpp"
 
 using namespace mppp;

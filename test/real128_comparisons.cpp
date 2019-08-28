@@ -25,7 +25,6 @@
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 static std::mt19937 rng;

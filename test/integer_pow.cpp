@@ -8,20 +8,19 @@
 
 #include <cmath>
 #include <cstddef>
-#include <gmp.h>
 #include <limits>
 #include <random>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
 
+#include <gmp.h>
+
 #include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 
-#include "test_utils.hpp"
-
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 static int ntries = 1000;
 

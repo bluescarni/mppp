@@ -7,17 +7,16 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cstddef>
-#include <gmp.h>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 
+#include <gmp.h>
+
 #include <mp++/integer.hpp>
 
-#include "test_utils.hpp"
-
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 using namespace mppp;
 using namespace mppp_test;

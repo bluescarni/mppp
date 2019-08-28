@@ -6,15 +6,13 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
-
 #include <stdexcept>
 #include <string>
 #include <utility>
 
 #include <mp++/real.hpp>
 
+#include "catch.hpp"
 #include "test_utils.hpp"
 
 using namespace mppp;
@@ -141,7 +139,7 @@ TEST_CASE("real hyper")
     REQUIRE_THROWS_PREDICATE(sinh_cosh(sop, sop, real{32}), std::invalid_argument, [](const std::invalid_argument &ex) {
         return ex.what()
                == std::string{
-                      "In the real sinh_cosh() function, the return values 'sop' and 'cop' must be distinct objects"};
+                   "In the real sinh_cosh() function, the return values 'sop' and 'cop' must be distinct objects"};
     });
 
     // Try with overlapping op/sop and op/cop.

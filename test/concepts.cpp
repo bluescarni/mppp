@@ -8,8 +8,6 @@
 
 #include <mp++/config.hpp>
 
-#include <mp++/concepts.hpp>
-#include <mp++/detail/type_traits.hpp>
 #include <sstream>
 #include <string>
 
@@ -17,7 +15,9 @@
 #include <string_view>
 #endif
 
-#define CATCH_CONFIG_MAIN
+#include <mp++/concepts.hpp>
+#include <mp++/detail/type_traits.hpp>
+
 #include "catch.hpp"
 
 using namespace mppp;

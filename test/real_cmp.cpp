@@ -6,18 +6,16 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
-
-#include <mp++/detail/mpfr.hpp>
-#include <mp++/real.hpp>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
-#include "test_utils.hpp"
+#include <mp++/config.hpp>
+#include <mp++/detail/mpfr.hpp>
+#include <mp++/real.hpp>
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 using namespace mppp;
 using namespace mppp_test;

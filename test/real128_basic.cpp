@@ -20,9 +20,7 @@
 
 #include <ciso646>
 #include <cstdint>
-#include <gmp.h>
 #include <limits>
-#include <quadmath.h>
 #include <random>
 #include <stdexcept>
 #include <string>
@@ -34,9 +32,12 @@
 #include <string_view>
 #endif
 
+#include <gmp.h>
+
+#include <quadmath.h>
+
 #include "test_utils.hpp"
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 using namespace mppp;
