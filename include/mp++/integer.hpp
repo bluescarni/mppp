@@ -6961,8 +6961,8 @@ inline integer<SSize> binomial_impl(const T &n, const integer<SSize> &k)
  * @throws std::overflow_error if \p k is outside an implementation-defined range.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerIntegralOpTypes<T, U>
-inline auto binomial(const T &n, const U &k)
+template <typename T, typename U>
+requires IntegerIntegralOpTypes<T, U> inline auto binomial(const T &n, const U &k)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline detail::integer_common_t<T, U> binomial(const T &n, const U &k)
@@ -7472,8 +7472,6 @@ namespace detail
 {
 
 // Detector for the presence of binary_save().
-// NOTE: we use declval<T>() (rather than declval<T &>()) because T will be the result
-// of perfect forwarding.
 template <typename T, typename Integer>
 using integer_binary_save_t = decltype(std::declval<const Integer &>().binary_save(std::declval<T>()));
 
@@ -7481,13 +7479,12 @@ template <typename T, std::size_t SSize>
 using has_integer_binary_save = is_detected<integer_binary_save_t, T, integer<SSize>>;
 
 // Detector for the presence of binary_load().
-// NOTE: we use declval<T>() (rather than declval<T &>()) because T will be the result
-// of perfect forwarding.
 template <typename T, typename Integer>
 using integer_binary_load_t = decltype(std::declval<Integer &>().binary_load(std::declval<T>()));
 
 template <typename T, std::size_t SSize>
 using has_integer_binary_load = is_detected<integer_binary_load_t, T, integer<SSize>>;
+
 } // namespace detail
 
 #if !defined(MPPP_DOXYGEN_INVOKED)
@@ -7525,14 +7522,13 @@ using integer_binary_load_enabler = detail::enable_if_t<detail::has_integer_bina
  * @throws unspecified any exception thrown by the invoked mppp::integer::binary_save() overload.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize, typename T> requires IntegerBinarySaveDest<T &&, SSize>
-inline std::size_t binary_save(const integer<SSize> &n, T &&dest)
+template <std::size_t SSize, IntegerBinarySaveDest<SSize> T>
 #else
-template <std::size_t SSize, typename T, integer_binary_save_enabler<T &&, SSize> = 0>
-inline std::size_t binary_save(const integer<SSize> &n, T &&dest)
+template <std::size_t SSize, typename T, integer_binary_save_enabler<T, SSize> = 0>
 #endif
+inline std::size_t binary_save(const integer<SSize> &n, T &&dest)
 {
-    return n.binary_save(std::forward<decltype(dest)>(dest));
+    return n.binary_save(std::forward<T>(dest));
 }
 
 /// Load an \link mppp::integer integer\endlink in binary format.
@@ -7552,14 +7548,13 @@ inline std::size_t binary_save(const integer<SSize> &n, T &&dest)
  * @throws unspecified any exception thrown by the invoked mppp::integer::binary_load() overload.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <std::size_t SSize, typename T> requires IntegerBinaryLoadSrc<T &&, SSize>
-inline std::size_t binary_load(integer<SSize> &n, T &&src)
+template <std::size_t SSize, IntegerBinaryLoadSrc<SSize> T>
 #else
-template <std::size_t SSize, typename T, integer_binary_load_enabler<T &&, SSize> = 0>
-inline std::size_t binary_load(integer<SSize> &n, T &&src)
+template <std::size_t SSize, typename T, integer_binary_load_enabler<T, SSize> = 0>
 #endif
+inline std::size_t binary_load(integer<SSize> &n, T &&src)
 {
-    return n.binary_load(std::forward<decltype(src)>(src));
+    return n.binary_load(std::forward<T>(src));
 }
 
 /** @} */
@@ -7735,8 +7730,8 @@ inline integer<SSize> operator+(const integer<SSize> &n)
  * @return <tt>op1 + op2</tt>.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline auto operator+(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline auto operator+(const T &op1, const U &op2)
 #else
 template <typename T, typename U>
 inline detail::integer_common_t<T, U> operator+(const T &op1, const U &op2)
@@ -7756,8 +7751,8 @@ inline detail::integer_common_t<T, U> operator+(const T &op1, const U &op2)
  * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline auto &operator+=(T &rop, const U &op)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline auto &operator+=(T &rop, const U &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator+=(T &rop, const U &op)
@@ -7909,8 +7904,8 @@ integer<SSize> operator-(const integer<SSize> &n)
  * @return <tt>op1 - op2</tt>.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline auto operator-(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline auto operator-(const T &op1, const U &op2)
 #else
 template <typename T, typename U>
 inline detail::integer_common_t<T, U> operator-(const T &op1, const U &op2)
@@ -7930,8 +7925,8 @@ inline detail::integer_common_t<T, U> operator-(const T &op1, const U &op2)
  * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline auto &operator-=(T &rop, const U &op)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline auto &operator-=(T &rop, const U &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator-=(T &rop, const U &op)
@@ -8056,8 +8051,8 @@ inline void dispatch_in_place_mul(T &rop, const integer<SSize> &op)
  * @return <tt>op1 * op2</tt>.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline auto operator*(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline auto operator*(const T &op1, const U &op2)
 #else
 template <typename T, typename U>
 inline detail::integer_common_t<T, U> operator*(const T &op1, const U &op2)
@@ -8077,8 +8072,8 @@ inline detail::integer_common_t<T, U> operator*(const T &op1, const U &op2)
  * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline T &operator*=(T &rop, const U &op)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline auto &operator*=(T &rop, const U &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator*=(T &rop, const U &op)
@@ -8219,8 +8214,8 @@ inline void dispatch_in_place_mod(T &rop, const integer<SSize> &op)
  * @throws zero_division_error if \p d is zero and only integral types are involved in the division.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline auto operator/(const T &n, const U &d)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline auto operator/(const T &n, const U &d)
 #else
 template <typename T, typename U>
 inline detail::integer_common_t<T, U> operator/(const T &n, const U &d)
@@ -8241,8 +8236,8 @@ inline detail::integer_common_t<T, U> operator/(const T &n, const U &d)
  * by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline auto &operator/=(T &rop, const U &op)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline auto &operator/=(T &rop, const U &op)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline T &operator/=(T &rop, const U &op)
@@ -8266,8 +8261,8 @@ inline T &operator/=(T &rop, const U &op)
  * @throws zero_division_error if \p d is zero.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerIntegralOpTypes<T, U>
-inline auto operator%(const T &n, const U &d)
+template <typename T, typename U>
+requires IntegerIntegralOpTypes<T, U> inline auto operator%(const T &n, const U &d)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline detail::integer_common_t<T, U> operator%(const T &n, const U &d)
@@ -8287,8 +8282,8 @@ inline detail::integer_common_t<T, U> operator%(const T &n, const U &d)
  * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerIntegralOpTypes<T, U>
-inline auto &operator%=(T &rop, const U &op)
+template <typename T, typename U>
+requires IntegerIntegralOpTypes<T, U> inline auto &operator%=(T &rop, const U &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator%=(T &rop, const U &op)
@@ -8618,8 +8613,8 @@ inline bool dispatch_less_than(T x, const integer<SSize> &a)
  * @return \p true if <tt>op1 == op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline bool operator==(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline bool operator==(const T &op1, const U &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator==(const T &op1, const U &op2)
@@ -8636,8 +8631,8 @@ inline bool operator==(const T &op1, const U &op2)
  * @return \p true if <tt>op1 != op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline bool operator!=(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline bool operator!=(const T &op1, const U &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator!=(const T &op1, const U &op2)
@@ -8654,8 +8649,8 @@ inline bool operator!=(const T &op1, const U &op2)
  * @return \p true if <tt>op1 < op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline bool operator<(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline bool operator<(const T &op1, const U &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator<(const T &op1, const U &op2)
@@ -8672,8 +8667,8 @@ inline bool operator<(const T &op1, const U &op2)
  * @return \p true if <tt>op1 <= op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline bool operator<=(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline bool operator<=(const T &op1, const U &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator<=(const T &op1, const U &op2)
@@ -8690,8 +8685,8 @@ inline bool operator<=(const T &op1, const U &op2)
  * @return \p true if <tt>op1 > op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline bool operator>(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline bool operator>(const T &op1, const U &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator>(const T &op1, const U &op2)
@@ -8708,8 +8703,8 @@ inline bool operator>(const T &op1, const U &op2)
  * @return \p true if <tt>op1 >= op2</tt>, \p false otherwise.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerOpTypes<T, U>
-inline bool operator>=(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerOpTypes<T, U> inline bool operator>=(const T &op1, const U &op2)
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
 inline bool operator>=(const T &op1, const U &op2)
@@ -8796,8 +8791,8 @@ inline void dispatch_in_place_or(T &rop, const integer<SSize> &op)
  * @return the bitwise OR of ``op1`` and ``op2``.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerIntegralOpTypes<T, U>
-inline auto operator|(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerIntegralOpTypes<T, U> inline auto operator|(const T &op1, const U &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline detail::integer_common_t<T, U> operator|(const T &op1, const U &op2)
@@ -8821,8 +8816,8 @@ inline detail::integer_common_t<T, U> operator|(const T &op1, const U &op2)
  * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerIntegralOpTypes<T, U>
-inline auto &operator|=(T &rop, const U &op)
+template <typename T, typename U>
+requires IntegerIntegralOpTypes<T, U> inline auto &operator|=(T &rop, const U &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator|=(T &rop, const U &op)
@@ -8891,8 +8886,8 @@ inline void dispatch_in_place_and(T &rop, const integer<SSize> &op)
  * @return the bitwise AND of ``op1`` and ``op2``.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerIntegralOpTypes<T, U>
-inline auto operator&(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerIntegralOpTypes<T, U> inline auto operator&(const T &op1, const U &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline detail::integer_common_t<T, U> operator&(const T &op1, const U &op2)
@@ -8916,8 +8911,8 @@ inline detail::integer_common_t<T, U> operator&(const T &op1, const U &op2)
  * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerIntegralOpTypes<T, U>
-inline auto &operator&=(T &rop, const U &op)
+template <typename T, typename U>
+requires IntegerIntegralOpTypes<T, U> inline auto &operator&=(T &rop, const U &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator&=(T &rop, const U &op)
@@ -8986,8 +8981,8 @@ inline void dispatch_in_place_xor(T &rop, const integer<SSize> &op)
  * @return the bitwise XOR of ``op1`` and ``op2``.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerIntegralOpTypes<T, U>
-inline auto operator^(const T &op1, const U &op2)
+template <typename T, typename U>
+requires IntegerIntegralOpTypes<T, U> inline auto operator^(const T &op1, const U &op2)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline detail::integer_common_t<T, U> operator^(const T &op1, const U &op2)
@@ -9011,8 +9006,8 @@ inline detail::integer_common_t<T, U> operator^(const T &op1, const U &op2)
  * @throws unspecified any exception thrown by the conversion operator of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U> requires IntegerIntegralOpTypes<T, U>
-inline auto &operator^=(T &rop, const U &op)
+template <typename T, typename U>
+requires IntegerIntegralOpTypes<T, U> inline auto &operator^=(T &rop, const U &op)
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
 inline T &operator^=(T &rop, const U &op)
