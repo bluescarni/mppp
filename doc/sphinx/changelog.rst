@@ -10,7 +10,6 @@ New
 - mp++'s concepts are now compatible with the C++20
   concepts proposal (`#196 <https://github.com/bluescarni/mppp/pull/196>`__).
   Many thanks to `7ofNine <https://github.com/7ofNine>`__!
-
 - Expose the gamma functions from the MPFR API
   for :cpp:class:`~mppp::real`
   (`#190 <https://github.com/bluescarni/mppp/pull/190>`__).
