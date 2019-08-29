@@ -67,8 +67,10 @@ set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
 set(MPPP_CXX_FLAGS_RELEASE ${YACMA_CXX_FLAGS})
 if(YACMA_COMPILER_IS_MSVC)
   # On both cl and clang-cl, disable the idiotic minmax macros and enable the bigobj option.
-  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/bigobj")
-  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/bigobj")
+  # Also, enable the WIN32_LEAN_AND_MEAN definition:
+  # https://stackoverflow.com/questions/11040133/what-does-defining-win32-lean-and-mean-exclude-exactly
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/bigobj" "-DWIN32_LEAN_AND_MEAN")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/bigobj" "-DWIN32_LEAN_AND_MEAN")
   if(MPPP_MSVC_UNICODE)
     # NOTE: Unicode solutions for MSVC can be enabled through
     # these definitions.

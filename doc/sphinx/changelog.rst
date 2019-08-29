@@ -18,6 +18,8 @@ New
 Changes
 ~~~~~~~
 
+- On MSVC, use the ``WIN32_LEAN_AND_MEAN`` definition
+  (`#198 <https://github.com/bluescarni/mppp/pull/198>`__).
 - Update the internal copy of Catch to the latest version, 2.9.2
   (`#197 <https://github.com/bluescarni/mppp/pull/197>`__).
 - Drastically reduce the build time of the test suite by separately

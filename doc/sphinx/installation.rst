@@ -236,7 +236,8 @@ Compiler and platform specific notes
 
 Visual Studio:
 
-* The mp++ library is compiled with the ``NOMINMAX`` definition, and,
+* The mp++ library is compiled with the ``NOMINMAX`` and
+  ``WIN32_LEAN_AND_MEAN`` definitions, and,
   if supported, with the ``/permissive-`` compiler flag.
 * If the ``MPPP_MSVC_UNICODE`` CMake option is enabled, the mp++ library
   is compiled with the ``UNICODE`` and ``_UNICODE`` definitions.
