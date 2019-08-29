@@ -1646,58 +1646,56 @@ private:
 #endif
 
 public:
-/// Generic assignment operator.
-/**
- * \rststar
- * This operator will assign ``x`` to ``this``. The storage type of ``this`` after the assignment
- * will depend only on the value of ``x`` (that is, the storage type will be static if the value of ``x``
- * is small enough, dynamic otherwise). Assignment from floating-point types will assign the truncated
- * counterpart of ``x``.
- * \endrststar
- *
- * @param x the assignment argument.
- *
- * @return a reference to \p this.
- *
- * @throws std::domain_error if ``x`` is a non-finite floating-point value.
- */
+    /// Generic assignment operator.
+    /**
+     * \rststar
+     * This operator will assign ``x`` to ``this``. The storage type of ``this`` after the assignment
+     * will depend only on the value of ``x`` (that is, the storage type will be static if the value of ``x``
+     * is small enough, dynamic otherwise). Assignment from floating-point types will assign the truncated
+     * counterpart of ``x``.
+     * \endrststar
+     *
+     * @param x the assignment argument.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::domain_error if ``x`` is a non-finite floating-point value.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
-    integer &operator=(const T &x)
 #else
     template <typename T, cpp_interoperable_enabler<T> = 0>
-    integer &operator=(const T &x)
 #endif
+    integer &operator=(const T &x)
     {
         dispatch_assignment(x);
         return *this;
     }
-/// Assignment from string.
-/**
- * \rststar
- * The body of this operator is equivalent to:
- *
- * .. code-block:: c++
- *
- *    return *this = integer{s};
- *
- * That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
- * ``s`` and it is then move-assigned to ``this``.
- * \endrststar
- *
- * @param s the string that will be used for the assignment.
- *
- * @return a reference to \p this.
- *
- * @throws unspecified any exception thrown by the constructor from string.
- */
+    /// Assignment from string.
+    /**
+     * \rststar
+     * The body of this operator is equivalent to:
+     *
+     * .. code-block:: c++
+     *
+     *    return *this = integer{s};
+     *
+     * That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
+     * ``s`` and it is then move-assigned to ``this``.
+     * \endrststar
+     *
+     * @param s the string that will be used for the assignment.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws unspecified any exception thrown by the constructor from string.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
-    integer &operator=(const T &s)
 #else
     template <typename T, string_type_enabler<T> = 0>
-    integer &operator=(const T &s)
 #endif
+    integer &operator=(const T &s)
     {
         return *this = integer{s};
     }
@@ -7752,11 +7750,11 @@ inline detail::integer_common_t<T, U> operator+(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline auto &operator+=(T &rop, const U &op)
+requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
-inline T &operator+=(T &rop, const U &op)
 #endif
+    inline T &operator+=(T &rop, const U &op)
 {
     detail::dispatch_in_place_add(rop, op);
     return rop;
@@ -7926,11 +7924,11 @@ inline detail::integer_common_t<T, U> operator-(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline auto &operator-=(T &rop, const U &op)
+requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
-inline T &operator-=(T &rop, const U &op)
 #endif
+    inline T &operator-=(T &rop, const U &op)
 {
     detail::dispatch_in_place_sub(rop, op);
     return rop;
@@ -8073,11 +8071,11 @@ inline detail::integer_common_t<T, U> operator*(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline auto &operator*=(T &rop, const U &op)
+requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
-inline T &operator*=(T &rop, const U &op)
 #endif
+    inline T &operator*=(T &rop, const U &op)
 {
     detail::dispatch_in_place_mul(rop, op);
     return rop;
@@ -8237,11 +8235,11 @@ inline detail::integer_common_t<T, U> operator/(const T &n, const U &d)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline auto &operator/=(T &rop, const U &op)
+requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
-inline T &operator/=(T &rop, const U &op)
 #endif
+    inline T &operator/=(T &rop, const U &op)
 {
     detail::dispatch_in_place_div(rop, op);
     return rop;
@@ -8283,11 +8281,11 @@ inline detail::integer_common_t<T, U> operator%(const T &n, const U &d)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto &operator%=(T &rop, const U &op)
+requires IntegerIntegralOpTypes<T, U>
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline T &operator%=(T &rop, const U &op)
 #endif
+    inline T &operator%=(T &rop, const U &op)
 {
     detail::dispatch_in_place_mod(rop, op);
     return rop;
@@ -8304,11 +8302,10 @@ inline T &operator%=(T &rop, const U &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
-inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 #else
 template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
-inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 #endif
+inline integer<SSize> operator<<(const integer<SSize> &n, T s)
 {
     integer<SSize> retval;
     mul_2exp(retval, n, detail::safe_cast<::mp_bitcnt_t>(s));
@@ -8326,11 +8323,10 @@ inline integer<SSize> operator<<(const integer<SSize> &n, T s)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
-inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 #else
 template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
-inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 #endif
+inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
 {
     mul_2exp(rop, rop, detail::safe_cast<::mp_bitcnt_t>(s));
     return rop;
@@ -8347,11 +8343,10 @@ inline integer<SSize> &operator<<=(integer<SSize> &rop, T s)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
-inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 #else
 template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
-inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 #endif
+inline integer<SSize> operator>>(const integer<SSize> &n, T s)
 {
     integer<SSize> retval;
     tdiv_q_2exp(retval, n, detail::safe_cast<::mp_bitcnt_t>(s));
@@ -8369,11 +8364,10 @@ inline integer<SSize> operator>>(const integer<SSize> &n, T s)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppIntegralInteroperable T, std::size_t SSize>
-inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
 #else
 template <typename T, std::size_t SSize, cpp_integral_interoperable_enabler<T> = 0>
-inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
 #endif
+inline integer<SSize> &operator>>=(integer<SSize> &rop, T s)
 {
     tdiv_q_2exp(rop, rop, detail::safe_cast<::mp_bitcnt_t>(s));
     return rop;
@@ -8614,11 +8608,11 @@ inline bool dispatch_less_than(T x, const integer<SSize> &a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline bool operator==(const T &op1, const U &op2)
+requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
-inline bool operator==(const T &op1, const U &op2)
 #endif
+    inline bool operator==(const T &op1, const U &op2)
 {
     return detail::dispatch_equality(op1, op2);
 }
@@ -8632,11 +8626,11 @@ inline bool operator==(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline bool operator!=(const T &op1, const U &op2)
+requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
-inline bool operator!=(const T &op1, const U &op2)
 #endif
+    inline bool operator!=(const T &op1, const U &op2)
 {
     return !(op1 == op2);
 }
@@ -8650,11 +8644,11 @@ inline bool operator!=(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline bool operator<(const T &op1, const U &op2)
+requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
-inline bool operator<(const T &op1, const U &op2)
 #endif
+    inline bool operator<(const T &op1, const U &op2)
 {
     return detail::dispatch_less_than(op1, op2);
 }
@@ -8668,11 +8662,11 @@ inline bool operator<(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline bool operator<=(const T &op1, const U &op2)
+requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
-inline bool operator<=(const T &op1, const U &op2)
 #endif
+    inline bool operator<=(const T &op1, const U &op2)
 {
     return !(op1 > op2);
 }
@@ -8686,11 +8680,11 @@ inline bool operator<=(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline bool operator>(const T &op1, const U &op2)
+requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
-inline bool operator>(const T &op1, const U &op2)
 #endif
+    inline bool operator>(const T &op1, const U &op2)
 {
     return detail::dispatch_greater_than(op1, op2);
 }
@@ -8704,11 +8698,11 @@ inline bool operator>(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline bool operator>=(const T &op1, const U &op2)
+requires IntegerOpTypes<T, U>
 #else
 template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
-inline bool operator>=(const T &op1, const U &op2)
 #endif
+    inline bool operator>=(const T &op1, const U &op2)
 {
     return !(op1 < op2);
 }
@@ -8817,11 +8811,11 @@ inline detail::integer_common_t<T, U> operator|(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto &operator|=(T &rop, const U &op)
+requires IntegerIntegralOpTypes<T, U>
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline T &operator|=(T &rop, const U &op)
 #endif
+    inline T &operator|=(T &rop, const U &op)
 {
     detail::dispatch_in_place_or(rop, op);
     return rop;
@@ -8912,11 +8906,11 @@ inline detail::integer_common_t<T, U> operator&(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto &operator&=(T &rop, const U &op)
+requires IntegerIntegralOpTypes<T, U>
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline T &operator&=(T &rop, const U &op)
 #endif
+    inline T &operator&=(T &rop, const U &op)
 {
     detail::dispatch_in_place_and(rop, op);
     return rop;
@@ -9007,11 +9001,11 @@ inline detail::integer_common_t<T, U> operator^(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerIntegralOpTypes<T, U> inline auto &operator^=(T &rop, const U &op)
+requires IntegerIntegralOpTypes<T, U>
 #else
 template <typename T, typename U, integer_integral_op_types_enabler<T, U> = 0>
-inline T &operator^=(T &rop, const U &op)
 #endif
+    inline T &operator^=(T &rop, const U &op)
 {
     detail::dispatch_in_place_xor(rop, op);
     return rop;

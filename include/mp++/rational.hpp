@@ -1776,11 +1776,11 @@ inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline auto &operator+=(T &rop, const U &op)
+requires RationalOpTypes<T, U>
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
-inline T &operator+=(T &rop, const U &op)
 #endif
+    inline T &operator+=(T &rop, const U &op)
 {
     detail::dispatch_in_place_add(rop, op);
     return rop;
@@ -1968,11 +1968,11 @@ inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline auto &operator-=(T &rop, const U &op)
+requires RationalOpTypes<T, U>
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
-inline T &operator-=(T &rop, const U &op)
 #endif
+    inline T &operator-=(T &rop, const U &op)
 {
     detail::dispatch_in_place_sub(rop, op);
     return rop;
@@ -2165,11 +2165,11 @@ inline void dispatch_in_place_mul(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline auto &operator*=(T &rop, const U &op)
+requires RationalOpTypes<T, U>
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
-inline T &operator*=(T &rop, const U &op)
 #endif
+    inline T &operator*=(T &rop, const U &op)
 {
     detail::dispatch_in_place_mul(rop, op);
     return rop;
@@ -2377,11 +2377,11 @@ inline void dispatch_in_place_div(T &rop, const rational<SSize> &op)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline auto &operator/=(T &rop, const U &op)
+requires RationalOpTypes<T, U>
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
-inline T &operator/=(T &rop, const U &op)
 #endif
+    inline T &operator/=(T &rop, const U &op)
 {
     detail::dispatch_in_place_div(rop, op);
     return rop;
@@ -2430,11 +2430,11 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline bool operator==(const T &op1, const U &op2)
+requires RationalOpTypes<T, U>
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
-inline bool operator==(const T &op1, const U &op2)
 #endif
+    inline bool operator==(const T &op1, const U &op2)
 {
     return detail::dispatch_equality(op1, op2);
 }
@@ -2448,11 +2448,11 @@ inline bool operator==(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline bool operator!=(const T &op1, const U &op2)
+requires RationalOpTypes<T, U>
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
-inline bool operator!=(const T &op1, const U &op2)
 #endif
+    inline bool operator!=(const T &op1, const U &op2)
 {
     return !(op1 == op2);
 }
@@ -2563,11 +2563,11 @@ inline bool dispatch_less_than(T x, const rational<SSize> &a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline bool operator<(const T &op1, const U &op2)
+requires RationalOpTypes<T, U>
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
-inline bool operator<(const T &op1, const U &op2)
 #endif
+    inline bool operator<(const T &op1, const U &op2)
 {
     return detail::dispatch_less_than(op1, op2);
 }
@@ -2581,11 +2581,11 @@ inline bool operator<(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline bool operator<=(const T &op1, const U &op2)
+requires RationalOpTypes<T, U>
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
-inline bool operator<=(const T &op1, const U &op2)
 #endif
+    inline bool operator<=(const T &op1, const U &op2)
 {
     return !(op1 > op2);
 }
@@ -2599,11 +2599,11 @@ inline bool operator<=(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline bool operator>(const T &op1, const U &op2)
+requires RationalOpTypes<T, U>
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
-inline bool operator>(const T &op1, const U &op2)
 #endif
+    inline bool operator>(const T &op1, const U &op2)
 {
     return detail::dispatch_greater_than(op1, op2);
 }
@@ -2617,11 +2617,11 @@ inline bool operator>(const T &op1, const U &op2)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U> inline bool operator>=(const T &op1, const U &op2)
+requires RationalOpTypes<T, U>
 #else
 template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
-inline bool operator>=(const T &op1, const U &op2)
 #endif
+    inline bool operator>=(const T &op1, const U &op2)
 {
     return !(op1 < op2);
 }
