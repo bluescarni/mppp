@@ -9,11 +9,6 @@
 #include <mp++/config.hpp>
 
 #include <limits>
-#include <mp++/detail/mpfr.hpp>
-#include <mp++/detail/type_traits.hpp>
-#include <mp++/integer.hpp>
-#include <mp++/rational.hpp>
-#include <mp++/real.hpp>
 #include <random>
 #include <sstream>
 #include <stdexcept>
@@ -21,10 +16,14 @@
 #include <tuple>
 #include <type_traits>
 
-#include "test_utils.hpp"
+#include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/type_traits.hpp>
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
+#include <mp++/real.hpp>
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 using namespace mppp;
 using namespace mppp_test;

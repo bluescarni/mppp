@@ -8,17 +8,16 @@
 
 #include <cstddef>
 #include <functional>
-#include <gmp.h>
 #include <random>
 #include <tuple>
 #include <type_traits>
 
+#include <gmp.h>
+
 #include <mp++/rational.hpp>
 
-#include "test_utils.hpp"
-
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 static int ntries = 1000;
 

@@ -6,21 +6,21 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
-
 #include <algorithm>
+#include <utility>
+
+#include <mp++/config.hpp>
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
+#include <mp++/real.hpp>
+
 #if defined(MPPP_WITH_QUADMATH)
 #include <mp++/real128.hpp>
 #endif
-#include <mp++/rational.hpp>
-#include <mp++/real.hpp>
-#include <utility>
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 using namespace mppp;

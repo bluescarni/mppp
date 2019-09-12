@@ -7,17 +7,34 @@ Changelog
 New
 ~~~
 
+- mp++'s concepts are now compatible with the C++20
+  concepts proposal (`#196 <https://github.com/bluescarni/mppp/pull/196>`__,
+  `#198 <https://github.com/bluescarni/mppp/pull/198>`__).
+  Many thanks to `7ofNine <https://github.com/7ofNine>`__!
 - Expose the Bessel functions from the MPFR API
   for :cpp:class:`~mppp::real`
   (`#192 <https://github.com/bluescarni/mppp/pull/192>`__).
-
 - Expose the gamma functions from the MPFR API
   for :cpp:class:`~mppp::real`
   (`#190 <https://github.com/bluescarni/mppp/pull/190>`__).
 
+Changes
+~~~~~~~
+
+- On MSVC, use the ``WIN32_LEAN_AND_MEAN`` definition
+  (`#198 <https://github.com/bluescarni/mppp/pull/198>`__).
+- Update the internal copy of Catch to the latest version, 2.9.2
+  (`#197 <https://github.com/bluescarni/mppp/pull/197>`__).
+- Drastically reduce the build time of the test suite by separately
+  compiling the Catch main function
+  (`#197 <https://github.com/bluescarni/mppp/pull/197>`__).
+
 Fix
 ~~~
 
+- Workaround a constexpr issue involving :cpp:class:`~mppp::real128`
+  in GCC 9
+  (`#197 <https://github.com/bluescarni/mppp/pull/197>`__).
 - Fix C++17 builds with MSVC 2015
   (`#191 <https://github.com/bluescarni/mppp/pull/191>`__).
 

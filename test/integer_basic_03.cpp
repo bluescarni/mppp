@@ -26,19 +26,17 @@
 #include <utility>
 #include <vector>
 
-#include <gmp.h>
-
 #if defined(MPPP_HAVE_STRING_VIEW)
 #include <string_view>
 #endif
 
+#include <gmp.h>
+
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 
-#include "test_utils.hpp"
-
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 static int ntries = 1000;
 

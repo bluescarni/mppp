@@ -1,18 +1,20 @@
 cmake_minimum_required(VERSION 3.3.0)
 
+# Set default build type to "Release".
+# NOTE: this should be done before the project command since the latter can set
+# CMAKE_BUILD_TYPE itself (it does so for nmake).
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Release CACHE STRING
+		"Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+	FORCE)
+endif()
+
 project(mp++ VERSION 0.17 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
 message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "mp++ version: ${mp++_VERSION}")
-
-# Set default build type to "Release".
-if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release CACHE STRING
-		"Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-	FORCE)
-endif()
 
 include(YACMACompilerLinkerSettings)
 include(CheckCXXCompilerFlag)
@@ -65,8 +67,10 @@ set(MPPP_CXX_FLAGS_DEBUG ${YACMA_CXX_FLAGS} ${YACMA_CXX_FLAGS_DEBUG})
 set(MPPP_CXX_FLAGS_RELEASE ${YACMA_CXX_FLAGS})
 if(YACMA_COMPILER_IS_MSVC)
   # On both cl and clang-cl, disable the idiotic minmax macros and enable the bigobj option.
-  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/bigobj")
-  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/bigobj")
+  # Also, enable the WIN32_LEAN_AND_MEAN definition:
+  # https://stackoverflow.com/questions/11040133/what-does-defining-win32-lean-and-mean-exclude-exactly
+  list(APPEND MPPP_CXX_FLAGS_DEBUG "-DNOMINMAX" "/bigobj" "-DWIN32_LEAN_AND_MEAN")
+  list(APPEND MPPP_CXX_FLAGS_RELEASE "-DNOMINMAX" "/bigobj" "-DWIN32_LEAN_AND_MEAN")
   if(MPPP_MSVC_UNICODE)
     # NOTE: Unicode solutions for MSVC can be enabled through
     # these definitions.

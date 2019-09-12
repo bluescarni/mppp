@@ -5,6 +5,22 @@ include(YACMACompilerLinkerSettings)
 list(APPEND MPPP_CXX_FLAGS_DEBUG ${YACMA_THREADING_CXX_FLAGS})
 list(APPEND MPPP_CXX_FLAGS_RELEASE ${YACMA_THREADING_CXX_FLAGS})
 
+add_library(mp++_test STATIC catch_main.cpp)
+target_compile_options(mp++_test PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>" "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
+                       "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>")
+# Let's setup the target C++ standard, but only if the user did not provide it manually.
+if(NOT CMAKE_CXX_STANDARD)
+  if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
+    # NOTE: the idea here is that we want to use C++14 if the compilers supports
+    # concepts (as variable concepts are essentially template variables).
+    set_property(TARGET mp++_test PROPERTY CXX_STANDARD 14)
+  else()
+    set_property(TARGET mp++_test PROPERTY CXX_STANDARD 11)
+  endif()
+endif()
+set_property(TARGET mp++_test PROPERTY CXX_STANDARD_REQUIRED YES)
+set_property(TARGET mp++_test PROPERTY CXX_EXTENSIONS NO)
+
 function(ADD_MPPP_TESTCASE arg1)
   if(MPPP_TEST_NSPLIT)
     # Increase by one the _MPPP_TEST_NUM variable in the parent scope.
@@ -19,7 +35,7 @@ function(ADD_MPPP_TESTCASE arg1)
     return()
   endif()
   add_executable(${arg1} ${arg1}.cpp)
-  target_link_libraries(${arg1} mp++ Threads::Threads)
+  target_link_libraries(${arg1} mp++ mp++_test Threads::Threads)
   target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>"
     "$<$<CONFIG:RELWITHDEBINFO>:${MPPP_CXX_FLAGS_RELEASE}>")
   # Let's setup the target C++ standard, but only if the user did not provide it manually.
@@ -34,9 +50,6 @@ function(ADD_MPPP_TESTCASE arg1)
   endif()
   set_property(TARGET ${arg1} PROPERTY CXX_STANDARD_REQUIRED YES)
   set_property(TARGET ${arg1} PROPERTY CXX_EXTENSIONS NO)
-  # Visibility settings.
-  set_target_properties(${arg1} PROPERTIES CXX_VISIBILITY_PRESET hidden)
-  set_target_properties(${arg1} PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
   add_test(${arg1} ${arg1})
 endfunction()
 

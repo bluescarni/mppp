@@ -12,7 +12,6 @@
 #include <mp++/integer.hpp>
 #include <mp++/real128.hpp>
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 using namespace mppp;
