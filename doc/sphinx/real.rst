@@ -835,6 +835,9 @@ Other special functions
    either the default precision, if set, or it is automatically deduced depending on the type
    and value of the operand to be converted.
 
+   .. note::
+      This function is available from MPFR 4 onwards.
+
    :param x: the first argument.
    :param y: the second argument.
 
