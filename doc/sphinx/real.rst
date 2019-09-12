@@ -727,6 +727,187 @@ Bessel functions
 
    :return: the Bessel function of *r*.
 
+.. _real_err_func:
+
+Error functions
+~~~~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::erf(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::erfc(mppp::real &rop, T &&op)
+
+   Binary error functions.
+
+   These functions will set *rop* to, respectively, the error function and the complementary
+   error function of *op*.
+   The precision of the result will be equal to the precision of *op*.
+
+   :param rop: the return value.
+   :param op: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::erf(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::erfc(T &&r)
+
+   Unary error functions.
+
+   These functions will return, respectively, the error function and the complementary
+   error function of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the argument.
+
+   :return: the error function or the complementary error function of *r*.
+
+.. _real_other_specfunc:
+
+Other special functions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::eint(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::li2(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::zeta(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::ai(mppp::real &rop, T &&op)
+
+   Other binary special functions.
+
+   These functions will set *rop* to, respectively,
+
+   * the exponential integral,
+   * the dilogarithm,
+   * the Riemann Zeta function,
+   * the Airy function,
+
+   of *op*. The precision of the result will be equal to the precision of *op*.
+
+   :param rop: the return value.
+   :param op: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::eint(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::li2(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::zeta(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::ai(T &&r)
+
+   Other unary special functions.
+
+   These functions will return, respectively,
+
+   * the exponential integral,
+   * the dilogarithm,
+   * the Riemann Zeta function,
+   * the Airy function,
+
+   of *r*. The precision of the result will be equal to the precision of *r*.
+
+   :param r: the argument.
+
+   :return: the exponential integral, dilogarithm, Riemann Zeta function or Airy function
+      of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::beta(mppp::real &rop, T &&x, U &&y)
+
+   Ternary beta function.
+
+   This function will set *rop* to the beta function of *x* and *y*.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   .. note::
+      This function is available from MPFR 4 onwards.
+
+   :param rop: the return value.
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::beta(T &&x, U &&y)
+
+   Binary beta function.
+
+   This function will compute and return the beta function of *x* and *y*.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
+   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
+   either the default precision, if set, or it is automatically deduced depending on the type
+   and value of the operand to be converted.
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the beta function of *x* and *y*.
+
+   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::hypot(mppp::real &rop, T &&x, U &&y)
+
+   Ternary hypot function.
+
+   This function will set *rop* to :math:`\sqrt{x^2+y^2}`.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::hypot(T &&x, U &&y)
+
+   Binary hypot function.
+
+   This function will compute and return :math:`\sqrt{x^2+y^2}`.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
+   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
+   either the default precision, if set, or it is automatically deduced depending on the type
+   and value of the operand to be converted.
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the hypot function of *x* and *y*.
+
+   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::agm(mppp::real &rop, T &&x, U &&y)
+
+   Ternary AGM.
+
+   This function will set *rop* to the arithmetic-geometric mean of *x* and *y*.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::agm(T &&x, U &&y)
+
+   Binary AGM.
+
+   This function will compute and return the arithmetic-geometric mean of *x* and *y*.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
+   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
+   either the default precision, if set, or it is automatically deduced depending on the type
+   and value of the operand to be converted.
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the AGM of *x* and *y*.
+
+   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+
 .. _real_intrem:
 
 Integer and remainder related functions
