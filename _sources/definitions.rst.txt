@@ -47,4 +47,4 @@ Macros and definitions
    .. versionadded:: 0.17
 
    This name is defined if mp++ detects the availability of the ``std::string_view``
-   class.
+   class (available since C++17).
