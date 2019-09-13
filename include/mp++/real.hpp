@@ -2207,6 +2207,18 @@ public:
     real &y0();
     // In-place Bessel function of the second kind of order 1.
     real &y1();
+    // In-place exponential integral.
+    real &eint();
+    // In-place dilogarithm.
+    real &li2();
+    // In-place Riemann Zeta function.
+    real &zeta();
+    // In-place error function.
+    real &erf();
+    // In-place complementary error function.
+    real &erfc();
+    // In-place Airy function.
+    real &ai();
     /// Check if the value is an integer.
     /**
      * @return ``true`` if ``this`` represents an integer value, ``false`` otherwise.
@@ -3666,6 +3678,197 @@ inline real yn(long n, T &&r)
 {
     auto yn_wrapper = [n](::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd) { ::mpfr_yn(rop, n, op, rnd); };
     return detail::mpfr_nary_op_return(0, yn_wrapper, std::forward<T>(r));
+}
+
+// Other special functions.
+MPPP_REAL_MPFR_UNARY_RETVAL(eint)
+MPPP_REAL_MPFR_UNARY_RETURN(eint)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(li2)
+MPPP_REAL_MPFR_UNARY_RETURN(li2)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(zeta)
+MPPP_REAL_MPFR_UNARY_RETURN(zeta)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(erf)
+MPPP_REAL_MPFR_UNARY_RETURN(erf)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(erfc)
+MPPP_REAL_MPFR_UNARY_RETURN(erfc)
+
+MPPP_REAL_MPFR_UNARY_RETVAL(ai)
+MPPP_REAL_MPFR_UNARY_RETURN(ai)
+
+#if MPFR_VERSION_MAJOR >= 4
+
+// Ternary beta.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &beta(real &rop, T &&x, U &&y)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_beta, rop, std::forward<T>(x), std::forward<U>(y));
+}
+
+namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_beta(T &&x, U &&y)
+{
+    return mpfr_nary_op_return(0, ::mpfr_beta, std::forward<T>(x), std::forward<U>(y));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+inline real dispatch_beta(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_beta(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_beta(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_beta(tmp, std::forward<U>(a));
+}
+
+} // namespace detail
+
+// Binary beta.
+#if defined(MPPP_HAVE_CONCEPTS)
+// NOTE: written like this, the constraint is equivalent
+// to: requires RealOpTypes<U, T>.
+template <typename T, RealOpTypes<T> U>
+#else
+// NOTE: we flip around T and U in the enabler to keep
+// it consistent with the concept above.
+template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+#endif
+inline real beta(T &&x, U &&y)
+{
+    return detail::dispatch_beta(std::forward<T>(x), std::forward<U>(y));
+}
+
+#endif
+
+// Ternary hypot.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &hypot(real &rop, T &&x, U &&y)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_hypot, rop, std::forward<T>(x), std::forward<U>(y));
+}
+
+namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_hypot(T &&x, U &&y)
+{
+    return mpfr_nary_op_return(0, ::mpfr_hypot, std::forward<T>(x), std::forward<U>(y));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+inline real dispatch_hypot(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_hypot(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_hypot(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_hypot(tmp, std::forward<U>(a));
+}
+
+} // namespace detail
+
+// Binary hypot.
+#if defined(MPPP_HAVE_CONCEPTS)
+// NOTE: written like this, the constraint is equivalent
+// to: requires RealOpTypes<U, T>.
+template <typename T, RealOpTypes<T> U>
+#else
+// NOTE: we flip around T and U in the enabler to keep
+// it consistent with the concept above.
+template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+#endif
+inline real hypot(T &&x, U &&y)
+{
+    return detail::dispatch_hypot(std::forward<T>(x), std::forward<U>(y));
+}
+
+// Ternary agm.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &agm(real &rop, T &&x, U &&y)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_agm, rop, std::forward<T>(x), std::forward<U>(y));
+}
+
+namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_agm(T &&x, U &&y)
+{
+    return mpfr_nary_op_return(0, ::mpfr_agm, std::forward<T>(x), std::forward<U>(y));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+inline real dispatch_agm(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_agm(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_agm(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_agm(tmp, std::forward<U>(a));
+}
+
+} // namespace detail
+
+// Binary agm.
+#if defined(MPPP_HAVE_CONCEPTS)
+// NOTE: written like this, the constraint is equivalent
+// to: requires RealOpTypes<U, T>.
+template <typename T, RealOpTypes<T> U>
+#else
+// NOTE: we flip around T and U in the enabler to keep
+// it consistent with the concept above.
+template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+#endif
+inline real agm(T &&x, U &&y)
+{
+    return detail::dispatch_agm(std::forward<T>(x), std::forward<U>(y));
 }
 
 #undef MPPP_REAL_MPFR_UNARY_RETURN

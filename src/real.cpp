@@ -651,4 +651,76 @@ real &real::y1()
     return self_mpfr_unary(::mpfr_y1);
 }
 
+/// In-place exponential integral.
+/**
+ * This method will set ``this`` to its exponential integral.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::eint()
+{
+    return self_mpfr_unary(::mpfr_eint);
+}
+
+/// In-place dilogarithm.
+/**
+ * This method will set ``this`` to its dilogarithm.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::li2()
+{
+    return self_mpfr_unary(::mpfr_li2);
+}
+
+/// In-place Riemann Zeta function.
+/**
+ * This method will set ``this`` to its Riemann Zeta function.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::zeta()
+{
+    return self_mpfr_unary(::mpfr_zeta);
+}
+
+/// In-place error function.
+/**
+ * This method will set ``this`` to its error function.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::erf()
+{
+    return self_mpfr_unary(::mpfr_erf);
+}
+
+/// In-place complementary error function.
+/**
+ * This method will set ``this`` to its complementary error function.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::erfc()
+{
+    return self_mpfr_unary(::mpfr_erfc);
+}
+
+/// In-place Airy function.
+/**
+ * This method will set ``this`` to its Airy function.
+ * The precision of ``this`` will not be altered.
+ *
+ * @return a reference to ``this``.
+ */
+real &real::ai()
+{
+    return self_mpfr_unary(::mpfr_ai);
+}
+
 } // namespace mppp
