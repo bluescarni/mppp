@@ -208,6 +208,31 @@ if(MPPP_WITH_MPFR)
         "${MPPP_SRC_FILES}")
 endif()
 
+# Make mp++ header files accessible in Visual Studio IDE
+if(YACMA_COMPILER_IS_MSVC)
+  set(MPPP_HEADER_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/concepts.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/exceptions.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/integer.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/mp++.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/rational.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/real.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/real128.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/type_name.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/fwd_decl.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/gmp.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/mpfr.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/quadmath.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/type_traits.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/utils.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/visibility.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/extra/pybind11.hpp"
+)
+
+  SOURCE_GROUP(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" PREFIX "Header Files" FILES ${MPPP_HEADER_FILES})
+  SET(MPPP_SRC_FILES ${MPPP_SRC_FILES} ${MPPP_HEADER_FILES})
+endif()
+
 if(MPPP_BUILD_STATIC_LIBRARY)
     # Setup of the mp++ static library.
     message(STATUS "mp++ will be built as a static library.")
