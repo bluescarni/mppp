@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.18 (unreleased)
+-----------------
+
+New
+~~~
+
+- Include mp++'s headers in the project files generated
+  for MSVC (`#199 <https://github.com/bluescarni/mppp/pull/199>`__).
+  Many thanks to `7ofNine <https://github.com/7ofNine>`__!
+
 0.17 (13-09-2019)
 -----------------
 

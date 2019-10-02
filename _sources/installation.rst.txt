@@ -108,8 +108,13 @@ suite with the following command:
    DLL (otherwise the tests will fail to run).
 
 
-Installation via conda
-----------------------
+Packages
+--------
+
+mp++ is also available from a variety of package managers on various platforms.
+
+Conda
+^^^^^
 
 .. versionadded:: 0.2
 
@@ -127,6 +132,18 @@ to add ``conda-forge`` to the channels:
 
 Please refer to the `conda documentation <https://conda.io/en/latest/>`__ for instructions on how to setup and manage
 your conda installation.
+
+FreeBSD
+^^^^^^^
+
+A FreeBSD port via `pkg
+<https://www.freebsd.org/doc/handbook/pkgng-intro.html>`__ has been created for
+mp++. In order to install mp++ using pkg, execute the following command:
+
+.. code-block:: console
+
+   $ pkg install mppp
+
 
 Checking the installation
 -------------------------
