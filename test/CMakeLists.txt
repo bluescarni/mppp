@@ -6,8 +6,12 @@ list(APPEND MPPP_CXX_FLAGS_DEBUG ${YACMA_THREADING_CXX_FLAGS})
 list(APPEND MPPP_CXX_FLAGS_RELEASE ${YACMA_THREADING_CXX_FLAGS})
 
 add_library(mp++_test STATIC catch_main.cpp)
-target_compile_options(mp++_test PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>" "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
-                       "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>")
+target_compile_options(mp++_test PRIVATE
+  "$<$<CONFIG:Debug>:${MPPP_CXX_FLAGS_DEBUG}>"
+  "$<$<CONFIG:Release>:${MPPP_CXX_FLAGS_RELEASE}>"
+  "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
+  "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
+)
 # Let's setup the target C++ standard, but only if the user did not provide it manually.
 if(NOT CMAKE_CXX_STANDARD)
   if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
@@ -36,8 +40,12 @@ function(ADD_MPPP_TESTCASE arg1)
   endif()
   add_executable(${arg1} ${arg1}.cpp)
   target_link_libraries(${arg1} mp++ mp++_test Threads::Threads)
-  target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>"
-    "$<$<CONFIG:RELWITHDEBINFO>:${MPPP_CXX_FLAGS_RELEASE}>")
+  target_compile_options(${arg1} PRIVATE
+    "$<$<CONFIG:Debug>:${MPPP_CXX_FLAGS_DEBUG}>"
+    "$<$<CONFIG:Release>:${MPPP_CXX_FLAGS_RELEASE}>"
+    "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
+    "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
+  )
   # Let's setup the target C++ standard, but only if the user did not provide it manually.
   if(NOT CMAKE_CXX_STANDARD)
     if(MPPP_COMPILER_SUPPORTS_CONCEPTS)

@@ -15,8 +15,12 @@ function(ADD_MPPP_PYBIND11_TESTCASE arg1)
     endif()
     pybind11_add_module(${arg1} ${arg1}.cpp)
     target_link_libraries(${arg1} PRIVATE mp++)
-    target_compile_options(${arg1} PRIVATE "$<$<CONFIG:DEBUG>:${MPPP_CXX_FLAGS_DEBUG}>" "$<$<CONFIG:RELEASE>:${MPPP_CXX_FLAGS_RELEASE}>"
-        "$<$<CONFIG:RELWITHDEBINFO>:${MPPP_CXX_FLAGS_RELEASE}>")
+    target_compile_options(${arg1} PRIVATE
+        "$<$<CONFIG:Debug>:${MPPP_CXX_FLAGS_DEBUG}>"
+        "$<$<CONFIG:Release>:${MPPP_CXX_FLAGS_RELEASE}>"
+        "$<$<CONFIG:RelWithDebInfo>:${MPPP_CXX_FLAGS_RELEASE}>"
+        "$<$<CONFIG:MinSizeRel>:${MPPP_CXX_FLAGS_RELEASE}>"
+    )
     # Let's setup the target C++ standard, but only if the user did not provide it manually.
     if(NOT CMAKE_CXX_STANDARD)
         if(MPPP_COMPILER_SUPPORTS_CONCEPTS)
