@@ -29,25 +29,25 @@ install:
 - if [%BUILD_TYPE%]==[MSVC15_32] set PATH=C:\Miniconda36\Scripts;%PATH%
 - if [%BUILD_TYPE%]==[MSVC15_32] conda config --add channels conda-forge --force
 - if [%BUILD_TYPE%]==[MSVC15_32] conda update -n base conda -y
-- if [%BUILD_TYPE%]==[MSVC15_32] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath
+- if [%BUILD_TYPE%]==[MSVC15_32] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath python=3.6
 - if [%BUILD_TYPE%]==[MSVC15_32] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC17_32] set PATH=C:\Miniconda36\Scripts;%PATH%
 - if [%BUILD_TYPE%]==[MSVC17_32] conda config --add channels conda-forge --force
 - if [%BUILD_TYPE%]==[MSVC17_32] conda update -n base conda -y
-- if [%BUILD_TYPE%]==[MSVC17_32] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath
+- if [%BUILD_TYPE%]==[MSVC17_32] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath python=3.6
 - if [%BUILD_TYPE%]==[MSVC17_32] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC15_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
 - if [%BUILD_TYPE%]==[MSVC15_64] conda config --add channels conda-forge --force
 - if [%BUILD_TYPE%]==[MSVC15_64] conda update -n base conda -y
-- if [%BUILD_TYPE%]==[MSVC15_64] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath
+- if [%BUILD_TYPE%]==[MSVC15_64] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath python=3.6
 - if [%BUILD_TYPE%]==[MSVC15_64] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC17_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
 - if [%BUILD_TYPE%]==[MSVC17_64] conda config --add channels conda-forge --force
 - if [%BUILD_TYPE%]==[MSVC17_64] conda update -n base conda -y
-- if [%BUILD_TYPE%]==[MSVC17_64] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath
+- if [%BUILD_TYPE%]==[MSVC17_64] conda create -y --name mppp cmake mpir mpfr pybind11 mpmath python=3.6
 - if [%BUILD_TYPE%]==[MSVC17_64] call activate mppp
 
 - if [%BUILD_TYPE%]==[MSVC15_clang_64] set PATH=C:\Miniconda36-x64\Scripts;%PATH%
@@ -123,8 +123,8 @@ test_script:
 - if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Release -R pybind11
 
 - if [%BUILD_TYPE%]==[MSVC17_64] set OLD_PATH=%PATH%
-- if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%PATH%;%CD%\Debug
-- if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Debug -E pybind11
+# - if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%PATH%;%CD%\Debug
+# - if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Debug -E pybind11
 - if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%OLD_PATH%;%CD%\Release
 - if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Release -R pybind11
 
