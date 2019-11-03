@@ -6,24 +6,24 @@ branches:
 
 environment:
   matrix:
-    # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    #   BUILD_TYPE: MSVC15_clang_64
-    # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-    #   BUILD_TYPE: MSVC17_32
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      BUILD_TYPE: MSVC15_clang_64
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      BUILD_TYPE: MSVC17_32
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       BUILD_TYPE: MSVC17_64
-    # - BUILD_TYPE: MSVC15_32
-    # - BUILD_TYPE: MSVC15_64
-    # - BUILD_TYPE: MinGW
-    #   TEST_NSPLIT: "2"
-    #   SPLIT_TEST_NUM: "0"
-    #   COMPILER: MinGW
-    #   PLATFORM: x64
-    # - BUILD_TYPE: MinGW
-    #   TEST_NSPLIT: "2"
-    #   SPLIT_TEST_NUM: "1"
-    #   COMPILER: MinGW
-    #   PLATFORM: x64
+    - BUILD_TYPE: MSVC15_32
+    - BUILD_TYPE: MSVC15_64
+    - BUILD_TYPE: MinGW
+      TEST_NSPLIT: "2"
+      SPLIT_TEST_NUM: "0"
+      COMPILER: MinGW
+      PLATFORM: x64
+    - BUILD_TYPE: MinGW
+      TEST_NSPLIT: "2"
+      SPLIT_TEST_NUM: "1"
+      COMPILER: MinGW
+      PLATFORM: x64
 
 install:
 - if [%BUILD_TYPE%]==[MSVC15_32] set PATH=C:\Miniconda36\Scripts;%PATH%
@@ -88,8 +88,8 @@ build_script:
 - if [%BUILD_TYPE%]==[MSVC15_64] cmake --build . --config Release --target pybind11_test_01
 
 # This build enables Unicode solutions.
-# - if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_MSVC_UNICODE=YES
-# - if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Debug
+- if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_MSVC_UNICODE=YES
+- if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Debug
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake .. -G "Visual Studio 15 2017 Win64" -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_TEST_PYBIND11=yes -DCMAKE_CXX_STANDARD=17 -DMPPP_MSVC_UNICODE=YES
 - if [%BUILD_TYPE%]==[MSVC17_64] cmake --build . --config Release --target pybind11_test_01
 
@@ -123,8 +123,8 @@ test_script:
 - if [%BUILD_TYPE%]==[MSVC15_64] ctest -V -C Release -R pybind11
 
 - if [%BUILD_TYPE%]==[MSVC17_64] set OLD_PATH=%PATH%
-# - if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%PATH%;%CD%\Debug
-# - if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Debug -E pybind11
+- if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%PATH%;%CD%\Debug
+- if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Debug -E pybind11
 - if [%BUILD_TYPE%]==[MSVC17_64] set PATH=%OLD_PATH%;%CD%\Release
 - if [%BUILD_TYPE%]==[MSVC17_64] ctest -V -C Release -R pybind11
 
@@ -137,5 +137,5 @@ test_script:
 # Enable this to be able to login to the build worker. You can use the
 # `remmina` program in Ubuntu, use the login information that the line below
 # prints into the log.
-on_finish:
-- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+# on_finish:
+# - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
