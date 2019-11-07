@@ -309,7 +309,7 @@ namespace Catch {
   #  endif // __has_include(<optional>) && defined(CATCH_CPP17_OR_GREATER)
 
   // Check if byte is available and usable
-  #  if __has_include(<cstddef>) && defined(CATCH_CPP17_OR_GREATER)
+  #  if __has_include(<cstddef>) && defined(CATCH_CPP17_OR_GREATER) && false
   #    define CATCH_INTERNAL_CONFIG_CPP17_BYTE
   #  endif // __has_include(<cstddef>) && defined(CATCH_CPP17_OR_GREATER)
 
