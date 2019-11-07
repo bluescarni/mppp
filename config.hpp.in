@@ -79,10 +79,15 @@
 
 #define MPPP_HAVE_CONCEPTS
 
-#if defined(_MSC_VER)
-#define MPPP_CONCEPT_DECL concept
+// NOTE: GCC < 9 uses the syntax of the concept TS.
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 9
+
+#define MPPP_CONCEPT_DECL concept bool
+
 #else
-#define MPPP_CONCEPT_DECL concept bool 
+
+#define MPPP_CONCEPT_DECL concept
+
 #endif
 
 #endif
