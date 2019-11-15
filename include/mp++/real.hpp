@@ -21,7 +21,6 @@
 #include <cstdint>
 #include <iostream>
 #include <limits>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -1198,26 +1197,10 @@ private:
     }
 
 public:
-    /// Negate in-place.
-    /**
-     * This method will set ``this`` to ``-this``.
-     *
-     * @return a reference to ``this``.
-     */
-    real &neg()
-    {
-        return self_mpfr_unary(::mpfr_neg);
-    }
-    /// In-place absolute value.
-    /**
-     * This method will set ``this`` to its absolute value.
-     *
-     * @return a reference to ``this``.
-     */
-    real &abs()
-    {
-        return self_mpfr_unary(::mpfr_abs);
-    }
+    // Negate in-place.
+    real &neg();
+    // In-place absolute value.
+    real &abs();
 
 private:
     // Utility function to check precision in set_prec().
@@ -1244,45 +1227,10 @@ private:
     }
 
 public:
-    /// Destructively set the precision.
-    /**
-     * \rststar
-     * This method will set the precision of ``this`` to exactly ``p`` bits. The value
-     * of ``this`` will be set to NaN.
-     * \endrststar
-     *
-     * @param p the desired precision.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::invalid_argument if the value of \p p is not in the range established by
-     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
-     */
-    real &set_prec(::mpfr_prec_t p)
-    {
-        set_prec_impl<true>(p);
-        return *this;
-    }
-    /// Set the precision maintaining the current value.
-    /**
-     * \rststar
-     * This method will set the precision of ``this`` to exactly ``p`` bits. If ``p``
-     * is smaller than the current precision of ``this``, a rounding operation will be performed,
-     * otherwise the value will be preserved exactly.
-     * \endrststar
-     *
-     * @param p the desired precision.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::invalid_argument if the value of \p p is not in the range established by
-     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
-     */
-    real &prec_round(::mpfr_prec_t p)
-    {
-        prec_round_impl<true>(p);
-        return *this;
-    }
+    // Destructively set the precision.
+    real &set_prec(::mpfr_prec_t);
+    // Set the precision maintaining the current value.
+    real &prec_round(::mpfr_prec_t);
 
 private:
     // Generic conversion.
@@ -1603,225 +1551,65 @@ public:
      * @throws std::invalid_argument if \p base is not in the [2,62] range.
      * @throws std::runtime_error if the call to the ``mpfr_get_str()`` function of the MPFR API fails.
      */
-    std::string to_string(int base = 10) const
-    {
-        std::ostringstream oss;
-        detail::mpfr_to_stream(&m_mpfr, oss, base);
-        return oss.str();
-    }
-    /// In-place square root.
-    /**
-     * This method will set ``this`` to its square root.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &sqrt()
-    {
-        return self_mpfr_unary(::mpfr_sqrt);
-    }
-    /// In-place reciprocal square root.
-    /**
-     * This method will set ``this`` to its reciprocal square root.
-     * The precision of ``this`` will not be altered.
-     *
-     * If ``this`` is zero, the result will be a positive infinity (regardless of the sign of ``this``).
-     * If ``this`` is a positive infinity, the result will be +0. If ``this`` is negative,
-     * the result will be NaN.
-     *
-     * @return a reference to ``this``.
-     */
-    real &rec_sqrt()
-    {
-        return self_mpfr_unary(::mpfr_rec_sqrt);
-    }
-    /// In-place cubic root.
-    /**
-     * This method will set ``this`` to its cubic root.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &cbrt()
-    {
-        return self_mpfr_unary(::mpfr_cbrt);
-    }
-    /// In-place sine.
-    /**
-     * This method will set ``this`` to its sine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &sin()
-    {
-        return self_mpfr_unary(::mpfr_sin);
-    }
-    /// In-place cosine.
-    /**
-     * This method will set ``this`` to its cosine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &cos()
-    {
-        return self_mpfr_unary(::mpfr_cos);
-    }
-    /// In-place tangent.
-    /**
-     * This method will set ``this`` to its tangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &tan()
-    {
-        return self_mpfr_unary(::mpfr_tan);
-    }
-    /// In-place secant.
-    /**
-     * This method will set ``this`` to its secant.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &sec()
-    {
-        return self_mpfr_unary(::mpfr_sec);
-    }
-    /// In-place cosecant.
-    /**
-     * This method will set ``this`` to its cosecant.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &csc()
-    {
-        return self_mpfr_unary(::mpfr_csc);
-    }
-    /// In-place cotangent.
-    /**
-     * This method will set ``this`` to its cotangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &cot()
-    {
-        return self_mpfr_unary(::mpfr_cot);
-    }
-    /// In-place arccosine.
-    /**
-     * This method will set ``this`` to its arccosine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &acos()
-    {
-        return self_mpfr_unary(::mpfr_acos);
-    }
-    /// In-place arcsine.
-    /**
-     * This method will set ``this`` to its arcsine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &asin()
-    {
-        return self_mpfr_unary(::mpfr_asin);
-    }
-    /// In-place arctangent.
-    /**
-     * This method will set ``this`` to its arctangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &atan()
-    {
-        return self_mpfr_unary(::mpfr_atan);
-    }
-    /// In-place hyperbolic cosine.
-    /**
-     * This method will set ``this`` to its hyperbolic cosine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &cosh()
-    {
-        return self_mpfr_unary(::mpfr_cosh);
-    }
-    /// In-place hyperbolic sine.
-    /**
-     * This method will set ``this`` to its hyperbolic sine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &sinh()
-    {
-        return self_mpfr_unary(::mpfr_sinh);
-    }
-    /// In-place hyperbolic tangent.
-    /**
-     * This method will set ``this`` to its hyperbolic tangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &tanh()
-    {
-        return self_mpfr_unary(::mpfr_tanh);
-    }
-    /// In-place hyperbolic secant.
-    /**
-     * This method will set ``this`` to its hyperbolic secant.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &sech()
-    {
-        return self_mpfr_unary(::mpfr_sech);
-    }
-    /// In-place hyperbolic cosecant.
-    /**
-     * This method will set ``this`` to its hyperbolic cosecant.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &csch()
-    {
-        return self_mpfr_unary(::mpfr_csch);
-    }
-    /// In-place hyperbolic cotangent.
-    /**
-     * This method will set ``this`` to its hyperbolic cotangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &coth()
-    {
-        return self_mpfr_unary(::mpfr_coth);
-    }
-    /// In-place inverse hyperbolic cosine.
-    /**
-     * This method will set ``this`` to its inverse hyperbolic cosine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &acosh()
-    {
-        return self_mpfr_unary(::mpfr_acosh);
-    }
+    std::string to_string(int base = 10) const;
+
+    // In-place square root.
+    real &sqrt();
+
+    // In-place reciprocal square root.
+    real &rec_sqrt();
+
+    // In-place cubic root.
+    real &cbrt();
+
+    // In-place sine.
+    real &sin();
+
+    // In-place cosine.
+    real &cos();
+
+    // In-place tangent.
+    real &tan();
+
+    // In-place secant.
+    real &sec();
+
+    // In-place cosecant.
+    real &csc();
+
+    // In-place cotangent.
+    real &cot();
+
+    // In-place arccosine.
+    real &acos();
+
+    // In-place arcsine.
+    real &asin();
+
+    // In-place arctangent.
+    real &atan();
+
+    // In-place hyperbolic cosine.
+    real &cosh();
+
+    // In-place hyperbolic sine.
+    real &sinh();
+
+    // In-place hyperbolic tangent.
+    real &tanh();
+
+    // In-place hyperbolic secant.
+    real &sech();
+
+    // In-place hyperbolic cosecant.
+    real &csch();
+
+    // In-place hyperbolic cotangent.
+    real &coth();
+
+    // In-place inverse hyperbolic cosine.
+    real &acosh();
+
     /// In-place inverse hyperbolic sine.
     /**
      * This method will set ``this`` to its inverse hyperbolic sine.
