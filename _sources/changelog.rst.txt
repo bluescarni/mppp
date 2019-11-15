@@ -11,6 +11,22 @@ New
   for MSVC (`#199 <https://github.com/bluescarni/mppp/pull/199>`__).
   Many thanks to `7ofNine <https://github.com/7ofNine>`__!
 
+Changes
+~~~~~~~
+
+- Enable the C++20 concept declaration syntax if GCC >= 9 is
+  being used
+  (`#203 <https://github.com/bluescarni/mppp/pull/203>`__).
+- Update the internal copy of Catch to the latest version, 2.10.2
+  (`#203 <https://github.com/bluescarni/mppp/pull/203>`__).
+
+Fix
+~~~
+
+- Various build system and documentation improvements
+  (`#200 <https://github.com/bluescarni/mppp/pull/200>`__,
+  `#202 <https://github.com/bluescarni/mppp/pull/202>`__).
+
 0.17 (13-09-2019)
 -----------------
 
