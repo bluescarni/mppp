@@ -1610,167 +1610,83 @@ public:
     // In-place inverse hyperbolic cosine.
     real &acosh();
 
-    /// In-place inverse hyperbolic sine.
-    /**
-     * This method will set ``this`` to its inverse hyperbolic sine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &asinh()
-    {
-        return self_mpfr_unary(::mpfr_asinh);
-    }
-    /// In-place inverse hyperbolic tangent.
-    /**
-     * This method will set ``this`` to its inverse hyperbolic tangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &atanh()
-    {
-        return self_mpfr_unary(::mpfr_atanh);
-    }
-    /// In-place exponential.
-    /**
-     * This method will set ``this`` to its exponential.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &exp()
-    {
-        return self_mpfr_unary(::mpfr_exp);
-    }
-    /// In-place base-2 exponential.
-    /**
-     * This method will set ``this`` to ``2**this``.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &exp2()
-    {
-        return self_mpfr_unary(::mpfr_exp2);
-    }
-    /// In-place base-10 exponential.
-    /**
-     * This method will set ``this`` to ``10**this``.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &exp10()
-    {
-        return self_mpfr_unary(::mpfr_exp10);
-    }
-    /// In-place exponential minus 1.
-    /**
-     * This method will set ``this`` to its exponential minus one.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &expm1()
-    {
-        return self_mpfr_unary(::mpfr_expm1);
-    }
-    /// In-place logarithm.
-    /**
-     * This method will set ``this`` to its logarithm.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &log()
-    {
-        return self_mpfr_unary(::mpfr_log);
-    }
-    /// In-place base-2 logarithm.
-    /**
-     * This method will set ``this`` to its base-2 logarithm.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &log2()
-    {
-        return self_mpfr_unary(::mpfr_log2);
-    }
-    /// In-place base-10 logarithm.
-    /**
-     * This method will set ``this`` to its base-10 logarithm.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &log10()
-    {
-        return self_mpfr_unary(::mpfr_log10);
-    }
-    /// In-place augmented logarithm.
-    /**
-     * This method will set ``this`` the logarithm of ``this + 1``.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &log1p()
-    {
-        return self_mpfr_unary(::mpfr_log1p);
-    }
+    // In-place inverse hyperbolic sine.
+    real &asinh();
+
+    // In-place inverse hyperbolic tangent.
+    real &atanh();
+
+    // In-place exponential.
+    real &exp();
+
+    // In-place base-2 exponential.
+    real &exp2();
+
+    // In-place base-10 exponential.
+    real &exp10();
+
+    // In-place exponential minus 1.
+    real &expm1();
+
+    // In-place logarithm.
+    real &log();
+
+    // In-place base-2 logarithm.
+    real &log2();
+
+    // In-place base-10 logarithm.
+    real &log10();
+
+    // In-place augmented logarithm.
+    real &log1p();
+
     // In-place Gamma function.
     real &gamma();
+
     // In-place logarithm of the Gamma function.
     real &lngamma();
+
     // In-place logarithm of the absolute value of the Gamma function.
     real &lgamma();
+
     // In-place Digamma function.
     real &digamma();
+
     // In-place Bessel function of the first kind of order 0.
     real &j0();
+
     // In-place Bessel function of the first kind of order 1.
     real &j1();
+
     // In-place Bessel function of the second kind of order 0.
     real &y0();
+
     // In-place Bessel function of the second kind of order 1.
     real &y1();
+
     // In-place exponential integral.
     real &eint();
+
     // In-place dilogarithm.
     real &li2();
+
     // In-place Riemann Zeta function.
     real &zeta();
+
     // In-place error function.
     real &erf();
+
     // In-place complementary error function.
     real &erfc();
+
     // In-place Airy function.
     real &ai();
-    /// Check if the value is an integer.
-    /**
-     * @return ``true`` if ``this`` represents an integer value, ``false`` otherwise.
-     */
-    bool integer_p() const
-    {
-        return ::mpfr_integer_p(&m_mpfr) != 0;
-    }
-    /// In-place truncation.
-    /**
-     * This method will set ``this`` to its truncated counterpart. The precision of ``this``
-     * will not be altered.
-     *
-     * @return a reference to ``this``.
-     *
-     * @throws std::domain_error if ``this`` represents a NaN value.
-     */
-    real &trunc()
-    {
-        detail::real_check_trunc_arg(*this);
-        ::mpfr_trunc(&m_mpfr, &m_mpfr);
-        return *this;
-    }
+
+    // Check if the value is an integer.
+    bool integer_p() const;
+
+    // In-place truncation.
+    real &trunc();
 
 private:
     mpfr_struct_t m_mpfr;
