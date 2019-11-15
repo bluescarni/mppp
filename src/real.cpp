@@ -491,6 +491,192 @@ real &real::operator=(const real &other)
     return *this;
 }
 
+// Implementation of the assignment from string.
+void real::string_assignment_impl(const char *s, int base)
+{
+    if (mppp_unlikely(base && (base < 2 || base > 62))) {
+        throw std::invalid_argument("Cannot assign a real from a string in base " + detail::to_string(base)
+                                    + ": the base must either be zero or in the [2,62] range");
+    }
+    const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
+    if (mppp_unlikely(ret == -1)) {
+        ::mpfr_set_nan(&m_mpfr);
+        throw std::invalid_argument(std::string{"The string '"} + s
+                                    + "' cannot be interpreted as a floating-point value in base "
+                                    + detail::to_string(base));
+    }
+}
+
+// Dispatching for string assignment.
+real &real::string_assignment(const char *s)
+{
+    const auto dp = real_get_default_prec();
+    if (mppp_unlikely(!dp)) {
+        throw std::invalid_argument("Cannot assign a string to a real if a default precision is not set");
+    }
+    set_prec_impl<false>(dp);
+    string_assignment_impl(s, 10);
+    return *this;
+}
+
+real &real::string_assignment(const std::string &s)
+{
+    return string_assignment(s.c_str());
+}
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+real &real::string_assignment(const std::string_view &s)
+{
+    MPPP_MAYBE_TLS std::vector<char> buffer;
+    buffer.assign(s.begin(), s.end());
+    buffer.emplace_back('\0');
+    return string_assignment(buffer.data());
+}
+#endif
+
+/// Copy assignment from ``mpfr_t``.
+/**
+ * This operator will set ``this`` to a deep copy of ``x``.
+ *
+ * \rststar
+ * .. warning::
+ *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
+ *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
+ *    and :cpp:func:`~mppp::real_prec_max()`.
+ * \endrststar
+ *
+ * @param x the ``mpfr_t`` that will be copied.
+ *
+ * @return a reference to \p this.
+ */
+real &real::operator=(const ::mpfr_t x)
+{
+    // Set the precision, assuming the prec of x is valid.
+    set_prec_impl<false>(mpfr_get_prec(x));
+    // Set the value.
+    ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
+    return *this;
+}
+
+/// Set to another \link mppp::real real\endlink value.
+/**
+ * \rststar
+ * This method will set ``this`` to the value of ``other``. Contrary to the copy assignment operator,
+ * the precision of the assignment is dictated by the precision of ``this``, rather than
+ * the precision of ``other``. Consequently, the precision of ``this`` will not be altered by the
+ * assignment, and a rounding might occur, depending on the values
+ * and the precisions of the operands.
+ *
+ * This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
+ *
+ * .. seealso ::
+ *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+ * \endrststar
+ *
+ * @param other the value to which \p this will be set.
+ *
+ * @return a reference to \p this.
+ */
+real &real::set(const real &other)
+{
+    return set(&other.m_mpfr);
+}
+
+// Implementation of string setters.
+real &real::set_impl(const char *s, int base)
+{
+    string_assignment_impl(s, base);
+    return *this;
+}
+
+real &real::set_impl(const std::string &s, int base)
+{
+    return set(s.c_str(), base);
+}
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+real &real::set_impl(const std::string_view &s, int base)
+{
+    return set(s.data(), s.data() + s.size(), base);
+}
+#endif
+
+// Set to character range.
+real &real::set(const char *begin, const char *end, int base)
+{
+    MPPP_MAYBE_TLS std::vector<char> buffer;
+    buffer.assign(begin, end);
+    buffer.emplace_back('\0');
+    return set(buffer.data(), base);
+}
+
+/// Set to an ``mpfr_t``.
+/**
+ * \rststar
+ * This method will set ``this`` to the value of ``x``. Contrary to the corresponding assignment operator,
+ * the precision of the assignment is dictated by the precision of ``this``, rather than
+ * the precision of ``x``. Consequently, the precision of ``this`` will not be altered by the
+ * assignment, and a rounding might occur, depending on the values
+ * and the precisions of the operands.
+ *
+ * This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
+ *
+ * .. warning::
+ *    It is the user's responsibility to ensure that ``x`` has been correctly initialised.
+ *
+ * .. seealso ::
+ *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
+ * \endrststar
+ *
+ * @param x the ``mpfr_t`` to which \p this will be set.
+ *
+ * @return a reference to \p this.
+ */
+real &real::set(const ::mpfr_t x)
+{
+    ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
+    return *this;
+}
+
+/// Set to NaN.
+/**
+ * This setter will set \p this to NaN with an unspecified sign bit. The precision of \p this
+ * will not be altered.
+ *
+ * @return a reference to \p this.
+ */
+real &real::set_nan()
+{
+    ::mpfr_set_nan(&m_mpfr);
+    return *this;
+}
+
+// Set to infinity.
+real &real::set_inf(int sign)
+{
+    ::mpfr_set_inf(&m_mpfr, sign);
+    return *this;
+}
+
+// Set to zero.
+real &real::set_zero(int sign)
+{
+    ::mpfr_set_zero(&m_mpfr, sign);
+    return *this;
+}
+
+/// Detect one.
+/**
+ * @return \p true if \p this is exactly equal to 1, \p false otherwise.
+ */
+bool real::is_one() const
+{
+    // NOTE: preempt calling the comparison function, if this is NaN
+    // (in such case, the range flag will be touched and we do not
+    // want to bother with that).
+    return !nan_p() && (::mpfr_cmp_ui(&m_mpfr, 1u) == 0);
+}
+
 #if defined(MPPP_WITH_QUADMATH)
 
 namespace detail
