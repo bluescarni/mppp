@@ -6,6 +6,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
 #include <algorithm>
 #include <array>
 #include <atomic>
@@ -18,8 +20,12 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
-#include <mp++/config.hpp>
+#if defined(MPPP_HAVE_STRING_VIEW)
+#include <string_view>
+#endif
+
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/detail/utils.hpp>
@@ -192,6 +198,195 @@ std::atomic<::mpfr_prec_t> real_default_prec = ATOMIC_VAR_INIT(::mpfr_prec_t(0))
 
 } // namespace detail
 
+/// Default constructor.
+/**
+ * \rststar
+ * The value will be initialised to positive zero. The precision of ``this`` will be
+ * either the default precision, if set, or the value returned by :cpp:func:`~mppp::real_prec_min()`
+ * otherwise.
+ * \endrststar
+ */
+real::real()
+{
+    // Init with minimum or default precision.
+    const auto dp = real_get_default_prec();
+    ::mpfr_init2(&m_mpfr, dp ? dp : real_prec_min());
+    ::mpfr_set_zero(&m_mpfr, 1);
+}
+
+// Init a real with precision p, setting its value to n. No precision
+// checking is performed.
+real::real(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
+{
+    assert(ignore_prec);
+    assert(detail::real_prec_check(p));
+    detail::ignore(ignore_prec);
+    ::mpfr_init2(&m_mpfr, p);
+}
+
+/// Copy constructor.
+/**
+ * The copy constructor performs an exact deep copy of the input object.
+ *
+ * @param other the \link mppp::real real\endlink that will be copied.
+ */
+real::real(const real &other) : real(&other.m_mpfr) {}
+
+/// Copy constructor with custom precision.
+/**
+ * This constructor will set \p this to a copy of \p other with precision \p p. If \p p
+ * is smaller than the precision of \p other, a rounding operation will be performed,
+ * otherwise the value will be copied exactly.
+ *
+ * @param other the \link mppp::real real\endlink that will be copied.
+ * @param p the desired precision.
+ *
+ * @throws std::invalid_argument if \p p is outside the range established by
+ * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
+ */
+real::real(const real &other, ::mpfr_prec_t p)
+{
+    // Init with custom precision, and then set.
+    ::mpfr_init2(&m_mpfr, check_init_prec(p));
+    ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
+}
+
+// Construction from FPs.
+template <typename Func, typename T>
+void real::dispatch_fp_construction(const Func &func, const T &x, ::mpfr_prec_t p)
+{
+    ::mpfr_init2(&m_mpfr, compute_init_precision(p, x));
+    func(&m_mpfr, x, MPFR_RNDN);
+}
+
+void real::dispatch_construction(const float &x, ::mpfr_prec_t p)
+{
+    dispatch_fp_construction(::mpfr_set_flt, x, p);
+}
+
+void real::dispatch_construction(const double &x, ::mpfr_prec_t p)
+{
+    dispatch_fp_construction(::mpfr_set_d, x, p);
+}
+
+void real::dispatch_construction(const long double &x, ::mpfr_prec_t p)
+{
+    dispatch_fp_construction(::mpfr_set_ld, x, p);
+}
+
+// Special casing for bool, otherwise MSVC warns if we fold this into the
+// constructor from unsigned.
+void real::dispatch_construction(const bool &b, ::mpfr_prec_t p)
+{
+    dispatch_integral_init(p, b);
+    ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
+}
+
+#if defined(MPPP_WITH_QUADMATH)
+void real::dispatch_construction(const real128 &x, ::mpfr_prec_t p)
+{
+    // Init the value.
+    ::mpfr_init2(&m_mpfr, compute_init_precision(p, x));
+    assign_real128(x);
+}
+#endif
+
+void real::dispatch_mpz_construction(const ::mpz_t n, ::mpfr_prec_t p)
+{
+    ::mpfr_init2(&m_mpfr, p);
+    ::mpfr_set_z(&m_mpfr, n, MPFR_RNDN);
+}
+
+void real::dispatch_mpq_construction(const ::mpq_t q, ::mpfr_prec_t p)
+{
+    ::mpfr_init2(&m_mpfr, p);
+    ::mpfr_set_q(&m_mpfr, q, MPFR_RNDN);
+}
+
+// Various helpers and constructors from string-like entities.
+void real::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
+{
+    if (mppp_unlikely(base && (base < 2 || base > 62))) {
+        throw std::invalid_argument("Cannot construct a real from a string in base " + detail::to_string(base)
+                                    + ": the base must either be zero or in the [2,62] range");
+    }
+    const ::mpfr_prec_t prec = p ? check_init_prec(p) : real_get_default_prec();
+    if (mppp_unlikely(!prec)) {
+        throw std::invalid_argument("Cannot construct a real from a string if the precision is not explicitly "
+                                    "specified and no default precision has been set");
+    }
+    ::mpfr_init2(&m_mpfr, prec);
+    const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
+    if (mppp_unlikely(ret == -1)) {
+        ::mpfr_clear(&m_mpfr);
+        throw std::invalid_argument(std::string{"The string '"} + s + "' does not represent a valid real in base "
+                                    + detail::to_string(base));
+    }
+}
+
+real::real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
+{
+    construct_from_c_string(s, base, p);
+}
+
+real::real(const ptag &, const std::string &s, int base, ::mpfr_prec_t p) : real(s.c_str(), base, p) {}
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+real::real(const ptag &, const std::string_view &s, int base, ::mpfr_prec_t p)
+    : real(s.data(), s.data() + s.size(), base, p)
+{
+}
+#endif
+
+/// Constructor from range of characters, base and precision.
+/**
+ * This constructor will initialise \p this from the content of the input half-open range,
+ * which is interpreted as the string representation of a floating-point value in base \p base.
+ *
+ * Internally, the constructor will copy the content of the range to a local buffer, add a
+ * string terminator, and invoke the constructor from string, base and precision.
+ *
+ * @param begin the start of the input range.
+ * @param end the end of the input range.
+ * @param base the base used in the string representation.
+ * @param p the desired precision.
+ *
+ * @throws unspecified any exception thrown by the constructor from string, or by memory
+ * allocation errors in standard containers.
+ */
+real::real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
+{
+    MPPP_MAYBE_TLS std::vector<char> buffer;
+    buffer.assign(begin, end);
+    buffer.emplace_back('\0');
+    construct_from_c_string(buffer.data(), base, p);
+}
+
+/// Constructor from range of characters and precision.
+/**
+ * This constructor is equivalent to the constructor from range of characters with a ``base`` value hard-coded
+ * to 10.
+ *
+ * @param begin the start of the input range.
+ * @param end the end of the input range.
+ * @param p the desired precision.
+ *
+ * @throws unspecified any exception thrown by the constructor from range of characters, base and precision.
+ */
+real::real(const char *begin, const char *end, ::mpfr_prec_t p) : real(begin, end, 10, p) {}
+
+/// Constructor from range of characters.
+/**
+ * This constructor is equivalent to the constructor from range of characters with a ``base`` value hard-coded
+ * to 10 and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
+ *
+ * @param begin the start of the input range.
+ * @param end the end of the input range.
+ *
+ * @throws unspecified any exception thrown by the constructor from range of characters, base and precision.
+ */
+real::real(const char *begin, const char *end) : real(begin, end, 10, 0) {}
+
 /// Constructor from a special value, sign and precision.
 /**
  * \rststar
@@ -250,24 +445,50 @@ real::real(real_kind k, int sign, ::mpfr_prec_t p)
     }
 }
 
-void real::construct_from_c_string(const char *s, int base, ::mpfr_prec_t p)
+/// Copy constructor from ``mpfr_t``.
+/**
+ * This constructor will initialise ``this`` with an exact deep copy of ``x``.
+ *
+ * \rststar
+ * .. warning::
+ *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
+ *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
+ *    and :cpp:func:`~mppp::real_prec_max()`.
+ * \endrststar
+ *
+ * @param x the ``mpfr_t`` that will be deep-copied.
+ */
+real::real(const ::mpfr_t x)
 {
-    if (mppp_unlikely(base && (base < 2 || base > 62))) {
-        throw std::invalid_argument("Cannot construct a real from a string in base " + detail::to_string(base)
-                                    + ": the base must either be zero or in the [2,62] range");
+    // Init with the same precision as other, and then set.
+    ::mpfr_init2(&m_mpfr, mpfr_get_prec(x));
+    ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
+}
+
+/// Copy assignment operator.
+/**
+ * The operator will deep-copy \p other into \p this.
+ *
+ * @param other the \link mppp::real real\endlink that will be copied into \p this.
+ *
+ * @return a reference to \p this.
+ */
+real &real::operator=(const real &other)
+{
+    if (mppp_likely(this != &other)) {
+        if (m_mpfr._mpfr_d) {
+            // this has not been moved-from.
+            // Copy the precision. This will also reset the internal value.
+            // No need for prec checking as we assume other has a valid prec.
+            set_prec_impl<false>(other.get_prec());
+        } else {
+            // this has been moved-from: init before setting.
+            ::mpfr_init2(&m_mpfr, other.get_prec());
+        }
+        // Perform the actual copy from other.
+        ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
     }
-    const ::mpfr_prec_t prec = p ? check_init_prec(p) : real_get_default_prec();
-    if (mppp_unlikely(!prec)) {
-        throw std::invalid_argument("Cannot construct a real from a string if the precision is not explicitly "
-                                    "specified and no default precision has been set");
-    }
-    ::mpfr_init2(&m_mpfr, prec);
-    const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
-    if (mppp_unlikely(ret == -1)) {
-        ::mpfr_clear(&m_mpfr);
-        throw std::invalid_argument(std::string{"The string '"} + s + "' does not represent a valid real in base "
-                                    + detail::to_string(base));
-    }
+    return *this;
 }
 
 #if defined(MPPP_WITH_QUADMATH)
