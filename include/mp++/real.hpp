@@ -1190,11 +1190,7 @@ private:
     // Wrapper to apply the input unary MPFR function to this with
     // MPFR_RNDN rounding mode. Returns a reference to this.
     template <typename T>
-    real &self_mpfr_unary(T &&f)
-    {
-        std::forward<T>(f)(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
-    }
+    MPPP_DLL_LOCAL real &self_mpfr_unary(T &&);
 
 public:
     // Negate in-place.
