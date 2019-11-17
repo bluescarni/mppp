@@ -14,6 +14,8 @@ New
 Changes
 ~~~~~~~
 
+- Continue moving code into the compiled library
+  (`#204 <https://github.com/bluescarni/mppp/pull/204>`__).
 - Enable the C++20 concept declaration syntax if GCC >= 9 is
   being used
   (`#203 <https://github.com/bluescarni/mppp/pull/203>`__).
