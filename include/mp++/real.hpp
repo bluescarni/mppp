@@ -21,7 +21,6 @@
 #include <cstdint>
 #include <iostream>
 #include <limits>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -430,21 +429,8 @@ class MPPP_DLL_PUBLIC real
     }
 
 public:
-    /// Default constructor.
-    /**
-     * \rststar
-     * The value will be initialised to positive zero. The precision of ``this`` will be
-     * either the default precision, if set, or the value returned by :cpp:func:`~mppp::real_prec_min()`
-     * otherwise.
-     * \endrststar
-     */
-    real()
-    {
-        // Init with minimum or default precision.
-        const auto dp = real_get_default_prec();
-        ::mpfr_init2(&m_mpfr, dp ? dp : real_prec_min());
-        ::mpfr_set_zero(&m_mpfr, 1);
-    }
+    // Default constructor.
+    real();
 
 private:
     // A tag to call private ctors.
@@ -452,40 +438,13 @@ private:
     };
     // Init a real with precision p, setting its value to n. No precision
     // checking is performed.
-    explicit real(const ptag &, ::mpfr_prec_t p, bool ignore_prec)
-    {
-        assert(ignore_prec);
-        assert(detail::real_prec_check(p));
-        detail::ignore(ignore_prec);
-        ::mpfr_init2(&m_mpfr, p);
-    }
+    explicit real(const ptag &, ::mpfr_prec_t, bool);
 
 public:
-    /// Copy constructor.
-    /**
-     * The copy constructor performs an exact deep copy of the input object.
-     *
-     * @param other the \link mppp::real real\endlink that will be copied.
-     */
-    real(const real &other) : real(&other.m_mpfr) {}
-    /// Copy constructor with custom precision.
-    /**
-     * This constructor will set \p this to a copy of \p other with precision \p p. If \p p
-     * is smaller than the precision of \p other, a rounding operation will be performed,
-     * otherwise the value will be copied exactly.
-     *
-     * @param other the \link mppp::real real\endlink that will be copied.
-     * @param p the desired precision.
-     *
-     * @throws std::invalid_argument if \p p is outside the range established by
-     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
-     */
-    explicit real(const real &other, ::mpfr_prec_t p)
-    {
-        // Init with custom precision, and then set.
-        ::mpfr_init2(&m_mpfr, check_init_prec(p));
-        ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
-    }
+    // Copy constructor.
+    real(const real &);
+    // Copy constructor with custom precision.
+    explicit real(const real &, ::mpfr_prec_t);
     /// Move constructor.
     /**
      * \rststar
@@ -504,7 +463,7 @@ public:
         other.m_mpfr._mpfr_d = nullptr;
     }
     // Constructor from a special value, sign and precision.
-    explicit real(real_kind k, int, ::mpfr_prec_t);
+    explicit real(real_kind, int, ::mpfr_prec_t);
     /// Constructor from a special value and precision.
     /**
      * This constructor is equivalent to the constructor from a special value, sign and precision
@@ -541,25 +500,14 @@ private:
         // Return the default or deduced precision.
         return detail::real_dd_prec(x);
     }
+
     // Construction from FPs.
     template <typename Func, typename T>
-    void dispatch_fp_construction(const Func &func, const T &x, ::mpfr_prec_t p)
-    {
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, x));
-        func(&m_mpfr, x, MPFR_RNDN);
-    }
-    void dispatch_construction(const float &x, ::mpfr_prec_t p)
-    {
-        dispatch_fp_construction(::mpfr_set_flt, x, p);
-    }
-    void dispatch_construction(const double &x, ::mpfr_prec_t p)
-    {
-        dispatch_fp_construction(::mpfr_set_d, x, p);
-    }
-    void dispatch_construction(const long double &x, ::mpfr_prec_t p)
-    {
-        dispatch_fp_construction(::mpfr_set_ld, x, p);
-    }
+    MPPP_DLL_LOCAL void dispatch_fp_construction(const Func &, const T &, ::mpfr_prec_t);
+    void dispatch_construction(const float &, ::mpfr_prec_t);
+    void dispatch_construction(const double &, ::mpfr_prec_t);
+    void dispatch_construction(const long double &, ::mpfr_prec_t);
+
     // Construction from integral types.
     template <typename T>
     void dispatch_integral_init(::mpfr_prec_t p, const T &n)
@@ -568,11 +516,7 @@ private:
     }
     // Special casing for bool, otherwise MSVC warns if we fold this into the
     // constructor from unsigned.
-    void dispatch_construction(const bool &b, ::mpfr_prec_t p)
-    {
-        dispatch_integral_init(p, b);
-        ::mpfr_set_ui(&m_mpfr, static_cast<unsigned long>(b), MPFR_RNDN);
-    }
+    void dispatch_construction(const bool &, ::mpfr_prec_t);
     template <typename T,
               detail::enable_if_t<detail::conjunction<detail::is_integral<T>, detail::is_unsigned<T>>::value, int> = 0>
     void dispatch_construction(const T &n, ::mpfr_prec_t p)
@@ -597,26 +541,28 @@ private:
             ::mpfr_set_z(&m_mpfr, integer<2>(n).get_mpz_view(), MPFR_RNDN);
         }
     }
+
+    // Construction from mppp::integer.
+    void dispatch_mpz_construction(const ::mpz_t, ::mpfr_prec_t);
     template <std::size_t SSize>
     void dispatch_construction(const integer<SSize> &n, ::mpfr_prec_t p)
     {
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, n));
-        ::mpfr_set_z(&m_mpfr, n.get_mpz_view(), MPFR_RNDN);
+        dispatch_mpz_construction(n.get_mpz_view(), compute_init_precision(p, n));
     }
+
+    // Construction from mppp::rational.
+    void dispatch_mpq_construction(const ::mpq_t, ::mpfr_prec_t);
     template <std::size_t SSize>
     void dispatch_construction(const rational<SSize> &q, ::mpfr_prec_t p)
     {
+        // NOTE: get_mpq_view() returns an mpq_struct, whose
+        // address we then need to use.
         const auto v = detail::get_mpq_view(q);
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, q));
-        ::mpfr_set_q(&m_mpfr, &v, MPFR_RNDN);
+        dispatch_mpq_construction(&v, compute_init_precision(p, q));
     }
+
 #if defined(MPPP_WITH_QUADMATH)
-    void dispatch_construction(const real128 &x, ::mpfr_prec_t p)
-    {
-        // Init the value.
-        ::mpfr_init2(&m_mpfr, compute_init_precision(p, x));
-        assign_real128(x);
-    }
+    void dispatch_construction(const real128 &, ::mpfr_prec_t);
     // NOTE: split this off from the dispatch_construction() overload, so we can re-use it in the
     // generic assignment.
     void assign_real128(const real128 &);
@@ -671,17 +617,11 @@ public:
     }
 
 private:
-    void construct_from_c_string(const char *, int, ::mpfr_prec_t);
-    explicit real(const ptag &, const char *s, int base, ::mpfr_prec_t p)
-    {
-        construct_from_c_string(s, base, p);
-    }
-    explicit real(const ptag &, const std::string &s, int base, ::mpfr_prec_t p) : real(s.c_str(), base, p) {}
+    MPPP_DLL_LOCAL void construct_from_c_string(const char *, int, ::mpfr_prec_t);
+    explicit real(const ptag &, const char *, int, ::mpfr_prec_t);
+    explicit real(const ptag &, const std::string &, int, ::mpfr_prec_t);
 #if defined(MPPP_HAVE_STRING_VIEW)
-    explicit real(const ptag &, const std::string_view &s, int base, ::mpfr_prec_t p)
-        : real(s.data(), s.data() + s.size(), base, p)
-    {
-    }
+    explicit real(const ptag &, const std::string_view &, int, ::mpfr_prec_t);
 #endif
 
 public:
@@ -754,71 +694,14 @@ public:
     explicit real(const T &s) : real(s, 10, 0)
     {
     }
-    /// Constructor from range of characters, base and precision.
-    /**
-     * This constructor will initialise \p this from the content of the input half-open range,
-     * which is interpreted as the string representation of a floating-point value in base \p base.
-     *
-     * Internally, the constructor will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the constructor from string, base and precision.
-     *
-     * @param begin the start of the input range.
-     * @param end the end of the input range.
-     * @param base the base used in the string representation.
-     * @param p the desired precision.
-     *
-     * @throws unspecified any exception thrown by the constructor from string, or by memory
-     * allocation errors in standard containers.
-     */
-    explicit real(const char *begin, const char *end, int base, ::mpfr_prec_t p)
-    {
-        MPPP_MAYBE_TLS std::vector<char> buffer;
-        buffer.assign(begin, end);
-        buffer.emplace_back('\0');
-        construct_from_c_string(buffer.data(), base, p);
-    }
-    /// Constructor from range of characters and precision.
-    /**
-     * This constructor is equivalent to the constructor from range of characters with a ``base`` value hard-coded
-     * to 10.
-     *
-     * @param begin the start of the input range.
-     * @param end the end of the input range.
-     * @param p the desired precision.
-     *
-     * @throws unspecified any exception thrown by the constructor from range of characters, base and precision.
-     */
-    explicit real(const char *begin, const char *end, ::mpfr_prec_t p) : real(begin, end, 10, p) {}
-    /// Constructor from range of characters.
-    /**
-     * This constructor is equivalent to the constructor from range of characters with a ``base`` value hard-coded
-     * to 10 and a precision value hard-coded to zero (that is, the precision will be the default precision, if set).
-     *
-     * @param begin the start of the input range.
-     * @param end the end of the input range.
-     *
-     * @throws unspecified any exception thrown by the constructor from range of characters, base and precision.
-     */
-    explicit real(const char *begin, const char *end) : real(begin, end, 10, 0) {}
-    /// Copy constructor from ``mpfr_t``.
-    /**
-     * This constructor will initialise ``this`` with an exact deep copy of ``x``.
-     *
-     * \rststar
-     * .. warning::
-     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
-     *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
-     *    and :cpp:func:`~mppp::real_prec_max()`.
-     * \endrststar
-     *
-     * @param x the ``mpfr_t`` that will be deep-copied.
-     */
-    explicit real(const ::mpfr_t x)
-    {
-        // Init with the same precision as other, and then set.
-        ::mpfr_init2(&m_mpfr, mpfr_get_prec(x));
-        ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
-    }
+    // Constructor from range of characters, base and precision.
+    explicit real(const char *, const char *, int, ::mpfr_prec_t);
+    // Constructor from range of characters and precision.
+    explicit real(const char *, const char *, ::mpfr_prec_t);
+    // Constructor from range of characters.
+    explicit real(const char *, const char *);
+    // Copy constructor from ``mpfr_t``.
+    explicit real(const ::mpfr_t);
     /// Move constructor from ``mpfr_t``.
     /**
      * This constructor will initialise ``this`` with a shallow copy of ``x``.
@@ -837,33 +720,13 @@ public:
      * @param x the ``mpfr_t`` that will be moved.
      */
     explicit real(::mpfr_t &&x) : m_mpfr(*x) {}
+
     // Destructor.
     ~real();
-    /// Copy assignment operator.
-    /**
-     * The operator will deep-copy \p other into \p this.
-     *
-     * @param other the \link mppp::real real\endlink that will be copied into \p this.
-     *
-     * @return a reference to \p this.
-     */
-    real &operator=(const real &other)
-    {
-        if (mppp_likely(this != &other)) {
-            if (m_mpfr._mpfr_d) {
-                // this has not been moved-from.
-                // Copy the precision. This will also reset the internal value.
-                // No need for prec checking as we assume other has a valid prec.
-                set_prec_impl<false>(other.get_prec());
-            } else {
-                // this has been moved-from: init before setting.
-                ::mpfr_init2(&m_mpfr, other.get_prec());
-            }
-            // Perform the actual copy from other.
-            ::mpfr_set(&m_mpfr, &other.m_mpfr, MPFR_RNDN);
-        }
-        return *this;
-    }
+
+    // Copy assignment operator.
+    real &operator=(const real &);
+
     /// Move assignment operator.
     /**
      * @param other the \link mppp::real real\endlink that will be moved into \p this.
@@ -1008,43 +871,12 @@ public:
 
 private:
     // Implementation of the assignment from string.
-    void string_assignment_impl(const char *s, int base)
-    {
-        if (mppp_unlikely(base && (base < 2 || base > 62))) {
-            throw std::invalid_argument("Cannot assign a real from a string in base " + detail::to_string(base)
-                                        + ": the base must either be zero or in the [2,62] range");
-        }
-        const auto ret = ::mpfr_set_str(&m_mpfr, s, base, MPFR_RNDN);
-        if (mppp_unlikely(ret == -1)) {
-            ::mpfr_set_nan(&m_mpfr);
-            throw std::invalid_argument(std::string{"The string '"} + s
-                                        + "' cannot be interpreted as a floating-point value in base "
-                                        + detail::to_string(base));
-        }
-    }
+    MPPP_DLL_LOCAL void string_assignment_impl(const char *, int);
     // Dispatching for string assignment.
-    real &string_assignment(const char *s)
-    {
-        const auto dp = real_get_default_prec();
-        if (mppp_unlikely(!dp)) {
-            throw std::invalid_argument("Cannot assign a string to a real if a default precision is not set");
-        }
-        set_prec_impl<false>(dp);
-        string_assignment_impl(s, 10);
-        return *this;
-    }
-    real &string_assignment(const std::string &s)
-    {
-        return string_assignment(s.c_str());
-    }
+    real &string_assignment(const char *);
+    real &string_assignment(const std::string &);
 #if defined(MPPP_HAVE_STRING_VIEW)
-    real &string_assignment(const std::string_view &s)
-    {
-        MPPP_MAYBE_TLS std::vector<char> buffer;
-        buffer.assign(s.begin(), s.end());
-        buffer.emplace_back('\0');
-        return string_assignment(buffer.data());
-    }
+    real &string_assignment(const std::string_view &);
 #endif
 
 public:
@@ -1075,29 +907,9 @@ public:
     {
         return string_assignment(s);
     }
-    /// Copy assignment from ``mpfr_t``.
-    /**
-     * This operator will set ``this`` to a deep copy of ``x``.
-     *
-     * \rststar
-     * .. warning::
-     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised
-     *    with a precision within the bounds established by :cpp:func:`~mppp::real_prec_min()`
-     *    and :cpp:func:`~mppp::real_prec_max()`.
-     * \endrststar
-     *
-     * @param x the ``mpfr_t`` that will be copied.
-     *
-     * @return a reference to \p this.
-     */
-    real &operator=(const ::mpfr_t x)
-    {
-        // Set the precision, assuming the prec of x is valid.
-        set_prec_impl<false>(mpfr_get_prec(x));
-        // Set the value.
-        ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
-        return *this;
-    }
+    // Copy assignment from ``mpfr_t``.
+    real &operator=(const ::mpfr_t);
+
     /// Move assignment from ``mpfr_t``.
     /**
      * This operator will set ``this`` to a shallow copy of ``x``.
@@ -1125,29 +937,10 @@ public:
         m_mpfr = *x;
         return *this;
     }
-    /// Set to another \link mppp::real real\endlink value.
-    /**
-     * \rststar
-     * This method will set ``this`` to the value of ``other``. Contrary to the copy assignment operator,
-     * the precision of the assignment is dictated by the precision of ``this``, rather than
-     * the precision of ``other``. Consequently, the precision of ``this`` will not be altered by the
-     * assignment, and a rounding might occur, depending on the values
-     * and the precisions of the operands.
-     *
-     * This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
-     *
-     * .. seealso ::
-     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     * \endrststar
-     *
-     * @param other the value to which \p this will be set.
-     *
-     * @return a reference to \p this.
-     */
-    real &set(const real &other)
-    {
-        return set(&other.m_mpfr);
-    }
+
+    // Set to another real.
+    real &set(const real &);
+
     /// Generic setter.
     /**
      * \rststar
@@ -1180,20 +973,10 @@ public:
 
 private:
     // Implementation of string setters.
-    real &set_impl(const char *s, int base)
-    {
-        string_assignment_impl(s, base);
-        return *this;
-    }
-    real &set_impl(const std::string &s, int base)
-    {
-        return set(s.c_str(), base);
-    }
+    real &set_impl(const char *, int);
+    real &set_impl(const std::string &, int);
 #if defined(MPPP_HAVE_STRING_VIEW)
-    real &set_impl(const std::string_view &s, int base)
-    {
-        return set(s.data(), s.data() + s.size(), base);
-    }
+    real &set_impl(const std::string_view &, int);
 #endif
 
 public:
@@ -1235,6 +1018,7 @@ public:
     {
         return set_impl(s, base);
     }
+
     /// Set to character range.
     /**
      * This setter will set \p this to the content of the input half-open range,
@@ -1252,52 +1036,14 @@ public:
      * @throws unspecified any exception thrown by the setter to string, or by memory
      * allocation errors in standard containers.
      */
-    real &set(const char *begin, const char *end, int base = 10)
-    {
-        MPPP_MAYBE_TLS std::vector<char> buffer;
-        buffer.assign(begin, end);
-        buffer.emplace_back('\0');
-        return set(buffer.data(), base);
-    }
-    /// Set to an ``mpfr_t``.
-    /**
-     * \rststar
-     * This method will set ``this`` to the value of ``x``. Contrary to the corresponding assignment operator,
-     * the precision of the assignment is dictated by the precision of ``this``, rather than
-     * the precision of ``x``. Consequently, the precision of ``this`` will not be altered by the
-     * assignment, and a rounding might occur, depending on the values
-     * and the precisions of the operands.
-     *
-     * This method is a thin wrapper around the ``mpfr_set()`` assignment function from the MPFR API.
-     *
-     * .. warning::
-     *    It is the user's responsibility to ensure that ``x`` has been correctly initialised.
-     *
-     * .. seealso ::
-     *    https://www.mpfr.org/mpfr-current/mpfr.html#Assignment-Functions
-     * \endrststar
-     *
-     * @param x the ``mpfr_t`` to which \p this will be set.
-     *
-     * @return a reference to \p this.
-     */
-    real &set(const ::mpfr_t x)
-    {
-        ::mpfr_set(&m_mpfr, x, MPFR_RNDN);
-        return *this;
-    }
-    /// Set to NaN.
-    /**
-     * This setter will set \p this to NaN with an unspecified sign bit. The precision of \p this
-     * will not be altered.
-     *
-     * @return a reference to \p this.
-     */
-    real &set_nan()
-    {
-        ::mpfr_set_nan(&m_mpfr);
-        return *this;
-    }
+    real &set(const char *begin, const char *end, int base = 10);
+
+    // Set to an mpfr_t.
+    real &set(const ::mpfr_t);
+
+    // Set to NaN.
+    real &set_nan();
+
     /// Set to infinity.
     /**
      * This setter will set \p this to infinity. The sign bit will be positive if \p sign
@@ -1307,11 +1053,8 @@ public:
      *
      * @return a reference to \p this.
      */
-    real &set_inf(int sign = 0)
-    {
-        ::mpfr_set_inf(&m_mpfr, sign);
-        return *this;
-    }
+    real &set_inf(int sign = 0);
+
     /// Set to zero.
     /**
      * This setter will set \p this to zero. The sign bit will be positive if \p sign
@@ -1321,11 +1064,8 @@ public:
      *
      * @return a reference to \p this.
      */
-    real &set_zero(int sign = 0)
-    {
-        ::mpfr_set_zero(&m_mpfr, sign);
-        return *this;
-    }
+    real &set_zero(int sign = 0);
+
     /// Const reference to the internal <tt>mpfr_t</tt>.
     /**
      * This method will return a const pointer to the internal MPFR structure used
@@ -1360,6 +1100,7 @@ public:
     {
         return &m_mpfr;
     }
+
     /// Detect NaN.
     /**
      * @return \p true if \p this is NaN, \p false otherwise.
@@ -1368,6 +1109,7 @@ public:
     {
         return mpfr_nan_p(&m_mpfr) != 0;
     }
+
     /// Detect infinity.
     /**
      * @return \p true if \p this is an infinity, \p false otherwise.
@@ -1376,6 +1118,7 @@ public:
     {
         return mpfr_inf_p(&m_mpfr) != 0;
     }
+
     /// Detect finite number.
     /**
      * @return \p true if \p this is a finite number (i.e., not NaN or infinity), \p false otherwise.
@@ -1384,6 +1127,7 @@ public:
     {
         return mpfr_number_p(&m_mpfr) != 0;
     }
+
     /// Detect zero.
     /**
      * @return \p true if \p this is zero, \p false otherwise.
@@ -1392,6 +1136,7 @@ public:
     {
         return mpfr_zero_p(&m_mpfr) != 0;
     }
+
     /// Detect regular number.
     /**
      * @return \p true if \p this is a regular number (i.e., not NaN, infinity or zero), \p false otherwise.
@@ -1400,17 +1145,10 @@ public:
     {
         return mpfr_regular_p(&m_mpfr) != 0;
     }
-    /// Detect one.
-    /**
-     * @return \p true if \p this is exactly equal to 1, \p false otherwise.
-     */
-    bool is_one() const
-    {
-        // NOTE: preempt calling the comparison function, if this is NaN
-        // (in such case, the range flag will be touched and we do not
-        // want to bother with that).
-        return !nan_p() && (::mpfr_cmp_ui(&m_mpfr, 1u) == 0);
-    }
+
+    // Detect one.
+    bool is_one() const;
+
     /// Detect sign.
     /**
      * @return a positive value if \p this is positive, zero if \p this is zero, a negative value if \p this
@@ -1427,6 +1165,7 @@ public:
         }
         return mpfr_sgn(&m_mpfr);
     }
+
     /// Get the sign bit.
     /**
      * The sign bit is set if ``this`` is negative, -0, or a NaN whose representation has its sign bit set.
@@ -1437,6 +1176,7 @@ public:
     {
         return mpfr_signbit(&m_mpfr) != 0;
     }
+
     /// Get the precision of \p this.
     /**
      * @return the current precision (i.e., the number of binary digits in the significand) of \p this.
@@ -1450,33 +1190,13 @@ private:
     // Wrapper to apply the input unary MPFR function to this with
     // MPFR_RNDN rounding mode. Returns a reference to this.
     template <typename T>
-    real &self_mpfr_unary(T &&f)
-    {
-        std::forward<T>(f)(&m_mpfr, &m_mpfr, MPFR_RNDN);
-        return *this;
-    }
+    MPPP_DLL_LOCAL real &self_mpfr_unary(T &&);
 
 public:
-    /// Negate in-place.
-    /**
-     * This method will set ``this`` to ``-this``.
-     *
-     * @return a reference to ``this``.
-     */
-    real &neg()
-    {
-        return self_mpfr_unary(::mpfr_neg);
-    }
-    /// In-place absolute value.
-    /**
-     * This method will set ``this`` to its absolute value.
-     *
-     * @return a reference to ``this``.
-     */
-    real &abs()
-    {
-        return self_mpfr_unary(::mpfr_abs);
-    }
+    // Negate in-place.
+    real &neg();
+    // In-place absolute value.
+    real &abs();
 
 private:
     // Utility function to check precision in set_prec().
@@ -1503,45 +1223,10 @@ private:
     }
 
 public:
-    /// Destructively set the precision.
-    /**
-     * \rststar
-     * This method will set the precision of ``this`` to exactly ``p`` bits. The value
-     * of ``this`` will be set to NaN.
-     * \endrststar
-     *
-     * @param p the desired precision.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::invalid_argument if the value of \p p is not in the range established by
-     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
-     */
-    real &set_prec(::mpfr_prec_t p)
-    {
-        set_prec_impl<true>(p);
-        return *this;
-    }
-    /// Set the precision maintaining the current value.
-    /**
-     * \rststar
-     * This method will set the precision of ``this`` to exactly ``p`` bits. If ``p``
-     * is smaller than the current precision of ``this``, a rounding operation will be performed,
-     * otherwise the value will be preserved exactly.
-     * \endrststar
-     *
-     * @param p the desired precision.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::invalid_argument if the value of \p p is not in the range established by
-     * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink.
-     */
-    real &prec_round(::mpfr_prec_t p)
-    {
-        prec_round_impl<true>(p);
-        return *this;
-    }
+    // Destructively set the precision.
+    real &set_prec(::mpfr_prec_t);
+    // Set the precision maintaining the current value.
+    real &prec_round(::mpfr_prec_t);
 
 private:
     // Generic conversion.
@@ -1862,386 +1547,142 @@ public:
      * @throws std::invalid_argument if \p base is not in the [2,62] range.
      * @throws std::runtime_error if the call to the ``mpfr_get_str()`` function of the MPFR API fails.
      */
-    std::string to_string(int base = 10) const
-    {
-        std::ostringstream oss;
-        detail::mpfr_to_stream(&m_mpfr, oss, base);
-        return oss.str();
-    }
-    /// In-place square root.
-    /**
-     * This method will set ``this`` to its square root.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &sqrt()
-    {
-        return self_mpfr_unary(::mpfr_sqrt);
-    }
-    /// In-place reciprocal square root.
-    /**
-     * This method will set ``this`` to its reciprocal square root.
-     * The precision of ``this`` will not be altered.
-     *
-     * If ``this`` is zero, the result will be a positive infinity (regardless of the sign of ``this``).
-     * If ``this`` is a positive infinity, the result will be +0. If ``this`` is negative,
-     * the result will be NaN.
-     *
-     * @return a reference to ``this``.
-     */
-    real &rec_sqrt()
-    {
-        return self_mpfr_unary(::mpfr_rec_sqrt);
-    }
-    /// In-place cubic root.
-    /**
-     * This method will set ``this`` to its cubic root.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &cbrt()
-    {
-        return self_mpfr_unary(::mpfr_cbrt);
-    }
-    /// In-place sine.
-    /**
-     * This method will set ``this`` to its sine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &sin()
-    {
-        return self_mpfr_unary(::mpfr_sin);
-    }
-    /// In-place cosine.
-    /**
-     * This method will set ``this`` to its cosine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &cos()
-    {
-        return self_mpfr_unary(::mpfr_cos);
-    }
-    /// In-place tangent.
-    /**
-     * This method will set ``this`` to its tangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &tan()
-    {
-        return self_mpfr_unary(::mpfr_tan);
-    }
-    /// In-place secant.
-    /**
-     * This method will set ``this`` to its secant.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &sec()
-    {
-        return self_mpfr_unary(::mpfr_sec);
-    }
-    /// In-place cosecant.
-    /**
-     * This method will set ``this`` to its cosecant.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &csc()
-    {
-        return self_mpfr_unary(::mpfr_csc);
-    }
-    /// In-place cotangent.
-    /**
-     * This method will set ``this`` to its cotangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &cot()
-    {
-        return self_mpfr_unary(::mpfr_cot);
-    }
-    /// In-place arccosine.
-    /**
-     * This method will set ``this`` to its arccosine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &acos()
-    {
-        return self_mpfr_unary(::mpfr_acos);
-    }
-    /// In-place arcsine.
-    /**
-     * This method will set ``this`` to its arcsine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &asin()
-    {
-        return self_mpfr_unary(::mpfr_asin);
-    }
-    /// In-place arctangent.
-    /**
-     * This method will set ``this`` to its arctangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &atan()
-    {
-        return self_mpfr_unary(::mpfr_atan);
-    }
-    /// In-place hyperbolic cosine.
-    /**
-     * This method will set ``this`` to its hyperbolic cosine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &cosh()
-    {
-        return self_mpfr_unary(::mpfr_cosh);
-    }
-    /// In-place hyperbolic sine.
-    /**
-     * This method will set ``this`` to its hyperbolic sine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &sinh()
-    {
-        return self_mpfr_unary(::mpfr_sinh);
-    }
-    /// In-place hyperbolic tangent.
-    /**
-     * This method will set ``this`` to its hyperbolic tangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &tanh()
-    {
-        return self_mpfr_unary(::mpfr_tanh);
-    }
-    /// In-place hyperbolic secant.
-    /**
-     * This method will set ``this`` to its hyperbolic secant.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &sech()
-    {
-        return self_mpfr_unary(::mpfr_sech);
-    }
-    /// In-place hyperbolic cosecant.
-    /**
-     * This method will set ``this`` to its hyperbolic cosecant.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &csch()
-    {
-        return self_mpfr_unary(::mpfr_csch);
-    }
-    /// In-place hyperbolic cotangent.
-    /**
-     * This method will set ``this`` to its hyperbolic cotangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &coth()
-    {
-        return self_mpfr_unary(::mpfr_coth);
-    }
-    /// In-place inverse hyperbolic cosine.
-    /**
-     * This method will set ``this`` to its inverse hyperbolic cosine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &acosh()
-    {
-        return self_mpfr_unary(::mpfr_acosh);
-    }
-    /// In-place inverse hyperbolic sine.
-    /**
-     * This method will set ``this`` to its inverse hyperbolic sine.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &asinh()
-    {
-        return self_mpfr_unary(::mpfr_asinh);
-    }
-    /// In-place inverse hyperbolic tangent.
-    /**
-     * This method will set ``this`` to its inverse hyperbolic tangent.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &atanh()
-    {
-        return self_mpfr_unary(::mpfr_atanh);
-    }
-    /// In-place exponential.
-    /**
-     * This method will set ``this`` to its exponential.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &exp()
-    {
-        return self_mpfr_unary(::mpfr_exp);
-    }
-    /// In-place base-2 exponential.
-    /**
-     * This method will set ``this`` to ``2**this``.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &exp2()
-    {
-        return self_mpfr_unary(::mpfr_exp2);
-    }
-    /// In-place base-10 exponential.
-    /**
-     * This method will set ``this`` to ``10**this``.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &exp10()
-    {
-        return self_mpfr_unary(::mpfr_exp10);
-    }
-    /// In-place exponential minus 1.
-    /**
-     * This method will set ``this`` to its exponential minus one.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &expm1()
-    {
-        return self_mpfr_unary(::mpfr_expm1);
-    }
-    /// In-place logarithm.
-    /**
-     * This method will set ``this`` to its logarithm.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &log()
-    {
-        return self_mpfr_unary(::mpfr_log);
-    }
-    /// In-place base-2 logarithm.
-    /**
-     * This method will set ``this`` to its base-2 logarithm.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &log2()
-    {
-        return self_mpfr_unary(::mpfr_log2);
-    }
-    /// In-place base-10 logarithm.
-    /**
-     * This method will set ``this`` to its base-10 logarithm.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &log10()
-    {
-        return self_mpfr_unary(::mpfr_log10);
-    }
-    /// In-place augmented logarithm.
-    /**
-     * This method will set ``this`` the logarithm of ``this + 1``.
-     * The precision of ``this`` will not be altered.
-     *
-     * @return a reference to ``this``.
-     */
-    real &log1p()
-    {
-        return self_mpfr_unary(::mpfr_log1p);
-    }
+    std::string to_string(int base = 10) const;
+
+    // In-place square root.
+    real &sqrt();
+
+    // In-place reciprocal square root.
+    real &rec_sqrt();
+
+    // In-place cubic root.
+    real &cbrt();
+
+    // In-place sine.
+    real &sin();
+
+    // In-place cosine.
+    real &cos();
+
+    // In-place tangent.
+    real &tan();
+
+    // In-place secant.
+    real &sec();
+
+    // In-place cosecant.
+    real &csc();
+
+    // In-place cotangent.
+    real &cot();
+
+    // In-place arccosine.
+    real &acos();
+
+    // In-place arcsine.
+    real &asin();
+
+    // In-place arctangent.
+    real &atan();
+
+    // In-place hyperbolic cosine.
+    real &cosh();
+
+    // In-place hyperbolic sine.
+    real &sinh();
+
+    // In-place hyperbolic tangent.
+    real &tanh();
+
+    // In-place hyperbolic secant.
+    real &sech();
+
+    // In-place hyperbolic cosecant.
+    real &csch();
+
+    // In-place hyperbolic cotangent.
+    real &coth();
+
+    // In-place inverse hyperbolic cosine.
+    real &acosh();
+
+    // In-place inverse hyperbolic sine.
+    real &asinh();
+
+    // In-place inverse hyperbolic tangent.
+    real &atanh();
+
+    // In-place exponential.
+    real &exp();
+
+    // In-place base-2 exponential.
+    real &exp2();
+
+    // In-place base-10 exponential.
+    real &exp10();
+
+    // In-place exponential minus 1.
+    real &expm1();
+
+    // In-place logarithm.
+    real &log();
+
+    // In-place base-2 logarithm.
+    real &log2();
+
+    // In-place base-10 logarithm.
+    real &log10();
+
+    // In-place augmented logarithm.
+    real &log1p();
+
     // In-place Gamma function.
     real &gamma();
+
     // In-place logarithm of the Gamma function.
     real &lngamma();
+
     // In-place logarithm of the absolute value of the Gamma function.
     real &lgamma();
+
     // In-place Digamma function.
     real &digamma();
+
     // In-place Bessel function of the first kind of order 0.
     real &j0();
+
     // In-place Bessel function of the first kind of order 1.
     real &j1();
+
     // In-place Bessel function of the second kind of order 0.
     real &y0();
+
     // In-place Bessel function of the second kind of order 1.
     real &y1();
+
     // In-place exponential integral.
     real &eint();
+
     // In-place dilogarithm.
     real &li2();
+
     // In-place Riemann Zeta function.
     real &zeta();
+
     // In-place error function.
     real &erf();
+
     // In-place complementary error function.
     real &erfc();
+
     // In-place Airy function.
     real &ai();
-    /// Check if the value is an integer.
-    /**
-     * @return ``true`` if ``this`` represents an integer value, ``false`` otherwise.
-     */
-    bool integer_p() const
-    {
-        return ::mpfr_integer_p(&m_mpfr) != 0;
-    }
-    /// In-place truncation.
-    /**
-     * This method will set ``this`` to its truncated counterpart. The precision of ``this``
-     * will not be altered.
-     *
-     * @return a reference to ``this``.
-     *
-     * @throws std::domain_error if ``this`` represents a NaN value.
-     */
-    real &trunc()
-    {
-        detail::real_check_trunc_arg(*this);
-        ::mpfr_trunc(&m_mpfr, &m_mpfr);
-        return *this;
-    }
+
+    // Check if the value is an integer.
+    bool integer_p() const;
+
+    // In-place truncation.
+    real &trunc();
 
 private:
     mpfr_struct_t m_mpfr;
