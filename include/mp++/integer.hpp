@@ -4697,6 +4697,147 @@ inline integer<SSize> &mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::
     return rop;
 }
 
+namespace detail
+{
+
+// Selection of the algorithm for the
+// static squaring. We'll be using the
+// double-limb mul primitives if available.
+template <typename SInt>
+using integer_static_sqr_algo
+    = std::integral_constant<int, (SInt::s_size == 1 && integer_have_dlimb_mul::value)
+                                      ? 1
+                                      : ((SInt::s_size == 2 && integer_have_dlimb_mul::value) ? 2 : 0)>;
+
+// mpn implementation.
+// NOTE: this function (and the other overloads) returns 0 in case of success, otherwise it returns a hint
+// about the size in limbs of the result.
+template <std::size_t SSize>
+inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSize> &op,
+                                   const std::integral_constant<int, 0> &)
+{
+    const auto asize = static_cast<std::size_t>(std::abs(op._mp_size));
+
+    // Handle zero.
+    if (mppp_unlikely(asize == 0u)) {
+        rop._mp_size = 0;
+        return 0u;
+    }
+
+    // Temporary storage for mpn_sqr(). The largest possible
+    // size needed is twice the static size.
+    std::array<::mp_limb_t, SSize * 2u> res;
+    const auto res_data = res.data();
+
+    // Run the mpn function.
+    ::mpn_sqr(res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
+
+    // Compute the actual size of the result: it could be asize * 2
+    // or 1 less, depending on whether the most significant limb of the
+    // result is zero.
+    const auto res_size = asize * 2u - static_cast<std::size_t>((res_data[asize * 2u - 1u] & GMP_NUMB_MASK) == 0u);
+    if (res_size > SSize) {
+        // Not enough space: return asize * 2, which is
+        // what mpz_mul() would like to allocate for the result.
+        return asize * 2u;
+    }
+
+    // Enough space, write out the result.
+    rop._mp_size = static_cast<mpz_size_t>(res_size);
+    copy_limbs_no(res_data, res_data + res_size, rop.m_limbs.data());
+
+    return 0u;
+}
+
+// 1-limb optimization via dlimb.
+template <std::size_t SSize>
+inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSize> &op,
+                                   const std::integral_constant<int, 1> &)
+{
+    ::mp_limb_t hi;
+    const ::mp_limb_t lo = dlimb_mul(op.m_limbs[0], op.m_limbs[0], &hi);
+    if (mppp_unlikely(hi)) {
+        return 2u;
+    }
+
+    // NOTE: if op is zero, the output size is zero,
+    // otherwise the output size is 1 (cannot be 2, handled
+    // above).
+    rop._mp_size = static_cast<mpz_size_t>(op._mp_size != 0);
+    rop.m_limbs[0] = lo;
+
+    return 0;
+}
+
+// 2-limb optimization via dlimb.
+template <std::size_t SSize>
+inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSize> &op,
+                                   const std::integral_constant<int, 2> &)
+{
+    const auto asize = std::abs(op._mp_size);
+
+    if (asize == 2) {
+        // If asize is 2, this function cannot succeed.
+        // Return 4 as a size hint. Real size could be 3, but GMP will require 4 limbs
+        // of storage to perform the operation anyway.
+        return 4u;
+    }
+
+    // NOTE: this handles zeroes as well: we know that the limbs are all zeroes in such
+    // a case (as we always guarantee unused limbs are zeroed).
+    rop.m_limbs[0] = dlimb_mul(op.m_limbs[0], op.m_limbs[0], &rop.m_limbs[1]);
+    // NOTE: if asize == 0, then rop's limbs will have been set
+    // to zero via dlimb_mul(), and rop's size will also thus be zero.
+    // Otherwise, rop's size is 1 or 2, depending on whether the top limb
+    // is set or not.
+    rop._mp_size = static_cast<mpz_size_t>(2 - (asize == 0) - (rop.m_limbs[1] == 0u));
+
+    return 0;
+}
+
+template <std::size_t SSize>
+inline std::size_t static_sqr(static_int<SSize> &rop, const static_int<SSize> &op)
+{
+    const std::size_t retval = static_sqr_impl(rop, op, integer_static_sqr_algo<static_int<SSize>>{});
+
+    if (integer_static_sqr_algo<static_int<SSize>>::value == 0 && retval == 0u) {
+        // If we used the mpn functions, and actually wrote into the result,
+        // zero the unused limbs on top (if necessary).
+        // NOTE: as elsewhere, if we don't have double-limb primitives
+        // available, we may end up using mpn functions also for
+        // small sizes.
+        rop.zero_unused_limbs();
+    }
+
+    return retval;
+}
+
+} // namespace detail
+
+// Binary squaring.
+template <std::size_t SSize>
+inline integer<SSize> &sqr(integer<SSize> &rop, const integer<SSize> &n)
+{
+    const bool sn = n.is_static();
+    bool sr = rop.is_static();
+    std::size_t size_hint = 0u;
+    if (mppp_likely(sn)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
+        size_hint = static_sqr(rop._get_union().g_st(), n._get_union().g_st());
+        if (mppp_likely(size_hint == 0u)) {
+            return rop;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(size_hint);
+    }
+    ::mpz_mul(&rop._get_union().g_dy(), n.get_mpz_view(), n.get_mpz_view());
+    return rop;
+}
+
 /// Binary negation.
 /**
  * This method will set \p rop to <tt>-n</tt>.
