@@ -15,9 +15,11 @@
 #endif
 
 #include <cstddef>
+#include <random>
 #include <tuple>
 #include <type_traits>
 
+#include <mp++/detail/gmp.hpp>
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
@@ -29,6 +31,13 @@ using namespace mppp_test;
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
                          std::integral_constant<std::size_t, 10>>;
+
+const auto ntries = 1000;
+
+std::mt19937 rng;
+
+// Set mpz to random value with n limbs. Top limb is divided by div.
+// inline void random_integer(mppp::detail::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
 
 struct sqr_tester {
     template <typename S>
@@ -61,6 +70,47 @@ struct sqr_tester {
 
         sqr(ret, integer{-8070l});
         REQUIRE(ret == 65124900l);
+
+        // Random testing.
+        integer n1, n2;
+        detail::mpz_raii tmp;
+        std::uniform_int_distribution<int> sdist(0, 1);
+        // Run a variety of tests with operand with x number of limbs.
+        auto random_x = [&](unsigned x) {
+            for (int i = 0; i < ntries; ++i) {
+                random_integer(tmp, x, rng);
+                n2 = &tmp.m_mpz;
+                if (sdist(rng)) {
+                    n2.neg();
+                }
+                if (n2.is_static() && sdist(rng)) {
+                    // Promote sometimes, if possible.
+                    n2.promote();
+                }
+                if (sdist(rng) && sdist(rng) && sdist(rng)) {
+                    // Reset rop every once in a while.
+                    n1 = integer{};
+                }
+                sqr(n1, n2);
+                REQUIRE(n1 == n2 * n2);
+
+                // The unary variant.
+                REQUIRE(sqr(n2) == n1);
+
+                // In-place variant.
+                auto n2_old(n2);
+                sqr(n2, n2);
+                REQUIRE(n2 == n2_old * n2_old);
+            }
+        };
+
+        random_x(0);
+        random_x(1);
+        random_x(2);
+        random_x(3);
+        random_x(4);
+        random_x(5);
+        random_x(6);
     }
 };
 

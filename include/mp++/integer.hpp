@@ -4814,6 +4814,8 @@ inline std::size_t static_sqr(static_int<SSize> &rop, const static_int<SSize> &o
 
 } // namespace detail
 
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
 // Binary squaring.
 template <std::size_t SSize>
 inline integer<SSize> &sqr(integer<SSize> &rop, const integer<SSize> &n)
@@ -4837,6 +4839,17 @@ inline integer<SSize> &sqr(integer<SSize> &rop, const integer<SSize> &n)
     ::mpz_mul(&rop._get_union().g_dy(), n.get_mpz_view(), n.get_mpz_view());
     return rop;
 }
+
+// Unary squaring.
+template <std::size_t SSize>
+inline integer<SSize> sqr(const integer<SSize> &n)
+{
+    integer<SSize> retval;
+    sqr(retval, n);
+    return retval;
+}
+
+#endif
 
 /// Binary negation.
 /**
