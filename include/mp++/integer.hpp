@@ -987,6 +987,9 @@ union integer_union {
 template <std::size_t SSize>
 integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 
+template <std::size_t SSize>
+integer<SSize> &sqr(integer<SSize> &, const integer<SSize> &);
+
 namespace detail
 {
 
@@ -2379,8 +2382,17 @@ public:
      */
     integer &sqrt()
     {
-        mppp::sqrt(*this, *this);
-        return *this;
+        return mppp::sqrt(*this, *this);
+    }
+    /// Integer squaring (in-place version).
+    /**
+     * This method will set \p this to its square.
+     *
+     * @return a reference to \p this.
+     */
+    integer &sqr()
+    {
+        return mppp::sqr(*this, *this);
     }
     /// Test if value is odd.
     /**

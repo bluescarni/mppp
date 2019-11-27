@@ -101,6 +101,10 @@ struct sqr_tester {
                 auto n2_old(n2);
                 sqr(n2, n2);
                 REQUIRE(n2 == n2_old * n2_old);
+
+                // The member function.
+                n2 = n2_old;
+                REQUIRE(n2.sqr() == n2_old * n2_old);
             }
         };
 
