@@ -32,9 +32,9 @@ using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_c
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
                          std::integral_constant<std::size_t, 10>>;
 
-const auto ntries = 1000;
+static int ntries = 1000;
 
-std::mt19937 rng;
+static std::mt19937 rng;
 
 // Set mpz to random value with n limbs. Top limb is divided by div.
 // inline void random_integer(mppp::detail::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
