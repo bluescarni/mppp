@@ -36,9 +36,6 @@ static int ntries = 1000;
 
 static std::mt19937 rng;
 
-// Set mpz to random value with n limbs. Top limb is divided by div.
-// inline void random_integer(mppp::detail::mpz_raii &m, unsigned n, std::mt19937 &rng, ::mp_limb_t div = 1u)
-
 struct sqr_tester {
     template <typename S>
     void operator()(const S &) const
