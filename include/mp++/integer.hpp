@@ -5047,31 +5047,52 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
     r.m_limbs[0] = r_;
 }
 
+// Implementation of the 2-limb division/remainder primitives,
+// parametrised on the double limb type and limb bit width.
+// These assume that there are no nail bits and that
+// the bit width of DLimb is exactly twice the bit
+// width of the limb type.
+
+// Quotient+remainder.
+template <typename DLimb, int NBits>
+inline void dlimb_tdiv_qr_impl(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                               ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2,
+                               ::mp_limb_t *MPPP_RESTRICT r1, ::mp_limb_t *MPPP_RESTRICT r2)
+{
+    const auto op1 = op11 + (DLimb(op12) << NBits);
+    const auto op2 = op21 + (DLimb(op22) << NBits);
+    const auto q = op1 / op2, r = op1 % op2;
+    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q2 = static_cast<::mp_limb_t>(q >> NBits);
+    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
+    *r2 = static_cast<::mp_limb_t>(r >> NBits);
+}
+
+// Quotient only.
+template <typename DLimb, int NBits>
+inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                         ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
+{
+    const auto op1 = op11 + (DLimb(op12) << NBits);
+    const auto op2 = op21 + (DLimb(op22) << NBits);
+    const auto q = op1 / op2;
+    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q2 = static_cast<::mp_limb_t>(q >> NBits);
+}
+
 #if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+
 inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                           ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
                           ::mp_limb_t *MPPP_RESTRICT r2)
 {
-    using dlimb_t = __uint128_t;
-    const auto op1 = op11 + (dlimb_t(op12) << 64);
-    const auto op2 = op21 + (dlimb_t(op22) << 64);
-    const auto q = op1 / op2, r = op1 % op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-    *q2 = static_cast<::mp_limb_t>(q >> 64);
-    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
-    *r2 = static_cast<::mp_limb_t>(r >> 64);
+    dlimb_tdiv_qr_impl<__uint128_t, 64>(op11, op12, op21, op22, q1, q2, r1, r2);
 }
 
-// Without remainder.
 inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
-    using dlimb_t = __uint128_t;
-    const auto op1 = op11 + (dlimb_t(op12) << 64);
-    const auto op2 = op21 + (dlimb_t(op22) << 64);
-    const auto q = op1 / op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-    *q2 = static_cast<::mp_limb_t>(q >> 64);
+    dlimb_tdiv_q<__uint128_t, 64>(op11, op12, op21, op22, q1, q2);
 }
 
 #elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
@@ -5080,25 +5101,13 @@ inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, 
                           ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
                           ::mp_limb_t *MPPP_RESTRICT r2)
 {
-    using dlimb_t = std::uint_least64_t;
-    const auto op1 = op11 + (dlimb_t(op12) << 32);
-    const auto op2 = op21 + (dlimb_t(op22) << 32);
-    const auto q = op1 / op2, r = op1 % op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-    *q2 = static_cast<::mp_limb_t>(q >> 32);
-    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
-    *r2 = static_cast<::mp_limb_t>(r >> 32);
+    dlimb_tdiv_qr_impl<std::uint_least64_t, 32>(op11, op12, op21, op22, q1, q2, r1, r2);
 }
 
 inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
-    using dlimb_t = std::uint_least64_t;
-    const auto op1 = op11 + (dlimb_t(op12) << 32);
-    const auto op2 = op21 + (dlimb_t(op22) << 32);
-    const auto q = op1 / op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-    *q2 = static_cast<::mp_limb_t>(q >> 32);
+    dlimb_tdiv_q<std::uint_least64_t, 32>(op11, op12, op21, op22, q1, q2);
 }
 
 #endif
