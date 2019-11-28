@@ -4738,7 +4738,7 @@ inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSiz
 
     // Temporary storage for mpn_sqr(). The largest possible
     // size needed is twice the static size.
-    // NOTE: here we could add some logic, like in static_mul_impl,
+    // NOTE: here we could add some logic, like in static_mul_impl(),
     // to check whether we can write directly into rop instead
     // of using this temporary storage. Need to profile first,
     // however, because I am not sure whether this is worth
