@@ -52,7 +52,6 @@ if ("header" IN_LIST Quadmath_FIND_COMPONENTS)
     # The associated variable is Quadmath_INCLUDE_DIR.
     list(APPEND _Quadmath_FPHSA_ARGS Quadmath_INCLUDE_DIR)
 
-    message(STATUS "Attempting to locate quadmath.h.")
     find_path(Quadmath_INCLUDE_DIR NAMES quadmath.h)
 
     if(NOT Quadmath_INCLUDE_DIR)
@@ -82,7 +81,6 @@ if ("libquadmath" IN_LIST Quadmath_FIND_COMPONENTS)
     # The associated variable is Quadmath_LIBRARY.
     list(APPEND _Quadmath_FPHSA_ARGS Quadmath_LIBRARY)
 
-    message(STATUS "Attempting to locate libquadmath.")
     find_library(Quadmath_LIBRARY NAMES quadmath)
 
     if(NOT Quadmath_LIBRARY)
