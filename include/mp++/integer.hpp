@@ -4868,6 +4868,115 @@ inline integer<SSize> sqr(const integer<SSize> &n)
 
 #endif
 
+namespace detail
+{
+
+// Detect the presence of dual-limb division/remainder. This is currently possible only if:
+// - we are on a 32bit build (with the usual constraints that the types have exactly 32/64 bits and no nails),
+// - we are on a 64bit build and we have the 128bit int type available (plus usual constraints).
+// NOTE: starting from MSVC 2019, there are some 128bit division intrinsics
+// available:
+// https://docs.microsoft.com/en-us/cpp/intrinsics/udiv128
+using integer_have_dlimb_div = std::integral_constant<bool,
+#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64)
+                                                      !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
+#elif GMP_NUMB_BITS == 32
+                                                      !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
+                                                          && nl_digits<::mp_limb_t>() == 32
+#else
+                                                      false
+#endif
+                                                      >;
+
+// Selection of the algorithm for static modular squaring:
+// - for 1/2 limbs, we need both the double-limb multiplication AND
+//   division/remainder primitives,
+// - otherwise we just use the mpn functions.
+template <typename SInt>
+using integer_static_sqrm_algo = std::integral_constant<
+    int, (SInt::s_size == 1 && integer_have_dlimb_mul::value && integer_have_dlimb_div::value)
+             ? 1
+             : ((SInt::s_size == 2 && integer_have_dlimb_mul::value && integer_have_dlimb_div::value) ? 2 : 0)>;
+
+// mpn implementation.
+// NOTE: this assumes that mod is not zero.
+template <std::size_t SSize>
+inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op, const static_int<SSize> &mod,
+                             const std::integral_constant<int, 0> &)
+{
+    // Fetch the asize of the operand.
+    const auto asize = static_cast<std::size_t>(std::abs(op._mp_size));
+
+    // Handle zero operand.
+    if (mppp_unlikely(asize == 0u)) {
+        rop._mp_size = 0;
+        return;
+    }
+
+    // Fetch the asize of the mod argument.
+    const auto mod_asize = static_cast<std::size_t>(std::abs(mod._mp_size));
+    assert(mod_asize > 0u);
+
+    // Temporary storage for mpn_sqr(). The largest possible
+    // size needed is twice the static size.
+    std::array<::mp_limb_t, SSize * 2u> sqr_res;
+    const auto sqr_res_data = sqr_res.data();
+
+    // Run the squaring function.
+    ::mpn_sqr(sqr_res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
+    // Compute the actual size of the result of the squaring: it could be asize * 2
+    // or 1 less, depending on whether the most significant limb of the
+    // result is zero.
+    const auto sqr_res_asize
+        = asize * 2u - static_cast<std::size_t>((sqr_res_data[asize * 2u - 1u] & GMP_NUMB_MASK) == 0u);
+
+    if (mod_asize > sqr_res_asize) {
+        // The divisor is larger than the square of op.
+        // Copy the square of op to rop and exit.
+        rop._mp_size = static_cast<mpz_size_t>(sqr_res_asize);
+        copy_limbs_no(sqr_res_data, sqr_res_data + sqr_res_asize, rop.m_limbs.data());
+
+        return;
+    }
+
+    // Temporary storage for the modulo operation.
+    // Need space for both quotient and remainder.
+    std::array<::mp_limb_t, SSize * 2u> q_res, r_res;
+    // Run the modulo operation.
+    // NOTE: here we could add some logic, like in tdiv_qr(),
+    // to check whether we can write directly into rop instead
+    // of using this temporary storage. Need to profile first,
+    // however, because I am not sure whether this is worth
+    // it or not performance-wise.
+    // NOTE: ret_size will never be negative, as the
+    // dividend is a square and thus also never negative.
+    mpz_size_t ret_size;
+    if (mod_asize == 1u) {
+        // Optimization when the divisor has 1 limb.
+        r_res[0]
+            = ::mpn_divrem_1(q_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize), mod.m_limbs[0]);
+        // The size can be 1 or zero, depending on the value
+        // of the only limb in r_res.
+        ret_size = static_cast<mpz_size_t>((r_res[0] & GMP_NUMB_MASK) != 0u);
+    } else {
+        // The general case.
+        ::mpn_tdiv_qr(q_res.data(), r_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize),
+                      mod.m_limbs.data(), static_cast<::mp_size_t>(mod_asize));
+        // Determine the size of the output, which will
+        // be in the [0, mod_asize] range.
+        ret_size = static_cast<mpz_size_t>(mod_asize);
+        while (ret_size && !(r_res[static_cast<std::size_t>(ret_size - 1)] & GMP_NUMB_MASK)) {
+            --ret_size;
+        }
+    }
+
+    // Write out the result.
+    rop._mp_size = ret_size;
+    copy_limbs_no(r_res.data(), r_res.data() + ret_size, rop.m_limbs.data());
+}
+
+} // namespace detail
+
 /// Binary negation.
 /**
  * This method will set \p rop to <tt>-n</tt>.
@@ -4936,21 +5045,6 @@ inline integer<SSize> abs(const integer<SSize> &n)
 
 namespace detail
 {
-
-// Detect the presence of dual-limb division. This is currently possible only if:
-// - we are on a 32bit build (with the usual constraints that the types have exactly 32/64 bits and no nails),
-// - we are on a 64bit build and we have the 128bit int type available (plus usual constraints).
-// MSVC currently does not provide any primitive for 128bit division.
-using integer_have_dlimb_div = std::integral_constant<bool,
-#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64)
-                                                      !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
-#elif GMP_NUMB_BITS == 32
-                                                      !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
-                                                          && nl_digits<::mp_limb_t>() == 32
-#else
-                                                      false
-#endif
-                                                      >;
 
 // Selection of the algorithm for static division:
 // - for 1 limb, we can always do static division,
@@ -5078,6 +5172,18 @@ inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, :
     const auto q = op1 / op2;
     *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
     *q2 = static_cast<::mp_limb_t>(q >> NBits);
+}
+
+// Remainder only.
+template <typename DLimb, int NBits>
+inline void dlimb_tdiv_r(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                         ::mp_limb_t *MPPP_RESTRICT r1, ::mp_limb_t *MPPP_RESTRICT r2)
+{
+    const auto op1 = op11 + (DLimb(op12) << NBits);
+    const auto op2 = op21 + (DLimb(op22) << NBits);
+    const auto r = op1 % op2;
+    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
+    *r2 = static_cast<::mp_limb_t>(r >> NBits);
 }
 
 #if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
