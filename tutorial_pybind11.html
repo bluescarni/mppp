@@ -276,7 +276,7 @@ works as intended. Now, assuming that we have built the code above into a Python
 called <code class="docutils literal notranslate"><span class="pre">pybind11_test_01</span></code> (see the <a class="reference external" href="https://pybind11.readthedocs.io/en/master/compiling.html">pybind11 documentation</a>
 for details), we can try to call the exposed functions from Python:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pybind11_test_01</span> <span class="k">as</span> <span class="nn">p</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fractions</span> <span class="k">import</span> <span class="n">Fraction</span> <span class="k">as</span> <span class="n">F</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fractions</span> <span class="kn">import</span> <span class="n">Fraction</span> <span class="k">as</span> <span class="n">F</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_int1_conversion</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="go">42</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_int1_conversion</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -290,7 +290,7 @@ for details), we can try to call the exposed functions from Python:</p>
 <p>Indeed, the Python objects passed as arguments to the exposed functions are correctly translated to mp++ objects
 before being passed to the C++ functions, and the mp++ return values are correctly translated back to the original Python objects.</p>
 <p>Let’s try with some floating-point objects:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mpmath</span> <span class="k">import</span> <span class="n">mpf</span><span class="p">,</span> <span class="n">mp</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mpmath</span> <span class="kn">import</span> <span class="n">mpf</span><span class="p">,</span> <span class="n">mp</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">))</span>
 <span class="go">mpf(&#39;1.1000000000000001&#39;)</span>
 </pre></div>
