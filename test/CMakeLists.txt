@@ -39,7 +39,12 @@ function(ADD_MPPP_TESTCASE arg1)
     return()
   endif()
   add_executable(${arg1} ${arg1}.cpp)
-  target_link_libraries(${arg1} mp++ mp++_test Threads::Threads)
+  target_link_libraries(${arg1} PRIVATE mp++ mp++_test Threads::Threads)
+  if(MPPP_WITH_QUADMATH)
+    # NOTE: in some real128 tests we access
+    # functions from the quadmath.h header.
+    target_link_libraries(${arg1} PRIVATE Quadmath::header)
+  endif()
   target_compile_options(${arg1} PRIVATE
     "$<$<CONFIG:Debug>:${MPPP_CXX_FLAGS_DEBUG}>"
     "$<$<CONFIG:Release>:${MPPP_CXX_FLAGS_RELEASE}>"
