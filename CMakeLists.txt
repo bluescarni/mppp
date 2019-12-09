@@ -339,8 +339,13 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake" "${CMAKE_CURRENT
 install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 # Take care of versioning.
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" VERSION ${mp++_VERSION}
-	COMPATIBILITY SameMajorVersion)
+# NOTE: SameMinorVersion available only
+# since CMake 3.11.
+if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
+    write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" COMPATIBILITY SameMajorVersion)
+else()
+    write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" COMPATIBILITY SameMinorVersion)
+endif()
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 
 # This is just a simple counter variable, internal use only.
