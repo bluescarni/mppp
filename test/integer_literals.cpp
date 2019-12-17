@@ -6,8 +6,9 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <mp++/config.hpp>
+#include <stdexcept>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
@@ -46,27 +47,27 @@ TEST_CASE("integer_literal_check_str_test")
     }
     {
         char str[] = {'a', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'a', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'1', 'a', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'a', '1', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'1', '2', '.', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'1', '2', 'e', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
 
     // Binary.
@@ -102,27 +103,27 @@ TEST_CASE("integer_literal_check_str_test")
     }
     {
         char str[] = {'0', 'b', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'B', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'b', '2', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'B', '2', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'b', 'a', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'B', 'f', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
 
     // Octal.
@@ -153,27 +154,27 @@ TEST_CASE("integer_literal_check_str_test")
     }
     {
         char str[] = {'0', '9', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'a', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', '1', 'a', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', '7', '8', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', '1', '.', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', '3', 'e', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
 
     // Hex.
@@ -209,33 +210,40 @@ TEST_CASE("integer_literal_check_str_test")
     }
     {
         char str[] = {'0', 'x', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'X', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'x', 'g', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'X', 'G', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'x', '.', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
     {
         char str[] = {'0', 'X', 'p', '\0'};
-        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), detail::invalid_integer_literal);
+        REQUIRE_THROWS_AS(detail::integer_literal_check_str(str), std::invalid_argument);
     }
 }
 
 TEST_CASE("z1_test")
 {
     REQUIRE(0b1101010010101001010100100101_z1 == integer<1>{"1101010010101001010100100101", 2});
+    REQUIRE(
+        0b1101010010101001010100100101010101010101010010101010010101010110101010101010101010110101010101001010101101010101010101010_z1
+        == integer<1>{"110101001010100101010010010101010101010101001010101001010101011010101010101010101011010101010100"
+                      "1010101101010101010101010",
+                      2});
+    REQUIRE(21309213209382109382190382190382109303821321002140982142139081_z1
+            == integer<1>{"21309213209382109382190382190382109303821321002140982142139081"});
 }
 
 #else
