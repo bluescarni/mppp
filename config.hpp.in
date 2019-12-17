@@ -142,4 +142,24 @@
 
 #endif
 
+// Wrapper for the C++17 [[fallthrough]] attribute.
+#if MPPP_CPLUSPLUS >= 201703L
+
+#define MPPP_FALLTHROUGH [[fallthrough]]
+
+#elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 7
+
+// On GCC>=7, if we are not using C++17 we can use
+// an alternative attribute:
+// https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
+// This may be supported on some clang versions as well:
+// https://reviews.llvm.org/D63260
+#define MPPP_FALLTHROUGH [[gnu::fallthrough]]
+
+#else
+
+#define MPPP_FALLTHROUGH void(0)
+
+#endif
+
 #endif
