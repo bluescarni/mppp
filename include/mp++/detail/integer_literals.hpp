@@ -326,19 +326,26 @@ inline integer<SSize> integer_literal_impl()
         }();
 
         // Turn the limb array into an integer.
-        // Start with the last significant limb.
+        // Start with the least significant limb.
         integer<SSize> retval{limb_arr.arr[nlimbs - 1u]}, tmp;
 
         // A couple of variables used only in base 10.
         [[maybe_unused]] const auto factor10 = []() {
             if constexpr (base == 10) {
-                return mppp::pow_ui(integer<SSize>{10},
-                                    static_cast<unsigned>(std::numeric_limits<::mp_limb_t>::digits10));
+                return mppp::pow_ui(integer<SSize>{10}, nd_limb);
             } else {
                 return 0;
             }
         }();
         [[maybe_unused]] auto cur_factor10(factor10);
+
+        if constexpr (base != 10) {
+            // NOTE: for bases other than 10, we will use bit shifting below.
+            // Make sure that we can represent the max shift amount
+            // via std::size_t.
+            static_assert(nlimbs <= std::numeric_limits<std::size_t>::max()
+                                        / static_cast<unsigned>(std::numeric_limits<::mp_limb_t>::digits));
+        }
 
         for (std::size_t i = nlimbs - 1u; i > 0u; --i) {
             tmp = limb_arr.arr[i - 1u];
@@ -360,7 +367,20 @@ inline integer<SSize> integer_literal_impl()
         return retval;
     }
 #else
+    // Run the checks on the char sequence, and determine the base.
+    const auto base = detail::integer_literal_check_str(arr);
+    assert(base == 2 || base == 8 || base == 10 || base == 16);
 
+    switch (base) {
+        case 2:
+            return integer<SSize>{arr + 2, arr + sizeof(arr) - 1, 2};
+        case 8:
+            return integer<SSize>{arr + 1, arr + sizeof(arr) - 1, 8};
+        case 16:
+            return integer<SSize>{arr + 2, arr + sizeof(arr) - 1, 16};
+        default:
+            return integer<SSize>{arr};
+    }
 #endif
 }
 
