@@ -15,7 +15,7 @@
 
 using namespace mppp;
 
-#if MPPP_CPLUSPLUS >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
 
 TEST_CASE("integer_literal_check_str_test")
 {
