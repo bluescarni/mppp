@@ -238,6 +238,105 @@ TEST_CASE("integer_literal_check_str_test")
 
 TEST_CASE("z1_test")
 {
+    // A few simple tests.
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b0_z1 == 0);
+#endif
+    REQUIRE(00_z1 == 0);
+    REQUIRE(0_z1 == 0);
+    REQUIRE(0x0_z1 == 0);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b0_z2 == 0);
+#endif
+    REQUIRE(00_z2 == 0);
+    REQUIRE(0_z2 == 0);
+    REQUIRE(0x0_z2 == 0);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b0_z3 == 0);
+#endif
+    REQUIRE(00_z3 == 0);
+    REQUIRE(0_z3 == 0);
+    REQUIRE(0x0_z3 == 0);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b1_z1 == 1);
+#endif
+    REQUIRE(01_z1 == 1);
+    REQUIRE(1_z1 == 1);
+    REQUIRE(0x1_z1 == 1);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b1_z2 == 1);
+#endif
+    REQUIRE(01_z2 == 1);
+    REQUIRE(1_z2 == 1);
+    REQUIRE(0x1_z2 == 1);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b1_z3 == 1);
+#endif
+    REQUIRE(01_z3 == 1);
+    REQUIRE(1_z3 == 1);
+    REQUIRE(0x1_z3 == 1);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b10_z1 == 2);
+#endif
+    REQUIRE(02_z1 == 2);
+    REQUIRE(2_z1 == 2);
+    REQUIRE(0x2_z1 == 2);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b10_z2 == 2);
+#endif
+    REQUIRE(02_z2 == 2);
+    REQUIRE(2_z2 == 2);
+    REQUIRE(0x2_z2 == 2);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b10_z3 == 2);
+#endif
+    REQUIRE(02_z3 == 2);
+    REQUIRE(2_z3 == 2);
+    REQUIRE(0x2_z3 == 2);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b101010_z1 == 42);
+#endif
+    REQUIRE(052_z1 == 42);
+    REQUIRE(42_z1 == 42);
+    REQUIRE(0x2a_z1 == 42);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b101010_z2 == 42);
+#endif
+    REQUIRE(052_z2 == 42);
+    REQUIRE(42_z2 == 42);
+    REQUIRE(0x2a_z2 == 42);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b101010_z2 == 42);
+#endif
+    REQUIRE(052_z2 == 42);
+    REQUIRE(42_z2 == 42);
+    REQUIRE(0x2a_z2 == 42);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(0b101010_z3 == 42);
+#endif
+    REQUIRE(052_z3 == 42);
+    REQUIRE(42_z3 == 42);
+    REQUIRE(0x2a_z3 == 42);
+
+#if MPPP_CPLUSPLUS >= 201402L
+    REQUIRE(-0b101010_z1 == -42);
+#endif
+    REQUIRE(-052_z1 == -42);
+    REQUIRE(-42_z1 == -42);
+    REQUIRE(-0x2a_z1 == -42);
+
 #if MPPP_CPLUSPLUS >= 201402L
     REQUIRE(0b1101010010101001010100100101_z1 == integer<1>{"1101010010101001010100100101", 2});
     REQUIRE(
