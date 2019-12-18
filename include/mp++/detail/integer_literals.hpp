@@ -168,7 +168,7 @@ inline MPPP_CONSTEXPR_14 int integer_literal_check_str(const char (&arr)[Size])
     return base;
 }
 
-#if MPPP_CPLUSPLUS >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
 
 // Small helper to convert the char representation
 // of a digit into the corresponding numerical
@@ -232,7 +232,7 @@ inline integer<SSize> integer_literal_impl()
     // into a null-terminated char array.
     constexpr char arr[] = {Chars..., '\0'};
 
-#if MPPP_CPLUSPLUS >= 201703L
+#if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
     // Run the checks on the char sequence, and determine the base.
     constexpr auto base = detail::integer_literal_check_str(arr);
     static_assert(base == 2 || base == 8 || base == 10 || base == 16);
@@ -244,11 +244,7 @@ inline integer<SSize> integer_literal_impl()
 
     // Determine how many digits in the given base we can always fit
     // into a single mp_limb_t.
-    constexpr auto nd_limb = static_cast<unsigned>([
-#if defined(_MSC_VER) && !defined(__clang__)
-                                                       base
-#endif
-    ]() {
+    constexpr auto nd_limb = static_cast<unsigned>([]() {
         [[maybe_unused]] constexpr auto nbits = std::numeric_limits<::mp_limb_t>::digits;
 
         if constexpr (base == 2) {
@@ -273,11 +269,7 @@ inline integer<SSize> integer_literal_impl()
 
     // Helper function to parse a single limb from a subset
     // of digits at indices [begin, end) in the literal.
-    auto parse_limb = [
-#if defined(_MSC_VER) && !defined(__clang__)
-                          base, &arr
-#endif
-    ](std::size_t begin, std::size_t end) {
+    auto parse_limb = [](std::size_t begin, std::size_t end) {
         ::mp_limb_t retval = 0, shifter = 1;
 
         for (auto i = end; i > begin; --i) {
@@ -311,12 +303,7 @@ inline integer<SSize> integer_literal_impl()
             ::mp_limb_t arr[nlimbs];
         };
 
-        constexpr auto limb_arr = [parse_limb
-#if defined(_MSC_VER) && !defined(__clang__)
-                                   ,
-                                   ndigits, nd_limb, nlimbs
-#endif
-        ]() {
+        constexpr auto limb_arr = [parse_limb]() {
             arr_wrap retval{};
 
             // Manually compute the first limb, which might
@@ -336,11 +323,7 @@ inline integer<SSize> integer_literal_impl()
         integer<SSize> retval{limb_arr.arr[nlimbs - 1u]}, tmp;
 
         // A couple of variables used only in base 10.
-        [[maybe_unused]] const auto factor10 = [
-#if defined(_MSC_VER) && !defined(__clang__)
-                                                   base, nd_limb
-#endif
-        ]() {
+        [[maybe_unused]] const auto factor10 = []() {
             if constexpr (base == 10) {
                 return mppp::pow_ui(integer<SSize>{10}, nd_limb);
             } else {

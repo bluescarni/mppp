@@ -6,8 +6,8 @@ branches:
 
 environment:
   matrix:
-    # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    #   BUILD_TYPE: MSVC15_clang_64
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      BUILD_TYPE: MSVC15_clang_64
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       BUILD_TYPE: MSVC17_32
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
