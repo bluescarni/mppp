@@ -239,19 +239,16 @@ inline integer<SSize> integer_literal_impl()
 
     // The actual number of digits in the literal
     // (discounting prefixes).
-    constexpr auto ndigits = []() {
-        if constexpr (base == 2 || base == 16) {
-            return sizeof...(Chars) - 2u;
-        } else if constexpr (base == 8) {
-            return sizeof...(Chars) - 1u;
-        } else {
-            return sizeof...(Chars);
-        }
-    }();
+    constexpr auto ndigits = (base == 2 || base == 16) ? (sizeof...(Chars) - 2u)
+                                                       : (base == 8 ? (sizeof...(Chars) - 1u) : sizeof...(Chars));
 
     // Determine how many digits in the given base we can always fit
     // into a single mp_limb_t.
-    constexpr auto nd_limb = static_cast<unsigned>([]() {
+    constexpr auto nd_limb = static_cast<unsigned>([
+#if defined(_MSC_VER) && !defined(__clang__)
+                                                       base
+#endif
+    ]() {
         [[maybe_unused]] constexpr auto nbits = std::numeric_limits<::mp_limb_t>::digits;
 
         if constexpr (base == 2) {
@@ -276,7 +273,11 @@ inline integer<SSize> integer_literal_impl()
 
     // Helper function to parse a single limb from a subset
     // of digits at indices [begin, end) in the literal.
-    auto parse_limb = [](std::size_t begin, std::size_t end) {
+    auto parse_limb = [
+#if defined(_MSC_VER) && !defined(__clang__)
+                          base, &arr
+#endif
+    ](std::size_t begin, std::size_t end) {
         ::mp_limb_t retval = 0, shifter = 1;
 
         for (auto i = end; i > begin; --i) {
@@ -310,7 +311,12 @@ inline integer<SSize> integer_literal_impl()
             ::mp_limb_t arr[nlimbs];
         };
 
-        constexpr auto limb_arr = [parse_limb]() {
+        constexpr auto limb_arr = [parse_limb
+#if defined(_MSC_VER) && !defined(__clang__)
+                                   ,
+                                   ndigits, nd_limb, nlimbs
+#endif
+        ]() {
             arr_wrap retval{};
 
             // Manually compute the first limb, which might
@@ -330,7 +336,11 @@ inline integer<SSize> integer_literal_impl()
         integer<SSize> retval{limb_arr.arr[nlimbs - 1u]}, tmp;
 
         // A couple of variables used only in base 10.
-        [[maybe_unused]] const auto factor10 = []() {
+        [[maybe_unused]] const auto factor10 = [
+#if defined(_MSC_VER) && !defined(__clang__)
+                                                   base, nd_limb
+#endif
+        ]() {
             if constexpr (base == 10) {
                 return mppp::pow_ui(integer<SSize>{10}, nd_limb);
             } else {
