@@ -33,7 +33,12 @@ namespace detail
 // NOTE: we need this function in the C++11/C++14 implementation
 // as well, so use MPPP_CONSTEXPR_14, MPPP_FALLTHROUGH, etc.
 template <std::size_t Size>
-inline MPPP_CONSTEXPR_14 int integer_literal_check_str(const char (&arr)[Size])
+inline
+#if !defined(_MSC_VER) || defined(__clang__)
+    MPPP_CONSTEXPR_14
+#endif
+    int
+    integer_literal_check_str(const char (&arr)[Size])
 {
     // We expect the size of the array to be
     // always at least 2, the null terminator
@@ -133,7 +138,7 @@ inline MPPP_CONSTEXPR_14 int integer_literal_check_str(const char (&arr)[Size])
         }
     }();
 
-    // Run the checks on the remainder of the literal,
+    // Run the checks on the rest of the literal,
     // after we already checked the first 2 digits.
     // For bases 2 and 16, we need to have other digits,
     // otherwise the literal is malformed.
