@@ -561,9 +561,11 @@ TEST_CASE("integer_literals_tutorial")
     auto n1 = 123_z1; // n1 has 1 limb of static storage,
                       // and it contains the value 123.
 
+#if MPPP_CPLUSPLUS >= 201402L
     auto n2 = -0b10011_z2; // n2 has 2 limbs of static storage,
                            // and it contains the value -19
                            // (-10011 in base 2).
+#endif
 
     auto n3 = 0146_z1; // n3 has 1 limb of static storage,
                        // and it contains the value 102
