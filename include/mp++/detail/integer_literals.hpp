@@ -312,8 +312,10 @@ inline integer<SSize> integer_literal_impl()
             arr_wrap retval{};
 
             // Manually compute the first limb, which might
-            // contain fewer digits than the others.
-            const auto idx_end1 = sizeof...(Chars) - ndigits + ndigits % nd_limb;
+            // contain fewer digits than the others (in which
+            // case rem is non-null).
+            constexpr auto rem = ndigits % nd_limb;
+            const auto idx_end1 = sizeof...(Chars) - ndigits + (rem == 0u ? nd_limb : rem);
             retval.arr[0] = parse_limb(sizeof...(Chars) - ndigits, idx_end1);
 
             for (std::size_t i = 1; i < nlimbs; ++i) {
