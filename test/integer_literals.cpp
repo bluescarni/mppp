@@ -6,7 +6,9 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <initializer_list>
 #include <stdexcept>
+#include <vector>
 
 #include <mp++/config.hpp>
 #include <mp++/integer.hpp>
@@ -549,4 +551,35 @@ TEST_CASE("z1_test")
             == integer<3>{"12140227947719468759797663285047392109678128832104635964910228"});
     REQUIRE(0x78e0cc5df23bca510ffc70d7bc45dc08645f2433025d564ea94_z3
             == integer<3>{"12140227947719468759797663285047392109678128832104635964910228"});
+}
+
+// Code from the tutorial.
+TEST_CASE("integer_literals_tutorial")
+{
+    using namespace mppp::literals;
+
+    auto n1 = 123_z1; // n1 has 1 limb of static storage,
+                      // and it contains the value 123.
+
+    auto n2 = -0b10011_z2; // n2 has 2 limbs of static storage,
+                           // and it contains the value -19
+                           // (-10011 in base 2).
+
+    auto n3 = 0146_z1; // n3 has 1 limb of static storage,
+                       // and it contains the value 102
+                       // (146 in base 8).
+
+    auto n4 = 0xfe45_z3; // n4 has 3 limbs of static storage,
+                         // and it contains the value 65093
+                         // (fe45 in base 16).
+}
+
+// Test use with initializer lists.
+TEST_CASE("integer_literals_init_list")
+{
+    std::vector<mppp::integer<1>> v = {1_z1, 2_z1, 3_z1};
+
+    REQUIRE(v[0] == 1);
+    REQUIRE(v[1] == 2);
+    REQUIRE(v[2] == 3);
 }

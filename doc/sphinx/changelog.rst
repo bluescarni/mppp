@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Implement user-defined literals for :cpp:class:`~mppp::integer`
+  (`#209 <https://github.com/bluescarni/mppp/pull/209>`__).
 - Include mp++'s headers in the project files generated
   for MSVC (`#199 <https://github.com/bluescarni/mppp/pull/199>`__).
   Many thanks to `7ofNine <https://github.com/7ofNine>`__!
