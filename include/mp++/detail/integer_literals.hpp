@@ -239,7 +239,7 @@ inline integer<SSize> integer_literal_impl()
 
 #if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
     // Run the checks on the char sequence, and determine the base.
-    constexpr auto base = detail::integer_literal_check_str(arr);
+    constexpr auto base = integer_literal_check_str(arr);
     static_assert(base == 2 || base == 8 || base == 10 || base == 16);
 
     // The actual number of digits in the literal
@@ -278,7 +278,7 @@ inline integer<SSize> integer_literal_impl()
         ::mp_limb_t retval = 0, shifter = 1;
 
         for (auto i = end; i > begin; --i) {
-            const auto cur_digit = detail::digit_to_value<base, ::mp_limb_t>(arr[i - 1u]);
+            const auto cur_digit = digit_to_value<base, ::mp_limb_t>(arr[i - 1u]);
             retval += cur_digit * shifter;
 
             if (i > begin + 1u) {
@@ -368,7 +368,7 @@ inline integer<SSize> integer_literal_impl()
     }
 #else
     // Run the checks on the char sequence, and determine the base.
-    const auto base = detail::integer_literal_check_str(arr);
+    const auto base = integer_literal_check_str(arr);
     assert(base == 2 || base == 8 || base == 10 || base == 16);
 
     switch (base) {

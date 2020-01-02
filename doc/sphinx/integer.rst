@@ -413,8 +413,8 @@ User-defined literals
 
    These numeric literal operator templates can be used to construct
    :cpp:class:`mppp::integer` instances with, respectively, 1, 2 and 3
-   limbs of static storage. Binary, octal, decimal and hexadecimal
-   integer literals are supported.
+   limbs of static storage. Literals in binary, octal, decimal and
+   hexadecimal format are supported.
 
    .. seealso::
 
