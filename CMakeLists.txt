@@ -221,6 +221,7 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/type_name.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/fwd_decl.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/gmp.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/integer_literals.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/mpfr.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/type_traits.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/utils.hpp"
