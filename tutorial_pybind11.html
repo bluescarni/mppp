@@ -275,7 +275,7 @@ This will allow us to verify that the automatic translation between mp++ and Pyt
 works as intended. Now, assuming that we have built the code above into a Python extension
 called <code class="docutils literal notranslate"><span class="pre">pybind11_test_01</span></code> (see the <a class="reference external" href="https://pybind11.readthedocs.io/en/master/compiling.html">pybind11 documentation</a>
 for details), we can try to call the exposed functions from Python:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pybind11_test_01</span> <span class="k">as</span> <span class="nn">p</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pybind11_test_01</span> <span class="k">as</span> <span class="nn">p</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fractions</span> <span class="kn">import</span> <span class="n">Fraction</span> <span class="k">as</span> <span class="n">F</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_int1_conversion</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="go">42</span>
@@ -290,7 +290,7 @@ for details), we can try to call the exposed functions from Python:</p>
 <p>Indeed, the Python objects passed as arguments to the exposed functions are correctly translated to mp++ objects
 before being passed to the C++ functions, and the mp++ return values are correctly translated back to the original Python objects.</p>
 <p>Let’s try with some floating-point objects:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mpmath</span> <span class="kn">import</span> <span class="n">mpf</span><span class="p">,</span> <span class="n">mp</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mpmath</span> <span class="kn">import</span> <span class="n">mpf</span><span class="p">,</span> <span class="n">mp</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">))</span>
 <span class="go">mpf(&#39;1.1000000000000001&#39;)</span>
 </pre></div>
@@ -298,13 +298,13 @@ before being passed to the C++ functions, and the mp++ return values are correct
 <p>The default precision in mpmath is 53 (double-precision), and indeed the conversion between <code class="docutils literal notranslate"><span class="pre">mpf</span></code> on the Python side
 and <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> on the C++ side is done with 53 bits of precision. We can increase the precision to 200 bits and
 verify that the value is correctly preserved and translated:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">200</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">200</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">))</span>
 <span class="go">mpf(&#39;1.1000000000000000000000000000000000000000000000000000000000002&#39;)</span>
 </pre></div>
 </div>
 <p>If the precision is set <strong>exactly</strong> to 113, <code class="docutils literal notranslate"><span class="pre">mpf</span></code> objects can be converted to <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">113</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">113</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real128_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">))</span>
 <span class="go">mpf(&#39;1.10000000000000000000000000000000008&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">114</span>
@@ -317,7 +317,7 @@ verify that the value is correctly preserved and translated:</p>
 </div>
 <p>A <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> will be successfully converted to an <code class="docutils literal notranslate"><span class="pre">mpf</span></code> iff the current mpmath working precision is exactly 113.
 A <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> will be successfully converted to an <code class="docutils literal notranslate"><span class="pre">mpf</span></code> iff its precision is not greater than the current mpmath working precision:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">53</span><span class="p">;</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">53</span><span class="p">;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="s2">&quot;1.1&quot;</span><span class="p">),</span> <span class="mi">100</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
      <span class="o">...</span>
@@ -328,7 +328,7 @@ A <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp:
 </pre></div>
 </div>
 <p>Overloaded functions are supported as well:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_overload</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_overload</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
 <span class="go">-2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_overload</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
 <span class="go">Fraction(6, 7)</span>
@@ -342,7 +342,7 @@ overloads with <a class="reference internal" href="real128.html#_CPPv4N4mppp7rea
 <p>There’s an important caveat to keep in mind when translating to/from <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>. The IEEE 754 quadruple precision
 format, implemented by <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>, has a limited exponent range. The value <span class="math notranslate nohighlight">\(2^{-30000}\)</span>, for instance, becomes
 simply zero in quadruple precision, and <span class="math notranslate nohighlight">\(2^{30000}\)</span> becomes <span class="math notranslate nohighlight">\(+\infty\)</span>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">113</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mp</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">113</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real128_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**-</span><span class="mi">30000</span><span class="p">)</span>
 <span class="go">mpf(&#39;0.0&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_real128_conversion</span><span class="p">(</span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">30000</span><span class="p">)</span>
@@ -350,7 +350,7 @@ simply zero in quadruple precision, and <span class="math notranslate nohighligh
 </pre></div>
 </div>
 <p>In mpmath, however, <span class="math notranslate nohighlight">\(2^{-30000}\)</span> and <span class="math notranslate nohighlight">\(2^{30000}\)</span> are correctly computed to quadruple precision:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**-</span><span class="mi">30000</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**-</span><span class="mi">30000</span>
 <span class="go">mpf(&#39;1.25930254358409145729153078521520406e-9031&#39;)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mpf</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">30000</span>
 <span class="go">mpf(&#39;7.94090351913296032413251784349270251e+9030&#39;)</span>
@@ -360,7 +360,7 @@ simply zero in quadruple precision, and <span class="math notranslate nohighligh
 As a consequence, a conversion from <code class="docutils literal notranslate"><span class="pre">mpf</span></code> to <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> will <strong>not</strong> preserve the exact value if the absolute value of the
 exponent is too large.</p>
 <p>We can verify that the conversion between mp++ and Python works transparently when containers are involved:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_vector_conversion</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_vector_conversion</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 <span class="go">[1, 2, 3]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_vector_conversion</span><span class="p">([</span><span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">F</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])</span>
 <span class="go">[Fraction(1, 1), Fraction(1, 2), Fraction(1, 3)]</span>
@@ -377,7 +377,7 @@ exponent is too large.</p>
 <p>Finally, the pybind11 integration utilities will automatically translate mp++ <a class="reference internal" href="exceptions.html#exceptions"><span class="std std-ref">exceptions</span></a> thrown
 from C++ code into corresponding Python exceptions. Here is an example where mp++’s <a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">zero_division_error</span></code></a>
 exception is translated to Python’s <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ZeroDivisionError" title="(in Python v3.8)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ZeroDivisionError</span></code></a> exception:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_zero_division_error</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">test_zero_division_error</span><span class="p">()</span>
 <span class="gt">Traceback (most recent call last):</span>
      <span class="o">...</span>
 <span class="gr">ZeroDivisionError</span>: <span class="n">Integer division by zero</span>

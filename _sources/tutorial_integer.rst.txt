@@ -217,3 +217,39 @@ A couple of important points about the serialisation API need to be emphasised:
   and it might be subject to changes in future versions of mp++. Users are thus advised not to use
   the binary serialisation format for long-term persistence or as a data exchange format: for such
   purposes, it is better to use the string representation of :cpp:class:`~mppp::integer` objects.
+
+User-defined literals
+---------------------
+
+.. versionadded:: 0.18
+
+User-defined literals are available to construct
+:cpp:class:`mppp::integer` instances with 1, 2 and 3
+limbs of static storage. The :ref:`literals <integer_literals>`
+are defined within
+the inline namespace ``mppp::literals``, and, like the builtin
+C++ integer literals, they support
+binary, octal, decimal and hexadecimal representations:
+
+.. code-block:: c++
+
+   using namespace mppp::literals;
+
+   auto n1 = 123_z1;      // n1 has 1 limb of static storage,
+                          // and it contains the value 123.
+
+   auto n2 = -0b10011_z2; // n2 has 2 limbs of static storage,
+                          // and it contains the value -19
+                          // (-10011 in base 2).
+
+   auto n3 = 0146_z1;     // n3 has 1 limb of static storage,
+                          // and it contains the value 102
+                          // (146 in base 8).
+
+   auto n4 = 0xfe45_z3;   // n4 has 3 limbs of static storage,
+                          // and it contains the value 65093
+                          // (fe45 in base 16).
+
+.. seealso::
+
+   https://en.cppreference.com/w/cpp/language/integer_literal

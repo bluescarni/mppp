@@ -85,7 +85,8 @@ Concepts
 Functions
 ---------
 
-Much of the functionality of the :cpp:class:`~mppp::integer` class is exposed via plain functions. These functions
+Much of the functionality of the :cpp:class:`~mppp::integer` class
+is exposed via plain functions. These functions
 mimic the `GMP API <https://gmplib.org/manual/Integer-Functions.html>`__ where appropriate, but a variety of
 convenience/generic overloads is provided as well.
 
@@ -368,7 +369,8 @@ Other
 Mathematical operators
 ----------------------
 
-Overloaded operators are provided for convenience. Their interface is generic, and their implementation
+Overloaded operators are provided for convenience.
+Their interface is generic, and their implementation
 is typically built on top of basic :ref:`functions <integer_functions>`.
 
 .. doxygengroup:: integer_operators
@@ -395,3 +397,28 @@ Standard library specialisations
       :param n: the input :cpp:class:`mppp::integer`.
 
       :return: a hash value for *n*.
+
+.. _integer_literals:
+
+User-defined literals
+---------------------
+
+.. versionadded:: 0.18
+
+.. cpp:function:: template <char... Chars> mppp::integer<1> mppp::literals::operator"" _z1()
+.. cpp:function:: template <char... Chars> mppp::integer<2> mppp::literals::operator"" _z2()
+.. cpp:function:: template <char... Chars> mppp::integer<3> mppp::literals::operator"" _z3()
+
+   User-defined integer literals.
+
+   These numeric literal operator templates can be used to construct
+   :cpp:class:`mppp::integer` instances with, respectively, 1, 2 and 3
+   limbs of static storage. Literals in binary, octal, decimal and
+   hexadecimal format are supported.
+
+   .. seealso::
+
+      https://en.cppreference.com/w/cpp/language/integer_literal
+
+   :exception std\:\:invalid_argument: if the input sequence of charaters is not
+     a valid integer literal (as defined by the C++ standard).

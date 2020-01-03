@@ -114,6 +114,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#mathematical-operators">Mathematical operators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#standard-library-specialisations">Standard library specialisations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user-defined-literals">User-defined literals</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="rational.html">Multiprecision rationals</a></li>
@@ -1463,7 +1464,8 @@ an object of type <code class="docutils literal notranslate"><span class="pre">T
 </div>
 <div class="section" id="functions">
 <span id="integer-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<p>Much of the functionality of the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> class is exposed via plain functions. These functions
+<p>Much of the functionality of the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> class
+is exposed via plain functions. These functions
 mimic the <a class="reference external" href="https://gmplib.org/manual/Integer-Functions.html">GMP API</a> where appropriate, but a variety of
 convenience/generic overloads is provided as well.</p>
 <div class="section" id="assignment">
@@ -2730,7 +2732,8 @@ the program’s end or a thread’s exit. This function does exactly that.</p>
 </div>
 <div class="section" id="mathematical-operators">
 <span id="integer-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
-<p>Overloaded operators are provided for convenience. Their interface is generic, and their implementation
+<p>Overloaded operators are provided for convenience.
+Their interface is generic, and their implementation
 is typically built on top of basic <a class="reference internal" href="#integer-functions"><span class="std std-ref">functions</span></a>.</p>
 <dl class="function">
 <dt id="_CPPv4I_NSt6size_tEEN4mpppplE7integerI5SSizeERK7integerI5SSizeE">
@@ -3403,6 +3406,42 @@ are treated as-if they were represented using two’s complement.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="user-defined-literals">
+<span id="integer-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.18.</span></p>
+</div>
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli3_z1EN4mppp7integerIXL1EEEEv">
+<span id="_CPPv3I_DpcEN4mppp8literalsli3_z1Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli3_z1Ev"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::integer&lt;1&gt; <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_z1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli3_z1EN4mppp7integerIXL1EEEEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli3_z2EN4mppp7integerIXL2EEEEv">
+<span id="_CPPv3I_DpcEN4mppp8literalsli3_z2Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli3_z2Ev"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::integer&lt;2&gt; <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_z2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli3_z2EN4mppp7integerIXL2EEEEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli3_z3EN4mppp7integerIXL3EEEEv">
+<span id="_CPPv3I_DpcEN4mppp8literalsli3_z3Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli3_z3Ev"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::integer&lt;3&gt; <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_z3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli3_z3EN4mppp7integerIXL3EEEEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>User-defined integer literals.</p>
+<p>These numeric literal operator templates can be used to construct
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::integer</span></code> instances with, respectively, 1, 2 and 3
+limbs of static storage. Literals in binary, octal, decimal and
+hexadecimal format are supported.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/integer_literal">https://en.cppreference.com/w/cpp/language/integer_literal</a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>std::invalid_argument</strong> – if the input sequence of charaters is not
+a valid integer literal (as defined by the C++ standard).</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

@@ -97,6 +97,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Integer tutorial</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#interacting-with-the-gmp-api">Interacting with the GMP API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#serialisation">Serialisation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user-defined-literals">User-defined literals</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
@@ -367,6 +368,41 @@ and it might be subject to changes in future versions of mp++. Users are thus ad
 the binary serialisation format for long-term persistence or as a data exchange format: for such
 purposes, it is better to use the string representation of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> objects.</p></li>
 </ul>
+</div>
+<div class="section" id="user-defined-literals">
+<h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.18.</span></p>
+</div>
+<p>User-defined literals are available to construct
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::integer</span></code> instances with 1, 2 and 3
+limbs of static storage. The <a class="reference internal" href="integer.html#integer-literals"><span class="std std-ref">literals</span></a>
+are defined within
+the inline namespace <code class="docutils literal notranslate"><span class="pre">mppp::literals</span></code>, and, like the builtin
+C++ integer literals, they support
+binary, octal, decimal and hexadecimal representations:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">mppp</span><span class="o">::</span><span class="n">literals</span><span class="p">;</span>
+
+<span class="k">auto</span> <span class="n">n1</span> <span class="o">=</span> <span class="mi">123</span><span class="n">_z1</span><span class="p">;</span>      <span class="c1">// n1 has 1 limb of static storage,</span>
+                       <span class="c1">// and it contains the value 123.</span>
+
+<span class="k">auto</span> <span class="n">n2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">0</span><span class="n">b10011_z2</span><span class="p">;</span> <span class="c1">// n2 has 2 limbs of static storage,</span>
+                       <span class="c1">// and it contains the value -19</span>
+                       <span class="c1">// (-10011 in base 2).</span>
+
+<span class="k">auto</span> <span class="n">n3</span> <span class="o">=</span> <span class="mo">0146</span><span class="n">_z1</span><span class="p">;</span>     <span class="c1">// n3 has 1 limb of static storage,</span>
+                       <span class="c1">// and it contains the value 102</span>
+                       <span class="c1">// (146 in base 8).</span>
+
+<span class="k">auto</span> <span class="n">n4</span> <span class="o">=</span> <span class="mh">0xfe45</span><span class="n">_z3</span><span class="p">;</span>   <span class="c1">// n4 has 3 limbs of static storage,</span>
+                       <span class="c1">// and it contains the value 65093</span>
+                       <span class="c1">// (fe45 in base 16).</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/integer_literal">https://en.cppreference.com/w/cpp/language/integer_literal</a></p>
+</div>
 </div>
 </div>
 
