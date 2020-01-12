@@ -164,6 +164,61 @@ Arithmetic
 .. doxygengroup:: integer_arithmetic
    :content-only:
 
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::sqr(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n)
+
+   .. versionadded:: 0.18
+
+   Binary :cpp:class:`~mppp::integer` squaring.
+
+   This function will set *rop* to the square of *n*.
+
+   :param rop: the return value.
+   :param n: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::sqr(const mppp::integer<SSize> &n)
+
+   .. versionadded:: 0.18
+
+   Unary :cpp:class:`~mppp::integer` squaring.
+
+   This function will return the square of *n*.
+
+   :param n: the argument.
+
+   :return: the square of *n*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::sqrm(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n, const mppp::integer<SSize> &mod)
+
+   .. versionadded:: 0.18
+
+   Ternary modular :cpp:class:`~mppp::integer` squaring.
+
+   This function will set *rop* to the square of *n* modulo *mod*.
+
+   :param rop: the return value.
+   :param n: the argument.
+   :param mod: the modulus.
+
+   :return: a reference to *rop*.
+
+   :exception mppp\:\:zero_division_error: if *mod* is zero.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::sqrm(const mppp::integer<SSize> &n, const mppp::integer<SSize> &mod)
+
+   .. versionadded:: 0.18
+
+   Binary modular :cpp:class:`~mppp::integer` squaring.
+
+   This function will return the square of *n* modulo *mod*.
+
+   :param n: the argument.
+   :param mod: the modulus.
+
+   :return: the square of *n* modulo *mod*.
+   :exception mppp\:\:zero_division_error: if *mod* is zero.
+
 .. _integer_division:
 
 Division
