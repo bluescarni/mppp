@@ -980,6 +980,18 @@ becomes invalid);</p></li>
 </dd></dl>
 
 <dl class="function">
+<dt id="_CPPv4N4mppp7integer3sqrEv">
+<span id="_CPPv3N4mppp7integer3sqrEv"></span><span id="_CPPv2N4mppp7integer3sqrEv"></span><span id="mppp::integer::sqr"></span><span class="target" id="classmppp_1_1integer_1a65a90400bad532b82fe9e425318e8acf"></span>integer &amp;<code class="sig-name descname">sqr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer3sqrEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Integer squaring (in-place version). </p>
+<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its square.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv4NK4mppp7integer5odd_pEv">
 <span id="_CPPv3NK4mppp7integer5odd_pEv"></span><span id="_CPPv2NK4mppp7integer5odd_pEv"></span><span id="mppp::integer::odd_pC"></span><span class="target" id="classmppp_1_1integer_1a51b6881e263188db55a3931cbb9f25fe"></span>bool <code class="sig-name descname">odd_p</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7integer5odd_pEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test if value is odd. </p>
@@ -1831,6 +1843,94 @@ if <code class="docutils literal notranslate"><span class="pre">op2</span></code
 </dd>
 </dl>
 </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp3sqrERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppp3sqrERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3sqrERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3sqrERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqr::SSize">SSize</a>&gt; &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">sqr</code><span class="sig-paren">(</span>mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3sqrERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqr::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3sqrERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqr::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3sqrERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.18.</span></p>
+</div>
+<p>Binary <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> squaring.</p>
+<p>This function will set <em>rop</em> to the square of <em>n</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rop</strong> – the return value.</p></li>
+<li><p><strong>n</strong> – the argument.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a reference to <em>rop</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp3sqrEN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppp3sqrERKN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3sqrERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3sqrERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqr::SSize">SSize</a>&gt; <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">sqr</code><span class="sig-paren">(</span><em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3sqrERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqr::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3sqrEN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.18.</span></p>
+</div>
+<p>Unary <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> squaring.</p>
+<p>This function will return the square of <em>n</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> – the argument.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the square of <em>n</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrm::SSize">SSize</a>&gt; &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">sqrm</code><span class="sig-paren">(</span>mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrm::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrm::SSize">SSize</a>&gt; &amp;<em>n</em>, <em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrm::SSize">SSize</a>&gt; &amp;<em>mod</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.18.</span></p>
+</div>
+<p>Ternary modular <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> squaring.</p>
+<p>This function will set <em>rop</em> to the square of <em>n</em> modulo <em>mod</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rop</strong> – the return value.</p></li>
+<li><p><strong>n</strong> – the argument.</p></li>
+<li><p><strong>mod</strong> – the modulus.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a reference to <em>rop</em>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><strong>mppp::zero_division_error</strong></a> – if <em>mod</em> is zero.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_NSt6size_tEEN4mppp4sqrmEN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_NSt6size_tEEN4mppp4sqrmERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp4sqrmERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrm::SSize">SSize</a>&gt; <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">sqrm</code><span class="sig-paren">(</span><em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrm::SSize">SSize</a>&gt; &amp;<em>n</em>, <em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp4sqrmERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="mppp::sqrm::SSize">SSize</a>&gt; &amp;<em>mod</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp4sqrmEN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.18.</span></p>
+</div>
+<p>Binary modular <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> squaring.</p>
+<p>This function will return the square of <em>n</em> modulo <em>mod</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – the argument.</p></li>
+<li><p><strong>mod</strong> – the modulus.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the square of <em>n</em> modulo <em>mod</em>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><strong>mppp::zero_division_error</strong></a> – if <em>mod</em> is zero.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -3438,7 +3538,7 @@ hexadecimal format are supported.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Throws</dt>
-<dd class="field-odd"><p><strong>std::invalid_argument</strong> – if the input sequence of charaters is not
+<dd class="field-odd"><p><strong>std::invalid_argument</strong> – if the input sequence of characters is not
 a valid integer literal (as defined by the C++ standard).</p>
 </dd>
 </dl>
