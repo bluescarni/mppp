@@ -16,9 +16,8 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
-#include <iostream>
 #include <limits>
-#include <sstream>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -31,9 +30,9 @@
 
 #include <mp++/concepts.hpp>
 #include <mp++/detail/gmp.hpp>
-#include <mp++/detail/quadmath.hpp>
 #include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
+#include <mp++/detail/visibility.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
@@ -45,6 +44,51 @@ class real128;
 
 namespace detail
 {
+
+// Machinery for low-level manipulation of __float128. Inspired by:
+// https://github.com/gcc-mirror/gcc/blob/master/libquadmath/quadmath-imp.h
+// Note that the union machinery is technically UB, but well-defined on GCC as
+// an extension:
+// https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html#Type%2Dpunning
+// quadmath so far is limited to GCC and perhaps clang, which I'd imagine
+// implements the same extension for GCC compatibility. So we should be ok.
+
+// The ieee fields.
+struct ieee_t {
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    std::uint_least8_t negative : 1;
+    std::uint_least16_t exponent : 15;
+    std::uint_least64_t mant_high : 48;
+    std::uint_least64_t mant_low : 64;
+#else
+    std::uint_least64_t mant_low : 64;
+    std::uint_least64_t mant_high : 48;
+    std::uint_least16_t exponent : 15;
+    std::uint_least8_t negative : 1;
+#endif
+}
+#if defined(__MINGW32__)
+// On mingw targets the ms-bitfields option is active by default.
+// Therefore enforce gnu-bitfield style.
+__attribute__((gcc_struct))
+#endif
+;
+
+// The union.
+union ieee_float128 {
+    __float128 value;
+    ieee_t i_eee;
+};
+
+// String conversion helpers.
+MPPP_DLL_PUBLIC void float128_stream(std::ostream &, const __float128 &);
+MPPP_DLL_PUBLIC __float128 str_to_float128(const char *);
+
+// Wrappers for use in various functions below (so that
+// we don't have to include quadmath.h here).
+MPPP_DLL_PUBLIC __float128 scalbnq(__float128, int);
+MPPP_DLL_PUBLIC __float128 scalblnq(__float128, long);
+MPPP_DLL_PUBLIC __float128 powq(__float128, __float128);
 
 // Story time!
 //
@@ -232,12 +276,10 @@ using real128_op_types_enabler = detail::enable_if_t<
  *    https://gcc.gnu.org/onlinedocs/libquadmath/
  * \endrststar
  */
-class real128
+class MPPP_DLL_PUBLIC real128
 {
     // Number of digits in the significand.
     static constexpr unsigned sig_digits = 113;
-    // Double check our assumption.
-    static_assert(FLT128_MANT_DIG == sig_digits, "Invalid number of digits.");
 
 public:
     /// Default constructor.
@@ -308,7 +350,7 @@ private:
             const unsigned rbits = detail::c_min(unsigned(GMP_NUMB_BITS), sig_digits - read_bits);
             // Shift m_value by rbits.
             // NOTE: safe to cast to int here, as rbits is not greater than GMP_NUMB_BITS which in turn fits in int.
-            m_value = ::scalbnq(m_value, static_cast<int>(rbits));
+            m_value = detail::scalbnq(m_value, static_cast<int>(rbits));
             // Add the bottom part, and move to the next limb. We might need to remove lower bits
             // in case rbits is not exactly GMP_NUMB_BITS.
             m_value += (ptr[--ls] & GMP_NUMB_MASK) >> (unsigned(GMP_NUMB_BITS) - rbits);
@@ -321,7 +363,7 @@ private:
             // We did not read from n all its bits. This means that n has more bits than the quad-precision
             // significand, and thus we need to multiply this by 2**unread_bits.
             // Use the long variant of scalbn() to maximise the range.
-            m_value = ::scalblnq(m_value, detail::safe_cast<long>(n_bits - read_bits));
+            m_value = detail::scalblnq(m_value, detail::safe_cast<long>(n_bits - read_bits));
         }
         // Fix the sign as needed.
         if (n_sgn == -1) {
@@ -344,14 +386,14 @@ private:
             const auto shift = n_bits - sig_digits;
             tdiv_q_2exp(n, q.get_num(), detail::safe_cast<::mp_bitcnt_t>(shift));
             m_value = real128{n}.m_value / real128{q.get_den()}.m_value;
-            m_value = ::scalblnq(m_value, detail::safe_cast<long>(shift));
+            m_value = detail::scalblnq(m_value, detail::safe_cast<long>(shift));
         } else if (n_bits <= sig_digits && d_bits > sig_digits) {
             // The opposite of above.
             MPPP_MAYBE_TLS integer<SSize> d;
             const auto shift = d_bits - sig_digits;
             tdiv_q_2exp(d, q.get_den(), detail::safe_cast<::mp_bitcnt_t>(shift));
             m_value = real128{q.get_num()}.m_value / real128{d}.m_value;
-            m_value = ::scalblnq(m_value, detail::negate_unsigned<long>(shift));
+            m_value = detail::scalblnq(m_value, detail::negate_unsigned<long>(shift));
         } else {
             // Both num and den have more bits than quad's significand. We will downshift
             // both until they have 113 bits, do the division, and then recover the shifted bits.
@@ -363,9 +405,9 @@ private:
             tdiv_q_2exp(d, q.get_den(), detail::safe_cast<::mp_bitcnt_t>(d_shift));
             m_value = real128{n}.m_value / real128{d}.m_value;
             if (n_shift >= d_shift) {
-                m_value = ::scalblnq(m_value, detail::safe_cast<long>(n_shift - d_shift));
+                m_value = detail::scalblnq(m_value, detail::safe_cast<long>(n_shift - d_shift));
             } else {
-                m_value = ::scalblnq(m_value, detail::negate_unsigned<long>(d_shift - n_shift));
+                m_value = detail::scalblnq(m_value, detail::negate_unsigned<long>(d_shift - n_shift));
             }
         }
     }
@@ -429,27 +471,8 @@ public:
         : real128(ptag{}, s)
     {
     }
-    /// Constructor from range of characters.
-    /**
-     * This constructor will initialise \p this from the content of the input half-open range, which is interpreted
-     * as the string representation of a floating-point value.
-     *
-     * Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and
-     * invoke the constructor from string.
-     *
-     * @param begin the begin of the input range.
-     * @param end the end of the input range.
-     *
-     * @throws unspecified any exception thrown by the constructor from string or by memory errors in standard
-     * containers.
-     */
-    explicit real128(const char *begin, const char *end)
-    {
-        MPPP_MAYBE_TLS std::vector<char> buffer;
-        buffer.assign(begin, end);
-        buffer.emplace_back('\0');
-        m_value = detail::str_to_float128(buffer.data());
-    }
+    // Constructor from range of characters.
+    explicit real128(const char *, const char *);
     /// Trivial copy assignment operator.
     /**
      * @param other the assignment argument.
@@ -785,29 +808,8 @@ public:
     {
         return mppp_conversion(rop);
     }
-    /// Convert to string.
-    /**
-     * \rststar
-     * This method will convert ``this`` to a decimal string representation in scientific format.
-     * The number of significant digits in the output (36) guarantees that a :cpp:class:`~mppp::real128`
-     * constructed from the returned string will have a value identical to the value of ``this``.
-     *
-     * The implementation uses the ``quadmath_snprintf()`` function from the quadmath library.
-     *
-     * .. seealso::
-     *    https://gcc.gnu.org/onlinedocs/libquadmath/quadmath_005fsnprintf.html
-     * \endrststar
-     *
-     * @return a decimal string representation of ``this``.
-     *
-     * @throws std::runtime_error if the internal call to the ``quadmath_snprintf()`` function fails.
-     */
-    std::string to_string() const
-    {
-        std::ostringstream oss;
-        detail::float128_stream(oss, m_value);
-        return oss.str();
-    }
+    // Convert to string.
+    std::string to_string() const;
     /// Get the IEEE representation of the value.
     /**
      * This method will return a tuple containing the IEEE quadruple-precision floating-point representation
@@ -832,18 +834,8 @@ public:
         return std::make_tuple(std::uint_least8_t(ie.i_eee.negative), std::uint_least16_t(ie.i_eee.exponent),
                                std::uint_least64_t(ie.i_eee.mant_high), std::uint_least64_t(ie.i_eee.mant_low));
     }
-    /// Sign bit.
-    /**
-     * This method will return the value of the sign bit of \p this. That is, if \p this
-     * is not a NaN the method will return \p true if \p this is negative, \p false otherwise.
-     * If \p this is NaN, the sign bit of the NaN value will be returned.
-     *
-     * @return \p true if the sign bit of \p this is set, \p false otherwise.
-     */
-    bool signbit() const
-    {
-        return ::signbitq(m_value);
-    }
+    // Sign bit.
+    bool signbit() const;
     /// Categorise the floating point value.
     /**
      * This method will categorise the floating-point value of \p this into the 5 categories,
@@ -917,207 +909,46 @@ public:
         // NOTE: for NaN, don't do anything and leave the NaN.
         return *this;
     }
-    /// In-place square root.
-    /**
-     * This method will set \p this to its nonnegative square root.
-     * If \p this is less than negative zero, the result will be NaN.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &sqrt()
-    {
-        return *this = ::sqrtq(m_value);
-    }
-    /// In-place cube root.
-    /**
-     * This method will set \p this to its real cube root.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &cbrt()
-    {
-        return *this = ::cbrtq(m_value);
-    }
-    /// In-place sine.
-    /**
-     * This method will set \p this to its sine.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &sin()
-    {
-        return *this = ::sinq(m_value);
-    }
-    /// In-place cosine.
-    /**
-     * This method will set \p this to its cosine.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &cos()
-    {
-        return *this = ::cosq(m_value);
-    }
-    /// In-place tangent.
-    /**
-     * This method will set \p this to its trigonometric tangent.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &tan()
-    {
-        return *this = ::tanq(m_value);
-    }
-    /// In-place inverse sine.
-    /**
-     * This method will set \p this to its inverse sine.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &asin()
-    {
-        return *this = ::asinq(m_value);
-    }
-    /// In-place inverse cosine.
-    /**
-     * This method will set \p this to its inverse cosine.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &acos()
-    {
-        return *this = ::acosq(m_value);
-    }
-    /// In-place inverse tangent.
-    /**
-     * This method will set \p this to its inverse trigonomotric tangent.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &atan()
-    {
-        return *this = ::atanq(m_value);
-    }
-    /// In-place hyperbolic sine.
-    /**
-     * This method will set \p this to its hyperbolic sine.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &sinh()
-    {
-        return *this = ::sinhq(m_value);
-    }
-    /// In-place hyperbolic cosine.
-    /**
-     * This method will set \p this to its hyperbolic cosine.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &cosh()
-    {
-        return *this = ::coshq(m_value);
-    }
-    /// In-place hyperbolic tangent.
-    /**
-     * This method will set \p this to its hyperbolic tangent.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &tanh()
-    {
-        return *this = ::tanhq(m_value);
-    }
-    /// In-place inverse hyperbolic sine.
-    /**
-     * This method will set \p this to its inverse hyperbolic sine.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &asinh()
-    {
-        return *this = ::asinhq(m_value);
-    }
-    /// In-place inverse hyperbolic cosine.
-    /**
-     * This method will set \p this to its inverse hyperbolic cosine.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &acosh()
-    {
-        return *this = ::acoshq(m_value);
-    }
-    /// In-place inverse hyperbolic tangent.
-    /**
-     * This method will set \p this to its inverse hyperbolic tangent.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &atanh()
-    {
-        return *this = ::atanhq(m_value);
-    }
-    /// In-place natural exponential function.
-    /**
-     * This method will set \p this to \f$ \mathrm{e} \f$ raised to the power of \p this.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &exp()
-    {
-        return *this = ::expq(m_value);
-    }
-    /// In-place natural logarithm.
-    /**
-     * This method will set \p this to its natural logarithm.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &log()
-    {
-        return *this = ::logq(m_value);
-    }
-    /// In-place base-10 logarithm.
-    /**
-     * This method will set \p this to its base-10 logarithm.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &log10()
-    {
-        return *this = ::log10q(m_value);
-    }
-    /// In-place base-2 logarithm.
-    /**
-     * This method will set \p this to its base-2 logarithm.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &log2()
-    {
-        return *this = ::log2q(m_value);
-    }
-    /// In-place lgamma function
-    /**
-     * This method will set \p this to the value of the natural logarithm of its gamma function.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &lgamma()
-    {
-        return *this = ::lgammaq(m_value);
-    }
-    /// In-place error function.
-    /**
-     * This method will set \p this to the value of its error function.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &erf()
-    {
-        return *this = ::erfq(m_value);
-    }
+    // In-place square root.
+    real128 &sqrt();
+    // In-place cube root.
+    real128 &cbrt();
+    // In-place sine.
+    real128 &sin();
+    // In-place cosine.
+    real128 &cos();
+    // In-place tangent.
+    real128 &tan();
+    // In-place inverse sine.
+    real128 &asin();
+    // In-place inverse cosine.
+    real128 &acos();
+    // In-place inverse tangent.
+    real128 &atan();
+    // In-place hyperbolic sine.
+    real128 &sinh();
+    // In-place hyperbolic cosine.
+    real128 &cosh();
+    // In-place hyperbolic tangent.
+    real128 &tanh();
+    // In-place inverse hyperbolic sine.
+    real128 &asinh();
+    // In-place inverse hyperbolic cosine.
+    real128 &acosh();
+    // In-place inverse hyperbolic tangent.
+    real128 &atanh();
+    // In-place natural exponential function.
+    real128 &exp();
+    // In-place natural logarithm.
+    real128 &log();
+    // In-place base-10 logarithm.
+    real128 &log10();
+    // In-place base-2 logarithm.
+    real128 &log2();
+    // In-place lgamma function.
+    real128 &lgamma();
+    // In-place error function.
+    real128 &erf();
     /// The internal value.
     /**
      * \rststar
@@ -1193,25 +1024,8 @@ inline bool get(T &rop, const real128 &x)
     return x.get(rop);
 }
 
-/// Decompose a \link mppp::real128 real128\endlink into a normalized fraction and an integral power of two.
-/**
- * \rststar
- * If ``x`` is zero, this function will return zero and store zero in ``exp``. Otherwise,
- * this function will return a :cpp:class:`~mppp::real128` :math:`r` with an absolute value in the
- * :math:`\left[0.5,1\right)` range, and it will store an integer value :math:`n` in ``exp``
- * such that :math:`r \times 2^n` equals to :math:`r`. If ``x`` is a non-finite value, the return
- * value will be ``x`` and an unspecified value will be stored in ``exp``.
- * \endrststar
- *
- * @param x the input \link mppp::real128 real128\endlink.
- * @param exp a pointer to the value that will store the exponent.
- *
- * @return the binary significand of ``x``.
- */
-inline real128 frexp(const real128 &x, int *exp)
-{
-    return real128{::frexpq(x.m_value, exp)};
-}
+// Decompose into a normalized fraction and an integral power of two.
+MPPP_DLL_PUBLIC real128 frexp(const real128 &, int *);
 
 /** @} */
 
@@ -1219,23 +1033,8 @@ inline real128 frexp(const real128 &x, int *exp)
  *  @{
  */
 
-/// Fused multiply-add.
-/**
- * \rststar
- * This function will return :math:`\left(x \times y\right) + z` as if calculated to infinite precision and
- * rounded once.
- * \endrststar
- *
- * @param x the first factor.
- * @param y the second factor.
- * @param z the addend.
- *
- * @return \f$ \left(x \times y\right) + z \f$.
- */
-inline real128 fma(const real128 &x, const real128 &y, const real128 &z)
-{
-    return real128{::fmaq(x.m_value, y.m_value, z.m_value)};
-}
+// Fused multiply-add.
+MPPP_DLL_PUBLIC real128 fma(const real128 &, const real128 &, const real128 &);
 
 /// Unary absolute value.
 /**
@@ -1261,7 +1060,7 @@ constexpr real128 abs(const real128 &x)
  */
 inline real128 scalbn(const real128 &x, int n)
 {
-    return real128{::scalbnq(x.m_value, n)};
+    return real128{detail::scalbnq(x.m_value, n)};
 }
 
 /// Multiply by power of 2 (\p long overload).
@@ -1273,7 +1072,7 @@ inline real128 scalbn(const real128 &x, int n)
  */
 inline real128 scalbln(const real128 &x, long n)
 {
-    return real128{::scalblnq(x.m_value, n)};
+    return real128{detail::scalblnq(x.m_value, n)};
 }
 
 /** @} */
@@ -1458,20 +1257,8 @@ inline real128 cbrt(real128 x)
     return x.cbrt();
 }
 
-/// Euclidean distance.
-/**
- * The calculation is performed without undue overflow or underflow during the intermediate
- * steps of the calculation.
- *
- * @param x the first \link mppp::real128 real128\endlink argument.
- * @param y the second \link mppp::real128 real128\endlink argument.
- *
- * @return the euclidean distance \f$ \sqrt{x^2+y^2} \f$.
- */
-inline real128 hypot(const real128 &x, const real128 &y)
-{
-    return real128{::hypotq(x.m_value, y.m_value)};
-}
+// Euclidean distance.
+MPPP_DLL_PUBLIC real128 hypot(const real128 &, const real128 &);
 
 /** @} */
 
@@ -1484,19 +1271,19 @@ namespace detail
 
 inline real128 dispatch_pow(const real128 &x, const real128 &y)
 {
-    return real128{::powq(x.m_value, y.m_value)};
+    return real128{detail::powq(x.m_value, y.m_value)};
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_pow(const real128 &x, const T &y)
 {
-    return real128{::powq(x.m_value, y)};
+    return real128{detail::powq(x.m_value, y)};
 }
 
 template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_pow(const T &x, const real128 &y)
 {
-    return real128{::powq(x, y.m_value)};
+    return real128{detail::powq(x, y.m_value)};
 }
 
 template <typename T, enable_if_t<is_real128_mppp_interoperable<T>::value, int> = 0>
@@ -1767,10 +1554,7 @@ inline real128 erf(real128 x)
 /** @} */
 
 // Next real128 from 'from' to 'to'.
-inline real128 nextafter(const real128 &from, const real128 &to)
-{
-    return real128{::nextafterq(from.m_value, to.m_value)};
-}
+MPPP_DLL_PUBLIC real128 nextafter(const real128 &, const real128 &);
 
 /** @defgroup real128_operators real128_operators
  *  @{

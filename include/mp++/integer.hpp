@@ -9328,4 +9328,6 @@ struct hash<mppp::integer<SSize>> {
 
 #endif
 
+#include <mp++/detail/integer_literals.hpp>
+
 #endif

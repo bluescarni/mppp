@@ -7,6 +7,8 @@ Changelog
 New
 ~~~
 
+- Implement user-defined literals for :cpp:class:`~mppp::integer`
+  (`#209 <https://github.com/bluescarni/mppp/pull/209>`__).
 - Include mp++'s headers in the project files generated
   for MSVC (`#199 <https://github.com/bluescarni/mppp/pull/199>`__).
   Many thanks to `7ofNine <https://github.com/7ofNine>`__!
@@ -14,8 +16,14 @@ New
 Changes
 ~~~~~~~
 
+- mp++'s public headers do not include
+  the ``quadmath.h`` header any more. This change greatly
+  improves mp++'s compatibility with clang when the
+  ``MPPP_WITH_QUADMATH`` option is active
+  (`#206 <https://github.com/bluescarni/mppp/pull/206>`__).
 - Continue moving code into the compiled library
-  (`#204 <https://github.com/bluescarni/mppp/pull/204>`__).
+  (`#204 <https://github.com/bluescarni/mppp/pull/204>`__,
+  `#206 <https://github.com/bluescarni/mppp/pull/206>`__).
 - Enable the C++20 concept declaration syntax if GCC >= 9 is
   being used
   (`#203 <https://github.com/bluescarni/mppp/pull/203>`__).

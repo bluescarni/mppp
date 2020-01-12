@@ -199,7 +199,7 @@ set(MPPP_SRC_FILES
 )
 
 if(MPPP_WITH_QUADMATH)
-    set(MPPP_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/detail/quadmath.cpp" "${MPPP_SRC_FILES}")
+    set(MPPP_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/real128.cpp" "${MPPP_SRC_FILES}")
 endif()
 
 if(MPPP_WITH_MPFR)
@@ -221,16 +221,15 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/type_name.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/fwd_decl.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/gmp.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/integer_literals.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/mpfr.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/quadmath.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/type_traits.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/utils.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/visibility.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/extra/pybind11.hpp"
-)
-
-  SOURCE_GROUP(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" PREFIX "Header Files" FILES ${MPPP_HEADER_FILES})
-  SET(MPPP_SRC_FILES ${MPPP_SRC_FILES} ${MPPP_HEADER_FILES})
+  )
+  source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++" PREFIX "Header Files" FILES ${MPPP_HEADER_FILES})
+  set(MPPP_SRC_FILES ${MPPP_SRC_FILES} ${MPPP_HEADER_FILES})
 endif()
 
 if(MPPP_BUILD_STATIC_LIBRARY)
@@ -292,8 +291,12 @@ if(MPPP_WITH_QUADMATH)
         message(FATAL_ERROR "The 'MPPP_WITH_QUADMATH' option was enabled but the '__float128' type does not exist.")
     endif()
     unset(_MPPP_FLOAT128_EXISTS)
-    find_package(Quadmath REQUIRED)
-    target_link_libraries(mp++ PUBLIC Quadmath::quadmath)
+    find_package(Quadmath REQUIRED COMPONENTS libquadmath header)
+    target_link_libraries(mp++ PUBLIC Quadmath::libquadmath)
+    # NOTE: the quadmath.h header is used only in the
+    # compilation of the library, it does not need to be
+    # included by the users of mp++.
+    target_link_libraries(mp++ PRIVATE Quadmath::header)
     set(MPPP_ENABLE_QUADMATH "#define MPPP_WITH_QUADMATH")
 endif()
 
@@ -327,7 +330,7 @@ if(MPPP_WITH_MPFR)
     set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(MPFR REQUIRED)\n")
 endif()
 if(MPPP_WITH_QUADMATH)
-    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(Quadmath REQUIRED)\n")
+    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(Quadmath REQUIRED COMPONENTS libquadmath)\n")
 endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
@@ -336,8 +339,13 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake" "${CMAKE_CURRENT
 install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 # Take care of versioning.
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" VERSION ${mp++_VERSION}
-	COMPATIBILITY SameMajorVersion)
+# NOTE: SameMinorVersion available only
+# since CMake 3.11.
+if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
+    write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" COMPATIBILITY SameMajorVersion)
+else()
+    write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" COMPATIBILITY SameMinorVersion)
+endif()
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config-version.cmake" DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 
 # This is just a simple counter variable, internal use only.
