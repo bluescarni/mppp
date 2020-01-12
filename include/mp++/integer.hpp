@@ -4915,7 +4915,7 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
 
     // Fetch the asize of the mod argument.
     const auto mod_asize = static_cast<std::size_t>(std::abs(mod._mp_size));
-    assert(mod_asize > 0u);
+    assert(mod_asize != 0u);
 
     // Temporary storage for mpn_sqr(). The largest possible
     // size needed is twice the static size.
@@ -4975,7 +4975,103 @@ inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op
     copy_limbs_no(r_res.data(), r_res.data() + ret_size, rop.m_limbs.data());
 }
 
+#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+
+inline ::mp_limb_t static_sqrm_impl_1(::mp_limb_t op, ::mp_limb_t mod)
+{
+    using dlimb_t = __uint128_t;
+    return static_cast<::mp_limb_t>((dlimb_t(op) * op) % mod);
+}
+
+#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
+
+inline ::mp_limb_t static_sqrm_impl_1(::mp_limb_t op, ::mp_limb_t mod)
+{
+    using dlimb_t = std::uint_least64_t;
+    return static_cast<::mp_limb_t>((dlimb_t(op) * op) % mod);
+}
+
+#endif
+
+// 1-limb optimization via dlimb.
+// NOTE: this assumes that mod is not zero.
+template <std::size_t SSize>
+inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op, const static_int<SSize> &mod,
+                             const std::integral_constant<int, 1> &)
+{
+    assert(mod._mp_size != 0);
+
+    // NOTE: no need for masking, as
+    // we are sure that there are no nails if
+    // this overload is selected.
+    const auto ret = static_sqrm_impl_1(op.m_limbs[0], mod.m_limbs[0]);
+
+    rop._mp_size = static_cast<mpz_size_t>(ret != 0u);
+    rop.m_limbs[0] = ret;
+}
+
+template <std::size_t SSize>
+inline void static_sqrm(static_int<SSize> &rop, const static_int<SSize> &op, const static_int<SSize> &mod)
+{
+    static_sqrm_impl(rop, op, mod, integer_static_sqrm_algo<static_int<SSize>>{});
+
+    if (integer_static_sqrm_algo<static_int<SSize>>::value == 0) {
+        // If we used the mpn functions, zero the unused limbs on top (if necessary).
+        // NOTE: as elsewhere, if we don't have double-limb primitives
+        // available, we may end up using mpn functions also for
+        // small sizes.
+        rop.zero_unused_limbs();
+    }
+}
+
 } // namespace detail
+
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
+// Ternary modular squaring.
+template <std::size_t SSize>
+inline integer<SSize> &sqrm(integer<SSize> &rop, const integer<SSize> &op, const integer<SSize> &mod)
+{
+    if (mppp_unlikely(mod.sgn() == 0)) {
+        throw zero_division_error("Integer division by zero");
+    }
+
+    const bool sr = rop.is_static(), so = op.is_static(), sm = mod.is_static();
+
+    if (mppp_likely(so && sm)) {
+        if (!sr) {
+            rop.set_zero();
+        }
+
+        detail::static_sqrm(rop._get_union().g_st(), op._get_union().g_st(), mod._get_union().g_st());
+
+        // Modular squaring can never fail.
+        return rop;
+    }
+
+    if (sr) {
+        rop._get_union().promote();
+    }
+
+    // NOTE: use temp storage to avoid issues with overlapping
+    // arguments.
+    MPPP_MAYBE_TLS detail::mpz_raii tmp;
+    ::mpz_mul(&tmp.m_mpz, op.get_mpz_view(), op.get_mpz_view());
+    ::mpz_tdiv_r(&rop._get_union().g_dy(), &tmp.m_mpz, mod.get_mpz_view());
+
+    return rop;
+}
+
+// Binary modular squaring.
+template <std::size_t SSize>
+inline integer<SSize> sqrm(const integer<SSize> &op, const integer<SSize> &mod)
+{
+    integer<SSize> retval;
+    sqrm(retval, op, mod);
+    return retval;
+}
+
+#endif
 
 /// Binary negation.
 /**
