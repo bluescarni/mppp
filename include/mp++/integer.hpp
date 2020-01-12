@@ -4889,14 +4889,14 @@ using integer_have_dlimb_div = std::integral_constant<bool,
                                                       >;
 
 // Selection of the algorithm for static modular squaring:
-// - for 1/2 limbs, we need both the double-limb multiplication AND
+// - for 1 limb, we need both the double-limb multiplication AND
 //   division/remainder primitives,
 // - otherwise we just use the mpn functions.
+// NOTE: the integer_have_dlimb_mul and integer_have_dlimb_div machinery
+// already checks for lack of nail bits, bit sizes, etc.
 template <typename SInt>
 using integer_static_sqrm_algo = std::integral_constant<
-    int, (SInt::s_size == 1 && integer_have_dlimb_mul::value && integer_have_dlimb_div::value)
-             ? 1
-             : ((SInt::s_size == 2 && integer_have_dlimb_mul::value && integer_have_dlimb_div::value) ? 2 : 0)>;
+    int, (SInt::s_size == 1 && integer_have_dlimb_mul::value && integer_have_dlimb_div::value) ? 1 : 0>;
 
 // mpn implementation.
 // NOTE: this assumes that mod is not zero.
@@ -5164,26 +5164,14 @@ inline void dlimb_tdiv_qr_impl(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t o
 
 // Quotient only.
 template <typename DLimb, int NBits>
-inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                         ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
+inline void dlimb_tdiv_q_impl(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                              ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
     const auto op1 = op11 + (DLimb(op12) << NBits);
     const auto op2 = op21 + (DLimb(op22) << NBits);
     const auto q = op1 / op2;
     *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
     *q2 = static_cast<::mp_limb_t>(q >> NBits);
-}
-
-// Remainder only.
-template <typename DLimb, int NBits>
-inline void dlimb_tdiv_r(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
-                         ::mp_limb_t *MPPP_RESTRICT r1, ::mp_limb_t *MPPP_RESTRICT r2)
-{
-    const auto op1 = op11 + (DLimb(op12) << NBits);
-    const auto op2 = op21 + (DLimb(op22) << NBits);
-    const auto r = op1 % op2;
-    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
-    *r2 = static_cast<::mp_limb_t>(r >> NBits);
 }
 
 #if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
@@ -5198,7 +5186,7 @@ inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, 
 inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
-    dlimb_tdiv_q<__uint128_t, 64>(op11, op12, op21, op22, q1, q2);
+    dlimb_tdiv_q_impl<__uint128_t, 64>(op11, op12, op21, op22, q1, q2);
 }
 
 #elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
@@ -5213,7 +5201,7 @@ inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, 
 inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
-    dlimb_tdiv_q<std::uint_least64_t, 32>(op11, op12, op21, op22, q1, q2);
+    dlimb_tdiv_q_impl<std::uint_least64_t, 32>(op11, op12, op21, op22, q1, q2);
 }
 
 #endif
