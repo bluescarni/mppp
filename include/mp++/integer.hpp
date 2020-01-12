@@ -987,6 +987,9 @@ union integer_union {
 template <std::size_t SSize>
 integer<SSize> &sqrt(integer<SSize> &, const integer<SSize> &);
 
+template <std::size_t SSize>
+integer<SSize> &sqr(integer<SSize> &, const integer<SSize> &);
+
 namespace detail
 {
 
@@ -2379,8 +2382,17 @@ public:
      */
     integer &sqrt()
     {
-        mppp::sqrt(*this, *this);
-        return *this;
+        return mppp::sqrt(*this, *this);
+    }
+    /// Integer squaring (in-place version).
+    /**
+     * This method will set \p this to its square.
+     *
+     * @return a reference to \p this.
+     */
+    integer &sqr()
+    {
+        return mppp::sqr(*this, *this);
     }
     /// Test if value is odd.
     /**
@@ -4697,6 +4709,370 @@ inline integer<SSize> &mul_2exp(integer<SSize> &rop, const integer<SSize> &n, ::
     return rop;
 }
 
+namespace detail
+{
+
+// Selection of the algorithm for the
+// static squaring. We'll be using the
+// double-limb mul primitives if available.
+template <typename SInt>
+using integer_static_sqr_algo
+    = std::integral_constant<int, (SInt::s_size == 1 && integer_have_dlimb_mul::value)
+                                      ? 1
+                                      : ((SInt::s_size == 2 && integer_have_dlimb_mul::value) ? 2 : 0)>;
+
+// mpn implementation.
+// NOTE: this function (and the other overloads) returns 0 in case of success, otherwise it returns a hint
+// about the size in limbs of the result.
+template <std::size_t SSize>
+inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSize> &op,
+                                   const std::integral_constant<int, 0> &)
+{
+    const auto asize = static_cast<std::size_t>(std::abs(op._mp_size));
+
+    // Handle zero.
+    if (mppp_unlikely(asize == 0u)) {
+        rop._mp_size = 0;
+        return 0u;
+    }
+
+    // Temporary storage for mpn_sqr(). The largest possible
+    // size needed is twice the static size.
+    // NOTE: here we could add some logic, like in static_mul_impl(),
+    // to check whether we can write directly into rop instead
+    // of using this temporary storage. Need to profile first,
+    // however, because I am not sure whether this is worth
+    // it or not performance-wise.
+    std::array<::mp_limb_t, SSize * 2u> res;
+    const auto res_data = res.data();
+
+    // Run the mpn function.
+    ::mpn_sqr(res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
+
+    // Compute the actual size of the result: it could be asize * 2
+    // or 1 less, depending on whether the most significant limb of the
+    // result is zero.
+    const auto res_size = asize * 2u - static_cast<std::size_t>((res_data[asize * 2u - 1u] & GMP_NUMB_MASK) == 0u);
+    if (res_size > SSize) {
+        // Not enough space: return asize * 2, which is
+        // what mpz_mul() would like to allocate for the result.
+        return asize * 2u;
+    }
+
+    // Enough space, write out the result.
+    rop._mp_size = static_cast<mpz_size_t>(res_size);
+    copy_limbs_no(res_data, res_data + res_size, rop.m_limbs.data());
+
+    return 0u;
+}
+
+// 1-limb optimization via dlimb.
+template <std::size_t SSize>
+inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSize> &op,
+                                   const std::integral_constant<int, 1> &)
+{
+    ::mp_limb_t hi;
+    const ::mp_limb_t lo = dlimb_mul(op.m_limbs[0], op.m_limbs[0], &hi);
+    if (mppp_unlikely(hi)) {
+        return 2u;
+    }
+
+    // NOTE: if op is zero, the output size is zero,
+    // otherwise the output size is 1 (cannot be 2, handled
+    // above).
+    rop._mp_size = static_cast<mpz_size_t>(op._mp_size != 0);
+    rop.m_limbs[0] = lo;
+
+    return 0;
+}
+
+// 2-limb optimization via dlimb.
+template <std::size_t SSize>
+inline std::size_t static_sqr_impl(static_int<SSize> &rop, const static_int<SSize> &op,
+                                   const std::integral_constant<int, 2> &)
+{
+    const auto asize = std::abs(op._mp_size);
+
+    if (asize == 2) {
+        // If asize is 2, this function cannot succeed.
+        // Return 4 as a size hint. Real size could be 3, but GMP will require 4 limbs
+        // of storage to perform the operation anyway.
+        return 4u;
+    }
+
+    // NOTE: this handles zeroes as well: we know that the limbs are all zeroes in such
+    // a case (as we always guarantee unused limbs are zeroed).
+    rop.m_limbs[0] = dlimb_mul(op.m_limbs[0], op.m_limbs[0], &rop.m_limbs[1]);
+    // NOTE: if asize == 0, then rop's limbs will have been set
+    // to zero via dlimb_mul(), and rop's size will also thus be zero.
+    // Otherwise, rop's size is 1 or 2, depending on whether the top limb
+    // is set or not.
+    rop._mp_size = static_cast<mpz_size_t>(2 - (asize == 0) - (rop.m_limbs[1] == 0u));
+
+    return 0;
+}
+
+template <std::size_t SSize>
+inline std::size_t static_sqr(static_int<SSize> &rop, const static_int<SSize> &op)
+{
+    const std::size_t retval = static_sqr_impl(rop, op, integer_static_sqr_algo<static_int<SSize>>{});
+
+    if (integer_static_sqr_algo<static_int<SSize>>::value == 0 && retval == 0u) {
+        // If we used the mpn functions, and actually wrote into the result,
+        // zero the unused limbs on top (if necessary).
+        // NOTE: as elsewhere, if we don't have double-limb primitives
+        // available, we may end up using mpn functions also for
+        // small sizes.
+        rop.zero_unused_limbs();
+    }
+
+    return retval;
+}
+
+} // namespace detail
+
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
+// Binary squaring.
+template <std::size_t SSize>
+inline integer<SSize> &sqr(integer<SSize> &rop, const integer<SSize> &n)
+{
+    const bool sn = n.is_static();
+    bool sr = rop.is_static();
+    std::size_t size_hint = 0u;
+    if (mppp_likely(sn)) {
+        if (!sr) {
+            rop.set_zero();
+            sr = true;
+        }
+        size_hint = static_sqr(rop._get_union().g_st(), n._get_union().g_st());
+        if (mppp_likely(size_hint == 0u)) {
+            return rop;
+        }
+    }
+    if (sr) {
+        rop._get_union().promote(size_hint);
+    }
+    ::mpz_mul(&rop._get_union().g_dy(), n.get_mpz_view(), n.get_mpz_view());
+    return rop;
+}
+
+// Unary squaring.
+template <std::size_t SSize>
+inline integer<SSize> sqr(const integer<SSize> &n)
+{
+    integer<SSize> retval;
+    sqr(retval, n);
+    return retval;
+}
+
+#endif
+
+namespace detail
+{
+
+// Detect the presence of dual-limb division/remainder. This is currently possible only if:
+// - we are on a 32bit build (with the usual constraints that the types have exactly 32/64 bits and no nails),
+// - we are on a 64bit build and we have the 128bit int type available (plus usual constraints).
+// NOTE: starting from MSVC 2019, there are some 128bit division intrinsics
+// available:
+// https://docs.microsoft.com/en-us/cpp/intrinsics/udiv128
+using integer_have_dlimb_div = std::integral_constant<bool,
+#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64)
+                                                      !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
+#elif GMP_NUMB_BITS == 32
+                                                      !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
+                                                          && nl_digits<::mp_limb_t>() == 32
+#else
+                                                      false
+#endif
+                                                      >;
+
+// Selection of the algorithm for static modular squaring:
+// - for 1 limb, we need both the double-limb multiplication AND
+//   division/remainder primitives,
+// - otherwise we just use the mpn functions.
+// NOTE: the integer_have_dlimb_mul and integer_have_dlimb_div machinery
+// already checks for lack of nail bits, bit sizes, etc.
+template <typename SInt>
+using integer_static_sqrm_algo = std::integral_constant<
+    int, (SInt::s_size == 1 && integer_have_dlimb_mul::value && integer_have_dlimb_div::value) ? 1 : 0>;
+
+// mpn implementation.
+// NOTE: this assumes that mod is not zero.
+template <std::size_t SSize>
+inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op, const static_int<SSize> &mod,
+                             const std::integral_constant<int, 0> &)
+{
+    // Fetch the asize of the operand.
+    const auto asize = static_cast<std::size_t>(std::abs(op._mp_size));
+
+    // Handle zero operand.
+    if (mppp_unlikely(asize == 0u)) {
+        rop._mp_size = 0;
+        return;
+    }
+
+    // Fetch the asize of the mod argument.
+    const auto mod_asize = static_cast<std::size_t>(std::abs(mod._mp_size));
+    assert(mod_asize != 0u);
+
+    // Temporary storage for mpn_sqr(). The largest possible
+    // size needed is twice the static size.
+    std::array<::mp_limb_t, SSize * 2u> sqr_res;
+    const auto sqr_res_data = sqr_res.data();
+
+    // Run the squaring function.
+    ::mpn_sqr(sqr_res_data, op.m_limbs.data(), static_cast<::mp_size_t>(asize));
+    // Compute the actual size of the result of the squaring: it could be asize * 2
+    // or 1 less, depending on whether the most significant limb of the
+    // result is zero.
+    const auto sqr_res_asize
+        = asize * 2u - static_cast<std::size_t>((sqr_res_data[asize * 2u - 1u] & GMP_NUMB_MASK) == 0u);
+
+    if (mod_asize > sqr_res_asize) {
+        // The divisor is larger than the square of op.
+        // Copy the square of op to rop and exit.
+        rop._mp_size = static_cast<mpz_size_t>(sqr_res_asize);
+        copy_limbs_no(sqr_res_data, sqr_res_data + sqr_res_asize, rop.m_limbs.data());
+
+        return;
+    }
+
+    // Temporary storage for the modulo operation.
+    // Need space for both quotient and remainder.
+    std::array<::mp_limb_t, SSize * 2u> q_res, r_res;
+    // Run the modulo operation.
+    // NOTE: here we could add some logic, like in tdiv_qr(),
+    // to check whether we can write directly into rop instead
+    // of using this temporary storage. Need to profile first,
+    // however, because I am not sure whether this is worth
+    // it or not performance-wise.
+    // NOTE: ret_size will never be negative, as the
+    // dividend is a square and thus also never negative.
+    mpz_size_t ret_size;
+    if (mod_asize == 1u) {
+        // Optimization when the divisor has 1 limb.
+        r_res[0]
+            = ::mpn_divrem_1(q_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize), mod.m_limbs[0]);
+        // The size can be 1 or zero, depending on the value
+        // of the only limb in r_res.
+        ret_size = static_cast<mpz_size_t>((r_res[0] & GMP_NUMB_MASK) != 0u);
+    } else {
+        // The general case.
+        ::mpn_tdiv_qr(q_res.data(), r_res.data(), 0, sqr_res_data, static_cast<::mp_size_t>(sqr_res_asize),
+                      mod.m_limbs.data(), static_cast<::mp_size_t>(mod_asize));
+        // Determine the size of the output, which will
+        // be in the [0, mod_asize] range.
+        ret_size = static_cast<mpz_size_t>(mod_asize);
+        while (ret_size && !(r_res[static_cast<std::size_t>(ret_size - 1)] & GMP_NUMB_MASK)) {
+            --ret_size;
+        }
+    }
+
+    // Write out the result.
+    rop._mp_size = ret_size;
+    copy_limbs_no(r_res.data(), r_res.data() + ret_size, rop.m_limbs.data());
+}
+
+#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+
+inline ::mp_limb_t static_sqrm_impl_1(::mp_limb_t op, ::mp_limb_t mod)
+{
+    using dlimb_t = __uint128_t;
+    return static_cast<::mp_limb_t>((dlimb_t(op) * op) % mod);
+}
+
+#elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
+
+inline ::mp_limb_t static_sqrm_impl_1(::mp_limb_t op, ::mp_limb_t mod)
+{
+    using dlimb_t = std::uint_least64_t;
+    return static_cast<::mp_limb_t>((dlimb_t(op) * op) % mod);
+}
+
+#endif
+
+// 1-limb optimization via dlimb.
+// NOTE: this assumes that mod is not zero.
+template <std::size_t SSize>
+inline void static_sqrm_impl(static_int<SSize> &rop, const static_int<SSize> &op, const static_int<SSize> &mod,
+                             const std::integral_constant<int, 1> &)
+{
+    assert(mod._mp_size != 0);
+
+    // NOTE: no need for masking, as
+    // we are sure that there are no nails if
+    // this overload is selected.
+    const auto ret = static_sqrm_impl_1(op.m_limbs[0], mod.m_limbs[0]);
+
+    rop._mp_size = static_cast<mpz_size_t>(ret != 0u);
+    rop.m_limbs[0] = ret;
+}
+
+template <std::size_t SSize>
+inline void static_sqrm(static_int<SSize> &rop, const static_int<SSize> &op, const static_int<SSize> &mod)
+{
+    static_sqrm_impl(rop, op, mod, integer_static_sqrm_algo<static_int<SSize>>{});
+
+    if (integer_static_sqrm_algo<static_int<SSize>>::value == 0) {
+        // If we used the mpn functions, zero the unused limbs on top (if necessary).
+        // NOTE: as elsewhere, if we don't have double-limb primitives
+        // available, we may end up using mpn functions also for
+        // small sizes.
+        rop.zero_unused_limbs();
+    }
+}
+
+} // namespace detail
+
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
+// Ternary modular squaring.
+template <std::size_t SSize>
+inline integer<SSize> &sqrm(integer<SSize> &rop, const integer<SSize> &op, const integer<SSize> &mod)
+{
+    if (mppp_unlikely(mod.sgn() == 0)) {
+        throw zero_division_error("Integer division by zero");
+    }
+
+    const bool sr = rop.is_static(), so = op.is_static(), sm = mod.is_static();
+
+    if (mppp_likely(so && sm)) {
+        if (!sr) {
+            rop.set_zero();
+        }
+
+        detail::static_sqrm(rop._get_union().g_st(), op._get_union().g_st(), mod._get_union().g_st());
+
+        // Modular squaring can never fail.
+        return rop;
+    }
+
+    if (sr) {
+        rop._get_union().promote();
+    }
+
+    // NOTE: use temp storage to avoid issues with overlapping
+    // arguments.
+    MPPP_MAYBE_TLS detail::mpz_raii tmp;
+    ::mpz_mul(&tmp.m_mpz, op.get_mpz_view(), op.get_mpz_view());
+    ::mpz_tdiv_r(&rop._get_union().g_dy(), &tmp.m_mpz, mod.get_mpz_view());
+
+    return rop;
+}
+
+// Binary modular squaring.
+template <std::size_t SSize>
+inline integer<SSize> sqrm(const integer<SSize> &op, const integer<SSize> &mod)
+{
+    integer<SSize> retval;
+    sqrm(retval, op, mod);
+    return retval;
+}
+
+#endif
+
 /// Binary negation.
 /**
  * This method will set \p rop to <tt>-n</tt>.
@@ -4765,21 +5141,6 @@ inline integer<SSize> abs(const integer<SSize> &n)
 
 namespace detail
 {
-
-// Detect the presence of dual-limb division. This is currently possible only if:
-// - we are on a 32bit build (with the usual constraints that the types have exactly 32/64 bits and no nails),
-// - we are on a 64bit build and we have the 128bit int type available (plus usual constraints).
-// MSVC currently does not provide any primitive for 128bit division.
-using integer_have_dlimb_div = std::integral_constant<bool,
-#if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64)
-                                                      !GMP_NAIL_BITS && nl_digits<::mp_limb_t>() == 64
-#elif GMP_NUMB_BITS == 32
-                                                      !GMP_NAIL_BITS && nl_digits<std::uint_least64_t>() == 64
-                                                          && nl_digits<::mp_limb_t>() == 32
-#else
-                                                      false
-#endif
-                                                      >;
 
 // Selection of the algorithm for static division:
 // - for 1 limb, we can always do static division,
@@ -4876,31 +5237,52 @@ inline void static_tdiv_qr_impl(static_int<SSize> &q, static_int<SSize> &r, cons
     r.m_limbs[0] = r_;
 }
 
+// Implementation of the 2-limb division/remainder primitives,
+// parametrised on the double limb type and limb bit width.
+// These assume that there are no nail bits and that
+// the bit width of DLimb is exactly twice the bit
+// width of the limb type.
+
+// Quotient+remainder.
+template <typename DLimb, int NBits>
+inline void dlimb_tdiv_qr_impl(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                               ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2,
+                               ::mp_limb_t *MPPP_RESTRICT r1, ::mp_limb_t *MPPP_RESTRICT r2)
+{
+    const auto op1 = op11 + (DLimb(op12) << NBits);
+    const auto op2 = op21 + (DLimb(op22) << NBits);
+    const auto q = op1 / op2, r = op1 % op2;
+    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q2 = static_cast<::mp_limb_t>(q >> NBits);
+    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
+    *r2 = static_cast<::mp_limb_t>(r >> NBits);
+}
+
+// Quotient only.
+template <typename DLimb, int NBits>
+inline void dlimb_tdiv_q_impl(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
+                              ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
+{
+    const auto op1 = op11 + (DLimb(op12) << NBits);
+    const auto op2 = op21 + (DLimb(op22) << NBits);
+    const auto q = op1 / op2;
+    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
+    *q2 = static_cast<::mp_limb_t>(q >> NBits);
+}
+
 #if defined(MPPP_HAVE_GCC_INT128) && (GMP_NUMB_BITS == 64) && !GMP_NAIL_BITS
+
 inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                           ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
                           ::mp_limb_t *MPPP_RESTRICT r2)
 {
-    using dlimb_t = __uint128_t;
-    const auto op1 = op11 + (dlimb_t(op12) << 64);
-    const auto op2 = op21 + (dlimb_t(op22) << 64);
-    const auto q = op1 / op2, r = op1 % op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-    *q2 = static_cast<::mp_limb_t>(q >> 64);
-    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
-    *r2 = static_cast<::mp_limb_t>(r >> 64);
+    dlimb_tdiv_qr_impl<__uint128_t, 64>(op11, op12, op21, op22, q1, q2, r1, r2);
 }
 
-// Without remainder.
 inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
-    using dlimb_t = __uint128_t;
-    const auto op1 = op11 + (dlimb_t(op12) << 64);
-    const auto op2 = op21 + (dlimb_t(op22) << 64);
-    const auto q = op1 / op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-    *q2 = static_cast<::mp_limb_t>(q >> 64);
+    dlimb_tdiv_q_impl<__uint128_t, 64>(op11, op12, op21, op22, q1, q2);
 }
 
 #elif GMP_NUMB_BITS == 32 && !GMP_NAIL_BITS
@@ -4909,25 +5291,13 @@ inline void dlimb_tdiv_qr(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, 
                           ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2, ::mp_limb_t *MPPP_RESTRICT r1,
                           ::mp_limb_t *MPPP_RESTRICT r2)
 {
-    using dlimb_t = std::uint_least64_t;
-    const auto op1 = op11 + (dlimb_t(op12) << 32);
-    const auto op2 = op21 + (dlimb_t(op22) << 32);
-    const auto q = op1 / op2, r = op1 % op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-    *q2 = static_cast<::mp_limb_t>(q >> 32);
-    *r1 = static_cast<::mp_limb_t>(r & ::mp_limb_t(-1));
-    *r2 = static_cast<::mp_limb_t>(r >> 32);
+    dlimb_tdiv_qr_impl<std::uint_least64_t, 32>(op11, op12, op21, op22, q1, q2, r1, r2);
 }
 
 inline void dlimb_tdiv_q(::mp_limb_t op11, ::mp_limb_t op12, ::mp_limb_t op21, ::mp_limb_t op22,
                          ::mp_limb_t *MPPP_RESTRICT q1, ::mp_limb_t *MPPP_RESTRICT q2)
 {
-    using dlimb_t = std::uint_least64_t;
-    const auto op1 = op11 + (dlimb_t(op12) << 32);
-    const auto op2 = op21 + (dlimb_t(op22) << 32);
-    const auto q = op1 / op2;
-    *q1 = static_cast<::mp_limb_t>(q & ::mp_limb_t(-1));
-    *q2 = static_cast<::mp_limb_t>(q >> 32);
+    dlimb_tdiv_q_impl<std::uint_least64_t, 32>(op11, op12, op21, op22, q1, q2);
 }
 
 #endif
