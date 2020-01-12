@@ -475,5 +475,5 @@ User-defined literals
 
       https://en.cppreference.com/w/cpp/language/integer_literal
 
-   :exception std\:\:invalid_argument: if the input sequence of charaters is not
+   :exception std\:\:invalid_argument: if the input sequence of characters is not
      a valid integer literal (as defined by the C++ standard).
