@@ -18,6 +18,8 @@ New
 Changes
 ~~~~~~~
 
+- Update the internal copy of Catch to the latest version, 2.11.1
+  (`#210 <https://github.com/bluescarni/mppp/pull/210>`__).
 - mp++'s public headers do not include
   the ``quadmath.h`` header any more. This change greatly
   improves mp++'s compatibility with clang when the
@@ -28,8 +30,6 @@ Changes
   `#206 <https://github.com/bluescarni/mppp/pull/206>`__).
 - Enable the C++20 concept declaration syntax if GCC >= 9 is
   being used
-  (`#203 <https://github.com/bluescarni/mppp/pull/203>`__).
-- Update the internal copy of Catch to the latest version, 2.10.2
   (`#203 <https://github.com/bluescarni/mppp/pull/203>`__).
 
 Fix
