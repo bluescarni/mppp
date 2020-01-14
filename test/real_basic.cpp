@@ -187,6 +187,7 @@ TEST_CASE("real constructors")
     REQUIRE((!std::is_constructible<real, foobar>::value));
     // Default constructor.
     real r1;
+    REQUIRE(r1.is_valid());
     REQUIRE(r1.get_prec() == real_prec_min());
     REQUIRE(r1.zero_p());
     REQUIRE(!r1.signbit());
@@ -198,6 +199,7 @@ TEST_CASE("real constructors")
     real_reset_default_prec();
     // Copy ctor.
     real r3{real{4}};
+    REQUIRE(r3.is_valid());
     REQUIRE(::mpfr_equal_p(r3.get_mpfr_t(), real{4}.get_mpfr_t()));
     REQUIRE(r3.get_prec() == real{4}.get_prec());
     real r4{real{4, 123}};
@@ -238,6 +240,15 @@ TEST_CASE("real constructors")
     REQUIRE(::mpfr_equal_p(r9.get_mpfr_t(), real{42, 50}.get_mpfr_t()));
     REQUIRE(r9.get_prec() == 50);
     REQUIRE(r8.get_mpfr_t()->_mpfr_d == nullptr);
+    REQUIRE(!r8.is_valid());
+    // Revive via assignments.
+    r8 = r9;
+    REQUIRE(r8.is_valid());
+    real r8a(std::move(r8));
+    REQUIRE(!r8.is_valid());
+    r8 = std::move(r8a);
+    REQUIRE(!r8a.is_valid());
+    REQUIRE(r8.is_valid());
     // String constructors.
     REQUIRE(real_get_default_prec() == 0);
     REQUIRE((::mpfr_equal_p(real{"123", 10, 100}.get_mpfr_t(), real{123}.get_mpfr_t())));

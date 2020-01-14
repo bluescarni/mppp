@@ -449,8 +449,9 @@ public:
     /**
      * \rststar
      * .. warning::
-     *    Unless otherwise noted, the only valid operations on the moved-from ``other`` object are
-     *    destruction and copy/move assignment. After re-assignment, ``other`` can be used normally again.
+     *    The only valid operations on the moved-from ``other`` object are
+     *    destruction, copy/move assignment and the invocation of the :cpp:func:`~mppp::real::is_valid()`
+     *    member function. After re-assignment, ``other`` can be used normally again.
      * \endrststar
      *
      * @param other the \link mppp::real real\endlink that will be moved.
@@ -936,6 +937,20 @@ public:
         // Shallow copy x.
         m_mpfr = *x;
         return *this;
+    }
+
+    /// Check validity.
+    /**
+     * \rststar
+     * A :cpp:class:`~mppp::real` becomes invalid after it is used
+     * as an argument to the move constructor.
+     * \endrststar
+     *
+     * @return ``true`` if ``this`` is valid, ``false`` otherwise.
+     */
+    bool is_valid() const noexcept
+    {
+        return m_mpfr._mpfr_d != nullptr;
     }
 
     // Set to another real.

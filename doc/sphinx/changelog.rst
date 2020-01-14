@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Add a :cpp:func:`mppp::real::is_valid()` member function
+  to check if a :cpp:class:`~mppp::real` was moved from
+  (`#211 <https://github.com/bluescarni/mppp/pull/211>`__).
 - Implement user-defined literals for :cpp:class:`~mppp::integer`
   (`#209 <https://github.com/bluescarni/mppp/pull/209>`__).
 - Implement (modular) squaring primitives for :cpp:class:`~mppp::integer`
