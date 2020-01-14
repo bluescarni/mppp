@@ -361,8 +361,9 @@ otherwise.</p>
 <dd><p>Move constructor. </p>
 <p><div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Unless otherwise noted, the only valid operations on the moved-from <code class="docutils literal notranslate"><span class="pre">other</span></code> object are
-destruction and copy/move assignment. After re-assignment, <code class="docutils literal notranslate"><span class="pre">other</span></code> can be used normally again.</p>
+<p>The only valid operations on the moved-from <code class="docutils literal notranslate"><span class="pre">other</span></code> object are
+destruction, copy/move assignment and the invocation of the <a class="reference internal" href="#_CPPv4NK4mppp4real8is_validEv" title="mppp::real::is_valid"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">is_valid()</span></code></a>
+member function. After re-assignment, <code class="docutils literal notranslate"><span class="pre">other</span></code> can be used normally again.</p>
 </div>
 </p>
 <p><dl class="simple">
@@ -792,6 +793,20 @@ will take care of releasing them when the destructor is called.</p>
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">x</span></code>: the <code class="docutils literal notranslate"><span class="pre">mpfr_t</span></code> that will be moved.</p></li>
 </ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4NK4mppp4real8is_validEv">
+<span id="_CPPv3NK4mppp4real8is_validEv"></span><span id="_CPPv2NK4mppp4real8is_validEv"></span><span id="mppp::real::is_validC"></span><span class="target" id="classmppp_1_1real_1a356c30115e461073829ddacabfcfa509"></span>bool <code class="sig-name descname">is_valid</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp4real8is_validEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Check validity. </p>
+<p><p>A <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> becomes invalid after it is used
+as an argument to the move constructor.</p>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is valid, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
 </dd>
 </dl>
 </p>
