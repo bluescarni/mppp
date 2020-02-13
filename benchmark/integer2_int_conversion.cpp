@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -22,11 +22,10 @@
 #include <gmp.h>
 #endif
 
-#include "simple_timer.hpp"
 #include "constStrings.hpp"
+#include "simple_timer.hpp"
 
 #include <boost/format.hpp>
-
 
 using namespace mppp;
 using namespace mppp_bench;

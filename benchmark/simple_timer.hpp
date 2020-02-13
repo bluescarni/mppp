@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -20,9 +20,7 @@ namespace mppp_bench
 class simple_timer
 {
 public:
-    simple_timer() : m_start(std::chrono::high_resolution_clock::now())
-    {
-    }
+    simple_timer() : m_start(std::chrono::high_resolution_clock::now()) {}
     double elapsed() const
     {
         return static_cast<double>(
@@ -41,6 +39,6 @@ public:
 private:
     const std::chrono::high_resolution_clock::time_point m_start;
 };
-}
+} // namespace mppp_bench
 
 #endif
