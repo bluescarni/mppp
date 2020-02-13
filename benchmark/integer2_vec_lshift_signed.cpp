@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -15,8 +15,8 @@
 #include <tuple>
 #include <vector>
 
-#include "simple_timer.hpp"
 #include "constStrings.hpp"
+#include "simple_timer.hpp"
 
 #include <boost/format.hpp>
 
@@ -106,7 +106,7 @@ int main()
             for (auto i = 0ul; i < size; ++i) {
                 std::get<2>(p)[i] = std::get<0>(p)[i] << std::get<1>(p)[i];
             }
-            std::cout << " / " <<std::get<2>(p)[size - 1u];
+            std::cout << " / " << std::get<2>(p)[size - 1u];
             s += "['Boost (cpp_int)','operation'," + std::to_string(st2.elapsed()) + "],";
             std::cout << operRuntime;
         }
