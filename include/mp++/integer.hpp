@@ -1443,13 +1443,10 @@ public:
      */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
-    explicit integer(const T &s,
 #else
     template <typename T, string_type_enabler<T> = 0>
-    explicit integer(const T &s,
 #endif
-                     int base = 10)
-        : integer(ptag{}, s, base)
+    explicit integer(const T &s, int base = 10) : integer(ptag{}, s, base)
     {
     }
     /// Constructor from range of characters.
@@ -1669,7 +1666,7 @@ private:
 #endif
 
 public:
-    /// Generic assignment operator.
+    /// Generic assignment operator from a fundamental C++ type.
     /**
      * \rststar
      * This operator will assign ``x`` to ``this``. The storage type of ``this`` after the assignment
@@ -1693,6 +1690,34 @@ public:
     {
         dispatch_assignment(x);
         return *this;
+    }
+    /// Generic assignment operator from a complex C++ type.
+    /**
+     * \rststar
+     * This operator will assign ``c`` to ``this``. The storage type of ``this`` after the assignment
+     * will depend only on the value of ``c`` (that is, the storage type will be static if the value of ``c``
+     * is small enough, dynamic otherwise). The assignment will be successful only if
+     * the imaginary part of ``c`` is zero and the real part of ``c`` is finite.
+     * \endrststar
+     *
+     * @param c the assignment argument.
+     *
+     * @return a reference to \p this.
+     *
+     * @throws std::domain_error if the imaginary part of \p c is not zero or if
+     * the real part of \p c is not finite.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <CppComplex T>
+#else
+    template <typename T, cpp_complex_enabler<T> = 0>
+#endif
+    integer &operator=(const T &c)
+    {
+        if (mppp_unlikely(c.imag() != 0)) {
+            throw std::domain_error("Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+        }
+        return *this = c.real();
     }
     /// Assignment from string.
     /**

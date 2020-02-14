@@ -12,6 +12,7 @@
 #include <array>
 #include <atomic>
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <ios>
 #include <iostream>
@@ -57,6 +58,13 @@ using fp_types = std::tuple<float, double
                             long double
 #endif
                             >;
+
+using complex_types = std::tuple<std::complex<float>, std::complex<double>
+#if defined(MPPP_WITH_MPFR)
+                                 ,
+                                 std::complex<long double>
+#endif
+                                 >;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
@@ -151,6 +159,82 @@ struct fp_ass_tester {
 TEST_CASE("floating-point assignment")
 {
     tuple_for_each(sizes{}, fp_ass_tester{});
+}
+
+struct complex_ass_tester {
+    template <typename S>
+    struct runner {
+        template <typename C>
+        void operator()(const C &) const
+        {
+            using integer = integer<S::value>;
+            using Float = typename C::value_type;
+            REQUIRE((std::is_assignable<integer &, C>::value));
+            integer n0;
+            if (std::numeric_limits<Float>::is_iec559) {
+                REQUIRE_THROWS_PREDICATE(n0 = C(std::numeric_limits<Float>::infinity(), 0), std::domain_error,
+                                         [](const std::domain_error &ex) {
+                                             return ex.what()
+                                                    == "Cannot assign the non-finite floating-point value "
+                                                           + std::to_string(std::numeric_limits<Float>::infinity())
+                                                           + " to an integer";
+                                         });
+                REQUIRE_THROWS_PREDICATE(n0 = C(-std::numeric_limits<Float>::infinity(), 0), std::domain_error,
+                                         [](const std::domain_error &ex) {
+                                             return ex.what()
+                                                    == "Cannot assign the non-finite floating-point value "
+                                                           + std::to_string(-std::numeric_limits<Float>::infinity())
+                                                           + " to an integer";
+                                         });
+                REQUIRE_THROWS_PREDICATE(n0 = C(std::numeric_limits<Float>::quiet_NaN(), 0), std::domain_error,
+                                         [](const std::domain_error &ex) {
+                                             return ex.what()
+                                                    == "Cannot assign the non-finite floating-point value "
+                                                           + std::to_string(std::numeric_limits<Float>::quiet_NaN())
+                                                           + " to an integer";
+                                         });
+                REQUIRE_THROWS_PREDICATE(
+                    n0 = C(0, std::numeric_limits<Float>::quiet_NaN()), std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == std::string(
+                                   "Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    n0 = C(0, std::numeric_limits<Float>::infinity()), std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == std::string(
+                                   "Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+                    });
+            }
+            REQUIRE_THROWS_PREDICATE(n0 = C(0, 1), std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == std::string("Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+            });
+            REQUIRE_THROWS_PREDICATE(n0 = C(-1, 1), std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == std::string("Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+            });
+            REQUIRE_THROWS_PREDICATE(n0 = C(1, 1), std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == std::string("Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+            });
+            REQUIRE((n0 = C(0, 0)) == 0);
+            REQUIRE((n0 = C(12, 0)) == 12);
+            REQUIRE((n0 = C(-42, 0)) == -42);
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(complex_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("complex assignment")
+{
+    tuple_for_each(sizes{}, complex_ass_tester{});
 }
 
 struct string_ctor_tester {
