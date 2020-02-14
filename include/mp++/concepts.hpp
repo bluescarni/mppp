@@ -11,6 +11,7 @@
 
 #include <mp++/config.hpp>
 
+#include <complex>
 #include <cstddef>
 #include <string>
 #include <type_traits>
@@ -93,6 +94,21 @@ template <typename T>
 MPPP_CONCEPT_DECL CppInteroperable = is_cpp_interoperable<T>::value;
 #else
 using cpp_interoperable_enabler = detail::enable_if_t<is_cpp_interoperable<T>::value, int>;
+#endif
+
+template <typename T>
+using is_cpp_complex = detail::disjunction<std::is_same<T, std::complex<float>>, std::is_same<T, std::complex<double>>
+#if defined(MPPP_WITH_MPFR)
+                                           ,
+                                           std::is_same<T, std::complex<long double>>
+#endif
+                                           >;
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+MPPP_CONCEPT_DECL CppComplex = is_cpp_complex<T>::value;
+#else
+using cpp_complex_enabler = detail::enable_if_t<is_cpp_complex<T>::value, int>;
 #endif
 
 namespace detail

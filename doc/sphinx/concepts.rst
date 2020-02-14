@@ -60,6 +60,19 @@ Common concepts
    A corresponding boolean type trait called ``is_cpp_floating_point_interoperable`` is also available (even if the compiler does
    not support concepts).
 
+.. cpp:concept:: template <typename T> mppp::CppComplex
+
+   .. versionadded:: 0.19
+
+   This concept is satisfied if ``T`` is one of the C++ complex types:
+
+   * ``std::complex<float>``,
+   * ``std::complex<double>``,
+   * ``std::complex<long double>`` (only if mp++ was configured with the ``MPPP_WITH_MPFR`` option enabled).
+
+   A corresponding boolean type trait called ``is_cpp_complex`` is also available (even if the compiler does
+   not support concepts).
+
 .. cpp:concept:: template <typename T> mppp::StringType
 
    This concept is satisfied by C++ string-like types. Specifically, the concept will be true if ``T``,

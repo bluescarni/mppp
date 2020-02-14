@@ -1365,7 +1365,7 @@ public:
      * @throws std::overflow_error if the value of ``nbits`` is larger than an implementation-defined limit.
      */
     explicit integer(integer_bitcnt_t nbits) : m_int(nbits) {}
-    /// Generic constructor.
+    /// Generic constructor from a C++ fundamental type.
     /**
      * This constructor will initialize an integer with the value of \p x. The initialization is always
      * successful if \p x is an integral value (construction from \p bool yields 1 for \p true, 0 for \p false).
@@ -1378,12 +1378,32 @@ public:
      */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
-    explicit integer(const T &x)
 #else
     template <typename T, cpp_interoperable_enabler<T> = 0>
-    explicit integer(const T &x)
 #endif
-        : m_int(x)
+    explicit integer(const T &x) : m_int(x)
+    {
+    }
+    /// Generic constructor from a C++ complex type.
+    /**
+     * This constructor will initialize an integer with the value of \p c. The initialization is
+     * successful only if the imaginary part of \p c is zero and the real part of \p c is finite.
+     *
+     * @param c value that will be used to initialize \p this.
+     *
+     * @throws std::domain_error if the imaginary part of \p c is not zero or if
+     * the real part of \p c is not finite.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <CppComplex T>
+#else
+    template <typename T, cpp_complex_enabler<T> = 0>
+#endif
+    explicit integer(const T &c)
+        : integer(c.imag() == 0
+                      ? c.real()
+                      : throw std::domain_error(
+                          "Cannot construct an integer from a complex C++ value with a non-zero imaginary part"))
     {
     }
 
