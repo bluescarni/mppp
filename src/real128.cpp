@@ -35,10 +35,10 @@ void float128_stream(std::ostream &os, const __float128 &x)
     char buf[100];
     // NOTE: 36 decimal digits ensures that reading back the string always produces the same value.
     // https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
-    // We use 35 because the precision field in printf()-like functions refers to the number
-    // of digits to the right of the decimal point, and we have one digit to the left of
-    // the decimal point due to the scientific notation.
-    const auto n = ::quadmath_snprintf(buf, sizeof(buf), "%.35Qe", x);
+    // NOTE: when using the g/G format, the precision field represent the number
+    // of significant digits:
+    // https://linux.die.net/man/3/printf
+    const auto n = ::quadmath_snprintf(buf, sizeof(buf), "%.36Qg", x);
     // LCOV_EXCL_START
     if (mppp_unlikely(n < 0)) {
         throw std::runtime_error("A call to quadmath_snprintf() failed: a negative exit status of " + to_string(n)
