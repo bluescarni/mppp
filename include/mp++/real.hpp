@@ -1721,9 +1721,9 @@ using real_op_types_enabler = detail::enable_if_t<are_real_op_types<T, U>::value
 
 template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL RealCompoundOpTypes = RealOpTypes<T, U> && !std::is_const<detail::unref_t<T>>::value;
+MPPP_CONCEPT_DECL RealInPlaceOpTypes = RealOpTypes<T, U> && !std::is_const<detail::unref_t<T>>::value;
 #else
-using real_compound_op_types_enabler = detail::enable_if_t<
+using real_in_place_op_types_enabler = detail::enable_if_t<
     detail::conjunction<are_real_op_types<T, U>, detail::negation<std::is_const<detail::unref_t<T>>>>::value, int>;
 #endif
 
@@ -3690,9 +3690,9 @@ inline void dispatch_in_place_add(T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealCompoundOpTypes<T, U>
+requires RealInPlaceOpTypes<T, U>
 #else
-template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
+template <typename T, typename U, real_in_place_op_types_enabler<T, U> = 0>
 #endif
     inline T &operator+=(T &a, U &&b)
 {
@@ -3887,9 +3887,9 @@ inline void dispatch_in_place_sub(T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealCompoundOpTypes<T, U>
+requires RealInPlaceOpTypes<T, U>
 #else
-template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
+template <typename T, typename U, real_in_place_op_types_enabler<T, U> = 0>
 #endif
     inline T &operator-=(T &a, U &&b)
 {
@@ -4062,9 +4062,9 @@ inline void dispatch_in_place_mul(T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealCompoundOpTypes<T, U>
+requires RealInPlaceOpTypes<T, U>
 #else
-template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
+template <typename T, typename U, real_in_place_op_types_enabler<T, U> = 0>
 #endif
     inline T &operator*=(T &a, U &&b)
 {
@@ -4208,9 +4208,9 @@ inline void dispatch_in_place_div(T &x, U &&a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealCompoundOpTypes<T, U>
+requires RealInPlaceOpTypes<T, U>
 #else
-template <typename T, typename U, real_compound_op_types_enabler<T, U> = 0>
+template <typename T, typename U, real_in_place_op_types_enabler<T, U> = 0>
 #endif
     inline T &operator/=(T &a, U &&b)
 {

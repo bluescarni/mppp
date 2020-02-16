@@ -91,7 +91,7 @@ Concepts
    A corresponding boolean type trait called ``are_real_op_types`` is also available (even if the compiler does
    not support concepts).
 
-.. cpp:concept:: template <typename T, typename U> mppp::RealCompoundOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::RealInPlaceOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic in-place :ref:`operators <real_operators>`
