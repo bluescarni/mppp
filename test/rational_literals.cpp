@@ -8,6 +8,7 @@
 
 #include <type_traits>
 
+#include <mp++/config.hpp>
 #include <mp++/rational.hpp>
 
 #include "catch.hpp"
@@ -22,7 +23,9 @@ TEST_CASE("rational_literals_tests")
     REQUIRE(std::is_same<rational<1>, decltype(123_q1)>::value);
     REQUIRE(123_q1 == 123);
     REQUIRE(-456_q1 == -456);
+#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE(-0b1_q1 == -1);
+#endif
     REQUIRE(07_q1 == 7);
     REQUIRE(-0xf_q1 == -15);
     REQUIRE(4_q1 / -6 == -rational<1>{2, 3});
@@ -30,7 +33,9 @@ TEST_CASE("rational_literals_tests")
     REQUIRE(std::is_same<rational<2>, decltype(123_q2)>::value);
     REQUIRE(123_q2 == 123);
     REQUIRE(-456_q2 == -456);
+#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE(-0b1_q2 == -1);
+#endif
     REQUIRE(07_q2 == 7);
     REQUIRE(-0xf_q2 == -15);
     REQUIRE(4_q2 / -6 == -rational<2>{2, 3});
@@ -38,7 +43,9 @@ TEST_CASE("rational_literals_tests")
     REQUIRE(std::is_same<rational<3>, decltype(123_q3)>::value);
     REQUIRE(123_q3 == 123);
     REQUIRE(-456_q3 == -456);
+#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE(-0b1_q3 == -1);
+#endif
     REQUIRE(07_q3 == 7);
     REQUIRE(-0xf_q3 == -15);
     REQUIRE(4_q3 / -6 == -rational<3>{2, 3});
