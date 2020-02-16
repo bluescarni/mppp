@@ -9414,4 +9414,30 @@ struct hash<mppp::integer<SSize>> {
 
 #include <mp++/detail/integer_literals.hpp>
 
+// Support for pretty printing in xeus-cling.
+#if defined(__CLING__)
+
+#if __has_include(<nlohmann/json.hpp>)
+
+#include <nlohmann/json.hpp>
+
+namespace mppp
+{
+
+template <std::size_t SSize>
+inline nlohmann::json mime_bundle_repr(const integer<SSize> &n)
+{
+    auto bundle = nlohmann::json::object();
+
+    bundle["text/plain"] = n.to_string();
+
+    return bundle;
+}
+
+} // namespace mppp
+
+#endif
+
+#endif
+
 #endif

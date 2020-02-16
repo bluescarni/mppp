@@ -3002,4 +3002,37 @@ struct hash<mppp::rational<SSize>> {
 };
 } // namespace std
 
+#include <mp++/detail/rational_literals.hpp>
+
+// Support for pretty printing in xeus-cling.
+#if defined(__CLING__)
+
+#if __has_include(<nlohmann/json.hpp>)
+
+#include <nlohmann/json.hpp>
+
+namespace mppp
+{
+
+template <std::size_t SSize>
+inline nlohmann::json mime_bundle_repr(const rational<SSize> &q)
+{
+    auto bundle = nlohmann::json::object();
+
+    bundle["text/plain"] = q.to_string();
+    if (q.get_den().is_one()) {
+        bundle["text/latex"] = "$" + q.get_num().to_string() + "$";
+    } else {
+        bundle["text/latex"] = "$\\frac{" + q.get_num().to_string() + "}{" + q.get_den().to_string() + "}$";
+    }
+
+    return bundle;
+}
+
+} // namespace mppp
+
+#endif
+
+#endif
+
 #endif

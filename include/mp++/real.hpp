@@ -4476,6 +4476,33 @@ template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 /** @} */
 } // namespace mppp
 
+#include <mp++/detail/real_literals.hpp>
+
+// Support for pretty printing in xeus-cling.
+#if defined(__CLING__)
+
+#if __has_include(<nlohmann/json.hpp>)
+
+#include <nlohmann/json.hpp>
+
+namespace mppp
+{
+
+inline nlohmann::json mime_bundle_repr(const real &x)
+{
+    auto bundle = nlohmann::json::object();
+
+    bundle["text/plain"] = x.to_string();
+
+    return bundle;
+}
+
+} // namespace mppp
+
+#endif
+
+#endif
+
 #else
 
 #error The real.hpp header was included but mp++ was not configured with the MPPP_WITH_MPFR option.
