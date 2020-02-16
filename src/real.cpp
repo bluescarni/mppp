@@ -846,6 +846,12 @@ real128 real::convert_to_real128() const
     return sgn() > 0 ? retval : -retval;
 }
 
+bool real::dispatch_get(real128 &x) const
+{
+    x = static_cast<real128>(*this);
+    return true;
+}
+
 #endif
 
 namespace detail

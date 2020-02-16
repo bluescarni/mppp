@@ -1515,11 +1515,7 @@ private:
         return true;
     }
 #if defined(MPPP_WITH_QUADMATH)
-    bool dispatch_get(real128 &x) const
-    {
-        x = static_cast<real128>(*this);
-        return true;
-    }
+    bool dispatch_get(real128 &) const;
 #endif
 
 public:
