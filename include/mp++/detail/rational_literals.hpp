@@ -21,7 +21,7 @@ inline namespace literals
     template <char... Chars>                                                                                           \
     inline rational<n> operator"" _q##n()                                                                              \
     {                                                                                                                  \
-        return rational<n>{operator"" _z##n<Chars...>()};                                                              \
+        return rational<n>{detail::integer_literal_impl<n, Chars...>()};                                               \
     }
 
 MPPP_DECLARE_RATIONAL_UDL(1)
