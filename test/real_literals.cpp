@@ -10,6 +10,7 @@
 #include <string>
 #include <type_traits>
 
+#include <mp++/config.hpp>
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
@@ -25,20 +26,24 @@ TEST_CASE("real_literals_tests")
     REQUIRE(-123._r128 == -123);
     REQUIRE(-.1_r128 == -real{"0.1", 128});
     REQUIRE(-.123e-7_r128 == -real{".123e-7", 128});
+#if MPPP_CPLUSPLUS >= 201703L
     // Hex literals are supported as well.
     REQUIRE(0x123.p-7_r128 == real{"0x123.p-7", 16, 128});
     REQUIRE(-0X123.p-7_r128 == -real{"0x123.p-7", 16, 128});
     REQUIRE(0x123.P-7_r128 == real{"0x123.p-7", 16, 128});
     REQUIRE(-0X123.P-7_r128 == -real{"0x123.p-7", 16, 128});
+#endif
 
     // Runtime failures.
     real r;
+#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r128, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
     REQUIRE_THROWS_PREDICATE(r = 0B010010_r128, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
+#endif
     REQUIRE_THROWS_PREDICATE(r = 04552627_r128, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
@@ -49,19 +54,23 @@ TEST_CASE("real_literals_tests")
     REQUIRE(-123._r256 == -123);
     REQUIRE(-.1_r256 == -real{"0.1", 256});
     REQUIRE(-.123e-7_r256 == -real{".123e-7", 256});
+#if MPPP_CPLUSPLUS >= 201703L
     // Hex literals are supported as well.
     REQUIRE(0x123.p-7_r256 == real{"0x123.p-7", 16, 256});
     REQUIRE(-0X123.p-7_r256 == -real{"0x123.p-7", 16, 256});
     REQUIRE(0x123.P-7_r256 == real{"0x123.p-7", 16, 256});
     REQUIRE(-0X123.P-7_r256 == -real{"0x123.p-7", 16, 256});
+#endif
 
     // Runtime failures.
+#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r256, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
     REQUIRE_THROWS_PREDICATE(r = 0B010010_r256, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
+#endif
     REQUIRE_THROWS_PREDICATE(r = 04552627_r256, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
@@ -72,19 +81,23 @@ TEST_CASE("real_literals_tests")
     REQUIRE(-123._r512 == -123);
     REQUIRE(-.1_r512 == -real{"0.1", 512});
     REQUIRE(-.123e-7_r512 == -real{".123e-7", 512});
+#if MPPP_CPLUSPLUS >= 201703L
     // Hex literals are supported as well.
     REQUIRE(0x123.p-7_r512 == real{"0x123.p-7", 16, 512});
     REQUIRE(-0X123.p-7_r512 == -real{"0x123.p-7", 16, 512});
     REQUIRE(0x123.P-7_r512 == real{"0x123.p-7", 16, 512});
     REQUIRE(-0X123.P-7_r512 == -real{"0x123.p-7", 16, 512});
+#endif
 
     // Runtime failures.
+#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r512, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
     REQUIRE_THROWS_PREDICATE(r = 0B010010_r512, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
+#endif
     REQUIRE_THROWS_PREDICATE(r = 04552627_r512, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
@@ -95,19 +108,23 @@ TEST_CASE("real_literals_tests")
     REQUIRE(-123._r1024 == -123);
     REQUIRE(-.1_r1024 == -real{"0.1", 1024});
     REQUIRE(-.123e-7_r1024 == -real{".123e-7", 1024});
+#if MPPP_CPLUSPLUS >= 201703L
     // Hex literals are supported as well.
     REQUIRE(0x123.p-7_r1024 == real{"0x123.p-7", 16, 1024});
     REQUIRE(-0X123.p-7_r1024 == -real{"0x123.p-7", 16, 1024});
     REQUIRE(0x123.P-7_r1024 == real{"0x123.p-7", 16, 1024});
     REQUIRE(-0X123.P-7_r1024 == -real{"0x123.p-7", 16, 1024});
+#endif
 
     // Runtime failures.
+#if MPPP_CPLUSPLUS >= 201402L
     REQUIRE_THROWS_PREDICATE(r = 0b010010_r1024, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
     REQUIRE_THROWS_PREDICATE(r = 0B010010_r1024, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
+#endif
     REQUIRE_THROWS_PREDICATE(r = 04552627_r1024, std::invalid_argument, [](const std::invalid_argument &ia) {
         return ia.what() == std::string("A real cannot be constructed from binary or octal literals");
     });
