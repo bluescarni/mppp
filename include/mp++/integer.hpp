@@ -1187,10 +1187,10 @@ void nextprime_impl(integer<SSize> &, const integer<SSize> &);
  * features:
  *
  * * a constructor and an assignment operator from the GMP integer type ``mpz_t``,
- * * a :cpp:func:`~mppp::integer::get_mpz_t()` method that promotes ``this`` to dynamic
+ * * a :cpp:func:`~mppp::integer::get_mpz_t()` member function that promotes ``this`` to dynamic
  *   storage and returns a pointer to the internal ``mpz_t`` instance,
  * * an ``mpz_view`` class, an instance of which can be requested via the :cpp:func:`~mppp::integer::get_mpz_view()`
- *   method, which allows to use :cpp:class:`~mppp::integer` in the GMP API as a drop-in replacement for
+ *   member function, which allows to use :cpp:class:`~mppp::integer` in the GMP API as a drop-in replacement for
  *   ``const mpz_t`` function arguments.
  *
  * The ``mpz_view`` class represent a read-only view of an integer object which is implicitly convertible to the type
@@ -1386,8 +1386,12 @@ public:
     }
     /// Generic constructor from a C++ complex type.
     /**
-     * This constructor will initialize an integer with the value of \p c. The initialization is
-     * successful only if the imaginary part of \p c is zero and the real part of \p c is finite.
+     * \rststar
+     * .. versionadded:: 0.19
+     *
+     * This constructor will initialize an integer with the value of ``c``. The initialization is
+     * successful only if the imaginary part of ``c`` is zero and the real part of ``c`` is finite.
+     * \endrststar
      *
      * @param c value that will be used to initialize \p this.
      *
@@ -1694,6 +1698,8 @@ public:
     /// Generic assignment operator from a complex C++ type.
     /**
      * \rststar
+     * .. versionadded:: 0.19
+     *
      * This operator will assign ``c`` to ``this``. The storage type of ``this`` after the assignment
      * will depend only on the value of ``c`` (that is, the storage type will be static if the value of ``c``
      * is small enough, dynamic otherwise). The assignment will be successful only if
@@ -1859,7 +1865,7 @@ public:
 #endif
     /// Set to zero.
     /**
-     * After calling this method, the storage type of \p this will be static and its value will be zero.
+     * After calling this member function, the storage type of \p this will be static and its value will be zero.
      *
      * \rststar
      * .. note::
@@ -1903,7 +1909,7 @@ private:
 public:
     /// Set to one.
     /**
-     * After calling this method, the storage type of \p this will be static and its value will be one.
+     * After calling this member function, the storage type of \p this will be static and its value will be one.
      *
      * \rststar
      * .. note::
@@ -1919,7 +1925,7 @@ public:
     }
     /// Set to minus one.
     /**
-     * After calling this method, the storage type of \p this will be static and its value will be minus one.
+     * After calling this member function, the storage type of \p this will be static and its value will be minus one.
      *
      * \rststar
      * .. note::
@@ -1951,7 +1957,7 @@ public:
     }
     /// Conversion to string.
     /**
-     * This method will convert \p this into a string in base \p base using the GMP function \p mpz_get_str().
+     * This member function will convert \p this into a string in base \p base using the GMP function \p mpz_get_str().
      *
      * @param base the desired base.
      *
@@ -1974,7 +1980,7 @@ public:
         }
         return detail::mpz_to_str(get_mpz_view(), base);
     }
-    // NOTE: maybe provide a method to access the lower-level str conversion that writes to
+    // NOTE: maybe provide a member function to access the lower-level str conversion that writes to
     // std::vector<char>?
 
 private:
@@ -2192,21 +2198,21 @@ private:
     }
 
 public:
-/// Generic conversion operator.
-/**
- * \rststar
- * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppInteroperable` type.
- * Conversion to ``bool`` yields ``false`` if ``this`` is zero,
- * ``true`` otherwise. Conversion to other integral types yields the exact result, if representable by the target
- * :cpp:concept:`~mppp::CppInteroperable` type. Conversion to floating-point types might yield inexact values and
- * infinities.
- * \endrststar
- *
- * @return \p this converted to the target type.
- *
- * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be represented by
- * it.
- */
+    /// Generic conversion operator to a C++ fundamental type.
+    /**
+     * \rststar
+     * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppInteroperable` type.
+     * Conversion to ``bool`` yields ``false`` if ``this`` is zero,
+     * ``true`` otherwise. Conversion to other integral types yields the exact result, if representable by the target
+     * :cpp:concept:`~mppp::CppInteroperable` type. Conversion to floating-point types might yield inexact values and
+     * infinities.
+     * \endrststar
+     *
+     * @return \p this converted to the target type.
+     *
+     * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be
+     * represented by it.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -2221,13 +2227,35 @@ public:
         }
         return std::move(retval.second);
     }
-    /// Generic conversion method.
+    /// Generic conversion operator to a C++ complex type.
     /**
      * \rststar
-     * This method, similarly to the conversion operator, will convert ``this`` to a
+     * .. versionadded:: 0.19
+     *
+     * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppComplex` type.
+     * The conversion might yield inexact values and infinities.
+     * \endrststar
+     *
+     * @return \p this converted to the target type.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <CppComplex T>
+#else
+    template <typename T, cpp_complex_enabler<T> = 0>
+#endif
+    explicit operator T() const
+    {
+        using value_type = typename T::value_type;
+        return T{static_cast<value_type>(*this), value_type(0)};
+    }
+    /// Generic conversion member function to a C++ fundamental type.
+    /**
+     * \rststar
+     * This member function, similarly to the conversion operator, will convert ``this`` to a
      * :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into ``rop``. Differently
-     * from the conversion operator, this method does not raise any exception: if the conversion is successful, the
-     * method will return ``true``, otherwise the method will return ``false``. If the conversion fails,
+     * from the conversion operator, this member function does not raise any exception: if the conversion is successful,
+     * the member function will return ``true``, otherwise the member function will return ``false``. If the conversion
+     * fails,
      * ``rop`` will not be altered.
      * \endrststar
      *
@@ -2250,9 +2278,34 @@ public:
         }
         return false;
     }
+    /// Generic conversion member function to a C++ complex type.
+    /**
+     * \rststar
+     * .. versionadded:: 0.19
+     *
+     * This member function, similarly to the conversion operator, will convert ``this`` to a
+     * :cpp:concept:`~mppp::CppComplex` type, storing the result of the conversion into ``rop``.
+     * The conversion is always successful, and this member function
+     * will always return ``true``.
+     * \endrststar
+     *
+     * @param rop the variable which will store the result of the conversion.
+     *
+     * @return ``true``.
+     */
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <CppComplex T>
+#else
+    template <typename T, cpp_complex_enabler<T> = 0>
+#endif
+    bool get(T &rop) const
+    {
+        rop = static_cast<T>(*this);
+        return true;
+    }
     /// Promote to dynamic storage.
     /**
-     * This method will promote the storage type of \p this from static to dynamic.
+     * This member function will promote the storage type of \p this from static to dynamic.
      *
      * @return \p false if the storage type of \p this is already dynamic and no promotion takes place, \p true
      * otherwise.
@@ -2267,7 +2320,7 @@ public:
     }
     /// Demote to static storage.
     /**
-     * This method will demote the storage type of \p this from dynamic to static.
+     * This member function will demote the storage type of \p this from dynamic to static.
      *
      * @return \p false if the storage type of \p this is already static and no demotion takes place, or if the current
      * value of \p this does not fit in static storage, \p true otherwise.
@@ -2326,10 +2379,10 @@ public:
     }
     /// Get an \p mpz_t view.
     /**
-     * This method will return an object of an unspecified type \p mpz_view which is implicitly convertible
+     * This member function will return an object of an unspecified type \p mpz_view which is implicitly convertible
      * to a const pointer to an \p mpz_t struct (and which can thus be used as a <tt>const mpz_t</tt>
      * parameter in GMP functions). In addition to the implicit conversion operator, the <tt>const mpz_t</tt>
-     * object can also be retrieved via the <tt>%get()</tt> method of the \p mpz_view class.
+     * object can also be retrieved via the <tt>%get()</tt> member function of the \p mpz_view class.
      * The view provides a read-only GMP-compatible representation of the integer stored in \p this.
      *
      * \rststar
@@ -2341,11 +2394,11 @@ public:
      *     ``mpz_view`` objects can be used in the GMP API only where a ``const mpz_t`` parameter is expected;
      *   * ``mpz_view`` objects can only be move-constructed (the other constructors and the assignment operators
      *     are disabled);
-     *   * the returned object and the pointer returned by its ``get()`` method might reference internal data
+     *   * the returned object and the pointer returned by its ``get()`` member function might reference internal data
      *     belonging to ``this``, and they can thus be used safely only during the lifetime of ``this``;
-     *   * the lifetime of the pointer returned by the ``get()`` method is tied to the lifetime of the ``mpz_view``
-     *     object (that is, if the ``mpz_view`` object is destroyed, any pointer previously returned by ``get()``
-     *     becomes invalid);
+     *   * the lifetime of the pointer returned by the ``get()`` member function is tied to the lifetime of the
+     *     ``mpz_view`` object (that is, if the ``mpz_view`` object is destroyed, any pointer previously returned by
+     *     ``get()`` becomes invalid);
      *   * any modification to ``this`` will also invalidate the view and the pointer.
      * \endrststar
      *
@@ -2357,7 +2410,7 @@ public:
     }
     /// Negate in-place.
     /**
-     * This method will set \p this to <tt>-this</tt>.
+     * This member function will set \p this to <tt>-this</tt>.
      *
      * @return a reference to \p this.
      */
@@ -2368,7 +2421,7 @@ public:
     }
     /// In-place absolute value.
     /**
-     * This method will set \p this to its absolute value.
+     * This member function will set \p this to its absolute value.
      *
      * @return a reference to \p this.
      */
@@ -2385,7 +2438,7 @@ public:
     }
     /// Compute next prime number (in-place version).
     /**
-     * This method will set \p this to the first prime number greater than the current value.
+     * This member function will set \p this to the first prime number greater than the current value.
      *
      * @return a reference to \p this.
      */
@@ -2396,7 +2449,7 @@ public:
     }
     /// Test primality.
     /**
-     * This method will run a series of probabilistic tests to determine if \p this is a prime number.
+     * This member function will run a series of probabilistic tests to determine if \p this is a prime number.
      * It will return \p 2 if \p this is definitely a prime, \p 1 if \p this is probably a prime and \p 0 if \p this
      * is definitely not-prime.
      *
@@ -2419,7 +2472,7 @@ public:
     }
     /// Integer square root (in-place version).
     /**
-     * This method will set \p this to its integer square root.
+     * This member function will set \p this to its integer square root.
      *
      * @return a reference to \p this.
      *
@@ -2431,7 +2484,7 @@ public:
     }
     /// Integer squaring (in-place version).
     /**
-     * This method will set \p this to its square.
+     * This member function will set \p this to its square.
      *
      * @return a reference to \p this.
      */
@@ -2467,7 +2520,7 @@ public:
     }
     /// Return a reference to the internal union.
     /**
-     * This method returns a reference to the union used internally to implement the integer class.
+     * This member function returns a reference to the union used internally to implement the integer class.
      *
      * @return a reference to the internal union member.
      */
@@ -2477,7 +2530,7 @@ public:
     }
     /// Return a const reference to the internal union.
     /**
-     * This method returns a const reference to the union used internally to implement the integer class.
+     * This member function returns a const reference to the union used internally to implement the integer class.
      *
      * @return a const reference to the internal union member.
      */
@@ -2487,9 +2540,9 @@ public:
     }
     /// Get a pointer to the dynamic storage.
     /**
-     * This method will first promote \p this to dynamic storage (if \p this is not already employing dynamic storage),
-     * and it will then return a pointer to the internal \p mpz_t structure. The returned pointer can be used as an
-     * argument for the functions of the GMP API.
+     * This member function will first promote \p this to dynamic storage (if \p this is not already employing dynamic
+     * storage), and it will then return a pointer to the internal \p mpz_t structure. The returned pointer can be used
+     * as an argument for the functions of the GMP API.
      *
      * \rststar
      * .. note::
@@ -2555,7 +2608,7 @@ public:
     /// Size of the serialised binary representation.
     /**
      * \rststar
-     * This method will return a value representing the number of bytes necessary
+     * This member function will return a value representing the number of bytes necessary
      * to serialise ``this`` into a memory buffer in binary format via one of the available
      * :cpp:func:`~mppp::integer::binary_save()` overloads. The returned value
      * is platform-dependent.
@@ -2599,8 +2652,8 @@ public:
     /// Serialise into a memory buffer.
     /**
      * \rststar
-     * This method will write into ``dest`` a binary representation of ``this``. The serialised
-     * representation produced by this method can be read back with one of the
+     * This member function will write into ``dest`` a binary representation of ``this``. The serialised
+     * representation produced by this member function can be read back with one of the
      * :cpp:func:`~mppp::integer::binary_load()` overloads.
      *
      * ``dest`` must point to a memory area whose size is at least equal to the value returned
@@ -2609,7 +2662,7 @@ public:
      *
      * .. warning::
      *
-     *    The binary representation produced by this method is compiler, platform and architecture
+     *    The binary representation produced by this member function is compiler, platform and architecture
      *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
      *    it should not be used as an exchange format or for long-term data storage.
      * \endrststar
@@ -2630,8 +2683,8 @@ public:
     /// Serialise into a ``std::vector<char>``.
     /**
      * \rststar
-     * This method will write into ``dest`` a binary representation of ``this``. The serialised
-     * representation produced by this method can be read back with one of the
+     * This member function will write into ``dest`` a binary representation of ``this``. The serialised
+     * representation produced by this member function can be read back with one of the
      * :cpp:func:`~mppp::integer::binary_load()` overloads.
      *
      * The size of ``dest`` must be at least equal to the value returned by
@@ -2640,7 +2693,7 @@ public:
      *
      * .. warning::
      *
-     *    The binary representation produced by this method is compiler, platform and architecture
+     *    The binary representation produced by this member function is compiler, platform and architecture
      *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
      *    it should not be used as an exchange format or for long-term data storage.
      * \endrststar
@@ -2666,8 +2719,8 @@ public:
     /// Serialise into a ``std::array<char>``.
     /**
      * \rststar
-     * This method will write into ``dest`` a binary representation of ``this``. The serialised
-     * representation produced by this method can be read back with one of the
+     * This member function will write into ``dest`` a binary representation of ``this``. The serialised
+     * representation produced by this member function can be read back with one of the
      * :cpp:func:`~mppp::integer::binary_load()` overloads.
      *
      * The size of ``dest`` must be at least equal to the value returned by
@@ -2676,7 +2729,7 @@ public:
      *
      * .. warning::
      *
-     *    The binary representation produced by this method is compiler, platform and architecture
+     *    The binary representation produced by this member function is compiler, platform and architecture
      *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
      *    it should not be used as an exchange format or for long-term data storage.
      * \endrststar
@@ -2701,9 +2754,9 @@ public:
     /// Serialise into a ``std::ostream``.
     /**
      * \rststar
-     * This method will write into the output stream ``dest`` a binary representation of ``this``, starting from the
-     * current stream position. The serialised representation produced by this method can be read back with one of the
-     * :cpp:func:`~mppp::integer::binary_load()` overloads.
+     * This member function will write into the output stream ``dest`` a binary representation of ``this``, starting
+     * from the current stream position. The serialised representation produced by this member function can be read back
+     * with one of the :cpp:func:`~mppp::integer::binary_load()` overloads.
      *
      * If the serialisation is successful (that is, no stream error state is ever detected in ``dest`` after write
      * operations), then the binary size of ``this`` (that is, the number of bytes written into ``dest``) will be
@@ -2712,7 +2765,7 @@ public:
      *
      * .. warning::
      *
-     *    The binary representation produced by this method is compiler, platform and architecture
+     *    The binary representation produced by this member function is compiler, platform and architecture
      *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
      *    it should not be used as an exchange format or for long-term data storage.
      * \endrststar
@@ -2872,7 +2925,7 @@ public:
     /// Load a value from a memory buffer.
     /**
      * \rststar
-     * This method will load into ``this`` the content of the memory buffer starting
+     * This member function will load into ``this`` the content of the memory buffer starting
      * at ``src``, which must contain the serialised representation of an :cpp:class:`~mppp::integer`
      * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
      *
@@ -2880,9 +2933,9 @@ public:
      *
      * .. warning::
      *
-     *    Although this method performs a few consistency checks on the data in ``src``,
+     *    Although this member function performs a few consistency checks on the data in ``src``,
      *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this method only with trusted data.
+     *    advised to use this member function only with trusted data.
      * \endrststar
      *
      * @param src the source memory buffer.
@@ -2948,7 +3001,7 @@ public:
     /// Load a value from a ``std::vector<char>``.
     /**
      * \rststar
-     * This method will load into ``this`` the content of ``src``,
+     * This member function will load into ``this`` the content of ``src``,
      * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
      * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
      *
@@ -2959,9 +3012,9 @@ public:
      *
      * .. warning::
      *
-     *    Although this method performs a few consistency checks on the data in ``src``,
+     *    Although this member function performs a few consistency checks on the data in ``src``,
      *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this method only with trusted data.
+     *    advised to use this member function only with trusted data.
      * \endrststar
      *
      * @param src the source ``std::vector<char>``.
@@ -2980,7 +3033,7 @@ public:
     /// Load a value from a ``std::array<char>``.
     /**
      * \rststar
-     * This method will load into ``this`` the content of ``src``,
+     * This member function will load into ``this`` the content of ``src``,
      * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
      * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
      *
@@ -2991,9 +3044,9 @@ public:
      *
      * .. warning::
      *
-     *    Although this method performs a few consistency checks on the data in ``src``,
+     *    Although this member function performs a few consistency checks on the data in ``src``,
      *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this method only with trusted data.
+     *    advised to use this member function only with trusted data.
      * \endrststar
      *
      * @param src the source ``std::array<char>``.
@@ -3013,7 +3066,7 @@ public:
     /// Load a value from a ``std::istream``.
     /**
      * \rststar
-     * This method will load into ``this`` the content of ``src``,
+     * This member function will load into ``this`` the content of ``src``,
      * which must contain the serialised representation of an :cpp:class:`~mppp::integer`
      * produced by one of the :cpp:func:`~mppp::integer::binary_save()` overloads.
      *
@@ -3028,9 +3081,9 @@ public:
      *
      * .. warning::
      *
-     *    Although this method performs a few consistency checks on the data in ``src``,
+     *    Although this member function performs a few consistency checks on the data in ``src``,
      *    it cannot ensure complete safety against maliciously crafted data. Users are
-     *    advised to use this method only with trusted data.
+     *    advised to use this member function only with trusted data.
      * \endrststar
      *
      * @param src the source ``std::istream``.
@@ -3180,38 +3233,27 @@ inline integer<SSize> &set_negative_one(integer<SSize> &n)
     return n.set_negative_one();
 }
 
-/** @defgroup integer_conversion integer_conversion
- *  @{
- */
-
-/// Generic conversion function for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This function will convert the input :cpp:class:`~mppp::integer` ``n`` to a
- * :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into ``rop``.
- * If the conversion is successful, the function
- * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
- * not be altered.
- * \endrststar
- *
- * @param rop the variable which will store the result of the conversion.
- * @param n the input \link mppp::integer integer\endlink.
- *
- * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
- * a C++ integral which cannot represent the value of ``n``.
- */
+// Generic conversion function to C++ fundamental types.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CppInteroperable T, std::size_t SSize>
-inline bool get(T &rop, const integer<SSize> &n)
 #else
 template <typename T, std::size_t SSize, cpp_interoperable_enabler<T> = 0>
-inline bool get(T &rop, const integer<SSize> &n)
 #endif
+inline bool get(T &rop, const integer<SSize> &n)
 {
     return n.get(rop);
 }
 
-/** @} */
+// Generic conversion function to C++ complex types.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CppComplex T, std::size_t SSize>
+#else
+template <typename T, std::size_t SSize, cpp_complex_enabler<T> = 0>
+#endif
+inline bool get(T &rop, const integer<SSize> &n)
+{
+    return n.get(rop);
+}
 
 namespace detail
 {
@@ -5120,7 +5162,7 @@ inline integer<SSize> sqrm(const integer<SSize> &op, const integer<SSize> &mod)
 
 /// Binary negation.
 /**
- * This method will set \p rop to <tt>-n</tt>.
+ * This function will set \p rop to <tt>-n</tt>.
  *
  * @param rop the return value.
  * @param n the integer that will be negated.
@@ -7318,7 +7360,7 @@ inline unsigned long integer_exp_to_ulong(const integer<SSize> &exp)
 template <typename T, std::size_t SSize>
 inline integer<SSize> binomial_impl(const integer<SSize> &n, const T &k)
 {
-    // NOTE: here we re-use some helper methods used in the implementation of pow().
+    // NOTE: here we re-use some helper member functions used in the implementation of pow().
     if (sgn(k) >= 0) {
         return bin_ui(n, integer_exp_to_ulong(k));
     }
@@ -7866,7 +7908,7 @@ inline std::ostream &operator<<(std::ostream &os, const integer<SSize> &n)
 /**
  * \rststar
  * This function is the free function equivalent of the
- * :cpp:func:`mppp::integer::binary_size()` method.
+ * :cpp:func:`mppp::integer::binary_size()` member function.
  * \endrststar
  *
  * @param n the target \link mppp::integer integer\endlink.

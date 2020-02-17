@@ -153,8 +153,36 @@ Assignment
 Conversion
 ~~~~~~~~~~
 
-.. doxygengroup:: integer_conversion
-   :content-only:
+.. cpp:function:: template <mppp::CppInteroperable T, std::size_t SSize> bool mppp::get(T &rop, const mppp::integer<SSize> &n)
+
+   Generic conversion function from :cpp:class:`~mppp::integer` to C++ fundamental types.
+
+   This function will convert the input :cpp:class:`~mppp::integer` *n* to a
+   :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into *rop*.
+   If the conversion is successful, the function
+   will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
+   not be altered.
+
+   :param rop: the variable which will store the result of the conversion.
+   :param n: the input :cpp:class:`~mppp::integer`.
+
+   :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if *rop* is
+     a C++ integral which cannot represent the value of *n*.
+
+.. cpp:function:: template <mppp::CppComplex T, std::size_t SSize> bool mppp::get(T &rop, const mppp::integer<SSize> &n)
+
+   .. versionadded:: 0.19
+
+   Generic conversion function from :cpp:class:`~mppp::integer` to C++ complex types.
+
+   This function will convert the input :cpp:class:`~mppp::integer` *n* to a
+   :cpp:concept:`~mppp::CppComplex` type, storing the result of the conversion into *rop*.
+   The conversion is always successful, and this function will always return ``true``.
+
+   :param rop: the variable which will store the result of the conversion.
+   :param n: the input :cpp:class:`~mppp::integer`.
+
+   :return: ``true``.
 
 .. _integer_arithmetic:
 
