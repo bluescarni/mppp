@@ -33,9 +33,9 @@ namespace detail
 void float128_stream(std::ostream &os, const __float128 &x)
 {
     char buf[100];
-    // NOTE: 36 decimal digits ensures that reading back the string always produces the same value.
+    // NOTE: 36 decimal digits ensure that reading back the string always produces the same value:
     // https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
-    // NOTE: when using the g/G format, the precision field represent the number
+    // NOTE: when using the g/G format, the precision field represents the number
     // of significant digits:
     // https://linux.die.net/man/3/printf
     const auto n = ::quadmath_snprintf(buf, sizeof(buf), "%.36Qg", x);
