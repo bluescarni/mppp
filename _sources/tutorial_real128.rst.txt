@@ -88,3 +88,31 @@ a few additional capabilities:
 
 The :ref:`real128 reference <real128_reference>` contains the detailed description of all the features
 provided by :cpp:class:`~mppp::real128`.
+
+User-defined literal
+--------------------
+
+.. versionadded:: 0.19
+
+A user-defined literal is available to construct
+:cpp:class:`mppp::real128` instances.
+The :ref:`literal <real128_literal>`
+is defined within
+the inline namespace ``mppp::literals``, and it supports
+decimal and hexadecimal representations:
+
+.. code-block:: c++
+
+   using namespace mppp::literals;
+
+   auto r1 = 123.456_rq;   // r1 contains the quadruple-precision
+                           // approximation of 123.456 (that is,
+                           // 123.455999999999999999999999999999998).
+
+   auto r2 = 4.2e1_rq;     // Scientific notation can be used.
+
+   auto r3 = 0x1.12p-1_rq; // Hexadecimal floats are supported too.
+
+.. seealso::
+
+   https://en.cppreference.com/w/cpp/language/floating_literal

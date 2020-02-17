@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Quadruple-precision float tutorial &mdash; mp++ 0.18 documentation</title>
+  <title>Quadruple-precision float tutorial &mdash; mp++ 0.19 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18
+                0.19
               </div>
             
           
@@ -96,7 +96,10 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorial_api.html">API overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_integer.html">Integer tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_rational.html">Rational tutorial</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Quadruple-precision float tutorial</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Quadruple-precision float tutorial</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#user-defined-literal">User-defined literal</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_real.html">Multiprecision float tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_pybind11.html">Extra: integration with pybind11</a></li>
 </ul>
@@ -251,6 +254,33 @@ in mp++, they are supposed to be found via ADL. Member function overloads for th
 </ul>
 <p>The <a class="reference internal" href="real128.html#real128-reference"><span class="std std-ref">real128 reference</span></a> contains the detailed description of all the features
 provided by <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>.</p>
+<div class="section" id="user-defined-literal">
+<h2>User-defined literal<a class="headerlink" href="#user-defined-literal" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<p>A user-defined literal is available to construct
+<a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::real128</span></code></a> instances.
+The <a class="reference internal" href="real128.html#real128-literal"><span class="std std-ref">literal</span></a>
+is defined within
+the inline namespace <code class="docutils literal notranslate"><span class="pre">mppp::literals</span></code>, and it supports
+decimal and hexadecimal representations:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">mppp</span><span class="o">::</span><span class="n">literals</span><span class="p">;</span>
+
+<span class="k">auto</span> <span class="n">r1</span> <span class="o">=</span> <span class="mf">123.456</span><span class="n">_rq</span><span class="p">;</span>   <span class="c1">// r1 contains the quadruple-precision</span>
+                        <span class="c1">// approximation of 123.456 (that is,</span>
+                        <span class="c1">// 123.455999999999999999999999999999998).</span>
+
+<span class="k">auto</span> <span class="n">r2</span> <span class="o">=</span> <span class="mf">4.2e1</span><span class="n">_rq</span><span class="p">;</span>     <span class="c1">// Scientific notation can be used.</span>
+
+<span class="k">auto</span> <span class="n">r3</span> <span class="o">=</span> <span class="mh">0x1</span><span class="mf">.12</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="n">_rq</span><span class="p">;</span> <span class="c1">// Hexadecimal floats are supported too.</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/floating_literal">https://en.cppreference.com/w/cpp/language/floating_literal</a></p>
+</div>
+</div>
 </div>
 
 

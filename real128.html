@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Quadruple-precision floats &mdash; mp++ 0.18 documentation</title>
+  <title>Quadruple-precision floats &mdash; mp++ 0.19 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18
+                0.19
               </div>
             
           
@@ -118,6 +118,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#mathematical-operators">Mathematical operators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#constants">Constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#standard-library-specialisations">Standard library specialisations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user-defined-literal">User-defined literal</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="real.html">Multiprecision floats</a></li>
@@ -2597,6 +2598,31 @@ from the quadmath library.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="user-defined-literal">
+<span id="real128-literal"></span><h2>User-defined literal<a class="headerlink" href="#user-defined-literal" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli3_rqEN4mppp7real128Ev">
+<span id="_CPPv3I_DpcEN4mppp8literalsli3_rqEv"></span><span id="_CPPv2I_DpcEN4mppp8literalsli3_rqEv"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128">real128</a> <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_rq</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli3_rqEN4mppp7real128Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>User-defined quadruple-precision literal.</p>
+<p>This numeric literal operator template can be used to construct
+<a class="reference internal" href="#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::real128</span></code></a> instances. Floating-point literals in decimal and
+hexadecimal format are supported.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/floating_literal">https://en.cppreference.com/w/cpp/language/floating_literal</a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>std::invalid_argument</strong> – if the input sequence of characters is not
+a valid floating-point literal (as defined by the C++ standard).</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

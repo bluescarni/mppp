@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Multiprecision floats &mdash; mp++ 0.18 documentation</title>
+  <title>Multiprecision floats &mdash; mp++ 0.19 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18
+                0.19
               </div>
             
           
@@ -121,6 +121,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#mathematical-operators">Mathematical operators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#constants">Constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user-defined-literals">User-defined literals</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="utilities.html">Utility functions</a></li>
@@ -1931,8 +1932,8 @@ not support concepts).</p>
 </dd></dl>
 
 <dl class="concept">
-<dt id="_CPPv4I00EN4mppp19RealCompoundOpTypesE">
-<span id="_CPPv3I00EN4mppp19RealCompoundOpTypesE"></span><span id="_CPPv2I00EN4mppp19RealCompoundOpTypesE"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br /><em class="property">concept </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">RealCompoundOpTypes</code><a class="headerlink" href="#_CPPv4I00EN4mppp19RealCompoundOpTypesE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4I00EN4mppp18RealInPlaceOpTypesE">
+<span id="_CPPv3I00EN4mppp18RealInPlaceOpTypesE"></span><span id="_CPPv2I00EN4mppp18RealInPlaceOpTypesE"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br /><em class="property">concept </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">RealInPlaceOpTypes</code><a class="headerlink" href="#_CPPv4I00EN4mppp18RealInPlaceOpTypesE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if the types <code class="docutils literal notranslate"><span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code> are suitable for use in the
 generic in-place <a class="reference internal" href="#real-operators"><span class="std std-ref">operators</span></a>
 involving <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>. Specifically, the concept will be <code class="docutils literal notranslate"><span class="pre">true</span></code> if
@@ -4137,7 +4138,7 @@ operand to be converted.</p>
 
 <dl class="function">
 <dt>
-<span class="target" id="group__real__operators_1ga109f99a58ecb817f16bcc25657652c6f"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RealCompoundOpTypes&lt;T, U&gt; T&amp; mppp::operator+=(T &amp; a, U &amp;&amp; b)</code></dt>
+<span class="target" id="group__real__operators_1ga4f9ead677d4715ae243740c3e12e2782"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RealInPlaceOpTypes&lt;T, U&gt; T&amp; mppp::operator+=(T &amp; a, U &amp;&amp; b)</code></dt>
 <dd><p>In-place addition involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>If <code class="docutils literal notranslate"><span class="pre">a</span></code> is a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>, then this operator is equivalent
 to the expression:</p>
@@ -4246,7 +4247,7 @@ operand to be converted.</p>
 
 <dl class="function">
 <dt>
-<span class="target" id="group__real__operators_1ga75e056cc89dedf05bca11a2ab57bef50"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RealCompoundOpTypes&lt;T, U&gt; T&amp; mppp::operator-=(T &amp; a, U &amp;&amp; b)</code></dt>
+<span class="target" id="group__real__operators_1ga0cd76f859554a22a6fd31716a2c41601"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RealInPlaceOpTypes&lt;T, U&gt; T&amp; mppp::operator-=(T &amp; a, U &amp;&amp; b)</code></dt>
 <dd><p>In-place subtraction involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>If <code class="docutils literal notranslate"><span class="pre">a</span></code> is a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>, then this operator is equivalent
 to the expression:</p>
@@ -4338,7 +4339,7 @@ operand to be converted.</p>
 
 <dl class="function">
 <dt>
-<span class="target" id="group__real__operators_1gad97c0292a0dd21475f5a82d0e34c3c6c"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RealCompoundOpTypes&lt;T, U&gt; T&amp; mppp::operator*=(T &amp; a, U &amp;&amp; b)</code></dt>
+<span class="target" id="group__real__operators_1ga08cc9ee5fb4a10d7625545a27b7ae55b"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RealInPlaceOpTypes&lt;T, U&gt; T&amp; mppp::operator*=(T &amp; a, U &amp;&amp; b)</code></dt>
 <dd><p>In-place multiplication involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>If <code class="docutils literal notranslate"><span class="pre">a</span></code> is a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>, then this operator is equivalent
 to the expression:</p>
@@ -4398,7 +4399,7 @@ operand to be converted.</p>
 
 <dl class="function">
 <dt>
-<span class="target" id="group__real__operators_1ga910741f6cd8b59577dfe8d25fab081ae"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RealCompoundOpTypes&lt;T, U&gt; T&amp; mppp::operator/=(T &amp; a, U &amp;&amp; b)</code></dt>
+<span class="target" id="group__real__operators_1gac7939fd748299cbc821859f6bf0b71ac"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RealInPlaceOpTypes&lt;T, U&gt; T&amp; mppp::operator/=(T &amp; a, U &amp;&amp; b)</code></dt>
 <dd><p>In-place division involving <a class="reference internal" href="#classmppp_1_1real"><span class="std std-ref">real</span></a>. </p>
 <p><p>If <code class="docutils literal notranslate"><span class="pre">a</span></code> is a <a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>, then this operator is equivalent
 to the expression:</p>
@@ -4685,6 +4686,47 @@ If <code class="docutils literal notranslate"><span class="pre">p</span></code> 
 </dd>
 </dl>
 </p>
+</dd></dl>
+
+</div>
+<div class="section" id="user-defined-literals">
+<span id="real-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli5_r128EN4mppp4realEv">
+<span id="_CPPv3I_DpcEN4mppp8literalsli5_r128Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli5_r128Ev"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_r128</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli5_r128EN4mppp4realEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli5_r256EN4mppp4realEv">
+<span id="_CPPv3I_DpcEN4mppp8literalsli5_r256Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli5_r256Ev"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_r256</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli5_r256EN4mppp4realEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli5_r512EN4mppp4realEv">
+<span id="_CPPv3I_DpcEN4mppp8literalsli5_r512Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli5_r512Ev"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_r512</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli5_r512EN4mppp4realEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli6_r1024EN4mppp4realEv">
+<span id="_CPPv3I_DpcEN4mppp8literalsli6_r1024Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli6_r1024Ev"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_r1024</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli6_r1024EN4mppp4realEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>User-defined real literals.</p>
+<p>These numeric literal operator templates can be used to construct
+<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::real</span></code></a> instances with, respectively, 128, 256, 512
+and 1024 bits of precision. Floating-point literals in decimal and
+hexadecimal format are supported.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/floating_literal">https://en.cppreference.com/w/cpp/language/floating_literal</a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>std::invalid_argument</strong> – if the input sequence of characters is not
+a valid floating-point literal (as defined by the C++ standard).</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

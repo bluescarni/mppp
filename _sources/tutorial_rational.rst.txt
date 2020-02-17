@@ -108,3 +108,41 @@ and ``mpq_t`` objects:
 
    mpz_clear(m);                // Clear the mpz_t.
    mpq_clear(q);                // Clear the mpq_t.
+
+User-defined literals
+---------------------
+
+.. versionadded:: 0.19
+
+User-defined literals are available to construct
+:cpp:class:`mppp::rational` instances with 1, 2 and 3
+limbs of static storage. The :ref:`literals <rational_literals>`
+are defined within
+the inline namespace ``mppp::literals``, and they support
+binary, octal, decimal and hexadecimal representations:
+
+.. code-block:: c++
+
+   using namespace mppp::literals;
+
+   auto q1 = 123_q1;      // q1 has 1 limb of static storage,
+                          // and it contains the value 123.
+
+   auto q2 = -0b10011_q2; // q2 has 2 limbs of static storage,
+                          // and it contains the value -19
+                          // (-10011 in base 2).
+
+   auto q3 = 0146_q1;     // q3 has 1 limb of static storage,
+                          // and it contains the value 102
+                          // (146 in base 8).
+
+   auto q4 = 0xfe45_q3;   // q4 has 3 limbs of static storage,
+                          // and it contains the value 65093
+                          // (fe45 in base 16).
+
+Note that, due to language limitations, only values with unitary denominator
+can be constructed via these literals.
+
+.. seealso::
+
+   https://en.cppreference.com/w/cpp/language/integer_literal

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Multiprecision rationals &mdash; mp++ 0.18 documentation</title>
+  <title>Multiprecision rationals &mdash; mp++ 0.19 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.18
+                0.19
               </div>
             
           
@@ -110,6 +110,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#mathematical-operators">Mathematical operators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#standard-library-specialisations">Standard library specialisations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user-defined-literals">User-defined literals</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="real128.html">Quadruple-precision floats</a></li>
@@ -1831,6 +1832,44 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="user-defined-literals">
+<span id="rational-literals"></span><h2>User-defined literals<a class="headerlink" href="#user-defined-literals" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli3_q1EN4mppp8rationalIXL1EEEEv">
+<span id="_CPPv3I_DpcEN4mppp8literalsli3_q1Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli3_q1Ev"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::rational&lt;1&gt; <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_q1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli3_q1EN4mppp8rationalIXL1EEEEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli3_q2EN4mppp8rationalIXL2EEEEv">
+<span id="_CPPv3I_DpcEN4mppp8literalsli3_q2Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli3_q2Ev"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::rational&lt;2&gt; <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_q2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli3_q2EN4mppp8rationalIXL2EEEEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_DpcEN4mppp8literalsli3_q3EN4mppp8rationalIXL3EEEEv">
+<span id="_CPPv3I_DpcEN4mppp8literalsli3_q3Ev"></span><span id="_CPPv2I_DpcEN4mppp8literalsli3_q3Ev"></span>template&lt;char... <code class="sig-name descname">Chars</code>&gt;<br />mppp::rational&lt;3&gt; <code class="sig-prename descclassname">mppp::literals<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">operator&quot;&quot;_q3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_DpcEN4mppp8literalsli3_q3EN4mppp8rationalIXL3EEEEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>User-defined rational literals.</p>
+<p>These numeric literal operator templates can be used to construct
+<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">mppp::rational</span></code> instances with, respectively, 1, 2 and 3
+limbs of static storage. Literals in binary, octal, decimal and
+hexadecimal format are supported.</p>
+<p>Note that only integral values (i.e., rationals with unitary denominator)
+can be constructed via these literals.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://en.cppreference.com/w/cpp/language/integer_literal">https://en.cppreference.com/w/cpp/language/integer_literal</a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><p><strong>std::invalid_argument</strong> – if the input sequence of characters is not
+a valid integer literal (as defined by the C++ standard).</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
