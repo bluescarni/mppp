@@ -3162,6 +3162,33 @@ public:
 
 } // namespace std
 
+#include <mp++/detail/real128_literal.hpp>
+
+// Support for pretty printing in xeus-cling.
+#if defined(__CLING__)
+
+#if __has_include(<nlohmann/json.hpp>)
+
+#include <nlohmann/json.hpp>
+
+namespace mppp
+{
+
+inline nlohmann::json mime_bundle_repr(const real128 &x)
+{
+    auto bundle = nlohmann::json::object();
+
+    bundle["text/plain"] = x.to_string();
+
+    return bundle;
+}
+
+} // namespace mppp
+
+#endif
+
+#endif
+
 #else
 
 #error The real128.hpp header was included but mp++ was not configured with the MPPP_WITH_QUADMATH option.

@@ -292,3 +292,25 @@ Standard library specialisations
    .. cpp:function:: public static constexpr mppp::real128 denorm_min()
 
      :return: the output of :cpp:func:`mppp::real128_denorm_min()`.
+
+.. _real128_literal:
+
+User-defined literal
+--------------------
+
+.. versionadded:: 0.19
+
+.. cpp:function:: template <char... Chars> mppp::real128 mppp::literals::operator"" _rq()
+
+   User-defined quadruple-precision literal.
+
+   This numeric literal operator template can be used to construct
+   :cpp:class:`mppp::real128` instances. Floating-point literals in decimal and
+   hexadecimal format are supported.
+
+   .. seealso::
+
+      https://en.cppreference.com/w/cpp/language/floating_literal
+
+   :exception std\:\:invalid_argument: if the input sequence of characters is not
+     a valid floating-point literal (as defined by the C++ standard).

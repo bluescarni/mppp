@@ -235,7 +235,14 @@ inline integer<SSize> integer_literal_impl()
 {
     // Turn the sequence of input chars
     // into a null-terminated char array.
-    constexpr char arr[] = {Chars..., '\0'};
+    // NOTE: earlier clang versions won't properly
+    // capture arr in the lambdas below if it is
+    // not marked as static.
+#if defined(__clang__) && __clang_major__ <= 5
+    static
+#endif
+        constexpr char arr[]
+        = {Chars..., '\0'};
 
 #if MPPP_CPLUSPLUS >= 201703L && (!defined(_MSC_VER) || defined(__clang__))
     // Run the checks on the char sequence, and determine the base.

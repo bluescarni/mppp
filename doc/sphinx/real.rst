@@ -91,7 +91,7 @@ Concepts
    A corresponding boolean type trait called ``are_real_op_types`` is also available (even if the compiler does
    not support concepts).
 
-.. cpp:concept:: template <typename T, typename U> mppp::RealCompoundOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::RealInPlaceOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic in-place :ref:`operators <real_operators>`
@@ -942,3 +942,29 @@ Constants
 
 .. doxygengroup:: real_constants
    :content-only:
+
+.. _real_literals:
+
+User-defined literals
+---------------------
+
+.. versionadded:: 0.19
+
+.. cpp:function:: template <char... Chars> mppp::real mppp::literals::operator"" _r128()
+.. cpp:function:: template <char... Chars> mppp::real mppp::literals::operator"" _r256()
+.. cpp:function:: template <char... Chars> mppp::real mppp::literals::operator"" _r512()
+.. cpp:function:: template <char... Chars> mppp::real mppp::literals::operator"" _r1024()
+
+   User-defined real literals.
+
+   These numeric literal operator templates can be used to construct
+   :cpp:class:`mppp::real` instances with, respectively, 128, 256, 512
+   and 1024 bits of precision. Floating-point literals in decimal and
+   hexadecimal format are supported.
+
+   .. seealso::
+
+      https://en.cppreference.com/w/cpp/language/floating_literal
+
+   :exception std\:\:invalid_argument: if the input sequence of characters is not
+     a valid floating-point literal (as defined by the C++ standard).

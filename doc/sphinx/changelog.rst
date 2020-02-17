@@ -1,6 +1,32 @@
 Changelog
 =========
 
+0.19 (unreleased)
+-----------------
+
+New
+~~~
+
+- mp++'s multiprecision classes now support pretty-printing in the
+  `xeus-cling notebook <https://github.com/jupyter-xeus/xeus-cling>`__
+  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
+- Implement user-defined literals for :cpp:class:`~mppp::rational`,
+  :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::real`
+  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
+
+Changes
+~~~~~~~
+
+- The :cpp:class:`~mppp::real128` string representation
+  has been changed to use the ``g`` format specifier
+  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
+
+Fix
+~~~
+
+- Fix compilation with older clang versions in C++17 mode
+  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
+
 0.18 (14-02-2020)
 -----------------
 
