@@ -9,7 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
-project(mp++ VERSION 0.18 LANGUAGES CXX C)
+project(mp++ VERSION 0.19 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
@@ -199,7 +199,10 @@ set(MPPP_SRC_FILES
 )
 
 if(MPPP_WITH_QUADMATH)
-    set(MPPP_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/real128.cpp" "${MPPP_SRC_FILES}")
+    set(MPPP_SRC_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/real128.cpp"
+        "${MPPP_SRC_FILES}"
+    )
 endif()
 
 if(MPPP_WITH_MPFR)
@@ -240,8 +243,8 @@ if(MPPP_BUILD_STATIC_LIBRARY)
 else()
     # Setup of the mp++ shared library.
     add_library(mp++ SHARED "${MPPP_SRC_FILES}")
-    set_property(TARGET mp++ PROPERTY VERSION "4.0")
-    set_property(TARGET mp++ PROPERTY SOVERSION 4)
+    set_property(TARGET mp++ PROPERTY VERSION "5.0")
+    set_property(TARGET mp++ PROPERTY SOVERSION 5)
     set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
     set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
     set_target_properties(mp++ PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)

@@ -184,3 +184,31 @@ Standard library specialisations
       :param q: the input :cpp:class:`mppp::rational`.
 
       :return: a hash value for *q*.
+
+.. _rational_literals:
+
+User-defined literals
+---------------------
+
+.. versionadded:: 0.19
+
+.. cpp:function:: template <char... Chars> mppp::rational<1> mppp::literals::operator"" _q1()
+.. cpp:function:: template <char... Chars> mppp::rational<2> mppp::literals::operator"" _q2()
+.. cpp:function:: template <char... Chars> mppp::rational<3> mppp::literals::operator"" _q3()
+
+   User-defined rational literals.
+
+   These numeric literal operator templates can be used to construct
+   :cpp:class:`mppp::rational` instances with, respectively, 1, 2 and 3
+   limbs of static storage. Literals in binary, octal, decimal and
+   hexadecimal format are supported.
+
+   Note that only integral values (i.e., rationals with unitary denominator)
+   can be constructed via these literals.
+
+   .. seealso::
+
+      https://en.cppreference.com/w/cpp/language/integer_literal
+
+   :exception std\:\:invalid_argument: if the input sequence of characters is not
+     a valid integer literal (as defined by the C++ standard).
