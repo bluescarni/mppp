@@ -217,6 +217,10 @@ struct pow_tester {
                              decltype(mppp::pow(std::complex<long double>{2}, integer{2}))>::value);
 #endif
 
+        // NOTE: fully qualify the pow() call because on MSVC there are
+        // template implementations of std::pow() for complex that, through
+        // ADL, are preferred over mp++'s ones. Not sure if what MSVC
+        // is doing is 100% compliant.
         REQUIRE(mppp::pow(integer{2}, std::complex<float>{2}) == std::complex<float>{4, 0});
         REQUIRE(mppp::pow(std::complex<float>{2}, integer{2}) == std::complex<float>{4, 0});
         REQUIRE(mppp::pow(integer{2}, std::complex<double>{2}) == std::complex<double>{4, 0});
