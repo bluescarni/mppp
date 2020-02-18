@@ -3289,6 +3289,16 @@ struct integer_common_type<T, integer<SSize>, enable_if_t<is_cpp_floating_point_
     using type = T;
 };
 
+template <std::size_t SSize, typename U>
+struct integer_common_type<integer<SSize>, U, enable_if_t<is_cpp_complex<U>::value>> {
+    using type = U;
+};
+
+template <std::size_t SSize, typename T>
+struct integer_common_type<T, integer<SSize>, enable_if_t<is_cpp_complex<T>::value>> {
+    using type = T;
+};
+
 template <typename T, typename U>
 using integer_common_t = typename integer_common_type<T, U>::type;
 
@@ -7491,20 +7501,7 @@ inline int probab_prime_p(const integer<SSize> &n, int reps = 25)
 
 /** @} */
 
-/** @defgroup integer_exponentiation integer_exponentiation
- *  @{
- */
-
-/// Ternary exponentiation for \link mppp::integer integer\endlink.
-/**
- * This function will set \p rop to <tt>base**exp</tt>.
- *
- * @param rop the return value.
- * @param base the base.
- * @param exp the exponent.
- *
- * @return a reference to \p rop.
- */
+// Ternary exponentiation.
 template <std::size_t SSize>
 inline integer<SSize> &pow_ui(integer<SSize> &rop, const integer<SSize> &base, unsigned long exp)
 {
@@ -7513,13 +7510,7 @@ inline integer<SSize> &pow_ui(integer<SSize> &rop, const integer<SSize> &base, u
     return rop = &tmp.m_mpz;
 }
 
-/// Binary exponentiation for \link mppp::integer integer\endlink.
-/**
- * @param base the base.
- * @param exp the exponent.
- *
- * @return <tt>base**exp</tt>.
- */
+// Binary exponentiation.
 template <std::size_t SSize>
 inline integer<SSize> pow_ui(const integer<SSize> &base, unsigned long exp)
 {
@@ -7594,39 +7585,34 @@ inline T pow_impl(const T &base, const integer<SSize> &exp)
 {
     return std::pow(base, static_cast<T>(exp));
 }
+
+// integer -- complex overload.
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_complex<T>::value, int> = 0>
+inline T pow_impl(const integer<SSize> &base, const T &exp)
+{
+    return std::pow(static_cast<typename T::value_type>(base), exp);
+}
+
+// complex -- integer overload.
+template <typename T, std::size_t SSize, enable_if_t<is_cpp_complex<T>::value, int> = 0>
+inline T pow_impl(const T &base, const integer<SSize> &exp)
+{
+    return std::pow(base, static_cast<typename T::value_type>(exp));
+}
+
 } // namespace detail
 
-/// Generic binary exponentiation for \link mppp::integer integer\endlink.
-/**
- * \rststar
- * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
- * is a floating-point value, then the result will be computed via ``std::pow()`` and it will also be a
- * floating-point value. Otherwise, the result will be an :cpp:class:`~mppp::integer`.
- * In case of a negative integral exponent and integral base, the result will be zero unless
- * the absolute value of ``base`` is 1.
- * \endrststar
- *
- * @param base the base.
- * @param exp the exponent.
- *
- * @return <tt>base**exp</tt>.
- *
- * @throws std::overflow_error if \p base and \p exp are integrals and \p exp is non-negative and outside the range
- * of <tt>unsigned long</tt>.
- * @throws zero_division_error if \p base and \p exp are integrals and \p base is zero and \p exp is negative.
- */
+// Generic binary exponentiation.
+template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline auto pow(const T &base, const U &exp)
+requires IntegerOpTypes<T, U> inline auto
 #else
-template <typename T, typename U>
-inline detail::integer_common_t<T, U> pow(const T &base, const U &exp)
+inline detail::integer_common_t<T, U>
 #endif
+pow(const T &base, const U &exp)
 {
     return detail::pow_impl(base, exp);
 }
-
-/** @} */
 
 namespace detail
 {

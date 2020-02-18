@@ -48,7 +48,8 @@ Concepts
    involving :cpp:class:`~mppp::integer`. Specifically, the concept will be ``true`` if either:
 
    * ``T`` and ``U`` are both :cpp:class:`~mppp::integer` with the same static size ``SSize``, or
-   * one type is an :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::CppInteroperable` type.
+   * one type is an :cpp:class:`~mppp::integer` and the other is a :cpp:concept:`~mppp::CppInteroperable`
+     or :cpp:concept:`~mppp::CppComplex` type.
 
    Note that the modulo, bit-shifting and bitwise logic operators have additional restrictions.
 
@@ -286,8 +287,50 @@ Number theoretic functions
 Exponentiation
 ~~~~~~~~~~~~~~
 
-.. doxygengroup:: integer_exponentiation
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::pow_ui(mppp::integer<SSize> &rop, const mppp::integer<SSize> &base, unsigned long exp)
+
+   Ternary :cpp:class:`~mppp::integer` exponentiation.
+
+   This function will set *rop* to ``base**exp``.
+
+   :param rop: the return value.
+   :param base: the base.
+   :param exp: the exponent.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::pow_ui(const mppp::integer<SSize> &base, unsigned long exp)
+
+   Binary :cpp:class:`~mppp::integer` exponentiation.
+
+   :param base: the base.
+   :param exp: the exponent.
+
+   :return: ``base**exp``.
+
+.. cpp:function:: template <typename T, typename U> auto mppp::pow(const T &base, const U &exp)
+
+   .. note::
+
+      This function participates in overload resolution only if ``T`` and ``U`` satisfy
+      the :cpp:concept:`~mppp::IntegerOpTypes` concept.
+
+   Generic binary :cpp:class:`~mppp::integer` exponentiation.
+
+   This function will raise *base* to the power *exp*, and return the result. If one of the arguments
+   is a floating-point or complex value, then the result will be computed via ``std::pow()`` and it will
+   also be a floating-point or complex value. Otherwise, the result will be an :cpp:class:`~mppp::integer`.
+   In case of a negative integral exponent and integral base, the result will be zero unless
+   the absolute value of ``base`` is 1.
+
+   :param base: the base.
+   :param exp: the exponent.
+
+   :return: ``base**exp``.
+
+   :exception std\:\:overflow_error: if *base* and *exp* are integrals and *exp* is non-negative and outside the range
+     of ``unsigned long``.
+   :exception mppp\:\:zero_division_error: if *base* and *exp* are integrals and *base* is zero and *exp* is negative.
 
 .. _integer_roots:
 

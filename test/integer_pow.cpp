@@ -7,6 +7,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <limits>
 #include <random>
@@ -203,6 +204,26 @@ struct pow_tester {
         REQUIRE(pow(__int128_t{4}, integer{2}) == 16);
         REQUIRE(pow(integer{2}, __uint128_t{4}) == 16);
         REQUIRE(pow(__uint128_t{4}, integer{2}) == 16);
+#endif
+        // Complex testing.
+        REQUIRE(std::is_same<std::complex<float>, decltype(pow(integer{2}, std::complex<float>{2}))>::value);
+        REQUIRE(std::is_same<std::complex<float>, decltype(pow(std::complex<float>{2}, integer{2}))>::value);
+        REQUIRE(std::is_same<std::complex<double>, decltype(pow(integer{2}, std::complex<double>{2}))>::value);
+        REQUIRE(std::is_same<std::complex<double>, decltype(pow(std::complex<double>{2}, integer{2}))>::value);
+#if defined(MPPP_WITH_MPFR)
+        REQUIRE(
+            std::is_same<std::complex<long double>, decltype(pow(integer{2}, std::complex<long double>{2}))>::value);
+        REQUIRE(
+            std::is_same<std::complex<long double>, decltype(pow(std::complex<long double>{2}, integer{2}))>::value);
+#endif
+
+        REQUIRE(pow(integer{2}, std::complex<float>{2}) == std::complex<float>{4, 0});
+        REQUIRE(pow(std::complex<float>{2}, integer{2}) == std::complex<float>{4, 0});
+        REQUIRE(pow(integer{2}, std::complex<double>{2}) == std::complex<double>{4, 0});
+        REQUIRE(pow(std::complex<double>{2}, integer{2}) == std::complex<double>{4, 0});
+#if defined(MPPP_WITH_MPFR) && !defined(__FreeBSD__)
+        REQUIRE(pow(integer{2}, std::complex<long double>{2}) == std::complex<long double>{4, 0});
+        REQUIRE(pow(std::complex<long double>{2}, integer{2}) == std::complex<long double>{4, 0});
 #endif
     }
 };
