@@ -205,32 +205,31 @@ struct pow_tester {
         REQUIRE(pow(integer{2}, __uint128_t{4}) == 16);
         REQUIRE(pow(__uint128_t{4}, integer{2}) == 16);
 #endif
-        static_assert(std::is_same<std::complex<float>, decltype(mppp::pow(integer{2}, std::complex<float>{2}))>::value,
-                      "Oh noes 01");
-        static_assert(std::is_same<typename detail::integer_common_type<integer, std::complex<float>>::type,
-                                   std::complex<float>>::value,
-                      "Oh noes 02");
-#if 0
+        // static_assert(std::is_same<std::complex<float>, decltype(mppp::pow(integer{2},
+        // std::complex<float>{2}))>::value,
+        //               "Oh noes 01");
+        // static_assert(std::is_same<typename detail::integer_common_type<integer, std::complex<float>>::type,
+        //                            std::complex<float>>::value,
+        //               "Oh noes 02");
         // Complex testing.
-        REQUIRE(std::is_same<std::complex<float>, decltype(pow(integer{2}, std::complex<float>{2}))>::value);
-        REQUIRE(std::is_same<std::complex<float>, decltype(pow(std::complex<float>{2}, integer{2}))>::value);
-        REQUIRE(std::is_same<std::complex<double>, decltype(pow(integer{2}, std::complex<double>{2}))>::value);
-        REQUIRE(std::is_same<std::complex<double>, decltype(pow(std::complex<double>{2}, integer{2}))>::value);
+        REQUIRE(std::is_same<std::complex<float>, decltype(mppp::pow(integer{2}, std::complex<float>{2}))>::value);
+        REQUIRE(std::is_same<std::complex<float>, decltype(mppp::pow(std::complex<float>{2}, integer{2}))>::value);
+        REQUIRE(std::is_same<std::complex<double>, decltype(mppp::pow(integer{2}, std::complex<double>{2}))>::value);
+        REQUIRE(std::is_same<std::complex<double>, decltype(mppp::pow(std::complex<double>{2}, integer{2}))>::value);
 #if defined(MPPP_WITH_MPFR)
-        REQUIRE(
-            std::is_same<std::complex<long double>, decltype(pow(integer{2}, std::complex<long double>{2}))>::value);
-        REQUIRE(
-            std::is_same<std::complex<long double>, decltype(pow(std::complex<long double>{2}, integer{2}))>::value);
+        REQUIRE(std::is_same<std::complex<long double>,
+                             decltype(mppp::pow(integer{2}, std::complex<long double>{2}))>::value);
+        REQUIRE(std::is_same<std::complex<long double>,
+                             decltype(mppp::pow(std::complex<long double>{2}, integer{2}))>::value);
 #endif
 
-        REQUIRE(pow(integer{2}, std::complex<float>{2}) == std::complex<float>{4, 0});
-        REQUIRE(pow(std::complex<float>{2}, integer{2}) == std::complex<float>{4, 0});
-        REQUIRE(pow(integer{2}, std::complex<double>{2}) == std::complex<double>{4, 0});
-        REQUIRE(pow(std::complex<double>{2}, integer{2}) == std::complex<double>{4, 0});
+        REQUIRE(mppp::pow(integer{2}, std::complex<float>{2}) == std::complex<float>{4, 0});
+        REQUIRE(mppp::pow(std::complex<float>{2}, integer{2}) == std::complex<float>{4, 0});
+        REQUIRE(mppp::pow(integer{2}, std::complex<double>{2}) == std::complex<double>{4, 0});
+        REQUIRE(mppp::pow(std::complex<double>{2}, integer{2}) == std::complex<double>{4, 0});
 #if defined(MPPP_WITH_MPFR) && !defined(__FreeBSD__)
-        REQUIRE(pow(integer{2}, std::complex<long double>{2}) == std::complex<long double>{4, 0});
-        REQUIRE(pow(std::complex<long double>{2}, integer{2}) == std::complex<long double>{4, 0});
-#endif
+        REQUIRE(mppp::pow(integer{2}, std::complex<long double>{2}) == std::complex<long double>{4, 0});
+        REQUIRE(mppp::pow(std::complex<long double>{2}, integer{2}) == std::complex<long double>{4, 0});
 #endif
     }
 };
