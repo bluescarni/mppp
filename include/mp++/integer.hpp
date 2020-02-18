@@ -8094,13 +8094,15 @@ inline integer<SSize> dispatch_binary_add(T n, const integer<SSize> &op2)
     return dispatch_binary_add(op2, n);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_add(const integer<SSize> &op1, T x)
 {
     return static_cast<T>(op1) + x;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_add(T x, const integer<SSize> &op2)
 {
     return dispatch_binary_add(op2, x);
@@ -8125,17 +8127,20 @@ inline void dispatch_in_place_add(integer<SSize> &retval, const T &n)
     add_si(retval, retval, n);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_add(integer<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize,
+          enable_if_t<disjunction<is_cpp_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_add(T &rop, const integer<SSize> &op)
 {
     rop = static_cast<T>(rop + op);
 }
+
 } // namespace detail
 
 /// Identity operator.
@@ -8159,8 +8164,8 @@ inline integer<SSize> operator+(const integer<SSize> &n)
  * \rststar
  * The return type is determined as follows:
  *
- * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point type ``F``, then the
- *   type of the result is ``F``; otherwise,
+ * * if the non-:cpp:class:`~mppp::integer` argument is a floating-point or complex type, then the
+ *   type of the result is floating-point or complex; otherwise,
  * * the type of the result is :cpp:class:`~mppp::integer`.
  *
  * \endrststar
@@ -8170,13 +8175,13 @@ inline integer<SSize> operator+(const integer<SSize> &n)
  *
  * @return <tt>op1 + op2</tt>.
  */
+template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-requires IntegerOpTypes<T, U> inline auto operator+(const T &op1, const U &op2)
+requires IntegerOpTypes<T, U> inline auto
 #else
-template <typename T, typename U>
-inline detail::integer_common_t<T, U> operator+(const T &op1, const U &op2)
+inline detail::integer_common_t<T, U>
 #endif
+operator+(const T &op1, const U &op2)
 {
     return detail::dispatch_binary_add(op1, op2);
 }
@@ -8188,8 +8193,8 @@ inline detail::integer_common_t<T, U> operator+(const T &op1, const U &op2)
  *
  * @return a reference to \p rop.
  *
- * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
- * by the conversion operator of \link mppp::integer integer\endlink.
+ * @throws unspecified any exception thrown by the assignment/conversion operators
+ * of \link mppp::integer integer\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
