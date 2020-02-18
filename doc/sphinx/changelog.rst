@@ -24,6 +24,8 @@ Changes
 Fix
 ~~~
 
+- Fix a build system failure when building the benchmarks
+  (`#214 <https://github.com/bluescarni/mppp/pull/214>`__).
 - Fix compilation with older clang versions in C++17 mode
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 
