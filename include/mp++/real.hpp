@@ -3360,15 +3360,12 @@ inline real dispatch_log_hypot(const T &x, U &&a)
 
 // Binary log_hypot.
 #if defined(MPPP_HAVE_CONCEPTS)
-// NOTE: written like this, the constraint is equivalent
-// to: requires RealOpTypes<U, T>.
-template <typename T, RealOpTypes<T> U>
+template <typename T, typename U>
+requires RealOpTypes<T, U>
 #else
-// NOTE: we flip around T and U in the enabler to keep
-// it consistent with the concept above.
-template <typename T, typename U, real_op_types_enabler<U, T> = 0>
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
 #endif
-inline real log_hypot(T &&x, U &&y)
+    inline real log_hypot(T &&x, U &&y)
 {
     return detail::dispatch_log_hypot(std::forward<T>(x), std::forward<U>(y));
 }

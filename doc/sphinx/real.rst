@@ -639,7 +639,7 @@ Logarithms and exponentials
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::log_hypot(T &&x, U &&y)
+.. cpp:function:: template <typename T, typename U> mppp::real mppp::log_hypot(T &&x, U &&y)
 
    .. versionadded:: 0.19
 
@@ -647,6 +647,11 @@ Logarithms and exponentials
       This function is available only if mp++ was
       configured with the ``MPPP_WITH_ARB`` option enabled
       (see the :ref:`installation instructions <installation>`).
+
+   .. note::
+
+      This function participates in overload resolution only if ``T`` and ``U`` satisfy
+      the :cpp:concept:`~mppp::RealOpTypes` concept.
 
    Binary log hypot function.
 
