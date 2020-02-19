@@ -65,6 +65,14 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_cosmic_clang7_debuggmp.sh
+  bionic_gcc7_conda:
+    docker:
+    - image: circleci/buildpack-deps:bionic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_bionic_gcc7_conda.sh
 
 workflows:
   version: 2
@@ -78,3 +86,4 @@ workflows:
     - bionic_clang6_ubsan
     - cosmic_clang7_debuggmp_unstable
     - cosmic_clang7_debuggmp
+    - bionic_gcc7_conda

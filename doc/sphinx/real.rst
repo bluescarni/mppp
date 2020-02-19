@@ -177,6 +177,45 @@ Roots
 
    :return: the square root of *r*.
 
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sqrt1pm1(mppp::real &rop, T &&op)
+
+   .. versionadded:: 0.19
+
+   .. note::
+      This function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
+
+   Binary :cpp:class:`~mppp::real` sqrt1pm1.
+
+   This function will compute :math:`\sqrt{1+x}-1`, where :math:`x` is the value of *op*,
+   and store the result into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sqrt1pm1(T &&r)
+
+   .. versionadded:: 0.19
+
+   .. note::
+      This function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
+
+   Unary :cpp:class:`~mppp::real` sqrt1pm1.
+
+   This function will compute and return :math:`\sqrt{1+x}-1`, where :math:`x`
+   is the value of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the operand.
+
+   :return: the sqrt1pm1 of *r*.
+
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::rec_sqrt(mppp::real &rop, T &&op)
 
    .. versionadded:: 0.12
@@ -579,6 +618,53 @@ Logarithms and exponentials
    :param r: the operand.
 
    :return: the logarithm of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::log_hypot(mppp::real &rop, T &&x, U &&y)
+
+   .. versionadded:: 0.19
+
+   .. note::
+      This function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
+
+   Ternary log hypot function.
+
+   This function will set *rop* to :math:`\log\left(\sqrt{x^2+y^2}\right)`.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::log_hypot(T &&x, U &&y)
+
+   .. versionadded:: 0.19
+
+   .. note::
+      This function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
+
+   Binary log hypot function.
+
+   This function will compute and return :math:`\log\left(\sqrt{x^2+y^2}\right)`.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
+   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
+   either the default precision, if set, or it is automatically deduced depending on the type
+   and value of the operand to be converted.
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the log hypot function of *x* and *y*.
+
+   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
 
 .. _real_gamma:
 

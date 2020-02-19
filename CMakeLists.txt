@@ -27,12 +27,17 @@ mark_as_advanced(MPPP_BENCHMARK_BOOST)
 option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
 mark_as_advanced(MPPP_BENCHMARK_FLINT)
 option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
+option(MPPP_WITH_ARB "Enable features relying on Arb." OFF)
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
 mark_as_advanced(MPPP_TEST_PYBIND11)
 option(MPPP_BUILD_STATIC_LIBRARY "Build mp++ as a static library, instead of dynamic." OFF)
 if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_UNICODE "Enable Unicode solutions for MSVC." OFF)
+endif()
+
+if(MPPP_WITH_ARB AND NOT MPPP_WITH_MPFR)
+    message(FATAL_ERROR "Arb support requires MPFR, please enable the MPPP_WITH_MPFR build option.")
 endif()
 
 if(YACMA_COMPILER_IS_MSVC AND MPPP_BUILD_STATIC_LIBRARY)
@@ -284,6 +289,14 @@ if(MPPP_WITH_MPFR)
     find_package(MPFR REQUIRED)
     target_link_libraries(mp++ PUBLIC MPFR::MPFR)
     set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
+endif()
+
+# Optional dependency on Arb.
+if(MPPP_WITH_ARB)
+    find_package(FLINT REQUIRED)
+    find_package(Arb REQUIRED)
+    target_link_libraries(mp++ PRIVATE Arb::Arb FLINT::FLINT)
+    set(MPPP_ENABLE_ARB "#define MPPP_WITH_ARB")
 endif()
 
 # Optional dependency on quadmath.

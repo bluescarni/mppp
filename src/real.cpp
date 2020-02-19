@@ -27,8 +27,20 @@
 #include <string_view>
 #endif
 
+#if defined(MPPP_WITH_ARB)
+
+#include <flint/flint.h>
+#include <flint/fmpz.h>
+
+#include <arb.h>
+#include <arf.h>
+#include <mag.h>
+
+#endif
+
 #include <mp++/detail/gmp.hpp>
 #include <mp++/detail/mpfr.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
@@ -78,7 +90,179 @@ static_assert(test_mpfr_struct_t());
 
 #endif
 
+#if defined(MPPP_WITH_ARB)
+
+// Minimal RAII struct to hold
+// arb_t types.
+struct arb_raii {
+    arb_raii()
+    {
+        ::arb_init(m_arb);
+    }
+    arb_raii(const arb_raii &) = delete;
+    arb_raii(arb_raii &&) = delete;
+    arb_raii &operator=(const arb_raii &) = delete;
+    arb_raii &operator=(arb_raii &&) = delete;
+    ~arb_raii()
+    {
+        ::arb_clear(m_arb);
+    }
+    ::arb_t m_arb;
+};
+
+// Small helper to turn an MPFR precision
+// into an Arb precision.
+::slong mpfr_prec_to_arb_prec(::mpfr_prec_t p)
+{
+    const auto ret = safe_cast<::slong>(p);
+
+    // Check that ret is not too small.
+    // NOTE: the minimum precision in Arb is 2.
+    if (mppp_unlikely(ret < 2)) {
+        throw std::invalid_argument("A precision of at least 2 bits is required in order to use Arb's functions");
+    }
+
+    // Check that ret is not too large. The Arb documentation suggests < 2**24
+    // for 32-bit and < 2**36 for 64-bit. We use slightly smaller values.
+    // NOTE: the docs of ulong state that it has exactly either 64 or 32 bit width,
+    // depending on the architecture.
+    if (nl_digits<::ulong>() == 64) {
+        if (mppp_unlikely(ret > (1ll << 32))) {
+            throw std::invalid_argument("A precision of " + to_string(ret) + " bits is too large for Arb's functions");
+        }
+    } else {
+        if (mppp_unlikely(ret > (1ll << 20))) {
+            throw std::invalid_argument("A precision of " + to_string(ret) + " bits is too large for Arb's functions");
+        }
+    }
+
+    return ret;
+}
+
+// Helper to convert an arf_t into an mpfr_t.
+void arf_to_mpfr(::mpfr_t rop, const ::arf_t op)
+{
+    // Handle special values first.
+    if (::arf_is_nan(op)) {
+        ::mpfr_set_nan(rop);
+    } else if (::arf_is_pos_inf(op)) {
+        ::mpfr_set_inf(rop, 1);
+    } else if (::arf_is_neg_inf(op)) {
+        ::mpfr_set_inf(rop, -1);
+    } else {
+        // Get the min/max exponents allowed in MPFR.
+        const auto e_min = ::mpfr_get_emin(), e_max = ::mpfr_get_emax();
+
+        // We need to make sure the exponent of op is within range.
+        if (mppp_unlikely(e_min < nl_min<::slong>() || e_max > nl_max<::slong>()
+                          || ::fmpz_cmp_si(&op->exp, static_cast<::slong>(e_min)) < 0
+                          || ::fmpz_cmp_si(&op->exp, static_cast<::slong>(e_max)) > 0)) {
+            throw std::invalid_argument("In the conversion of an arf_t to an mpfr_t, the exponent of the arf_t object "
+                                        "overflows the exponent range of MPFR (the minimum allowed MPFR exponent is "
+                                        + std::to_string(e_min) + ", the maximum is " + std::to_string(e_max) + ")");
+        }
+
+        // Extract an mpfr from the arf.
+        ::arf_get_mpfr(rop, op, MPFR_RNDN);
+    }
+}
+
+// Helper to convert an mpfr_t into an arb_t.
+void mpfr_to_arb(::arb_t rop, const ::mpfr_t op)
+{
+    // Set the midpoint.
+    // NOTE: this function will set rop *exactly* to op.
+    ::arf_set_mpfr(arb_midref(rop), op);
+    // Set the radius to zero.
+    ::mag_zero(arb_radref(rop));
+}
+
+// NOTE: the cleanup machinery relies on a correct implementation
+// of the thread_local keyword. If that is not available, we'll
+// just skip the cleanup step altogether, which may result
+// in "memory leaks" being reported by sanitizers and valgrind.
+#if defined(MPPP_HAVE_THREAD_LOCAL)
+
+// A cleanup functor that will call flint_cleanup()
+// on destruction.
+struct flint_cleanup {
+    // NOTE: marking the ctor constexpr ensures that the initialisation
+    // of objects of this class with static storage duration is sequenced
+    // before the dynamic initialisation of objects with static storage
+    // duration:
+    // https://en.cppreference.com/w/cpp/language/constant_initialization
+    // This essentially means that we are sure that flint_cleanup()
+    // will be called after the destruction of any static real object
+    // (because real doesn't have a constexpr constructor and thus
+    // static reals are destroyed before static objects of this class).
+    constexpr flint_cleanup() {}
+    ~flint_cleanup()
+    {
+#if !defined(NDEBUG)
+        // NOTE: Access to cout from concurrent threads is safe as long as the
+        // cout object is synchronized to the underlying C stream:
+        // https://stackoverflow.com/questions/6374264/is-cout-synchronized-thread-safe
+        // http://en.cppreference.com/w/cpp/io/ios_base/sync_with_stdio
+        // By default, this is the case, but in theory someone might have changed
+        // the sync setting on cout by the time we execute the following line.
+        // However, we print only in debug mode, so it should not be too much of a problem
+        // in practice.
+        std::cout << "Cleaning up thread local FLINT caches." << std::endl;
+#endif
+        ::flint_cleanup();
+    }
+};
+
+// Instantiate a cleanup object for each thread.
+thread_local const flint_cleanup flint_cleanup_inst;
+
+#endif
+
+#endif
+
 } // namespace
+
+#if defined(MPPP_WITH_ARB)
+
+// Implementation of the Arb MPFR wrappers.
+void sqrt1pm1(::mpfr_t rop, const ::mpfr_t op)
+{
+    MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;
+
+    // Turn op into an arb.
+    mpfr_to_arb(arb_op.m_arb, op);
+
+    // Run the computation, using the precision of rop to mimic
+    // the behaviour of MPFR functions.
+    ::arb_sqrt1pm1(arb_rop.m_arb, arb_op.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
+
+    // Write the result into rop.
+    arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
+}
+
+void log_hypot(::mpfr_t rop, const ::mpfr_t x, const ::mpfr_t y)
+{
+    // Special handling if at least one of x and y is an inf,
+    // and the other is not a NaN.
+    if (mpfr_inf_p(x) && !mpfr_nan_p(y)) {
+        // x is inf, y not a nan. Return +inf.
+        ::mpfr_set_inf(rop, 1);
+    } else if (!mpfr_nan_p(x) && mpfr_inf_p(y)) {
+        // y is inf, x not a nan. Return +inf.
+        ::mpfr_set_inf(rop, 1);
+    } else {
+        MPPP_MAYBE_TLS arb_raii arb_rop, arb_x, arb_y;
+
+        mpfr_to_arb(arb_x.m_arb, x);
+        mpfr_to_arb(arb_y.m_arb, y);
+
+        ::arb_log_hypot(arb_rop.m_arb, arb_x.m_arb, arb_y.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
+
+        arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
+    }
+}
+
+#endif
 
 // Wrapper for calling mpfr_lgamma().
 void real_lgamma_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t)
@@ -899,7 +1083,7 @@ struct mpfr_cleanup {
 };
 
 // Instantiate a cleanup object for each thread.
-thread_local const mpfr_cleanup cleanup_inst;
+thread_local const mpfr_cleanup mpfr_cleanup_inst;
 
 #else
 
@@ -928,12 +1112,12 @@ struct mpfr_global_cleanup {
     }
 };
 
-thread_local const mpfr_tl_cleanup tl_cleanup_inst;
+thread_local const mpfr_tl_cleanup mpfr_tl_cleanup_inst;
 // NOTE: because the destruction of thread-local objects
 // always happens before the destruction of objects with
 // static storage duration, the global cleanup will always
 // be performed after thread-local cleanup.
-const mpfr_global_cleanup global_cleanup_inst;
+const mpfr_global_cleanup mpfr_global_cleanup_inst;
 
 #endif
 
@@ -955,10 +1139,13 @@ real::~real()
     // so that the compiler is forced to invoke its constructor.
     // This ensures that, as long as at least one real is created, the mpfr_free_cache()
     // function is called on shutdown.
-    detail::ignore(&detail::cleanup_inst);
+    detail::ignore(&detail::mpfr_cleanup_inst);
 #else
-    detail::ignore(&detail::tl_cleanup_inst);
-    detail::ignore(&detail::global_cleanup_inst);
+    detail::ignore(&detail::mpfr_tl_cleanup_inst);
+    detail::ignore(&detail::mpfr_global_cleanup_inst);
+#endif
+#if defined(MPPP_WITH_ARB)
+    detail::ignore(&detail::flint_cleanup_inst);
 #endif
 #endif
     if (m_mpfr._mpfr_d) {
@@ -974,6 +1161,15 @@ template <typename T>
 real &real::self_mpfr_unary(T &&f)
 {
     std::forward<T>(f)(&m_mpfr, &m_mpfr, MPFR_RNDN);
+    return *this;
+}
+
+// Wrapper to apply the input unary MPFR function to this.
+// f must not need a rounding mode. Returns a reference to this.
+template <typename T>
+real &real::self_mpfr_unary_nornd(T &&f)
+{
+    std::forward<T>(f)(&m_mpfr, &m_mpfr);
     return *this;
 }
 
@@ -1228,6 +1424,33 @@ real &real::sqrt()
 {
     return self_mpfr_unary(::mpfr_sqrt);
 }
+
+#if defined(MPPP_WITH_ARB)
+
+/// In-place sqrt1pm1.
+/**
+ * \rststar
+ * .. versionadded:: 0.19
+ *
+ * .. note::
+ *    This member function is available only if mp++ was
+ *    configured with the ``MPPP_WITH_ARB`` option enabled.
+ *
+ * This member function will set ``this`` to :math:`\sqrt{1+x}-1`,
+ * where :math:`x` is the original value of ``this``.
+ * This function will be more accurate than using the square
+ * root when :math:`x \approx 1`.
+ * The precision of ``this`` will not be altered.
+ * \endrststar
+ *
+ * @return a reference to ``this``.
+ */
+real &real::sqrt1pm1()
+{
+    return self_mpfr_unary_nornd(detail::sqrt1pm1);
+}
+
+#endif
 
 /// In-place reciprocal square root.
 /**
@@ -1590,8 +1813,7 @@ bool real::integer_p() const
 real &real::trunc()
 {
     detail::real_check_trunc_arg(*this);
-    ::mpfr_trunc(&m_mpfr, &m_mpfr);
-    return *this;
+    return self_mpfr_unary_nornd(::mpfr_trunc);
 }
 
 } // namespace mppp
