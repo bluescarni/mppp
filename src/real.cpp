@@ -29,8 +29,8 @@
 
 #if defined(MPPP_WITH_ARB)
 
-#include <flint/flint.h>
-#include <flint/fmpz.h>
+#include <flint.h>
+#include <fmpz.h>
 
 #include <arb.h>
 #include <arf.h>
