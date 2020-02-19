@@ -75,10 +75,6 @@ matrix:
     - env: MPPP_BUILD="OSXDebug"
       os: osx
       osx_image: xcode6.4
-    # - env: MPPP_BUILD="ICC" DOCKER_IMAGE="bluescarni/icc_ci:v1"
-    #   sudo: required
-    #   services:
-    #   - docker
 script:
     - mkdir build
     - cd build
