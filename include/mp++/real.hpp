@@ -161,7 +161,15 @@ MPPP_DLL_PUBLIC void real_check_trunc_arg(const real &);
 
 // The Arb MPFR wrappers.
 MPPP_DLL_PUBLIC void sqrt1pm1(::mpfr_t, const ::mpfr_t);
+
 MPPP_DLL_PUBLIC void log_hypot(::mpfr_t, const ::mpfr_t, const ::mpfr_t);
+
+MPPP_DLL_PUBLIC void sin_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void cos_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void tan_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void cot_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void sinc(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void sinc_pi(::mpfr_t, const ::mpfr_t);
 
 #endif
 
@@ -2820,6 +2828,23 @@ MPPP_REAL_MPFR_UNARY_RETURN(csc)
 
 MPPP_REAL_MPFR_UNARY_RETVAL(cot)
 MPPP_REAL_MPFR_UNARY_RETURN(cot)
+
+#if defined(MPPP_WITH_ARB)
+
+MPPP_REAL_ARB_UNARY_RETVAL(sin_pi)
+MPPP_REAL_ARB_UNARY_RETURN(sin_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(cos_pi)
+MPPP_REAL_ARB_UNARY_RETURN(cos_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(tan_pi)
+MPPP_REAL_ARB_UNARY_RETURN(tan_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(cot_pi)
+MPPP_REAL_ARB_UNARY_RETURN(cot_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(sinc)
+MPPP_REAL_ARB_UNARY_RETURN(sinc)
+MPPP_REAL_ARB_UNARY_RETVAL(sinc_pi)
+MPPP_REAL_ARB_UNARY_RETURN(sinc_pi)
+
+#endif
 
 MPPP_REAL_MPFR_UNARY_RETVAL(asin)
 MPPP_REAL_MPFR_UNARY_RETURN(asin)

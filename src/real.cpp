@@ -224,22 +224,25 @@ thread_local const flint_cleanup flint_cleanup_inst;
 
 #if defined(MPPP_WITH_ARB)
 
+// Helper for the implementation unary Arb wrappers.
+#define MPPP_UNARY_ARB_WRAPPER(fname)                                                                                  \
+    void fname(::mpfr_t rop, const ::mpfr_t op)                                                                        \
+    {                                                                                                                  \
+        MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;                                                                       \
+        /* Turn op into an arb. */                                                                                     \
+        mpfr_to_arb(arb_op.m_arb, op);                                                                                 \
+        /* Run the computation, using the precision of rop to mimic */                                                 \
+        /* the behaviour of MPFR functions. */                                                                         \
+        ::arb_##fname(arb_rop.m_arb, arb_op.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));                         \
+        /* Write the result into rop. */                                                                               \
+        arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));                                                                   \
+    }
+
 // Implementation of the Arb MPFR wrappers.
-void sqrt1pm1(::mpfr_t rop, const ::mpfr_t op)
-{
-    MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;
+MPPP_UNARY_ARB_WRAPPER(sqrt1pm1)
 
-    // Turn op into an arb.
-    mpfr_to_arb(arb_op.m_arb, op);
-
-    // Run the computation, using the precision of rop to mimic
-    // the behaviour of MPFR functions.
-    ::arb_sqrt1pm1(arb_rop.m_arb, arb_op.m_arb, mpfr_prec_to_arb_prec(mpfr_get_prec(rop)));
-
-    // Write the result into rop.
-    arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
-}
-
+// NOTE: log_hypot needs special handling for certain
+// input values.
 void log_hypot(::mpfr_t rop, const ::mpfr_t x, const ::mpfr_t y)
 {
     // Special handling if at least one of x and y is an inf,
@@ -261,6 +264,15 @@ void log_hypot(::mpfr_t rop, const ::mpfr_t x, const ::mpfr_t y)
         arf_to_mpfr(rop, arb_midref(arb_rop.m_arb));
     }
 }
+
+MPPP_UNARY_ARB_WRAPPER(sin_pi)
+MPPP_UNARY_ARB_WRAPPER(cos_pi)
+MPPP_UNARY_ARB_WRAPPER(tan_pi)
+MPPP_UNARY_ARB_WRAPPER(cot_pi)
+MPPP_UNARY_ARB_WRAPPER(sinc)
+MPPP_UNARY_ARB_WRAPPER(sinc_pi)
+
+#undef MPPP_UNARY_ARB_WRAPPER
 
 #endif
 

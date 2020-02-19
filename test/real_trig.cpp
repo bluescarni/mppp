@@ -10,6 +10,7 @@
 #include <string>
 #include <utility>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
 
@@ -201,3 +202,22 @@ TEST_CASE("real trig")
     REQUIRE(atan2(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
     REQUIRE(atan2(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
 }
+
+#if defined(MPPP_WITH_ARB)
+
+TEST_CASE("real trig arb")
+{
+    std::cout << sin_pi(0.5_r512) << '\n';
+    // real r0{0};
+    // r0.sin();
+    // REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    // REQUIRE(r0.zero_p());
+    // real rop;
+    // REQUIRE(sin(rop, r0).zero_p());
+    // REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    // REQUIRE(sin(r0).zero_p());
+    // REQUIRE(sin(std::move(r0)).zero_p());
+    // REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
+}
+
+#endif
