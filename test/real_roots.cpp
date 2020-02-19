@@ -167,6 +167,8 @@ TEST_CASE("real sqrt1pm1")
     REQUIRE(sqrt1pm1(real{"inf", 243}).inf_p());
     REQUIRE(sqrt1pm1(real{"inf", 243}) > 0);
     REQUIRE(sqrt1pm1(real{"inf", 243}).get_prec() == 243);
+    REQUIRE(sqrt1pm1(real{"-inf", 243}).nan_p());
+    REQUIRE(sqrt1pm1(real{"-inf", 243}).get_prec() == 243);
 
     // Test nan.
     REQUIRE(sqrt1pm1(real{"nan", 244}).nan_p());

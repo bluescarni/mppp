@@ -220,14 +220,23 @@ TEST_CASE("real log_hypot")
     REQUIRE(log_hypot(real{"inf", 32}, real{3, 25}).inf_p());
     REQUIRE(log_hypot(real{"inf", 32}, real{3, 25}) > 0);
     REQUIRE(log_hypot(real{"inf", 32}, real{3, 25}).get_prec() == 32);
+    REQUIRE(log_hypot(real{"-inf", 32}, real{3, 25}).inf_p());
+    REQUIRE(log_hypot(real{"-inf", 32}, real{3, 25}) > 0);
+    REQUIRE(log_hypot(real{"-inf", 32}, real{3, 25}).get_prec() == 32);
 
     REQUIRE(log_hypot(real{3, 25}, real{"inf", 32}).inf_p());
     REQUIRE(log_hypot(real{3, 25}, real{"inf", 32}) > 0);
     REQUIRE(log_hypot(real{3, 25}, real{"inf", 32}).get_prec() == 32);
+    REQUIRE(log_hypot(real{3, 25}, real{"-inf", 32}).inf_p());
+    REQUIRE(log_hypot(real{3, 25}, real{"-inf", 32}) > 0);
+    REQUIRE(log_hypot(real{3, 25}, real{"-inf", 32}).get_prec() == 32);
 
     REQUIRE(log_hypot(real{"inf", 25}, real{"inf", 32}).inf_p());
     REQUIRE(log_hypot(real{"inf", 25}, real{"inf", 32}) > 0);
     REQUIRE(log_hypot(real{"inf", 25}, real{"inf", 32}).get_prec() == 32);
+    REQUIRE(log_hypot(real{"-inf", 25}, real{"inf", 32}).inf_p());
+    REQUIRE(log_hypot(real{"inf", 25}, real{"-inf", 32}) > 0);
+    REQUIRE(log_hypot(real{"-inf", 25}, real{"-inf", 32}).get_prec() == 32);
 
     // Test nans.
     REQUIRE(log_hypot(real{"nan", 32}, real{3, 25}).nan_p());

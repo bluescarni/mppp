@@ -1,10 +1,3 @@
-#!/usr/bin/env bash
-
-# Echo each command
-set -x
-
-# Exit on error.
-set -e
 
 # Core deps.
 sudo apt-get install build-essential wget
@@ -15,7 +8,7 @@ export deps_dir=$HOME/local
 export PATH="$HOME/miniconda/bin:$PATH"
 bash miniconda.sh -b -p $HOME/miniconda
 conda config --add channels conda-forge --force
-conda_pkgs="cmake gmp mpfr flint arb"
+conda_pkgs="cmake gmp mpfr libflint arb"
 conda create -q -p $deps_dir -y
 source activate $deps_dir
 conda install $conda_pkgs -y
@@ -25,9 +18,9 @@ mkdir build
 cd build
 
 # GCC build.
-cmake ../ -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=address"
+cmake ../ -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=undefined"
 make -j2 VERBOSE=1
-ctest -V
+ctest -V -j2
 
 set +e
 set +x

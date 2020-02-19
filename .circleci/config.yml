@@ -41,14 +41,6 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_cosmic_clang7_tsan.sh
-  bionic_clang6_ubsan:
-    docker:
-    - image: circleci/buildpack-deps:bionic
-    steps:
-    - checkout
-    - run:
-        name: Build and test
-        command: bash ./tools/circleci_bionic_clang6_ubsan.sh
   cosmic_clang7_debuggmp_unstable:
     docker:
     - image: circleci/buildpack-deps:cosmic
@@ -65,14 +57,22 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_cosmic_clang7_debuggmp.sh
-  bionic_gcc7_conda:
+  bionic_gcc7_conda_asan:
     docker:
     - image: circleci/buildpack-deps:bionic
     steps:
     - checkout
     - run:
         name: Build and test
-        command: bash ./tools/circleci_bionic_gcc7_conda.sh
+        command: bash ./tools/circleci_bionic_gcc7_conda_asan.sh
+  bionic_gcc7_conda_ubsan:
+    docker:
+    - image: circleci/buildpack-deps:bionic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_bionic_gcc7_conda_ubsan.sh
 
 workflows:
   version: 2
@@ -83,7 +83,7 @@ workflows:
     - cosmic_gcc8_coverage
     - cosmic_clang7_asan
     - cosmic_clang7_tsan
-    - bionic_clang6_ubsan
     - cosmic_clang7_debuggmp_unstable
     - cosmic_clang7_debuggmp
-    - bionic_gcc7_conda
+    - bionic_gcc7_conda_asan
+    - bionic_gcc7_conda_ubsan
