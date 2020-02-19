@@ -330,8 +330,72 @@ Roots
 Exponentiation
 ~~~~~~~~~~~~~~
 
-.. doxygengroup:: real_exponentiation
-   :content-only:
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::pow(mppp::real &rop, T &&op1, U &&op2)
+
+   Ternary exponentiation.
+
+   This function will set *rop* to *op1* raised to the power of *op2*.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param op1: the base.
+   :param op2: the exponent.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, typename U> mppp::real pow(T &&op1, U &&op2)
+
+   .. note::
+
+      This function participates in overload resolution only if ``T`` and ``U`` satisfy
+      the :cpp:concept:`~mppp::RealOpTypes` concept.
+
+   Binary exponentiation.
+
+   This function will compute and return *op1* raised to the power of *op2*.
+   The precision of the result will be set to the largest precision among the operands.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+   :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+   precision, if set, or it is automatically deduced depending on the type and value of the
+   operand to be converted.
+
+   :param op1: the base.
+   :param op2: the exponent.
+
+   :return: *op1* raised to the power of *op2*.
+
+   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sqr(mppp::real &rop, T &&op)
+
+   .. versionadded:: 0.19
+
+   Binary :cpp:class:`~mppp::real` squaring.
+
+   This function will compute the square of *op* and store it
+   into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sqr(T &&r)
+
+   .. versionadded:: 0.19
+
+   Unary :cpp:class:`~mppp::real` squaring.
+
+   This function will compute and return the square of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the operand.
+
+   :return: the square of *r*.
 
 .. _real_trig:
 

@@ -1480,6 +1480,22 @@ real &real::cbrt()
     return self_mpfr_unary(::mpfr_cbrt);
 }
 
+/// In-place squaring.
+/**
+ * \rststar
+ * .. versionadded:: 0.19
+ *
+ * This method will set ``this`` to its square.
+ * The precision of ``this`` will not be altered.
+ * \endrststar
+ *
+ * @return a reference to ``this``.
+ */
+real &real::sqr()
+{
+    return self_mpfr_unary(::mpfr_sqr);
+}
+
 /// In-place sine.
 /**
  * This method will set ``this`` to its sine.

@@ -216,3 +216,37 @@ TEST_CASE("real pow")
     real_reset_default_prec();
 #endif
 }
+
+TEST_CASE("real sqr")
+{
+    real r0{2};
+    r0.sqr();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0 == 4);
+    real rop;
+    REQUIRE(sqr(rop, r0) == 16);
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(sqr(r0) == 16);
+    REQUIRE(sqr(std::move(r0)) == 16);
+    REQUIRE(!r0.is_valid());
+    r0 = real{-16, 128};
+    REQUIRE(sqr(r0) == 256);
+    REQUIRE(sqr(r0).get_prec() == 128);
+    rop = real{12, 40};
+    sqr(rop, r0);
+    REQUIRE(rop == 256);
+    REQUIRE(rop.get_prec() == 128);
+    r0.sqr();
+    REQUIRE(r0 == 256);
+    REQUIRE(r0.get_prec() == 128);
+
+    REQUIRE(sqr(real{0}).zero_p());
+    REQUIRE(sqr(real{-0.}).zero_p());
+    REQUIRE(sqr(real{1}) == 1);
+    REQUIRE(sqr(real{"inf", 34}).inf_p());
+    REQUIRE(sqr(real{"inf", 34}).get_prec() == 34);
+    REQUIRE(sqr(real{"-inf", 34}).inf_p());
+    REQUIRE(sqr(real{"-inf", 34}).get_prec() == 34);
+    REQUIRE(sqr(real{"nan", 34}).nan_p());
+    REQUIRE(sqr(real{"nan", 34}).get_prec() == 34);
+}

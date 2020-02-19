@@ -1582,6 +1582,9 @@ public:
     // In-place cubic root.
     real &cbrt();
 
+    // In-place squaring.
+    real &sqr();
+
     // In-place sine.
     real &sin();
 
@@ -2741,21 +2744,7 @@ inline real rootn_ui(T &&r, unsigned long k)
 
 #endif
 
-/** @defgroup real_exponentiation real_exponentiation
- *  @{
- */
-
-/// Ternary \link mppp::real real\endlink exponentiation.
-/**
- * This function will set \p rop to \p op1 raised to the power of \p op2.
- * The precision of \p rop will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param op1 the base.
- * @param op2 the exponent.
- *
- * @return a reference to \p rop.
- */
+// Ternary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2796,38 +2785,21 @@ inline real dispatch_pow(const T &x, U &&a)
 
 } // namespace detail
 
-/// Binary \link mppp::real real\endlink exponentiation.
-/**
- * \rststar
- * The precision of the result will be set to the largest precision among the operands.
- *
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- * \endrststar
- *
- * @param op1 the base.
- * @param op2 the exponent.
- *
- * @return \p op1 raised to the power of \p op2.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Binary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U> inline real pow(T &&op1, U &&op2)
+requires RealOpTypes<T, U>
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
-inline real pow(T &&op1, U &&op2)
 #endif
+    inline real pow(T &&op1, U &&op2)
 {
     return detail::dispatch_pow(std::forward<T>(op1), std::forward<U>(op2));
 }
 
-/** @} */
+// Squaring.
+MPPP_REAL_MPFR_UNARY_RETVAL(sqr)
+MPPP_REAL_MPFR_UNARY_RETURN(sqr)
 
 // Trigonometric functions.
 
