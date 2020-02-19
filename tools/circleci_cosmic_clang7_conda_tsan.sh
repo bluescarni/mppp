@@ -7,7 +7,7 @@ set -x
 set -e
 
 # Core deps.
-sudo apt-get install build-essential wget
+sudo apt-get install build-essential wget clang
 
 # Install conda+deps.
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -24,9 +24,10 @@ conda install $conda_pkgs -y
 mkdir build
 cd build
 
-# GCC build.
-cmake ../ -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=undefined"
+# clang build.
+CC=clang CXX=clang++ cmake ../ -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=YES -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=thread" -DQuadmath_INCLUDE_DIR=/usr/lib/gcc/x86_64-linux-gnu/8/include/ -DQuadmath_LIBRARY=/usr/lib/gcc/x86_64-linux-gnu/8/libquadmath.so
 make -j2 VERBOSE=1
+# Run the tests.
 ctest -V -j2
 
 set +e
