@@ -1611,6 +1611,18 @@ public:
     // In-place cotangent.
     real &cot();
 
+#if defined(MPPP_WITH_ARB)
+
+    // Trig functions from Arb.
+    real &sin_pi();
+    real &cos_pi();
+    real &tan_pi();
+    real &cot_pi();
+    real &sinc();
+    real &sinc_pi();
+
+#endif
+
     // In-place arccosine.
     real &acos();
 

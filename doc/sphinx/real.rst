@@ -197,6 +197,9 @@ Roots
 
    :return: a reference to *rop*.
 
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sqrt1pm1(T &&r)
 
    .. versionadded:: 0.19
@@ -215,6 +218,9 @@ Roots
    :param r: the operand.
 
    :return: the sqrt1pm1 of *r*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::rec_sqrt(mppp::real &rop, T &&op)
 
@@ -402,40 +408,108 @@ Exponentiation
 Trigonometry
 ~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sin(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cos(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tan(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sec(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::csc(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cot(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sin(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cos(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tan(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sec(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::csc(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cot(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sin_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cos_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tan_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cot_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sinc(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sinc_pi(mppp::real &rop, T &&x)
+
+   .. note::
+      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
+      ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
+      if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
 
    Binary basic trigonometric functions.
 
-   These functions will set *rop* to, respectively, the sine, cosine, tangent, secant,
-   cosecant and cotangent of *op*.
-   The precision of the result will be equal to the precision of *op*.
+   These functions will set *rop* to, respectively:
+
+   * :math:`\sin\left( x \right)`,
+   * :math:`\cos\left( x \right)`,
+   * :math:`\tan\left( x \right)`,
+   * :math:`\sec\left( x \right)`,
+   * :math:`\csc\left( x \right)`,
+   * :math:`\cot\left( x \right)`,
+   * :math:`\sin\left( \pi x \right)`,
+   * :math:`\cos\left( \pi x \right)`,
+   * :math:`\tan\left( \pi x \right)`,
+   * :math:`\cot\left( \pi x \right)`,
+   * :math:`\frac{\sin\left( x \right)}{x}`,
+   * :math:`\frac{\sin\left( \pi x \right)}{\pi x}`.
+
+   The precision of the result will be equal to the precision of *x*.
 
    :param rop: the return value.
-   :param op: the argument.
+   :param x: the argument.
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sin(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cos(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tan(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sec(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::csc(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cot(T &&r)
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
+   .. versionadded:: 0.19
+
+      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
+      ``cot_pi()``, ``sinc()`` and ``sinc_pi()``.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sin(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cos(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tan(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sec(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::csc(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cot(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sin_pi(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cos_pi(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tan_pi(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cot_pi(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sinc(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sinc_pi(T &&x)
+
+   .. note::
+      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
+      ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
+      if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
 
    Unary basic trigonometric functions.
 
-   These functions will return, respectively, the sine, cosine, tangent,
-   secant, cosecant and cotangent of *r*.
-   The precision of the result will be equal to the precision of *r*.
+   These functions will return, respectively:
 
-   :param r: the argument.
+   * :math:`\sin\left( x \right)`,
+   * :math:`\cos\left( x \right)`,
+   * :math:`\tan\left( x \right)`,
+   * :math:`\sec\left( x \right)`,
+   * :math:`\csc\left( x \right)`,
+   * :math:`\cot\left( x \right)`,
+   * :math:`\sin\left( \pi x \right)`,
+   * :math:`\cos\left( \pi x \right)`,
+   * :math:`\tan\left( \pi x \right)`,
+   * :math:`\cot\left( \pi x \right)`,
+   * :math:`\frac{\sin\left( x \right)}{x}`,
+   * :math:`\frac{\sin\left( \pi x \right)}{\pi x}`.
 
-   :return: the sine, cosine, tangent, secant, cosecant or cotangent of *r*.
+   The precision of the result will be equal to the precision of *x*.
+
+   :param x: the argument.
+
+   :return: the trigonometric function of *x*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
+   .. versionadded:: 0.19
+
+      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
+      ``cot_pi()``, ``sinc()`` and ``sinc_pi()``.
 
 .. cpp:function:: template <mppp::CvrReal T> void mppp::sin_cos(mppp::real &sop, mppp::real &cop, T &&op)
 
@@ -703,6 +777,9 @@ Logarithms and exponentials
 
    :return: a reference to *rop*.
 
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
 .. cpp:function:: template <typename T, typename U> mppp::real mppp::log_hypot(T &&x, U &&y)
 
    .. versionadded:: 0.19
@@ -734,6 +811,8 @@ Logarithms and exponentials
    :return: the log hypot function of *x* and *y*.
 
    :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
 
 .. _real_gamma:
 
