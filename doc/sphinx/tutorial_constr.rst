@@ -101,6 +101,25 @@ which allow to specify a different base for the representation of the value:
    assert((rat_t{"2a/1c", 16} == 1.5))           // Base 16.
    assert((real{"7B.1", 32, 100} == 235.03125)); // Base 32, 100 bits of precision.
 
+Starting from mp++ 0.19, all multiprecision
+classes support also initialisastion
+via user-defined literals, implemented in the
+``mppp::literals`` inline namespace:
+
+.. code-block:: c++
+
+   using namespace mppp::literals;
+
+   auto n = 123_z1;   // n is an integer with 1 limb of static
+                      // storage and initialised with the value 123.
+   auto q = 456_q2;   // q is a rational with 2 limbs of static
+                      // storage and initialised with the value 456.
+   auto x = 0.1_rq;   // x is a real128 initialised with the
+                      // quadruple-precision approximation of
+                      // the value 0.1.
+   auto y = 1.3_r256; // y is a real initialised with the 256-bit
+                      // approximation of the value 1.3.
+
 It is of course also possible to assign values to already-constructed multiprecision objects. In general, the behaviour
 of the assignment operators mirrors the behaviour of the corresponding constructors. For instance:
 
@@ -114,7 +133,7 @@ of the assignment operators mirrors the behaviour of the corresponding construct
    n = "-128";
    assert(n == -128);
    n = std::numeric_limits<double>::quiet_NaN(); // Raises std::domain_error.
-  
+
    rat_t q{3, 4};
    q = 1.5;
    assert((q == rat_t{3, 2}));
@@ -133,4 +152,3 @@ Explicitly casting the multiprecision value before the assignment will however w
    n = int_t{42};                   // This will NOT compile.
    n = static_cast<int>(int_t{42}); // This will compile.
    assert(n == 42);
-   
