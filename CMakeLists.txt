@@ -216,7 +216,7 @@ if(MPPP_WITH_MPFR)
         "${MPPP_SRC_FILES}")
 endif()
 
-# Make mp++ header files accessible in Visual Studio IDE
+# Make mp++ header files accessible in Visual Studio IDE.
 if(YACMA_COMPILER_IS_MSVC)
   set(MPPP_HEADER_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/concepts.hpp"
@@ -230,6 +230,9 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/fwd_decl.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/gmp.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/integer_literals.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/rational_literals.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/real_literals.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/real128_literal.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/mpfr.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/type_traits.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/utils.hpp"
