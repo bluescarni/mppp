@@ -224,7 +224,7 @@ thread_local const flint_cleanup flint_cleanup_inst;
 
 #if defined(MPPP_WITH_ARB)
 
-// Helper for the implementation unary Arb wrappers.
+// Helper for the implementation of unary Arb wrappers.
 #define MPPP_UNARY_ARB_WRAPPER(fname)                                                                                  \
     void fname(::mpfr_t rop, const ::mpfr_t op)                                                                        \
     {                                                                                                                  \
