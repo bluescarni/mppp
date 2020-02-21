@@ -2501,6 +2501,94 @@ inline real &abs(real &rop, T &&x)
     return detail::mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<T>(x));
 }
 
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real mul_2ui(T &&x, unsigned long n)
+{
+    auto mul_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2ui(r, o, n, rnd); };
+    return detail::mpfr_nary_op_return(0, mul_2ui_wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &mul_2ui(real &rop, T &&x, unsigned long n)
+{
+    auto mul_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2ui(r, o, n, rnd); };
+    return detail::mpfr_nary_op(0, mul_2ui_wrapper, rop, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real mul_2si(T &&x, long n)
+{
+    auto mul_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2si(r, o, n, rnd); };
+    return detail::mpfr_nary_op_return(0, mul_2si_wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &mul_2si(real &rop, T &&x, long n)
+{
+    auto mul_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2si(r, o, n, rnd); };
+    return detail::mpfr_nary_op(0, mul_2si_wrapper, rop, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real div_2ui(T &&x, unsigned long n)
+{
+    auto div_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2ui(r, o, n, rnd); };
+    return detail::mpfr_nary_op_return(0, div_2ui_wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &div_2ui(real &rop, T &&x, unsigned long n)
+{
+    auto div_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2ui(r, o, n, rnd); };
+    return detail::mpfr_nary_op(0, div_2ui_wrapper, rop, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real div_2si(T &&x, long n)
+{
+    auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2si(r, o, n, rnd); };
+    return detail::mpfr_nary_op_return(0, div_2si_wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &div_2si(real &rop, T &&x, long n)
+{
+    auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2si(r, o, n, rnd); };
+    return detail::mpfr_nary_op(0, div_2si_wrapper, rop, std::forward<T>(x));
+}
+
 /** @} */
 
 /** @defgroup real_comparison real_comparison
