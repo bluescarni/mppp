@@ -23,12 +23,12 @@ New
 Changes
 ~~~~~~~
 
-- The :cpp:class:`~mppp::real128` string representation
-  has been changed to use the ``g`` format specifier
-  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 - The GCC quadmath library is now a private dependency
   of the mp++ library
   (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
+- The :cpp:class:`~mppp::real128` string representation
+  has been changed to use the ``g`` format specifier
+  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 
 Fix
 ~~~
