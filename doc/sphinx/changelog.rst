@@ -34,9 +34,8 @@ Fix
 ~~~
 
 - Various build system fixes and improvements
-  (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
-- Fix a build system failure when building the benchmarks
-  (`#214 <https://github.com/bluescarni/mppp/pull/214>`__).
+  (`#214 <https://github.com/bluescarni/mppp/pull/214>`__,
+  `#215 <https://github.com/bluescarni/mppp/pull/215>`__).
 - Fix compilation with older clang versions in C++17 mode
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 
