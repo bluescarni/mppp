@@ -8,8 +8,6 @@
 
 #include <type_traits>
 
-#include <mp++/config.hpp>
-#include <mp++/detail/type_traits.hpp>
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
