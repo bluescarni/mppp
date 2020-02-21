@@ -14,7 +14,7 @@ mkdir build
 cd build
 
 # Download and compile locally GMP in debug mode.
-GMP_VERSION="6.1.2"
+GMP_VERSION="6.2.0"
 wget https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2 -O gmp.tar.bz2
 tar xjvf gmp.tar.bz2
 cd gmp-${GMP_VERSION}

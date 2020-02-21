@@ -8,8 +8,6 @@
 
 #include <cmath>
 
-#include <quadmath.h>
-
 #include <mp++/real128.hpp>
 
 #include "catch.hpp"

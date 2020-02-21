@@ -157,6 +157,22 @@ MPPP_DLL_PUBLIC void real_lgamma_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t)
 // A small helper to check the input of the trunc() overloads.
 MPPP_DLL_PUBLIC void real_check_trunc_arg(const real &);
 
+#if defined(MPPP_WITH_ARB)
+
+// The Arb MPFR wrappers.
+MPPP_DLL_PUBLIC void sqrt1pm1(::mpfr_t, const ::mpfr_t);
+
+MPPP_DLL_PUBLIC void log_hypot(::mpfr_t, const ::mpfr_t, const ::mpfr_t);
+
+MPPP_DLL_PUBLIC void sin_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void cos_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void tan_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void cot_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void sinc(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void sinc_pi(::mpfr_t, const ::mpfr_t);
+
+#endif
+
 } // namespace detail
 
 // Fwd declare swap.
@@ -1202,10 +1218,10 @@ public:
     }
 
 private:
-    // Wrapper to apply the input unary MPFR function to this with
-    // MPFR_RNDN rounding mode. Returns a reference to this.
     template <typename T>
     MPPP_DLL_LOCAL real &self_mpfr_unary(T &&);
+    template <typename T>
+    MPPP_DLL_LOCAL real &self_mpfr_unary_nornd(T &&);
 
 public:
     // Negate in-place.
@@ -1566,8 +1582,16 @@ public:
     // In-place reciprocal square root.
     real &rec_sqrt();
 
+#if defined(MPPP_WITH_ARB)
+    // In-place sqrt1pm1.
+    real &sqrt1pm1();
+#endif
+
     // In-place cubic root.
     real &cbrt();
+
+    // In-place squaring.
+    real &sqr();
 
     // In-place sine.
     real &sin();
@@ -1586,6 +1610,18 @@ public:
 
     // In-place cotangent.
     real &cot();
+
+#if defined(MPPP_WITH_ARB)
+
+    // Trig functions from Arb.
+    real &sin_pi();
+    real &cos_pi();
+    real &tan_pi();
+    real &cot_pi();
+    real &sinc();
+    real &sinc_pi();
+
+#endif
 
     // In-place arccosine.
     real &acos();
@@ -2181,6 +2217,26 @@ inline real mpfr_nary_op_return_nornd(::mpfr_prec_t min_prec, const F &f, Arg0 &
         return detail::mpfr_nary_op_return(0, ::mpfr_##fname, std::forward<T>(r));                                     \
     }
 
+#if defined(MPPP_WITH_ARB)
+
+// Same macros as above, but for the Arb wrappers defined
+// in the detail namespace.
+// NOTE: the Arb wrappers, contrary to the MPFR functions, do not
+// need the rounding mode argument.
+#define MPPP_REAL_ARB_UNARY_RETVAL_IMPL(fname)                                                                         \
+    inline real &fname(real &rop, T &&op)                                                                              \
+    {                                                                                                                  \
+        return detail::mpfr_nary_op_nornd(0, detail::fname, rop, std::forward<T>(op));                                 \
+    }
+
+#define MPPP_REAL_ARB_UNARY_RETURN_IMPL(fname)                                                                         \
+    inline real fname(T &&r)                                                                                           \
+    {                                                                                                                  \
+        return detail::mpfr_nary_op_return_nornd(0, detail::fname, std::forward<T>(r));                                \
+    }
+
+#endif
+
 #if defined(MPPP_HAVE_CONCEPTS)
 #define MPPP_REAL_MPFR_UNARY_HEADER template <CvrReal T>
 #else
@@ -2189,6 +2245,13 @@ inline real mpfr_nary_op_return_nornd(::mpfr_prec_t min_prec, const F &f, Arg0 &
 
 #define MPPP_REAL_MPFR_UNARY_RETVAL(fname) MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(fname)
 #define MPPP_REAL_MPFR_UNARY_RETURN(fname) MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_MPFR_UNARY_RETURN_IMPL(fname)
+
+#if defined(MPPP_WITH_ARB)
+
+#define MPPP_REAL_ARB_UNARY_RETVAL(fname) MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_ARB_UNARY_RETVAL_IMPL(fname)
+#define MPPP_REAL_ARB_UNARY_RETURN(fname) MPPP_REAL_MPFR_UNARY_HEADER MPPP_REAL_ARB_UNARY_RETURN_IMPL(fname)
+
+#endif
 
 /** @defgroup real_arithmetic real_arithmetic
  *  @{
@@ -2657,6 +2720,14 @@ inline bool real_gt(const real &a, const real &b)
 MPPP_REAL_MPFR_UNARY_RETVAL(sqrt)
 MPPP_REAL_MPFR_UNARY_RETURN(sqrt)
 
+#if defined(MPPP_WITH_ARB)
+
+// sqrt1pm1.
+MPPP_REAL_ARB_UNARY_RETVAL(sqrt1pm1)
+MPPP_REAL_ARB_UNARY_RETURN(sqrt1pm1)
+
+#endif
+
 // Reciprocal square root.
 MPPP_REAL_MPFR_UNARY_RETVAL(rec_sqrt)
 MPPP_REAL_MPFR_UNARY_RETURN(rec_sqrt)
@@ -2693,21 +2764,7 @@ inline real rootn_ui(T &&r, unsigned long k)
 
 #endif
 
-/** @defgroup real_exponentiation real_exponentiation
- *  @{
- */
-
-/// Ternary \link mppp::real real\endlink exponentiation.
-/**
- * This function will set \p rop to \p op1 raised to the power of \p op2.
- * The precision of \p rop will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param op1 the base.
- * @param op2 the exponent.
- *
- * @return a reference to \p rop.
- */
+// Ternary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2748,38 +2805,21 @@ inline real dispatch_pow(const T &x, U &&a)
 
 } // namespace detail
 
-/// Binary \link mppp::real real\endlink exponentiation.
-/**
- * \rststar
- * The precision of the result will be set to the largest precision among the operands.
- *
- * Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
- * before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
- * to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
- * :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
- * precision, if set, or it is automatically deduced depending on the type and value of the
- * operand to be converted.
- * \endrststar
- *
- * @param op1 the base.
- * @param op2 the exponent.
- *
- * @return \p op1 raised to the power of \p op2.
- *
- * @throws unspecified any exception thrown by the generic assignment operator of \link mppp::real real\endlink.
- */
+// Binary exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RealOpTypes<T, U> inline real pow(T &&op1, U &&op2)
+requires RealOpTypes<T, U>
 #else
 template <typename T, typename U, real_op_types_enabler<T, U> = 0>
-inline real pow(T &&op1, U &&op2)
 #endif
+    inline real pow(T &&op1, U &&op2)
 {
     return detail::dispatch_pow(std::forward<T>(op1), std::forward<U>(op2));
 }
 
-/** @} */
+// Squaring.
+MPPP_REAL_MPFR_UNARY_RETVAL(sqr)
+MPPP_REAL_MPFR_UNARY_RETURN(sqr)
 
 // Trigonometric functions.
 
@@ -2800,6 +2840,23 @@ MPPP_REAL_MPFR_UNARY_RETURN(csc)
 
 MPPP_REAL_MPFR_UNARY_RETVAL(cot)
 MPPP_REAL_MPFR_UNARY_RETURN(cot)
+
+#if defined(MPPP_WITH_ARB)
+
+MPPP_REAL_ARB_UNARY_RETVAL(sin_pi)
+MPPP_REAL_ARB_UNARY_RETURN(sin_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(cos_pi)
+MPPP_REAL_ARB_UNARY_RETURN(cos_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(tan_pi)
+MPPP_REAL_ARB_UNARY_RETURN(tan_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(cot_pi)
+MPPP_REAL_ARB_UNARY_RETURN(cot_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(sinc)
+MPPP_REAL_ARB_UNARY_RETURN(sinc)
+MPPP_REAL_ARB_UNARY_RETVAL(sinc_pi)
+MPPP_REAL_ARB_UNARY_RETURN(sinc_pi)
+
+#endif
 
 MPPP_REAL_MPFR_UNARY_RETVAL(asin)
 MPPP_REAL_MPFR_UNARY_RETURN(asin)
@@ -3267,6 +3324,63 @@ inline real hypot(T &&x, U &&y)
     return detail::dispatch_hypot(std::forward<T>(x), std::forward<U>(y));
 }
 
+#if defined(MPPP_WITH_ARB)
+
+// Ternary log_hypot.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U>
+#else
+template <typename T, typename U, cvr_real_enabler<T, U> = 0>
+#endif
+inline real &log_hypot(real &rop, T &&x, U &&y)
+{
+    return detail::mpfr_nary_op_nornd(0, detail::log_hypot, rop, std::forward<T>(x), std::forward<U>(y));
+}
+
+namespace detail
+{
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_log_hypot(T &&x, U &&y)
+{
+    return mpfr_nary_op_return_nornd(0, detail::log_hypot, std::forward<T>(x), std::forward<U>(y));
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, is_real_interoperable<U>>::value, int> = 0>
+inline real dispatch_log_hypot(T &&a, const U &x)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_log_hypot(std::forward<T>(a), tmp);
+}
+
+template <typename T, typename U,
+          enable_if_t<conjunction<is_real_interoperable<T>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
+inline real dispatch_log_hypot(const T &x, U &&a)
+{
+    MPPP_MAYBE_TLS real tmp;
+    tmp = x;
+    return dispatch_log_hypot(tmp, std::forward<U>(a));
+}
+
+} // namespace detail
+
+// Binary log_hypot.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires RealOpTypes<T, U>
+#else
+template <typename T, typename U, real_op_types_enabler<T, U> = 0>
+#endif
+    inline real log_hypot(T &&x, U &&y)
+{
+    return detail::dispatch_log_hypot(std::forward<T>(x), std::forward<U>(y));
+}
+
+#endif
+
 // Ternary agm.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
@@ -3328,6 +3442,15 @@ inline real agm(T &&x, U &&y)
 #undef MPPP_REAL_MPFR_UNARY_HEADER
 #undef MPPP_REAL_MPFR_UNARY_RETURN_IMPL
 #undef MPPP_REAL_MPFR_UNARY_RETVAL_IMPL
+
+#if defined(MPPP_WITH_ARB)
+
+#undef MPPP_REAL_ARB_UNARY_RETURN
+#undef MPPP_REAL_ARB_UNARY_RETVAL
+#undef MPPP_REAL_ARB_UNARY_RETURN_IMPL
+#undef MPPP_REAL_ARB_UNARY_RETVAL_IMPL
+
+#endif
 
 /** @defgroup real_io real_io
  *  @{

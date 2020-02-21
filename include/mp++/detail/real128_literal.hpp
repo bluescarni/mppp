@@ -25,7 +25,8 @@ inline real128 operator"" _rq()
     constexpr char arr[] = {Chars..., '\0'};
 
     // Pre-check for binary/octal literals.
-    if (sizeof...(Chars) >= 2u && arr[0] == '0' && arr[1] != 'x' && arr[1] != 'X') {
+    if (sizeof...(Chars) >= 2u && arr[0] == '0'
+        && (arr[1] == 'b' || arr[1] == 'B' || (arr[1] >= '0' && arr[1] <= '7'))) {
         throw std::invalid_argument("A real128 cannot be constructed from binary or octal literals");
     }
 

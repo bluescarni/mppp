@@ -131,6 +131,14 @@ ADD_MPPP_TESTCASE(rational_literals)
 if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_arith)
   ADD_MPPP_TESTCASE(real128_basic)
+  # NOTE: some real128 tests use directly
+  # the quadmath.h API.
+  # NOTE: the real128_basic target may
+  # not be defined due to the MPPP_TEST_NSPLIT
+  # machinery.
+  if(TARGET real128_basic)
+    target_link_libraries(real128_basic PRIVATE Quadmath::libquadmath Quadmath::header)
+  endif()
   ADD_MPPP_TESTCASE(real128_comparisons)
   ADD_MPPP_TESTCASE(real128_constants)
   ADD_MPPP_TESTCASE(real128_fpmanip)
@@ -142,7 +150,13 @@ if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_operators)
   ADD_MPPP_TESTCASE(real128_pow)
   ADD_MPPP_TESTCASE(real128_roots)
+  if(TARGET real128_roots)
+    target_link_libraries(real128_roots PRIVATE Quadmath::libquadmath Quadmath::header)
+  endif()
   ADD_MPPP_TESTCASE(real128_signbit)
+  if(TARGET real128_signbit)
+    target_link_libraries(real128_signbit PRIVATE Quadmath::libquadmath Quadmath::header)
+  endif()
   ADD_MPPP_TESTCASE(real128_trig)
   ADD_MPPP_TESTCASE(real128_hyperbolic)
   ADD_MPPP_TESTCASE(real128_miscfunctions)
