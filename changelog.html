@@ -267,6 +267,12 @@
 <div class="section" id="new">
 <h3>New<a class="headerlink" href="#new" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p>mp++ can now optionally use <a class="reference external" href="http://arblib.org/">Arb</a>
+to provide various additional special functions for
+<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/215">#215</a>).</p></li>
+<li><p>Implement squaring for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/215">#215</a>).</p></li>
 <li><p>mp++’s multiprecision classes now support pretty-printing in the
 <a class="reference external" href="https://github.com/jupyter-xeus/xeus-cling">xeus-cling notebook</a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/213">#213</a>).</p></li>
@@ -281,11 +287,16 @@
 <li><p>The <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> string representation
 has been changed to use the <code class="docutils literal notranslate"><span class="pre">g</span></code> format specifier
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/213">#213</a>).</p></li>
+<li><p>The GCC quadmath library is now a private dependency
+of the mp++ library
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/215">#215</a>).</p></li>
 </ul>
 </div>
 <div class="section" id="fix">
 <h3>Fix<a class="headerlink" href="#fix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p>Various build system fixes and improvements
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/215">#215</a>).</p></li>
 <li><p>Fix compilation with older clang versions in C++17 mode
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/213">#213</a>).</p></li>
 </ul>

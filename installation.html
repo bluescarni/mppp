@@ -200,11 +200,14 @@ the <a class="reference external" href="http://mpir.org/">MPIR</a> fork of GMP c
 <li><p>the <a class="reference external" href="https://www.mpfr.org">GNU MPFR</a> multiprecision floating-point library, <em>optional</em>, used in the implementation
 of the <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class and for providing support
 for the <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> type (MPFR 3 or a later version is required);</p></li>
+<li><p>the <a class="reference external" href="http://arblib.org/">Arb</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a> libraries, <em>optional</em>,
+used in the implementation of additional special functions for the
+<a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a> class;</p></li>
 <li><p>the <a class="reference external" href="https://gcc.gnu.org/onlinedocs/libquadmath/">quadmath library</a> from GCC, <em>optional</em>, used
 in the implementation of the <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class
 (typically, the quadmath library is part of GCC and it does not need to
 be installed separately);</p></li>
-<li><p>the <a class="reference external" href="https://www.boost.org/">Boost</a> and <a class="reference external" href="http://flintlib.org/">FLINT</a> libraries, <em>optional</em>, currently used
+<li><p>the <a class="reference external" href="https://www.boost.org/">Boost</a> libraries, <em>optional</em>, currently used
 only in the benchmarking suite.</p></li>
 </ul>
 <p>Additionally, <a class="reference external" href="https://cmake.org/">CMake</a> is the build system used by mp++ and it must also be available when
@@ -219,6 +222,8 @@ path, etc.). The available configuration options are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code>: enable features relying on the GNU
 MPFR library (off by default),</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code>: enable features relying on the Arb library
+(off by default, requires the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option to be active),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code>: enable features relying on the
 quadmath library (off by default),</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">MPPP_BUILD_TESTS</span></code>: build the test suite (off by default),</p></li>
@@ -335,6 +340,9 @@ using mp++ is the following:</p>
 (<code class="docutils literal notranslate"><span class="pre">-lgmp</span></code> on most Unix-like systems);</p></li>
 <li><p>the MPFR library, required only if mp++ was configured with
 the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option (<code class="docutils literal notranslate"><span class="pre">-lmpfr</span></code> on most Unix-like systems);</p></li>
+<li><p>the Arb and FLINT libraries, required only if mp++ was configured with
+the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</span></code> option (<code class="docutils literal notranslate"><span class="pre">-larb</span> <span class="pre">-lflint</span></code> on most
+Unix-like systems);</p></li>
 <li><p>the quadmath library, required only if mp++ was configured with the
 <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option (<code class="docutils literal notranslate"><span class="pre">-lquadmath</span></code> with GCC,
 with clang it might be necessary to provide the full path to the library).</p></li>
@@ -403,7 +411,7 @@ advanced CMake option.</p></li>
 <ul class="simple">
 <li><p>Due to a compiler bug in the implementation of <code class="docutils literal notranslate"><span class="pre">thread_local</span></code>
 storage <a class="footnote-reference brackets" href="#mingw-tls" id="id2">1</a>,
-certain multi-threading performance optimisations are disabled
+certain performance optimisations are disabled
 when compiling with MinGW.</p></li>
 </ul>
 <p>OSX:</p>

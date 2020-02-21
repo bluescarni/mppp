@@ -253,6 +253,23 @@ which allow to specify a different base for the representation of the value:</p>
 <span class="n">assert</span><span class="p">((</span><span class="n">real</span><span class="p">{</span><span class="s">&quot;7B.1&quot;</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">100</span><span class="p">}</span> <span class="o">==</span> <span class="mf">235.03125</span><span class="p">));</span> <span class="c1">// Base 32, 100 bits of precision.</span>
 </pre></div>
 </div>
+<p>Starting from mp++ 0.19, all multiprecision
+classes support also initialisastion
+via user-defined literals, implemented in the
+<code class="docutils literal notranslate"><span class="pre">mppp::literals</span></code> inline namespace:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">mppp</span><span class="o">::</span><span class="n">literals</span><span class="p">;</span>
+
+<span class="k">auto</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">123</span><span class="n">_z1</span><span class="p">;</span>   <span class="c1">// n is an integer with 1 limb of static</span>
+                   <span class="c1">// storage and initialised with the value 123.</span>
+<span class="k">auto</span> <span class="n">q</span> <span class="o">=</span> <span class="mi">456</span><span class="n">_q2</span><span class="p">;</span>   <span class="c1">// q is a rational with 2 limbs of static</span>
+                   <span class="c1">// storage and initialised with the value 456.</span>
+<span class="k">auto</span> <span class="n">x</span> <span class="o">=</span> <span class="mf">0.1</span><span class="n">_rq</span><span class="p">;</span>   <span class="c1">// x is a real128 initialised with the</span>
+                   <span class="c1">// quadruple-precision approximation of</span>
+                   <span class="c1">// the value 0.1.</span>
+<span class="k">auto</span> <span class="n">y</span> <span class="o">=</span> <span class="mf">1.3</span><span class="n">_r256</span><span class="p">;</span> <span class="c1">// y is a real initialised with the 256-bit</span>
+                   <span class="c1">// approximation of the value 1.3.</span>
+</pre></div>
+</div>
 <p>It is of course also possible to assign values to already-constructed multiprecision objects. In general, the behaviour
 of the assignment operators mirrors the behaviour of the corresponding constructors. For instance:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">int_t</span> <span class="n">n</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
