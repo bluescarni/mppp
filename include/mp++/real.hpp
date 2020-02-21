@@ -2461,7 +2461,7 @@ template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
-inline real neg(real &rop, T &&x)
+inline real &neg(real &rop, T &&x)
 {
     return detail::mpfr_nary_op(0, ::mpfr_neg, rop, std::forward<T>(x));
 }
@@ -2496,7 +2496,7 @@ template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
-inline real abs(real &rop, T &&x)
+inline real &abs(real &rop, T &&x)
 {
     return detail::mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<T>(x));
 }

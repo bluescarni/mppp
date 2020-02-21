@@ -29,6 +29,7 @@ TEST_CASE("real neg")
     r0 = 53;
     REQUIRE(neg(r0) == real{-53});
     neg(r0, real{-53, 8});
+    REQUIRE(std::is_same<real &, decltype(neg(r0, real{-53, 8}))>::value);
     REQUIRE(r0 == real{53});
     REQUIRE(r0.get_prec() == 8);
     real r1{123};
@@ -50,6 +51,7 @@ TEST_CASE("real abs")
     r0 = -53;
     REQUIRE(abs(r0) == real{53});
     abs(r0, real{-53, 8});
+    REQUIRE(std::is_same<real &, decltype(abs(r0, real{-53, 8}))>::value);
     REQUIRE(r0 == real{53});
     REQUIRE(r0.get_prec() == 8);
     real r1{-123};
