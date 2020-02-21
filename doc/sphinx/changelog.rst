@@ -7,6 +7,12 @@ Changelog
 New
 ~~~
 
+- mp++ can now optionally use `Arb <http://arblib.org/>`__
+  to provide various additional special functions for
+  :cpp:class:`~mppp::real`
+  (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
+- Implement squaring for :cpp:class:`~mppp::real`
+  (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
 - mp++'s multiprecision classes now support pretty-printing in the
   `xeus-cling notebook <https://github.com/jupyter-xeus/xeus-cling>`__
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
@@ -20,10 +26,15 @@ Changes
 - The :cpp:class:`~mppp::real128` string representation
   has been changed to use the ``g`` format specifier
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
+- The GCC quadmath library is now a private dependency
+  of the mp++ library
+  (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
 
 Fix
 ~~~
 
+- Various build system fixes and improvements
+  (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
 - Fix compilation with older clang versions in C++17 mode
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 
