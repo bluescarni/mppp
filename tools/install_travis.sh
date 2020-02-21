@@ -13,7 +13,7 @@ if [[ "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
 fi
 
 if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_BUILD_BENCHMARKS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes ../;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Release -DMPPP_BUILD_TESTS=yes -DMPPP_BUILD_BENCHMARKS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes ../;
     make -j2 VERBOSE=1 install;
     ctest -V;
 
@@ -24,36 +24,31 @@ if [[ "${MPPP_BUILD}" == "ReleaseGCC48" ]]; then
     cd ../tools/sample_project;
     mkdir build;
     cd build;
-    CXX=g++-4.8 CC=gcc-4.8 cmake ../ -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir;
+    CXX=g++-4.8 CC=gcc-4.8 cmake ../ -DCMAKE_PREFIX_PATH=$deps_dir;
     make;
     ./main;
 elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
-    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
+    CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
     make -j2 VERBOSE=1;
     ctest -V;
 elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
-    wget ftp://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.bz2;
-    tar xjvf gmp-6.1.2.tar.bz2;
-    cd gmp-6.1.2;
+    wget ftp://ftp.gnu.org/gnu/gmp/gmp-6.2.0.tar.bz2;
+    tar xjvf gmp-6.2.0.tar.bz2;
+    cd gmp-6.2.0;
     CXX=g++-6 CC=gcc-6 ABI=32 ./configure --disable-shared;
     make -j2;
     cd ..;
-    CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -fconcepts" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.1.2 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.1.2/.libs/libgmp.a -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM} ../;
+    CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -fconcepts" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.2.0 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.2.0/.libs/libgmp.a -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM} ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-6;
 elif [[ "${MPPP_BUILD}" == "OSXDebug" ]]; then
-    CXX=clang++ CC=clang cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes ../;
+    CXX=clang++ CC=clang cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes ../;
     make -j2 VERBOSE=1;
     ctest -V;
-# elif [[ "${MPPP_BUILD}" == "ICC" ]]; then
-#     set +x;
-#     docker login -u=bluescarni -p=${DOCKER_CLOUD_PWD};
-#     set -x;
-#     docker pull ${DOCKER_IMAGE};
 elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
     # Run the configure step to create the doc config files.
-    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_INSTALL_PREFIX=$deps_dir -DCMAKE_PREFIX_PATH=$deps_dir -DMPPP_WITH_MPFR=yes ../;
+    CXX=g++-5 CC=gcc-5 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes ../;
 
     cd ..;
     cd doc/doxygen;

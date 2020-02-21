@@ -10,6 +10,7 @@
 #include <string>
 #include <utility>
 
+#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/real.hpp>
 
@@ -201,3 +202,221 @@ TEST_CASE("real trig")
     REQUIRE(atan2(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
     REQUIRE(atan2(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
 }
+
+#if defined(MPPP_WITH_ARB)
+
+TEST_CASE("real trig arb")
+{
+    {
+        auto r0 = 1.23_r128;
+        r0.sin_pi();
+        REQUIRE(r0.get_prec() == 128);
+        REQUIRE(abs(r0 - sin(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
+        real rop{2, 12};
+        r0 = 1.23_r128;
+        sin_pi(rop, r0);
+        REQUIRE(rop.get_prec() == 128);
+        REQUIRE(abs(rop - sin(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
+        REQUIRE(sin_pi(std::move(r0)) == rop);
+        REQUIRE(!r0.is_valid());
+
+        REQUIRE(sin_pi(real{"inf", 128}).nan_p());
+        REQUIRE(sin_pi(real{"inf", 128}).get_prec() == 128);
+        REQUIRE(sin_pi(-real{"inf", 128}).nan_p());
+        REQUIRE(sin_pi(-real{"inf", 128}).get_prec() == 128);
+        REQUIRE(sin_pi(real{"nan", 128}).nan_p());
+        REQUIRE(sin_pi(real{"nan", 128}).get_prec() == 128);
+    }
+
+    {
+        auto r0 = 1.23_r128;
+        r0.cos_pi();
+        REQUIRE(r0.get_prec() == 128);
+        REQUIRE(abs(r0 - cos(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
+        real rop{2, 12};
+        r0 = 1.23_r128;
+        cos_pi(rop, r0);
+        REQUIRE(rop.get_prec() == 128);
+        REQUIRE(abs(rop - cos(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
+        REQUIRE(cos_pi(std::move(r0)) == rop);
+        REQUIRE(!r0.is_valid());
+
+        REQUIRE(cos_pi(real{"inf", 128}).nan_p());
+        REQUIRE(cos_pi(real{"inf", 128}).get_prec() == 128);
+        REQUIRE(cos_pi(-real{"inf", 128}).nan_p());
+        REQUIRE(cos_pi(-real{"inf", 128}).get_prec() == 128);
+        REQUIRE(cos_pi(real{"nan", 128}).nan_p());
+        REQUIRE(cos_pi(real{"nan", 128}).get_prec() == 128);
+    }
+
+    {
+        auto r0 = 1.23_r128;
+        r0.tan_pi();
+        REQUIRE(r0.get_prec() == 128);
+        REQUIRE(abs(r0 - tan(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
+        real rop{2, 12};
+        r0 = 1.23_r128;
+        tan_pi(rop, r0);
+        REQUIRE(rop.get_prec() == 128);
+        REQUIRE(abs(rop - tan(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
+        REQUIRE(tan_pi(std::move(r0)) == rop);
+        REQUIRE(!r0.is_valid());
+
+        REQUIRE(tan_pi(real{"inf", 128}).nan_p());
+        REQUIRE(tan_pi(real{"inf", 128}).get_prec() == 128);
+        REQUIRE(tan_pi(-real{"inf", 128}).nan_p());
+        REQUIRE(tan_pi(-real{"inf", 128}).get_prec() == 128);
+        REQUIRE(tan_pi(real{"nan", 128}).nan_p());
+        REQUIRE(tan_pi(real{"nan", 128}).get_prec() == 128);
+
+        // Special values.
+        REQUIRE(tan_pi(0_r128).zero_p());
+        REQUIRE(tan_pi(0_r128).get_prec() == 128);
+
+        REQUIRE(tan_pi(0.5_r128).inf_p());
+        REQUIRE(tan_pi(0.5_r128).get_prec() == 128);
+        REQUIRE(tan_pi(0.5_r128) > 0);
+
+        REQUIRE(tan_pi(1.5_r128).inf_p());
+        REQUIRE(tan_pi(1.5_r128).get_prec() == 128);
+        REQUIRE(tan_pi(1.5_r128) < 0);
+
+        REQUIRE(tan_pi(2.5_r128).inf_p());
+        REQUIRE(tan_pi(2.5_r128).get_prec() == 128);
+        REQUIRE(tan_pi(2.5_r128) > 0);
+
+        REQUIRE(tan_pi(3.5_r128).inf_p());
+        REQUIRE(tan_pi(3.5_r128).get_prec() == 128);
+        REQUIRE(tan_pi(3.5_r128) < 0);
+
+        REQUIRE(tan_pi(650.5_r128).inf_p());
+        REQUIRE(tan_pi(650.5_r128).get_prec() == 128);
+        REQUIRE(tan_pi(650.5_r128) > 0);
+
+        REQUIRE(tan_pi(-0.5_r128).inf_p());
+        REQUIRE(tan_pi(-0.5_r128).get_prec() == 128);
+        REQUIRE(tan_pi(-0.5_r128) < 0);
+
+        REQUIRE(tan_pi(-1.5_r128).inf_p());
+        REQUIRE(tan_pi(-1.5_r128).get_prec() == 128);
+        REQUIRE(tan_pi(-1.5_r128) > 0);
+
+        REQUIRE(tan_pi(-2.5_r128).inf_p());
+        REQUIRE(tan_pi(-2.5_r128).get_prec() == 128);
+        REQUIRE(tan_pi(-2.5_r128) < 0);
+
+        REQUIRE(tan_pi(-3.5_r128).inf_p());
+        REQUIRE(tan_pi(-3.5_r128).get_prec() == 128);
+        REQUIRE(tan_pi(-3.5_r128) > 0);
+
+        REQUIRE(tan_pi(-650.5_r128).inf_p());
+        REQUIRE(tan_pi(-650.5_r128).get_prec() == 128);
+        REQUIRE(tan_pi(-650.5_r128) < 0);
+    }
+
+    {
+        auto r0 = 1.23_r128;
+        r0.cot_pi();
+        REQUIRE(r0.get_prec() == 128);
+        REQUIRE(abs(r0 - cot(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
+        real rop{2, 12};
+        r0 = 1.23_r128;
+        cot_pi(rop, r0);
+        REQUIRE(rop.get_prec() == 128);
+        REQUIRE(abs(rop - cot(real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
+        REQUIRE(cot_pi(std::move(r0)) == rop);
+        REQUIRE(!r0.is_valid());
+
+        REQUIRE(cot_pi(real{"inf", 128}).nan_p());
+        REQUIRE(cot_pi(real{"inf", 128}).get_prec() == 128);
+        REQUIRE(cot_pi(-real{"inf", 128}).nan_p());
+        REQUIRE(cot_pi(-real{"inf", 128}).get_prec() == 128);
+        REQUIRE(cot_pi(real{"nan", 128}).nan_p());
+        REQUIRE(cot_pi(real{"nan", 128}).get_prec() == 128);
+
+        // Special values.
+        REQUIRE(cot_pi(0_r128).inf_p());
+        REQUIRE(cot_pi(0_r128).get_prec() == 128);
+        REQUIRE(cot_pi(0_r128) > 0);
+
+        REQUIRE(cot_pi(1_r128).inf_p());
+        REQUIRE(cot_pi(1_r128).get_prec() == 128);
+        REQUIRE(cot_pi(1_r128) < 0);
+
+        REQUIRE(cot_pi(2._r128).inf_p());
+        REQUIRE(cot_pi(2._r128).get_prec() == 128);
+        REQUIRE(cot_pi(2._r128) > 0);
+
+        REQUIRE(cot_pi(3_r128).inf_p());
+        REQUIRE(cot_pi(3_r128).get_prec() == 128);
+        REQUIRE(cot_pi(3_r128) < 0);
+
+        REQUIRE(cot_pi(650_r128).inf_p());
+        REQUIRE(cot_pi(650_r128).get_prec() == 128);
+        REQUIRE(cot_pi(650_r128) > 0);
+
+        REQUIRE(cot_pi(-1_r128).inf_p());
+        REQUIRE(cot_pi(-1_r128).get_prec() == 128);
+        REQUIRE(cot_pi(-1_r128) < 0);
+
+        REQUIRE(cot_pi(-2._r128).inf_p());
+        REQUIRE(cot_pi(-2._r128).get_prec() == 128);
+        REQUIRE(cot_pi(-2._r128) > 0);
+
+        REQUIRE(cot_pi(-3_r128).inf_p());
+        REQUIRE(cot_pi(-3_r128).get_prec() == 128);
+        REQUIRE(cot_pi(-3_r128) < 0);
+
+        REQUIRE(cot_pi(-650_r128).inf_p());
+        REQUIRE(cot_pi(-650_r128).get_prec() == 128);
+        REQUIRE(cot_pi(-650_r128) > 0);
+    }
+
+    {
+        auto r0 = 1.23_r128;
+        r0.sinc();
+        REQUIRE(r0.get_prec() == 128);
+        REQUIRE(abs(r0 - sin(1.23_r128) / 1.23_r128) < mppp::pow(2_r128, -126));
+        real rop{2, 12};
+        r0 = 1.23_r128;
+        sinc(rop, r0);
+        REQUIRE(rop.get_prec() == 128);
+        REQUIRE(abs(rop - sin(1.23_r128) / 1.23_r128) < mppp::pow(2_r128, -126));
+        REQUIRE(sinc(std::move(r0)) == rop);
+        REQUIRE(!r0.is_valid());
+
+        REQUIRE(sinc(real{"inf", 128}).zero_p());
+        REQUIRE(sinc(real{"inf", 128}).get_prec() == 128);
+        REQUIRE(sinc(-real{"inf", 128}).zero_p());
+        REQUIRE(sinc(-real{"inf", 128}).get_prec() == 128);
+        REQUIRE(sinc(real{"nan", 128}).nan_p());
+        REQUIRE(sinc(real{"nan", 128}).get_prec() == 128);
+        REQUIRE(sinc(real{0, 128}) == 1);
+        REQUIRE(sinc(real{0, 128}).get_prec() == 128);
+    }
+
+    {
+        auto r0 = 1.23_r128;
+        r0.sinc_pi();
+        REQUIRE(r0.get_prec() == 128);
+        REQUIRE(abs(r0 - sin(real_pi(128) * 1.23_r128) / (real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
+        real rop{2, 12};
+        r0 = 1.23_r128;
+        sinc_pi(rop, r0);
+        REQUIRE(rop.get_prec() == 128);
+        REQUIRE(abs(rop - sin(real_pi(128) * 1.23_r128) / (real_pi(128) * 1.23_r128)) < mppp::pow(2_r128, -126));
+        REQUIRE(sinc_pi(std::move(r0)) == rop);
+        REQUIRE(!r0.is_valid());
+
+        REQUIRE(sinc_pi(real{"inf", 128}).zero_p());
+        REQUIRE(sinc_pi(real{"inf", 128}).get_prec() == 128);
+        REQUIRE(sinc_pi(-real{"inf", 128}).zero_p());
+        REQUIRE(sinc_pi(-real{"inf", 128}).get_prec() == 128);
+        REQUIRE(sinc_pi(real{"nan", 128}).nan_p());
+        REQUIRE(sinc_pi(real{"nan", 128}).get_prec() == 128);
+        REQUIRE(sinc_pi(real{0, 128}) == 1);
+        REQUIRE(sinc_pi(real{0, 128}).get_prec() == 128);
+    }
+}
+
+#endif

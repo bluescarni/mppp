@@ -7548,19 +7548,19 @@ inline integer<SSize> pow_impl(const integer<SSize> &base, const T &exp)
         // 0**-n is a division by zero.
         throw zero_division_error("Cannot raise zero to the negative power " + detail::to_string(exp));
     } else if (base.is_one()) {
-        // 1**n == 1.
-        rop = 1;
+        // 1**-n == 1.
+        rop.set_one();
     } else if (base.is_negative_one()) {
         if (integer_exp_is_odd(exp)) {
-            // 1**(-2n-1) == -1.
-            rop = -1;
+            // (-1)**(-2n-1) == -1.
+            rop.set_negative_one();
         } else {
-            // 1**(-2n) == 1.
-            rop = 1;
+            // (-1)**(-2n) == 1.
+            rop.set_one();
         }
     } else {
-        // m**-n == 1 / m**n == 0.
-        rop = 0;
+        // m**-n == 1 / m**n == 0, truncated division.
+        rop.set_zero();
     }
     return rop;
 }

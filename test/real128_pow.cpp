@@ -14,8 +14,6 @@
 
 #include <type_traits>
 
-#include <quadmath.h>
-
 #include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>

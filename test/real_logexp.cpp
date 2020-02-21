@@ -8,6 +8,7 @@
 
 #include <utility>
 
+#include <mp++/config.hpp>
 #include <mp++/real.hpp>
 
 #include "catch.hpp"
@@ -169,3 +170,87 @@ TEST_CASE("real log1p")
     r0.log1p();
     REQUIRE(r0 == log(real{100}));
 }
+
+#if defined(MPPP_WITH_ARB)
+
+TEST_CASE("real log_hypot")
+{
+    real r0{12, 450};
+    log_hypot(r0, 1.2_r128, 1.3_r128);
+    REQUIRE(abs(r0 - 0.57051650227603092432139119994424096918528_r128) < mppp::pow(2_r128, -126));
+    REQUIRE(r0.get_prec() == 128);
+
+    real tmp1{4, 32}, tmp2{5, 32};
+    r0 = real{12, 16};
+    log_hypot(r0, std::move(tmp1), tmp2);
+    REQUIRE(abs(r0 - 1.85678603314) < 1E-8);
+    REQUIRE(r0.get_prec() == 32);
+    // Check tmp1 was swapped for r0.
+    REQUIRE(tmp1 == real{12, 16});
+    REQUIRE(tmp1.get_prec() == 16);
+    tmp1 = real{4, 32};
+    tmp2 = real{5, 32};
+    r0 = real{12, 16};
+    log_hypot(r0, tmp1, std::move(tmp2));
+    REQUIRE(abs(r0 - 1.85678603314) < 1E-8);
+    REQUIRE(r0.get_prec() == 32);
+    // Check tmp2 was swapped for r0.
+    REQUIRE(tmp2 == real{12, 16});
+    REQUIRE(tmp2.get_prec() == 16);
+
+    // Some tests for the binary form too.
+    REQUIRE(abs(log_hypot(real{4, 32}, real{5, 32}) - 1.85678603314) < 1E-8);
+    REQUIRE(log_hypot(real{4, 20}, real{5, 30}).get_prec() == 30);
+    REQUIRE(log_hypot(real{4}, 5.) == log_hypot(real{4}, real{5.}));
+    REQUIRE(log_hypot(5., real{4}) == log_hypot(real{5.}, real{4}));
+    REQUIRE(log_hypot(real{4}, 5) == log_hypot(real{4}, real{5}));
+    REQUIRE(log_hypot(5, real{4}) == log_hypot(real{5}, real{4}));
+    REQUIRE(log_hypot(-5., real{4}) == log_hypot(real{-5.}, real{4}));
+    REQUIRE(log_hypot(-5, real{4}) == log_hypot(real{-5}, real{4}));
+    REQUIRE(log_hypot(real{4}, integer<1>{5}) == log_hypot(real{4}, real{integer<1>{5}}));
+    REQUIRE(log_hypot(integer<1>{-5}, real{4}) == log_hypot(real{integer<1>{-5}}, real{4}));
+    REQUIRE(log_hypot(real{4, detail::real_deduce_precision(0.) / 2}, 5.).get_prec()
+            == detail::real_deduce_precision(0.));
+    REQUIRE(log_hypot(4., real{5, detail::real_deduce_precision(0.) / 2}).get_prec()
+            == detail::real_deduce_precision(0.));
+    REQUIRE(log_hypot(real{4, detail::real_deduce_precision(0) / 2}, 5).get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(log_hypot(4, real{5, detail::real_deduce_precision(0) / 2}).get_prec() == detail::real_deduce_precision(0));
+
+    // Test infinities.
+    REQUIRE(log_hypot(real{"inf", 32}, real{3, 25}).inf_p());
+    REQUIRE(log_hypot(real{"inf", 32}, real{3, 25}) > 0);
+    REQUIRE(log_hypot(real{"inf", 32}, real{3, 25}).get_prec() == 32);
+    REQUIRE(log_hypot(real{"-inf", 32}, real{3, 25}).inf_p());
+    REQUIRE(log_hypot(real{"-inf", 32}, real{3, 25}) > 0);
+    REQUIRE(log_hypot(real{"-inf", 32}, real{3, 25}).get_prec() == 32);
+
+    REQUIRE(log_hypot(real{3, 25}, real{"inf", 32}).inf_p());
+    REQUIRE(log_hypot(real{3, 25}, real{"inf", 32}) > 0);
+    REQUIRE(log_hypot(real{3, 25}, real{"inf", 32}).get_prec() == 32);
+    REQUIRE(log_hypot(real{3, 25}, real{"-inf", 32}).inf_p());
+    REQUIRE(log_hypot(real{3, 25}, real{"-inf", 32}) > 0);
+    REQUIRE(log_hypot(real{3, 25}, real{"-inf", 32}).get_prec() == 32);
+
+    REQUIRE(log_hypot(real{"inf", 25}, real{"inf", 32}).inf_p());
+    REQUIRE(log_hypot(real{"inf", 25}, real{"inf", 32}) > 0);
+    REQUIRE(log_hypot(real{"inf", 25}, real{"inf", 32}).get_prec() == 32);
+    REQUIRE(log_hypot(real{"-inf", 25}, real{"inf", 32}).inf_p());
+    REQUIRE(log_hypot(real{"inf", 25}, real{"-inf", 32}) > 0);
+    REQUIRE(log_hypot(real{"-inf", 25}, real{"-inf", 32}).get_prec() == 32);
+
+    // Test nans.
+    REQUIRE(log_hypot(real{"nan", 32}, real{3, 25}).nan_p());
+    REQUIRE(log_hypot(real{"nan", 32}, real{3, 25}).get_prec() == 32);
+    REQUIRE(log_hypot(real{"nan", 32}, real{"inf", 25}).nan_p());
+    REQUIRE(log_hypot(real{"nan", 32}, real{"inf", 25}).get_prec() == 32);
+
+    REQUIRE(log_hypot(real{3, 25}, real{"nan", 32}).nan_p());
+    REQUIRE(log_hypot(real{3, 25}, real{"nan", 32}).get_prec() == 32);
+    REQUIRE(log_hypot(real{"inf", 25}, real{"nan", 32}).nan_p());
+    REQUIRE(log_hypot(real{"inf", 25}, real{"nan", 32}).get_prec() == 32);
+
+    REQUIRE(log_hypot(real{"nan", 25}, real{"nan", 32}).nan_p());
+    REQUIRE(log_hypot(real{"nan", 25}, real{"nan", 32}).get_prec() == 32);
+}
+
+#endif
