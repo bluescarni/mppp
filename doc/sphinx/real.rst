@@ -288,6 +288,9 @@ Roots
 
    .. versionadded:: 0.12
 
+   .. note::
+      This function is available from MPFR 4 onwards.
+
    Binary :cpp:class:`~mppp::real` k-th root.
 
    This function will compute the k-th root of *op* and store it
@@ -299,9 +302,6 @@ Roots
    If *op* is zero, the result will be zero with the sign obtained by the usual limit rules, i.e.,
    the same sign as *op* if *k* is odd, and positive if *k* is even.
 
-   .. note::
-      This function is available from MPFR 4 onwards.
-
    :param rop: the return value.
    :param op: the operand.
    :param k: the degree of the root.
@@ -311,6 +311,9 @@ Roots
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::rootn_ui(T &&r, unsigned long k)
 
    .. versionadded:: 0.12
+
+   .. note::
+      This function is available from MPFR 4 onwards.
 
    Unary :cpp:class:`~mppp::real` k-th root.
 
@@ -322,9 +325,6 @@ Roots
    negative (including negative infinity), the result will be a negative number (resp. NaN).
    If *r* is zero, the result will be zero with the sign obtained by the usual limit rules, i.e.,
    the same sign as *r* if *k* is odd, and positive if *k* is even.
-
-   .. note::
-      This function is available from MPFR 4 onwards.
 
    :param r: the operand.
    :param k: the degree of the root.
@@ -866,13 +866,13 @@ Gamma functions
 
    .. versionadded:: 0.17
 
+   .. note::
+      This function is available from MPFR 4 onwards.
+
    Ternary incomplete Gamma function.
 
    This function will set *rop* to the upper incomplete Gamma function of *x* and *y*.
    The precision of *rop* will be set to the largest precision among the operands.
-
-   .. note::
-      This function is available from MPFR 4 onwards.
 
    :param rop: the return value.
    :param x: the first argument.
@@ -884,6 +884,9 @@ Gamma functions
 
    .. versionadded:: 0.17
 
+   .. note::
+      This function is available from MPFR 4 onwards.
+
    Binary incomplete Gamma function.
 
    This function will compute and return the upper incomplete Gamma function of *x* and *y*.
@@ -894,9 +897,6 @@ Gamma functions
    operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
    either the default precision, if set, or it is automatically deduced depending on the type
    and value of the operand to be converted.
-
-   .. note::
-      This function is available from MPFR 4 onwards.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -1042,13 +1042,15 @@ Other special functions
 
 .. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::beta(mppp::real &rop, T &&x, U &&y)
 
+   .. versionadded:: 0.17
+
+   .. note::
+      This function is available from MPFR 4 onwards.
+
    Ternary beta function.
 
    This function will set *rop* to the beta function of *x* and *y*.
    The precision of *rop* will be set to the largest precision among the operands.
-
-   .. note::
-      This function is available from MPFR 4 onwards.
 
    :param rop: the return value.
    :param x: the first argument.
@@ -1057,6 +1059,11 @@ Other special functions
    :return: a reference to *rop*.
 
 .. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::beta(T &&x, U &&y)
+
+   .. versionadded:: 0.17
+
+   .. note::
+      This function is available from MPFR 4 onwards.
 
    Binary beta function.
 
@@ -1068,9 +1075,6 @@ Other special functions
    operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
    either the default precision, if set, or it is automatically deduced depending on the type
    and value of the operand to be converted.
-
-   .. note::
-      This function is available from MPFR 4 onwards.
 
    :param x: the first argument.
    :param y: the second argument.
