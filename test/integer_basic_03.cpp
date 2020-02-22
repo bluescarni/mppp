@@ -677,7 +677,7 @@ struct binary_s11n_tester {
         n1 = integer{-1};
         size = static_cast<detail::mpz_size_t>(S::value + 1u);
         buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
-        std::array<::mp_limb_t, S::value + 1u> sbuffer{};
+        std::array<::mp_limb_t, S::value + 1u> sbuffer{{}};
         std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
                   detail::make_uai(buffer.data()));
         std::copy(reinterpret_cast<char *>(sbuffer.data()),
@@ -714,7 +714,7 @@ struct binary_s11n_tester {
         n1.promote();
         size = static_cast<detail::mpz_size_t>(S::value + 1u);
         buffer.resize(sizeof(size) + sizeof(::mp_limb_t) * unsigned(size));
-        sbuffer = std::array<::mp_limb_t, S::value + 1u>{};
+        sbuffer = std::array<::mp_limb_t, S::value + 1u>{{}};
         std::copy(reinterpret_cast<char *>(&size), reinterpret_cast<char *>(&size) + sizeof(size),
                   detail::make_uai(buffer.data()));
         std::copy(reinterpret_cast<char *>(sbuffer.data()),

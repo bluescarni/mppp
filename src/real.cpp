@@ -168,14 +168,13 @@ struct arf_raii {
 // from Arb to MPFR.
 void arf_to_mpfr(::mpfr_t rop, const ::arf_t op)
 {
-    // Handle special values first.
-    if (::arf_is_nan(op)) {
-        ::mpfr_set_nan(rop);
-    } else if (::arf_is_pos_inf(op)) {
-        ::mpfr_set_inf(rop, 1);
-    } else if (::arf_is_neg_inf(op)) {
-        ::mpfr_set_inf(rop, -1);
-    } else {
+    // NOTE: if op is not a special value,
+    // we'll have to do some checking on the
+    // exponents to ensure we can represent
+    // op as an mpfr_t. Otherwise, we might
+    // end up in a situation in which arf_get_mpfr()
+    // aborts the application.
+    if (!::arf_is_special(op)) {
         // Get the min/max exponents currently allowed in MPFR.
         const auto e_min = ::mpfr_get_emin(), e_max = ::mpfr_get_emax();
 
@@ -194,10 +193,10 @@ void arf_to_mpfr(::mpfr_t rop, const ::arf_t op)
                                         + std::to_string(e_min) + ", the maximum is " + std::to_string(e_max) + ")");
         }
         // LCOV_EXCL_STOP
-
-        // Extract an mpfr from the arf.
-        ::arf_get_mpfr(rop, op, MPFR_RNDN);
     }
+
+    // Extract an mpfr from the arf.
+    ::arf_get_mpfr(rop, op, MPFR_RNDN);
 }
 
 // Helper to convert an mpfr_t into an arb_t.
@@ -2100,6 +2099,200 @@ real &real::trunc()
 {
     detail::real_check_trunc_arg(*this);
     return self_mpfr_unary_nornd(::mpfr_trunc);
+}
+
+/// \link mppp::real Real\endlink comparison.
+/**
+ * \rststar
+ * This function will compare ``a`` and ``b``, returning:
+ *
+ * - zero if ``a`` equals ``b``,
+ * - a negative value if ``a`` is less than ``b``,
+ * - a positive value if ``a`` is greater than ``b``.
+ *
+ * If at least one NaN value is involved in the comparison, an error will be raised.
+ *
+ * This function is useful to distinguish the three possible cases. The comparison operators
+ * are recommended instead if it is needed to distinguish only two cases.
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return an integral value expressing how ``a`` compares to ``b``.
+ *
+ * @throws std::domain_error if at least one of the operands is NaN.
+ */
+int cmp(const real &a, const real &b)
+{
+    ::mpfr_clear_erangeflag();
+    auto retval = ::mpfr_cmp(a.get_mpfr_t(), b.get_mpfr_t());
+    if (mppp_unlikely(::mpfr_erangeflag_p())) {
+        ::mpfr_clear_erangeflag();
+        throw std::domain_error("Cannot compare two reals if at least one of them is NaN");
+    }
+    return retval;
+}
+
+/// Equality predicate with special NaN handling for \link mppp::real real\endlink.
+/**
+ * \rststar
+ * If both ``a`` and ``b`` are not NaN, this function is identical to the equality operator for
+ * :cpp:class:`~mppp::real`. If at least one operand is NaN, this function will return ``true``
+ * if both operands are NaN, ``false`` otherwise.
+ *
+ * In other words, this function behaves like an equality operator which considers all NaN
+ * values equal to each other.
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return \p true if \f$ a = b \f$ (including the case in which both operands are NaN),
+ * \p false otherwise.
+ */
+bool real_equal_to(const real &a, const real &b)
+{
+    const bool a_nan = a.nan_p(), b_nan = b.nan_p();
+    return (!a_nan && !b_nan) ? (::mpfr_equal_p(a.get_mpfr_t(), b.get_mpfr_t()) != 0) : (a_nan && b_nan);
+}
+
+/// Less-than predicate with special NaN and moved-from handling for \link mppp::real real\endlink.
+/**
+ * \rststar
+ * This function behaves like a less-than operator which considers NaN values
+ * greater than non-NaN values, and moved-from objects greater than both NaN and non-NaN values.
+ * This function can be used as a comparator in various facilities of the
+ * standard library (e.g., ``std::sort()``, ``std::set``, etc.).
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return \p true if \f$ a < b \f$ (following the rules above regarding NaN values and moved-from objects),
+ * \p false otherwise.
+ */
+bool real_lt(const real &a, const real &b)
+{
+    if (!a.is_valid()) {
+        // a is moved-from, consider it the largest possible value.
+        return false;
+    }
+    if (!b.is_valid()) {
+        // a is not moved-from, b is. a is smaller.
+        return true;
+    }
+    const bool a_nan = a.nan_p();
+    return (!a_nan && !b.nan_p()) ? (::mpfr_less_p(a.get_mpfr_t(), b.get_mpfr_t()) != 0) : !a_nan;
+}
+
+/// Greater-than predicate with special NaN and moved-from handling for \link mppp::real real\endlink.
+/**
+ * \rststar
+ * This function behaves like a greater-than operator which considers NaN values
+ * greater than non-NaN values, and moved-from objects greater than both NaN and non-NaN values.
+ * This function can be used as a comparator in various facilities of the
+ * standard library (e.g., ``std::sort()``, ``std::set``, etc.).
+ * \endrststar
+ *
+ * @param a the first operand.
+ * @param b the second operand.
+ *
+ * @return \p true if \f$ a > b \f$ (following the rules above regarding NaN values and moved-from objects),
+ * \p false otherwise.
+ */
+bool real_gt(const real &a, const real &b)
+{
+    if (!b.is_valid()) {
+        // b is moved-from, nothing can be bigger.
+        return false;
+    }
+    if (!a.is_valid()) {
+        // b is not moved-from, a is. a is bigger.
+        return true;
+    }
+    const bool b_nan = b.nan_p();
+    return (!a.nan_p() && !b_nan) ? (::mpfr_greater_p(a.get_mpfr_t(), b.get_mpfr_t()) != 0) : !b_nan;
+}
+
+/// Output stream operator for \link mppp::real real\endlink objects.
+/**
+ * \rststar
+ * This operator will insert into the stream ``os`` a string representation of ``r``
+ * in base 10 (as returned by :cpp:func:`mppp::real::to_string()`).
+ *
+ * .. warning::
+ *    In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
+ *    flags. For the time being, users are encouraged to use the ``mpfr_get_str()`` function from the MPFR
+ *    library if precise and forward-compatible control on the printing format is needed.
+ *
+ * \endrststar
+ *
+ * @param os the target stream.
+ * @param r the \link mppp::real real\endlink that will be directed to \p os.
+ *
+ * @return a reference to \p os.
+ *
+ * @throws unspecified any exception thrown by mppp::real::to_string().
+ */
+std::ostream &operator<<(std::ostream &os, const real &r)
+{
+    detail::mpfr_to_stream(r.get_mpfr_t(), os, 10);
+    return os;
+}
+
+namespace detail
+{
+
+// NOTE: don't put in unnamed namespace as
+// this needs do be just in detail:: for friendship
+// with real.
+template <typename F>
+inline real real_constant(const F &f, ::mpfr_prec_t p)
+{
+    ::mpfr_prec_t prec;
+    if (p) {
+        if (mppp_unlikely(!real_prec_check(p))) {
+            throw std::invalid_argument("Cannot init a real constant with a precision of " + detail::to_string(p)
+                                        + ": the value must be either zero or between "
+                                        + detail::to_string(real_prec_min()) + " and "
+                                        + detail::to_string(real_prec_max()));
+        }
+        prec = p;
+    } else {
+        const auto dp = real_get_default_prec();
+        if (mppp_unlikely(!dp)) {
+            throw std::invalid_argument("Cannot init a real constant with an automatically-deduced precision if "
+                                        "the global default precision has not been set");
+        }
+        prec = dp;
+    }
+    real retval{real::ptag{}, prec, true};
+    f(retval._get_mpfr_t(), MPFR_RNDN);
+    return retval;
+}
+
+} // namespace detail
+
+// pi constant.
+real real_pi(::mpfr_prec_t p)
+{
+    return detail::real_constant(::mpfr_const_pi, p);
+}
+
+/// Set \link mppp::real real\endlink to \f$\pi\f$.
+/**
+ * This function will set \p rop to \f$\pi\f$. The precision
+ * of \p rop will not be altered.
+ *
+ * @param rop the \link mppp::real real\endlink that will be set to \f$\pi\f$.
+ *
+ * @return a reference to \p rop.
+ */
+real &real_pi(real &rop)
+{
+    ::mpfr_const_pi(rop._get_mpfr_t(), MPFR_RNDN);
+    return rop;
 }
 
 } // namespace mppp

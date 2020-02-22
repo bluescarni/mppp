@@ -2253,21 +2253,7 @@ inline real mpfr_nary_op_return_nornd(::mpfr_prec_t min_prec, const F &f, Arg0 &
 
 #endif
 
-/** @defgroup real_arithmetic real_arithmetic
- *  @{
- */
-
-/// Ternary \link mppp::real real\endlink addition.
-/**
- * This function will compute \f$a+b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
+// Ternary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2278,17 +2264,7 @@ inline real &add(real &rop, T &&a, U &&b)
     return detail::mpfr_nary_op(0, ::mpfr_add, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Ternary \link mppp::real real\endlink subtraction.
-/**
- * This function will compute \f$a-b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
+// Ternary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2299,17 +2275,7 @@ inline real &sub(real &rop, T &&a, U &&b)
     return detail::mpfr_nary_op(0, ::mpfr_sub, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Ternary \link mppp::real real\endlink multiplication.
-/**
- * This function will compute \f$a \times b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
+// Ternary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2320,17 +2286,7 @@ inline real &mul(real &rop, T &&a, U &&b)
     return detail::mpfr_nary_op(0, ::mpfr_mul, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Ternary \link mppp::real real\endlink division.
-/**
- * This function will compute \f$a / b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
+// Ternary division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2341,18 +2297,7 @@ inline real &div(real &rop, T &&a, U &&b)
     return detail::mpfr_nary_op(0, ::mpfr_div, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Quaternary \link mppp::real real\endlink fused multiply–add.
-/**
- * This function will compute \f$a \times b + c\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- * @param c the third operand.
- *
- * @return a reference to \p rop.
- */
+// Quaternary fused multiply–add.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U, CvrReal V>
 #else
@@ -2363,41 +2308,7 @@ inline real &fma(real &rop, T &&a, U &&b, V &&c)
     return detail::mpfr_nary_op(0, ::mpfr_fma, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-/// Ternary \link mppp::real real\endlink fused multiply–add.
-/**
- * \rststar
- * This function will compute and return :math:`a \times b + c`.
- * The precision of the result will be set to the largest precision among the operands.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- * @param c the third operand.
- *
- * @return \f$ a \times b + c \f$.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U, CvrReal V>
-#else
-template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
-#endif
-inline real fma(T &&a, U &&b, V &&c)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
-}
-
-/// Quaternary \link mppp::real real\endlink fused multiply–sub.
-/**
- * This function will compute \f$a \times b - c\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- * @param c the third operand.
- *
- * @return a reference to \p rop.
- */
+// Quaternary fused multiply–sub.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U, CvrReal V>
 #else
@@ -2408,19 +2319,18 @@ inline real &fms(real &rop, T &&a, U &&b, V &&c)
     return detail::mpfr_nary_op(0, ::mpfr_fms, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-/// Ternary \link mppp::real real\endlink fused multiply–sub.
-/**
- * \rststar
- * This function will compute and return :math:`a \times b - c`.
- * The precision of the result will be set to the largest precision among the operands.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- * @param c the third operand.
- *
- * @return \f$ a \times b - c \f$.
- */
+// Ternary fused multiply–add.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U, CvrReal V>
+#else
+template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
+#endif
+inline real fma(T &&a, U &&b, V &&c)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
+}
+
+// Ternary fused multiply–sub.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U, CvrReal V>
 #else
@@ -2431,12 +2341,18 @@ inline real fms(T &&a, U &&b, V &&c)
     return detail::mpfr_nary_op_return(0, ::mpfr_fms, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-/// Unary negation for \link mppp::real real\endlink.
-/**
- * @param x the \link mppp::real real\endlink that will be negated.
- *
- * @return the negative of \p x.
- */
+// Binary negation.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &neg(real &rop, T &&x)
+{
+    return detail::mpfr_nary_op(0, ::mpfr_neg, rop, std::forward<T>(x));
+}
+
+// Unary negation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2447,31 +2363,18 @@ inline real neg(T &&x)
     return detail::mpfr_nary_op_return(0, ::mpfr_neg, std::forward<T>(x));
 }
 
-/// Binary negation for \link mppp::real real\endlink.
-/**
- * This function will set \p rop to the negation of \p x.
- *
- * @param rop the \link mppp::real real\endlink that will hold the result.
- * @param x the \link mppp::real real\endlink that will be negated.
- *
- * @return a reference to \p rop.
- */
+// Binary absolute value.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
-inline real neg(real &rop, T &&x)
+inline real &abs(real &rop, T &&x)
 {
-    return detail::mpfr_nary_op(0, ::mpfr_neg, rop, std::forward<T>(x));
+    return detail::mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<T>(x));
 }
 
-/// Unary absolute value for \link mppp::real real\endlink.
-/**
- * @param x the \link mppp::real real\endlink whose absolute value will be computed.
- *
- * @return the absolute value of \p x.
- */
+// Unary absolute value.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2482,26 +2385,94 @@ inline real abs(T &&x)
     return detail::mpfr_nary_op_return(0, ::mpfr_abs, std::forward<T>(x));
 }
 
-/// Binary absolute value for \link mppp::real real\endlink.
-/**
- * This function will set \p rop to the absolute value of \p x.
- *
- * @param rop the \link mppp::real real\endlink that will hold the result.
- * @param x the \link mppp::real real\endlink whose absolute value will be computed.
- *
- * @return a reference to \p rop.
- */
+// mul2/div2 primitives.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
-inline real abs(real &rop, T &&x)
+inline real mul_2ui(T &&x, unsigned long n)
 {
-    return detail::mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<T>(x));
+    auto mul_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2ui(r, o, n, rnd); };
+    return detail::mpfr_nary_op_return(0, mul_2ui_wrapper, std::forward<T>(x));
 }
 
-/** @} */
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &mul_2ui(real &rop, T &&x, unsigned long n)
+{
+    auto mul_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2ui(r, o, n, rnd); };
+    return detail::mpfr_nary_op(0, mul_2ui_wrapper, rop, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real mul_2si(T &&x, long n)
+{
+    auto mul_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2si(r, o, n, rnd); };
+    return detail::mpfr_nary_op_return(0, mul_2si_wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &mul_2si(real &rop, T &&x, long n)
+{
+    auto mul_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_mul_2si(r, o, n, rnd); };
+    return detail::mpfr_nary_op(0, mul_2si_wrapper, rop, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real div_2ui(T &&x, unsigned long n)
+{
+    auto div_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2ui(r, o, n, rnd); };
+    return detail::mpfr_nary_op_return(0, div_2ui_wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &div_2ui(real &rop, T &&x, unsigned long n)
+{
+    auto div_2ui_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2ui(r, o, n, rnd); };
+    return detail::mpfr_nary_op(0, div_2ui_wrapper, rop, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real div_2si(T &&x, long n)
+{
+    auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2si(r, o, n, rnd); };
+    return detail::mpfr_nary_op_return(0, div_2si_wrapper, std::forward<T>(x));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &div_2si(real &rop, T &&x, long n)
+{
+    auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2si(r, o, n, rnd); };
+    return detail::mpfr_nary_op(0, div_2si_wrapper, rop, std::forward<T>(x));
+}
 
 /** @defgroup real_comparison real_comparison
  *  @{
@@ -2600,119 +2571,17 @@ inline bool signbit(const real &r)
     return r.signbit();
 }
 
-/// \link mppp::real Real\endlink comparison.
-/**
- * \rststar
- * This function will compare ``a`` and ``b``, returning:
- *
- * - zero if ``a`` equals ``b``,
- * - a negative value if ``a`` is less than ``b``,
- * - a positive value if ``a`` is greater than ``b``.
- *
- * If at least one NaN value is involved in the comparison, an error will be raised.
- *
- * This function is useful to distinguish the three possible cases. The comparison operators
- * are recommended instead if it is needed to distinguish only two cases.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return an integral value expressing how ``a`` compares to ``b``.
- *
- * @throws std::domain_error if at least one of the operands is NaN.
- */
-inline int cmp(const real &a, const real &b)
-{
-    ::mpfr_clear_erangeflag();
-    auto retval = ::mpfr_cmp(a.get_mpfr_t(), b.get_mpfr_t());
-    if (mppp_unlikely(::mpfr_erangeflag_p())) {
-        ::mpfr_clear_erangeflag();
-        throw std::domain_error("Cannot compare two reals if at least one of them is NaN");
-    }
-    return retval;
-}
+// Comparison.
+MPPP_DLL_PUBLIC int cmp(const real &, const real &);
 
-/// Equality predicate with special NaN handling for \link mppp::real real\endlink.
-/**
- * \rststar
- * If both ``a`` and ``b`` are not NaN, this function is identical to the equality operator for
- * :cpp:class:`~mppp::real`. If at least one operand is NaN, this function will return ``true``
- * if both operands are NaN, ``false`` otherwise.
- *
- * In other words, this function behaves like an equality operator which considers all NaN
- * values equal to each other.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \p true if \f$ a = b \f$ (including the case in which both operands are NaN),
- * \p false otherwise.
- */
-inline bool real_equal_to(const real &a, const real &b)
-{
-    const bool a_nan = a.nan_p(), b_nan = b.nan_p();
-    return (!a_nan && !b_nan) ? (::mpfr_equal_p(a.get_mpfr_t(), b.get_mpfr_t()) != 0) : (a_nan && b_nan);
-}
+// Equality predicate with special NaN handling.
+MPPP_DLL_PUBLIC bool real_equal_to(const real &, const real &);
 
-/// Less-than predicate with special NaN and moved-from handling for \link mppp::real real\endlink.
-/**
- * \rststar
- * This function behaves like a less-than operator which considers NaN values
- * greater than non-NaN values, and moved-from objects greater than both NaN and non-NaN values.
- * This function can be used as a comparator in various facilities of the
- * standard library (e.g., ``std::sort()``, ``std::set``, etc.).
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \p true if \f$ a < b \f$ (following the rules above regarding NaN values and moved-from objects),
- * \p false otherwise.
- */
-inline bool real_lt(const real &a, const real &b)
-{
-    if (!a.get_mpfr_t()->_mpfr_d) {
-        // a is moved-from, consider it the largest possible value.
-        return false;
-    }
-    if (!b.get_mpfr_t()->_mpfr_d) {
-        // a is not moved-from, b is. a is smaller.
-        return true;
-    }
-    const bool a_nan = a.nan_p();
-    return (!a_nan && !b.nan_p()) ? (::mpfr_less_p(a.get_mpfr_t(), b.get_mpfr_t()) != 0) : !a_nan;
-}
+// Less-than predicate with special NaN and moved-from handling.
+MPPP_DLL_PUBLIC bool real_lt(const real &, const real &);
 
-/// Greater-than predicate with special NaN and moved-from handling for \link mppp::real real\endlink.
-/**
- * \rststar
- * This function behaves like a greater-than operator which considers NaN values
- * greater than non-NaN values, and moved-from objects greater than both NaN and non-NaN values.
- * This function can be used as a comparator in various facilities of the
- * standard library (e.g., ``std::sort()``, ``std::set``, etc.).
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return \p true if \f$ a > b \f$ (following the rules above regarding NaN values and moved-from objects),
- * \p false otherwise.
- */
-inline bool real_gt(const real &a, const real &b)
-{
-    if (!b.get_mpfr_t()->_mpfr_d) {
-        // b is moved-from, nothing can be bigger.
-        return false;
-    }
-    if (!a.get_mpfr_t()->_mpfr_d) {
-        // b is not moved-from, a is. a is bigger.
-        return true;
-    }
-    const bool b_nan = b.nan_p();
-    return (!a.nan_p() && !b_nan) ? (::mpfr_greater_p(a.get_mpfr_t(), b.get_mpfr_t()) != 0) : !b_nan;
-}
+// Greater-than predicate with special NaN and moved-from handling.
+MPPP_DLL_PUBLIC bool real_gt(const real &, const real &);
 
 /** @} */
 
@@ -3456,62 +3325,10 @@ inline real agm(T &&x, U &&y)
  *  @{
  */
 
-/// Output stream operator for \link mppp::real real\endlink objects.
-/**
- * \rststar
- * This operator will insert into the stream ``os`` a string representation of ``r``
- * in base 10 (as returned by :cpp:func:`mppp::real::to_string()`).
- *
- * .. warning::
- *    In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
- *    flags. For the time being, users are encouraged to use the ``mpfr_get_str()`` function from the MPFR
- *    library if precise and forward-compatible control on the printing format is needed.
- *
- * \endrststar
- *
- * @param os the target stream.
- * @param r the \link mppp::real real\endlink that will be directed to \p os.
- *
- * @return a reference to \p os.
- *
- * @throws unspecified any exception thrown by mppp::real::to_string().
- */
-inline std::ostream &operator<<(std::ostream &os, const real &r)
-{
-    detail::mpfr_to_stream(r.get_mpfr_t(), os, 10);
-    return os;
-}
+// Output stream operator.
+MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real &);
 
 /** @} */
-
-namespace detail
-{
-
-template <typename F>
-inline real real_constant(const F &f, ::mpfr_prec_t p)
-{
-    ::mpfr_prec_t prec;
-    if (p) {
-        if (mppp_unlikely(!real_prec_check(p))) {
-            throw std::invalid_argument("Cannot init a real constant with a precision of " + detail::to_string(p)
-                                        + ": the value must be either zero or between "
-                                        + detail::to_string(real_prec_min()) + " and "
-                                        + detail::to_string(real_prec_max()));
-        }
-        prec = p;
-    } else {
-        const auto dp = real_get_default_prec();
-        if (mppp_unlikely(!dp)) {
-            throw std::invalid_argument("Cannot init a real constant with an automatically-deduced precision if "
-                                        "the global default precision has not been set");
-        }
-        prec = dp;
-    }
-    real retval{real::ptag{}, prec, true};
-    f(retval._get_mpfr_t(), MPFR_RNDN);
-    return retval;
-}
-} // namespace detail
 
 /** @defgroup real_constants real_constants
  *  @{
@@ -3534,25 +3351,9 @@ inline real real_constant(const F &f, ::mpfr_prec_t p)
  * \link mppp::real_prec_min() real_prec_min()\endlink and \link mppp::real_prec_max() real_prec_max()\endlink,
  * or if \p p is zero but no default precision has been set.
  */
-inline real real_pi(::mpfr_prec_t p = 0)
-{
-    return detail::real_constant(::mpfr_const_pi, p);
-}
+MPPP_DLL_PUBLIC real real_pi(::mpfr_prec_t p = 0);
 
-/// Set \link mppp::real real\endlink to \f$\pi\f$.
-/**
- * This function will set \p rop to \f$\pi\f$. The precision
- * of \p rop will not be altered.
- *
- * @param rop the \link mppp::real real\endlink that will be set to \f$\pi\f$.
- *
- * @return a reference to \p rop.
- */
-inline real &real_pi(real &rop)
-{
-    ::mpfr_const_pi(rop._get_mpfr_t(), MPFR_RNDN);
-    return rop;
-}
+MPPP_DLL_PUBLIC real &real_pi(real &);
 
 /** @} */
 

@@ -7,6 +7,9 @@ Changelog
 New
 ~~~
 
+- Implement :cpp:class:`~mppp::real` primitives for exact
+  multiplication/division by powers of 2
+  (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
 - mp++ can now optionally use `Arb <http://arblib.org/>`__
   to provide various additional special functions for
   :cpp:class:`~mppp::real`
@@ -23,6 +26,9 @@ New
 Changes
 ~~~~~~~
 
+- Move more :cpp:class:`~mppp::real` functions from the
+  header into the compiled library
+  (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
 - The GCC quadmath library is now a private dependency
   of the mp++ library
   (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
@@ -33,9 +39,15 @@ Changes
 Fix
 ~~~
 
-- Various build system fixes and improvements
+- Fix a compilation warning with GCC 4.8
+  (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
+- Fix a couple of :cpp:class:`~mppp::real` functions
+  returning copies rather than references
+  (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
+- Various build system/doc fixes and improvements
   (`#214 <https://github.com/bluescarni/mppp/pull/214>`__,
-  `#215 <https://github.com/bluescarni/mppp/pull/215>`__).
+  `#215 <https://github.com/bluescarni/mppp/pull/215>`__,
+  `#216 <https://github.com/bluescarni/mppp/pull/216>`__).
 - Fix compilation with older clang versions in C++17 mode
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 
