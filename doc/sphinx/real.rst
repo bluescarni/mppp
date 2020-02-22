@@ -133,8 +133,157 @@ Conversion
 Arithmetic
 ~~~~~~~~~~
 
-.. doxygengroup:: real_arithmetic
-   :content-only:
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::add(mppp::real &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::sub(mppp::real &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::mul(mppp::real &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::div(mppp::real &rop, T &&a, U &&b)
+
+   Ternary basic :cpp:class:`~mppp::real` arithmetics.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`a+b`,
+   * :math:`a-b`,
+   * :math:`a \times b`,
+   * :math:`a/b`.
+
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real &mppp::fma(mppp::real &rop, T &&a, U &&b, V &&c)
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real &mppp::fms(mppp::real &rop, T &&a, U &&b, V &&c)
+
+   Quaternary :cpp:class:`~mppp::real` multiply-add/sub.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`a \times b + c`,
+   * :math:`a \times b - c`.
+
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param a: the first operand.
+   :param b: the second operand.
+   :param c: the third operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real mppp::fma(T &&a, U &&b, V &&c)
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real mppp::fms(T &&a, U &&b, V &&c)
+
+   Ternary :cpp:class:`~mppp::real` multiply-add/sub.
+
+   These functions will return, respectively:
+
+   * :math:`a \times b + c`,
+   * :math:`a \times b - c`.
+
+   The precision of the result will be the largest precision among the operands.
+
+   :param a: the first operand.
+   :param b: the second operand.
+   :param c: the third operand.
+
+   :return: :math:`a \times b + c` or :math:`a \times b - c`.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::neg(mppp::real &rop, T &&x)
+
+   Binary :cpp:class:`~mppp::real` negation.
+
+   This function will set *rop* to :math:`-x`. The precision of the result will be
+   equal to the precision of *x*.
+
+   :param rop: the return value.
+   :param x: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::neg(T &&x)
+
+   Unary :cpp:class:`~mppp::real` negation.
+
+   This function will return :math:`-x`. The precision of the result will be
+   equal to the precision of *x*.
+
+   :param x: the operand.
+
+   :return: :math:`-x`.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::abs(mppp::real &rop, T &&x)
+
+   Binary :cpp:class:`~mppp::real` absolute value.
+
+   This function will set *rop* to :math:`\left| x \right|`. The precision of the result will be
+   equal to the precision of *x*.
+
+   :param rop: the return value.
+   :param x: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::abs(T &&x)
+
+   Unary :cpp:class:`~mppp::real` absolute value.
+
+   This function will return :math:`\left| x \right|`. The precision of the result will be
+   equal to the precision of *x*.
+
+   :param x: the operand.
+
+   :return: :math:`\left| x \right|`.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::mul_2ui(mppp::real &rop, T &&x, unsigned long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::mul_2si(mppp::real &rop, T &&x, long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::div_2ui(mppp::real &rop, T &&x, unsigned long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::div_2si(mppp::real &rop, T &&x, long n)
+
+   .. versionadded:: 0.19
+
+   Ternary :cpp:class:`~mppp::real` primitives for exact
+   multiplication/division by powers of 2.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`x \times 2^n` (``mul_2`` variants),
+   * :math:`\frac{x}{2^n}` (``div_2`` variants).
+
+   The precision of the result will be equal to the precision of *x*.
+   The computation will be exact (that is, no rounding takes place).
+
+   :param rop: the return value.
+   :param x: the operand.
+   :param n: the power of 2.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::mul_2ui(T &&x, unsigned long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::mul_2si(T &&x, long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::div_2ui(T &&x, unsigned long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::div_2si(T &&x, long n)
+
+   .. versionadded:: 0.19
+
+   Binary :cpp:class:`~mppp::real` primitives for exact
+   multiplication/division by powers of 2.
+
+   These functions will return, respectively:
+
+   * :math:`x \times 2^n` (``mul_2`` variants),
+   * :math:`\frac{x}{2^n}` (``div_2`` variants).
+
+   The precision of the result will be equal to the precision of *x*.
+   The computation will be exact (that is, no rounding takes place).
+
+   :param x: the operand.
+   :param n: the power of 2.
+
+   :return: *x* multiplied/divided by :math:`2^n`.
 
 .. _real_comparison:
 

@@ -2253,21 +2253,7 @@ inline real mpfr_nary_op_return_nornd(::mpfr_prec_t min_prec, const F &f, Arg0 &
 
 #endif
 
-/** @defgroup real_arithmetic real_arithmetic
- *  @{
- */
-
-/// Ternary \link mppp::real real\endlink addition.
-/**
- * This function will compute \f$a+b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
+// Ternary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2278,17 +2264,7 @@ inline real &add(real &rop, T &&a, U &&b)
     return detail::mpfr_nary_op(0, ::mpfr_add, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Ternary \link mppp::real real\endlink subtraction.
-/**
- * This function will compute \f$a-b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
+// Ternary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2299,17 +2275,7 @@ inline real &sub(real &rop, T &&a, U &&b)
     return detail::mpfr_nary_op(0, ::mpfr_sub, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Ternary \link mppp::real real\endlink multiplication.
-/**
- * This function will compute \f$a \times b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
+// Ternary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2320,17 +2286,7 @@ inline real &mul(real &rop, T &&a, U &&b)
     return detail::mpfr_nary_op(0, ::mpfr_mul, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Ternary \link mppp::real real\endlink division.
-/**
- * This function will compute \f$a / b\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- *
- * @return a reference to \p rop.
- */
+// Ternary division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U>
 #else
@@ -2341,18 +2297,7 @@ inline real &div(real &rop, T &&a, U &&b)
     return detail::mpfr_nary_op(0, ::mpfr_div, rop, std::forward<T>(a), std::forward<U>(b));
 }
 
-/// Quaternary \link mppp::real real\endlink fused multiply–add.
-/**
- * This function will compute \f$a \times b + c\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- * @param c the third operand.
- *
- * @return a reference to \p rop.
- */
+// Quaternary fused multiply–add.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U, CvrReal V>
 #else
@@ -2363,41 +2308,7 @@ inline real &fma(real &rop, T &&a, U &&b, V &&c)
     return detail::mpfr_nary_op(0, ::mpfr_fma, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-/// Ternary \link mppp::real real\endlink fused multiply–add.
-/**
- * \rststar
- * This function will compute and return :math:`a \times b + c`.
- * The precision of the result will be set to the largest precision among the operands.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- * @param c the third operand.
- *
- * @return \f$ a \times b + c \f$.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T, CvrReal U, CvrReal V>
-#else
-template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
-#endif
-inline real fma(T &&a, U &&b, V &&c)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
-}
-
-/// Quaternary \link mppp::real real\endlink fused multiply–sub.
-/**
- * This function will compute \f$a \times b - c\f$, storing the result in \p rop.
- * The precision of the result will be set to the largest precision among the operands.
- *
- * @param rop the return value.
- * @param a the first operand.
- * @param b the second operand.
- * @param c the third operand.
- *
- * @return a reference to \p rop.
- */
+// Quaternary fused multiply–sub.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U, CvrReal V>
 #else
@@ -2408,19 +2319,18 @@ inline real &fms(real &rop, T &&a, U &&b, V &&c)
     return detail::mpfr_nary_op(0, ::mpfr_fms, rop, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-/// Ternary \link mppp::real real\endlink fused multiply–sub.
-/**
- * \rststar
- * This function will compute and return :math:`a \times b - c`.
- * The precision of the result will be set to the largest precision among the operands.
- * \endrststar
- *
- * @param a the first operand.
- * @param b the second operand.
- * @param c the third operand.
- *
- * @return \f$ a \times b - c \f$.
- */
+// Ternary fused multiply–add.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T, CvrReal U, CvrReal V>
+#else
+template <typename T, typename U, typename V, cvr_real_enabler<T, U, V> = 0>
+#endif
+inline real fma(T &&a, U &&b, V &&c)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_fma, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
+}
+
+// Ternary fused multiply–sub.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T, CvrReal U, CvrReal V>
 #else
@@ -2431,31 +2341,7 @@ inline real fms(T &&a, U &&b, V &&c)
     return detail::mpfr_nary_op_return(0, ::mpfr_fms, std::forward<T>(a), std::forward<U>(b), std::forward<V>(c));
 }
 
-/// Unary negation for \link mppp::real real\endlink.
-/**
- * @param x the \link mppp::real real\endlink that will be negated.
- *
- * @return the negative of \p x.
- */
-#if defined(MPPP_HAVE_CONCEPTS)
-template <CvrReal T>
-#else
-template <typename T, cvr_real_enabler<T> = 0>
-#endif
-inline real neg(T &&x)
-{
-    return detail::mpfr_nary_op_return(0, ::mpfr_neg, std::forward<T>(x));
-}
-
-/// Binary negation for \link mppp::real real\endlink.
-/**
- * This function will set \p rop to the negation of \p x.
- *
- * @param rop the \link mppp::real real\endlink that will hold the result.
- * @param x the \link mppp::real real\endlink that will be negated.
- *
- * @return a reference to \p rop.
- */
+// Binary negation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2466,31 +2352,18 @@ inline real &neg(real &rop, T &&x)
     return detail::mpfr_nary_op(0, ::mpfr_neg, rop, std::forward<T>(x));
 }
 
-/// Unary absolute value for \link mppp::real real\endlink.
-/**
- * @param x the \link mppp::real real\endlink whose absolute value will be computed.
- *
- * @return the absolute value of \p x.
- */
+// Unary negation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
 template <typename T, cvr_real_enabler<T> = 0>
 #endif
-inline real abs(T &&x)
+inline real neg(T &&x)
 {
-    return detail::mpfr_nary_op_return(0, ::mpfr_abs, std::forward<T>(x));
+    return detail::mpfr_nary_op_return(0, ::mpfr_neg, std::forward<T>(x));
 }
 
-/// Binary absolute value for \link mppp::real real\endlink.
-/**
- * This function will set \p rop to the absolute value of \p x.
- *
- * @param rop the \link mppp::real real\endlink that will hold the result.
- * @param x the \link mppp::real real\endlink whose absolute value will be computed.
- *
- * @return a reference to \p rop.
- */
+// Binary absolute value.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2501,6 +2374,18 @@ inline real &abs(real &rop, T &&x)
     return detail::mpfr_nary_op(0, ::mpfr_abs, rop, std::forward<T>(x));
 }
 
+// Unary absolute value.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real abs(T &&x)
+{
+    return detail::mpfr_nary_op_return(0, ::mpfr_abs, std::forward<T>(x));
+}
+
+// mul2/div2 primitives.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <CvrReal T>
 #else
@@ -2588,8 +2473,6 @@ inline real &div_2si(real &rop, T &&x, long n)
     auto div_2si_wrapper = [n](::mpfr_t r, const ::mpfr_t o, ::mpfr_rnd_t rnd) { ::mpfr_div_2si(r, o, n, rnd); };
     return detail::mpfr_nary_op(0, div_2si_wrapper, rop, std::forward<T>(x));
 }
-
-/** @} */
 
 /** @defgroup real_comparison real_comparison
  *  @{
