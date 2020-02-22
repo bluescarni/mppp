@@ -17,38 +17,38 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_bionic_gcc7_conda_relwithdebinfo.sh
-  cosmic_gcc8_conda_coverage:
+  focal_gcc9_conda_coverage:
     docker:
-    - image: circleci/buildpack-deps:cosmic
+    - image: circleci/buildpack-deps:focal
     steps:
     - checkout
     - run:
         name: Build and test
-        command: bash ./tools/circleci_cosmic_gcc8_conda_coverage.sh
-  cosmic_clang7_conda_tsan:
+        command: bash ./tools/circleci_focal_gcc9_conda_coverage.sh
+  focal_clang9_conda_tsan:
     docker:
-    - image: circleci/buildpack-deps:cosmic
+    - image: circleci/buildpack-deps:focal
     steps:
     - checkout
     - run:
         name: Build and test
-        command: bash ./tools/circleci_cosmic_clang7_conda_tsan.sh
-  cosmic_clang7_debuggmp_unstable:
+        command: bash ./tools/circleci_focal_clang9_conda_tsan.sh
+  focal_clang9_debuggmp_unstable:
     docker:
-    - image: circleci/buildpack-deps:cosmic
+    - image: circleci/buildpack-deps:focal
     steps:
     - checkout
     - run:
         name: Build and test
-        command: bash ./tools/circleci_cosmic_clang7_debuggmp_unstable.sh
-  cosmic_clang7_debuggmp:
+        command: bash ./tools/circleci_focal_clang9_debuggmp_unstable.sh
+  focal_clang9_debuggmp:
     docker:
-    - image: circleci/buildpack-deps:cosmic
+    - image: circleci/buildpack-deps:focal
     steps:
     - checkout
     - run:
         name: Build and test
-        command: bash ./tools/circleci_cosmic_clang7_debuggmp.sh
+        command: bash ./tools/circleci_focal_clang9_debuggmp.sh
   bionic_gcc7_conda_asan:
     docker:
     - image: circleci/buildpack-deps:bionic
@@ -72,9 +72,9 @@ workflows:
     jobs:
     - bionic_gcc7_conda_coverage
     - bionic_gcc7_conda_relwithdebinfo
-    - cosmic_gcc8_conda_coverage
-    - cosmic_clang7_conda_tsan
-    - cosmic_clang7_debuggmp_unstable
-    - cosmic_clang7_debuggmp
+    - focal_gcc9_conda_coverage
+    - focal_clang9_conda_tsan
+    - focal_clang9_debuggmp_unstable
+    - focal_clang9_debuggmp
     - bionic_gcc7_conda_asan
     - bionic_gcc7_conda_ubsan
