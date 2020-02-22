@@ -168,14 +168,13 @@ struct arf_raii {
 // from Arb to MPFR.
 void arf_to_mpfr(::mpfr_t rop, const ::arf_t op)
 {
-    // Handle special values first.
-    if (::arf_is_nan(op)) {
-        ::mpfr_set_nan(rop);
-    } else if (::arf_is_pos_inf(op)) {
-        ::mpfr_set_inf(rop, 1);
-    } else if (::arf_is_neg_inf(op)) {
-        ::mpfr_set_inf(rop, -1);
-    } else {
+    // NOTE: if op is not a special value,
+    // we'll have to do some checking on the
+    // exponents to ensure we can represent
+    // op as an mpfr_t. Otherwise, we might
+    // end up in a situation in which arf_get_mpfr()
+    // aborts the application.
+    if (!::arf_is_special(op)) {
         // Get the min/max exponents currently allowed in MPFR.
         const auto e_min = ::mpfr_get_emin(), e_max = ::mpfr_get_emax();
 
@@ -194,10 +193,10 @@ void arf_to_mpfr(::mpfr_t rop, const ::arf_t op)
                                         + std::to_string(e_min) + ", the maximum is " + std::to_string(e_max) + ")");
         }
         // LCOV_EXCL_STOP
-
-        // Extract an mpfr from the arf.
-        ::arf_get_mpfr(rop, op, MPFR_RNDN);
     }
+
+    // Extract an mpfr from the arf.
+    ::arf_get_mpfr(rop, op, MPFR_RNDN);
 }
 
 // Helper to convert an mpfr_t into an arb_t.
