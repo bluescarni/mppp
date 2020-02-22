@@ -675,87 +675,87 @@ Hyperbolic functions
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp2(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp10(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::expm1(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp2(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp10(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::expm1(mppp::real &rop, T &&x)
 
    Binary exponentials.
 
    These functions will set *rop* to, respectively,
 
-   * ``e**op``,
-   * ``2**op``,
-   * ``10**op``,
-   * ``e**op-1``.
+   * :math:`e^x`,
+   * :math:`2^x`,
+   * :math:`10^x`,
+   * :math:`e^x - 1`.
 
-   The precision of the result will be equal to the precision of *op*.
+   The precision of the result will be equal to the precision of *x*.
 
    :param rop: the return value.
-   :param op: the exponent.
+   :param x: the exponent.
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp2(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp10(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::expm1(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp2(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp10(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::expm1(T &&x)
 
    Unary exponentials.
 
    These functions will return, respectively,
 
-   * ``e**r``,
-   * ``2**r``,
-   * ``10**r``,
-   * ``e**r-1``.
+   * :math:`e^x`,
+   * :math:`2^x`,
+   * :math:`10^x`,
+   * :math:`e^x - 1`.
 
-   The precision of the result will be equal to the precision of *r*.
+   The precision of the result will be equal to the precision of *x*.
 
-   :param r: the exponent.
+   :param x: the exponent.
 
-   :return: the exponential of *r*.
+   :return: the exponential of *x*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log2(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log10(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log1p(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log2(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log10(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log1p(mppp::real &rop, T &&x)
 
    Binary logarithms.
 
    These functions will set *rop* to, respectively,
 
-   * ``log(op)``,
-   * ``log2(op)``,
-   * ``log10(op)``,
-   * ``log(1+op)``.
+   * :math:`\log x`,
+   * :math:`\log_2 x`,
+   * :math:`\log_{10} x`,
+   * :math:`\log\left( 1+x \right)`.
 
-   The precision of the result will be equal to the precision of *op*.
+   The precision of the result will be equal to the precision of *x*.
 
    :param rop: the return value.
-   :param op: the operand.
+   :param x: the operand.
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log2(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log10(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log1p(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log2(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log10(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log1p(T &&x)
 
    Unary logarithms.
 
    These functions will return, respectively,
 
-   * ``log(r)``,
-   * ``log2(r)``,
-   * ``log10(r)``,
-   * ``log(1+op)``.
+   * :math:`\log x`,
+   * :math:`\log_2 x`,
+   * :math:`\log_{10} x`,
+   * :math:`\log\left( 1+x \right)`.
 
-   The precision of the result will be equal to the precision of *r*.
+   The precision of the result will be equal to the precision of *x*.
 
-   :param r: the operand.
+   :param x: the operand.
 
-   :return: the logarithm of *r*.
+   :return: the logarithm of *x*.
 
 .. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::log_hypot(mppp::real &rop, T &&x, U &&y)
 
