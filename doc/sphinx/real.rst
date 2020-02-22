@@ -190,7 +190,7 @@ Arithmetic
    :param b: the second operand.
    :param c: the third operand.
 
-   :return: :math:`a \times b + c` or :math:`a \times b - c`.
+   :return: :math:`a \times b \pm c`.
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::neg(mppp::real &rop, T &&x)
 

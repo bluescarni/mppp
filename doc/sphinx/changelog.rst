@@ -29,17 +29,17 @@ Changes
 - Move more :cpp:class:`~mppp::real` functions from the
   header into the compiled library
   (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
-- The :cpp:class:`~mppp::real128` string representation
-  has been changed to use the ``g`` format specifier
-  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 - The GCC quadmath library is now a private dependency
   of the mp++ library
   (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
+- The :cpp:class:`~mppp::real128` string representation
+  has been changed to use the ``g`` format specifier
+  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 
 Fix
 ~~~
 
-- Fix a compilation warning with GCC 4.8.
+- Fix a compilation warning with GCC 4.8
   (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
 - Fix a couple of :cpp:class:`~mppp::real` functions
   returning copies rather than references
