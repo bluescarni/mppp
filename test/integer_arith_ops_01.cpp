@@ -559,6 +559,22 @@ struct mul_tester {
         REQUIRE((std::is_same<decltype(n1 * 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l * n2), long double>::value));
 #endif
+        REQUIRE(std::is_same<std::complex<float>, decltype(n1 * std::complex<float>{4, 0})>::value);
+        REQUIRE(std::is_same<std::complex<float>, decltype(std::complex<float>{4, 0} * n1)>::value);
+        REQUIRE(n1 * std::complex<float>{4, 0} == std::complex<float>{4, 0});
+        REQUIRE(std::complex<float>{4, 0} * n1 == std::complex<float>{4, 0});
+
+        REQUIRE(std::is_same<std::complex<double>, decltype(n1 * std::complex<double>{4, 0})>::value);
+        REQUIRE(std::is_same<std::complex<double>, decltype(std::complex<double>{4, 0} * n1)>::value);
+        REQUIRE(n1 * std::complex<double>{4, 0} == std::complex<double>{4, 0});
+        REQUIRE(std::complex<double>{4, 0} * n1 == std::complex<double>{4, 0});
+
+#if defined(MPPP_WITH_MPFR)
+        REQUIRE(std::is_same<std::complex<long double>, decltype(n1 * std::complex<long double>{4, 0})>::value);
+        REQUIRE(std::is_same<std::complex<long double>, decltype(std::complex<long double>{4, 0} * n1)>::value);
+        REQUIRE(n1 * std::complex<long double>{4, 0} == std::complex<long double>{4, 0});
+        REQUIRE(std::complex<long double>{4, 0} * n1 == std::complex<long double>{4, 0});
+#endif
 #if defined(MPPP_HAVE_GCC_INT128)
         REQUIRE((n1 * __uint128_t{4} == 4));
         REQUIRE((__uint128_t{4} * n1 == 4));
@@ -592,6 +608,18 @@ struct mul_tester {
 #if defined(MPPP_WITH_MPFR)
         retval *= -1.5l;
         REQUIRE((lex_cast(retval) == "-1312"));
+#endif
+        retval = 12;
+        retval *= std::complex<float>{2, 0};
+        REQUIRE(std::is_same<integer &, decltype(retval *= std::complex<float>{2, 0})>::value);
+        REQUIRE(retval == 24);
+        retval *= std::complex<double>{2, 0};
+        REQUIRE(std::is_same<integer &, decltype(retval *= std::complex<double>{2, 0})>::value);
+        REQUIRE(retval == 48);
+#if defined(MPPP_WITH_MPFR)
+        retval *= std::complex<long double>{2, 0};
+        REQUIRE(std::is_same<integer &, decltype(retval *= std::complex<long double>{2, 0})>::value);
+        REQUIRE(retval == 96);
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
         retval = -1312;
@@ -629,6 +657,27 @@ struct mul_tester {
             dl *= integer{2};
             REQUIRE(dl == std::numeric_limits<double>::infinity());
         }
+#if defined(MPPP_WITH_MPFR)
+        long double ld = 4;
+        ld *= integer{2};
+        REQUIRE(std::is_same<long double &, decltype(ld *= integer{2})>::value);
+        REQUIRE(ld == 8);
+#endif
+        std::complex<float> cf{1, 2};
+        cf *= integer{2};
+        REQUIRE(std::is_same<std::complex<float> &, decltype(cf *= integer{2})>::value);
+        REQUIRE(cf == std::complex<float>{2, 4});
+
+        std::complex<double> cd{1, 2};
+        cd *= integer{2};
+        REQUIRE(std::is_same<std::complex<double> &, decltype(cd *= integer{2})>::value);
+        REQUIRE(cd == std::complex<double>{2, 4});
+#if defined(MPPP_WITH_MPFR)
+        std::complex<long double> cld{1, 2};
+        cld *= integer{2};
+        REQUIRE(std::is_same<std::complex<long double> &, decltype(cld *= integer{2})>::value);
+        REQUIRE(cld == std::complex<long double>{2, 4});
+#endif
 #if defined(MPPP_HAVE_GCC_INT128)
         __int128_t n128{-7};
         n128 *= integer{5};
