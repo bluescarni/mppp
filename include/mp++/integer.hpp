@@ -2247,8 +2247,7 @@ public:
 #endif
     explicit operator T() const
     {
-        using value_type = typename T::value_type;
-        return T{static_cast<value_type>(*this), value_type(0)};
+        return T(static_cast<typename T::value_type>(*this));
     }
     /// Generic conversion member function to a C++ fundamental type.
     /**
@@ -3282,22 +3281,14 @@ struct integer_common_type<T, integer<SSize>, enable_if_t<is_cpp_integral_intero
 };
 
 template <std::size_t SSize, typename U>
-struct integer_common_type<integer<SSize>, U, enable_if_t<is_cpp_floating_point_interoperable<U>::value>> {
+struct integer_common_type<integer<SSize>, U,
+                           enable_if_t<disjunction<is_cpp_floating_point_interoperable<U>, is_cpp_complex<U>>::value>> {
     using type = U;
 };
 
 template <std::size_t SSize, typename T>
-struct integer_common_type<T, integer<SSize>, enable_if_t<is_cpp_floating_point_interoperable<T>::value>> {
-    using type = T;
-};
-
-template <std::size_t SSize, typename U>
-struct integer_common_type<integer<SSize>, U, enable_if_t<is_cpp_complex<U>::value>> {
-    using type = U;
-};
-
-template <std::size_t SSize, typename T>
-struct integer_common_type<T, integer<SSize>, enable_if_t<is_cpp_complex<T>::value>> {
+struct integer_common_type<T, integer<SSize>,
+                           enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value>> {
     using type = T;
 };
 
