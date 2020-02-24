@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <functional>
 #include <iostream>
@@ -46,7 +47,8 @@ namespace mppp
 {
 
 template <typename T, std::size_t SSize>
-using is_rational_interoperable = detail::disjunction<is_cpp_interoperable<T>, std::is_same<T, integer<SSize>>>;
+using is_rational_interoperable
+    = detail::disjunction<is_cpp_interoperable<T>, std::is_same<T, integer<SSize>>, is_cpp_complex<T>>;
 
 template <typename T, std::size_t SSize>
 #if defined(MPPP_HAVE_CONCEPTS)
@@ -208,11 +210,12 @@ mpq_struct_t get_mpq_view(const rational<SSize> &);
  *
  * The :cpp:class:`~mppp::rational` class allows to access and manipulate directly the numerator and denominator
  * via the :cpp:func:`~mppp::rational::get_num()`, :cpp:func:`~mppp::rational::get_den()`,
- * :cpp:func:`~mppp::rational::_get_num()` and :cpp:func:`~mppp::rational::_get_den()` methods, so that it is possible
- * to use :cpp:class:`~mppp::integer` functions directly on numerator and denominator. The mutable getters' names
- * :cpp:func:`~mppp::rational::_get_num()` and :cpp:func:`~mppp::rational::_get_den()` are prefixed with an underscore
- * ``_`` to highlight their potentially dangerous nature: it is the user's responsibility to ensure that the canonical
- * form of the rational is preserved after altering the numerator and/or the denominator via the mutable getters.
+ * :cpp:func:`~mppp::rational::_get_num()` and :cpp:func:`~mppp::rational::_get_den()` member functions, so that it is
+ * possible to use :cpp:class:`~mppp::integer` functions directly on numerator and denominator. The mutable getters'
+ * names :cpp:func:`~mppp::rational::_get_num()` and :cpp:func:`~mppp::rational::_get_den()` are prefixed with an
+ * underscore ``_`` to highlight their potentially dangerous nature: it is the user's responsibility to ensure that the
+ * canonical form of the rational is preserved after altering the numerator and/or the denominator via the mutable
+ * getters.
  * \endrststar
  */
 // NOTEs:
@@ -227,13 +230,13 @@ template <std::size_t SSize>
 class rational
 {
 public:
-/// Underlying integral type.
-/**
- * \rststar
- * This is the :cpp:class:`~mppp::integer` type used for the representation of numerator and
- * denominator.
- * \endrststar
- */
+    /// Underlying integral type.
+    /**
+     * \rststar
+     * This is the :cpp:class:`~mppp::integer` type used for the representation of numerator and
+     * denominator.
+     * \endrststar
+     */
 #if defined(MPPP_DOXYGEN_INVOKED)
     typedef integer<SSize> int_t;
 #else
@@ -318,18 +321,31 @@ private:
     explicit rational(const ptag &, T &&n) : m_num(std::forward<T>(n)), m_den(1u)
     {
     }
+    // Constructor from std::complex.
+    template <typename T>
+    explicit rational(const ptag &p, const std::complex<T> &c)
+        : rational(p, c.imag() == 0
+                          ? c.real()
+                          : throw std::domain_error(
+                              "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(c.imag())))
+    {
+    }
 
 public:
     /// Generic constructor.
     /**
      * \rststar
-     * This constructor will initialize a rational with the value ``x``. The construction will fail if ``x``
-     * is a non-finite floating-point value.
+     * This constructor will initialize a rational with the value ``x``. The construction will fail if either:
+     * * ``x`` is a non-finite floating-point value, or,
+     * * ``x`` is a complex value whose imaginary part is not zero
+     *   or whose real part is not finite.
      * \endrststar
      *
      * @param x the value that will be used to initialize \p this.
      *
-     * @throws std::domain_error if \p x is a non-finite floating-point value.
+     * @throws std::domain_error if \p x is a non-finite floating-point value, or
+     * a complex value with non-zero imaginary part or non-finite real part.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <RationalCvrInteroperable<SSize> T>
@@ -822,14 +838,14 @@ private:
     }
 
 public:
-    /// Generic conversion method.
+    /// Generic conversion member function.
     /**
      * \rststar
-     * This method, similarly to the conversion operator, will convert ``this`` to a
+     * This member function, similarly to the conversion operator, will convert ``this`` to a
      * :cpp:concept:`~mppp::RationalInteroperable` type, storing the result of the conversion into ``rop``. Differently
-     * from the conversion operator, this method does not raise any exception: if the conversion is successful, the
-     * method will return ``true``, otherwise the method will return ``false``. If the conversion fails,
-     * ``rop`` will not be altered.
+     * from the conversion operator, this member function does not raise any exception: if the conversion is successful,
+     * the member function will return ``true``, otherwise the member function will return ``false``. If the conversion
+     * fails, ``rop`` will not be altered.
      * \endrststar
      *
      * @param rop the variable which will store the result of the conversion.
@@ -895,23 +911,23 @@ public:
     /// Canonicalise.
     /**
      * \rststar
-     * This method will put ``this`` in canonical form. In particular, this method
+     * This member function will put ``this`` in canonical form. In particular, this member function
      * will make sure that:
      *
      * * the numerator and denominator are coprime (dividing them by their GCD,
      *   if necessary),
      * * the denominator is strictly positive.
      *
-     * In general, it is not necessary to call explicitly this method, as the public
+     * In general, it is not necessary to call explicitly this member function, as the public
      * API of :cpp:class:`~mppp::rational` ensures that rationals are kept in canonical
-     * form. Calling this method, however, might be necessary if the numerator and/or denominator
+     * form. Calling this member function, however, might be necessary if the numerator and/or denominator
      * are modified manually, or when constructing/assigning from non-canonical ``mpq_t``
      * values.
      *
      * .. warning::
      *
-     *    Calling this method with on a rational with null denominator will result in undefined
-     *    behaviour.
+     *    Calling this member function with on a rational with null denominator will
+     *    result in undefined behaviour.
      * \endrststar
      *
      * @return a reference to \p this.
@@ -974,7 +990,7 @@ public:
     }
     /// Negate in-place.
     /**
-     * This method will set \p this to <tt>-this</tt>.
+     * This member function will set \p this to <tt>-this</tt>.
      *
      * @return a reference to \p this.
      */
@@ -985,7 +1001,7 @@ public:
     }
     /// In-place absolute value.
     /**
-     * This method will set \p this to its absolute value.
+     * This member function will set \p this to its absolute value.
      *
      * @return a reference to \p this.
      */
@@ -996,7 +1012,7 @@ public:
     }
     /// In-place inversion.
     /**
-     * This method will set \p this to its inverse.
+     * This member function will set \p this to its inverse.
      *
      * @return a reference to \p this.
      *
@@ -1504,7 +1520,7 @@ inline rational<SSize> &div(rational<SSize> &rop, const rational<SSize> &op1, co
 
 /// Binary negation.
 /**
- * This method will set \p rop to <tt>-q</tt>.
+ * This member function will set \p rop to <tt>-q</tt>.
  *
  * @param rop the return value.
  * @param q the rational that will be negated.

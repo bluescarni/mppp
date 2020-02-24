@@ -20,7 +20,8 @@ Concepts
 
    This concept is satisfied if the type ``T`` can interoperate with a :cpp:class:`~mppp::rational`
    with static size ``SSize``. Specifically, this concept will be ``true`` if ``T`` satisfies
-   :cpp:concept:`~mppp::CppInteroperable` or it is an :cpp:class:`~mppp::integer` with static size ``SSize``.
+   :cpp:concept:`~mppp::CppInteroperable` or :cpp:concept:`~mppp::CppComplex`,
+   or it is an :cpp:class:`~mppp::integer` with static size ``SSize``.
 
    A corresponding boolean type trait called ``is_rational_interoperable`` is also available (even if the compiler does
    not support concepts).
@@ -63,7 +64,8 @@ Concepts
 Functions
 ---------
 
-Much of the functionality of the :cpp:class:`~mppp::rational` class is exposed via plain functions. These functions
+Much of the functionality of the :cpp:class:`~mppp::rational` class is exposed
+via plain functions. These functions
 mimic the `GMP API <https://gmplib.org/manual/Rational-Number-Functions.html>`__ where appropriate, but a variety of
 convenience/generic overloads is provided as well.
 
@@ -157,7 +159,8 @@ Other
 Mathematical operators
 ----------------------
 
-Overloaded operators are provided for convenience. Their interface is generic, and their implementation
+Overloaded operators are provided for convenience. Their interface is generic,
+and their implementation
 is typically built on top of basic :ref:`functions <rational_functions>`.
 
 .. doxygengroup:: rational_operators
