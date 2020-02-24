@@ -124,22 +124,7 @@ todo_include_todos = False
 
 # -- Options for HTML output ----------------------------------------------
 
-# html_theme = "sphinx_rtd_theme"
-
-extensions += ['sphinxjp.themes.basicstrap']
-html_theme = 'basicstrap'
-
-html_sidebars = { '**': ['globaltoc.html', 'searchbox.html'] }
-
-html_theme_options = {
-    'header_inverse': True,
-    'relbar_inverse': True,
-    'inner_theme': True,
-    'inner_theme_name': 'bootswatch-journal',
-    'googlewebfont': True,
-    'googlewebfont_url': 'http://fonts.googleapis.com/css?family=IBM+Plex+Sans',
-    'googlewebfont_style': "font-family: 'IBM Plex Sans', sans-serif",
-}
+html_theme = "sphinx_rtd_theme"
 
 # html_theme = 'sphinx_materialdesign_theme'
 

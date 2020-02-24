@@ -59,7 +59,7 @@ elif [[ "${MPPP_BUILD}" == "Documentation" ]]; then
         exit 1;
     fi
     cd ../sphinx;
-    pip install --user breathe requests[security] sphinx sphinxjp.themes.basicstrap
+    pip install --user breathe requests[security] sphinx sphinx-rtd-theme
     # There are some warnings in real128 and in the sphinx code currently.
     # Ignore them.
     export SPHINX_OUTPUT=`make html linkcheck 2>&1 | grep -v "Duplicate declaration" | grep -v "is deprecated" >/dev/null`;

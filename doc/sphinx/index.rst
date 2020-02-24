@@ -39,7 +39,7 @@ at `this link <https://doi.org/10.5281/zenodo.1043579>`__.
    not yet available in mp++'s stable releases.
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    installation.rst
    tutorial.rst
