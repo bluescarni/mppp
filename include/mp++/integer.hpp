@@ -3332,6 +3332,17 @@ using integer_op_types_enabler = detail::enable_if_t<are_integer_op_types<T, U>:
 #endif
 
 template <typename T, typename U>
+using are_integer_real_op_types = detail::conjunction<are_integer_op_types<T, U>, detail::negation<is_cpp_complex<T>>,
+                                                      detail::negation<is_cpp_complex<U>>>;
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+MPPP_CONCEPT_DECL IntegerRealOpTypes = are_integer_real_op_types<T, U>::value;
+#else
+using integer_real_op_types_enabler = detail::enable_if_t<are_integer_real_op_types<T, U>::value, int>;
+#endif
+
+template <typename T, typename U>
 using are_integer_integral_op_types
     = detail::disjunction<detail::is_same_ssize_integer<T, U>,
                           detail::conjunction<detail::is_integer<T>, is_cpp_integral_interoperable<U>>,
@@ -8870,13 +8881,15 @@ inline bool dispatch_equality(T n, const integer<SSize> &a)
     return dispatch_equality(a, n);
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline bool dispatch_equality(const integer<SSize> &a, T x)
 {
     return static_cast<T>(a) == x;
 }
 
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <typename T, std::size_t SSize,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline bool dispatch_equality(T x, const integer<SSize> &a)
 {
     return dispatch_equality(a, x);
@@ -9106,9 +9119,9 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U>
+requires IntegerRealOpTypes<T, U>
 #else
-template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator<(const T &op1, const U &op2)
 {
@@ -9124,9 +9137,9 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U>
+requires IntegerRealOpTypes<T, U>
 #else
-template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator<=(const T &op1, const U &op2)
 {
@@ -9142,9 +9155,9 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U>
+requires IntegerRealOpTypes<T, U>
 #else
-template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator>(const T &op1, const U &op2)
 {
@@ -9160,9 +9173,9 @@ template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires IntegerOpTypes<T, U>
+requires IntegerRealOpTypes<T, U>
 #else
-template <typename T, typename U, integer_op_types_enabler<T, U> = 0>
+template <typename T, typename U, integer_real_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator>=(const T &op1, const U &op2)
 {

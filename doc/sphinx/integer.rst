@@ -56,6 +56,16 @@ Concepts
    A corresponding boolean type trait called ``are_integer_op_types`` is also available (even if the compiler does
    not support concepts).
 
+.. cpp:concept:: template <typename T, typename U> mppp::IntegerRealOpTypes
+
+   This concept will be ``true`` if:
+
+   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::IntegerOpTypes`, and
+   * neither ``T`` nor ``U`` satisfy :cpp:concept:`~mppp::CppComplex`.
+
+   A corresponding boolean type trait called ``are_integer_real_op_types`` is also available (even if the compiler does
+   not support concepts).
+
 .. cpp:concept:: template <typename T, typename U> mppp::IntegerIntegralOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
