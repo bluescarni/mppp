@@ -34,6 +34,7 @@
 #include <gmp.h>
 
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
@@ -197,28 +198,31 @@ struct complex_ass_tester {
                     n0 = C(0, std::numeric_limits<Float>::quiet_NaN()), std::domain_error,
                     [](const std::domain_error &ex) {
                         return ex.what()
-                               == std::string(
-                                   "Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+                               == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                      + detail::to_string(std::numeric_limits<Float>::quiet_NaN()) + " to an integer";
                     });
                 REQUIRE_THROWS_PREDICATE(
                     n0 = C(0, std::numeric_limits<Float>::infinity()), std::domain_error,
                     [](const std::domain_error &ex) {
                         return ex.what()
-                               == std::string(
-                                   "Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+                               == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                      + detail::to_string(std::numeric_limits<Float>::infinity()) + " to an integer";
                     });
             }
             REQUIRE_THROWS_PREDICATE(n0 = C(0, 1), std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
-                       == std::string("Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+                       == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(Float(1)) + " to an integer";
             });
             REQUIRE_THROWS_PREDICATE(n0 = C(-1, 1), std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
-                       == std::string("Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+                       == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(Float(1)) + " to an integer";
             });
             REQUIRE_THROWS_PREDICATE(n0 = C(1, 1), std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
-                       == std::string("Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+                       == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(Float(1)) + " to an integer";
             });
             REQUIRE((n0 = C(0, 0)) == 0);
             REQUIRE((n0 = C(12, 0)) == 12);

@@ -25,6 +25,7 @@
 
 #include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
@@ -304,27 +305,29 @@ struct complex_ctor_tester {
                 REQUIRE_THROWS_PREDICATE(integer{(C{0, std::numeric_limits<Float>::quiet_NaN()})}, std::domain_error,
                                          [](const std::domain_error &ex) {
                                              return ex.what()
-                                                    == std::string("Cannot construct an integer from a complex C++ "
-                                                                   "value with a non-zero imaginary part");
+                                                    == "Cannot construct an integer from a complex C++ "
+                                                       "value with a non-zero imaginary part of "
+                                                           + detail::to_string(std::numeric_limits<Float>::quiet_NaN());
                                          });
                 REQUIRE_THROWS_PREDICATE(integer{(C{0, std::numeric_limits<Float>::infinity()})}, std::domain_error,
                                          [](const std::domain_error &ex) {
                                              return ex.what()
-                                                    == std::string("Cannot construct an integer from a complex C++ "
-                                                                   "value with a non-zero imaginary part");
+                                                    == "Cannot construct an integer from a complex C++ "
+                                                       "value with a non-zero imaginary part of "
+                                                           + detail::to_string(std::numeric_limits<Float>::infinity());
                                          });
             }
 
             REQUIRE_THROWS_PREDICATE(integer{(C{0, 1})}, std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
-                       == std::string(
-                           "Cannot construct an integer from a complex C++ value with a non-zero imaginary part");
+                       == "Cannot construct an integer from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(Float(1));
             });
 
             REQUIRE_THROWS_PREDICATE(integer{(C{-1, 1})}, std::domain_error, [](const std::domain_error &ex) {
                 return ex.what()
-                       == std::string(
-                           "Cannot construct an integer from a complex C++ value with a non-zero imaginary part");
+                       == "Cannot construct an integer from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(Float(1));
             });
         }
     };

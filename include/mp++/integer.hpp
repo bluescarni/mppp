@@ -1407,7 +1407,8 @@ public:
         : integer(c.imag() == 0
                       ? c.real()
                       : throw std::domain_error(
-                          "Cannot construct an integer from a complex C++ value with a non-zero imaginary part"))
+                          "Cannot construct an integer from a complex C++ value with a non-zero imaginary part of "
+                          + detail::to_string(c.imag())))
     {
     }
 
@@ -1721,7 +1722,8 @@ public:
     integer &operator=(const T &c)
     {
         if (mppp_unlikely(c.imag() != 0)) {
-            throw std::domain_error("Cannot assign a complex C++ value with a non-zero imaginary part to an integer");
+            throw std::domain_error("Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                    + detail::to_string(c.imag()) + " to an integer");
         }
         return *this = c.real();
     }

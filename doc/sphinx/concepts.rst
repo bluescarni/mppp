@@ -64,7 +64,8 @@ Common concepts
 
    .. versionadded:: 0.19
 
-   This concept is satisfied if ``T`` is one of the C++ complex types:
+   This concept is satisfied if ``T`` is one of the C++ complex types
+   supported by mp++:
 
    * ``std::complex<float>``,
    * ``std::complex<double>``,

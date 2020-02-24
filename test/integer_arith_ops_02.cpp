@@ -27,6 +27,7 @@
 
 #include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
@@ -140,13 +141,32 @@ struct div_tester {
         retval /= std::complex<float>{2, 0};
         REQUIRE(std::is_same<integer &, decltype(retval /= std::complex<float>{2, 0})>::value);
         REQUIRE(retval == 12);
+        REQUIRE_THROWS_PREDICATE((retval /= std::complex<float>{0, 1}), std::domain_error,
+                                 [](const std::domain_error &ex) {
+                                     return std::string(ex.what())
+                                            == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                                   + detail::to_string(-12.f) + " to an integer";
+                                 });
+
         retval /= std::complex<double>{2, 0};
         REQUIRE(std::is_same<integer &, decltype(retval /= std::complex<double>{2, 0})>::value);
         REQUIRE(retval == 6);
+        REQUIRE_THROWS_PREDICATE((retval /= std::complex<double>{0, 1}), std::domain_error,
+                                 [](const std::domain_error &ex) {
+                                     return std::string(ex.what())
+                                            == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                                   + detail::to_string(-6.) + " to an integer";
+                                 });
 #if defined(MPPP_WITH_MPFR)
         retval /= std::complex<long double>{2, 0};
         REQUIRE(std::is_same<integer &, decltype(retval /= std::complex<long double>{2, 0})>::value);
         REQUIRE(retval == 3);
+        REQUIRE_THROWS_PREDICATE((retval /= std::complex<long double>{0, 1}), std::domain_error,
+                                 [](const std::domain_error &ex) {
+                                     return std::string(ex.what())
+                                            == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                                   + detail::to_string(-3.l) + " to an integer";
+                                 });
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
         retval = 1;
