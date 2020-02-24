@@ -1338,6 +1338,57 @@ TEST_CASE("floating-point conversions")
     tuple_for_each(sizes{}, fp_convert_tester{});
 }
 
+struct complex_convert_tester {
+    template <typename S>
+    struct runner {
+        template <typename C>
+        void operator()(const C &) const
+        {
+            using rational = rational<S::value>;
+            using Float = typename C::value_type;
+
+            // Type traits.
+            REQUIRE((is_convertible<rational, C>::value));
+            REQUIRE((is_convertible<C, rational>::value));
+
+            C rop{1, 2};
+
+            REQUIRE(static_cast<C>(rational{0}) == C{});
+            REQUIRE(static_cast<C>(rational{123}) == C{Float(123)});
+            REQUIRE(static_cast<C>(rational{-45}) == C{Float(-45)});
+
+            REQUIRE(rational{0}.get(rop));
+            REQUIRE(rop == C{});
+            REQUIRE(rational{123}.get(rop));
+            REQUIRE(rop == C{Float(123)});
+            REQUIRE(rational{-45}.get(rop));
+            REQUIRE(rop == C{Float(-45)});
+
+            REQUIRE(get(rop, rational{0}));
+            REQUIRE(rop == C{});
+            REQUIRE(get(rop, rational{123}));
+            REQUIRE(rop == C{Float(123)});
+            REQUIRE(get(rop, rational{-45}));
+            REQUIRE(rop == C{Float(-45)});
+
+            // Functional cast form from rational to C.
+            REQUIRE(C(rational{}) == C{0, 0});
+            REQUIRE(C(rational{-37}) == C{-37, 0});
+            REQUIRE(C(rational{42}) == C{42, 0});
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(complex_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("complex conversions")
+{
+    tuple_for_each(sizes{}, complex_convert_tester{});
+}
+
 struct is_canonical_tester {
     template <typename S>
     inline void operator()(const S &) const

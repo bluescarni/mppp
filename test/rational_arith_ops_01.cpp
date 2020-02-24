@@ -7,6 +7,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <limits>
 #include <stdexcept>
@@ -80,6 +81,23 @@ struct add_tester {
         REQUIRE((rational{3} + 4.l == 7.l));
         REQUIRE((4.l + rational{3} == 7.l));
         REQUIRE((std::is_same<long double, decltype(integer{4} + 3.l)>::value));
+#endif
+        n1 = 1;
+        REQUIRE(std::is_same<std::complex<float>, decltype(n1 + std::complex<float>{4, 0})>::value);
+        REQUIRE(std::is_same<std::complex<float>, decltype(std::complex<float>{4, 0} + n1)>::value);
+        REQUIRE(n1 + std::complex<float>{4, 0} == std::complex<float>{5, 0});
+        REQUIRE(std::complex<float>{4, 0} + n1 == std::complex<float>{5, 0});
+
+        REQUIRE(std::is_same<std::complex<double>, decltype(n1 + std::complex<double>{4, 0})>::value);
+        REQUIRE(std::is_same<std::complex<double>, decltype(std::complex<double>{4, 0} + n1)>::value);
+        REQUIRE(n1 + std::complex<double>{4, 0} == std::complex<double>{5, 0});
+        REQUIRE(std::complex<double>{4, 0} + n1 == std::complex<double>{5, 0});
+
+#if defined(MPPP_WITH_MPFR)
+        REQUIRE(std::is_same<std::complex<long double>, decltype(n1 + std::complex<long double>{4, 0})>::value);
+        REQUIRE(std::is_same<std::complex<long double>, decltype(std::complex<long double>{4, 0} + n1)>::value);
+        REQUIRE(n1 + std::complex<long double>{4, 0} == std::complex<long double>{5, 0});
+        REQUIRE(std::complex<long double>{4, 0} + n1 == std::complex<long double>{5, 0});
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
         REQUIRE((rational{3} + __int128_t{4} == 7));
