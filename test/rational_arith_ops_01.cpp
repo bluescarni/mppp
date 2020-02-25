@@ -232,6 +232,7 @@ struct add_tester {
                 REQUIRE((lex_cast(x) == "1"));
                 x += rational{-5, 2};
                 REQUIRE((std::abs(-1.5 - x) < 1E-8));
+                retval = 1;
                 REQUIRE_THROWS_PREDICATE(
                     retval += std::numeric_limits<double>::infinity(), std::domain_error,
                     [](const std::domain_error &ex) {
@@ -502,6 +503,7 @@ struct sub_tester {
                 REQUIRE((lex_cast(x) == "9"));
                 x -= rational{-5, 2};
                 REQUIRE((std::abs(23. / 2 - x) < 1E-8));
+                retval = 1;
                 REQUIRE_THROWS_PREDICATE(
                     retval -= std::numeric_limits<double>::infinity(), std::domain_error,
                     [](const std::domain_error &ex) {
@@ -775,8 +777,9 @@ struct mul_tester {
                 REQUIRE((std::abs(-25. / 2 - x) < 1E-8));
                 x *= rational{-5, 2};
                 REQUIRE((std::abs(125. / 4 - x) < 1E-8));
+                retval = 1;
                 REQUIRE_THROWS_PREDICATE(
-                    retval *= -std::numeric_limits<double>::infinity(), std::domain_error,
+                    retval *= std::numeric_limits<double>::infinity(), std::domain_error,
                     [](const std::domain_error &ex) {
                         return std::string(ex.what())
                                == "Cannot construct a rational from the non-finite floating-point value "
