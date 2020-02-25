@@ -20,6 +20,7 @@
 
 #include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
@@ -87,17 +88,29 @@ struct add_tester {
         REQUIRE(std::is_same<std::complex<float>, decltype(std::complex<float>{4, 0} + n1)>::value);
         REQUIRE(n1 + std::complex<float>{4, 0} == std::complex<float>{5, 0});
         REQUIRE(std::complex<float>{4, 0} + n1 == std::complex<float>{5, 0});
+        if (std::numeric_limits<float>::is_iec559) {
+            REQUIRE(n1 / 2 + std::complex<float>{4, 0} == std::complex<float>{4.5f, 0});
+            REQUIRE(std::complex<float>{4, 0} + n1 / 2 == std::complex<float>{4.5f, 0});
+        }
 
         REQUIRE(std::is_same<std::complex<double>, decltype(n1 + std::complex<double>{4, 0})>::value);
         REQUIRE(std::is_same<std::complex<double>, decltype(std::complex<double>{4, 0} + n1)>::value);
         REQUIRE(n1 + std::complex<double>{4, 0} == std::complex<double>{5, 0});
         REQUIRE(std::complex<double>{4, 0} + n1 == std::complex<double>{5, 0});
+        if (std::numeric_limits<double>::is_iec559) {
+            REQUIRE(n1 / 2 + std::complex<double>{4, 0} == std::complex<double>{4.5, 0});
+            REQUIRE(std::complex<double>{4, 0} + n1 / 2 == std::complex<double>{4.5, 0});
+        }
 
 #if defined(MPPP_WITH_MPFR)
         REQUIRE(std::is_same<std::complex<long double>, decltype(n1 + std::complex<long double>{4, 0})>::value);
         REQUIRE(std::is_same<std::complex<long double>, decltype(std::complex<long double>{4, 0} + n1)>::value);
         REQUIRE(n1 + std::complex<long double>{4, 0} == std::complex<long double>{5, 0});
         REQUIRE(std::complex<long double>{4, 0} + n1 == std::complex<long double>{5, 0});
+        if (std::numeric_limits<long double>::is_iec559) {
+            REQUIRE(n1 / 2 + std::complex<long double>{4, 0} == std::complex<long double>{4.5l, 0});
+            REQUIRE(std::complex<long double>{4, 0} + n1 / 2 == std::complex<long double>{4.5l, 0});
+        }
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
         REQUIRE((rational{3} + __int128_t{4} == 7));
@@ -135,6 +148,52 @@ struct add_tester {
 #if defined(MPPP_WITH_MPFR)
         retval += 2.l;
         REQUIRE((lex_cast(retval) == "15/2"));
+#endif
+        retval = 12;
+        retval += std::complex<float>{1, 0};
+        REQUIRE(std::is_same<rational &, decltype(retval += std::complex<float>{1, 0})>::value);
+        REQUIRE(retval == 13);
+        if (std::numeric_limits<float>::is_iec559) {
+            retval += std::complex<float>{1.5f, 0};
+            REQUIRE(retval == rational{29, 2});
+            retval = 13;
+        }
+        REQUIRE_THROWS_PREDICATE(
+            (retval += std::complex<float>{0, 1}), std::domain_error, [](const std::domain_error &ex) {
+                return std::string(ex.what())
+                       == "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(1.f);
+            });
+
+        retval += std::complex<double>{1, 0};
+        REQUIRE(std::is_same<rational &, decltype(retval += std::complex<double>{1, 0})>::value);
+        REQUIRE(retval == 14);
+        if (std::numeric_limits<double>::is_iec559) {
+            retval += std::complex<double>{1.5, 0};
+            REQUIRE(retval == rational{31, 2});
+            retval = 14;
+        }
+        REQUIRE_THROWS_PREDICATE(
+            (retval += std::complex<double>{0, 1}), std::domain_error, [](const std::domain_error &ex) {
+                return std::string(ex.what())
+                       == "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(1.);
+            });
+#if defined(MPPP_WITH_MPFR)
+        retval += std::complex<long double>{1, 0};
+        REQUIRE(std::is_same<rational &, decltype(retval += std::complex<long double>{1, 0})>::value);
+        REQUIRE(retval == 15);
+        if (std::numeric_limits<long double>::is_iec559) {
+            retval += std::complex<long double>{1.5l, 0};
+            REQUIRE(retval == rational{33, 2});
+            retval = 15;
+        }
+        REQUIRE_THROWS_PREDICATE(
+            (retval += std::complex<long double>{0, 1}), std::domain_error, [](const std::domain_error &ex) {
+                return std::string(ex.what())
+                       == "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(1.l);
+            });
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
         retval = 1;
@@ -191,6 +250,34 @@ struct add_tester {
                 x += rational{-5, 2};
                 REQUIRE((std::abs(-1.5l - x) < 1E-8l));
             }
+        }
+#endif
+        std::complex<float> cf{1, 2};
+        cf += rational{2};
+        REQUIRE(std::is_same<std::complex<float> &, decltype(cf += rational{2})>::value);
+        REQUIRE(cf == std::complex<float>{3, 2});
+        if (std::numeric_limits<float>::is_iec559) {
+            cf += rational{1, 2};
+            REQUIRE(cf == std::complex<float>{3.5f, 2});
+        }
+
+        std::complex<double> cd{1, 2};
+        cd += rational{2};
+        REQUIRE(std::is_same<std::complex<double> &, decltype(cd += rational{2})>::value);
+        REQUIRE(cd == std::complex<double>{3, 2});
+        if (std::numeric_limits<double>::is_iec559) {
+            cd += rational{1, 2};
+            REQUIRE(cd == std::complex<double>{3.5, 2});
+        }
+
+#if defined(MPPP_WITH_MPFR)
+        std::complex<long double> cld{1, 2};
+        cld += rational{2};
+        REQUIRE(std::is_same<std::complex<long double> &, decltype(cld += rational{2})>::value);
+        REQUIRE(cld == std::complex<long double>{3, 2});
+        if (std::numeric_limits<long double>::is_iec559) {
+            cld += rational{1, 2};
+            REQUIRE(cld == std::complex<long double>{3.5l, 2});
         }
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)

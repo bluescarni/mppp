@@ -1778,7 +1778,8 @@ inline void dispatch_in_place_add(rational<SSize> &retval, const T &n)
     dispatch_in_place_add(retval, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_add(rational<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) + x;
@@ -1789,6 +1790,7 @@ inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
 {
     rop = static_cast<T>(rop + op);
 }
+
 } // namespace detail
 
 /// In-place addition operator.
@@ -1798,8 +1800,8 @@ inline void dispatch_in_place_add(T &rop, const rational<SSize> &op)
  *
  * @return a reference to \p rop.
  *
- * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
- * by the conversion operator of \link mppp::rational rational\endlink.
+ * @throws unspecified any exception thrown by the assignment/conversion operators
+ * of \link mppp::rational rational\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
