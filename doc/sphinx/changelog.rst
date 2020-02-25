@@ -48,7 +48,7 @@ Fix
   (`#214 <https://github.com/bluescarni/mppp/pull/214>`__,
   `#215 <https://github.com/bluescarni/mppp/pull/215>`__,
   `#216 <https://github.com/bluescarni/mppp/pull/216>`__).
-- Fix compilation with older clang versions in C++17 mode
+- Fix compilation with older Clang versions in C++17 mode
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 
 0.18 (14-02-2020)
@@ -75,7 +75,7 @@ Changes
   (`#210 <https://github.com/bluescarni/mppp/pull/210>`__).
 - mp++'s public headers do not include
   the ``quadmath.h`` header any more. This change greatly
-  improves mp++'s compatibility with clang when the
+  improves mp++'s compatibility with Clang when the
   ``MPPP_WITH_QUADMATH`` option is active
   (`#206 <https://github.com/bluescarni/mppp/pull/206>`__).
 - Continue moving code into the compiled library
