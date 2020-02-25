@@ -1906,17 +1906,20 @@ inline rational<SSize> dispatch_binary_sub(T n, const rational<SSize> &op2)
     return retval;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_sub(const rational<SSize> &op1, T x)
 {
     return static_cast<T>(op1) - x;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
 {
     return -dispatch_binary_sub(op2, x);
 }
+
 } // namespace detail
 
 /// Binary subtraction operator.
@@ -1924,8 +1927,8 @@ inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
  * \rststar
  * The return type is determined as follows:
  *
- * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point type ``F``, then the
- *   type of the result is ``F``; otherwise,
+ * * if the non-:cpp:class:`~mppp::rational` argument is a floating-point or complex type, then the
+ *   type of the result is floating-point or complex; otherwise,
  * * the type of the result is a :cpp:class:`~mppp::rational`.
  *
  * \endrststar
@@ -1935,13 +1938,13 @@ inline T dispatch_binary_sub(T x, const rational<SSize> &op2)
  *
  * @return <tt>op1 - op2</tt>.
  */
+template <typename T, typename U>
 #if defined(MPPP_HAVE_CONCEPTS)
-template <typename T, typename U>
-requires RationalOpTypes<T, U> inline auto operator-(const T &op1, const U &op2)
+requires RationalOpTypes<T, U> inline auto
 #else
-template <typename T, typename U>
-inline detail::rational_common_t<T, U> operator-(const T &op1, const U &op2)
+inline detail::rational_common_t<T, U>
 #endif
+operator-(const T &op1, const U &op2)
 {
     return detail::dispatch_binary_sub(op1, op2);
 }
@@ -1972,7 +1975,8 @@ inline void dispatch_in_place_sub(rational<SSize> &retval, const T &n)
     dispatch_in_place_sub(retval, integer<SSize>{n});
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline void dispatch_in_place_sub(rational<SSize> &retval, const T &x)
 {
     retval = static_cast<T>(retval) - x;
@@ -1983,6 +1987,7 @@ inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
 {
     rop = static_cast<T>(rop - op);
 }
+
 } // namespace detail
 
 /// In-place subtraction operator.
@@ -1992,8 +1997,8 @@ inline void dispatch_in_place_sub(T &rop, const rational<SSize> &op)
  *
  * @return a reference to \p rop.
  *
- * @throws unspecified any exception thrown by the assignment of a floating-point value to \p rop or
- * by the conversion operator of \link mppp::rational rational\endlink.
+ * @throws unspecified any exception thrown by the assignment/conversion operators
+ * of \link mppp::rational rational\endlink.
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
