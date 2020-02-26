@@ -2463,26 +2463,16 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
     return dispatch_equality(op2, op1);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline bool dispatch_equality(const rational<SSize> &op1, const T &op2)
 {
     return static_cast<T>(op1) == op2;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
-{
-    return dispatch_equality(op2, op1);
-}
-
-template <std::size_t SSize, typename T>
-inline bool dispatch_equality(const rational<SSize> &op1, const std::complex<T> &op2)
-{
-    return static_cast<T>(op1) == op2;
-}
-
-template <std::size_t SSize, typename T>
-inline bool dispatch_equality(const std::complex<T> &op1, const rational<SSize> &op2)
 {
     return dispatch_equality(op2, op1);
 }
