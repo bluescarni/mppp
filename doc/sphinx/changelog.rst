@@ -16,6 +16,9 @@ New
   (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
 - Implement squaring for :cpp:class:`~mppp::real`
   (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
+- :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
+  can now interact with ``std::complex``
+  (`#214 <https://github.com/bluescarni/mppp/pull/214>`__).
 - mp++'s multiprecision classes now support pretty-printing in the
   `xeus-cling notebook <https://github.com/jupyter-xeus/xeus-cling>`__
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
