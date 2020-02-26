@@ -59,6 +59,16 @@ Concepts
    A corresponding boolean type trait called ``are_rational_op_types`` is also available (even if the compiler does
    not support concepts).
 
+.. cpp:concept:: template <typename T, typename U> mppp::RationalRealOpTypes
+
+   This concept will be ``true`` if:
+
+   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`, and
+   * neither ``T`` nor ``U`` satisfy :cpp:concept:`~mppp::CppComplex`.
+
+   A corresponding boolean type trait called ``are_rational_real_op_types`` is also available (even if the compiler does
+   not support concepts).
+
 .. _rational_functions:
 
 Functions
