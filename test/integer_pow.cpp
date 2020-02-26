@@ -223,11 +223,19 @@ struct pow_tester {
         // is doing is 100% compliant.
         REQUIRE(mppp::pow(integer{2}, std::complex<float>{2}) == std::complex<float>{4, 0});
         REQUIRE(mppp::pow(std::complex<float>{2}, integer{2}) == std::complex<float>{4, 0});
+        REQUIRE(mppp::pow(integer{2}, std::complex<float>{2, 1}) == std::pow(2.f, std::complex<float>{2, 1}));
+        REQUIRE(mppp::pow(std::complex<float>{2, 1}, integer{2}) == std::pow(std::complex<float>{2, 1}, 2.f));
         REQUIRE(mppp::pow(integer{2}, std::complex<double>{2}) == std::complex<double>{4, 0});
         REQUIRE(mppp::pow(std::complex<double>{2}, integer{2}) == std::complex<double>{4, 0});
+        REQUIRE(mppp::pow(integer{2}, std::complex<double>{2, 1}) == std::pow(2., std::complex<double>{2, 1}));
+        REQUIRE(mppp::pow(std::complex<double>{2, 1}, integer{2}) == std::pow(std::complex<double>{2, 1}, 2.));
 #if defined(MPPP_WITH_MPFR) && !defined(__FreeBSD__)
         REQUIRE(mppp::pow(integer{2}, std::complex<long double>{2}) == std::complex<long double>{4, 0});
         REQUIRE(mppp::pow(std::complex<long double>{2}, integer{2}) == std::complex<long double>{4, 0});
+        REQUIRE(mppp::pow(integer{2}, std::complex<long double>{2, 1})
+                == std::pow(2.l, std::complex<long double>{2, 1}));
+        REQUIRE(mppp::pow(std::complex<long double>{2, 1}, integer{2})
+                == std::pow(std::complex<long double>{2, 1}, 2.l));
 #endif
     }
 };

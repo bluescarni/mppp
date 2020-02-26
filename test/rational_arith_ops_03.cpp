@@ -7,6 +7,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <limits>
 #include <stdexcept>
@@ -31,6 +32,30 @@ using namespace mppp_test;
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
                          std::integral_constant<std::size_t, 10>>;
+
+template <typename T, typename U>
+using lt_t = decltype(std::declval<const T &>() < std::declval<const U &>());
+
+template <typename T, typename U>
+using lte_t = decltype(std::declval<const T &>() <= std::declval<const U &>());
+
+template <typename T, typename U>
+using gt_t = decltype(std::declval<const T &>() > std::declval<const U &>());
+
+template <typename T, typename U>
+using gte_t = decltype(std::declval<const T &>() >= std::declval<const U &>());
+
+template <typename T, typename U>
+using is_lt_cmpable = detail::is_detected<lt_t, T, U>;
+
+template <typename T, typename U>
+using is_lte_cmpable = detail::is_detected<lte_t, T, U>;
+
+template <typename T, typename U>
+using is_gt_cmpable = detail::is_detected<gt_t, T, U>;
+
+template <typename T, typename U>
+using is_gte_cmpable = detail::is_detected<gte_t, T, U>;
 
 struct rel_tester {
     template <typename S>
@@ -72,6 +97,24 @@ struct rel_tester {
         REQUIRE(-3.l != n2);
         REQUIRE(n2 != -3.l);
 #endif
+
+        REQUIRE(std::complex<float>{1, 0} == rational{1});
+        REQUIRE(rational{1} == std::complex<float>{1});
+        REQUIRE(std::complex<float>{1, 1} != rational{1});
+        REQUIRE(rational{1} != std::complex<float>{1, 1});
+
+        REQUIRE(std::complex<double>{1, 0} == rational{1});
+        REQUIRE(rational{1} == std::complex<double>{1});
+        REQUIRE(std::complex<double>{1, 1} != rational{1});
+        REQUIRE(rational{1} != std::complex<double>{1, 1});
+
+#if defined(MPPP_WITH_MPFR)
+        REQUIRE(std::complex<long double>{1, 0} == rational{1});
+        REQUIRE(rational{1} == std::complex<long double>{1});
+        REQUIRE(std::complex<long double>{1, 1} != rational{1});
+        REQUIRE(rational{1} != std::complex<long double>{1, 1});
+#endif
+
 #if defined(MPPP_HAVE_GCC_INT128)
         REQUIRE(__int128_t{2} == rational{2});
         REQUIRE(rational{2} == __int128_t{2});
@@ -100,6 +143,34 @@ struct rel_tester {
         REQUIRE(n2 < 0.l);
         REQUIRE(-3.l < n2);
 #endif
+
+        REQUIRE(!is_lt_cmpable<rational, std::complex<float>>::value);
+        REQUIRE(!is_lt_cmpable<std::complex<float>, rational>::value);
+        REQUIRE(!is_lte_cmpable<rational, std::complex<float>>::value);
+        REQUIRE(!is_lte_cmpable<std::complex<float>, rational>::value);
+        REQUIRE(!is_gt_cmpable<rational, std::complex<float>>::value);
+        REQUIRE(!is_gt_cmpable<std::complex<float>, rational>::value);
+        REQUIRE(!is_gte_cmpable<rational, std::complex<float>>::value);
+        REQUIRE(!is_gte_cmpable<std::complex<float>, rational>::value);
+
+        REQUIRE(!is_lt_cmpable<rational, std::complex<double>>::value);
+        REQUIRE(!is_lt_cmpable<std::complex<double>, rational>::value);
+        REQUIRE(!is_lte_cmpable<rational, std::complex<double>>::value);
+        REQUIRE(!is_lte_cmpable<std::complex<double>, rational>::value);
+        REQUIRE(!is_gt_cmpable<rational, std::complex<double>>::value);
+        REQUIRE(!is_gt_cmpable<std::complex<double>, rational>::value);
+        REQUIRE(!is_gte_cmpable<rational, std::complex<double>>::value);
+        REQUIRE(!is_gte_cmpable<std::complex<double>, rational>::value);
+
+        REQUIRE(!is_lt_cmpable<rational, std::complex<long double>>::value);
+        REQUIRE(!is_lt_cmpable<std::complex<long double>, rational>::value);
+        REQUIRE(!is_lte_cmpable<rational, std::complex<long double>>::value);
+        REQUIRE(!is_lte_cmpable<std::complex<long double>, rational>::value);
+        REQUIRE(!is_gt_cmpable<rational, std::complex<long double>>::value);
+        REQUIRE(!is_gt_cmpable<std::complex<long double>, rational>::value);
+        REQUIRE(!is_gte_cmpable<rational, std::complex<long double>>::value);
+        REQUIRE(!is_gte_cmpable<std::complex<long double>, rational>::value);
+
 #if defined(MPPP_HAVE_GCC_INT128)
         REQUIRE(__int128_t{2} < rational{4});
         REQUIRE(rational{2} < __int128_t{3});

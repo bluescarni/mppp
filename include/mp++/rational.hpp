@@ -1270,6 +1270,17 @@ MPPP_CONCEPT_DECL RationalOpTypes = are_rational_op_types<T, U>::value;
 using rational_op_types_enabler = detail::enable_if_t<are_rational_op_types<T, U>::value, int>;
 #endif
 
+template <typename T, typename U>
+using are_rational_real_op_types = detail::conjunction<are_rational_op_types<T, U>, detail::negation<is_cpp_complex<T>>,
+                                                       detail::negation<is_cpp_complex<U>>>;
+
+template <typename T, typename U>
+#if defined(MPPP_HAVE_CONCEPTS)
+MPPP_CONCEPT_DECL RationalRealOpTypes = are_rational_real_op_types<T, U>::value;
+#else
+using rational_real_op_types_enabler = detail::enable_if_t<are_rational_real_op_types<T, U>::value, int>;
+#endif
+
 /** @defgroup rational_conversion rational_conversion
  *  @{
  */
@@ -2452,17 +2463,30 @@ inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
     return dispatch_equality(op2, op1);
 }
 
-template <std::size_t SSize, typename T, enable_if_t<!is_rational_integral_interoperable<T, SSize>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_equality(const rational<SSize> &op1, const T &op2)
 {
     return static_cast<T>(op1) == op2;
 }
 
-template <std::size_t SSize, typename T, enable_if_t<!is_rational_integral_interoperable<T, SSize>::value, int> = 0>
+template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline bool dispatch_equality(const T &op1, const rational<SSize> &op2)
 {
     return dispatch_equality(op2, op1);
 }
+
+template <std::size_t SSize, typename T>
+inline bool dispatch_equality(const rational<SSize> &op1, const std::complex<T> &op2)
+{
+    return static_cast<T>(op1) == op2;
+}
+
+template <std::size_t SSize, typename T>
+inline bool dispatch_equality(const std::complex<T> &op1, const rational<SSize> &op2)
+{
+    return dispatch_equality(op2, op1);
+}
+
 } // namespace detail
 
 /// Equality operator.
@@ -2607,9 +2631,9 @@ inline bool dispatch_less_than(T x, const rational<SSize> &a)
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U>
+requires RationalRealOpTypes<T, U>
 #else
-template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator<(const T &op1, const U &op2)
 {
@@ -2625,9 +2649,9 @@ template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U>
+requires RationalRealOpTypes<T, U>
 #else
-template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator<=(const T &op1, const U &op2)
 {
@@ -2643,9 +2667,9 @@ template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U>
+requires RationalRealOpTypes<T, U>
 #else
-template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator>(const T &op1, const U &op2)
 {
@@ -2661,9 +2685,9 @@ template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
  */
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires RationalOpTypes<T, U>
+requires RationalRealOpTypes<T, U>
 #else
-template <typename T, typename U, rational_op_types_enabler<T, U> = 0>
+template <typename T, typename U, rational_real_op_types_enabler<T, U> = 0>
 #endif
     inline bool operator>=(const T &op1, const U &op2)
 {
@@ -2933,29 +2957,44 @@ inline rational<SSize> pow_impl(const T &base, const rational<SSize> &exp)
     return pow_impl(rational<SSize>{base}, exp);
 }
 
-// Fp base, rational exponent.
+// Rational base, fp exponent.
 template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T pow_impl(const rational<SSize> &base, const T &exp)
 {
     return std::pow(static_cast<T>(base), exp);
 }
 
-// Rational base, fp exponent.
+// Fp base, rational exponent.
 template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
 inline T pow_impl(const T &base, const rational<SSize> &exp)
 {
     return std::pow(base, static_cast<T>(exp));
 }
+
+// Rational base, complex exponent.
+template <std::size_t SSize, typename T>
+inline std::complex<T> pow_impl(const rational<SSize> &base, const std::complex<T> &exp)
+{
+    return std::pow(static_cast<T>(base), exp);
+}
+
+// Complex base, rational exponent.
+template <std::size_t SSize, typename T>
+inline std::complex<T> pow_impl(const std::complex<T> &base, const rational<SSize> &exp)
+{
+    return std::pow(base, static_cast<T>(exp));
+}
+
 } // namespace detail
 
 /// Binary exponentiation.
 /**
  * \rststar
  * This function will raise ``base`` to the power ``exp``, and return the result. If one of the arguments
- * is a floating-point value, then the result will be computed via ``std::pow()`` and it will also be a
- * floating-point value. Otherwise, the result will be a :cpp:class:`~mppp::rational`.
+ * is a floating-point or complex value, then the result will be computed via ``std::pow()`` and it will also be a
+ * floating-point or complex value. Otherwise, the result will be a :cpp:class:`~mppp::rational`.
  *
- * When floating-point types are not involved, the implementation is based on the integral exponentiation
+ * When floating-point and complex types are not involved, the implementation is based on the integral exponentiation
  * of numerator and denominator. Thus, if ``exp`` is a rational value, the exponentiation will be successful
  * only in a few special cases (e.g., unitary base, zero exponent, etc.).
  * \endrststar
@@ -2965,8 +3004,9 @@ inline T pow_impl(const T &base, const rational<SSize> &exp)
  *
  * @return <tt>base**exp</tt>.
  *
- * @throws zero_division_error if floating-point types are not involved, \p base is zero and \p exp is negative.
- * @throws std::domain_error if floating-point types are not involved and \p exp is a rational value (except
+ * @throws zero_division_error if floating-point or complex types are not involved, \p base is zero and \p exp is
+ * negative.
+ * @throws std::domain_error if floating-point or complex types are not involved and \p exp is a rational value (except
  * in a handful of special cases).
  */
 #if defined(MPPP_HAVE_CONCEPTS)
