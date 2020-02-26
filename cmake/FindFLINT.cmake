@@ -33,7 +33,7 @@ if(FLINT_INCLUDE_DIR AND FLINT_LIBRARY)
     set(FLINT_FIND_QUIETLY TRUE)
 endif()
 
-find_path(FLINT_INCLUDE_DIR NAMES fmpz.h PATH_SUFFIXES flint)
+find_path(FLINT_INCLUDE_DIR NAMES flint/flint.h)
 find_library(FLINT_LIBRARY NAMES flint)
 
 include(FindPackageHandleStandardArgs)
