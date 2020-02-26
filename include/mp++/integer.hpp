@@ -1023,6 +1023,14 @@ void nextprime_impl(integer<SSize> &, const integer<SSize> &);
 //   we could have an overload that returns the two values as tuple/pair/array.
 // - the lt/gt static implementations could be specialised for 2-limbs integers. But we need to have
 //   benchmarks before doing it.
+// - Regarding complex interoperability (for integer but rational as well): it seems like for
+//   mixed-mode binary operations there might be benefits in converting the integer argument not
+//   to complex<T> (as we are doing now), but rather T, because like this we end up using
+//   real vs complex rather than complex vs complex primitives. It's not however 100% clear
+//   to me that proceeding like this is always equivalent to doing the complex promotion
+//   (which is what the usual type coercion rules would dictate),
+//   and in any case the performance of integer vs complex arithmetics is not a high
+//   priority at this time. Perhaps revisit this topic in the future.
 
 // NOTE: about the nails:
 // - whenever we need to read the *numerical value* of a limb (e.g., in our optimised primitives),
@@ -7576,32 +7584,20 @@ inline integer<SSize> pow_impl(const T &base, const integer<SSize> &exp)
     return pow_impl(integer<SSize>{base}, exp);
 }
 
-// integer -- FP overload.
-template <typename T, std::size_t SSize, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+// integer -- FP/complex overload.
+template <typename T, std::size_t SSize,
+          enable_if_t<disjunction<std::is_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T pow_impl(const integer<SSize> &base, const T &exp)
 {
     return std::pow(static_cast<T>(base), exp);
 }
 
-// FP -- integer overload.
-template <typename T, std::size_t SSize, enable_if_t<std::is_floating_point<T>::value, int> = 0>
+// FP/complex -- integer overload.
+template <typename T, std::size_t SSize,
+          enable_if_t<disjunction<std::is_floating_point<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T pow_impl(const T &base, const integer<SSize> &exp)
 {
     return std::pow(base, static_cast<T>(exp));
-}
-
-// integer -- complex overload.
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_complex<T>::value, int> = 0>
-inline T pow_impl(const integer<SSize> &base, const T &exp)
-{
-    return std::pow(static_cast<typename T::value_type>(base), exp);
-}
-
-// complex -- integer overload.
-template <typename T, std::size_t SSize, enable_if_t<is_cpp_complex<T>::value, int> = 0>
-inline T pow_impl(const T &base, const integer<SSize> &exp)
-{
-    return std::pow(base, static_cast<typename T::value_type>(exp));
 }
 
 } // namespace detail

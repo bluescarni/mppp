@@ -2957,30 +2957,18 @@ inline rational<SSize> pow_impl(const T &base, const rational<SSize> &exp)
     return pow_impl(rational<SSize>{base}, exp);
 }
 
-// Rational base, fp exponent.
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+// Rational base, fp/complex exponent.
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T pow_impl(const rational<SSize> &base, const T &exp)
 {
     return std::pow(static_cast<T>(base), exp);
 }
 
-// Fp base, rational exponent.
-template <std::size_t SSize, typename T, enable_if_t<is_cpp_floating_point_interoperable<T>::value, int> = 0>
+// Fp/complex base, rational exponent.
+template <std::size_t SSize, typename T,
+          enable_if_t<disjunction<is_cpp_floating_point_interoperable<T>, is_cpp_complex<T>>::value, int> = 0>
 inline T pow_impl(const T &base, const rational<SSize> &exp)
-{
-    return std::pow(base, static_cast<T>(exp));
-}
-
-// Rational base, complex exponent.
-template <std::size_t SSize, typename T>
-inline std::complex<T> pow_impl(const rational<SSize> &base, const std::complex<T> &exp)
-{
-    return std::pow(static_cast<T>(base), exp);
-}
-
-// Complex base, rational exponent.
-template <std::size_t SSize, typename T>
-inline std::complex<T> pow_impl(const std::complex<T> &base, const rational<SSize> &exp)
 {
     return std::pow(base, static_cast<T>(exp));
 }
