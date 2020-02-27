@@ -161,7 +161,7 @@ struct arf_raii {
 
 // Helper to convert an arf_t into an mpfr_t.
 // NOTE: at the moment we don't have easy ways to test
-// the failure modes below. Perhaps in the future
+// the failure mode below. Perhaps in the future
 // we'll have wrappers for Arb functions that can
 // drastically increase the exponents, and we may be
 // able to use them to test failures when converting
@@ -169,31 +169,17 @@ struct arf_raii {
 void arf_to_mpfr(::mpfr_t rop, const ::arf_t op)
 {
     // NOTE: if op is not a special value,
-    // we'll have to do some checking on the
-    // exponents to ensure we can represent
-    // op as an mpfr_t. Otherwise, we might
-    // end up in a situation in which arf_get_mpfr()
-    // aborts the application.
-    if (!::arf_is_special(op)) {
-        // Get the min/max exponents currently allowed in MPFR.
-        const auto e_min = ::mpfr_get_emin(), e_max = ::mpfr_get_emax();
-
-        // LCOV_EXCL_START
-        // Check first if we can cast e_min/e_max to slong.
-        if (mppp_unlikely(e_min < nl_min<::slong>() || e_max > nl_max<::slong>())) {
-            throw std::invalid_argument("The current min/max MPFR exponent range is too wide and it results in an "
-                                        "overflow condition when converting an arf_t into an mpfr_t");
-        }
-
-        // Ensure that the exponent of op is within the MPFR exponent range.
-        if (mppp_unlikely(::fmpz_cmp_si(&op->exp, static_cast<::slong>(e_min)) < 0
-                          || ::fmpz_cmp_si(&op->exp, static_cast<::slong>(e_max)) > 0)) {
-            throw std::invalid_argument("In the conversion of an arf_t to an mpfr_t, the exponent of the arf_t object "
-                                        "overflows the exponent range of MPFR (the minimum allowed MPFR exponent is "
-                                        + std::to_string(e_min) + ", the maximum is " + std::to_string(e_max) + ")");
-        }
-        // LCOV_EXCL_STOP
+    // we'll have to check if its exponent
+    // if a multiprecision integer. In such a case,
+    // arf_get_mpfr() will abort, and we want to avoid that.
+    // See:
+    // https://github.com/fredrik-johansson/arb/blob/e71718411e5f59615dce8e790f6f89bf208057a6/arf/get_mpfr.c#L31
+    // LCOV_EXCL_START
+    if (mppp_unlikely(!::arf_is_special(op) && COEFF_IS_MPZ(*ARF_EXPREF(op)))) {
+        throw std::invalid_argument("In the conversion of an arf_t to an mpfr_t, the exponent of the arf_t object "
+                                    "is too large for the conversion to be successful");
     }
+    // LCOV_EXCL_STOP
 
     // Extract an mpfr from the arf.
     ::arf_get_mpfr(rop, op, MPFR_RNDN);

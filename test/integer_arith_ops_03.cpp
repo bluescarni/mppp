@@ -14,6 +14,7 @@
 
 #endif
 
+#include <complex>
 #include <cstddef>
 #include <limits>
 #include <stdexcept>
@@ -61,6 +62,30 @@ using is_rshiftable = detail::is_detected<rshift_t, T, U>;
 
 template <typename T, typename U>
 using is_rshiftable_inplace = detail::is_detected<inplace_rshift_t, T, U>;
+
+template <typename T, typename U>
+using lt_t = decltype(std::declval<const T &>() < std::declval<const U &>());
+
+template <typename T, typename U>
+using lte_t = decltype(std::declval<const T &>() <= std::declval<const U &>());
+
+template <typename T, typename U>
+using gt_t = decltype(std::declval<const T &>() > std::declval<const U &>());
+
+template <typename T, typename U>
+using gte_t = decltype(std::declval<const T &>() >= std::declval<const U &>());
+
+template <typename T, typename U>
+using is_lt_cmpable = detail::is_detected<lt_t, T, U>;
+
+template <typename T, typename U>
+using is_lte_cmpable = detail::is_detected<lte_t, T, U>;
+
+template <typename T, typename U>
+using is_gt_cmpable = detail::is_detected<gt_t, T, U>;
+
+template <typename T, typename U>
+using is_gte_cmpable = detail::is_detected<gte_t, T, U>;
 
 struct shift_tester {
     template <typename S>
@@ -330,6 +355,23 @@ struct rel_tester {
         REQUIRE(wchar_t{3} != n2);
         REQUIRE(n2 != wchar_t{3});
 #endif
+        REQUIRE(std::complex<float>{1, 0} == integer{1});
+        REQUIRE(integer{1} == std::complex<float>{1});
+        REQUIRE(std::complex<float>{1, 1} != integer{1});
+        REQUIRE(integer{1} != std::complex<float>{1, 1});
+
+        REQUIRE(std::complex<double>{1, 0} == integer{1});
+        REQUIRE(integer{1} == std::complex<double>{1});
+        REQUIRE(std::complex<double>{1, 1} != integer{1});
+        REQUIRE(integer{1} != std::complex<double>{1, 1});
+
+#if defined(MPPP_WITH_MPFR)
+        REQUIRE(std::complex<long double>{1, 0} == integer{1});
+        REQUIRE(integer{1} == std::complex<long double>{1});
+        REQUIRE(std::complex<long double>{1, 1} != integer{1});
+        REQUIRE(integer{1} != std::complex<long double>{1, 1});
+#endif
+
 #if defined(MPPP_HAVE_GCC_INT128)
         REQUIRE(integer{1} == __uint128_t{1});
         REQUIRE(__uint128_t{1} == integer{1});
@@ -356,6 +398,34 @@ struct rel_tester {
         REQUIRE(n2 < 0.l);
         REQUIRE(-3.l < n2);
 #endif
+
+        REQUIRE(!is_lt_cmpable<integer, std::complex<float>>::value);
+        REQUIRE(!is_lt_cmpable<std::complex<float>, integer>::value);
+        REQUIRE(!is_lte_cmpable<integer, std::complex<float>>::value);
+        REQUIRE(!is_lte_cmpable<std::complex<float>, integer>::value);
+        REQUIRE(!is_gt_cmpable<integer, std::complex<float>>::value);
+        REQUIRE(!is_gt_cmpable<std::complex<float>, integer>::value);
+        REQUIRE(!is_gte_cmpable<integer, std::complex<float>>::value);
+        REQUIRE(!is_gte_cmpable<std::complex<float>, integer>::value);
+
+        REQUIRE(!is_lt_cmpable<integer, std::complex<double>>::value);
+        REQUIRE(!is_lt_cmpable<std::complex<double>, integer>::value);
+        REQUIRE(!is_lte_cmpable<integer, std::complex<double>>::value);
+        REQUIRE(!is_lte_cmpable<std::complex<double>, integer>::value);
+        REQUIRE(!is_gt_cmpable<integer, std::complex<double>>::value);
+        REQUIRE(!is_gt_cmpable<std::complex<double>, integer>::value);
+        REQUIRE(!is_gte_cmpable<integer, std::complex<double>>::value);
+        REQUIRE(!is_gte_cmpable<std::complex<double>, integer>::value);
+
+        REQUIRE(!is_lt_cmpable<integer, std::complex<long double>>::value);
+        REQUIRE(!is_lt_cmpable<std::complex<long double>, integer>::value);
+        REQUIRE(!is_lte_cmpable<integer, std::complex<long double>>::value);
+        REQUIRE(!is_lte_cmpable<std::complex<long double>, integer>::value);
+        REQUIRE(!is_gt_cmpable<integer, std::complex<long double>>::value);
+        REQUIRE(!is_gt_cmpable<std::complex<long double>, integer>::value);
+        REQUIRE(!is_gte_cmpable<integer, std::complex<long double>>::value);
+        REQUIRE(!is_gte_cmpable<std::complex<long double>, integer>::value);
+
 #if defined(MPPP_HAVE_GCC_INT128)
         REQUIRE(integer{2} < __uint128_t{3});
         REQUIRE(__uint128_t{2} < integer{3});

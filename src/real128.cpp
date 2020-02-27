@@ -422,4 +422,30 @@ real128 nextafter(const real128 &from, const real128 &to)
     return real128{::nextafterq(from.m_value, to.m_value)};
 }
 
+/// Output stream operator.
+/**
+ * \rststar
+ * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real128` ``x``. The current implementation
+ * ignores any formatting flag specified in ``os``, and the print format will be the one
+ * described in :cpp:func:`mppp::real128::to_string()`.
+ *
+ * .. warning::
+ *    In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
+ *    flags. For the time being, users are encouraged to use the ``quadmath_snprintf()`` function from the quadmath
+ *    library if precise and forward-compatible control on the printing format is needed.
+ * \endrststar
+ *
+ * @param os the target stream.
+ * @param x the input \link mppp::real128 real128\endlink.
+ *
+ * @return a reference to \p os.
+ *
+ * @throws unspecified any exception thrown by real128::to_string().
+ */
+std::ostream &operator<<(std::ostream &os, const real128 &x)
+{
+    detail::float128_stream(os, x.m_value);
+    return os;
+}
+
 } // namespace mppp

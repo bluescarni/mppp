@@ -175,7 +175,7 @@ struct make_unsigned_impl {
 // not in relation to make_unsigned (only make_signed, which we don't use
 // so far). This workaround is lifted directly from the commit cited
 // in the bugreport.
-#if __GNUC__ == 4 && (__GNUC_MINOR__ < 9 || (__GNUC_MINOR__ == 9 && __GNUC_PATCHLEVEL__ < 1))
+#if defined(__GNUC__) && __GNUC__ == 4 && (__GNUC_MINOR__ < 9 || (__GNUC_MINOR__ == 9 && __GNUC_PATCHLEVEL__ < 1))
 
 #if defined(_GLIBCXX_USE_WCHAR_T) && !defined(__WCHAR_UNSIGNED__)
 
