@@ -276,6 +276,9 @@ to provide various additional special functions for
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/215">#215</a>).</p></li>
 <li><p>Implement squaring for <a class="reference internal" href="real.html#_CPPv4N4mppp4realE" title="mppp::real"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real</span></code></a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/215">#215</a>).</p></li>
+<li><p><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>
+can now interact with <code class="docutils literal notranslate"><span class="pre">std::complex</span></code>
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/214">#214</a>).</p></li>
 <li><p>mp++’s multiprecision classes now support pretty-printing in the
 <a class="reference external" href="https://github.com/jupyter-xeus/xeus-cling">xeus-cling notebook</a>
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/213">#213</a>).</p></li>
@@ -307,9 +310,10 @@ has been changed to use the <code class="docutils literal notranslate"><span cla
 returning copies rather than references
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/216">#216</a>).</p></li>
 <li><p>Various build system/doc fixes and improvements
-(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/215">#215</a>,
+(<a class="reference external" href="https://github.com/bluescarni/mppp/pull/214">#214</a>,
+<a class="reference external" href="https://github.com/bluescarni/mppp/pull/215">#215</a>,
 <a class="reference external" href="https://github.com/bluescarni/mppp/pull/216">#216</a>).</p></li>
-<li><p>Fix compilation with older clang versions in C++17 mode
+<li><p>Fix compilation with older Clang versions in C++17 mode
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/213">#213</a>).</p></li>
 </ul>
 </div>
@@ -338,7 +342,7 @@ Many thanks to <a class="reference external" href="https://github.com/7ofNine">7
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/210">#210</a>).</p></li>
 <li><p>mp++’s public headers do not include
 the <code class="docutils literal notranslate"><span class="pre">quadmath.h</span></code> header any more. This change greatly
-improves mp++’s compatibility with clang when the
+improves mp++’s compatibility with Clang when the
 <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option is active
 (<a class="reference external" href="https://github.com/bluescarni/mppp/pull/206">#206</a>).</p></li>
 <li><p>Continue moving code into the compiled library

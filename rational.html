@@ -264,11 +264,12 @@ promoted to <code class="xref cpp cpp-class docutils literal notranslate"><span 
 type of the floating-point argument).</p>
 <p>The <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> class allows to access and manipulate directly the numerator and denominator
 via the <a class="reference internal" href="#_CPPv4NK4mppp8rational7get_numEv" title="mppp::rational::get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_num()</span></code></a>, <a class="reference internal" href="#_CPPv4NK4mppp8rational7get_denEv" title="mppp::rational::get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_den()</span></code></a>,
-<a class="reference internal" href="#_CPPv4N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">_get_num()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">_get_den()</span></code></a> methods, so that it is possible
-to use <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> functions directly on numerator and denominator. The mutable getters’ names
-<a class="reference internal" href="#_CPPv4N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">_get_num()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">_get_den()</span></code></a> are prefixed with an underscore
-<code class="docutils literal notranslate"><span class="pre">_</span></code> to highlight their potentially dangerous nature: it is the user’s responsibility to ensure that the canonical
-form of the rational is preserved after altering the numerator and/or the denominator via the mutable getters.</p>
+<a class="reference internal" href="#_CPPv4N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">_get_num()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">_get_den()</span></code></a> member functions, so that it is
+possible to use <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> functions directly on numerator and denominator. The mutable getters’
+names <a class="reference internal" href="#_CPPv4N4mppp8rational8_get_numEv" title="mppp::rational::_get_num"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">_get_num()</span></code></a> and <a class="reference internal" href="#_CPPv4N4mppp8rational8_get_denEv" title="mppp::rational::_get_den"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">_get_den()</span></code></a> are prefixed with an
+underscore <code class="docutils literal notranslate"><span class="pre">_</span></code> to highlight their potentially dangerous nature: it is the user’s responsibility to ensure that the
+canonical form of the rational is preserved after altering the numerator and/or the denominator via the mutable
+getters.</p>
  </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Types</p>
@@ -315,8 +316,12 @@ denominator.</p>
 <dt id="_CPPv4I_24RationalCvrInteroperableI5SSizeEEN4mppp8rational8rationalERR1T">
 <span id="_CPPv3I_24RationalCvrInteroperableI5SSizeEEN4mppp8rational8rationalERR1T"></span><span id="_CPPv2I_24RationalCvrInteroperableI5SSizeEEN4mppp8rational8rationalERR1T"></span><span class="target" id="classmppp_1_1rational_1a1a343b7d913a36d46d2cce77f9a2d30f"></span>template&lt;<a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp24RationalCvrInteroperableE" title="mppp::RationalCvrInteroperable">RationalCvrInteroperable</a>&lt;SSize&gt; <code class="sig-name descname">T</code>&gt;<br /><code class="sig-name descname">rational</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_24RationalCvrInteroperableI5SSizeEEN4mppp8rational8rationalERR1T" title="mppp::rational::rational::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_24RationalCvrInteroperableI5SSizeEEN4mppp8rational8rationalERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Generic constructor. </p>
-<p><p>This constructor will initialize a rational with the value <code class="docutils literal notranslate"><span class="pre">x</span></code>. The construction will fail if <code class="docutils literal notranslate"><span class="pre">x</span></code>
-is a non-finite floating-point value.</p>
+<p><p>This constructor will initialize a rational with the value <code class="docutils literal notranslate"><span class="pre">x</span></code>. The construction will fail if either:
+* <code class="docutils literal notranslate"><span class="pre">x</span></code> is a non-finite floating-point value, or,
+* <code class="docutils literal notranslate"><span class="pre">x</span></code> is a complex value whose imaginary part is not zero</p>
+<blockquote>
+<div><p>or whose real part is not finite.</p>
+</div></blockquote>
 </p>
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
@@ -324,7 +329,7 @@ is a non-finite floating-point value.</p>
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a non-finite floating-point value. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a non-finite floating-point value, or a complex value with non-zero imaginary part or non-finite real part. </p></li>
 </ul>
 </dd>
 </dl>
@@ -670,8 +675,8 @@ represented in the returned string.</p>
 Conversion to <code class="docutils literal notranslate"><span class="pre">bool</span></code> yields <code class="docutils literal notranslate"><span class="pre">false</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero,
 <code class="docutils literal notranslate"><span class="pre">true</span></code> otherwise. Conversion to other integral types and to <a class="reference internal" href="#_CPPv4N4mppp8rational5int_tE" title="mppp::rational::int_t"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">int_t</span></code></a>
 yields the result of the truncated division of the numerator by the denominator, if representable by the target
-<a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalInteroperable</span></code></a> type. Conversion to floating-point types might yield inexact values and
-infinities.</p>
+<a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalInteroperable</span></code></a> type. Conversion to floating-point and complex types
+might yield inexact values and infinities.</p>
 </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to the target type.</p>
@@ -687,12 +692,12 @@ infinities.</p>
 <dl class="function">
 <dt id="_CPPv4I_21RationalInteroperableI5SSizeEENK4mppp8rational3getEbR1T">
 <span id="_CPPv3I_21RationalInteroperableI5SSizeEENK4mppp8rational3getER1T"></span><span id="_CPPv2I_21RationalInteroperableI5SSizeEENK4mppp8rational3getER1T"></span><span class="target" id="classmppp_1_1rational_1a730c27b91be7344fcafe04219e65a1a0"></span>template&lt;<a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable">RationalInteroperable</a>&lt;SSize&gt; <code class="sig-name descname">T</code>&gt;<br />bool <code class="sig-name descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_21RationalInteroperableI5SSizeEENK4mppp8rational3getEbR1T" title="mppp::rational::get::T">T</a> &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_21RationalInteroperableI5SSizeEENK4mppp8rational3getEbR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Generic conversion method. </p>
-<p><p>This method, similarly to the conversion operator, will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a
+<dd><p>Generic conversion member function. </p>
+<p><p>This member function, similarly to the conversion operator, will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a
 <a class="reference internal" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="mppp::RationalInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalInteroperable</span></code></a> type, storing the result of the conversion into <code class="docutils literal notranslate"><span class="pre">rop</span></code>. Differently
-from the conversion operator, this method does not raise any exception: if the conversion is successful, the
-method will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the method will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails,
-<code class="docutils literal notranslate"><span class="pre">rop</span></code> will not be altered.</p>
+from the conversion operator, this member function does not raise any exception: if the conversion is successful,
+the member function will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the member function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion
+fails, <code class="docutils literal notranslate"><span class="pre">rop</span></code> will not be altered.</p>
 </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">rop</span></code> is a C++ integral which cannot represent the truncated value of <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
@@ -765,22 +770,22 @@ via this getter, the rational is kept in canonical form.</p>
 <dt id="_CPPv4N4mppp8rational12canonicaliseEv">
 <span id="_CPPv3N4mppp8rational12canonicaliseEv"></span><span id="_CPPv2N4mppp8rational12canonicaliseEv"></span><span id="mppp::rational::canonicalise"></span><span class="target" id="classmppp_1_1rational_1a05fae17560bf806ecee6dd68a5d11e8f"></span>rational &amp;<code class="sig-name descname">canonicalise</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational12canonicaliseEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Canonicalise. </p>
-<p><p>This method will put <code class="docutils literal notranslate"><span class="pre">this</span></code> in canonical form. In particular, this method
+<p><p>This member function will put <code class="docutils literal notranslate"><span class="pre">this</span></code> in canonical form. In particular, this member function
 will make sure that:</p>
 <ul class="simple">
 <li><p>the numerator and denominator are coprime (dividing them by their GCD,
 if necessary),</p></li>
 <li><p>the denominator is strictly positive.</p></li>
 </ul>
-<p>In general, it is not necessary to call explicitly this method, as the public
+<p>In general, it is not necessary to call explicitly this member function, as the public
 API of <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> ensures that rationals are kept in canonical
-form. Calling this method, however, might be necessary if the numerator and/or denominator
+form. Calling this member function, however, might be necessary if the numerator and/or denominator
 are modified manually, or when constructing/assigning from non-canonical <code class="docutils literal notranslate"><span class="pre">mpq_t</span></code>
 values.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Calling this method with on a rational with null denominator will result in undefined
-behaviour.</p>
+<p>Calling this member function with on a rational with null denominator will
+result in undefined behaviour.</p>
 </div>
 </p>
 <p><dl class="simple">
@@ -816,7 +821,7 @@ behaviour.</p>
 <dt id="_CPPv4N4mppp8rational3negEv">
 <span id="_CPPv3N4mppp8rational3negEv"></span><span id="_CPPv2N4mppp8rational3negEv"></span><span id="mppp::rational::neg"></span><span class="target" id="classmppp_1_1rational_1a3a1169a57c6e89978eab94a32a6cedeb"></span>rational &amp;<code class="sig-name descname">neg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational3negEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Negate in-place. </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <code class="docutils literal notranslate"><span class="pre">-this</span></code>.</p>
+<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <code class="docutils literal notranslate"><span class="pre">-this</span></code>.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
 </dd>
@@ -828,7 +833,7 @@ behaviour.</p>
 <dt id="_CPPv4N4mppp8rational3absEv">
 <span id="_CPPv3N4mppp8rational3absEv"></span><span id="_CPPv2N4mppp8rational3absEv"></span><span id="mppp::rational::abs"></span><span class="target" id="classmppp_1_1rational_1ae7c09653e4309bc03f5605c2748684be"></span>rational &amp;<code class="sig-name descname">abs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational3absEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place absolute value. </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its absolute value.</p>
+<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its absolute value.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
 </dd>
@@ -840,7 +845,7 @@ behaviour.</p>
 <dt id="_CPPv4N4mppp8rational3invEv">
 <span id="_CPPv3N4mppp8rational3invEv"></span><span id="_CPPv2N4mppp8rational3invEv"></span><span id="mppp::rational::inv"></span><span class="target" id="classmppp_1_1rational_1ad6f7236d16033f544a8a9c46a6f1c019"></span>rational &amp;<code class="sig-name descname">inv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp8rational3invEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place inversion. </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its inverse.</p>
+<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its inverse.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
@@ -905,7 +910,8 @@ behaviour.</p>
 <span id="_CPPv3I0_NSt6size_tEEN4mppp21RationalInteroperableE"></span><span id="_CPPv2I0_NSt6size_tEEN4mppp21RationalInteroperableE"></span>template&lt;typename <code class="sig-name descname">T</code>, std::size_t <code class="sig-name descname">SSize</code>&gt;<br /><em class="property">concept </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">RationalInteroperable</code><a class="headerlink" href="#_CPPv4I0_NSt6size_tEEN4mppp21RationalInteroperableE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied if the type <code class="docutils literal notranslate"><span class="pre">T</span></code> can interoperate with a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>
 with static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code>. Specifically, this concept will be <code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies
-<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> or it is an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> with static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code>.</p>
+<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> or <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppComplex</span></code></a>,
+or it is an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> with static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code>.</p>
 <p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">is_rational_interoperable</span></code> is also available (even if the compiler does
 not support concepts).</p>
 </dd></dl>
@@ -951,10 +957,23 @@ type.</p></li>
 not support concepts).</p>
 </dd></dl>
 
+<dl class="concept">
+<dt id="_CPPv4I00EN4mppp19RationalRealOpTypesE">
+<span id="_CPPv3I00EN4mppp19RationalRealOpTypesE"></span><span id="_CPPv2I00EN4mppp19RationalRealOpTypesE"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br /><em class="property">concept </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">RationalRealOpTypes</code><a class="headerlink" href="#_CPPv4I00EN4mppp19RationalRealOpTypesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept will be <code class="docutils literal notranslate"><span class="pre">true</span></code> if:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv4I00EN4mppp15RationalOpTypesE" title="mppp::RationalOpTypes"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">RationalOpTypes</span></code></a>, and</p></li>
+<li><p>neither <code class="docutils literal notranslate"><span class="pre">T</span></code> nor <code class="docutils literal notranslate"><span class="pre">U</span></code> satisfy <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppComplex</span></code></a>.</p></li>
+</ul>
+<p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">are_rational_real_op_types</span></code> is also available (even if the compiler does
+not support concepts).</p>
+</dd></dl>
+
 </div>
 <div class="section" id="functions">
 <span id="rational-functions"></span><h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<p>Much of the functionality of the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> class is exposed via plain functions. These functions
+<p>Much of the functionality of the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> class is exposed
+via plain functions. These functions
 mimic the <a class="reference external" href="https://gmplib.org/manual/Rational-Number-Functions.html">GMP API</a> where appropriate, but a variety of
 convenience/generic overloads is provided as well.</p>
 <div class="section" id="assignment">
@@ -1085,7 +1104,7 @@ not be altered.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3negER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3negER8rationalI5SSizeERK8rationalI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3negER8rationalI5SSizeERK8rationalI5SSizeE"></span><span class="target" id="group__rational__arithmetic_1ga8335212f0436d2290bfe383a7f3f24cd"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">neg</code><span class="sig-paren">(</span>rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> rational&lt;<a class="reference internal" href="integer.html#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; &amp;<em>q</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3negER8rationalI5SSizeER8rationalI5SSizeERK8rationalI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary negation. </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to <code class="docutils literal notranslate"><span class="pre">-q</span></code>.</p>
+<p>This member function will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to <code class="docutils literal notranslate"><span class="pre">-q</span></code>.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </p>
 </dd>
@@ -1335,9 +1354,9 @@ based on the falling factorial is employed.</p>
 <span class="target" id="group__rational__exponentiation_1gae3d2f11ff606d459b3e103e79098ea26"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RationalOpTypes&lt;T, U&gt; auto mppp::pow(const T &amp; base, const U &amp; exp)</code></dt>
 <dd><p>Binary exponentiation. </p>
 <p><p>This function will raise <code class="docutils literal notranslate"><span class="pre">base</span></code> to the power <code class="docutils literal notranslate"><span class="pre">exp</span></code>, and return the result. If one of the arguments
-is a floating-point value, then the result will be computed via <code class="docutils literal notranslate"><span class="pre">std::pow()</span></code> and it will also be a
-floating-point value. Otherwise, the result will be a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p>
-<p>When floating-point types are not involved, the implementation is based on the integral exponentiation
+is a floating-point or complex value, then the result will be computed via <code class="docutils literal notranslate"><span class="pre">std::pow()</span></code> and it will also be a
+floating-point or complex value. Otherwise, the result will be a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p>
+<p>When floating-point and complex types are not involved, the implementation is based on the integral exponentiation
 of numerator and denominator. Thus, if <code class="docutils literal notranslate"><span class="pre">exp</span></code> is a rational value, the exponentiation will be successful
 only in a few special cases (e.g., unitary base, zero exponent, etc.).</p>
 </p>
@@ -1350,8 +1369,8 @@ only in a few special cases (e.g., unitary base, zero exponent, etc.).</p>
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">zero_division_error</span></code>: if floating-point types are not involved, <code class="docutils literal notranslate"><span class="pre">base</span></code> is zero and <code class="docutils literal notranslate"><span class="pre">exp</span></code> is negative. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if floating-point types are not involved and <code class="docutils literal notranslate"><span class="pre">exp</span></code> is a rational value (except in a handful of special cases). </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zero_division_error</span></code>: if floating-point or complex types are not involved, <code class="docutils literal notranslate"><span class="pre">base</span></code> is zero and <code class="docutils literal notranslate"><span class="pre">exp</span></code> is negative. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if floating-point or complex types are not involved and <code class="docutils literal notranslate"><span class="pre">exp</span></code> is a rational value (except in a handful of special cases). </p></li>
 </ul>
 </dd>
 </dl>
@@ -1429,7 +1448,8 @@ that it is possible to use <code class="xref cpp cpp-class docutils literal notr
 </div>
 <div class="section" id="mathematical-operators">
 <span id="rational-operators"></span><h2>Mathematical operators<a class="headerlink" href="#mathematical-operators" title="Permalink to this headline">¶</a></h2>
-<p>Overloaded operators are provided for convenience. Their interface is generic, and their implementation
+<p>Overloaded operators are provided for convenience. Their interface is generic,
+and their implementation
 is typically built on top of basic <a class="reference internal" href="#rational-functions"><span class="std std-ref">functions</span></a>.</p>
 <dl class="function">
 <dt id="_CPPv4I_NSt6size_tEEN4mpppplE8rationalI5SSizeERK8rationalI5SSizeE">
@@ -1452,8 +1472,8 @@ is typically built on top of basic <a class="reference internal" href="#rational
 <dd><p>Binary addition operator. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point or complex type, then the
+type of the result is floating-point or complex; otherwise,</p></li>
 <li><p>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p></li>
 </ul>
 </p>
@@ -1482,7 +1502,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment/conversion operators of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1542,8 +1562,8 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dd><p>Binary subtraction operator. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point or complex type, then the
+type of the result is floating-point or complex; otherwise,</p></li>
 <li><p>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p></li>
 </ul>
 </p>
@@ -1572,7 +1592,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment/conversion operators of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1617,8 +1637,8 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dd><p>Binary multiplication operator. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point or complex type, then the
+type of the result is floating-point or complex; otherwise,</p></li>
 <li><p>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p></li>
 </ul>
 </p>
@@ -1647,7 +1667,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment/conversion operators of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1660,8 +1680,8 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dd><p>Binary division operator. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code> argument is a floating-point or complex type, then the
+type of the result is floating-point or complex; otherwise,</p></li>
 <li><p>the type of the result is a <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>.</p></li>
 </ul>
 </p>
@@ -1695,7 +1715,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">zero_division_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">op</span></code> is zero and only integral types are involved in the division. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment/conversion operators of <a class="reference internal" href="#classmppp_1_1rational"><span class="std std-ref">rational</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1736,7 +1756,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
 <dl class="function">
 <dt>
-<span class="target" id="group__rational__operators_1ga6e34157187502ec48520c47028f4c911"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RationalOpTypes&lt;T, U&gt; bool mppp::operator&lt;(const T &amp; op1, const U &amp; op2)</code></dt>
+<span class="target" id="group__rational__operators_1gad39abdbf6d6521a9374b13360bcc870e"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RationalRealOpTypes&lt;T, U&gt; bool mppp::operator&lt;(const T &amp; op1, const U &amp; op2)</code></dt>
 <dd><p>Less-than operator. </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
@@ -1752,7 +1772,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
 <dl class="function">
 <dt>
-<span class="target" id="group__rational__operators_1ga28e8d3a2f1fa7f9d45edd9f78ce90dfa"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RationalOpTypes&lt;T, U&gt; bool mppp::operator&lt;=(const T &amp; op1, const U &amp; op2)</code></dt>
+<span class="target" id="group__rational__operators_1gac484a3c7388f11f177e60919f824617b"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RationalRealOpTypes&lt;T, U&gt; bool mppp::operator&lt;=(const T &amp; op1, const U &amp; op2)</code></dt>
 <dd><p>Less-than or equal operator. </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;=</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
@@ -1768,7 +1788,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
 <dl class="function">
 <dt>
-<span class="target" id="group__rational__operators_1gac2157a1c16016d3adf803edb76f96876"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RationalOpTypes&lt;T, U&gt; bool mppp::operator&gt;(const T &amp; op1, const U &amp; op2)</code></dt>
+<span class="target" id="group__rational__operators_1gaac02a63549b65680491af7d80aaa1b0e"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RationalRealOpTypes&lt;T, U&gt; bool mppp::operator&gt;(const T &amp; op1, const U &amp; op2)</code></dt>
 <dd><p>Greater-than operator. </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
@@ -1784,7 +1804,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
 <dl class="function">
 <dt>
-<span class="target" id="group__rational__operators_1ga467a59e8c6055cdfe1c1fc73f744d47b"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RationalOpTypes&lt;T, U&gt; bool mppp::operator&gt;=(const T &amp; op1, const U &amp; op2)</code></dt>
+<span class="target" id="group__rational__operators_1ga68cec4e9eaaee1e83bb8db88659e4916"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires RationalRealOpTypes&lt;T, U&gt; bool mppp::operator&gt;=(const T &amp; op1, const U &amp; op2)</code></dt>
 <dd><p>Greater-than or equal operator. </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;=</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>

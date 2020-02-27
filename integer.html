@@ -302,10 +302,10 @@ of the floating-point argument).</p>
 features:</p>
 <ul class="simple">
 <li><p>a constructor and an assignment operator from the GMP integer type <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code>,</p></li>
-<li><p>a <a class="reference internal" href="#_CPPv4N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> method that promotes <code class="docutils literal notranslate"><span class="pre">this</span></code> to dynamic
+<li><p>a <a class="reference internal" href="#_CPPv4N4mppp7integer9get_mpz_tEv" title="mppp::integer::get_mpz_t"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_t()</span></code></a> member function that promotes <code class="docutils literal notranslate"><span class="pre">this</span></code> to dynamic
 storage and returns a pointer to the internal <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> instance,</p></li>
 <li><p>an <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> class, an instance of which can be requested via the <a class="reference internal" href="#_CPPv4NK4mppp7integer12get_mpz_viewEv" title="mppp::integer::get_mpz_view"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">get_mpz_view()</span></code></a>
-method, which allows to use <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> in the GMP API as a drop-in replacement for
+member function, which allows to use <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> in the GMP API as a drop-in replacement for
 <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">mpz_t</span></code> function arguments.</p></li>
 </ul>
 <p>The <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> class represent a read-only view of an integer object which is implicitly convertible to the type
@@ -430,7 +430,7 @@ is small enough, dynamic otherwise. For instance, the code</p>
 <dl class="function">
 <dt id="_CPPv4I_16CppInteroperableEN4mppp7integer7integerERK1T">
 <span id="_CPPv3I_16CppInteroperableEN4mppp7integer7integerERK1T"></span><span id="_CPPv2I_16CppInteroperableEN4mppp7integer7integerERK1T"></span><span class="target" id="classmppp_1_1integer_1a4d74ee67ad8bf7f2c6ea80a2e5321a64"></span>template&lt;<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable">CppInteroperable</a> <code class="sig-name descname">T</code>&gt;<br /><code class="sig-name descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I_16CppInteroperableEN4mppp7integer7integerERK1T" title="mppp::integer::integer::T">T</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_16CppInteroperableEN4mppp7integer7integerERK1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Generic constructor. </p>
+<dd><p>Generic constructor from a C++ fundamental type. </p>
 <p>This constructor will initialize an integer with the value of <code class="docutils literal notranslate"><span class="pre">x</span></code>. The initialization is always successful if <code class="docutils literal notranslate"><span class="pre">x</span></code> is an integral value (construction from <code class="docutils literal notranslate"><span class="pre">bool</span></code> yields 1 for <code class="docutils literal notranslate"><span class="pre">true</span></code>, 0 for <code class="docutils literal notranslate"><span class="pre">false</span></code>). If <code class="docutils literal notranslate"><span class="pre">x</span></code> is a floating-point value, the construction will fail if <code class="docutils literal notranslate"><span class="pre">x</span></code> is not finite. Construction from a floating-point type yields the truncated counterpart of the input value.</p>
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
@@ -439,6 +439,29 @@ is small enough, dynamic otherwise. For instance, the code</p>
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a non-finite floating-point value. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_10CppComplexEN4mppp7integer7integerERK1T">
+<span id="_CPPv3I_10CppComplexEN4mppp7integer7integerERK1T"></span><span id="_CPPv2I_10CppComplexEN4mppp7integer7integerERK1T"></span><span class="target" id="classmppp_1_1integer_1aa4cd70381bd0f05b45f7f1ec257569af"></span>template&lt;<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex">CppComplex</a> <code class="sig-name descname">T</code>&gt;<br /><code class="sig-name descname">integer</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I_10CppComplexEN4mppp7integer7integerERK1T" title="mppp::integer::integer::T">T</a> &amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_10CppComplexEN4mppp7integer7integerERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Generic constructor from a C++ complex type. </p>
+<p><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<p>This constructor will initialize an integer with the value of <code class="docutils literal notranslate"><span class="pre">c</span></code>. The initialization is
+successful only if the imaginary part of <code class="docutils literal notranslate"><span class="pre">c</span></code> is zero and the real part of <code class="docutils literal notranslate"><span class="pre">c</span></code> is finite.</p>
+</p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: value that will be used to initialize <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p></li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if the imaginary part of <code class="docutils literal notranslate"><span class="pre">c</span></code> is not zero or if the real part of <code class="docutils literal notranslate"><span class="pre">c</span></code> is not finite. </p></li>
 </ul>
 </dd>
 </dl>
@@ -576,7 +599,7 @@ will take care of releasing them when the destructor is called.</p>
 <dl class="function">
 <dt id="_CPPv4I_16CppInteroperableEN4mppp7integeraSER7integerRK1T">
 <span id="_CPPv3I_16CppInteroperableEN4mppp7integeraSERK1T"></span><span id="_CPPv2I_16CppInteroperableEN4mppp7integeraSERK1T"></span><span class="target" id="classmppp_1_1integer_1ae293ad13f15227341a688c74e2e25b1c"></span>template&lt;<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable">CppInteroperable</a> <code class="sig-name descname">T</code>&gt;<br />integer &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I_16CppInteroperableEN4mppp7integeraSER7integerRK1T" title="mppp::integer::operator=::T">T</a> &amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_16CppInteroperableEN4mppp7integeraSER7integerRK1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Generic assignment operator. </p>
+<dd><p>Generic assignment operator from a fundamental C++ type. </p>
 <p><p>This operator will assign <code class="docutils literal notranslate"><span class="pre">x</span></code> to <code class="docutils literal notranslate"><span class="pre">this</span></code>. The storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> after the assignment
 will depend only on the value of <code class="docutils literal notranslate"><span class="pre">x</span></code> (that is, the storage type will be static if the value of <code class="docutils literal notranslate"><span class="pre">x</span></code>
 is small enough, dynamic otherwise). Assignment from floating-point types will assign the truncated
@@ -591,6 +614,33 @@ counterpart of <code class="docutils literal notranslate"><span class="pre">x</s
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a non-finite floating-point value. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_10CppComplexEN4mppp7integeraSER7integerRK1T">
+<span id="_CPPv3I_10CppComplexEN4mppp7integeraSERK1T"></span><span id="_CPPv2I_10CppComplexEN4mppp7integeraSERK1T"></span><span class="target" id="classmppp_1_1integer_1a2dd825401bdb64e3c0d518522b10b6e1"></span>template&lt;<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex">CppComplex</a> <code class="sig-name descname">T</code>&gt;<br />integer &amp;<code class="sig-name descname">operator=</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I_10CppComplexEN4mppp7integeraSER7integerRK1T" title="mppp::integer::operator=::T">T</a> &amp;<em>c</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_10CppComplexEN4mppp7integeraSER7integerRK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Generic assignment operator from a complex C++ type. </p>
+<p><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<p>This operator will assign <code class="docutils literal notranslate"><span class="pre">c</span></code> to <code class="docutils literal notranslate"><span class="pre">this</span></code>. The storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> after the assignment
+will depend only on the value of <code class="docutils literal notranslate"><span class="pre">c</span></code> (that is, the storage type will be static if the value of <code class="docutils literal notranslate"><span class="pre">c</span></code>
+is small enough, dynamic otherwise). The assignment will be successful only if
+the imaginary part of <code class="docutils literal notranslate"><span class="pre">c</span></code> is zero and the real part of <code class="docutils literal notranslate"><span class="pre">c</span></code> is finite.</p>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: the assignment argument.</p></li>
+</ul>
+</dd>
+<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">std::domain_error</span></code>: if the imaginary part of <code class="docutils literal notranslate"><span class="pre">c</span></code> is not zero or if the real part of <code class="docutils literal notranslate"><span class="pre">c</span></code> is not finite. </p></li>
 </ul>
 </dd>
 </dl>
@@ -682,7 +732,7 @@ will take care of releasing them when the destructor is called.</p>
 <dt id="_CPPv4N4mppp7integer8set_zeroEv">
 <span id="_CPPv3N4mppp7integer8set_zeroEv"></span><span id="_CPPv2N4mppp7integer8set_zeroEv"></span><span id="mppp::integer::set_zero"></span><span class="target" id="classmppp_1_1integer_1a6073aaf6c63657285854de896bc4b20f"></span>integer &amp;<code class="sig-name descname">set_zero</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer8set_zeroEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set to zero. </p>
-<p>After calling this method, the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> will be static and its value will be zero.</p>
+<p>After calling this member function, the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> will be static and its value will be zero.</p>
 <p><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This is a specialised higher-performance alternative to the assignment operator.</p>
@@ -699,7 +749,7 @@ will take care of releasing them when the destructor is called.</p>
 <dt id="_CPPv4N4mppp7integer7set_oneEv">
 <span id="_CPPv3N4mppp7integer7set_oneEv"></span><span id="_CPPv2N4mppp7integer7set_oneEv"></span><span id="mppp::integer::set_one"></span><span class="target" id="classmppp_1_1integer_1a06bbee0b45cc2249bf41f525728d27cb"></span>integer &amp;<code class="sig-name descname">set_one</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer7set_oneEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set to one. </p>
-<p>After calling this method, the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> will be static and its value will be one.</p>
+<p>After calling this member function, the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> will be static and its value will be one.</p>
 <p><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This is a specialised higher-performance alternative to the assignment operator.</p>
@@ -716,7 +766,7 @@ will take care of releasing them when the destructor is called.</p>
 <dt id="_CPPv4N4mppp7integer16set_negative_oneEv">
 <span id="_CPPv3N4mppp7integer16set_negative_oneEv"></span><span id="_CPPv2N4mppp7integer16set_negative_oneEv"></span><span id="mppp::integer::set_negative_one"></span><span class="target" id="classmppp_1_1integer_1a0ea92112e97cb78844f945af49c7abce"></span>integer &amp;<code class="sig-name descname">set_negative_one</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer16set_negative_oneEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Set to minus one. </p>
-<p>After calling this method, the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> will be static and its value will be minus one.</p>
+<p>After calling this member function, the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> will be static and its value will be minus one.</p>
 <p><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This is a specialised higher-performance alternative to the assignment operator.</p>
@@ -755,7 +805,7 @@ will take care of releasing them when the destructor is called.</p>
 <dt id="_CPPv4NK4mppp7integer9to_stringEi">
 <span id="_CPPv3NK4mppp7integer9to_stringEi"></span><span id="_CPPv2NK4mppp7integer9to_stringEi"></span><span id="mppp::integer::to_string__iC"></span><span class="target" id="classmppp_1_1integer_1a44da76950f17f77a05e95e1f1581266c"></span>std::string <code class="sig-name descname">to_string</code><span class="sig-paren">(</span>int <em>base</em> = 10<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7integer9to_stringEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Conversion to string. </p>
-<p>This method will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> into a string in base <code class="docutils literal notranslate"><span class="pre">base</span></code> using the GMP function <code class="docutils literal notranslate"><span class="pre">mpz_get_str()</span></code>.</p>
+<p>This member function will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> into a string in base <code class="docutils literal notranslate"><span class="pre">base</span></code> using the GMP function <code class="docutils literal notranslate"><span class="pre">mpz_get_str()</span></code>.</p>
 <p><div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference external" href="https://gmplib.org/manual/Converting-Integers.html">https://gmplib.org/manual/Converting-Integers.html</a></p>
@@ -778,7 +828,7 @@ will take care of releasing them when the destructor is called.</p>
 <dl class="function">
 <dt id="_CPPv4I_16CppInteroperableENK4mppp7integercv1TEv">
 <span id="_CPPv3I_16CppInteroperableENK4mppp7integercv1TEv"></span><span id="_CPPv2I_16CppInteroperableENK4mppp7integercv1TEv"></span><span class="target" id="classmppp_1_1integer_1ade1ebeddded2b5235b66008a37a37b19"></span>template&lt;<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable">CppInteroperable</a> <code class="sig-name descname">T</code>&gt;<br /><code class="sig-name descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_16CppInteroperableENK4mppp7integercv1TEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Generic conversion operator. </p>
+<dd><p>Generic conversion operator to a C++ fundamental type. </p>
 <p><p>This operator will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> type.
 Conversion to <code class="docutils literal notranslate"><span class="pre">bool</span></code> yields <code class="docutils literal notranslate"><span class="pre">false</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is zero,
 <code class="docutils literal notranslate"><span class="pre">true</span></code> otherwise. Conversion to other integral types yields the exact result, if representable by the target
@@ -797,13 +847,31 @@ infinities.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="_CPPv4I_10CppComplexENK4mppp7integercv1TEv">
+<span id="_CPPv3I_10CppComplexENK4mppp7integercv1TEv"></span><span id="_CPPv2I_10CppComplexENK4mppp7integercv1TEv"></span><span class="target" id="classmppp_1_1integer_1ade1ebeddded2b5235b66008a37a37b19"></span>template&lt;<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex">CppComplex</a> <code class="sig-name descname">T</code>&gt;<br /><code class="sig-name descname">operator T</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_10CppComplexENK4mppp7integercv1TEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Generic conversion operator to a C++ complex type. </p>
+<p><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<p>This operator will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppComplex</span></code></a> type.
+The conversion might yield inexact values and infinities.</p>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">this</span></code> converted to the target type. </p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv4I_16CppInteroperableENK4mppp7integer3getEbR1T">
 <span id="_CPPv3I_16CppInteroperableENK4mppp7integer3getER1T"></span><span id="_CPPv2I_16CppInteroperableENK4mppp7integer3getER1T"></span><span class="target" id="classmppp_1_1integer_1a46c6b8b25d26a696c1703694fe90748f"></span>template&lt;<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable">CppInteroperable</a> <code class="sig-name descname">T</code>&gt;<br />bool <code class="sig-name descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_16CppInteroperableENK4mppp7integer3getEbR1T" title="mppp::integer::get::T">T</a> &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_16CppInteroperableENK4mppp7integer3getEbR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Generic conversion method. </p>
-<p><p>This method, similarly to the conversion operator, will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a
+<dd><p>Generic conversion member function to a C++ fundamental type. </p>
+<p><p>This member function, similarly to the conversion operator, will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a
 <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> type, storing the result of the conversion into <code class="docutils literal notranslate"><span class="pre">rop</span></code>. Differently
-from the conversion operator, this method does not raise any exception: if the conversion is successful, the
-method will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the method will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails,
+from the conversion operator, this member function does not raise any exception: if the conversion is successful,
+the member function will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the member function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion
+fails,
 <code class="docutils literal notranslate"><span class="pre">rop</span></code> will not be altered.</p>
 </p>
 <p><dl class="simple">
@@ -818,10 +886,33 @@ method will return <code class="docutils literal notranslate"><span class="pre">
 </dd></dl>
 
 <dl class="function">
+<dt id="_CPPv4I_10CppComplexENK4mppp7integer3getEbR1T">
+<span id="_CPPv3I_10CppComplexENK4mppp7integer3getER1T"></span><span id="_CPPv2I_10CppComplexENK4mppp7integer3getER1T"></span><span class="target" id="classmppp_1_1integer_1a46c6b8b25d26a696c1703694fe90748f"></span>template&lt;<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex">CppComplex</a> <code class="sig-name descname">T</code>&gt;<br />bool <code class="sig-name descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_10CppComplexENK4mppp7integer3getEbR1T" title="mppp::integer::get::T">T</a> &amp;<em>rop</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_10CppComplexENK4mppp7integer3getEbR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Generic conversion member function to a C++ complex type. </p>
+<p><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<p>This member function, similarly to the conversion operator, will convert <code class="docutils literal notranslate"><span class="pre">this</span></code> to a
+<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppComplex</span></code></a> type, storing the result of the conversion into <code class="docutils literal notranslate"><span class="pre">rop</span></code>.
+The conversion is always successful, and this member function
+will always return <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code>. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the variable which will store the result of the conversion.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv4N4mppp7integer7promoteEv">
 <span id="_CPPv3N4mppp7integer7promoteEv"></span><span id="_CPPv2N4mppp7integer7promoteEv"></span><span id="mppp::integer::promote"></span><span class="target" id="classmppp_1_1integer_1aee7ab8ff0a569b0a13123fca31b36616"></span>bool <code class="sig-name descname">promote</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer7promoteEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Promote to dynamic storage. </p>
-<p>This method will promote the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> from static to dynamic.</p>
+<p>This member function will promote the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> from static to dynamic.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">false</span></code> if the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> is already dynamic and no promotion takes place, <code class="docutils literal notranslate"><span class="pre">true</span></code> otherwise. </p>
 </dd>
@@ -833,7 +924,7 @@ method will return <code class="docutils literal notranslate"><span class="pre">
 <dt id="_CPPv4N4mppp7integer6demoteEv">
 <span id="_CPPv3N4mppp7integer6demoteEv"></span><span id="_CPPv2N4mppp7integer6demoteEv"></span><span id="mppp::integer::demote"></span><span class="target" id="classmppp_1_1integer_1afba662d9c623075360049f6fce06abda"></span>bool <code class="sig-name descname">demote</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer6demoteEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Demote to static storage. </p>
-<p>This method will demote the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> from dynamic to static.</p>
+<p>This member function will demote the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> from dynamic to static.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">false</span></code> if the storage type of <code class="docutils literal notranslate"><span class="pre">this</span></code> is already static and no demotion takes place, or if the current value of <code class="docutils literal notranslate"><span class="pre">this</span></code> does not fit in static storage, <code class="docutils literal notranslate"><span class="pre">true</span></code> otherwise. </p>
 </dd>
@@ -882,7 +973,7 @@ method will return <code class="docutils literal notranslate"><span class="pre">
 <dt id="_CPPv4NK4mppp7integer12get_mpz_viewEv">
 <span id="_CPPv3NK4mppp7integer12get_mpz_viewEv"></span><span id="_CPPv2NK4mppp7integer12get_mpz_viewEv"></span><span id="mppp::integer::get_mpz_viewC"></span><span class="target" id="classmppp_1_1integer_1a83dffd90f698955df97f0c366450aa3d"></span>mpz_view <code class="sig-name descname">get_mpz_view</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7integer12get_mpz_viewEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get an <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> view. </p>
-<p>This method will return an object of an unspecified type <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> which is implicitly convertible to a const pointer to an <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> struct (and which can thus be used as a <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">mpz_t</span></code> parameter in GMP functions). In addition to the implicit conversion operator, the <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">mpz_t</span></code> object can also be retrieved via the <code class="docutils literal notranslate"><span class="pre">get()</span></code> method of the <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> class. The view provides a read-only GMP-compatible representation of the integer stored in <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
+<p>This member function will return an object of an unspecified type <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> which is implicitly convertible to a const pointer to an <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> struct (and which can thus be used as a <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">mpz_t</span></code> parameter in GMP functions). In addition to the implicit conversion operator, the <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">mpz_t</span></code> object can also be retrieved via the <code class="docutils literal notranslate"><span class="pre">get()</span></code> member function of the <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> class. The view provides a read-only GMP-compatible representation of the integer stored in <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 <p><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>It is important to keep in mind the following facts about the returned <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> object:</p>
@@ -891,11 +982,11 @@ method will return <code class="docutils literal notranslate"><span class="pre">
 <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> objects can be used in the GMP API only where a <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">mpz_t</span></code> parameter is expected;</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> objects can only be move-constructed (the other constructors and the assignment operators
 are disabled);</p></li>
-<li><p>the returned object and the pointer returned by its <code class="docutils literal notranslate"><span class="pre">get()</span></code> method might reference internal data
+<li><p>the returned object and the pointer returned by its <code class="docutils literal notranslate"><span class="pre">get()</span></code> member function might reference internal data
 belonging to <code class="docutils literal notranslate"><span class="pre">this</span></code>, and they can thus be used safely only during the lifetime of <code class="docutils literal notranslate"><span class="pre">this</span></code>;</p></li>
-<li><p>the lifetime of the pointer returned by the <code class="docutils literal notranslate"><span class="pre">get()</span></code> method is tied to the lifetime of the <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code>
-object (that is, if the <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> object is destroyed, any pointer previously returned by <code class="docutils literal notranslate"><span class="pre">get()</span></code>
-becomes invalid);</p></li>
+<li><p>the lifetime of the pointer returned by the <code class="docutils literal notranslate"><span class="pre">get()</span></code> member function is tied to the lifetime of the
+<code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> object (that is, if the <code class="docutils literal notranslate"><span class="pre">mpz_view</span></code> object is destroyed, any pointer previously returned by
+<code class="docutils literal notranslate"><span class="pre">get()</span></code> becomes invalid);</p></li>
 <li><p>any modification to <code class="docutils literal notranslate"><span class="pre">this</span></code> will also invalidate the view and the pointer.</p></li>
 </ul>
 </div>
@@ -911,7 +1002,7 @@ becomes invalid);</p></li>
 <dt id="_CPPv4N4mppp7integer3negEv">
 <span id="_CPPv3N4mppp7integer3negEv"></span><span id="_CPPv2N4mppp7integer3negEv"></span><span id="mppp::integer::neg"></span><span class="target" id="classmppp_1_1integer_1af7b68176f1b8779558c8aa9193122fd7"></span>integer &amp;<code class="sig-name descname">neg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer3negEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Negate in-place. </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <code class="docutils literal notranslate"><span class="pre">-this</span></code>.</p>
+<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to <code class="docutils literal notranslate"><span class="pre">-this</span></code>.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
 </dd>
@@ -923,7 +1014,7 @@ becomes invalid);</p></li>
 <dt id="_CPPv4N4mppp7integer3absEv">
 <span id="_CPPv3N4mppp7integer3absEv"></span><span id="_CPPv2N4mppp7integer3absEv"></span><span id="mppp::integer::abs"></span><span class="target" id="classmppp_1_1integer_1a459c9ae3437297219ce25c731ea77dd8"></span>integer &amp;<code class="sig-name descname">abs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer3absEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>In-place absolute value. </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its absolute value.</p>
+<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its absolute value.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
 </dd>
@@ -935,7 +1026,7 @@ becomes invalid);</p></li>
 <dt id="_CPPv4N4mppp7integer9nextprimeEv">
 <span id="_CPPv3N4mppp7integer9nextprimeEv"></span><span id="_CPPv2N4mppp7integer9nextprimeEv"></span><span id="mppp::integer::nextprime"></span><span class="target" id="classmppp_1_1integer_1aeaf33e5f9c30cc3c0edcf4d95c5edbe4"></span>integer &amp;<code class="sig-name descname">nextprime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer9nextprimeEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Compute next prime number (in-place version). </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to the first prime number greater than the current value.</p>
+<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to the first prime number greater than the current value.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
 </dd>
@@ -947,7 +1038,7 @@ becomes invalid);</p></li>
 <dt id="_CPPv4NK4mppp7integer14probab_prime_pEi">
 <span id="_CPPv3NK4mppp7integer14probab_prime_pEi"></span><span id="_CPPv2NK4mppp7integer14probab_prime_pEi"></span><span id="mppp::integer::probab_prime_p__iC"></span><span class="target" id="classmppp_1_1integer_1a50b8dc531a53ef15edc138af3005e817"></span>int <code class="sig-name descname">probab_prime_p</code><span class="sig-paren">(</span>int <em>reps</em> = 25<span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7integer14probab_prime_pEi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Test primality. </p>
-<p>This method will run a series of probabilistic tests to determine if <code class="docutils literal notranslate"><span class="pre">this</span></code> is a prime number. It will return <code class="docutils literal notranslate"><span class="pre">2</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is definitely a prime, <code class="docutils literal notranslate"><span class="pre">1</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is probably a prime and <code class="docutils literal notranslate"><span class="pre">0</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is definitely not-prime.</p>
+<p>This member function will run a series of probabilistic tests to determine if <code class="docutils literal notranslate"><span class="pre">this</span></code> is a prime number. It will return <code class="docutils literal notranslate"><span class="pre">2</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is definitely a prime, <code class="docutils literal notranslate"><span class="pre">1</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is probably a prime and <code class="docutils literal notranslate"><span class="pre">0</span></code> if <code class="docutils literal notranslate"><span class="pre">this</span></code> is definitely not-prime.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>an integer indicating if <code class="docutils literal notranslate"><span class="pre">this</span></code> is a prime.</p>
 </dd>
@@ -967,7 +1058,7 @@ becomes invalid);</p></li>
 <dt id="_CPPv4N4mppp7integer4sqrtEv">
 <span id="_CPPv3N4mppp7integer4sqrtEv"></span><span id="_CPPv2N4mppp7integer4sqrtEv"></span><span id="mppp::integer::sqrt"></span><span class="target" id="classmppp_1_1integer_1a73e46139d874839ef94fd1cc83b9cd47"></span>integer &amp;<code class="sig-name descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer4sqrtEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Integer square root (in-place version). </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its integer square root.</p>
+<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its integer square root.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>.</p>
 </dd>
@@ -983,7 +1074,7 @@ becomes invalid);</p></li>
 <dt id="_CPPv4N4mppp7integer3sqrEv">
 <span id="_CPPv3N4mppp7integer3sqrEv"></span><span id="_CPPv2N4mppp7integer3sqrEv"></span><span id="mppp::integer::sqr"></span><span class="target" id="classmppp_1_1integer_1a65a90400bad532b82fe9e425318e8acf"></span>integer &amp;<code class="sig-name descname">sqr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer3sqrEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Integer squaring (in-place version). </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its square.</p>
+<p>This member function will set <code class="docutils literal notranslate"><span class="pre">this</span></code> to its square.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">this</span></code>. </p>
 </dd>
@@ -1017,7 +1108,7 @@ becomes invalid);</p></li>
 <dt id="_CPPv4N4mppp7integer10_get_unionEv">
 <span id="_CPPv3N4mppp7integer10_get_unionEv"></span><span id="_CPPv2N4mppp7integer10_get_unionEv"></span><span id="mppp::integer::_get_union"></span><span class="target" id="classmppp_1_1integer_1a697332861e9e8b00ac1191210a6354a3"></span>detail::integer_union&lt;SSize&gt; &amp;<code class="sig-name descname">_get_union</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer10_get_unionEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Return a reference to the internal union. </p>
-<p>This method returns a reference to the union used internally to implement the integer class.</p>
+<p>This member function returns a reference to the union used internally to implement the integer class.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to the internal union member. </p>
 </dd>
@@ -1029,7 +1120,7 @@ becomes invalid);</p></li>
 <dt id="_CPPv4NK4mppp7integer10_get_unionEv">
 <span id="_CPPv3NK4mppp7integer10_get_unionEv"></span><span id="_CPPv2NK4mppp7integer10_get_unionEv"></span><span id="mppp::integer::_get_unionC"></span><span class="target" id="classmppp_1_1integer_1acc6c68f0bdc9c0f8de25992f6e89cd11"></span><em class="property">const</em> detail::integer_union&lt;SSize&gt; &amp;<code class="sig-name descname">_get_union</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7integer10_get_unionEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Return a const reference to the internal union. </p>
-<p>This method returns a const reference to the union used internally to implement the integer class.</p>
+<p>This member function returns a const reference to the union used internally to implement the integer class.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a const reference to the internal union member. </p>
 </dd>
@@ -1041,7 +1132,7 @@ becomes invalid);</p></li>
 <dt id="_CPPv4N4mppp7integer9get_mpz_tEv">
 <span id="_CPPv3N4mppp7integer9get_mpz_tEv"></span><span id="_CPPv2N4mppp7integer9get_mpz_tEv"></span><span id="mppp::integer::get_mpz_t"></span><span class="target" id="classmppp_1_1integer_1a8772a1cdb5ab3f61d601882fc1ac212d"></span>std::remove_extent&lt;mpz_t&gt;::type *<code class="sig-name descname">get_mpz_t</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer9get_mpz_tEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get a pointer to the dynamic storage. </p>
-<p>This method will first promote <code class="docutils literal notranslate"><span class="pre">this</span></code> to dynamic storage (if <code class="docutils literal notranslate"><span class="pre">this</span></code> is not already employing dynamic storage), and it will then return a pointer to the internal <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> structure. The returned pointer can be used as an argument for the functions of the GMP API.</p>
+<p>This member function will first promote <code class="docutils literal notranslate"><span class="pre">this</span></code> to dynamic storage (if <code class="docutils literal notranslate"><span class="pre">this</span></code> is not already employing dynamic storage), and it will then return a pointer to the internal <code class="docutils literal notranslate"><span class="pre">mpz_t</span></code> structure. The returned pointer can be used as an argument for the functions of the GMP API.</p>
 <p><div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The returned pointer is a raw, non-owning pointer tied to the lifetime of <code class="docutils literal notranslate"><span class="pre">this</span></code>. Calling
@@ -1094,7 +1185,7 @@ pointer.</p>
 <dt id="_CPPv4NK4mppp7integer11binary_sizeEv">
 <span id="_CPPv3NK4mppp7integer11binary_sizeEv"></span><span id="_CPPv2NK4mppp7integer11binary_sizeEv"></span><span id="mppp::integer::binary_sizeC"></span><span class="target" id="classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"></span>std::size_t <code class="sig-name descname">binary_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7integer11binary_sizeEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Size of the serialised binary representation. </p>
-<p><p>This method will return a value representing the number of bytes necessary
+<p><p>This member function will return a value representing the number of bytes necessary
 to serialise <code class="docutils literal notranslate"><span class="pre">this</span></code> into a memory buffer in binary format via one of the available
 <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_save()</span></code></a> overloads. The returned value
 is platform-dependent.</p>
@@ -1114,15 +1205,15 @@ is platform-dependent.</p>
 <dt id="_CPPv4NK4mppp7integer11binary_saveEPc">
 <span id="_CPPv3NK4mppp7integer11binary_saveEPc"></span><span id="_CPPv2NK4mppp7integer11binary_saveEPc"></span><span id="mppp::integer::binary_save__cPC"></span><span class="target" id="classmppp_1_1integer_1a0767e99492d969b31b49c9aa332b71f5"></span>std::size_t <code class="sig-name descname">binary_save</code><span class="sig-paren">(</span>char *<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7integer11binary_saveEPc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serialise into a memory buffer. </p>
-<p><p>This method will write into <code class="docutils literal notranslate"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal notranslate"><span class="pre">this</span></code>. The serialised
-representation produced by this method can be read back with one of the
+<p><p>This member function will write into <code class="docutils literal notranslate"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal notranslate"><span class="pre">this</span></code>. The serialised
+representation produced by this member function can be read back with one of the
 <a class="reference internal" href="#_CPPv4N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_load()</span></code></a> overloads.</p>
 <p><code class="docutils literal notranslate"><span class="pre">dest</span></code> must point to a memory area whose size is at least equal to the value returned
 by <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>, otherwise the behaviour will be undefined.
 <code class="docutils literal notranslate"><span class="pre">dest</span></code> does not have any special alignment requirements.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The binary representation produced by this method is compiler, platform and architecture
+<p>The binary representation produced by this member function is compiler, platform and architecture
 specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
 it should not be used as an exchange format or for long-term data storage.</p>
 </div>
@@ -1146,15 +1237,15 @@ it should not be used as an exchange format or for long-term data storage.</p>
 <dt id="_CPPv4NK4mppp7integer11binary_saveERNSt6vectorIcEE">
 <span id="_CPPv3NK4mppp7integer11binary_saveERNSt6vectorIcEE"></span><span id="_CPPv2NK4mppp7integer11binary_saveERNSt6vectorIcEE"></span><span id="mppp::integer::binary_save__std::vector:c:RC"></span><span class="target" id="classmppp_1_1integer_1a65eed7538e8a00745dbdf19267cfe382"></span>std::size_t <code class="sig-name descname">binary_save</code><span class="sig-paren">(</span>std::vector&lt;char&gt; &amp;<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7integer11binary_saveERNSt6vectorIcEE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serialise into a <code class="docutils literal notranslate"><span class="pre">std::vector&lt;char&gt;</span></code>. </p>
-<p><p>This method will write into <code class="docutils literal notranslate"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal notranslate"><span class="pre">this</span></code>. The serialised
-representation produced by this method can be read back with one of the
+<p><p>This member function will write into <code class="docutils literal notranslate"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal notranslate"><span class="pre">this</span></code>. The serialised
+representation produced by this member function can be read back with one of the
 <a class="reference internal" href="#_CPPv4N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_load()</span></code></a> overloads.</p>
 <p>The size of <code class="docutils literal notranslate"><span class="pre">dest</span></code> must be at least equal to the value returned by
 <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>. If that is not the case, <code class="docutils literal notranslate"><span class="pre">dest</span></code> will be resized
 to <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The binary representation produced by this method is compiler, platform and architecture
+<p>The binary representation produced by this member function is compiler, platform and architecture
 specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
 it should not be used as an exchange format or for long-term data storage.</p>
 </div>
@@ -1179,15 +1270,15 @@ it should not be used as an exchange format or for long-term data storage.</p>
 <dt id="_CPPv4I_NSt6size_tEENK4mppp7integer11binary_saveENSt6size_tERNSt5arrayIc1SEE">
 <span id="_CPPv3I_NSt6size_tEENK4mppp7integer11binary_saveERNSt5arrayIc1SEE"></span><span id="_CPPv2I_NSt6size_tEENK4mppp7integer11binary_saveERNSt5arrayIc1SEE"></span><span class="target" id="classmppp_1_1integer_1acf04450572531291313cc17270b2dbbc"></span>template&lt;std::size_t <code class="sig-name descname">S</code>&gt;<br />std::size_t <code class="sig-name descname">binary_save</code><span class="sig-paren">(</span>std::array&lt;char, <a class="reference internal" href="#_CPPv4I_NSt6size_tEENK4mppp7integer11binary_saveENSt6size_tERNSt5arrayIc1SEE" title="mppp::integer::binary_save::S">S</a>&gt; &amp;<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4I_NSt6size_tEENK4mppp7integer11binary_saveENSt6size_tERNSt5arrayIc1SEE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serialise into a <code class="docutils literal notranslate"><span class="pre">std::array&lt;char&gt;</span></code>. </p>
-<p><p>This method will write into <code class="docutils literal notranslate"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal notranslate"><span class="pre">this</span></code>. The serialised
-representation produced by this method can be read back with one of the
+<p><p>This member function will write into <code class="docutils literal notranslate"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal notranslate"><span class="pre">this</span></code>. The serialised
+representation produced by this member function can be read back with one of the
 <a class="reference internal" href="#_CPPv4N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_load()</span></code></a> overloads.</p>
 <p>The size of <code class="docutils literal notranslate"><span class="pre">dest</span></code> must be at least equal to the value returned by
 <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_size()</span></code></a>. If that is not the case, no data
 will be written to <code class="docutils literal notranslate"><span class="pre">dest</span></code> and zero will be returned.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The binary representation produced by this method is compiler, platform and architecture
+<p>The binary representation produced by this member function is compiler, platform and architecture
 specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
 it should not be used as an exchange format or for long-term data storage.</p>
 </div>
@@ -1211,16 +1302,16 @@ it should not be used as an exchange format or for long-term data storage.</p>
 <dt id="_CPPv4NK4mppp7integer11binary_saveERNSt7ostreamE">
 <span id="_CPPv3NK4mppp7integer11binary_saveERNSt7ostreamE"></span><span id="_CPPv2NK4mppp7integer11binary_saveERNSt7ostreamE"></span><span id="mppp::integer::binary_save__osRC"></span><span class="target" id="classmppp_1_1integer_1aca4a03ef6efb3524c6907f1af8b18723"></span>std::size_t <code class="sig-name descname">binary_save</code><span class="sig-paren">(</span>std::ostream &amp;<em>dest</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK4mppp7integer11binary_saveERNSt7ostreamE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serialise into a <code class="docutils literal notranslate"><span class="pre">std::ostream</span></code>. </p>
-<p><p>This method will write into the output stream <code class="docutils literal notranslate"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal notranslate"><span class="pre">this</span></code>, starting from the
-current stream position. The serialised representation produced by this method can be read back with one of the
-<a class="reference internal" href="#_CPPv4N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_load()</span></code></a> overloads.</p>
+<p><p>This member function will write into the output stream <code class="docutils literal notranslate"><span class="pre">dest</span></code> a binary representation of <code class="docutils literal notranslate"><span class="pre">this</span></code>, starting
+from the current stream position. The serialised representation produced by this member function can be read back
+with one of the <a class="reference internal" href="#_CPPv4N4mppp7integer11binary_loadEPKc" title="mppp::integer::binary_load"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_load()</span></code></a> overloads.</p>
 <p>If the serialisation is successful (that is, no stream error state is ever detected in <code class="docutils literal notranslate"><span class="pre">dest</span></code> after write
 operations), then the binary size of <code class="docutils literal notranslate"><span class="pre">this</span></code> (that is, the number of bytes written into <code class="docutils literal notranslate"><span class="pre">dest</span></code>) will be
 returned. Otherwise, zero will be returned. Note that a return value of zero does not necessarily imply that no
 bytes were written into <code class="docutils literal notranslate"><span class="pre">dest</span></code>, just that an error occurred at some point during the serialisation process.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The binary representation produced by this method is compiler, platform and architecture
+<p>The binary representation produced by this member function is compiler, platform and architecture
 specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
 it should not be used as an exchange format or for long-term data storage.</p>
 </div>
@@ -1245,15 +1336,15 @@ it should not be used as an exchange format or for long-term data storage.</p>
 <dt id="_CPPv4N4mppp7integer11binary_loadEPKc">
 <span id="_CPPv3N4mppp7integer11binary_loadEPKc"></span><span id="_CPPv2N4mppp7integer11binary_loadEPKc"></span><span id="mppp::integer::binary_load__cCP"></span><span class="target" id="classmppp_1_1integer_1a8d543cfca7270eac6a75ee15fdacd2e2"></span>std::size_t <code class="sig-name descname">binary_load</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer11binary_loadEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Load a value from a memory buffer. </p>
-<p><p>This method will load into <code class="docutils literal notranslate"><span class="pre">this</span></code> the content of the memory buffer starting
+<p><p>This member function will load into <code class="docutils literal notranslate"><span class="pre">this</span></code> the content of the memory buffer starting
 at <code class="docutils literal notranslate"><span class="pre">src</span></code>, which must contain the serialised representation of an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>
 produced by one of the <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_save()</span></code></a> overloads.</p>
 <p><code class="docutils literal notranslate"><span class="pre">dest</span></code> does not have any special alignment requirements.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Although this method performs a few consistency checks on the data in <code class="docutils literal notranslate"><span class="pre">src</span></code>,
+<p>Although this member function performs a few consistency checks on the data in <code class="docutils literal notranslate"><span class="pre">src</span></code>,
 it cannot ensure complete safety against maliciously crafted data. Users are
-advised to use this method only with trusted data.</p>
+advised to use this member function only with trusted data.</p>
 </div>
 </p>
 <p><dl class="simple">
@@ -1276,7 +1367,7 @@ advised to use this method only with trusted data.</p>
 <dt id="_CPPv4N4mppp7integer11binary_loadERKNSt6vectorIcEE">
 <span id="_CPPv3N4mppp7integer11binary_loadERKNSt6vectorIcEE"></span><span id="_CPPv2N4mppp7integer11binary_loadERKNSt6vectorIcEE"></span><span id="mppp::integer::binary_load__std::vector:c:CR"></span><span class="target" id="classmppp_1_1integer_1a6811e2a602d5f368a6cc5de89ebec758"></span>std::size_t <code class="sig-name descname">binary_load</code><span class="sig-paren">(</span><em class="property">const</em> std::vector&lt;char&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer11binary_loadERKNSt6vectorIcEE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Load a value from a <code class="docutils literal notranslate"><span class="pre">std::vector&lt;char&gt;</span></code>. </p>
-<p><p>This method will load into <code class="docutils literal notranslate"><span class="pre">this</span></code> the content of <code class="docutils literal notranslate"><span class="pre">src</span></code>,
+<p><p>This member function will load into <code class="docutils literal notranslate"><span class="pre">this</span></code> the content of <code class="docutils literal notranslate"><span class="pre">src</span></code>,
 which must contain the serialised representation of an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>
 produced by one of the <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_save()</span></code></a> overloads.</p>
 <p>The serialised representation of the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> must start at
@@ -1285,9 +1376,9 @@ past the end of the serialised representation of the <code class="xref cpp cpp-c
 will be ignored.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Although this method performs a few consistency checks on the data in <code class="docutils literal notranslate"><span class="pre">src</span></code>,
+<p>Although this member function performs a few consistency checks on the data in <code class="docutils literal notranslate"><span class="pre">src</span></code>,
 it cannot ensure complete safety against maliciously crafted data. Users are
-advised to use this method only with trusted data.</p>
+advised to use this member function only with trusted data.</p>
 </div>
 </p>
 <p><dl class="simple">
@@ -1310,7 +1401,7 @@ advised to use this method only with trusted data.</p>
 <dt id="_CPPv4I_NSt6size_tEEN4mppp7integer11binary_loadENSt6size_tERKNSt5arrayIc1SEE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp7integer11binary_loadERKNSt5arrayIc1SEE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp7integer11binary_loadERKNSt5arrayIc1SEE"></span><span class="target" id="classmppp_1_1integer_1ac9e97e1be0e2631ba378b4febf0e07da"></span>template&lt;std::size_t <code class="sig-name descname">S</code>&gt;<br />std::size_t <code class="sig-name descname">binary_load</code><span class="sig-paren">(</span><em class="property">const</em> std::array&lt;char, <a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp7integer11binary_loadENSt6size_tERKNSt5arrayIc1SEE" title="mppp::integer::binary_load::S">S</a>&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp7integer11binary_loadENSt6size_tERKNSt5arrayIc1SEE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Load a value from a <code class="docutils literal notranslate"><span class="pre">std::array&lt;char&gt;</span></code>. </p>
-<p><p>This method will load into <code class="docutils literal notranslate"><span class="pre">this</span></code> the content of <code class="docutils literal notranslate"><span class="pre">src</span></code>,
+<p><p>This member function will load into <code class="docutils literal notranslate"><span class="pre">this</span></code> the content of <code class="docutils literal notranslate"><span class="pre">src</span></code>,
 which must contain the serialised representation of an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>
 produced by one of the <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_save()</span></code></a> overloads.</p>
 <p>The serialised representation of the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> must start at
@@ -1319,9 +1410,9 @@ past the end of the serialised representation of the <code class="xref cpp cpp-c
 will be ignored.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Although this method performs a few consistency checks on the data in <code class="docutils literal notranslate"><span class="pre">src</span></code>,
+<p>Although this member function performs a few consistency checks on the data in <code class="docutils literal notranslate"><span class="pre">src</span></code>,
 it cannot ensure complete safety against maliciously crafted data. Users are
-advised to use this method only with trusted data.</p>
+advised to use this member function only with trusted data.</p>
 </div>
 </p>
 <p><dl class="simple">
@@ -1344,7 +1435,7 @@ advised to use this method only with trusted data.</p>
 <dt id="_CPPv4N4mppp7integer11binary_loadERNSt7istreamE">
 <span id="_CPPv3N4mppp7integer11binary_loadERNSt7istreamE"></span><span id="_CPPv2N4mppp7integer11binary_loadERNSt7istreamE"></span><span id="mppp::integer::binary_load__isR"></span><span class="target" id="classmppp_1_1integer_1a4a84caebafd02284edc57bd893fe7e83"></span>std::size_t <code class="sig-name descname">binary_load</code><span class="sig-paren">(</span>std::istream &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N4mppp7integer11binary_loadERNSt7istreamE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Load a value from a <code class="docutils literal notranslate"><span class="pre">std::istream</span></code>. </p>
-<p><p>This method will load into <code class="docutils literal notranslate"><span class="pre">this</span></code> the content of <code class="docutils literal notranslate"><span class="pre">src</span></code>,
+<p><p>This member function will load into <code class="docutils literal notranslate"><span class="pre">this</span></code> the content of <code class="docutils literal notranslate"><span class="pre">src</span></code>,
 which must contain the serialised representation of an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>
 produced by one of the <a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_saveEPc" title="mppp::integer::binary_save"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">binary_save()</span></code></a> overloads.</p>
 <p>The serialised representation of the <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> must start at
@@ -1357,9 +1448,9 @@ Note that a return value of zero does not necessarily imply that no
 bytes were read from <code class="docutils literal notranslate"><span class="pre">src</span></code>, just that an error occurred at some point during the serialisation process.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Although this method performs a few consistency checks on the data in <code class="docutils literal notranslate"><span class="pre">src</span></code>,
+<p>Although this member function performs a few consistency checks on the data in <code class="docutils literal notranslate"><span class="pre">src</span></code>,
 it cannot ensure complete safety against maliciously crafted data. Users are
-advised to use this method only with trusted data.</p>
+advised to use this member function only with trusted data.</p>
 </div>
 </p>
 <p><dl class="simple">
@@ -1435,10 +1526,23 @@ generic binary <a class="reference internal" href="#integer-operators"><span cla
 involving <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>. Specifically, the concept will be <code class="docutils literal notranslate"><span class="pre">true</span></code> if either:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code> are both <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> with the same static size <code class="docutils literal notranslate"><span class="pre">SSize</span></code>, or</p></li>
-<li><p>one type is an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and the other is a <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> type.</p></li>
+<li><p>one type is an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> and the other is a <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a>
+or <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppComplex</span></code></a> type.</p></li>
 </ul>
 <p>Note that the modulo, bit-shifting and bitwise logic operators have additional restrictions.</p>
 <p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">are_integer_op_types</span></code> is also available (even if the compiler does
+not support concepts).</p>
+</dd></dl>
+
+<dl class="concept">
+<dt id="_CPPv4I00EN4mppp18IntegerRealOpTypesE">
+<span id="_CPPv3I00EN4mppp18IntegerRealOpTypesE"></span><span id="_CPPv2I00EN4mppp18IntegerRealOpTypesE"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br /><em class="property">concept </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">IntegerRealOpTypes</code><a class="headerlink" href="#_CPPv4I00EN4mppp18IntegerRealOpTypesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>This concept will be <code class="docutils literal notranslate"><span class="pre">true</span></code> if:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code> satisfy <a class="reference internal" href="#_CPPv4I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">IntegerOpTypes</span></code></a>, and</p></li>
+<li><p>neither <code class="docutils literal notranslate"><span class="pre">T</span></code> nor <code class="docutils literal notranslate"><span class="pre">U</span></code> satisfy <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppComplex</span></code></a>.</p></li>
+</ul>
+<p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">are_integer_real_op_types</span></code> is also available (even if the compiler does
 not support concepts).</p>
 </dd></dl>
 
@@ -1561,25 +1665,49 @@ convenience/generic overloads is provided as well.</p>
 <div class="section" id="conversion">
 <span id="integer-conversion"></span><h3>Conversion<a class="headerlink" href="#conversion" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="_CPPv4I_16CppInteroperable_NSt6size_tEEN4mppp3getEbR1TRK7integerI5SSizeE">
-<span id="_CPPv3I_16CppInteroperable_NSt6size_tEEN4mppp3getER1TRK7integerI5SSizeE"></span><span id="_CPPv2I_16CppInteroperable_NSt6size_tEEN4mppp3getER1TRK7integerI5SSizeE"></span><span class="target" id="group__integer__conversion_1ga79bf068ef59597a58d35b06a06482915"></span>template&lt;<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable">CppInteroperable</a> <code class="sig-name descname">T</code>, std::size_t <code class="sig-name descname">SSize</code>&gt;<br />bool <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_16CppInteroperable_NSt6size_tEEN4mppp3getEbR1TRK7integerI5SSizeE" title="mppp::get::T">T</a> &amp;<em>rop</em>, <em class="property">const</em> integer&lt;<a class="reference internal" href="#_CPPv4I_16CppInteroperable_NSt6size_tEEN4mppp3getEbR1TRK7integerI5SSizeE" title="mppp::get::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_16CppInteroperable_NSt6size_tEEN4mppp3getEbR1TRK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Generic conversion function for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
-<p><p>This function will convert the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> <code class="docutils literal notranslate"><span class="pre">n</span></code> to a
-<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> type, storing the result of the conversion into <code class="docutils literal notranslate"><span class="pre">rop</span></code>.
+<dt id="_CPPv4I_N4mppp16CppInteroperableE_NSt6size_tEEN4mppp3getEbR1TRKN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_N4mppp16CppInteroperableE_NSt6size_tEEN4mppp3getER1TRKN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_N4mppp16CppInteroperableE_NSt6size_tEEN4mppp3getER1TRKN4mppp7integerI5SSizeEE"></span>template&lt;mppp::<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable">CppInteroperable</a> <code class="sig-name descname">T</code>, std::size_t <code class="sig-name descname">SSize</code>&gt;<br />bool <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp16CppInteroperableE_NSt6size_tEEN4mppp3getEbR1TRKN4mppp7integerI5SSizeEE" title="mppp::get::T">T</a> &amp;<em>rop</em>, <em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_N4mppp16CppInteroperableE_NSt6size_tEEN4mppp3getEbR1TRKN4mppp7integerI5SSizeEE" title="mppp::get::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp16CppInteroperableE_NSt6size_tEEN4mppp3getEbR1TRKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Generic conversion function from <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> to C++ fundamental types.</p>
+<p>This function will convert the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> <em>n</em> to a
+<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppInteroperable</span></code></a> type, storing the result of the conversion into <em>rop</em>.
 If the conversion is successful, the function
-will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails, <code class="docutils literal notranslate"><span class="pre">rop</span></code> will
+will return <code class="docutils literal notranslate"><span class="pre">true</span></code>, otherwise the function will return <code class="docutils literal notranslate"><span class="pre">false</span></code>. If the conversion fails, <em>rop</em> will
 not be altered.</p>
-</p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <code class="docutils literal notranslate"><span class="pre">rop</span></code> is a C++ integral which cannot represent the value of <code class="docutils literal notranslate"><span class="pre">n</span></code>. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the variable which will store the result of the conversion. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">n</span></code>: the input <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>.</p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rop</strong> – the variable which will store the result of the conversion.</p></li>
+<li><p><strong>n</strong> – the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the conversion succeeded, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. The conversion can fail only if <em>rop</em> is
+a C++ integral which cannot represent the value of <em>n</em>.</p>
+</dd>
 </dl>
-</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp10CppComplexE_NSt6size_tEEN4mppp3getEbR1TRKN4mppp7integerI5SSizeEE">
+<span id="_CPPv3I_N4mppp10CppComplexE_NSt6size_tEEN4mppp3getER1TRKN4mppp7integerI5SSizeEE"></span><span id="_CPPv2I_N4mppp10CppComplexE_NSt6size_tEEN4mppp3getER1TRKN4mppp7integerI5SSizeEE"></span>template&lt;mppp::<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex">CppComplex</a> <code class="sig-name descname">T</code>, std::size_t <code class="sig-name descname">SSize</code>&gt;<br />bool <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">get</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp10CppComplexE_NSt6size_tEEN4mppp3getEbR1TRKN4mppp7integerI5SSizeEE" title="mppp::get::T">T</a> &amp;<em>rop</em>, <em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_N4mppp10CppComplexE_NSt6size_tEEN4mppp3getEbR1TRKN4mppp7integerI5SSizeEE" title="mppp::get::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp10CppComplexE_NSt6size_tEEN4mppp3getEbR1TRKN4mppp7integerI5SSizeEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<p>Generic conversion function from <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> to C++ complex types.</p>
+<p>This function will convert the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> <em>n</em> to a
+<a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp10CppComplexE" title="mppp::CppComplex"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">CppComplex</span></code></a> type, storing the result of the conversion into <em>rop</em>.
+The conversion is always successful, and this function will always return <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rop</strong> – the variable which will store the result of the conversion.</p></li>
+<li><p><strong>n</strong> – the input <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -1785,7 +1913,7 @@ if <code class="docutils literal notranslate"><span class="pre">op2</span></code
 <dt id="_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE">
 <span id="_CPPv3I_NSt6size_tEEN4mppp3negER7integerI5SSizeERK7integerI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp3negER7integerI5SSizeERK7integerI5SSizeE"></span><span class="target" id="group__integer__arithmetic_1ga1407ee8c4fff146ed4abd41486087ae7"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">neg</code><span class="sig-paren">(</span>integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="mppp::neg::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp3negER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary negation. </p>
-<p>This method will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to <code class="docutils literal notranslate"><span class="pre">-n</span></code>.</p>
+<p>This function will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to <code class="docutils literal notranslate"><span class="pre">-n</span></code>.</p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </p>
 </dd>
@@ -2450,64 +2578,73 @@ The implementation can handle positive and negative values for both the top and 
 <div class="section" id="exponentiation">
 <span id="integer-exponentiation"></span><h3>Exponentiation<a class="headerlink" href="#exponentiation" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="_CPPv4I_NSt6size_tEEN4mppp6pow_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeEm">
-<span id="_CPPv3I_NSt6size_tEEN4mppp6pow_uiER7integerI5SSizeERK7integerI5SSizeEm"></span><span id="_CPPv2I_NSt6size_tEEN4mppp6pow_uiER7integerI5SSizeERK7integerI5SSizeEm"></span><span class="target" id="group__integer__exponentiation_1ga2bcbf1eb80cfdda017bb2f6a85f70354"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeEm" title="mppp::pow_ui::SSize">SSize</a>&gt; &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">pow_ui</code><span class="sig-paren">(</span>integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeEm" title="mppp::pow_ui::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeEm" title="mppp::pow_ui::SSize">SSize</a>&gt; &amp;<em>base</em>, unsigned long <em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeEm" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Ternary exponentiation for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
-<p>This function will set <code class="docutils literal notranslate"><span class="pre">rop</span></code> to <code class="docutils literal notranslate"><span class="pre">base**exp</span></code>.</p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>a reference to <code class="docutils literal notranslate"><span class="pre">rop</span></code>. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">rop</span></code>: the return value. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">base</span></code>: the base. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">exp</span></code>: the exponent.</p></li>
+<dt id="_CPPv4I_NSt6size_tEEN4mppp6pow_uiERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm">
+<span id="_CPPv3I_NSt6size_tEEN4mppp6pow_uiERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm"></span><span id="_CPPv2I_NSt6size_tEEN4mppp6pow_uiERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::pow_ui::SSize">SSize</a>&gt; &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">pow_ui</code><span class="sig-paren">(</span>mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::pow_ui::SSize">SSize</a>&gt; &amp;<em>rop</em>, <em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::pow_ui::SSize">SSize</a>&gt; &amp;<em>base</em>, unsigned long <em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Ternary <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> exponentiation.</p>
+<p>This function will set <em>rop</em> to <code class="docutils literal notranslate"><span class="pre">base**exp</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rop</strong> – the return value.</p></li>
+<li><p><strong>base</strong> – the base.</p></li>
+<li><p><strong>exp</strong> – the exponent.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a reference to <em>rop</em>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv4I_NSt6size_tEEN4mppp6pow_uiE7integerI5SSizeERK7integerI5SSizeEm">
-<span id="_CPPv3I_NSt6size_tEEN4mppp6pow_uiERK7integerI5SSizeEm"></span><span id="_CPPv2I_NSt6size_tEEN4mppp6pow_uiERK7integerI5SSizeEm"></span><span class="target" id="group__integer__exponentiation_1ga6c0721a6042cff553a833506b115ec4a"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeEm" title="mppp::pow_ui::SSize">SSize</a>&gt; <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">pow_ui</code><span class="sig-paren">(</span><em class="property">const</em> integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiER7integerI5SSizeER7integerI5SSizeERK7integerI5SSizeEm" title="mppp::pow_ui::SSize">SSize</a>&gt; &amp;<em>base</em>, unsigned long <em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiE7integerI5SSizeERK7integerI5SSizeEm" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Binary exponentiation for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">base**exp</span></code>. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">base</span></code>: the base. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">exp</span></code>: the exponent.</p></li>
+<dt id="_CPPv4I_NSt6size_tEEN4mppp6pow_uiEN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm">
+<span id="_CPPv3I_NSt6size_tEEN4mppp6pow_uiERKN4mppp7integerI5SSizeEEm"></span><span id="_CPPv2I_NSt6size_tEEN4mppp6pow_uiERKN4mppp7integerI5SSizeEEm"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::pow_ui::SSize">SSize</a>&gt; <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">pow_ui</code><span class="sig-paren">(</span><em class="property">const</em> mppp::integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiERN4mppp7integerI5SSizeEERN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="mppp::pow_ui::SSize">SSize</a>&gt; &amp;<em>base</em>, unsigned long <em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp6pow_uiEN4mppp7integerI5SSizeEERKN4mppp7integerI5SSizeEEm" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> exponentiation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – the base.</p></li>
+<li><p><strong>exp</strong> – the exponent.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">base**exp</span></code>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 
 <dl class="function">
-<dt>
-<span class="target" id="group__integer__exponentiation_1gac12cf4ea31aa3ed1b0e6202f6bb7aed0"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires IntegerOpTypes&lt;T, U&gt; auto mppp::pow(const T &amp; base, const U &amp; exp)</code></dt>
-<dd><p>Generic binary exponentiation for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
-<p><p>This function will raise <code class="docutils literal notranslate"><span class="pre">base</span></code> to the power <code class="docutils literal notranslate"><span class="pre">exp</span></code>, and return the result. If one of the arguments
-is a floating-point value, then the result will be computed via <code class="docutils literal notranslate"><span class="pre">std::pow()</span></code> and it will also be a
-floating-point value. Otherwise, the result will be an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.
+<dt id="_CPPv4I00EN4mppp3powEDaRK1TRK1U">
+<span id="_CPPv3I00EN4mppp3powERK1TRK1U"></span><span id="_CPPv2I00EN4mppp3powERK1TRK1U"></span>template&lt;typename <code class="sig-name descname">T</code>, typename <code class="sig-name descname">U</code>&gt;<br />auto <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">pow</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mppp3powEDaRK1TRK1U" title="mppp::pow::T">T</a> &amp;<em>base</em>, <em class="property">const</em> <a class="reference internal" href="#_CPPv4I00EN4mppp3powEDaRK1TRK1U" title="mppp::pow::U">U</a> &amp;<em>exp</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN4mppp3powEDaRK1TRK1U" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function participates in overload resolution only if <code class="docutils literal notranslate"><span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code> satisfy
+the <a class="reference internal" href="#_CPPv4I00EN4mppp14IntegerOpTypesE" title="mppp::IntegerOpTypes"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">IntegerOpTypes</span></code></a> concept.</p>
+</div>
+<p>Generic binary <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> exponentiation.</p>
+<p>This function will raise <em>base</em> to the power <em>exp</em>, and return the result. If one of the arguments
+is a floating-point or complex value, then the result will be computed via <code class="docutils literal notranslate"><span class="pre">std::pow()</span></code> and it will
+also be a floating-point or complex value. Otherwise, the result will be an <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.
 In case of a negative integral exponent and integral base, the result will be zero unless
 the absolute value of <code class="docutils literal notranslate"><span class="pre">base</span></code> is 1.</p>
-</p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">base**exp</span></code>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">base</span></code>: the base. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">exp</span></code>: the exponent.</p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – the base.</p></li>
+<li><p><strong>exp</strong> – the exponent.</p></li>
 </ul>
 </dd>
-<dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">std::overflow_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">base</span></code> and <code class="docutils literal notranslate"><span class="pre">exp</span></code> are integrals and <code class="docutils literal notranslate"><span class="pre">exp</span></code> is non-negative and outside the range of <code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span></code>. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">zero_division_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">base</span></code> and <code class="docutils literal notranslate"><span class="pre">exp</span></code> are integrals and <code class="docutils literal notranslate"><span class="pre">base</span></code> is zero and <code class="docutils literal notranslate"><span class="pre">exp</span></code> is negative. </p></li>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">base**exp</span></code>.</p>
+</dd>
+<dt class="field-odd">Throws</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>std::overflow_error</strong> – if <em>base</em> and <em>exp</em> are integrals and <em>exp</em> is non-negative and outside the range
+of <code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">long</span></code>.</p></li>
+<li><p><a class="reference internal" href="exceptions.html#_CPPv4N4mppp19zero_division_errorE" title="mppp::zero_division_error"><strong>mppp::zero_division_error</strong></a> – if <em>base</em> and <em>exp</em> are integrals and <em>base</em> is zero and <em>exp</em> is negative.</p></li>
 </ul>
 </dd>
 </dl>
-</p>
 </dd></dl>
 
 </div>
@@ -2728,7 +2865,7 @@ with <span class="math notranslate nohighlight">\(b&gt;1\)</span>, such that <em
 <span id="_CPPv3I_NSt6size_tEEN4mppp11binary_sizeERK7integerI5SSizeE"></span><span id="_CPPv2I_NSt6size_tEEN4mppp11binary_sizeERK7integerI5SSizeE"></span><span class="target" id="group__integer__s11n_1ga8190c77652589517ca3c88a488e9dcb6"></span>template&lt;std::size_t <code class="sig-name descname">SSize</code>&gt;<br />std::size_t <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">binary_size</code><span class="sig-paren">(</span><em class="property">const</em> integer&lt;<a class="reference internal" href="#_CPPv4I_NSt6size_tEEN4mppp11binary_sizeENSt6size_tERK7integerI5SSizeE" title="mppp::binary_size::SSize">SSize</a>&gt; &amp;<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_NSt6size_tEEN4mppp11binary_sizeENSt6size_tERK7integerI5SSizeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Binary size of an <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p><p>This function is the free function equivalent of the
-<a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_size()</span></code></a> method.</p>
+<a class="reference internal" href="#_CPPv4NK4mppp7integer11binary_sizeEv" title="mppp::integer::binary_size"><code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">mppp::integer::binary_size()</span></code></a> member function.</p>
 </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>the output of <a class="reference internal" href="#classmppp_1_1integer_1a9661291537154ccbb6df6c4287fb9c93"><span class="std std-ref">mppp::integer::binary_size()</span></a> called on <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p>
@@ -2856,8 +2993,8 @@ is typically built on top of basic <a class="reference internal" href="#integer-
 <dd><p>Binary addition operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> argument is a floating-point or complex type, then the
+type of the result is floating-point or complex; otherwise,</p></li>
 <li><p>the type of the result is <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</p></li>
 </ul>
 </p>
@@ -2886,7 +3023,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment/conversion operators of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -2946,8 +3083,8 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dd><p>Binary subtraction operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> argument is a floating-point or complex type, then the
+type of the result is floating-point or complex; otherwise,</p></li>
 <li><p>the type of the result is <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</p></li>
 </ul>
 </p>
@@ -2976,7 +3113,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment/conversion operators of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -3021,8 +3158,8 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dd><p>Binary multiplication operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> argument is a floating-point or complex type, then the
+type of the result is floating-point or complex; otherwise,</p></li>
 <li><p>the type of the result is <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</p></li>
 </ul>
 </p>
@@ -3051,7 +3188,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 </ul>
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment/conversion operators of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -3064,8 +3201,8 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 <dd><p>Binary division operator for <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p>
 <p><p>The return type is determined as follows:</p>
 <ul class="simple">
-<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> argument is a floating-point type <code class="docutils literal notranslate"><span class="pre">F</span></code>, then the
-type of the result is <code class="docutils literal notranslate"><span class="pre">F</span></code>; otherwise,</p></li>
+<li><p>if the non-<code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code> argument is a floating-point or complex type, then the
+type of the result is floating-point or complex; otherwise,</p></li>
 <li><p>the type of the result is <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>.</p></li>
 </ul>
 </p>
@@ -3099,7 +3236,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 </dd>
 <dt><strong>Exceptions</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">zero_division_error</span></code>: if <code class="docutils literal notranslate"><span class="pre">op</span></code> is zero and only integral types are involved in the division. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment of a floating-point value to <code class="docutils literal notranslate"><span class="pre">rop</span></code> or by the conversion operator of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unspecified</span></code>: any exception thrown by the assignment/conversion operators of <a class="reference internal" href="#classmppp_1_1integer"><span class="std std-ref">integer</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -3263,7 +3400,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
 <dl class="function">
 <dt>
-<span class="target" id="group__integer__operators_1gadce1eb4a80bdf96929196b47a23b8704"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires IntegerOpTypes&lt;T, U&gt; bool mppp::operator&lt;(const T &amp; op1, const U &amp; op2)</code></dt>
+<span class="target" id="group__integer__operators_1ga037c5a2d820603fbfca4408524ccd6c7"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires IntegerRealOpTypes&lt;T, U&gt; bool mppp::operator&lt;(const T &amp; op1, const U &amp; op2)</code></dt>
 <dd><p>Less-than operator. </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
@@ -3279,7 +3416,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
 <dl class="function">
 <dt>
-<span class="target" id="group__integer__operators_1ga25e379f0c344934e51f78f2dcd3d7f00"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires IntegerOpTypes&lt;T, U&gt; bool mppp::operator&lt;=(const T &amp; op1, const U &amp; op2)</code></dt>
+<span class="target" id="group__integer__operators_1gae75eeef01f214cc262a328c0da50294d"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires IntegerRealOpTypes&lt;T, U&gt; bool mppp::operator&lt;=(const T &amp; op1, const U &amp; op2)</code></dt>
 <dd><p>Less-than or equal operator. </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&lt;=</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
@@ -3295,7 +3432,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
 <dl class="function">
 <dt>
-<span class="target" id="group__integer__operators_1ga89a86be5a18f4dd60339f08bc5c3d1c5"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires IntegerOpTypes&lt;T, U&gt; bool mppp::operator&gt;(const T &amp; op1, const U &amp; op2)</code></dt>
+<span class="target" id="group__integer__operators_1ga9e90501f766c1ea8917dc140d99ba6fe"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires IntegerRealOpTypes&lt;T, U&gt; bool mppp::operator&gt;(const T &amp; op1, const U &amp; op2)</code></dt>
 <dd><p>Greater-than operator. </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
@@ -3311,7 +3448,7 @@ type of the result is <code class="docutils literal notranslate"><span class="pr
 
 <dl class="function">
 <dt>
-<span class="target" id="group__integer__operators_1ga1b30281a2cf6aea353b29345d88b0a36"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires IntegerOpTypes&lt;T, U&gt; bool mppp::operator&gt;=(const T &amp; op1, const U &amp; op2)</code></dt>
+<span class="target" id="group__integer__operators_1gabc4a509ecd31c5edd481382ccce555f2"></span><code class="sig-name descname">template&lt;typename T, typename U&gt;requires IntegerRealOpTypes&lt;T, U&gt; bool mppp::operator&gt;=(const T &amp; op1, const U &amp; op2)</code></dt>
 <dd><p>Greater-than or equal operator. </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">op1</span> <span class="pre">&gt;=</span> <span class="pre">op2</span></code>, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>

@@ -232,6 +232,23 @@ not support concepts).</p>
 </dd></dl>
 
 <dl class="concept">
+<dt id="_CPPv4I0EN4mppp10CppComplexE">
+<span id="_CPPv3I0EN4mppp10CppComplexE"></span><span id="_CPPv2I0EN4mppp10CppComplexE"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><em class="property">concept </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">CppComplex</code><a class="headerlink" href="#_CPPv4I0EN4mppp10CppComplexE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.19.</span></p>
+</div>
+<p>This concept is satisfied if <code class="docutils literal notranslate"><span class="pre">T</span></code> is one of the C++ complex types
+supported by mp++:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">std::complex&lt;float&gt;</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">std::complex&lt;double&gt;</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">std::complex&lt;long</span> <span class="pre">double&gt;</span></code> (only if mp++ was configured with the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_MPFR</span></code> option enabled).</p></li>
+</ul>
+<p>A corresponding boolean type trait called <code class="docutils literal notranslate"><span class="pre">is_cpp_complex</span></code> is also available (even if the compiler does
+not support concepts).</p>
+</dd></dl>
+
+<dl class="concept">
 <dt id="_CPPv4I0EN4mppp10StringTypeE">
 <span id="_CPPv3I0EN4mppp10StringTypeE"></span><span id="_CPPv2I0EN4mppp10StringTypeE"></span>template&lt;typename <code class="sig-name descname">T</code>&gt;<br /><em class="property">concept </em><code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">StringType</code><a class="headerlink" href="#_CPPv4I0EN4mppp10StringTypeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>This concept is satisfied by C++ string-like types. Specifically, the concept will be true if <code class="docutils literal notranslate"><span class="pre">T</span></code>,

@@ -172,18 +172,10 @@
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>mp++ is written in modern C++, and it requires a compiler able to understand
-at least C++11 (mp++ will also use some features from C++14 and C++17,
-if supported by the compiler). mp++ is known to run on the following setups:</p>
-<ul class="simple">
-<li><p>GCC 4.8 and later versions on GNU/Linux 32/64-bit,</p></li>
-<li><p>Clang 3.8 and later versions on GNU/Linux 64-bit,</p></li>
-<li><p>MSVC 2015 and later versions on Windows 32/64-bit,</p></li>
-<li><p>Clang 4 and later versions on Windows 32/64-bit
-(with the <code class="docutils literal notranslate"><span class="pre">clang-cl</span></code> driver for MSVC),</p></li>
-<li><p>MinGW GCC 8 on Windows 64-bit,</p></li>
-<li><p>Clang on OSX 64-bit (Xcode 6.4 and later),</p></li>
-<li><p>Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).</p></li>
-</ul>
+at least C++11 (mp++ will also use features from C++14 and C++17,
+if supported by the compiler). The library is regularly tested on
+various versions of the three major compilers (GCC, Clang and MSVC)
+and operating-systems (Linux, Windows and OSX).</p>
 <p>mp++ has been written, tested and benchmarked on x86 processors, but it does
 not contain any architecture-specific code
 and thus it should run on any architecture supported by GMP
@@ -345,7 +337,7 @@ the <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_ARB</
 Unix-like systems);</p></li>
 <li><p>the quadmath library, required only if mp++ was configured with the
 <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option (<code class="docutils literal notranslate"><span class="pre">-lquadmath</span></code> with GCC,
-with clang it might be necessary to provide the full path to the library).</p></li>
+with Clang it might be necessary to provide the full path to the library).</p></li>
 </ul>
 <p>If you are using CMake, it’s highly recommended to make use of the config-file
 package provided with mp++ rather
