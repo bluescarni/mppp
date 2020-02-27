@@ -7,17 +7,10 @@ Introduction
 ------------
 
 mp++ is written in modern C++, and it requires a compiler able to understand
-at least C++11 (mp++ will also use some features from C++14 and C++17,
-if supported by the compiler). mp++ is known to run on the following setups:
-
-* GCC 4.8 and later versions on GNU/Linux 32/64-bit,
-* Clang 3.8 and later versions on GNU/Linux 64-bit,
-* MSVC 2015 and later versions on Windows 32/64-bit,
-* Clang 4 and later versions on Windows 32/64-bit
-  (with the ``clang-cl`` driver for MSVC),
-* MinGW GCC 8 on Windows 64-bit,
-* Clang on OSX 64-bit (Xcode 6.4 and later),
-* Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).
+at least C++11 (mp++ will also use features from C++14 and C++17,
+if supported by the compiler). The library is regularly tested on
+various versions of the three major compilers (GCC, Clang and MSVC)
+and operating-systems (Linux, Windows and OSX).
 
 mp++ has been written, tested and benchmarked on x86 processors, but it does
 not contain any architecture-specific code
@@ -207,7 +200,7 @@ using mp++ is the following:
   Unix-like systems);
 * the quadmath library, required only if mp++ was configured with the
   ``MPPP_WITH_QUADMATH`` option (``-lquadmath`` with GCC,
-  with clang it might be necessary to provide the full path to the library).
+  with Clang it might be necessary to provide the full path to the library).
 
 If you are using CMake, it's highly recommended to make use of the config-file
 package provided with mp++ rather

@@ -16,6 +16,9 @@ New
   (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
 - Implement squaring for :cpp:class:`~mppp::real`
   (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
+- :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
+  can now interact with ``std::complex``
+  (`#214 <https://github.com/bluescarni/mppp/pull/214>`__).
 - mp++'s multiprecision classes now support pretty-printing in the
   `xeus-cling notebook <https://github.com/jupyter-xeus/xeus-cling>`__
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
@@ -45,9 +48,10 @@ Fix
   returning copies rather than references
   (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
 - Various build system/doc fixes and improvements
-  (`#215 <https://github.com/bluescarni/mppp/pull/215>`__,
+  (`#214 <https://github.com/bluescarni/mppp/pull/214>`__,
+  `#215 <https://github.com/bluescarni/mppp/pull/215>`__,
   `#216 <https://github.com/bluescarni/mppp/pull/216>`__).
-- Fix compilation with older clang versions in C++17 mode
+- Fix compilation with older Clang versions in C++17 mode
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 
 0.18 (14-02-2020)
@@ -74,7 +78,7 @@ Changes
   (`#210 <https://github.com/bluescarni/mppp/pull/210>`__).
 - mp++'s public headers do not include
   the ``quadmath.h`` header any more. This change greatly
-  improves mp++'s compatibility with clang when the
+  improves mp++'s compatibility with Clang when the
   ``MPPP_WITH_QUADMATH`` option is active
   (`#206 <https://github.com/bluescarni/mppp/pull/206>`__).
 - Continue moving code into the compiled library
