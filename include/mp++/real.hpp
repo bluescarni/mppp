@@ -154,6 +154,9 @@ real real_constant(const F &, ::mpfr_prec_t);
 // Wrapper for calling mpfr_lgamma().
 MPPP_DLL_PUBLIC void real_lgamma_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t);
 
+// Wrapper for calling mpfr_li2().
+MPPP_DLL_PUBLIC void real_li2_wrapper(::mpfr_t, const ::mpfr_t, ::mpfr_rnd_t);
+
 // A small helper to check the input of the trunc() overloads.
 MPPP_DLL_PUBLIC void real_check_trunc_arg(const real &);
 
@@ -3058,12 +3061,33 @@ inline real yn(long n, T &&r)
     return detail::mpfr_nary_op_return(0, yn_wrapper, std::forward<T>(r));
 }
 
+// Polylogarithms.
+
+// NOTE: for li2 we have to spell out the full implementations,
+// since we are using a wrapper internally.
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real &li2(real &rop, T &&op)
+{
+    return detail::mpfr_nary_op(0, detail::real_li2_wrapper, rop, std::forward<T>(op));
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <CvrReal T>
+#else
+template <typename T, cvr_real_enabler<T> = 0>
+#endif
+inline real li2(T &&r)
+{
+    return detail::mpfr_nary_op_return(0, detail::real_li2_wrapper, std::forward<T>(r));
+}
+
 // Other special functions.
 MPPP_REAL_MPFR_UNARY_RETVAL(eint)
 MPPP_REAL_MPFR_UNARY_RETURN(eint)
-
-MPPP_REAL_MPFR_UNARY_RETVAL(li2)
-MPPP_REAL_MPFR_UNARY_RETURN(li2)
 
 MPPP_REAL_MPFR_UNARY_RETVAL(zeta)
 MPPP_REAL_MPFR_UNARY_RETURN(zeta)

@@ -376,6 +376,22 @@ void real_lgamma_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t)
     ::mpfr_lgamma(rop, &signp, op, MPFR_RNDN);
 }
 
+// Wrapper for calling mpfr_li2().
+void real_li2_wrapper(::mpfr_t rop, const ::mpfr_t op, ::mpfr_rnd_t rnd)
+{
+    // NOTE: mpfr_li2() returns the *real* part of the result,
+    // which, for op >= 1, is a complex number. For consistency
+    // with other functions, if the result is complex just set
+    // rop to nan.
+    // NOTE: check for nan before checking for >= 1, otherwise
+    // the comparison function will set the erange flag.
+    if (!mpfr_nan_p(op) && ::mpfr_cmp_ui(op, 1u) >= 0) {
+        ::mpfr_set_nan(rop);
+    } else {
+        ::mpfr_li2(rop, op, rnd);
+    }
+}
+
 // A small helper to check the input of the trunc() overloads.
 void real_check_trunc_arg(const real &r)
 {
@@ -1395,7 +1411,7 @@ real &real::eint()
  */
 real &real::li2()
 {
-    return self_mpfr_unary(::mpfr_li2);
+    return self_mpfr_unary(detail::real_li2_wrapper);
 }
 
 /// In-place Riemann Zeta function.
