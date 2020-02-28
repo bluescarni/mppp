@@ -1165,20 +1165,7 @@ public:
     explicit integer(const T &x) : m_int(x)
     {
     }
-    /// Generic constructor from a C++ complex type.
-    /**
-     * \rststar
-     * .. versionadded:: 0.19
-     *
-     * This constructor will initialize an integer with the value of ``c``. The initialization is
-     * successful only if the imaginary part of ``c`` is zero and the real part of ``c`` is finite.
-     * \endrststar
-     *
-     * @param c value that will be used to initialize \p this.
-     *
-     * @throws std::domain_error if the imaginary part of \p c is not zero or if
-     * the real part of \p c is not finite.
-     */
+    // Generic constructor from a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppComplex T>
 #else
@@ -1215,61 +1202,12 @@ public:
     explicit integer(const T &s, int base = 10) : integer(ptag{}, s, base)
     {
     }
-    /// Constructor from range of characters.
-    /**
-     * This constructor will initialise \p this from the content of the input half-open range,
-     * which is interpreted as the string representation of an integer in base \p base.
-     *
-     * Internally, the constructor will copy the content of the range to a local buffer, add a
-     * string terminator, and invoke the constructor from string.
-     *
-     * @param begin the begin of the input range.
-     * @param end the end of the input range.
-     * @param base the base used in the string representation.
-     *
-     * @throws unspecified any exception thrown by the constructor from string, or by memory
-     * allocation errors in standard containers.
-     */
+    // Constructor from range of characters.
     explicit integer(const char *begin, const char *end, int base = 10) : m_int(begin, end, base) {}
-    /// Copy constructor from \p mpz_t.
-    /**
-     * This constructor will initialize \p this with the value of the GMP integer \p n. The storage type of \p this
-     * will be static if \p n fits in the static storage, otherwise it will be dynamic.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``n`` results in undefined behaviour.
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     */
+    // Copy constructor from \p mpz_t.
     explicit integer(const ::mpz_t n) : m_int(n) {}
 #if !defined(_MSC_VER)
-    /// Move constructor from \p mpz_t.
-    /**
-     * This constructor will initialize \p this with the value of the GMP integer \p n, transferring the state
-     * of \p n into \p this. The storage type of \p this
-     * will be static if \p n fits in the static storage, otherwise it will be dynamic.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this constructor
-     *    with an uninitialized ``n`` results in undefined behaviour.
-     *
-     *    Additionally, the user must ensure that, after construction, ``mpz_clear()`` is never
-     *    called on ``n``: the resources previously owned by ``n`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     *
-     * .. note::
-     *
-     *    Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     */
+    // Move constructor from \p mpz_t.
     explicit integer(::mpz_t &&n) : m_int(std::move(n)) {}
 #endif
     /// Copy assignment operator.

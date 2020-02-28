@@ -5,8 +5,8 @@ Multiprecision integers
 
 *#include <mp++/integer.hpp>*
 
-The ``integer`` class
----------------------
+The integer class
+-----------------
 
 .. cpp:class:: template <std::size_t SSize> mppp::integer
 
@@ -243,9 +243,9 @@ The ``integer`` class
       :exception std\:\:overflow_error: if the value of *nbits* is larger than an
         implementation-defined limit.
 
-   .. cpp:function:: template \<CppInteroperable T\> explicit integer(const T &x)
+   .. cpp:function:: template <CppInteroperable T> explicit integer(const T &x)
 
-      Generic constructor.
+      Generic constructor from a C++ fundamental type.
 
       This constructor will initialize an integer with the value of *x*.
       The initialization is always successful if *x* is an integral value
@@ -258,7 +258,21 @@ The ``integer`` class
 
       :exception std\:\:domain_error: if *x* is a non-finite floating-point value.
 
-   .. cpp:function:: template \<StringType T\> explicit integer(const T &s, int base = 10)
+   .. cpp:function:: template <CppComplex T> explicit integer(const T &c)
+
+      .. versionadded:: 0.19
+
+      Generic constructor from a C++ complex type.
+
+      This constructor will initialize an integer with the value of *c*. The initialization is
+      successful only if the imaginary part of *c* is zero and the real part of *c* is finite.
+
+      :param c: value that will be used to initialize ``this``.
+
+      :exception std\:\:domain_error: if the imaginary part of *c* is not zero or if
+        the real part of *c* is not finite.
+
+   .. cpp:function:: template <StringType T> explicit integer(const T &s, int base = 10)
 
       Constructor from string.
 
@@ -279,9 +293,76 @@ The ``integer`` class
       :exception unspecified: any exception thrown by memory allocation errors in
         standard containers.
 
+   .. cpp:function:: explicit integer(const char *begin, const char *end, int base = 10)
+
+      Constructor from range of characters.
+
+      This constructor will initialise ``this`` from the content of the input half-open range,
+      which is interpreted as the string representation of an integer in base *base*.
+
+      Internally, the constructor will copy the content of the range to a local buffer, add a
+      string terminator, and invoke the constructor from string.
+
+      :param begin: the begin of the input range.
+      :param end: the end of the input range.
+      :param base: the base used in the string representation.
+
+      :exception unspecified: any exception thrown by the constructor from string, or by memory
+        allocation errors in standard containers.
+
+   .. cpp:function:: explicit integer(const mpz_t n)
+
+      Copy constructor from :cpp:type:`mpz_t`.
+
+      This constructor will initialize ``this`` with the value of the GMP integer *n*.
+      The storage type of ``this`` will be static if *n* fits in the static storage,
+      otherwise it will be dynamic.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *n* has been correctly
+         initialized. Calling this constructor with an uninitialized *n*
+         results in undefined behaviour.
+
+      :param n: the input GMP integer.
+
+   .. cpp:function:: explicit integer(mpz_t &&n)
+
+      Move constructor from :cpp:type:`mpz_t`.
+
+      This constructor will initialize ``this`` with the value of the
+      GMP integer *n*, transferring the state of *n* into ``this``.
+      The storage type of ``this`` will be static if *n* fits in the
+      static storage, otherwise it will be dynamic.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *n* has been
+         correctly initialized. Calling this constructor
+         with an uninitialized *n* results in undefined behaviour.
+
+         Additionally, the user must ensure that, after construction,
+         ``mpz_clear()`` is never called on *n*: the resources previously
+         owned by *n* are now owned by ``this``, which
+         will take care of releasing them when the destructor is called.
+
+      .. note::
+
+         Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
+
+      :param n: the input GMP integer.
 
 Types
 -----
+
+.. cpp:type:: mpz_t
+
+   This is the type used by the GMP library to represent multiprecision integers.
+   It is defined as an array of size 1 of an unspecified structure.
+
+   .. seealso::
+
+      https://gmplib.org/manual/Nomenclature-and-Types.html#Nomenclature-and-Types
 
 .. cpp:type:: mp_limb_t
 
