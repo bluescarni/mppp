@@ -30,8 +30,7 @@ Changes
 ~~~~~~~
 
 - The :cpp:class:`~mppp::real` dilogarithm functions now
-  return NaN if the argument is not less than 1
-  (`#217 <https://github.com/bluescarni/mppp/pull/217>`__).
+  return NaN if the argument is not less than 1.
 - Move more :cpp:class:`~mppp::real` functions from the
   header into the compiled library
   (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
