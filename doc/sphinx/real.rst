@@ -91,7 +91,7 @@ Concepts
    A corresponding boolean type trait called ``are_real_op_types`` is also available (even if the compiler does
    not support concepts).
 
-.. cpp:concept:: template <typename T, typename U> mppp::RealCompoundOpTypes
+.. cpp:concept:: template <typename T, typename U> mppp::RealInPlaceOpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
    generic in-place :ref:`operators <real_operators>`
@@ -133,8 +133,157 @@ Conversion
 Arithmetic
 ~~~~~~~~~~
 
-.. doxygengroup:: real_arithmetic
-   :content-only:
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::add(mppp::real &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::sub(mppp::real &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::mul(mppp::real &rop, T &&a, U &&b)
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::div(mppp::real &rop, T &&a, U &&b)
+
+   Ternary basic :cpp:class:`~mppp::real` arithmetics.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`a+b`,
+   * :math:`a-b`,
+   * :math:`a \times b`,
+   * :math:`a/b`.
+
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param a: the first operand.
+   :param b: the second operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real &mppp::fma(mppp::real &rop, T &&a, U &&b, V &&c)
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real &mppp::fms(mppp::real &rop, T &&a, U &&b, V &&c)
+
+   Quaternary :cpp:class:`~mppp::real` multiply-add/sub.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`a \times b + c`,
+   * :math:`a \times b - c`.
+
+   The precision of the result will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param a: the first operand.
+   :param b: the second operand.
+   :param c: the third operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real mppp::fma(T &&a, U &&b, V &&c)
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U, mppp::CvrReal V> mppp::real mppp::fms(T &&a, U &&b, V &&c)
+
+   Ternary :cpp:class:`~mppp::real` multiply-add/sub.
+
+   These functions will return, respectively:
+
+   * :math:`a \times b + c`,
+   * :math:`a \times b - c`.
+
+   The precision of the result will be the largest precision among the operands.
+
+   :param a: the first operand.
+   :param b: the second operand.
+   :param c: the third operand.
+
+   :return: :math:`a \times b \pm c`.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::neg(mppp::real &rop, T &&x)
+
+   Binary :cpp:class:`~mppp::real` negation.
+
+   This function will set *rop* to :math:`-x`. The precision of the result will be
+   equal to the precision of *x*.
+
+   :param rop: the return value.
+   :param x: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::neg(T &&x)
+
+   Unary :cpp:class:`~mppp::real` negation.
+
+   This function will return :math:`-x`. The precision of the result will be
+   equal to the precision of *x*.
+
+   :param x: the operand.
+
+   :return: :math:`-x`.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::abs(mppp::real &rop, T &&x)
+
+   Binary :cpp:class:`~mppp::real` absolute value.
+
+   This function will set *rop* to :math:`\left| x \right|`. The precision of the result will be
+   equal to the precision of *x*.
+
+   :param rop: the return value.
+   :param x: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::abs(T &&x)
+
+   Unary :cpp:class:`~mppp::real` absolute value.
+
+   This function will return :math:`\left| x \right|`. The precision of the result will be
+   equal to the precision of *x*.
+
+   :param x: the operand.
+
+   :return: :math:`\left| x \right|`.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::mul_2ui(mppp::real &rop, T &&x, unsigned long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::mul_2si(mppp::real &rop, T &&x, long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::div_2ui(mppp::real &rop, T &&x, unsigned long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::div_2si(mppp::real &rop, T &&x, long n)
+
+   .. versionadded:: 0.19
+
+   Ternary :cpp:class:`~mppp::real` primitives for exact
+   multiplication/division by powers of 2.
+
+   These functions will set *rop* to, respectively:
+
+   * :math:`x \times 2^n` (``mul_2`` variants),
+   * :math:`\frac{x}{2^n}` (``div_2`` variants).
+
+   The precision of the result will be equal to the precision of *x*.
+   The computation will be exact (that is, no rounding takes place).
+
+   :param rop: the return value.
+   :param x: the operand.
+   :param n: the power of 2.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::mul_2ui(T &&x, unsigned long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::mul_2si(T &&x, long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::div_2ui(T &&x, unsigned long n)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::div_2si(T &&x, long n)
+
+   .. versionadded:: 0.19
+
+   Binary :cpp:class:`~mppp::real` primitives for exact
+   multiplication/division by powers of 2.
+
+   These functions will return, respectively:
+
+   * :math:`x \times 2^n` (``mul_2`` variants),
+   * :math:`\frac{x}{2^n}` (``div_2`` variants).
+
+   The precision of the result will be equal to the precision of *x*.
+   The computation will be exact (that is, no rounding takes place).
+
+   :param x: the operand.
+   :param n: the power of 2.
+
+   :return: *x* multiplied/divided by :math:`2^n`.
 
 .. _real_comparison:
 
@@ -176,6 +325,51 @@ Roots
    :param r: the operand.
 
    :return: the square root of *r*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sqrt1pm1(mppp::real &rop, T &&op)
+
+   .. versionadded:: 0.19
+
+   .. note::
+      This function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
+
+   Binary :cpp:class:`~mppp::real` sqrt1pm1.
+
+   This function will compute :math:`\sqrt{1+x}-1`, where :math:`x` is the value of *op*,
+   and store the result into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sqrt1pm1(T &&r)
+
+   .. versionadded:: 0.19
+
+   .. note::
+      This function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
+
+   Unary :cpp:class:`~mppp::real` sqrt1pm1.
+
+   This function will compute and return :math:`\sqrt{1+x}-1`, where :math:`x`
+   is the value of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the operand.
+
+   :return: the sqrt1pm1 of *r*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::rec_sqrt(mppp::real &rop, T &&op)
 
@@ -243,6 +437,9 @@ Roots
 
    .. versionadded:: 0.12
 
+   .. note::
+      This function is available from MPFR 4 onwards.
+
    Binary :cpp:class:`~mppp::real` k-th root.
 
    This function will compute the k-th root of *op* and store it
@@ -254,9 +451,6 @@ Roots
    If *op* is zero, the result will be zero with the sign obtained by the usual limit rules, i.e.,
    the same sign as *op* if *k* is odd, and positive if *k* is even.
 
-   .. note::
-      This function is available from MPFR 4 onwards.
-
    :param rop: the return value.
    :param op: the operand.
    :param k: the degree of the root.
@@ -266,6 +460,9 @@ Roots
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::rootn_ui(T &&r, unsigned long k)
 
    .. versionadded:: 0.12
+
+   .. note::
+      This function is available from MPFR 4 onwards.
 
    Unary :cpp:class:`~mppp::real` k-th root.
 
@@ -278,9 +475,6 @@ Roots
    If *r* is zero, the result will be zero with the sign obtained by the usual limit rules, i.e.,
    the same sign as *r* if *k* is odd, and positive if *k* is even.
 
-   .. note::
-      This function is available from MPFR 4 onwards.
-
    :param r: the operand.
    :param k: the degree of the root.
 
@@ -291,48 +485,180 @@ Roots
 Exponentiation
 ~~~~~~~~~~~~~~
 
-.. doxygengroup:: real_exponentiation
-   :content-only:
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::pow(mppp::real &rop, T &&op1, U &&op2)
+
+   Ternary exponentiation.
+
+   This function will set *rop* to *op1* raised to the power of *op2*.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param op1: the base.
+   :param op2: the exponent.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <typename T, typename U> mppp::real pow(T &&op1, U &&op2)
+
+   .. note::
+
+      This function participates in overload resolution only if ``T`` and ``U`` satisfy
+      the :cpp:concept:`~mppp::RealOpTypes` concept.
+
+   Binary exponentiation.
+
+   This function will compute and return *op1* raised to the power of *op2*.
+   The precision of the result will be set to the largest precision among the operands.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment operator of
+   :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is either the default
+   precision, if set, or it is automatically deduced depending on the type and value of the
+   operand to be converted.
+
+   :param op1: the base.
+   :param op2: the exponent.
+
+   :return: *op1* raised to the power of *op2*.
+
+   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sqr(mppp::real &rop, T &&op)
+
+   .. versionadded:: 0.19
+
+   Binary :cpp:class:`~mppp::real` squaring.
+
+   This function will compute the square of *op* and store it
+   into *rop*. The precision of the result will be equal to the precision
+   of *op*.
+
+   :param rop: the return value.
+   :param op: the operand.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sqr(T &&r)
+
+   .. versionadded:: 0.19
+
+   Unary :cpp:class:`~mppp::real` squaring.
+
+   This function will compute and return the square of *r*.
+   The precision of the result will be equal to the precision of *r*.
+
+   :param r: the operand.
+
+   :return: the square of *r*.
 
 .. _real_trig:
 
 Trigonometry
 ~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sin(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cos(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tan(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sec(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::csc(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cot(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sin(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cos(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tan(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sec(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::csc(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cot(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sin_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cos_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::tan_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::cot_pi(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sinc(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::sinc_pi(mppp::real &rop, T &&x)
+
+   .. note::
+      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
+      ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
+      if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
 
    Binary basic trigonometric functions.
 
-   These functions will set *rop* to, respectively, the sine, cosine, tangent, secant,
-   cosecant and cotangent of *op*.
-   The precision of the result will be equal to the precision of *op*.
+   These functions will set *rop* to, respectively:
+
+   * :math:`\sin\left( x \right)`,
+   * :math:`\cos\left( x \right)`,
+   * :math:`\tan\left( x \right)`,
+   * :math:`\sec\left( x \right)`,
+   * :math:`\csc\left( x \right)`,
+   * :math:`\cot\left( x \right)`,
+   * :math:`\sin\left( \pi x \right)`,
+   * :math:`\cos\left( \pi x \right)`,
+   * :math:`\tan\left( \pi x \right)`,
+   * :math:`\cot\left( \pi x \right)`,
+   * :math:`\frac{\sin\left( x \right)}{x}`,
+   * :math:`\frac{\sin\left( \pi x \right)}{\pi x}`.
+
+   The precision of the result will be equal to the precision of *x*.
 
    :param rop: the return value.
-   :param op: the argument.
+   :param x: the argument.
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sin(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cos(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tan(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sec(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::csc(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cot(T &&r)
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
+   .. versionadded:: 0.19
+
+      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
+      ``cot_pi()``, ``sinc()`` and ``sinc_pi()``.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sin(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cos(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tan(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sec(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::csc(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cot(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sin_pi(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cos_pi(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::tan_pi(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::cot_pi(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sinc(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::sinc_pi(T &&x)
+
+   .. note::
+      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
+      ``cot_pi()``, ``sinc()`` and ``sinc_pi()`` are available only
+      if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
 
    Unary basic trigonometric functions.
 
-   These functions will return, respectively, the sine, cosine, tangent,
-   secant, cosecant and cotangent of *r*.
-   The precision of the result will be equal to the precision of *r*.
+   These functions will return, respectively:
 
-   :param r: the argument.
+   * :math:`\sin\left( x \right)`,
+   * :math:`\cos\left( x \right)`,
+   * :math:`\tan\left( x \right)`,
+   * :math:`\sec\left( x \right)`,
+   * :math:`\csc\left( x \right)`,
+   * :math:`\cot\left( x \right)`,
+   * :math:`\sin\left( \pi x \right)`,
+   * :math:`\cos\left( \pi x \right)`,
+   * :math:`\tan\left( \pi x \right)`,
+   * :math:`\cot\left( \pi x \right)`,
+   * :math:`\frac{\sin\left( x \right)}{x}`,
+   * :math:`\frac{\sin\left( \pi x \right)}{\pi x}`.
 
-   :return: the sine, cosine, tangent, secant, cosecant or cotangent of *r*.
+   The precision of the result will be equal to the precision of *x*.
+
+   :param x: the argument.
+
+   :return: the trigonometric function of *x*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
+   .. versionadded:: 0.19
+
+      The functions ``sin_pi()``, ``cos_pi()``, ``tan_pi()``,
+      ``cot_pi()``, ``sinc()`` and ``sinc_pi()``.
 
 .. cpp:function:: template <mppp::CvrReal T> void mppp::sin_cos(mppp::real &sop, mppp::real &cop, T &&op)
 
@@ -498,87 +824,172 @@ Hyperbolic functions
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp2(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp10(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::expm1(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp2(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::exp10(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::expm1(mppp::real &rop, T &&x)
 
    Binary exponentials.
 
    These functions will set *rop* to, respectively,
 
-   * ``e**op``,
-   * ``2**op``,
-   * ``10**op``,
-   * ``e**op-1``.
+   * :math:`e^x`,
+   * :math:`2^x`,
+   * :math:`10^x`,
+   * :math:`e^x - 1`.
 
-   The precision of the result will be equal to the precision of *op*.
+   The precision of the result will be equal to the precision of *x*.
 
    :param rop: the return value.
-   :param op: the exponent.
+   :param x: the exponent.
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp2(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp10(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::expm1(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp2(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::exp10(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::expm1(T &&x)
 
    Unary exponentials.
 
    These functions will return, respectively,
 
-   * ``e**r``,
-   * ``2**r``,
-   * ``10**r``,
-   * ``e**r-1``.
+   * :math:`e^x`,
+   * :math:`2^x`,
+   * :math:`10^x`,
+   * :math:`e^x - 1`.
 
-   The precision of the result will be equal to the precision of *r*.
+   The precision of the result will be equal to the precision of *x*.
 
-   :param r: the exponent.
+   :param x: the exponent.
 
-   :return: the exponential of *r*.
+   :return: the exponential of *x*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log2(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log10(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log1p(mppp::real &rop, T &&op)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log2(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log10(mppp::real &rop, T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::log1p(mppp::real &rop, T &&x)
 
    Binary logarithms.
 
    These functions will set *rop* to, respectively,
 
-   * ``log(op)``,
-   * ``log2(op)``,
-   * ``log10(op)``,
-   * ``log(1+op)``.
+   * :math:`\log x`,
+   * :math:`\log_2 x`,
+   * :math:`\log_{10} x`,
+   * :math:`\log\left( 1+x \right)`.
 
-   The precision of the result will be equal to the precision of *op*.
+   The precision of the result will be equal to the precision of *x*.
 
    :param rop: the return value.
-   :param op: the operand.
+   :param x: the operand.
 
    :return: a reference to *rop*.
 
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log2(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log10(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log1p(T &&r)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log2(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log10(T &&x)
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::log1p(T &&x)
 
    Unary logarithms.
 
    These functions will return, respectively,
 
-   * ``log(r)``,
-   * ``log2(r)``,
-   * ``log10(r)``,
-   * ``log(1+op)``.
+   * :math:`\log x`,
+   * :math:`\log_2 x`,
+   * :math:`\log_{10} x`,
+   * :math:`\log\left( 1+x \right)`.
 
-   The precision of the result will be equal to the precision of *r*.
+   The precision of the result will be equal to the precision of *x*.
 
-   :param r: the operand.
+   :param x: the operand.
 
-   :return: the logarithm of *r*.
+   :return: the logarithm of *x*.
+
+.. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::log_hypot(mppp::real &rop, T &&x, U &&y)
+
+   .. versionadded:: 0.19
+
+   .. note::
+      This function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
+
+   Ternary log hypot function.
+
+   This function will set *rop* to :math:`\log\left(\sqrt{x^2+y^2}\right)`.
+   The precision of *rop* will be set to the largest precision among the operands.
+
+   :param rop: the return value.
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: a reference to *rop*.
+
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
+.. cpp:function:: template <typename T, typename U> mppp::real mppp::log_hypot(T &&x, U &&y)
+
+   .. versionadded:: 0.19
+
+   .. note::
+      This function is available only if mp++ was
+      configured with the ``MPPP_WITH_ARB`` option enabled
+      (see the :ref:`installation instructions <installation>`).
+
+   .. note::
+
+      This function participates in overload resolution only if ``T`` and ``U`` satisfy
+      the :cpp:concept:`~mppp::RealOpTypes` concept.
+
+   Binary log hypot function.
+
+   This function will compute and return :math:`\log\left(\sqrt{x^2+y^2}\right)`.
+
+   Non-:cpp:class:`~mppp::real` operands will be converted to :cpp:class:`~mppp::real`
+   before performing the operation. The conversion of non-:cpp:class:`~mppp::real` operands
+   to :cpp:class:`~mppp::real` follows the same heuristics described in the generic assignment
+   operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
+   either the default precision, if set, or it is automatically deduced depending on the type
+   and value of the operand to be converted.
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: the log hypot function of *x* and *y*.
+
+   :exception unspecified: any exception thrown by the generic assignment operator of :cpp:class:`~mppp::real`.
+   :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
+     fails because of (unlikely) overflow conditions.
+
+Polylogarithms
+~~~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::li2(mppp::real &rop, T &&x)
+
+   Binary dilogarithm.
+
+   This function will set *rop* to :math:`\operatorname{Li}_2\left( x \right)`.
+   The precision of the result will be equal to the precision of *x*.
+   If :math:`x \geq 1`, *rop* will be set to NaN.
+
+   :param rop: the return value.
+   :param x: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::li2(T &&x)
+
+   Unary dilogarithm.
+
+   This function will return :math:`\operatorname{Li}_2\left( x \right)`.
+   The precision of the result will be equal to the precision of *x*.
+   If :math:`x \geq 1`, NaN will be returned.
+
+   :param x: the argument.
+
+   :return: the dilogarithm of *x*.
 
 .. _real_gamma:
 
@@ -632,13 +1043,13 @@ Gamma functions
 
    .. versionadded:: 0.17
 
+   .. note::
+      This function is available from MPFR 4 onwards.
+
    Ternary incomplete Gamma function.
 
    This function will set *rop* to the upper incomplete Gamma function of *x* and *y*.
    The precision of *rop* will be set to the largest precision among the operands.
-
-   .. note::
-      This function is available from MPFR 4 onwards.
 
    :param rop: the return value.
    :param x: the first argument.
@@ -650,6 +1061,9 @@ Gamma functions
 
    .. versionadded:: 0.17
 
+   .. note::
+      This function is available from MPFR 4 onwards.
+
    Binary incomplete Gamma function.
 
    This function will compute and return the upper incomplete Gamma function of *x* and *y*.
@@ -660,9 +1074,6 @@ Gamma functions
    operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
    either the default precision, if set, or it is automatically deduced depending on the type
    and value of the operand to be converted.
-
-   .. note::
-      This function is available from MPFR 4 onwards.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -765,7 +1176,6 @@ Other special functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::eint(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::li2(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::zeta(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::ai(mppp::real &rop, T &&op)
 
@@ -774,7 +1184,6 @@ Other special functions
    These functions will set *rop* to, respectively,
 
    * the exponential integral,
-   * the dilogarithm,
    * the Riemann Zeta function,
    * the Airy function,
 
@@ -786,7 +1195,6 @@ Other special functions
    :return: a reference to *rop*.
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::eint(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::li2(T &&r)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::zeta(T &&r)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::ai(T &&r)
 
@@ -795,7 +1203,6 @@ Other special functions
    These functions will return, respectively,
 
    * the exponential integral,
-   * the dilogarithm,
    * the Riemann Zeta function,
    * the Airy function,
 
@@ -803,18 +1210,19 @@ Other special functions
 
    :param r: the argument.
 
-   :return: the exponential integral, dilogarithm, Riemann Zeta function or Airy function
-      of *r*.
+   :return: the exponential integral, Riemann Zeta function or Airy function of *r*.
 
 .. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::beta(mppp::real &rop, T &&x, U &&y)
+
+   .. versionadded:: 0.17
+
+   .. note::
+      This function is available from MPFR 4 onwards.
 
    Ternary beta function.
 
    This function will set *rop* to the beta function of *x* and *y*.
    The precision of *rop* will be set to the largest precision among the operands.
-
-   .. note::
-      This function is available from MPFR 4 onwards.
 
    :param rop: the return value.
    :param x: the first argument.
@@ -823,6 +1231,11 @@ Other special functions
    :return: a reference to *rop*.
 
 .. cpp:function:: template <typename T, mppp::RealOpTypes<T> U> mppp::real mppp::beta(T &&x, U &&y)
+
+   .. versionadded:: 0.17
+
+   .. note::
+      This function is available from MPFR 4 onwards.
 
    Binary beta function.
 
@@ -834,9 +1247,6 @@ Other special functions
    operator of :cpp:class:`~mppp::real`. Specifically, the precision of the conversion is
    either the default precision, if set, or it is automatically deduced depending on the type
    and value of the operand to be converted.
-
-   .. note::
-      This function is available from MPFR 4 onwards.
 
    :param x: the first argument.
    :param y: the second argument.
@@ -942,3 +1352,29 @@ Constants
 
 .. doxygengroup:: real_constants
    :content-only:
+
+.. _real_literals:
+
+User-defined literals
+---------------------
+
+.. versionadded:: 0.19
+
+.. cpp:function:: template <char... Chars> mppp::real mppp::literals::operator"" _r128()
+.. cpp:function:: template <char... Chars> mppp::real mppp::literals::operator"" _r256()
+.. cpp:function:: template <char... Chars> mppp::real mppp::literals::operator"" _r512()
+.. cpp:function:: template <char... Chars> mppp::real mppp::literals::operator"" _r1024()
+
+   User-defined real literals.
+
+   These numeric literal operator templates can be used to construct
+   :cpp:class:`mppp::real` instances with, respectively, 128, 256, 512
+   and 1024 bits of precision. Floating-point literals in decimal and
+   hexadecimal format are supported.
+
+   .. seealso::
+
+      https://en.cppreference.com/w/cpp/language/floating_literal
+
+   :exception std\:\:invalid_argument: if the input sequence of characters is not
+     a valid floating-point literal (as defined by the C++ standard).

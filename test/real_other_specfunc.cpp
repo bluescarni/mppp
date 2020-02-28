@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -27,21 +27,6 @@ TEST_CASE("real eint")
     REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
     REQUIRE(abs(eint(r0) - 1.89511781) < 1E-5);
     REQUIRE(abs(eint(std::move(r0)) - 1.89511781) < 1E-5);
-    REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
-}
-
-TEST_CASE("real li2")
-{
-    real r0{-1};
-    r0.li2();
-    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
-    REQUIRE(abs(r0 + 0.8224670334241132) < 1E-5);
-    real rop;
-    r0 = real{-1};
-    REQUIRE(abs(li2(rop, r0) + 0.8224670334241132) < 1E-5);
-    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
-    REQUIRE(abs(li2(r0) + 0.8224670334241132) < 1E-5);
-    REQUIRE(abs(li2(std::move(r0)) + 0.8224670334241132) < 1E-5);
     REQUIRE(!r0.get_mpfr_t()->_mpfr_d);
 }
 

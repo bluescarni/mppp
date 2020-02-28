@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -14,6 +14,7 @@
 
 #endif
 
+#include <complex>
 #include <cstddef>
 #include <limits>
 #include <stdexcept>
@@ -26,6 +27,7 @@
 
 #include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
@@ -88,6 +90,22 @@ struct div_tester {
         REQUIRE((std::is_same<decltype(n1 / 4.l), long double>::value));
         REQUIRE((std::is_same<decltype(4.l / n2), long double>::value));
 #endif
+        REQUIRE(std::is_same<std::complex<float>, decltype(n1 / std::complex<float>{4, 0})>::value);
+        REQUIRE(std::is_same<std::complex<float>, decltype(std::complex<float>{4, 0} / n1)>::value);
+        REQUIRE(n1 / std::complex<float>{4, 0} == std::complex<float>{1, 0});
+        REQUIRE(std::complex<float>{4, 0} / n1 == std::complex<float>{1, 0});
+
+        REQUIRE(std::is_same<std::complex<double>, decltype(n1 / std::complex<double>{4, 0})>::value);
+        REQUIRE(std::is_same<std::complex<double>, decltype(std::complex<double>{4, 0} / n1)>::value);
+        REQUIRE(n1 / std::complex<double>{4, 0} == std::complex<double>{1, 0});
+        REQUIRE(std::complex<double>{4, 0} / n1 == std::complex<double>{1, 0});
+
+#if defined(MPPP_WITH_MPFR)
+        REQUIRE(std::is_same<std::complex<long double>, decltype(n1 / std::complex<long double>{4, 0})>::value);
+        REQUIRE(std::is_same<std::complex<long double>, decltype(std::complex<long double>{4, 0} / n1)>::value);
+        REQUIRE(n1 / std::complex<long double>{4, 0} == std::complex<long double>{1, 0});
+        REQUIRE(std::complex<long double>{4, 0} / n1 == std::complex<long double>{1, 0});
+#endif
 #if defined(MPPP_HAVE_GCC_INT128)
         REQUIRE((n1 / __uint128_t{4} == 1));
         REQUIRE((__uint128_t{4} / n2 == -2));
@@ -119,6 +137,37 @@ struct div_tester {
         retval /= -1.5l;
         REQUIRE((lex_cast(retval) == lex_cast(integer{10. / -3.5 / -1.5l})));
 #endif
+        retval = 24;
+        retval /= std::complex<float>{2, 0};
+        REQUIRE(std::is_same<integer &, decltype(retval /= std::complex<float>{2, 0})>::value);
+        REQUIRE(retval == 12);
+        REQUIRE_THROWS_PREDICATE((retval /= std::complex<float>{0, 1}), std::domain_error,
+                                 [](const std::domain_error &ex) {
+                                     return std::string(ex.what())
+                                            == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                                   + detail::to_string(-12.f) + " to an integer";
+                                 });
+
+        retval /= std::complex<double>{2, 0};
+        REQUIRE(std::is_same<integer &, decltype(retval /= std::complex<double>{2, 0})>::value);
+        REQUIRE(retval == 6);
+        REQUIRE_THROWS_PREDICATE((retval /= std::complex<double>{0, 1}), std::domain_error,
+                                 [](const std::domain_error &ex) {
+                                     return std::string(ex.what())
+                                            == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                                   + detail::to_string(-6.) + " to an integer";
+                                 });
+#if defined(MPPP_WITH_MPFR)
+        retval /= std::complex<long double>{2, 0};
+        REQUIRE(std::is_same<integer &, decltype(retval /= std::complex<long double>{2, 0})>::value);
+        REQUIRE(retval == 3);
+        REQUIRE_THROWS_PREDICATE((retval /= std::complex<long double>{0, 1}), std::domain_error,
+                                 [](const std::domain_error &ex) {
+                                     return std::string(ex.what())
+                                            == "Cannot assign a complex C++ value with a non-zero imaginary part of "
+                                                   + detail::to_string(-3.l) + " to an integer";
+                                 });
+#endif
 #if defined(MPPP_HAVE_GCC_INT128)
         retval = 1;
         retval /= __uint128_t{1};
@@ -147,6 +196,27 @@ struct div_tester {
             dl /= integer{2};
             REQUIRE(dl == std::numeric_limits<double>::infinity());
         }
+#if defined(MPPP_WITH_MPFR)
+        long double ld = 4;
+        ld /= integer{2};
+        REQUIRE(std::is_same<long double &, decltype(ld /= integer{2})>::value);
+        REQUIRE(ld == 2);
+#endif
+        std::complex<float> cf{4, 2};
+        cf /= integer{2};
+        REQUIRE(std::is_same<std::complex<float> &, decltype(cf /= integer{2})>::value);
+        REQUIRE(cf == std::complex<float>{2, 1});
+
+        std::complex<double> cd{4, 2};
+        cd /= integer{2};
+        REQUIRE(std::is_same<std::complex<double> &, decltype(cd /= integer{2})>::value);
+        REQUIRE(cd == std::complex<double>{2, 1});
+#if defined(MPPP_WITH_MPFR)
+        std::complex<long double> cld{4, 2};
+        cld /= integer{2};
+        REQUIRE(std::is_same<std::complex<long double> &, decltype(cld /= integer{2})>::value);
+        REQUIRE(cld == std::complex<long double>{2, 1});
+#endif
 #if defined(MPPP_HAVE_GCC_INT128)
         __int128_t n128{-7};
         n128 /= integer{5};

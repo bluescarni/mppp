@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -33,12 +33,12 @@ namespace detail
 void float128_stream(std::ostream &os, const __float128 &x)
 {
     char buf[100];
-    // NOTE: 36 decimal digits ensures that reading back the string always produces the same value.
+    // NOTE: 36 decimal digits ensure that reading back the string always produces the same value:
     // https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
-    // We use 35 because the precision field in printf()-like functions refers to the number
-    // of digits to the right of the decimal point, and we have one digit to the left of
-    // the decimal point due to the scientific notation.
-    const auto n = ::quadmath_snprintf(buf, sizeof(buf), "%.35Qe", x);
+    // NOTE: when using the g/G format, the precision field represents the number
+    // of significant digits:
+    // https://linux.die.net/man/3/printf
+    const auto n = ::quadmath_snprintf(buf, sizeof(buf), "%.36Qg", x);
     // LCOV_EXCL_START
     if (mppp_unlikely(n < 0)) {
         throw std::runtime_error("A call to quadmath_snprintf() failed: a negative exit status of " + to_string(n)
@@ -420,6 +420,32 @@ real128 hypot(const real128 &x, const real128 &y)
 real128 nextafter(const real128 &from, const real128 &to)
 {
     return real128{::nextafterq(from.m_value, to.m_value)};
+}
+
+/// Output stream operator.
+/**
+ * \rststar
+ * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real128` ``x``. The current implementation
+ * ignores any formatting flag specified in ``os``, and the print format will be the one
+ * described in :cpp:func:`mppp::real128::to_string()`.
+ *
+ * .. warning::
+ *    In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
+ *    flags. For the time being, users are encouraged to use the ``quadmath_snprintf()`` function from the quadmath
+ *    library if precise and forward-compatible control on the printing format is needed.
+ * \endrststar
+ *
+ * @param os the target stream.
+ * @param x the input \link mppp::real128 real128\endlink.
+ *
+ * @return a reference to \p os.
+ *
+ * @throws unspecified any exception thrown by real128::to_string().
+ */
+std::ostream &operator<<(std::ostream &os, const real128 &x)
+{
+    detail::float128_stream(os, x.m_value);
+    return os;
 }
 
 } // namespace mppp

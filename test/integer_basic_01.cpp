@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <iostream>
 #include <limits>
@@ -24,6 +25,7 @@
 
 #include <mp++/config.hpp>
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 
 #include "catch.hpp"
@@ -48,6 +50,13 @@ using fp_types = std::tuple<float, double
                             long double
 #endif
                             >;
+
+using complex_types = std::tuple<std::complex<float>, std::complex<double>
+#if defined(MPPP_WITH_MPFR)
+                                 ,
+                                 std::complex<long double>
+#endif
+                                 >;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
@@ -256,4 +265,80 @@ struct fp_ctor_tester {
 TEST_CASE("floating-point constructors")
 {
     tuple_for_each(sizes{}, fp_ctor_tester{});
+}
+
+struct complex_ctor_tester {
+    template <typename S>
+    struct runner {
+        template <typename C>
+        void operator()(const C &) const
+        {
+            using integer = integer<S::value>;
+            using Float = typename C::value_type;
+
+            REQUIRE((std::is_constructible<integer, C>::value));
+            REQUIRE(integer{C(0, 0)} == integer{0});
+            REQUIRE(integer{C(123, 0)} == integer{123});
+            REQUIRE(integer{C(-456, 0)} == integer{-456});
+            if (std::numeric_limits<Float>::is_iec559) {
+                REQUIRE_THROWS_PREDICATE(
+                    integer{(C{std::numeric_limits<Float>::infinity(), 0})}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct an integer from the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<Float>::infinity());
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    integer{(C{-std::numeric_limits<Float>::infinity(), 0})}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct an integer from the non-finite floating-point value "
+                                      + std::to_string(-std::numeric_limits<Float>::infinity());
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    integer{(C{std::numeric_limits<Float>::quiet_NaN(), 0})}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct an integer from the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<Float>::quiet_NaN());
+                    });
+                REQUIRE_THROWS_PREDICATE(integer{(C{0, std::numeric_limits<Float>::quiet_NaN()})}, std::domain_error,
+                                         [](const std::domain_error &ex) {
+                                             return ex.what()
+                                                    == "Cannot construct an integer from a complex C++ "
+                                                       "value with a non-zero imaginary part of "
+                                                           + detail::to_string(std::numeric_limits<Float>::quiet_NaN());
+                                         });
+                REQUIRE_THROWS_PREDICATE(integer{(C{0, std::numeric_limits<Float>::infinity()})}, std::domain_error,
+                                         [](const std::domain_error &ex) {
+                                             return ex.what()
+                                                    == "Cannot construct an integer from a complex C++ "
+                                                       "value with a non-zero imaginary part of "
+                                                           + detail::to_string(std::numeric_limits<Float>::infinity());
+                                         });
+            }
+
+            REQUIRE_THROWS_PREDICATE(integer{(C{0, 1})}, std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == "Cannot construct an integer from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(Float(1));
+            });
+
+            REQUIRE_THROWS_PREDICATE(integer{(C{-1, 1})}, std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == "Cannot construct an integer from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(Float(1));
+            });
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(complex_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("complex constructors")
+{
+    tuple_for_each(sizes{}, complex_ctor_tester{});
 }

@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -7,6 +7,7 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <limits>
 #include <random>
@@ -180,6 +181,39 @@ struct pow_tester {
         REQUIRE(pow(rational{2, 3}, __uint128_t{2}) == rational{4, 9});
         REQUIRE(pow(__int128_t{2}, rational{3}) == 8);
         REQUIRE(pow(__uint128_t{2}, rational{3}) == 8);
+#endif
+
+        // Complex testing.
+        REQUIRE(std::is_same<std::complex<float>, decltype(mppp::pow(rational{2}, std::complex<float>{2}))>::value);
+        REQUIRE(std::is_same<std::complex<float>, decltype(mppp::pow(std::complex<float>{2}, rational{2}))>::value);
+        REQUIRE(std::is_same<std::complex<double>, decltype(mppp::pow(rational{2}, std::complex<double>{2}))>::value);
+        REQUIRE(std::is_same<std::complex<double>, decltype(mppp::pow(std::complex<double>{2}, rational{2}))>::value);
+#if defined(MPPP_WITH_MPFR)
+        REQUIRE(std::is_same<std::complex<long double>,
+                             decltype(mppp::pow(rational{2}, std::complex<long double>{2}))>::value);
+        REQUIRE(std::is_same<std::complex<long double>,
+                             decltype(mppp::pow(std::complex<long double>{2}, rational{2}))>::value);
+#endif
+
+        // NOTE: fully qualify the pow() call because on MSVC there are
+        // template implementations of std::pow() for complex that, through
+        // ADL, are preferred over mp++'s ones. Not sure if what MSVC
+        // is doing is 100% compliant.
+        REQUIRE(mppp::pow(rational{2}, std::complex<float>{2}) == std::complex<float>{4, 0});
+        REQUIRE(mppp::pow(std::complex<float>{2}, rational{2}) == std::complex<float>{4, 0});
+        REQUIRE(mppp::pow(rational{2}, std::complex<float>{2, 1}) == std::pow(2.f, std::complex<float>{2, 1}));
+        REQUIRE(mppp::pow(std::complex<float>{2, 1}, rational{2}) == std::pow(std::complex<float>{2, 1}, 2.f));
+        REQUIRE(mppp::pow(rational{2}, std::complex<double>{2}) == std::complex<double>{4, 0});
+        REQUIRE(mppp::pow(std::complex<double>{2}, rational{2}) == std::complex<double>{4, 0});
+        REQUIRE(mppp::pow(rational{2}, std::complex<double>{2, 1}) == std::pow(2., std::complex<double>{2, 1}));
+        REQUIRE(mppp::pow(std::complex<double>{2, 1}, rational{2}) == std::pow(std::complex<double>{2, 1}, 2.));
+#if defined(MPPP_WITH_MPFR) && !defined(__FreeBSD__)
+        REQUIRE(mppp::pow(rational{2}, std::complex<long double>{2}) == std::complex<long double>{4, 0});
+        REQUIRE(mppp::pow(std::complex<long double>{2}, rational{2}) == std::complex<long double>{4, 0});
+        REQUIRE(mppp::pow(rational{2}, std::complex<long double>{2, 1})
+                == std::pow(2.l, std::complex<long double>{2, 1}));
+        REQUIRE(mppp::pow(std::complex<long double>{2, 1}, rational{2})
+                == std::pow(std::complex<long double>{2, 1}, 2.l));
 #endif
     }
 };

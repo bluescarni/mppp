@@ -1,11 +1,10 @@
-if(MPPP_BENCHMARK_BOOST)
-  find_package(Boost 1.55.0 REQUIRED)
-  if(NOT TARGET Boost::boost)
-    # Depending on the CMake version, Boost::boost might not have been created.
-    message(STATUS "The 'Boost::boost' target is missing, creating it.")
-    add_library(Boost::boost INTERFACE IMPORTED)
-    set_target_properties(Boost::boost PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIRS}")
-  endif()
+# NOTE: Boost is always required by the benchmarking code.
+find_package(Boost 1.55.0 REQUIRED)
+if(NOT TARGET Boost::boost)
+  # Depending on the CMake version, Boost::boost might not have been created.
+  message(STATUS "The 'Boost::boost' target is missing, creating it.")
+  add_library(Boost::boost INTERFACE IMPORTED)
+  set_target_properties(Boost::boost PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIRS}")
 endif()
 
 if(MPPP_BENCHMARK_FLINT)
@@ -18,9 +17,10 @@ add_custom_target(benchmark)
 # Helper to add a benchmark.
 function(ADD_MPPP_BENCHMARK arg1)
   add_executable(${arg1} ${arg1}.cpp)
-  target_link_libraries(${arg1} PRIVATE mp++)
+  # NOTE: always link to Boost, as we need its headers
+  # in the benchmarking code.
+  target_link_libraries(${arg1} PRIVATE mp++ Boost::boost)
   if(MPPP_BENCHMARK_BOOST)
-    target_link_libraries(${arg1} PRIVATE Boost::boost)
     target_compile_options(${arg1} PRIVATE "-DMPPP_BENCHMARK_BOOST")
   endif()
   if(MPPP_BENCHMARK_FLINT)

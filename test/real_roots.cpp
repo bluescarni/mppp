@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -8,6 +8,7 @@
 
 #include <utility>
 
+#include <mp++/config.hpp>
 #include <mp++/detail/mpfr.hpp>
 #include <mp++/real.hpp>
 
@@ -127,6 +128,57 @@ TEST_CASE("real rootn_ui")
     REQUIRE(rootn_ui(real{"-0", 60}, 3).signbit());
     REQUIRE(!rootn_ui(real{"+0", 60}, 4).signbit());
     REQUIRE(!rootn_ui(real{"-0", 60}, 4).signbit());
+}
+
+#endif
+
+#if defined(MPPP_WITH_ARB)
+
+TEST_CASE("real sqrt1pm1")
+{
+    real r0{0};
+    r0.sqrt1pm1();
+    REQUIRE(r0.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(r0.zero_p());
+    real rop;
+    REQUIRE(sqrt1pm1(rop, r0).zero_p());
+    REQUIRE(rop.get_prec() == detail::real_deduce_precision(0));
+    REQUIRE(sqrt1pm1(r0).zero_p());
+    REQUIRE(sqrt1pm1(std::move(r0)).zero_p());
+    REQUIRE(!r0.is_valid());
+    r0 = real{15, 128};
+    REQUIRE(sqrt1pm1(r0) == 3);
+    REQUIRE(sqrt1pm1(r0).get_prec() == 128);
+    rop = real{12, 40};
+    sqrt1pm1(rop, r0);
+    REQUIRE(rop == 3);
+    REQUIRE(rop.get_prec() == 128);
+    r0.sqrt1pm1();
+    REQUIRE(r0 == 3);
+    REQUIRE(r0.get_prec() == 128);
+    // Negative value.
+    r0 = real{-16, 128};
+    REQUIRE(sqrt1pm1(r0).nan_p());
+    REQUIRE(sqrt1pm1(r0).get_prec() == 128);
+    REQUIRE(sqrt1pm1(real{-16, 129}).nan_p());
+    REQUIRE(sqrt1pm1(real{-16, 129}).get_prec() == 129);
+
+    // Test infinity.
+    REQUIRE(sqrt1pm1(real{"inf", 243}).inf_p());
+    REQUIRE(sqrt1pm1(real{"inf", 243}) > 0);
+    REQUIRE(sqrt1pm1(real{"inf", 243}).get_prec() == 243);
+    REQUIRE(sqrt1pm1(real{"-inf", 243}).nan_p());
+    REQUIRE(sqrt1pm1(real{"-inf", 243}).get_prec() == 243);
+
+    // Test nan.
+    REQUIRE(sqrt1pm1(real{"nan", 244}).nan_p());
+    REQUIRE(sqrt1pm1(real{"nan", 244}).get_prec() == 244);
+
+    // Test a known result.
+    REQUIRE(
+        abs(sqrt1pm1(1.1_r512)
+            - 0.449137674618943857371866415716977172314013287475897308869592480711814437265368042171256319200361749775304608312117024175586888785578864947776625773207505235_r512)
+        < mppp::pow(2_r512, -510));
 }
 
 #endif

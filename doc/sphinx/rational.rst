@@ -20,7 +20,8 @@ Concepts
 
    This concept is satisfied if the type ``T`` can interoperate with a :cpp:class:`~mppp::rational`
    with static size ``SSize``. Specifically, this concept will be ``true`` if ``T`` satisfies
-   :cpp:concept:`~mppp::CppInteroperable` or it is an :cpp:class:`~mppp::integer` with static size ``SSize``.
+   :cpp:concept:`~mppp::CppInteroperable` or :cpp:concept:`~mppp::CppComplex`,
+   or it is an :cpp:class:`~mppp::integer` with static size ``SSize``.
 
    A corresponding boolean type trait called ``is_rational_interoperable`` is also available (even if the compiler does
    not support concepts).
@@ -58,12 +59,23 @@ Concepts
    A corresponding boolean type trait called ``are_rational_op_types`` is also available (even if the compiler does
    not support concepts).
 
+.. cpp:concept:: template <typename T, typename U> mppp::RationalRealOpTypes
+
+   This concept will be ``true`` if:
+
+   * ``T`` and ``U`` satisfy :cpp:concept:`~mppp::RationalOpTypes`, and
+   * neither ``T`` nor ``U`` satisfy :cpp:concept:`~mppp::CppComplex`.
+
+   A corresponding boolean type trait called ``are_rational_real_op_types`` is also available (even if the compiler does
+   not support concepts).
+
 .. _rational_functions:
 
 Functions
 ---------
 
-Much of the functionality of the :cpp:class:`~mppp::rational` class is exposed via plain functions. These functions
+Much of the functionality of the :cpp:class:`~mppp::rational` class is exposed
+via plain functions. These functions
 mimic the `GMP API <https://gmplib.org/manual/Rational-Number-Functions.html>`__ where appropriate, but a variety of
 convenience/generic overloads is provided as well.
 
@@ -157,7 +169,8 @@ Other
 Mathematical operators
 ----------------------
 
-Overloaded operators are provided for convenience. Their interface is generic, and their implementation
+Overloaded operators are provided for convenience. Their interface is generic,
+and their implementation
 is typically built on top of basic :ref:`functions <rational_functions>`.
 
 .. doxygengroup:: rational_operators
@@ -184,3 +197,31 @@ Standard library specialisations
       :param q: the input :cpp:class:`mppp::rational`.
 
       :return: a hash value for *q*.
+
+.. _rational_literals:
+
+User-defined literals
+---------------------
+
+.. versionadded:: 0.19
+
+.. cpp:function:: template <char... Chars> mppp::rational<1> mppp::literals::operator"" _q1()
+.. cpp:function:: template <char... Chars> mppp::rational<2> mppp::literals::operator"" _q2()
+.. cpp:function:: template <char... Chars> mppp::rational<3> mppp::literals::operator"" _q3()
+
+   User-defined rational literals.
+
+   These numeric literal operator templates can be used to construct
+   :cpp:class:`mppp::rational` instances with, respectively, 1, 2 and 3
+   limbs of static storage. Literals in binary, octal, decimal and
+   hexadecimal format are supported.
+
+   Note that only integral values (i.e., rationals with unitary denominator)
+   can be constructed via these literals.
+
+   .. seealso::
+
+      https://en.cppreference.com/w/cpp/language/integer_literal
+
+   :exception std\:\:invalid_argument: if the input sequence of characters is not
+     a valid integer literal (as defined by the C++ standard).

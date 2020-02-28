@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -1081,31 +1081,8 @@ inline real128 scalbln(const real128 &x, long n)
  *  @{
  */
 
-/// Output stream operator.
-/**
- * \rststar
- * This operator will print to the stream ``os`` the :cpp:class:`~mppp::real128` ``x``. The current implementation
- * ignores any formatting flag specified in ``os``, and the print format will be the one
- * described in :cpp:func:`mppp::real128::to_string()`.
- *
- * .. warning::
- *    In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
- *    flags. For the time being, users are encouraged to use the ``quadmath_snprintf()`` function from the quadmath
- *    library if precise and forward-compatible control on the printing format is needed.
- * \endrststar
- *
- * @param os the target stream.
- * @param x the input \link mppp::real128 real128\endlink.
- *
- * @return a reference to \p os.
- *
- * @throws unspecified any exception thrown by real128::to_string().
- */
-inline std::ostream &operator<<(std::ostream &os, const real128 &x)
-{
-    detail::float128_stream(os, x.m_value);
-    return os;
-}
+// Output stream operator.
+MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real128 &);
 
 /** @} */
 
@@ -2926,7 +2903,7 @@ constexpr real128 real128_denorm_min()
  */
 constexpr real128 real128_inf()
 {
-#if __GNUC__ < 7
+#if !defined(__GNUC__) || __GNUC__ < 7
     // NOTE: it seems like there's no way to arithmetically construct infinity in constexpr.
     // I tried 1/0 and repeated multiplications by a large int, but it always ends up in
     // a 'not a constant expression' error message.
@@ -2946,7 +2923,7 @@ constexpr real128 real128_inf()
  */
 constexpr real128 real128_nan()
 {
-#if __GNUC__ < 7
+#if !defined(__GNUC__) || __GNUC__ < 7
     // Same as above - GCC would accept arithmetic generation of NaN,
     // but Clang does not.
     return real128{std::numeric_limits<double>::quiet_NaN()};
@@ -3161,6 +3138,33 @@ public:
 };
 
 } // namespace std
+
+#include <mp++/detail/real128_literal.hpp>
+
+// Support for pretty printing in xeus-cling.
+#if defined(__CLING__)
+
+#if __has_include(<nlohmann/json.hpp>)
+
+#include <nlohmann/json.hpp>
+
+namespace mppp
+{
+
+inline nlohmann::json mime_bundle_repr(const real128 &x)
+{
+    auto bundle = nlohmann::json::object();
+
+    bundle["text/plain"] = x.to_string();
+
+    return bundle;
+}
+
+} // namespace mppp
+
+#endif
+
+#endif
 
 #else
 

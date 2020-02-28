@@ -2,7 +2,7 @@
 # http://websvn.kde.org/trunk/KDE/kdeutils/cmake/modules/FindGMP.cmake?view=markup&pathrev=675218
 
 # Copyright (c) 2006, Laurent Montel, <montel@kde.org>
-# Copyright (c) 2008-2019 Francesco Biscani, <bluescarni@gmail.com>
+# Copyright (c) 2008-2020 Francesco Biscani, <bluescarni@gmail.com>
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,7 +33,7 @@ if(FLINT_INCLUDE_DIR AND FLINT_LIBRARY)
     set(FLINT_FIND_QUIETLY TRUE)
 endif()
 
-find_path(FLINT_INCLUDE_DIR NAMES flint/fmpz.h)
+find_path(FLINT_INCLUDE_DIR NAMES flint/flint.h)
 find_library(FLINT_LIBRARY NAMES flint)
 
 include(FindPackageHandleStandardArgs)
@@ -45,7 +45,7 @@ mark_as_advanced(FLINT_INCLUDE_DIR FLINT_LIBRARY)
 # NOTE: this has been adapted from CMake's FindPNG.cmake.
 if(FLINT_FOUND AND NOT TARGET FLINT::FLINT)
     add_library(FLINT::FLINT UNKNOWN IMPORTED)
-    set_target_properties(FLINT::FLINT PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${FLINT_INCLUDE_DIR};${FLINT_INCLUDE_DIR}/flint"
+    set_target_properties(FLINT::FLINT PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${FLINT_INCLUDE_DIR}"
         IMPORTED_LINK_INTERFACE_LANGUAGES "C"
         IMPORTED_LOCATION "${FLINT_LIBRARY}")
 endif()

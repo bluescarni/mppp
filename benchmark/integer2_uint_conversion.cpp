@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -16,15 +16,14 @@
 #include <utility>
 #include <vector>
 
-
 #if defined(MPPP_BENCHMARK_BOOST)
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/gmp.hpp>
 #include <gmp.h>
 #endif
 
-#include "simple_timer.hpp"
 #include "constStrings.hpp"
+#include "simple_timer.hpp"
 #include <boost/format.hpp>
 
 using namespace mppp;
@@ -33,10 +32,10 @@ using namespace mppp_bench;
 #if defined(MPPP_BENCHMARK_BOOST)
 // Make sure we use the cpp_int version that does the overflow check, in order to
 // match mp++'s behaviour.
-using cpp_int = boost::multiprecision::
-    number<boost::multiprecision::cpp_int_backend<0, 0, boost::multiprecision::signed_magnitude,
-                                                  boost::multiprecision::checked>,
-           boost::multiprecision::et_off>;
+using cpp_int
+    = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
+                                        0, 0, boost::multiprecision::signed_magnitude, boost::multiprecision::checked>,
+                                    boost::multiprecision::et_off>;
 using mpz_int = boost::multiprecision::number<boost::multiprecision::gmp_int, boost::multiprecision::et_off>;
 #endif
 

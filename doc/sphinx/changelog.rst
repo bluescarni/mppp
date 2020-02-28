@@ -1,7 +1,62 @@
 Changelog
 =========
 
-0.18 (unreleased)
+0.19 (unreleased)
+-----------------
+
+New
+~~~
+
+- Implement :cpp:class:`~mppp::real` primitives for exact
+  multiplication/division by powers of 2
+  (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
+- mp++ can now optionally use `Arb <http://arblib.org/>`__
+  to provide various additional special functions for
+  :cpp:class:`~mppp::real`
+  (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
+- Implement squaring for :cpp:class:`~mppp::real`
+  (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
+- :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`
+  can now interact with ``std::complex``
+  (`#214 <https://github.com/bluescarni/mppp/pull/214>`__).
+- mp++'s multiprecision classes now support pretty-printing in the
+  `xeus-cling notebook <https://github.com/jupyter-xeus/xeus-cling>`__
+  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
+- Implement user-defined literals for :cpp:class:`~mppp::rational`,
+  :cpp:class:`~mppp::real128` and :cpp:class:`~mppp::real`
+  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
+
+Changes
+~~~~~~~
+
+- The :cpp:class:`~mppp::real` dilogarithm functions now
+  return NaN if the argument is not less than 1.
+- Move more :cpp:class:`~mppp::real` functions from the
+  header into the compiled library
+  (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
+- The GCC quadmath library is now a private dependency
+  of the mp++ library
+  (`#215 <https://github.com/bluescarni/mppp/pull/215>`__).
+- The :cpp:class:`~mppp::real128` string representation
+  has been changed to use the ``g`` format specifier
+  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
+
+Fix
+~~~
+
+- Fix a compilation warning with GCC 4.8
+  (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
+- Fix a couple of :cpp:class:`~mppp::real` functions
+  returning copies rather than references
+  (`#216 <https://github.com/bluescarni/mppp/pull/216>`__).
+- Various build system/doc fixes and improvements
+  (`#214 <https://github.com/bluescarni/mppp/pull/214>`__,
+  `#215 <https://github.com/bluescarni/mppp/pull/215>`__,
+  `#216 <https://github.com/bluescarni/mppp/pull/216>`__).
+- Fix compilation with older Clang versions in C++17 mode
+  (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
+
+0.18 (14-02-2020)
 -----------------
 
 New
@@ -25,7 +80,7 @@ Changes
   (`#210 <https://github.com/bluescarni/mppp/pull/210>`__).
 - mp++'s public headers do not include
   the ``quadmath.h`` header any more. This change greatly
-  improves mp++'s compatibility with clang when the
+  improves mp++'s compatibility with Clang when the
   ``MPPP_WITH_QUADMATH`` option is active
   (`#206 <https://github.com/bluescarni/mppp/pull/206>`__).
 - Continue moving code into the compiled library

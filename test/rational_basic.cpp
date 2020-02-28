@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -10,6 +10,7 @@
 
 #include <atomic>
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <iostream>
 #include <limits>
@@ -30,6 +31,7 @@
 #include <gmp.h>
 
 #include <mp++/detail/type_traits.hpp>
+#include <mp++/detail/utils.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 
@@ -265,6 +267,95 @@ struct fp_ctor_tester {
 TEST_CASE("floating-point constructors")
 {
     tuple_for_each(sizes{}, fp_ctor_tester{});
+}
+
+using complex_types = std::tuple<std::complex<float>, std::complex<double>
+#if defined(MPPP_WITH_MPFR)
+                                 ,
+                                 std::complex<long double>
+#endif
+                                 >;
+
+struct complex_ctor_tester {
+    template <typename S>
+    struct runner {
+        template <typename C>
+        void operator()(const C &) const
+        {
+            using rational = rational<S::value>;
+            using Float = typename C::value_type;
+
+            REQUIRE((std::is_constructible<rational, C>::value));
+            REQUIRE((std::is_constructible<rational, C &>::value));
+            REQUIRE((std::is_constructible<rational, C &&>::value));
+            REQUIRE((std::is_constructible<rational, const C &>::value));
+
+            // A few simple tests.
+            REQUIRE(rational{C{0, 0}} == 0);
+            REQUIRE(rational{C{1, 0}} == 1);
+            REQUIRE(rational{C{-42, 0}} == -42);
+
+            if (std::numeric_limits<Float>::is_iec559) {
+                REQUIRE_THROWS_PREDICATE(
+                    rational{C(std::numeric_limits<Float>::infinity(), Float(0))}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct a rational from the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<Float>::infinity());
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    rational{C(-std::numeric_limits<Float>::infinity(), Float(0))}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct a rational from the non-finite floating-point value "
+                                      + std::to_string(-std::numeric_limits<Float>::infinity());
+                    });
+                REQUIRE_THROWS_PREDICATE(
+                    rational{C(std::numeric_limits<Float>::quiet_NaN(), Float(0))}, std::domain_error,
+                    [](const std::domain_error &ex) {
+                        return ex.what()
+                               == "Cannot construct a rational from the non-finite floating-point value "
+                                      + std::to_string(std::numeric_limits<Float>::quiet_NaN());
+                    });
+                REQUIRE_THROWS_PREDICATE(rational{(C{0, std::numeric_limits<Float>::quiet_NaN()})}, std::domain_error,
+                                         [](const std::domain_error &ex) {
+                                             return ex.what()
+                                                    == "Cannot construct a rational from a complex C++ "
+                                                       "value with a non-zero imaginary part of "
+                                                           + detail::to_string(std::numeric_limits<Float>::quiet_NaN());
+                                         });
+                REQUIRE_THROWS_PREDICATE(rational{(C{0, std::numeric_limits<Float>::infinity()})}, std::domain_error,
+                                         [](const std::domain_error &ex) {
+                                             return ex.what()
+                                                    == "Cannot construct a rational from a complex C++ "
+                                                       "value with a non-zero imaginary part of "
+                                                           + detail::to_string(std::numeric_limits<Float>::infinity());
+                                         });
+            }
+
+            REQUIRE_THROWS_PREDICATE(rational{(C{0, 1})}, std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(Float(1));
+            });
+
+            REQUIRE_THROWS_PREDICATE(rational{(C{-1, 1})}, std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(Float(1));
+            });
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(complex_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("complex constructors")
+{
+    tuple_for_each(sizes{}, complex_ctor_tester{});
 }
 
 struct string_ctor_tester {
@@ -959,6 +1050,33 @@ struct gen_ass_tester {
             REQUIRE(lex_cast(q) == "-9/2");
         }
 #endif
+        q = std::complex<float>{-42, 0};
+        REQUIRE(q == -42);
+        REQUIRE_THROWS_PREDICATE(q = std::complex<float>(0, 1), std::domain_error, [](const std::domain_error &ex) {
+            return ex.what()
+                   == "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
+                          + detail::to_string(1.f);
+        });
+
+        q = std::complex<double>{-43, 0};
+        REQUIRE(q == -43);
+        REQUIRE_THROWS_PREDICATE(q = std::complex<double>(0, 1), std::domain_error, [](const std::domain_error &ex) {
+            return ex.what()
+                   == "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
+                          + detail::to_string(1.);
+        });
+
+#if defined(MPPP_WITH_MPFR)
+        q = std::complex<long double>{-44, 0};
+        REQUIRE(q == -44);
+        REQUIRE_THROWS_PREDICATE(
+            q = std::complex<long double>(0, 1), std::domain_error, [](const std::domain_error &ex) {
+                return ex.what()
+                       == "Cannot construct a rational from a complex C++ value with a non-zero imaginary part of "
+                              + detail::to_string(1.l);
+            });
+#endif
+
 #if defined(MPPP_HAVE_GCC_INT128)
         q = __int128{-42};
         REQUIRE(q == -42);
@@ -1218,6 +1336,57 @@ struct fp_convert_tester {
 TEST_CASE("floating-point conversions")
 {
     tuple_for_each(sizes{}, fp_convert_tester{});
+}
+
+struct complex_convert_tester {
+    template <typename S>
+    struct runner {
+        template <typename C>
+        void operator()(const C &) const
+        {
+            using rational = rational<S::value>;
+            using Float = typename C::value_type;
+
+            // Type traits.
+            REQUIRE((is_convertible<rational, C>::value));
+            REQUIRE((is_convertible<C, rational>::value));
+
+            C rop{1, 2};
+
+            REQUIRE(static_cast<C>(rational{0}) == C{});
+            REQUIRE(static_cast<C>(rational{123}) == C{Float(123)});
+            REQUIRE(static_cast<C>(rational{-45}) == C{Float(-45)});
+
+            REQUIRE(rational{0}.get(rop));
+            REQUIRE(rop == C{});
+            REQUIRE(rational{123}.get(rop));
+            REQUIRE(rop == C{Float(123)});
+            REQUIRE(rational{-45}.get(rop));
+            REQUIRE(rop == C{Float(-45)});
+
+            REQUIRE(get(rop, rational{0}));
+            REQUIRE(rop == C{});
+            REQUIRE(get(rop, rational{123}));
+            REQUIRE(rop == C{Float(123)});
+            REQUIRE(get(rop, rational{-45}));
+            REQUIRE(rop == C{Float(-45)});
+
+            // Functional cast form from rational to C.
+            REQUIRE(C(rational{}) == C{0, 0});
+            REQUIRE(C(rational{-37}) == C{-37, 0});
+            REQUIRE(C(rational{42}) == C{42, 0});
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(complex_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("complex conversions")
+{
+    tuple_for_each(sizes{}, complex_convert_tester{});
 }
 
 struct is_canonical_tester {

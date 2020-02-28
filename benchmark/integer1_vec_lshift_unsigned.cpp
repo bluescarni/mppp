@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -15,11 +15,10 @@
 #include <tuple>
 #include <vector>
 
-#include "simple_timer.hpp"
 #include "constStrings.hpp"
+#include "simple_timer.hpp"
 
 #include <boost/format.hpp>
-
 
 #if defined(MPPP_BENCHMARK_BOOST)
 #include <boost/multiprecision/cpp_int.hpp>

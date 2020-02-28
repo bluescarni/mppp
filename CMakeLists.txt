@@ -9,7 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
 	FORCE)
 endif()
 
-project(mp++ VERSION 0.18 LANGUAGES CXX C)
+project(mp++ VERSION 0.19 LANGUAGES CXX C)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/yacma")
 
@@ -27,12 +27,17 @@ mark_as_advanced(MPPP_BENCHMARK_BOOST)
 option(MPPP_BENCHMARK_FLINT "Build benchmarks against Flint (effective only if MPPP_BUILD_BENCHMARKS is TRUE, requires FLINT)." OFF)
 mark_as_advanced(MPPP_BENCHMARK_FLINT)
 option(MPPP_WITH_MPFR "Enable features relying on MPFR (e.g., interoperability with long double)." OFF)
+option(MPPP_WITH_ARB "Enable features relying on Arb." OFF)
 option(MPPP_WITH_QUADMATH "Enable features relying on libquadmath (e.g., the real128 type)." OFF)
 option(MPPP_TEST_PYBIND11 "Build tests for the pybind11 integration utilities (effective only if MPPP_BUILD_TESTS is TRUE, requires pybind11 and Python).")
 mark_as_advanced(MPPP_TEST_PYBIND11)
 option(MPPP_BUILD_STATIC_LIBRARY "Build mp++ as a static library, instead of dynamic." OFF)
 if(YACMA_COMPILER_IS_MSVC)
     option(MPPP_MSVC_UNICODE "Enable Unicode solutions for MSVC." OFF)
+endif()
+
+if(MPPP_WITH_ARB AND NOT MPPP_WITH_MPFR)
+    message(FATAL_ERROR "Arb support requires MPFR, please enable the MPPP_WITH_MPFR build option.")
 endif()
 
 if(YACMA_COMPILER_IS_MSVC AND MPPP_BUILD_STATIC_LIBRARY)
@@ -199,7 +204,10 @@ set(MPPP_SRC_FILES
 )
 
 if(MPPP_WITH_QUADMATH)
-    set(MPPP_SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/real128.cpp" "${MPPP_SRC_FILES}")
+    set(MPPP_SRC_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/real128.cpp"
+        "${MPPP_SRC_FILES}"
+    )
 endif()
 
 if(MPPP_WITH_MPFR)
@@ -208,7 +216,7 @@ if(MPPP_WITH_MPFR)
         "${MPPP_SRC_FILES}")
 endif()
 
-# Make mp++ header files accessible in Visual Studio IDE
+# Make mp++ header files accessible in Visual Studio IDE.
 if(YACMA_COMPILER_IS_MSVC)
   set(MPPP_HEADER_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/concepts.hpp"
@@ -222,6 +230,9 @@ if(YACMA_COMPILER_IS_MSVC)
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/fwd_decl.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/gmp.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/integer_literals.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/rational_literals.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/real_literals.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/real128_literal.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/mpfr.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/type_traits.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/mp++/detail/utils.hpp"
@@ -240,8 +251,8 @@ if(MPPP_BUILD_STATIC_LIBRARY)
 else()
     # Setup of the mp++ shared library.
     add_library(mp++ SHARED "${MPPP_SRC_FILES}")
-    set_property(TARGET mp++ PROPERTY VERSION "4.0")
-    set_property(TARGET mp++ PROPERTY SOVERSION 4)
+    set_property(TARGET mp++ PROPERTY VERSION "5.0")
+    set_property(TARGET mp++ PROPERTY SOVERSION 5)
     set_property(TARGET mp++ PROPERTY DEFINE_SYMBOL "mppp_EXPORTS")
     set_target_properties(mp++ PROPERTIES CXX_VISIBILITY_PRESET hidden)
     set_target_properties(mp++ PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
@@ -283,6 +294,14 @@ if(MPPP_WITH_MPFR)
     set(MPPP_ENABLE_MPFR "#define MPPP_WITH_MPFR")
 endif()
 
+# Optional dependency on Arb.
+if(MPPP_WITH_ARB)
+    find_package(FLINT REQUIRED)
+    find_package(Arb REQUIRED)
+    target_link_libraries(mp++ PRIVATE Arb::Arb FLINT::FLINT)
+    set(MPPP_ENABLE_ARB "#define MPPP_WITH_ARB")
+endif()
+
 # Optional dependency on quadmath.
 if(MPPP_WITH_QUADMATH)
     include(CheckTypeSize)
@@ -292,10 +311,10 @@ if(MPPP_WITH_QUADMATH)
     endif()
     unset(_MPPP_FLOAT128_EXISTS)
     find_package(Quadmath REQUIRED COMPONENTS libquadmath header)
-    target_link_libraries(mp++ PUBLIC Quadmath::libquadmath)
-    # NOTE: the quadmath.h header is used only in the
-    # compilation of the library, it does not need to be
-    # included by the users of mp++.
+    # NOTE: both the header and the library functions are used
+    # only within libmp++. Thus, consumers of mp++ won't
+    # need to link to them.
+    target_link_libraries(mp++ PRIVATE Quadmath::libquadmath)
     target_link_libraries(mp++ PRIVATE Quadmath::header)
     set(MPPP_ENABLE_QUADMATH "#define MPPP_WITH_QUADMATH")
 endif()
@@ -329,13 +348,12 @@ set(_MPPP_CONFIG_OPTIONAL_DEPS)
 if(MPPP_WITH_MPFR)
     set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(MPFR REQUIRED)\n")
 endif()
-if(MPPP_WITH_QUADMATH)
-    set(_MPPP_CONFIG_OPTIONAL_DEPS "${_MPPP_CONFIG_OPTIONAL_DEPS}find_package(Quadmath REQUIRED COMPONENTS libquadmath)\n")
-endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mp++-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" @ONLY)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake" DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMPFR.cmake"
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindQuadmath.cmake" DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/mp++-config.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGMP.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindMPFR.cmake"
+    DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 install(EXPORT mp++_export NAMESPACE mp++:: DESTINATION "${MPPP_INSTALL_LIBDIR}/cmake/mp++")
 # Take care of versioning.
 include(CMakePackageConfigHelpers)

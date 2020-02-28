@@ -4,7 +4,7 @@ Quadruple-precision float tutorial
 ==================================
 
 The :cpp:class:`~mppp::real128` class is a thin wrapper around the :cpp:type:`__float128` type
-available in GCC and (more recently) clang. :cpp:type:`__float128` is an implementation the
+available in GCC and (more recently) Clang. :cpp:type:`__float128` is an implementation the
 `quadruple-precision IEEE 754 binary floating-point standard <https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format>`__,
 which provides up to 36 decimal digits of precision.
 
@@ -15,7 +15,7 @@ the library is configured with the
 Note that mp++ needs access to the quadmath library
 ``libquadmath.so``, which may be installed in
 a non-standard location. While GCC is typically
-able to resolve the correct path automatically, clang might need assistance
+able to resolve the correct path automatically, Clang might need assistance
 in order to identify the correct location
 of this library.
 
@@ -88,3 +88,31 @@ a few additional capabilities:
 
 The :ref:`real128 reference <real128_reference>` contains the detailed description of all the features
 provided by :cpp:class:`~mppp::real128`.
+
+User-defined literal
+--------------------
+
+.. versionadded:: 0.19
+
+A user-defined literal is available to construct
+:cpp:class:`mppp::real128` instances.
+The :ref:`literal <real128_literal>`
+is defined within
+the inline namespace ``mppp::literals``, and it supports
+decimal and hexadecimal representations:
+
+.. code-block:: c++
+
+   using namespace mppp::literals;
+
+   auto r1 = 123.456_rq;   // r1 contains the quadruple-precision
+                           // approximation of 123.456 (that is,
+                           // 123.455999999999999999999999999999998).
+
+   auto r2 = 4.2e1_rq;     // Scientific notation can be used.
+
+   auto r3 = 0x1.12p-1_rq; // Hexadecimal floats are supported too.
+
+.. seealso::
+
+   https://en.cppreference.com/w/cpp/language/floating_literal

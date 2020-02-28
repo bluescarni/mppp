@@ -7,17 +7,10 @@ Introduction
 ------------
 
 mp++ is written in modern C++, and it requires a compiler able to understand
-at least C++11 (mp++ will also use some features from C++14 and C++17,
-if supported by the compiler). mp++ is known to run on the following setups:
-
-* GCC 4.8 and later versions on GNU/Linux 32/64-bit,
-* Clang 3.8 and later versions on GNU/Linux 64-bit,
-* MSVC 2015 and later versions on Windows 32/64-bit,
-* Clang 4 and later versions on Windows 32/64-bit
-  (with the ``clang-cl`` driver for MSVC),
-* MinGW GCC 8 on Windows 64-bit,
-* Clang on OSX 64-bit (Xcode 6.4 and later),
-* Intel compiler ICC 17 on GNU/Linux 64-bit (tested only occasionally).
+at least C++11 (mp++ will also use features from C++14 and C++17,
+if supported by the compiler). The library is regularly tested on
+various versions of the three major compilers (GCC, Clang and MSVC)
+and operating-systems (Linux, Windows and OSX).
 
 mp++ has been written, tested and benchmarked on x86 processors, but it does
 not contain any architecture-specific code
@@ -36,11 +29,14 @@ mp++ has the following dependencies:
 * the `GNU MPFR <https://www.mpfr.org>`__ multiprecision floating-point library, *optional*, used in the implementation
   of the :cpp:class:`~mppp::real` class and for providing support
   for the ``long double`` type (MPFR 3 or a later version is required);
+* the `Arb <http://arblib.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*,
+  used in the implementation of additional special functions for the
+  :cpp:class:`~mppp::real` class;
 * the `quadmath library <https://gcc.gnu.org/onlinedocs/libquadmath/>`__ from GCC, *optional*, used
   in the implementation of the :cpp:class:`~mppp::real128` class
   (typically, the quadmath library is part of GCC and it does not need to
   be installed separately);
-* the `Boost <https://www.boost.org/>`__ and `FLINT <http://flintlib.org/>`__ libraries, *optional*, currently used
+* the `Boost <https://www.boost.org/>`__ libraries, *optional*, currently used
   only in the benchmarking suite.
 
 Additionally, `CMake <https://cmake.org/>`__ is the build system used by mp++ and it must also be available when
@@ -56,6 +52,8 @@ path, etc.). The available configuration options are:
 
 * ``MPPP_WITH_MPFR``: enable features relying on the GNU
   MPFR library (off by default),
+* ``MPPP_WITH_ARB``: enable features relying on the Arb library
+  (off by default, requires the ``MPPP_WITH_MPFR`` option to be active),
 * ``MPPP_WITH_QUADMATH``: enable features relying on the
   quadmath library (off by default),
 * ``MPPP_BUILD_TESTS``: build the test suite (off by default),
@@ -197,9 +195,12 @@ using mp++ is the following:
   (``-lgmp`` on most Unix-like systems);
 * the MPFR library, required only if mp++ was configured with
   the ``MPPP_WITH_MPFR`` option (``-lmpfr`` on most Unix-like systems);
+* the Arb and FLINT libraries, required only if mp++ was configured with
+  the ``MPPP_WITH_ARB`` option (``-larb -lflint`` on most
+  Unix-like systems);
 * the quadmath library, required only if mp++ was configured with the
   ``MPPP_WITH_QUADMATH`` option (``-lquadmath`` with GCC,
-  with clang it might be necessary to provide the full path to the library).
+  with Clang it might be necessary to provide the full path to the library).
 
 If you are using CMake, it's highly recommended to make use of the config-file
 package provided with mp++ rather
@@ -268,7 +269,7 @@ MinGW:
 
 * Due to a compiler bug in the implementation of ``thread_local``
   storage [#mingw_tls]_,
-  certain multi-threading performance optimisations are disabled
+  certain performance optimisations are disabled
   when compiling with MinGW.
 
 OSX:

@@ -30,6 +30,13 @@ Macros and definitions
    This name is defined if mp++ was configured with support for the MPFR library
    (see the :ref:`installation instructions <installation>`).
 
+.. c:macro:: MPPP_WITH_ARB
+
+   .. versionadded:: 0.19
+
+   This name is defined if mp++ was configured with support for the Arb library
+   (see the :ref:`installation instructions <installation>`).
+
 .. c:macro:: MPPP_HAVE_GCC_INT128
 
    This name is defined if mp++ detects the presence of the GCC-style 128-bit integers

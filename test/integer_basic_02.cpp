@@ -1,4 +1,4 @@
-// Copyright 2016-2019 Francesco Biscani (bluescarni@gmail.com)
+// Copyright 2016-2020 Francesco Biscani (bluescarni@gmail.com)
 //
 // This file is part of the mp++ library.
 //
@@ -10,6 +10,7 @@
 
 #include <atomic>
 #include <cmath>
+#include <complex>
 #include <cstddef>
 #include <iostream>
 #include <limits>
@@ -53,6 +54,13 @@ using fp_types = std::tuple<float, double
                             long double
 #endif
                             >;
+
+using complex_types = std::tuple<std::complex<float>, std::complex<double>
+#if defined(MPPP_WITH_MPFR)
+                                 ,
+                                 std::complex<long double>
+#endif
+                                 >;
 
 using sizes = std::tuple<std::integral_constant<std::size_t, 1>, std::integral_constant<std::size_t, 2>,
                          std::integral_constant<std::size_t, 3>, std::integral_constant<std::size_t, 6>,
@@ -701,6 +709,54 @@ struct fp_convert_tester {
 TEST_CASE("floating-point conversions")
 {
     tuple_for_each(sizes{}, fp_convert_tester{});
+}
+
+// A few simple tests, as the conversions
+// are based on the fp ones.
+struct complex_convert_tester {
+    template <typename S>
+    struct runner {
+        template <typename C>
+        void operator()(const C &) const
+        {
+            using integer = integer<S::value>;
+
+            // Type traits.
+            REQUIRE((is_convertible<integer, C>::value));
+            REQUIRE((is_convertible<C, integer>::value));
+
+            // Casts to C.
+            REQUIRE(static_cast<C>(integer{0}) == C{0, 0});
+            REQUIRE(static_cast<C>(integer{1}) == C{1, 0});
+            REQUIRE(static_cast<C>(integer{-42}) == -C{42, 0});
+            C rop{4, 5};
+
+            // get() functions.
+            REQUIRE(integer{1}.get(rop));
+            REQUIRE(rop == C{1, 0});
+            REQUIRE(integer{0}.get(rop));
+            REQUIRE(rop == C{0, 0});
+            REQUIRE(get(rop, integer{-5}));
+            REQUIRE(rop == C{-5, 0});
+            REQUIRE(get(rop, integer{0}));
+            REQUIRE(rop == C{0, 0});
+
+            // Functional cast form from integer to C.
+            REQUIRE(C(integer{}) == C{0, 0});
+            REQUIRE(C(integer{-37}) == C{-37, 0});
+            REQUIRE(C(integer{42}) == C{42, 0});
+        }
+    };
+    template <typename S>
+    inline void operator()(const S &) const
+    {
+        tuple_for_each(complex_types{}, runner<S>{});
+    }
+};
+
+TEST_CASE("complex conversions")
+{
+    tuple_for_each(sizes{}, complex_convert_tester{});
 }
 
 struct sizes_tester {
