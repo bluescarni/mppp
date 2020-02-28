@@ -244,7 +244,7 @@ thread_local const flint_cleanup flint_cleanup_inst;
 
 // Helper for the implementation of unary Arb wrappers.
 #define MPPP_UNARY_ARB_WRAPPER(fname)                                                                                  \
-    void fname(::mpfr_t rop, const ::mpfr_t op)                                                                        \
+    void arb_##fname(::mpfr_t rop, const ::mpfr_t op)                                                                  \
     {                                                                                                                  \
         MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;                                                                       \
         /* Turn op into an arb. */                                                                                     \
@@ -261,7 +261,7 @@ MPPP_UNARY_ARB_WRAPPER(sqrt1pm1)
 
 // NOTE: log_hypot needs special handling for certain
 // input values.
-void log_hypot(::mpfr_t rop, const ::mpfr_t x, const ::mpfr_t y)
+void arb_log_hypot(::mpfr_t rop, const ::mpfr_t x, const ::mpfr_t y)
 {
     // Special handling if at least one of x and y is an inf,
     // and the other is not a NaN.
@@ -288,7 +288,7 @@ MPPP_UNARY_ARB_WRAPPER(cos_pi)
 
 // NOTE: tan_pi needs special handling for certain
 // input values.
-void tan_pi(::mpfr_t rop, const ::mpfr_t op)
+void arb_tan_pi(::mpfr_t rop, const ::mpfr_t op)
 {
     MPPP_MAYBE_TLS arb_raii arb_op;
     mpfr_to_arb(arb_op.m_arb, op);
@@ -325,7 +325,7 @@ void tan_pi(::mpfr_t rop, const ::mpfr_t op)
 
 // NOTE: cot_pi needs special handling for certain
 // input values.
-void cot_pi(::mpfr_t rop, const ::mpfr_t op)
+void arb_cot_pi(::mpfr_t rop, const ::mpfr_t op)
 {
     MPPP_MAYBE_TLS arb_raii arb_rop, arb_op;
     mpfr_to_arb(arb_op.m_arb, op);
@@ -346,7 +346,7 @@ MPPP_UNARY_ARB_WRAPPER(sinc)
 
 // NOTE: sinc_pi needs special handling for certain
 // input values.
-void sinc_pi(::mpfr_t rop, const ::mpfr_t op)
+void arb_sinc_pi(::mpfr_t rop, const ::mpfr_t op)
 {
     // The Arb function does not seem to handle
     // well infs or nans.
@@ -1570,7 +1570,7 @@ real &real::sqrt()
  */
 real &real::sqrt1pm1()
 {
-    return self_mpfr_unary_nornd(detail::sqrt1pm1);
+    return self_mpfr_unary_nornd(detail::arb_sqrt1pm1);
 }
 
 #endif
@@ -1714,7 +1714,7 @@ real &real::cot()
  */
 real &real::sin_pi()
 {
-    return self_mpfr_unary_nornd(detail::sin_pi);
+    return self_mpfr_unary_nornd(detail::arb_sin_pi);
 }
 
 /// In-place cos_pi.
@@ -1738,7 +1738,7 @@ real &real::sin_pi()
  */
 real &real::cos_pi()
 {
-    return self_mpfr_unary_nornd(detail::cos_pi);
+    return self_mpfr_unary_nornd(detail::arb_cos_pi);
 }
 
 /// In-place tan_pi.
@@ -1762,7 +1762,7 @@ real &real::cos_pi()
  */
 real &real::tan_pi()
 {
-    return self_mpfr_unary_nornd(detail::tan_pi);
+    return self_mpfr_unary_nornd(detail::arb_tan_pi);
 }
 
 /// In-place cot_pi.
@@ -1786,7 +1786,7 @@ real &real::tan_pi()
  */
 real &real::cot_pi()
 {
-    return self_mpfr_unary_nornd(detail::cot_pi);
+    return self_mpfr_unary_nornd(detail::arb_cot_pi);
 }
 
 /// In-place sinc.
@@ -1810,7 +1810,7 @@ real &real::cot_pi()
  */
 real &real::sinc()
 {
-    return self_mpfr_unary_nornd(detail::sinc);
+    return self_mpfr_unary_nornd(detail::arb_sinc);
 }
 
 /// In-place sinc_pi.
@@ -1834,7 +1834,7 @@ real &real::sinc()
  */
 real &real::sinc_pi()
 {
-    return self_mpfr_unary_nornd(detail::sinc_pi);
+    return self_mpfr_unary_nornd(detail::arb_sinc_pi);
 }
 
 #endif

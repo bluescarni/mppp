@@ -163,16 +163,16 @@ MPPP_DLL_PUBLIC void real_check_trunc_arg(const real &);
 #if defined(MPPP_WITH_ARB)
 
 // The Arb MPFR wrappers.
-MPPP_DLL_PUBLIC void sqrt1pm1(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_sqrt1pm1(::mpfr_t, const ::mpfr_t);
 
-MPPP_DLL_PUBLIC void log_hypot(::mpfr_t, const ::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_log_hypot(::mpfr_t, const ::mpfr_t, const ::mpfr_t);
 
-MPPP_DLL_PUBLIC void sin_pi(::mpfr_t, const ::mpfr_t);
-MPPP_DLL_PUBLIC void cos_pi(::mpfr_t, const ::mpfr_t);
-MPPP_DLL_PUBLIC void tan_pi(::mpfr_t, const ::mpfr_t);
-MPPP_DLL_PUBLIC void cot_pi(::mpfr_t, const ::mpfr_t);
-MPPP_DLL_PUBLIC void sinc(::mpfr_t, const ::mpfr_t);
-MPPP_DLL_PUBLIC void sinc_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_sin_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_cos_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_tan_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_cot_pi(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_sinc(::mpfr_t, const ::mpfr_t);
+MPPP_DLL_PUBLIC void arb_sinc_pi(::mpfr_t, const ::mpfr_t);
 
 #endif
 
@@ -2181,7 +2181,7 @@ inline real mpfr_nary_op_return_impl(::mpfr_prec_t min_prec, const F &f, Arg0 &&
 // These are helper macros to reduce typing when dealing with the common case
 // of exposing MPFR functions with a single argument (both variants with retval
 // and with return). "name" will be the name of the mppp function, "fname" is
-// the name of the MPFR function ans "rnd" is a boolean flag that signals whether
+// the name of the MPFR function and "rnd" is a boolean flag that signals whether
 // fname requires a rounding mode argument or not.
 #define MPPP_REAL_MPFR_UNARY_RETVAL_IMPL(name, fname, rnd)                                                             \
     inline real &name(real &rop, T &&op)                                                                               \
@@ -2560,8 +2560,8 @@ MPPP_REAL_MPFR_UNARY_RETURN(sqrt, ::mpfr_sqrt)
 #if defined(MPPP_WITH_ARB)
 
 // sqrt1pm1.
-MPPP_REAL_ARB_UNARY_RETVAL(sqrt1pm1, detail::sqrt1pm1)
-MPPP_REAL_ARB_UNARY_RETURN(sqrt1pm1, detail::sqrt1pm1)
+MPPP_REAL_ARB_UNARY_RETVAL(sqrt1pm1, detail::arb_sqrt1pm1)
+MPPP_REAL_ARB_UNARY_RETURN(sqrt1pm1, detail::arb_sqrt1pm1)
 
 #endif
 
@@ -2680,18 +2680,18 @@ MPPP_REAL_MPFR_UNARY_RETURN(cot, ::mpfr_cot)
 
 #if defined(MPPP_WITH_ARB)
 
-MPPP_REAL_ARB_UNARY_RETVAL(sin_pi, detail::sin_pi)
-MPPP_REAL_ARB_UNARY_RETURN(sin_pi, detail::sin_pi)
-MPPP_REAL_ARB_UNARY_RETVAL(cos_pi, detail::cos_pi)
-MPPP_REAL_ARB_UNARY_RETURN(cos_pi, detail::cos_pi)
-MPPP_REAL_ARB_UNARY_RETVAL(tan_pi, detail::tan_pi)
-MPPP_REAL_ARB_UNARY_RETURN(tan_pi, detail::tan_pi)
-MPPP_REAL_ARB_UNARY_RETVAL(cot_pi, detail::cot_pi)
-MPPP_REAL_ARB_UNARY_RETURN(cot_pi, detail::cot_pi)
-MPPP_REAL_ARB_UNARY_RETVAL(sinc, detail::sinc)
-MPPP_REAL_ARB_UNARY_RETURN(sinc, detail::sinc)
-MPPP_REAL_ARB_UNARY_RETVAL(sinc_pi, detail::sinc_pi)
-MPPP_REAL_ARB_UNARY_RETURN(sinc_pi, detail::sinc_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(sin_pi, detail::arb_sin_pi)
+MPPP_REAL_ARB_UNARY_RETURN(sin_pi, detail::arb_sin_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(cos_pi, detail::arb_cos_pi)
+MPPP_REAL_ARB_UNARY_RETURN(cos_pi, detail::arb_cos_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(tan_pi, detail::arb_tan_pi)
+MPPP_REAL_ARB_UNARY_RETURN(tan_pi, detail::arb_tan_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(cot_pi, detail::arb_cot_pi)
+MPPP_REAL_ARB_UNARY_RETURN(cot_pi, detail::arb_cot_pi)
+MPPP_REAL_ARB_UNARY_RETVAL(sinc, detail::arb_sinc)
+MPPP_REAL_ARB_UNARY_RETURN(sinc, detail::arb_sinc)
+MPPP_REAL_ARB_UNARY_RETVAL(sinc_pi, detail::arb_sinc_pi)
+MPPP_REAL_ARB_UNARY_RETURN(sinc_pi, detail::arb_sinc_pi)
 
 #endif
 
@@ -3154,7 +3154,7 @@ template <typename T, typename U, cvr_real_enabler<T, U> = 0>
 #endif
 inline real &log_hypot(real &rop, T &&x, U &&y)
 {
-    return detail::mpfr_nary_op_impl<false>(0, detail::log_hypot, rop, std::forward<T>(x), std::forward<U>(y));
+    return detail::mpfr_nary_op_impl<false>(0, detail::arb_log_hypot, rop, std::forward<T>(x), std::forward<U>(y));
 }
 
 namespace detail
@@ -3164,7 +3164,7 @@ template <typename T, typename U,
           enable_if_t<conjunction<std::is_same<real, uncvref_t<T>>, std::is_same<real, uncvref_t<U>>>::value, int> = 0>
 inline real dispatch_log_hypot(T &&x, U &&y)
 {
-    return mpfr_nary_op_return_impl<false>(0, detail::log_hypot, std::forward<T>(x), std::forward<U>(y));
+    return mpfr_nary_op_return_impl<false>(0, detail::arb_log_hypot, std::forward<T>(x), std::forward<U>(y));
 }
 
 template <typename T, typename U,
