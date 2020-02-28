@@ -28,8 +28,8 @@
 #endif
 
 #if defined(MPPP_BENCHMARK_FLINT)
-#include <flint.h>
-#include <fmpzxx.h>
+#include <flint/flint.h>
+#include <flint/fmpzxx.h>
 #endif
 
 using namespace mppp;
