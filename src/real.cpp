@@ -243,6 +243,11 @@ thread_local const flint_cleanup flint_cleanup_inst;
 #if defined(MPPP_WITH_ARB)
 
 // Helper for the implementation of unary Arb wrappers.
+// NOTE: it would probably pay off to put a bunch of thread-local arb_raii
+// objects in the unnamed namespace above, and use those, instead of function-local
+// statics, to convert to/from MPFR. However such a scheme would not work
+// on MinGW due to the thread_local issues, so as long as we support MinGW
+// (or any platform with non-functional thread_local), we cannot adopt this approach.
 #define MPPP_UNARY_ARB_WRAPPER(fname)                                                                                  \
     void arb_##fname(::mpfr_t rop, const ::mpfr_t op)                                                                  \
     {                                                                                                                  \
