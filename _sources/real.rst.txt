@@ -963,6 +963,34 @@ Logarithms and exponentials
    :exception std\:\:invalid_argument: if the conversion between Arb and MPFR types
      fails because of (unlikely) overflow conditions.
 
+Polylogarithms
+~~~~~~~~~~~~~~
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::li2(mppp::real &rop, T &&x)
+
+   Binary dilogarithm.
+
+   This function will set *rop* to :math:`\operatorname{Li}_2\left( x \right)`.
+   The precision of the result will be equal to the precision of *x*.
+   If :math:`x \geq 1`, *rop* will be set to NaN.
+
+   :param rop: the return value.
+   :param x: the argument.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::li2(T &&x)
+
+   Unary dilogarithm.
+
+   This function will return :math:`\operatorname{Li}_2\left( x \right)`.
+   The precision of the result will be equal to the precision of *x*.
+   If :math:`x \geq 1`, NaN will be returned.
+
+   :param x: the argument.
+
+   :return: the dilogarithm of *x*.
+
 .. _real_gamma:
 
 Gamma functions
@@ -1148,7 +1176,6 @@ Other special functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::eint(mppp::real &rop, T &&op)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::li2(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::zeta(mppp::real &rop, T &&op)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real &mppp::ai(mppp::real &rop, T &&op)
 
@@ -1157,7 +1184,6 @@ Other special functions
    These functions will set *rop* to, respectively,
 
    * the exponential integral,
-   * the dilogarithm,
    * the Riemann Zeta function,
    * the Airy function,
 
@@ -1169,7 +1195,6 @@ Other special functions
    :return: a reference to *rop*.
 
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::eint(T &&r)
-.. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::li2(T &&r)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::zeta(T &&r)
 .. cpp:function:: template <mppp::CvrReal T> mppp::real mppp::ai(T &&r)
 
@@ -1178,7 +1203,6 @@ Other special functions
    These functions will return, respectively,
 
    * the exponential integral,
-   * the dilogarithm,
    * the Riemann Zeta function,
    * the Airy function,
 
@@ -1186,8 +1210,7 @@ Other special functions
 
    :param r: the argument.
 
-   :return: the exponential integral, dilogarithm, Riemann Zeta function or Airy function
-      of *r*.
+   :return: the exponential integral, Riemann Zeta function or Airy function of *r*.
 
 .. cpp:function:: template <mppp::CvrReal T, mppp::CvrReal U> mppp::real &mppp::beta(mppp::real &rop, T &&x, U &&y)
 

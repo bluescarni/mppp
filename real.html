@@ -111,6 +111,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#trigonometry">Trigonometry</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#hyperbolic-functions">Hyperbolic functions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#logarithms-and-exponentials">Logarithms and exponentials</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#polylogarithms">Polylogarithms</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gamma-functions">Gamma functions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#bessel-functions">Bessel functions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#error-functions">Error functions</a></li>
@@ -4026,6 +4027,46 @@ fails because of (unlikely) overflow conditions.</p></li>
 </dd></dl>
 
 </div>
+<div class="section" id="polylogarithms">
+<h3>Polylogarithms<a class="headerlink" href="#polylogarithms" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="sig-name descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">li2</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T" title="mppp::li2::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Binary dilogarithm.</p>
+<p>This function will set <em>rop</em> to <span class="math notranslate nohighlight">\(\operatorname{Li}_2\left( x \right)\)</span>.
+The precision of the result will be equal to the precision of <em>x</em>.
+If <span class="math notranslate nohighlight">\(x \geq 1\)</span>, <em>rop</em> will be set to NaN.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rop</strong> – the return value.</p></li>
+<li><p><strong>x</strong> – the argument.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a reference to <em>rop</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp3li2EN4mppp4realERR1T">
+<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp3li2ERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp3li2ERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="sig-name descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">li2</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T" title="mppp::li2::T">T</a> &amp;&amp;<em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3li2EN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Unary dilogarithm.</p>
+<p>This function will return <span class="math notranslate nohighlight">\(\operatorname{Li}_2\left( x \right)\)</span>.
+The precision of the result will be equal to the precision of <em>x</em>.
+If <span class="math notranslate nohighlight">\(x \geq 1\)</span>, NaN will be returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – the argument.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the dilogarithm of <em>x</em>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="gamma-functions">
 <span id="real-gamma"></span><h3>Gamma functions<a class="headerlink" href="#gamma-functions" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
@@ -4334,11 +4375,6 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T">
-<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="sig-name descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">li2</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T" title="mppp::li2::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="function">
 <dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp4zetaERN4mppp4realERN4mppp4realERR1T">
 <span id="_CPPv3I_N4mppp7CvrRealEEN4mppp4zetaERN4mppp4realERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp4zetaERN4mppp4realERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="sig-name descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">zeta</code><span class="sig-paren">(</span>mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> &amp;<em>rop</em>, <a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp4zetaERN4mppp4realERN4mppp4realERR1T" title="mppp::zeta::T">T</a> &amp;&amp;<em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp4zetaERN4mppp4realERN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
@@ -4350,7 +4386,6 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 <p>These functions will set <em>rop</em> to, respectively,</p>
 <ul class="simple">
 <li><p>the exponential integral,</p></li>
-<li><p>the dilogarithm,</p></li>
 <li><p>the Riemann Zeta function,</p></li>
 <li><p>the Airy function,</p></li>
 </ul>
@@ -4374,11 +4409,6 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp3li2EN4mppp4realERR1T">
-<span id="_CPPv3I_N4mppp7CvrRealEEN4mppp3li2ERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp3li2ERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="sig-name descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">li2</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3li2ERN4mppp4realERN4mppp4realERR1T" title="mppp::li2::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp3li2EN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="function">
 <dt id="_CPPv4I_N4mppp7CvrRealEEN4mppp4zetaEN4mppp4realERR1T">
 <span id="_CPPv3I_N4mppp7CvrRealEEN4mppp4zetaERR1T"></span><span id="_CPPv2I_N4mppp7CvrRealEEN4mppp4zetaERR1T"></span>template&lt;mppp::<a class="reference internal" href="#_CPPv4I0EN4mppp7CvrRealE" title="mppp::CvrReal">CvrReal</a> <code class="sig-name descname">T</code>&gt;<br />mppp::<a class="reference internal" href="#_CPPv4N4mppp4realE" title="mppp::real">real</a> <code class="sig-prename descclassname">mppp<code class="sig-prename descclassname">::</code></code><code class="sig-name descname">zeta</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp4zetaERN4mppp4realERN4mppp4realERR1T" title="mppp::zeta::T">T</a> &amp;&amp;<em>r</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N4mppp7CvrRealEEN4mppp4zetaEN4mppp4realERR1T" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
@@ -4390,7 +4420,6 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 <p>These functions will return, respectively,</p>
 <ul class="simple">
 <li><p>the exponential integral,</p></li>
-<li><p>the dilogarithm,</p></li>
 <li><p>the Riemann Zeta function,</p></li>
 <li><p>the Airy function,</p></li>
 </ul>
@@ -4400,8 +4429,7 @@ The precision of the result will be equal to the precision of <em>r</em>.</p>
 <dd class="field-odd"><p><strong>r</strong> – the argument.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the exponential integral, dilogarithm, Riemann Zeta function or Airy function
-of <em>r</em>.</p>
+<dd class="field-even"><p>the exponential integral, Riemann Zeta function or Airy function of <em>r</em>.</p>
 </dd>
 </dl>
 </dd></dl>
