@@ -657,12 +657,6 @@ struct fp_convert_tester {
             REQUIRE(rop == Float(-12));
             if (std::numeric_limits<Float>::is_iec559) {
                 // Try with large numbers.
-                REQUIRE(std::abs(static_cast<Float>(integer{"1000000000000000000000000000000"}) - Float(1E30))
-                            / Float(1E30)
-                        <= std::numeric_limits<Float>::epsilon() * 1000.);
-                REQUIRE(std::abs(static_cast<Float>(integer{"-1000000000000000000000000000000"}) + Float(1E30))
-                            / Float(1E30)
-                        <= std::numeric_limits<Float>::epsilon() * 1000.);
                 REQUIRE(static_cast<Float>(integer{std::numeric_limits<Float>::max()})
                         == std::numeric_limits<Float>::max());
                 REQUIRE(static_cast<Float>(integer{-std::numeric_limits<Float>::max()})
