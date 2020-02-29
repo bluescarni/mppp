@@ -203,11 +203,9 @@ struct pow_tester {
         REQUIRE(mppp::pow(std::complex<float>{2}, rational{2}) == std::complex<float>{4, 0});
         REQUIRE(mppp::pow(rational{2}, std::complex<double>{2}) == std::complex<double>{4, 0});
         REQUIRE(mppp::pow(std::complex<double>{2}, rational{2}) == std::complex<double>{4, 0});
-#if defined(MPPP_WITH_MPFR) && !defined(__FreeBSD__)
-        if (std::numeric_limits<long double>::is_iec559) {
-            REQUIRE(mppp::pow(rational{2}, std::complex<long double>{2}) == std::complex<long double>{4, 0});
-            REQUIRE(mppp::pow(std::complex<long double>{2}, rational{2}) == std::complex<long double>{4, 0});
-        }
+#if defined(MPPP_WITH_MPFR) && !defined(__FreeBSD__) && !defined(_ARCH_PPC)
+        REQUIRE(mppp::pow(rational{2}, std::complex<long double>{2}) == std::complex<long double>{4, 0});
+        REQUIRE(mppp::pow(std::complex<long double>{2}, rational{2}) == std::complex<long double>{4, 0});
 #endif
     }
 };

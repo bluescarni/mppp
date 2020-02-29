@@ -71,6 +71,14 @@ static inline std::string f2str(const T &x)
     return oss.str();
 }
 
+constexpr bool ppc_arch =
+#if defined(_ARCH_PPC)
+    true
+#else
+    false
+#endif
+    ;
+
 TEST_CASE("real default prec")
 {
     REQUIRE(real_get_default_prec() == 0);
@@ -163,7 +171,7 @@ struct fp_ctor_tester {
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
         real_reset_default_prec();
-        if (std::numeric_limits<T>::radix != 2 || !std::numeric_limits<T>::is_iec559) {
+        if (std::numeric_limits<T>::radix != 2 || (ppc_arch && std::is_same<T, long double>::value)) {
             return;
         }
         std::uniform_real_distribution<T> dist(-T(100), T(100));
@@ -694,7 +702,7 @@ struct fp_ass_tester {
         REQUIRE(r.zero_p());
         REQUIRE(r.get_prec() == 101);
         real_reset_default_prec();
-        if (std::numeric_limits<T>::radix != 2 || !std::numeric_limits<T>::is_iec559) {
+        if (std::numeric_limits<T>::radix != 2 || (ppc_arch && std::is_same<T, long double>::value)) {
             return;
         }
         std::uniform_real_distribution<T> dist(-T(100), T(100));
@@ -1316,9 +1324,11 @@ struct fp_conv_tester {
         REQUIRE(r0.get(rop));
         REQUIRE(get(rop, r0));
         REQUIRE(rop == T(42));
-        if (!std::numeric_limits<T>::is_iec559) {
+
+        if (ppc_arch && std::is_same<T, long double>::value) {
             return;
         }
+
         std::uniform_real_distribution<T> dist(-T(1000), T(1000));
         for (int i = 0; i < ntrials; ++i) {
             const auto tmp = dist(rng);
