@@ -1,6 +1,16 @@
 Changelog
 =========
 
+0.20 (unreleased)
+-----------------
+
+Fix
+~~~
+
+- Fix a bug in the test suite in
+  release mode
+  (`#219 <https://github.com/bluescarni/mppp/pull/219>`__).
+
 0.19 (29-02-2020)
 -----------------
 
