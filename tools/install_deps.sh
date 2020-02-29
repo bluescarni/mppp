@@ -12,6 +12,8 @@ if [[ "${MPPP_BUILD}" != Coverage32GCC6 ]]; then
     else
         if [[ "${TRAVIS_CPU_ARCH}" == "arm64" ]]; then
             wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh -O miniconda.sh;
+        elif [[ "${TRAVIS_CPU_ARCH}" == "ppc64le" ]]; then
+            wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-ppc64le.sh -O miniconda.sh;
         else
             wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
         fi

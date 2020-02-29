@@ -18,10 +18,10 @@ matrix:
       os: linux
       arch: arm64
       dist: bionic
-      addons:
-        apt:
-          packages:
-          - build-essential
+    - env: MPPP_BUILD="DebugPPC64"
+      os: linux
+      arch: ppc64le
+      dist: bionic
     - env: MPPP_BUILD="ReleaseGCC48"
       compiler: gcc
       os: linux
