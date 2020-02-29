@@ -43,6 +43,10 @@ matrix:
           - g++-6
           - g++-6-multilib
           - cmake
+    - env: MPPP_BUILD="DebugARM64"
+      os: linux
+      arch: arm64
+      dist: bionic
     - env: MPPP_BUILD="Documentation"
       os: linux
       addons:
