@@ -12,7 +12,6 @@
 #include <cmath>
 #include <initializer_list>
 #include <iomanip>
-#include <ios>
 #include <limits>
 #include <random>
 #include <sstream>
@@ -68,7 +67,7 @@ template <typename T>
 static inline std::string f2str(const T &x)
 {
     std::ostringstream oss;
-    oss << std::scientific << std::setprecision(std::numeric_limits<T>::max_digits10) << x;
+    oss << std::setprecision(std::numeric_limits<T>::max_digits10) << x;
     return oss.str();
 }
 
@@ -164,7 +163,7 @@ struct fp_ctor_tester {
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.zero_p()));
         REQUIRE((real{T(0), ::mpfr_prec_t(100)}.get_prec() == 100));
         real_reset_default_prec();
-        if (std::numeric_limits<T>::radix != 2) {
+        if (std::numeric_limits<T>::radix != 2 || !std::numeric_limits<T>::is_iec559) {
             return;
         }
         std::uniform_real_distribution<T> dist(-T(100), T(100));
@@ -695,7 +694,7 @@ struct fp_ass_tester {
         REQUIRE(r.zero_p());
         REQUIRE(r.get_prec() == 101);
         real_reset_default_prec();
-        if (std::numeric_limits<T>::radix != 2) {
+        if (std::numeric_limits<T>::radix != 2 || !std::numeric_limits<T>::is_iec559) {
             return;
         }
         std::uniform_real_distribution<T> dist(-T(100), T(100));
@@ -1317,11 +1316,12 @@ struct fp_conv_tester {
         REQUIRE(r0.get(rop));
         REQUIRE(get(rop, r0));
         REQUIRE(rop == T(42));
+        if (!std::numeric_limits<T>::is_iec559) {
+            return;
+        }
         std::uniform_real_distribution<T> dist(-T(1000), T(1000));
-        std::cout << "Type name: " << type_name<T>() << '\n';
         for (int i = 0; i < ntrials; ++i) {
             const auto tmp = dist(rng);
-            std::cout << (static_cast<T>(real{tmp}) - tmp) << '\n';
             REQUIRE(static_cast<T>(real{tmp}) == tmp);
             REQUIRE(real{tmp}.get(rop));
             REQUIRE(get(rop, real{tmp}));
