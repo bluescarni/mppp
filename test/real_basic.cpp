@@ -12,6 +12,7 @@
 #include <cmath>
 #include <initializer_list>
 #include <iomanip>
+#include <ios>
 #include <limits>
 #include <random>
 #include <sstream>
@@ -67,7 +68,7 @@ template <typename T>
 static inline std::string f2str(const T &x)
 {
     std::ostringstream oss;
-    oss << std::setprecision(std::numeric_limits<T>::max_digits10) << x;
+    oss << std::scientific << std::setprecision(std::numeric_limits<T>::max_digits10) << x;
     return oss.str();
 }
 
@@ -1317,8 +1318,10 @@ struct fp_conv_tester {
         REQUIRE(get(rop, r0));
         REQUIRE(rop == T(42));
         std::uniform_real_distribution<T> dist(-T(1000), T(1000));
+        std::cout << "Type name: " << type_name<T>() << '\n';
         for (int i = 0; i < ntrials; ++i) {
             const auto tmp = dist(rng);
+            std::cout << (static_cast<T>(real{tmp}) - tmp) << '\n';
             REQUIRE(static_cast<T>(real{tmp}) == tmp);
             REQUIRE(real{tmp}.get(rop));
             REQUIRE(get(rop, real{tmp}));
