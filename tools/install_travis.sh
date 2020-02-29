@@ -31,6 +31,10 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
     make -j2 VERBOSE=1;
     ctest -V;
+elif [[ "${MPPP_BUILD}" == "DebugARM64" ]]; then
+    cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes ../;
+    make -j2 VERBOSE=1;
+    ctest -V;
 elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     wget ftp://ftp.gnu.org/gnu/gmp/gmp-6.2.0.tar.bz2;
     tar xjvf gmp-6.2.0.tar.bz2;
