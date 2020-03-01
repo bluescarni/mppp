@@ -181,7 +181,7 @@ dependencies (quadmath, Arb, etc.) is not necessary, as they are
 used only within the compiled component
 of the mp++ library.
 
-If you are using CMake, it's highly recommended to make use of the config-file
+If you are using CMake, it is highly recommended to make use of the config-file
 package provided with mp++ rather
 than locating and linking manually the required dependencies
 (see the next section).
