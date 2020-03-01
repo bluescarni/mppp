@@ -206,6 +206,7 @@ set(MPPP_SRC_FILES
 if(MPPP_WITH_QUADMATH)
     set(MPPP_SRC_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/real128.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/complex128.cpp"
         "${MPPP_SRC_FILES}"
     )
 endif()

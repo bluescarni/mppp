@@ -161,6 +161,8 @@ if(MPPP_WITH_QUADMATH)
   ADD_MPPP_TESTCASE(real128_hyperbolic)
   ADD_MPPP_TESTCASE(real128_miscfunctions)
   ADD_MPPP_TESTCASE(real128_literal)
+
+  ADD_MPPP_TESTCASE(complex128_basic)
 endif()
 
 if(MPPP_WITH_MPFR)
