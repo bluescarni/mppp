@@ -28,15 +28,15 @@ namespace mppp
 // Define the complex type corresponding to __float128
 // ("_Complex __float128" is not allowed).
 #if (!defined(_ARCH_PPC)) || defined(__LONG_DOUBLE_IEEE128__)
-typedef _Complex float __attribute__((mode(TC))) __complex128;
+typedef _Complex float __attribute__((mode(TC))) cplex128;
 #else
-typedef _Complex float __attribute__((mode(KC))) __complex128;
+typedef _Complex float __attribute__((mode(KC))) cplex128;
 #endif
 
 class MPPP_DLL_PUBLIC complex128
 {
 public:
-    __complex128 m_value;
+    cplex128 m_value;
 
     // Default constructor.
     constexpr complex128() : m_value{0} {}
@@ -46,7 +46,7 @@ public:
     constexpr complex128(complex128 &&other) = default;
 
     // Constructor from __complex128.
-    constexpr explicit complex128(__complex128 x) : m_value{x} {}
+    constexpr explicit complex128(cplex128 x) : m_value{x} {}
 
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128CppInteroperable T>
