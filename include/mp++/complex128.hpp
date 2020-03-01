@@ -13,10 +13,11 @@
 
 #if defined(MPPP_WITH_QUADMATH)
 
-#include <complex>
 #include <ostream>
+#include <type_traits>
 
 #include <mp++/concepts.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/detail/visibility.hpp>
 #include <mp++/real128.hpp>
 
@@ -25,12 +26,38 @@ namespace mppp
 
 // NOTE: lifted from quadmath.h, so that we can avoid
 // including the header.
+// NOTE: the definition changed in GCC 8, not sure
+// about the consequences for clang.
+#if defined(__GNUC__) && __GNUC__ >= 8
+
 // Define the complex type corresponding to __float128
 // ("_Complex __float128" is not allowed).
 #if (!defined(_ARCH_PPC)) || defined(__LONG_DOUBLE_IEEE128__)
 typedef _Complex float __attribute__((mode(TC))) cplex128;
 #else
 typedef _Complex float __attribute__((mode(KC))) cplex128;
+#endif
+
+#else
+
+typedef _Complex float __attribute__((mode(TC))) cplex128;
+
+#endif
+
+namespace detail
+{
+
+template <typename T>
+using is_complex128_literal_interoperable = disjunction<is_real128_cpp_interoperable<T>, std::is_same<T, real128>>;
+
+} // namespace detail
+
+template <typename T>
+#if defined(MPPP_HAVE_CONCEPTS)
+MPPP_CONCEPT_DECL Complex128LiteralInteroperable = detail::is_complex128_literal_interoperable<T>::value;
+#else
+using complex128_literal_interoperable_enabler
+    = detail::enable_if_t<detail::is_complex128_literal_interoperable<T>::value, int>;
 #endif
 
 class MPPP_DLL_PUBLIC complex128
@@ -48,28 +75,29 @@ public:
     // Constructor from __complex128.
     constexpr explicit complex128(cplex128 x) : m_value{x} {}
 
+    // Constructor from a literal type.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <Real128CppInteroperable T>
+    template <Complex128LiteralInteroperable T>
 #else
-    template <typename T, real128_cpp_interoperable_enabler<T> = 0>
+    template <typename T, complex128_literal_interoperable_enabler<T> = 0>
 #endif
-    constexpr explicit complex128(const T &x) : m_value{x}
+    constexpr explicit complex128(const T &x) : m_value{static_cast<__float128>(x)}
     {
     }
+    // Constructor from a pair of literal types.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <Real128CppInteroperable T, Real128CppInteroperable U>
+    template <Complex128LiteralInteroperable T, Complex128LiteralInteroperable U>
 #else
     template <typename T, typename U,
-              detail::enable_if_t<detail::conjunction<detail::is_real128_cpp_interoperable<T>,
-                                                      detail::is_real128_cpp_interoperable<U>>::value,
+              detail::enable_if_t<detail::conjunction<detail::is_complex128_literal_interoperable<T>,
+                                                      detail::is_complex128_literal_interoperable<U>>::value,
                                   int> = 0>
 #endif
     constexpr explicit complex128(const T &re, const U &im)
         : m_value{static_cast<__float128>(re), static_cast<__float128>(im)}
     {
     }
-
-public:
+    // Constructor from std::complex.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppComplex T>
 #else
@@ -80,6 +108,29 @@ public:
     {
     }
 
+    // Constructor from an mp++ type.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <Real128MpppInteroperable T>
+#else
+    template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+#endif
+    explicit complex128(const T &x) : m_value{real128{x}.m_value}
+    {
+    }
+    // Constructor from a pair of mp++ types.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <Real128MpppInteroperable T, Real128MpppInteroperable U>
+#else
+    template <typename T, typename U,
+              detail::enable_if_t<detail::conjunction<detail::is_real128_mppp_interoperable<T>,
+                                                      detail::is_real128_mppp_interoperable<U>>::value,
+                                  int> = 0>
+#endif
+    explicit complex128(const T &re, const U &im) : m_value{real128{re}.m_value, real128{im}.m_value}
+    {
+    }
+
+    // Getters for real/imaginary parts.
     constexpr real128 creal() const
     {
         return real128{__real__ m_value};

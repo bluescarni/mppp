@@ -28,4 +28,8 @@ TEST_CASE("complex128 constructors")
 #endif
     std::cout << c2 << '\n';
     std::cout << tmp << '\n';
+
+    std::cout << complex128{(123_q1 * pow(2_z1, 512)) / 456} << '\n';
+    // std::cout << complex128{123_q1 / 2, 1} << '\n';
+    complex128{real128{4}};
 }
