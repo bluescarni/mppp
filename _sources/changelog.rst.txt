@@ -1,6 +1,24 @@
 Changelog
 =========
 
+0.20 (unreleased)
+-----------------
+
+New
+~~~
+
+- mp++ now officially supports the ARM (``aarch64``)
+  and PowerPC (``ppc64le``) architectures, which have
+  been added to the continuous integration setup
+  (`#219 <https://github.com/bluescarni/mppp/pull/219>`__).
+
+Fix
+~~~
+
+- Fix a bug in the test suite in
+  release mode
+  (`#219 <https://github.com/bluescarni/mppp/pull/219>`__).
+
 0.19 (29-02-2020)
 -----------------
 

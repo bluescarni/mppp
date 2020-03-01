@@ -9,18 +9,12 @@ Introduction
 mp++ is written in modern C++, and it requires a compiler able to understand
 at least C++11 (mp++ will also use features from C++14 and C++17,
 if supported by the compiler). The library is regularly tested on
-various versions of the three major compilers (GCC, Clang and MSVC)
-and operating-systems (Linux, Windows and OSX).
+a comprehensive continuous integration pipeline, which includes:
 
-mp++ has been written, tested and benchmarked on x86 processors, but it does
-not contain any architecture-specific code
-and thus it should run on any architecture supported by GMP
-(as long as a decent C++11 compiler is available).
-mp++ does use compiler-specific functionality
-(e.g., 128-bit `integers <https://gcc.gnu.org/onlinedocs/gcc/_005f_005fint128.html>`__
-or intrinsics on 64-bit architectures) for the implementation of
-fast integer arithmetics. If such functionality is not available, mp++
-will fall back to GMP's ``mpn_`` functions.
+* various versions of the three major compilers (GCC, Clang and MSVC),
+* various versions of the three major operating systems
+  (Linux, Windows and OSX),
+* x86, ARM and PowerPC processors.
 
 mp++ has the following dependencies:
 
@@ -45,7 +39,9 @@ installing from source (the minimum required version is 3.3).
 Installation from source
 ------------------------
 
-Source releases of mp++ can be downloaded from `github <https://github.com/bluescarni/mppp/releases>`__. Once in the source tree
+Source releases of mp++ can be downloaded from
+`github <https://github.com/bluescarni/mppp/releases>`__.
+Once in the source tree
 of mp++, you can use ``cmake`` to configure the build to your liking
 (e.g., enabling optional features, customizing the installation
 path, etc.). The available configuration options are:

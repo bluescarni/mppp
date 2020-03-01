@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; mp++ 0.19 documentation</title>
+  <title>Installation &mdash; mp++ 0.20 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.19
+                0.20
               </div>
             
           
@@ -174,17 +174,13 @@
 <p>mp++ is written in modern C++, and it requires a compiler able to understand
 at least C++11 (mp++ will also use features from C++14 and C++17,
 if supported by the compiler). The library is regularly tested on
-various versions of the three major compilers (GCC, Clang and MSVC)
-and operating-systems (Linux, Windows and OSX).</p>
-<p>mp++ has been written, tested and benchmarked on x86 processors, but it does
-not contain any architecture-specific code
-and thus it should run on any architecture supported by GMP
-(as long as a decent C++11 compiler is available).
-mp++ does use compiler-specific functionality
-(e.g., 128-bit <a class="reference external" href="https://gcc.gnu.org/onlinedocs/gcc/_005f_005fint128.html">integers</a>
-or intrinsics on 64-bit architectures) for the implementation of
-fast integer arithmetics. If such functionality is not available, mp++
-will fall back to GMP’s <code class="docutils literal notranslate"><span class="pre">mpn_</span></code> functions.</p>
+a comprehensive continuous integration pipeline, which includes:</p>
+<ul class="simple">
+<li><p>various versions of the three major compilers (GCC, Clang and MSVC),</p></li>
+<li><p>various versions of the three major operating systems
+(Linux, Windows and OSX),</p></li>
+<li><p>x86, ARM and PowerPC processors.</p></li>
+</ul>
 <p>mp++ has the following dependencies:</p>
 <ul class="simple">
 <li><p>the <a class="reference external" href="https://gmplib.org/">GMP</a> library, <strong>mandatory</strong> (GMP 5 and later versions are supported,
@@ -207,7 +203,9 @@ installing from source (the minimum required version is 3.3).</p>
 </div>
 <div class="section" id="installation-from-source">
 <h2>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this headline">¶</a></h2>
-<p>Source releases of mp++ can be downloaded from <a class="reference external" href="https://github.com/bluescarni/mppp/releases">github</a>. Once in the source tree
+<p>Source releases of mp++ can be downloaded from
+<a class="reference external" href="https://github.com/bluescarni/mppp/releases">github</a>.
+Once in the source tree
 of mp++, you can use <code class="docutils literal notranslate"><span class="pre">cmake</span></code> to configure the build to your liking
 (e.g., enabling optional features, customizing the installation
 path, etc.). The available configuration options are:</p>
