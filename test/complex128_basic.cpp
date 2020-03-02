@@ -11,6 +11,12 @@
 #include <mp++/complex128.hpp>
 #include <mp++/config.hpp>
 
+#if defined(MPPP_WITH_MPFR)
+
+#include <mp++/real.hpp>
+
+#endif
+
 #include "catch.hpp"
 
 using namespace mppp;
@@ -32,4 +38,14 @@ TEST_CASE("complex128 constructors")
     std::cout << complex128{(123_q1 * pow(2_z1, 512)) / 456} << '\n';
     std::cout << complex128{123_q1 / 2, 1} << '\n';
     complex128{real128{4}};
+
+#if defined(MPPP_WITH_MPFR)
+    std::cout << complex128{123_q1, 1.1_r256} << '\n';
+#endif
+
+    std::cout << (complex128{1, 2} == complex128{1, 2}) << '\n';
+    std::cout << (complex128{1, 2} == real128{1}) << '\n';
+    std::cout << (real128{1} == complex128{1, 2}) << '\n';
+    std::cout << (complex128{1, 2} == 1.5) << '\n';
+    std::cout << (45ull == complex128{1, 2}) << '\n';
 }

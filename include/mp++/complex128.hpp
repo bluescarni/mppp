@@ -14,7 +14,14 @@
 #if defined(MPPP_WITH_QUADMATH)
 
 #include <ostream>
+#include <string>
 #include <type_traits>
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+
+#include <string_view>
+
+#endif
 
 #include <mp++/concepts.hpp>
 #include <mp++/detail/type_traits.hpp>
@@ -43,45 +50,41 @@ typedef _Complex float __attribute__((mode(TC))) cplex128;
 typedef _Complex float __attribute__((mode(KC))) cplex128;
 #endif
 
-namespace detail
-{
+template <typename T>
+using is_complex128_literal_interoperable
+    = detail::disjunction<detail::is_real128_cpp_interoperable<T>, std::is_same<T, real128>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
 
 template <typename T>
-using is_complex128_literal_interoperable = disjunction<is_real128_cpp_interoperable<T>, std::is_same<T, real128>>;
+MPPP_CONCEPT_DECL Complex128LiteralInteroperable = is_complex128_literal_interoperable<T>::value;
 
-template <typename T>
-using is_complex128_mppp_interoperable = disjunction<is_real128_mppp_interoperable<T>
-#if defined(MPPP_WITH_MPFR)
-                                                     ,
-                                                     std::is_same<T, real>
 #endif
-                                                     >;
+
+template <typename T>
+using is_complex128_nonliteral_interoperable = detail::disjunction<detail::is_real128_mppp_interoperable<T>
+#if defined(MPPP_WITH_MPFR)
+                                                                   ,
+                                                                   std::is_same<T, real>
+#endif
+                                                                   >;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL Complex128NonLiteralInteroperable = is_complex128_nonliteral_interoperable<T>::value;
+
+#endif
 
 template <typename T>
 using is_complex128_interoperable
-    = disjunction<is_complex128_literal_interoperable<T>, is_complex128_mppp_interoperable<T>>;
-
-} // namespace detail
-
-template <typename T>
-#if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL Complex128LiteralInteroperable = detail::is_complex128_literal_interoperable<T>::value;
-#else
-using complex128_literal_interoperable_enabler
-    = detail::enable_if_t<detail::is_complex128_literal_interoperable<T>::value, int>;
-#endif
-
-template <typename T>
-#if defined(MPPP_HAVE_CONCEPTS)
-MPPP_CONCEPT_DECL Complex128MpppInteroperable = detail::is_complex128_mppp_interoperable<T>::value;
-#else
-using complex128_mppp_interoperable_enabler
-    = detail::enable_if_t<detail::is_complex128_mppp_interoperable<T>::value, int>;
-#endif
+    = detail::disjunction<is_complex128_literal_interoperable<T>, is_complex128_nonliteral_interoperable<T>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
+
 template <typename T>
-MPPP_CONCEPT_DECL Complex128Interoperable = detail::is_complex128_interoperable<T>::value;
+MPPP_CONCEPT_DECL Complex128Interoperable = is_complex128_interoperable<T>::value;
+
 #endif
 
 class MPPP_DLL_PUBLIC complex128
@@ -103,7 +106,7 @@ public:
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Complex128LiteralInteroperable T>
 #else
-    template <typename T, complex128_literal_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_complex128_literal_interoperable<T>::value, int> = 0>
 #endif
     constexpr explicit complex128(const T &x) : m_value{static_cast<__float128>(x)}
     {
@@ -113,8 +116,8 @@ public:
     template <Complex128LiteralInteroperable T, Complex128LiteralInteroperable U>
 #else
     template <typename T, typename U,
-              detail::enable_if_t<detail::conjunction<detail::is_complex128_literal_interoperable<T>,
-                                                      detail::is_complex128_literal_interoperable<U>>::value,
+              detail::enable_if_t<detail::conjunction<is_complex128_literal_interoperable<T>,
+                                                      is_complex128_literal_interoperable<U>>::value,
                                   int> = 0>
 #endif
     constexpr explicit complex128(const T &re, const U &im)
@@ -125,36 +128,35 @@ public:
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppComplex T>
 #else
-    template <typename T, cpp_complex_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_cpp_complex<T>::value, int> = 0>
 #endif
     MPPP_CONSTEXPR_14 explicit complex128(const T &c)
         : m_value{static_cast<__float128>(c.real()), static_cast<__float128>(c.imag())}
     {
     }
 
-    // Constructor from an mp++ type.
+    // Constructor from a non-literal type.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <Real128MpppInteroperable T>
+    template <Complex128NonLiteralInteroperable T>
 #else
-    template <typename T, real128_mppp_interoperable_enabler<T> = 0>
+    template <typename T, detail::enable_if_t<is_complex128_nonliteral_interoperable<T>::value, int> = 0>
 #endif
     explicit complex128(const T &x) : complex128(static_cast<real128>(x))
     {
     }
     // Constructor from a pair of types, of which at least one
-    // is not a literal type.
+    // is a non-literal type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <typename T, typename U>
     requires Complex128Interoperable<T> && Complex128Interoperable<U> &&
-    (!Complex128LiteralInteroperable<T> || !Complex128LiteralInteroperable<U>)
+    (Complex128NonLiteralInteroperable<T> || Complex128NonLiteralInteroperable<U>)
 #else
-    template <typename T, typename U,
-              detail::enable_if_t<
-                  detail::conjunction<
-                      detail::is_complex128_interoperable<T>, detail::is_complex128_interoperable<U>,
-                      detail::disjunction<detail::negation<detail::is_complex128_literal_interoperable<T>>,
-                                          detail::negation<detail::is_complex128_literal_interoperable<U>>>>::value,
-                  int> = 0>
+    template <
+        typename T, typename U,
+        detail::enable_if_t<detail::conjunction<is_complex128_interoperable<T>, is_complex128_interoperable<U>,
+                                                detail::disjunction<is_complex128_nonliteral_interoperable<T>,
+                                                                    is_complex128_nonliteral_interoperable<U>>>::value,
+                            int> = 0>
 #endif
     explicit complex128(const T &re, const U &im) : m_value{static_cast<real128>(re).m_value, static_cast<real128>(im).m_value}
     {
@@ -169,8 +171,22 @@ public:
     {
         return real128{__imag__ m_value};
     }
+
+    // Setters for real/imaginary parts.
+    MPPP_CONSTEXPR_14 void set_real(const real128 &re)
+    {
+        __real__ m_value = re.m_value;
+    }
+    MPPP_CONSTEXPR_14 void set_imag(const real128 &im)
+    {
+        __imag__ m_value = im.m_value;
+    }
+
+    // Conversion to string.
+    std::string to_string() const;
 };
 
+// Getters for real/imaginary parts.
 constexpr real128 creal(const complex128 &c)
 {
     return c.creal();
@@ -181,7 +197,98 @@ constexpr real128 cimag(const complex128 &c)
     return c.cimag();
 }
 
+// Setters for real/imaginary parts.
+inline MPPP_CONSTEXPR_14 void set_real(complex128 &c, const real128 &re)
+{
+    c.set_real(re);
+}
+
+inline MPPP_CONSTEXPR_14 void set_imag(complex128 &c, const real128 &im)
+{
+    c.set_imag(im);
+}
+
+// Streaming operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const complex128 &);
+
+// Identity operator.
+constexpr complex128 operator+(const complex128 &c)
+{
+    return c;
+}
+
+// Negation operator.
+constexpr complex128 operator-(const complex128 &c)
+{
+    return complex128{-c.m_value};
+}
+
+template <typename T, typename U>
+using are_complex128_literal_op_types
+    = detail::disjunction<detail::conjunction<std::is_same<T, complex128>, std::is_same<U, complex128>>,
+                          detail::conjunction<std::is_same<T, complex128>, is_complex128_literal_interoperable<U>>,
+                          detail::conjunction<std::is_same<U, complex128>, is_complex128_literal_interoperable<T>>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T, typename U>
+MPPP_CONCEPT_DECL Complex128LiteralOpTypes = are_complex128_literal_op_types<T, U>::value;
+
+#endif
+
+namespace detail
+{
+
+constexpr bool dispatch_literal_eq(const complex128 &c1, const complex128 &c2)
+{
+    return c1.m_value == c2.m_value;
+}
+
+constexpr bool dispatch_literal_eq(const complex128 &c, const real128 &x)
+{
+    return c.m_value == x.m_value;
+}
+
+constexpr bool dispatch_literal_eq(const real128 &x, const complex128 &c)
+{
+    return dispatch_literal_eq(c, x);
+}
+
+template <typename T>
+constexpr bool dispatch_literal_eq(const complex128 &c, const T &x)
+{
+    return c.m_value == x;
+}
+
+template <typename T>
+constexpr bool dispatch_literal_eq(const T &x, const complex128 &c)
+{
+    return dispatch_literal_eq(c, x);
+}
+
+} // namespace detail
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires Complex128LiteralOpTypes<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex128_literal_op_types<T, U>::value, int> = 0>
+#endif
+    constexpr bool operator==(const T &x, const U &y)
+{
+    return detail::dispatch_literal_eq(x, y);
+}
+
+#if defined(MPPP_HAVE_CONCEPTS)
+template <typename T, typename U>
+requires Complex128LiteralOpTypes<T, U>
+#else
+template <typename T, typename U, detail::enable_if_t<are_complex128_literal_op_types<T, U>::value, int> = 0>
+#endif
+    constexpr bool operator!=(const T &x, const U &y)
+{
+    return !(x == y);
+}
 
 } // namespace mppp
 

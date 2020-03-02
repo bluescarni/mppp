@@ -7,6 +7,8 @@
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <ostream>
+#include <sstream>
+#include <string>
 
 // NOTE: extern "C" is already included in quadmath.h since GCC 4.8:
 // https://stackoverflow.com/questions/13780219/link-libquadmath-with-c-on-linux
@@ -22,12 +24,21 @@ std::ostream &operator<<(std::ostream &os, const complex128 &c)
 {
     // NOTE: use the same printing format as std::complex.
     os << '(';
-    detail::float128_stream(os, ::crealq(c.m_value));
+    detail::float128_stream(os, c.creal().m_value);
     os << ',';
-    detail::float128_stream(os, ::cimagq(c.m_value));
+    detail::float128_stream(os, c.cimag().m_value);
     os << ')';
 
     return os;
+}
+
+std::string complex128::to_string() const
+{
+    std::ostringstream oss;
+
+    oss << *this;
+
+    return oss.str();
 }
 
 } // namespace mppp
