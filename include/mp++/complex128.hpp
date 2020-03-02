@@ -162,6 +162,29 @@ public:
     {
     }
 
+private:
+    // A tag to call private ctors.
+    struct ptag {
+    };
+    explicit complex128(const ptag &, const char *);
+    explicit complex128(const ptag &, const std::string &);
+#if defined(MPPP_HAVE_STRING_VIEW)
+    explicit complex128(const ptag &, const std::string_view &);
+#endif
+
+public:
+    // Constructor from string.
+#if defined(MPPP_HAVE_CONCEPTS)
+    template <StringType T>
+#else
+    template <typename T, string_type_enabler<T> = 0>
+#endif
+    explicit complex128(const T &s) : complex128(ptag{}, s)
+    {
+    }
+    // Constructor from range of characters.
+    explicit complex128(const char *, const char *);
+
     // Getters for the real/imaginary parts.
     constexpr real128 creal() const
     {
@@ -289,6 +312,29 @@ template <typename T, typename U, detail::enable_if_t<are_complex128_literal_op_
 {
     return !(x == y);
 }
+
+inline namespace literals
+{
+
+template <char... Chars>
+inline complex128 operator"" _cq()
+{
+    return complex128{operator"" _rq<Chars...>()};
+}
+
+template <char... Chars>
+inline complex128 operator"" _irq()
+{
+    return complex128{0, operator"" _rq<Chars...>()};
+}
+
+template <>
+constexpr complex128 operator"" _irq<'1'>()
+{
+    return complex128{0, 1};
+}
+
+} // namespace literals
 
 } // namespace mppp
 

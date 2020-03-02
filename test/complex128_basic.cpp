@@ -48,4 +48,19 @@ TEST_CASE("complex128 constructors")
     std::cout << (real128{1} == complex128{1, 2}) << '\n';
     std::cout << (complex128{1, 2} == 1.5) << '\n';
     std::cout << (45ull == complex128{1, 2}) << '\n';
+
+    // Testing for string ctor:
+    // - leading whitespaces (outside and inside the brackets),
+    // - trailing whitespaces,
+    // - empty components,
+    // - non-closed bracket.
+    std::cout << complex128{"1.23"} << '\n';
+    std::cout << complex128{"(1.23)"} << '\n';
+    std::cout << complex128{"(1.23,-4.56)"} << '\n';
+    std::cout << complex128{"(1.23,-4.56)"} << '\n';
+
+    std::cout << 1.23_cq << '\n';
+    std::cout << 1.23_irq << '\n';
+    std::cout << 1_irq << '\n';
+    [[maybe_unused]] constexpr auto flop = 1_irq;
 }
