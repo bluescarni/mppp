@@ -80,10 +80,6 @@ union ieee_float128 {
     ieee_t i_eee;
 };
 
-// String conversion helpers.
-MPPP_DLL_PUBLIC void float128_stream(std::ostream &, const __float128 &);
-MPPP_DLL_PUBLIC __float128 str_to_float128(const char *);
-
 // Wrappers for use in various functions below (so that
 // we don't have to include quadmath.h here).
 MPPP_DLL_PUBLIC __float128 scalbnq(__float128, int);
@@ -438,11 +434,12 @@ private:
     // A tag to call private ctors.
     struct ptag {
     };
-    explicit real128(const ptag &, const char *s) : m_value(detail::str_to_float128(s)) {}
-    explicit real128(const ptag &, const std::string &s) : real128(s.c_str()) {}
+    explicit real128(const ptag &, const char *);
+    explicit real128(const ptag &, const std::string &);
 #if defined(MPPP_HAVE_STRING_VIEW)
-    explicit real128(const ptag &, const std::string_view &s) : real128(s.data(), s.data() + s.size()) {}
+    explicit real128(const ptag &, const std::string_view &);
 #endif
+
 public:
     /// Constructor from string.
     /**
@@ -463,12 +460,11 @@ public:
      * @throws unspecified any exception thrown by memory errors in standard containers.
      */
 #if defined(MPPP_HAVE_CONCEPTS)
-    explicit real128(const StringType &s)
+    template <StringType T>
 #else
     template <typename T, string_type_enabler<T> = 0>
-    explicit real128(const T &s)
 #endif
-        : real128(ptag{}, s)
+    explicit real128(const T &s) : real128(ptag{}, s)
     {
     }
     // Constructor from range of characters.
@@ -584,17 +580,17 @@ public:
     {
         return *this = real128{s};
     }
-/// Conversion operator to interoperable C++ types.
-/**
- * \rststar
- * This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128CppInteroperable` type. The conversion uses
- * a direct ``static_cast()`` of the internal :cpp:member:`~mppp::real128::m_value` member to the target type,
- * and thus no checks are performed to ensure that the value of ``this`` can be represented by the target type.
- * Conversion to integral types will produce the truncated counterpart of ``this``.
- * \endrststar
- *
- * @return \p this converted to \p T.
- */
+    /// Conversion operator to interoperable C++ types.
+    /**
+     * \rststar
+     * This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128CppInteroperable` type. The conversion uses
+     * a direct ``static_cast()`` of the internal :cpp:member:`~mppp::real128::m_value` member to the target type,
+     * and thus no checks are performed to ensure that the value of ``this`` can be represented by the target type.
+     * Conversion to integral types will produce the truncated counterpart of ``this``.
+     * \endrststar
+     *
+     * @return \p this converted to \p T.
+     */
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128CppInteroperable T>
 #else

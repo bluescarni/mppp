@@ -6,16 +6,23 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
 #include <ostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
+#if defined(MPPP_HAVE_STRING_VIEW)
+
+#include <string_view>
+
+#endif
+
 // NOTE: extern "C" is already included in quadmath.h since GCC 4.8:
 // https://stackoverflow.com/questions/13780219/link-libquadmath-with-c-on-linux
 #include <quadmath.h>
 
-#include <mp++/config.hpp>
 #include <mp++/detail/utils.hpp>
 #include <mp++/real128.hpp>
 
@@ -28,6 +35,9 @@ namespace mppp
 static_assert(FLT128_MANT_DIG == real128_sig_digits(), "Invalid number of digits.");
 
 namespace detail
+{
+
+namespace
 {
 
 void float128_stream(std::ostream &os, const __float128 &x)
@@ -66,6 +76,8 @@ __float128 str_to_float128(const char *s)
     return retval;
 }
 
+} // namespace
+
 __float128 scalbnq(__float128 x, int exp)
 {
     return ::scalbnq(x, exp);
@@ -82,6 +94,17 @@ __float128 powq(__float128 x, __float128 y)
 }
 
 } // namespace detail
+
+// Private string constructors.
+real128::real128(const ptag &, const char *s) : m_value(detail::str_to_float128(s)) {}
+
+real128::real128(const ptag &, const std::string &s) : real128(s.c_str()) {}
+
+#if defined(MPPP_HAVE_STRING_VIEW)
+
+real128::real128(const ptag &, const std::string_view &s) : real128(s.data(), s.data() + s.size()) {}
+
+#endif
 
 /// Constructor from range of characters.
 /**
