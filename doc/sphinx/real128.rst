@@ -33,43 +33,25 @@ Types
 Concepts
 --------
 
-.. cpp:concept:: template <typename T> mppp::Real128CppInteroperable
+.. cpp:concept:: template <typename T> mppp::Real128Interoperable
 
-   This concept is satisfied by fundamental C++ types that can interoperate with :cpp:class:`~mppp::real128`.
-   Specifically:
+   This concept is satisfied by types that can interoperate with :cpp:class:`~mppp::real128`.
+   Specifically, this concept is satisfied if either:
 
-   * on GCC, this concept is satisfied by the types satisfying :cpp:concept:`mppp::CppInteroperable`;
-   * on Clang, this concept is satisfied by the types satisfying :cpp:concept:`mppp::CppInteroperable`,
-     minus ``long double``.
-
-.. cpp:concept:: template <typename T> mppp::Real128MpppInteroperable
-
-   This concept is satisfied by mp++ types that can interoperate with :cpp:class:`~mppp::real128`.
-   Specifically, the concept is satisfied if ``T`` is either :cpp:class:`~mppp::integer` or
-   :cpp:class:`~mppp::rational`.
-
-.. cpp:concept:: template <typename T, typename U> mppp::Real128CppOpTypes
-
-   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
-   generic binary :ref:`operators <real128_operators>`
-   involving :cpp:class:`~mppp::real128` and C++ types. Specifically, the concept will be ``true`` if either:
-
-   * ``T`` and ``U`` are both :cpp:class:`~mppp::real128`, or
-   * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::Real128CppInteroperable` type.
-
-.. cpp:concept:: template <typename T, typename U> mppp::Real128MpppOpTypes
-
-   This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
-   generic binary :ref:`operators <real128_operators>`
-   involving :cpp:class:`~mppp::real128` and mp++ types. Specifically, the concept will be ``true`` if
-   one type is :cpp:class:`~mppp::real128` and the other type satisfies :cpp:concept:`~mppp::Real128MpppInteroperable`.
+   * ``T`` is :cpp:class:`~mppp::integer`, or
+   * ``T`` is :cpp:class:`~mppp::rational`, or
+   * on GCC, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable`, or
+   * on Clang, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable`,
+     except if ``T`` is ``long double``.
 
 .. cpp:concept:: template <typename T, typename U> mppp::Real128OpTypes
 
    This concept is satisfied if the types ``T`` and ``U`` are suitable for use in the
-   generic binary :ref:`operators <real128_operators>` and :ref:`functions <real128_functions>`
-   involving :cpp:class:`~mppp::real128`. Specifically, the concept will be ``true`` if
-   ``T`` and ``U`` satisfy :cpp:concept:`~mppp::Real128CppOpTypes` or :cpp:concept:`~mppp::Real128MpppOpTypes`.
+   generic binary :ref:`operators <real128_operators>`
+   involving :cpp:class:`~mppp::real128` and other types. Specifically, the concept will be ``true`` if either:
+
+   * ``T`` and ``U`` are both :cpp:class:`~mppp::real128`, or
+   * one type is :cpp:class:`~mppp::real128` and the other is a :cpp:concept:`~mppp::Real128Interoperable` type.
 
 .. _real128_functions:
 
