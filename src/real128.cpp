@@ -6,6 +6,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
 #include <mp++/config.hpp>
 
 #include <ostream>
@@ -106,20 +108,7 @@ real128::real128(const ptag &, const std::string_view &s) : real128(s.data(), s.
 
 #endif
 
-/// Constructor from range of characters.
-/**
- * This constructor will initialise \p this from the content of the input half-open range, which is interpreted
- * as the string representation of a floating-point value.
- *
- * Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and
- * invoke the constructor from string.
- *
- * @param begin the begin of the input range.
- * @param end the end of the input range.
- *
- * @throws unspecified any exception thrown by the constructor from string or by memory errors in standard
- * containers.
- */
+// Constructor from range of characters.
 real128::real128(const char *begin, const char *end)
 {
     MPPP_MAYBE_TLS std::vector<char> buffer;
@@ -472,3 +461,5 @@ std::ostream &operator<<(std::ostream &os, const real128 &x)
 }
 
 } // namespace mppp
+
+#endif

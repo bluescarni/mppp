@@ -12,11 +12,163 @@ Quadruple-precision floats
 
 *#include <mp++/real128.hpp>*
 
-The ``real128`` class
----------------------
+The real128 class
+-----------------
 
-.. doxygenclass:: mppp::real128
-   :members:
+.. cpp:class:: mppp::real128
+
+   Quadruple-precision floating-point class.
+
+   This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
+   (which features up to 36 decimal digits of precision).
+   The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available in GCC
+   and recent Clang versions on most modern platforms, on top of which it provides the following additions:
+
+   * interoperability with other mp++ classes,
+   * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
+     default-initialised to zero rather than to indefinite values, conversions must be explicit, etc.),
+   * enhanced compile-time (``constexpr``) capabilities,
+   * a generic C++ API.
+
+   Most of the functionality is exposed via plain :ref:`functions <real128_functions>`, with the
+   general convention that the functions are named after the corresponding quadmath functions minus the trailing ``q``
+   suffix. For instance, the quadmath code
+
+   .. code-block:: c++
+
+      __float128 a = 1;
+      auto b = ::sinq(a);
+
+   that computes the sine of 1 in quadruple precision, storing the result in ``b``, becomes in mp++
+
+   .. code-block:: c++
+
+      real128 a{1};
+      auto b = sin(a);
+
+   where the ``sin()`` function is resolved via argument-dependent lookup.
+
+   Various :ref:`overloaded operators <real128_operators>` are provided.
+   The common arithmetic operators (``+``, ``-``, ``*`` and ``/``) always return :cpp:class:`~mppp::real128`
+   as a result, promoting at most one operand to :cpp:class:`~mppp::real128` before actually performing
+   the computation. Similarly, the relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote at
+   most one argument to :cpp:class:`~mppp::real128` before performing the comparison. Alternative comparison functions
+   treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
+   are needed).
+
+   The :cpp:class:`~mppp::real128` class is a `literal type
+   <https://en.cppreference.com/w/cpp/named_req/LiteralType>`__, and, whenever possible, operations involving
+   :cpp:class:`~mppp::real128` are marked as ``constexpr``. Some functions which are not ``constexpr`` in the quadmath
+   library have been reimplemented as ``constexpr`` functions via compiler builtins.
+
+   A :ref:`tutorial <tutorial_real128>` showcasing various features of :cpp:class:`~mppp::real128`
+   is available.
+
+   .. seealso::
+      https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+
+      https://gcc.gnu.org/onlinedocs/libquadmath/
+
+   .. cpp:function:: constexpr real128()
+
+      Default constructor.
+
+      The default constructor will set ``this`` to zero.
+
+   .. cpp:function:: real128(const real128 &) = default
+   .. cpp:function:: real128(real128 &&) = default
+
+      :cpp:class:`~mppp::real128` is trivially copy and
+      move constructible.
+
+   .. cpp:function:: constexpr explicit real128(__float128 x)
+
+      Constructor from a :cpp:type:`__float128`.
+
+      This constructor will initialise the internal :cpp:type:`__float128`
+      value to *x*.
+
+      :param x: the :cpp:type:`__float128` that will be assigned to the internal value.
+
+   .. cpp:function:: template <Real128Interoperable T> constexpr explicit real128(const T &x)
+
+      Constructor from interoperable types.
+
+      This constructor will initialise the internal value to *x*.
+      Depending on the value and type of *x*, ``this`` may not be exactly equal
+      to *x* after initialisation (e.g., if *x* is a very large
+      :cpp:class:`~mppp::integer`).
+
+      :param x: the value that will be used for the initialisation.
+
+      :exception std\:\:overflow_error: in case of (unlikely) overflow errors during initialisation.
+
+   .. cpp:function:: template <StringType T> explicit real128(const T &s)
+
+      Constructor from string.
+
+      This constructor will initialise ``this`` from the :cpp:concept:`~mppp::StringType` *s*.
+      The accepted string formats are detailed in the quadmath library's documentation
+      (see the link below). Leading whitespaces are accepted (and ignored), but trailing whitespaces
+      will raise an error.
+
+      .. seealso::
+         https://gcc.gnu.org/onlinedocs/libquadmath/strtoflt128.html
+
+      :param s: the string that will be used to initialise ``this``.
+
+      :exception std\:\:invalid_argument: if *s* does not represent a valid quadruple-precision
+        floating-point value.
+      :exception unspecified: any exception thrown by memory errors in standard containers.
+
+   .. cpp:function:: explicit real128(const char *begin, const char *end)
+
+      Constructor from range of characters.
+
+      This constructor will initialise ``this`` from the content of the input half-open range, which is interpreted
+      as the string representation of a floating-point value.
+
+      Internally, the constructor will copy the content of the range to a local buffer, add a string terminator, and
+      invoke the constructor from string.
+
+      :param begin: the begin of the input range.
+      :param end: the end of the input range.
+
+      :exception unspecified: any exception thrown by the constructor from string or by memory errors in standard
+        containers.
+
+   .. cpp:function:: real128 &operator=(const real128 &) = default
+   .. cpp:function:: real128 &operator=(real128 &&) = default
+
+      :cpp:class:`~mppp::real128` is trivially copy and
+      move assignable.
+
+   .. cpp:function:: constexpr real128 &operator=(const __float128 &x)
+
+      .. note::
+
+        This operator is marked as ``constexpr`` only if at least C++14 is being used.
+
+      Assignment from a :cpp:type:`__float128`.
+
+      :param x: the :cpp:type:`__float128` that will be assigned to the internal value.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: template <Real128Interoperable T> constexpr real128 &operator=(const T &x)
+
+      .. note::
+
+        This operator is marked as ``constexpr`` only if at least C++14 is being used.
+
+      Assignment from interoperable types.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception thrown by the construction of a
+        :cpp:class:`~mppp::real128` from *x*.
 
 Types
 -----

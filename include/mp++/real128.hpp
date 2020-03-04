@@ -9,6 +9,8 @@
 #ifndef MPPP_REAL128_HPP
 #define MPPP_REAL128_HPP
 
+#if !defined(MPPP_DOXYGEN_INVOKED)
+
 #include <mp++/config.hpp>
 
 #if defined(MPPP_WITH_QUADMATH)
@@ -157,123 +159,24 @@ MPPP_CONCEPT_DECL Real128OpTypes = are_real128_op_types<T, U>::value;
 //   functions). Make sure to benchmark first though...
 // - initial code for stream formatting at 687b86d9380a534048f62aac3815c31b094e52d2. The problem to be
 //   solved is the segfault in MinGW.
+// - should we change the cast operator to C++ types to check the result of the conversion?
 
-/// Quadruple-precision floating-point class.
-/**
- * \rststar
- * This class represents real values encoded in the quadruple-precision IEEE 754 floating-point format
- * (which features up to 36 decimal digits of precision).
- * The class is a thin wrapper around the :cpp:type:`__float128` type and the quadmath library, available in GCC
- * and recent Clang versions on most modern platforms, on top of which it provides the following additions:
- *
- * * interoperability with other mp++ classes,
- * * consistent behaviour with respect to the conventions followed elsewhere in mp++ (e.g., values are
- *   default-initialised to zero rather than to indefinite values, conversions must be explicit, etc.),
- * * enhanced compile-time (``constexpr``) capabilities,
- * * a generic C++ API.
- *
- * This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
- * floating-point primitive types, :cpp:class:`~mppp::integer` and :cpp:class:`~mppp::rational`,
- * and it provides overloaded :ref:`operators <real128_operators>`. Differently from the builtin types,
- * however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
- * from and conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
- *
- * .. code-block:: c++
- *
- *    real128 r = 5.23;
- *    int m = r;
- *
- * will not work, and direct initialization should be used instead:
- *
- * .. code-block:: c++
- *
- *    real128 r{5.23};
- *    int m{r};
- *
- * Most of the functionality is exposed via plain :ref:`functions <real128_functions>`, with the
- * general convention that the functions are named after the corresponding quadmath functions minus the trailing ``q``
- * suffix. For instance, the quadmath code
- *
- * .. code-block:: c++
- *
- *    __float128 a = 1;
- *    auto b = ::sinq(a);
- *
- * that computes the sine of 1 in quadruple precision, storing the result in ``b``, becomes
- *
- * .. code-block:: c++
- *
- *    real128 a{1};
- *    auto b = sin(a);
- *
- * where the ``sin()`` function is resolved via argument-dependent lookup.
- *
- * Two ways of calling unary functions are usually provided:
- *
- * * a unary free function returning the result of the operation,
- * * a nullary member function that modifies the calling object in-place.
- *
- * For instance, here are two possible ways of computing the absolute value:
- *
- * .. code-block:: c++
- *
- *    real128 r1, r2{-5};
- *    r1 = abs(r2); // Unary abs(): returns the absolute value of r2, which is
- *                  // then assigned to r1.
- *    r2.abs();     // Member function abs(): replaces the value of r2 with its
- *                  // absolute value.
- *
- * Note that at this time a subset of the quadmath API has been wrapped by :cpp:class:`~mppp::real128`.
- *
- * Various :ref:`overloaded operators <real128_operators>` are provided.
- * The common arithmetic operators (``+``, ``-``, ``*`` and ``/``) always return :cpp:class:`~mppp::real128`
- * as a result, promoting at most one operand to :cpp:class:`~mppp::real128` before actually performing
- * the computation. Similarly, the relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote at
- * most one argument to :cpp:class:`~mppp::real128` before performing the comparison. Alternative comparison functions
- * treating NaNs specially are provided for use in the C++ standard library (and wherever strict weak ordering relations
- * are needed).
- *
- * The :cpp:class:`~mppp::real128` class is a `literal type
- * <https://en.cppreference.com/w/cpp/named_req/LiteralType>`__, and, whenever possible, operations involving
- * :cpp:class:`~mppp::real128` are marked as ``constexpr``. Some functions which are not ``constexpr`` in the quadmath
- * library have been reimplemented as ``constexpr`` functions via compiler builtins.
- *
- * .. seealso::
- *    https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
- *
- *    https://gcc.gnu.org/onlinedocs/libquadmath/
- * \endrststar
- */
+// Quadruple-precision floating-point class.
 class MPPP_DLL_PUBLIC real128
 {
     // Number of digits in the significand.
     static constexpr unsigned sig_digits = 113;
 
 public:
-    /// Default constructor.
-    /**
-     * The default constructor will set \p this to zero.
-     */
+    // Default constructor.
     constexpr real128() : m_value(0) {}
 
-    /// Trivial copy constructor.
-    /**
-     * @param other the construction argument.
-     */
-    constexpr real128(const real128 &other) = default;
-    /// Trivial move constructor.
-    /**
-     * @param other the construction argument.
-     */
-    constexpr real128(real128 &&other) = default;
+    // Trivial copy constructor.
+    real128(const real128 &) = default;
+    // Trivial move constructor.
+    real128(real128 &&) = default;
 
-    /// Constructor from a quadruple-precision floating-point value.
-    /**
-     * This constructor will initialise the internal value with \p x.
-     *
-     * @param x the quadruple-precision floating-point variable that will be
-     * used to initialise the internal value.
-     */
+    // Constructor from a quadruple-precision floating-point value.
     constexpr explicit real128(__float128 x) : m_value(x) {}
 
 private:
@@ -395,19 +298,7 @@ private:
     }
 
 public:
-    /// Constructor from interoperable types.
-    /**
-     * \rststar
-     * This constructor will initialise the internal value to ``x``.
-     * Depending on the value and type of ``x``, ``this`` may not be exactly equal
-     * to ``x`` after initialisation.
-     * \endrststar
-     *
-     * @param x the value that will be used for the initialisation.
-     *
-     * @throws std::overflow_error in case of (unlikely) overflow errors
-     * during initialisation.
-     */
+    // Constructor from interoperable types.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -428,24 +319,7 @@ private:
 #endif
 
 public:
-    /// Constructor from string.
-    /**
-     * \rststar
-     * This constructor will initialise \p this from the :cpp:concept:`~mppp::StringType` ``s``.
-     * The accepted string formats are detailed in the quadmath library's documentation
-     * (see the link below). Leading whitespaces are accepted (and ignored), but trailing whitespaces
-     * will raise an error.
-     *
-     * .. seealso::
-     *    https://gcc.gnu.org/onlinedocs/libquadmath/strtoflt128.html
-     * \endrststar
-     *
-     * @param s the string that will be used to initialise \p this.
-     *
-     * @throws std::invalid_argument if \p s does not represent a valid quadruple-precision
-     * floating-point value.
-     * @throws unspecified any exception thrown by memory errors in standard containers.
-     */
+    // Constructor from string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -457,55 +331,19 @@ public:
     // Constructor from range of characters.
     explicit real128(const char *, const char *);
 
-    /// Trivial copy assignment operator.
-    /**
-     * @param other the assignment argument.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &operator=(const real128 &other) = default;
-    /// Trivial move assignment operator.
-    /**
-     * @param other the assignment argument.
-     *
-     * @return a reference to \p this.
-     */
-    real128 &operator=(real128 &&other) = default;
+    // Trivial copy assignment operator.
+    real128 &operator=(const real128 &) = default;
+    // Trivial move assignment operator.
+    real128 &operator=(real128 &&) = default;
 
-    /// Assignment from a quadruple-precision floating-point value.
-    /**
-     * \rststar
-     * .. note::
-     *
-     *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
-     * \endrststar
-     *
-     * @param x the quadruple-precision floating-point variable that will be
-     * assigned to the internal value.
-     *
-     * @return a reference to \p this.
-     */
+    // Assignment from a quadruple-precision floating-point value.
     MPPP_CONSTEXPR_14 real128 &operator=(const __float128 &x)
     {
         m_value = x;
         return *this;
     }
 
-    /// Assignment from interoperable types.
-    /**
-     * \rststar
-     * .. note::
-     *
-     *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
-     * \endrststar
-     *
-     * @param x the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the construction of a
-     * \link mppp::real128 real128\endlink from ``x``.
-     */
+    // Assignment from interoperable types.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -2795,6 +2633,8 @@ inline nlohmann::json mime_bundle_repr(const real128 &x)
 #else
 
 #error The real128.hpp header was included but mp++ was not configured with the MPPP_WITH_QUADMATH option.
+
+#endif
 
 #endif
 
