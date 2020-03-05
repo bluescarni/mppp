@@ -540,23 +540,7 @@ public:
     // Convert to string.
     std::string to_string() const;
 
-    /// Get the IEEE representation of the value.
-    /**
-     * This member function will return a tuple containing the IEEE quadruple-precision floating-point representation
-     * of the value. The returned tuple elements are, in order:
-     * - the sign of the value (1 for a negative sign bit, 0 for a positive sign bit),
-     * - the exponent (a 15-bit unsigned value),
-     * - the high part of the significand (a 48-bit unsigned value),
-     * - the low part of the significand (a 64-bit unsigned value).
-     *
-     * \rststar
-     * .. seealso::
-     *    https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
-     * \endrststar
-     *
-     * @return a tuple containing the IEEE quadruple-precision floating-point representation of the value stored
-     * in \p this.
-     */
+    // Get the IEEE representation of the value.
     std::tuple<std::uint_least8_t, std::uint_least16_t, std::uint_least64_t, std::uint_least64_t> get_ieee() const
     {
         detail::ieee_float128 ie;
@@ -566,18 +550,7 @@ public:
     }
     // Sign bit.
     bool signbit() const;
-    /// Categorise the floating point value.
-    /**
-     * This member function will categorise the floating-point value of \p this into the 5 categories,
-     * represented as ``int`` values, defined by the standard:
-     * - ``FP_NAN`` for NaN,
-     * - ``FP_INFINITE`` for infinite,
-     * - ``FP_NORMAL`` for normal values,
-     * - ``FP_SUBNORMAL`` for subnormal values,
-     * - ``FP_ZERO`` for zero.
-     *
-     * @return the category to which the value of \p this belongs.
-     */
+    // Categorise the floating point value.
     constexpr int fpclassify() const
     {
         // NOTE: according to the docs the builtin accepts generic floating-point types:
@@ -586,42 +559,23 @@ public:
         // https://github.com/gcc-mirror/gcc/blob/master/libquadmath/quadmath-imp.h
         return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, m_value);
     }
-    /// Detect NaN.
-    /**
-     * @return \p true if \p this is NaN, \p false otherwise.
-     */
+    // Detect NaN.
     constexpr bool isnan() const
     {
         return fpclassify() == FP_NAN;
     }
-    /// Detect infinity.
-    /**
-     * @return \p true if \p this is infinite, \p false otherwise.
-     */
+    // Detect infinity.
     constexpr bool isinf() const
     {
         return fpclassify() == FP_INFINITE;
     }
-    /// Detect finite value.
-    /**
-     * @return \p true if \p this is finite, \p false otherwise.
-     */
+    // Detect finite value.
     constexpr bool finite() const
     {
-        return fpclassify() == FP_NORMAL || fpclassify() == FP_SUBNORMAL || fpclassify() == FP_ZERO;
+        return !isnan() && !isinf();
     }
-    /// In-place absolute value.
-    /**
-     * This member function will set \p this to its absolute value.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
-     * \endrststar
-     *
-     * @return a reference to \p this.
-     */
+
+    // In-place absolute value.
     MPPP_CONSTEXPR_14 real128 &abs()
     {
         const auto fpc = fpclassify();
@@ -639,34 +593,40 @@ public:
         // NOTE: for NaN, don't do anything and leave the NaN.
         return *this;
     }
+
     // In-place square root.
     real128 &sqrt();
     // In-place cube root.
     real128 &cbrt();
+
     // In-place sine.
     real128 &sin();
     // In-place cosine.
     real128 &cos();
     // In-place tangent.
     real128 &tan();
+
     // In-place inverse sine.
     real128 &asin();
     // In-place inverse cosine.
     real128 &acos();
     // In-place inverse tangent.
     real128 &atan();
+
     // In-place hyperbolic sine.
     real128 &sinh();
     // In-place hyperbolic cosine.
     real128 &cosh();
     // In-place hyperbolic tangent.
     real128 &tanh();
+
     // In-place inverse hyperbolic sine.
     real128 &asinh();
     // In-place inverse hyperbolic cosine.
     real128 &acosh();
     // In-place inverse hyperbolic tangent.
     real128 &atanh();
+
     // In-place natural exponential function.
     real128 &exp();
     // In-place natural logarithm.
@@ -675,10 +635,13 @@ public:
     real128 &log10();
     // In-place base-2 logarithm.
     real128 &log2();
+
     // In-place lgamma function.
     real128 &lgamma();
+
     // In-place error function.
     real128 &erf();
+
     /// The internal value.
     /**
      * \rststar

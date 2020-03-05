@@ -125,37 +125,19 @@ std::string real128::to_string() const
     return oss.str();
 }
 
-/// Sign bit.
-/**
- * This method will return the value of the sign bit of \p this. That is, if \p this
- * is not a NaN the method will return \p true if \p this is negative, \p false otherwise.
- * If \p this is NaN, the sign bit of the NaN value will be returned.
- *
- * @return \p true if the sign bit of \p this is set, \p false otherwise.
- */
+// Sign bit.
 bool real128::signbit() const
 {
     return ::signbitq(m_value);
 }
 
-/// In-place square root.
-/**
- * This method will set \p this to its nonnegative square root.
- * If \p this is less than negative zero, the result will be NaN.
- *
- * @return a reference to \p this.
- */
+// In-place square root.
 real128 &real128::sqrt()
 {
     return *this = ::sqrtq(m_value);
 }
 
-/// In-place cube root.
-/**
- * This method will set \p this to its real cube root.
- *
- * @return a reference to \p this.
- */
+// In-place cube root.
 real128 &real128::cbrt()
 {
     return *this = ::cbrtq(m_value);

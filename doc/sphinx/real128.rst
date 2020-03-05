@@ -236,7 +236,7 @@ The real128 class
 
       Convert to string.
 
-      This method will convert ``this`` to a decimal string representation in scientific format.
+      This member function will convert ``this`` to a decimal string representation in scientific format.
       The number of significant digits in the output (36) guarantees that a :cpp:class:`~mppp::real128`
       constructed from the returned string will have a value identical to the value of ``this``.
 
@@ -248,6 +248,85 @@ The real128 class
       :return: a decimal string representation of ``this``.
 
       :exception std\:\:runtime_error: if the internal call to the ``quadmath_snprintf()`` function fails.
+
+   .. cpp:function:: std::tuple<std::uint_least8_t, std::uint_least16_t, std::uint_least64_t, std::uint_least64_t> get_ieee() const
+
+      Get the IEEE representation of the value.
+
+      This member function will return a tuple containing the IEEE quadruple-precision floating-point representation
+      of the value. The returned tuple elements are, in order:
+
+      * the sign of the value (1 for a negative sign bit, 0 for a positive sign bit),
+      * the exponent (a 15-bit unsigned value),
+      * the high part of the significand (a 48-bit unsigned value),
+      * the low part of the significand (a 64-bit unsigned value).
+
+      .. seealso::
+         https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
+
+      :return: a tuple containing the IEEE quadruple-precision floating-point representation of the value stored
+        in ``this``.
+
+   .. cpp:function:: bool signbit() const
+
+      Sign bit.
+
+      This member function will return the value of the sign bit of ``this``. That is, if ``this``
+      is not a NaN the function will return ``true`` if ``this`` is negative or :math:`-0`,
+      ``false`` otherwise.
+      If ``this`` is NaN, the sign bit of the NaN value will be returned.
+
+      :return: ``true`` if the sign bit of ``this`` is set, ``false`` otherwise.
+
+   .. cpp:function:: constexpr int fpclassify() const
+
+      Categorise the floating point value.
+
+      This member function will categorise the floating-point value of ``this`` into the 5 categories,
+      represented as ``int`` values, defined by the standard:
+
+      * ``FP_NAN`` for NaN,
+      * ``FP_INFINITE`` for infinite,
+      * ``FP_NORMAL`` for normal values,
+      * ``FP_SUBNORMAL`` for subnormal values,
+      * ``FP_ZERO`` for zero.
+
+      :return: the category to which the value of ``this`` belongs.
+
+   .. cpp:function:: constexpr bool isnan() const
+   .. cpp:function:: constexpr bool isinf() const
+   .. cpp:function:: constexpr bool finite() const
+
+      Detect NaN, infinity or finite value.
+
+      :return: ``true`` is the value of ``this`` is, respectively,
+        NaN, an infinity or finite, ``false`` otherwise.
+
+   .. cpp:function:: constexpr real128 &abs()
+
+      .. note::
+
+        This operator is marked as ``constexpr`` only if at least C++14 is being used.
+
+      In-place absolute value.
+
+      This member function will set ``this`` to its absolute value.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real128 &sqrt()
+   .. cpp:function:: real128 &cbrt()
+
+      In-place roots.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sqrt{x}`,
+      * :math:`\sqrt[3]{x}`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
 
 Types
 -----
