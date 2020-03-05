@@ -117,23 +117,7 @@ real128::real128(const char *begin, const char *end)
     m_value = detail::str_to_float128(buffer.data());
 }
 
-/// Convert to string.
-/**
- * \rststar
- * This method will convert ``this`` to a decimal string representation in scientific format.
- * The number of significant digits in the output (36) guarantees that a :cpp:class:`~mppp::real128`
- * constructed from the returned string will have a value identical to the value of ``this``.
- *
- * The implementation uses the ``quadmath_snprintf()`` function from the quadmath library.
- *
- * .. seealso::
- *    https://gcc.gnu.org/onlinedocs/libquadmath/quadmath_005fsnprintf.html
- * \endrststar
- *
- * @return a decimal string representation of ``this``.
- *
- * @throws std::runtime_error if the internal call to the ``quadmath_snprintf()`` function fails.
- */
+// Convert to string.
 std::string real128::to_string() const
 {
     std::ostringstream oss;

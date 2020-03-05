@@ -354,43 +354,18 @@ public:
         return *this = real128{x};
     }
 
-    /// Assignment from string.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = real128{s};
-     *
-     * That is, a temporary :cpp:class:`~mppp::real128` is constructed from ``s`` and it is then move-assigned to
-     * ``this``.
-     * \endrststar
-     *
-     * @param s the string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string.
-     */
+    // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
-    real128 &operator=(const StringType &s)
+    template <StringType T>
 #else
     template <typename T, string_type_enabler<T> = 0>
-    real128 &operator=(const T &s)
 #endif
+    real128 &operator=(const T &s)
     {
         return *this = real128{s};
     }
 
-    /// Conversion to quadruple-precision floating-point.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to :cpp:type:`__float128`.
-     * \endrststar
-     *
-     * @return a copy of the quadruple-precision floating-point value stored internally.
-     */
+    // Conversion to quadruple-precision floating-point.
     constexpr explicit operator __float128() const
     {
         return m_value;
@@ -525,24 +500,7 @@ private:
     }
 
 public:
-    /// Conversion operator to interoperable types.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128Interoperable` type.
-     *
-     * Conversion to C++ types is implemented via direct cast, and thus no checks are
-     * performed to ensure that the value of ``this`` can be represented by the target type.
-     *
-     * Conversion to :cpp:class:`~mppp::rational`, if successful, is exact.
-     *
-     * Conversion to integral types will produce the truncated counterpart of ``this``.
-     * \endrststar
-     *
-     * @return \p this converted to \p T.
-     *
-     * @throws std::domain_error if \p this represents a non-finite value and \p T
-     * is an mp++ integer or rational.
-     */
+    // Conversion operator to interoperable types.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -568,26 +526,7 @@ private:
     }
 
 public:
-    /// Conversion member function to interoperable types.
-    /**
-     * \rststar
-     * This member function, similarly to the conversion operator, will convert ``this`` to a
-     * :cpp:concept:`~mppp::Real128Interoperable` type, storing the result of the conversion into ``rop``.
-     * Differently from the conversion operator, this member function does not raise any exception: if the conversion is
-     * successful, the member function will return ``true``, otherwise the member function will return ``false``. If the
-     * conversion fails, ``rop`` will not be altered. The conversion can fail only if ``T`` is either
-     * :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`, and ``this`` represents a non-finite value.
-     *
-     * .. note::
-     *
-     *   This member function is marked as ``constexpr`` only if at least C++14 is being used.
-     *
-     * \endrststar
-     *
-     * @param rop the variable which will store the result of the conversion.
-     *
-     * @return ``true`` if the conversion succeeds, ``false`` otherwise.
-     */
+    // Conversion member function to interoperable types.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -600,6 +539,7 @@ public:
 
     // Convert to string.
     std::string to_string() const;
+
     /// Get the IEEE representation of the value.
     /**
      * This member function will return a tuple containing the IEEE quadruple-precision floating-point representation

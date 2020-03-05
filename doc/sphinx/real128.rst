@@ -170,6 +170,85 @@ The real128 class
       :exception unspecified: any exception thrown by the construction of a
         :cpp:class:`~mppp::real128` from *x*.
 
+   .. cpp:function:: template <StringType T> real128 &operator=(const T &s)
+
+      Assignment from string.
+
+      The body of this operator is equivalent to:
+
+      .. code-block:: c++
+
+         return *this = real128{s};
+
+      That is, a temporary :cpp:class:`~mppp::real128` is constructed from *s*
+      and it is then move-assigned to ``this``.
+
+      :param s: the string that will be used for the assignment.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception thrown by the constructor from string.
+
+   .. cpp:function:: constexpr explicit operator __float128() const
+
+      Conversion to :cpp:type:`__float128`.
+
+      :return: a copy of the :cpp:type:`__float128` value stored internally.
+
+   .. cpp:function:: template <Real128Interoperable T> constexpr explicit operator T() const
+
+      Conversion operator to interoperable types.
+
+      This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128Interoperable` type.
+
+      Conversion to C++ types is implemented via direct cast, and thus no checks are
+      performed to ensure that the value of ``this`` can be represented by the target type.
+
+      Conversion to :cpp:class:`~mppp::rational`, if successful, is exact.
+
+      Conversion to integral types will produce the truncated counterpart of ``this``.
+
+      :return: ``this`` converted to ``T``.
+
+      :exception std\:\:domain_error: if ``this`` represents a non-finite value and ``T``
+        is :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`.
+
+   .. cpp:function:: template <Real128Interoperable T> constexpr bool get(T &rop) const
+
+      .. note::
+
+        This member function is marked as ``constexpr`` only if at least C++14 is being used.
+
+      Conversion member function to interoperable types.
+
+      This member function, similarly to the conversion operator, will convert ``this`` to a
+      :cpp:concept:`~mppp::Real128Interoperable` type, storing the result of the conversion into *rop*.
+      Differently from the conversion operator, this function does not raise any exception: if the conversion is
+      successful, the function will return ``true``, otherwise the function will return ``false``. If the
+      conversion fails, *rop* will not be altered. The conversion can fail only if ``T`` is either
+      :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`, and ``this`` represents a non-finite value.
+
+      :param rop: the variable which will store the result of the conversion.
+
+      :return: ``true`` if the conversion succeeds, ``false`` otherwise.
+
+   .. cpp:function:: std::string to_string() const
+
+      Convert to string.
+
+      This method will convert ``this`` to a decimal string representation in scientific format.
+      The number of significant digits in the output (36) guarantees that a :cpp:class:`~mppp::real128`
+      constructed from the returned string will have a value identical to the value of ``this``.
+
+      The implementation uses the ``quadmath_snprintf()`` function from the quadmath library.
+
+      .. seealso::
+         https://gcc.gnu.org/onlinedocs/libquadmath/quadmath_005fsnprintf.html
+
+      :return: a decimal string representation of ``this``.
+
+      :exception std\:\:runtime_error: if the internal call to the ``quadmath_snprintf()`` function fails.
+
 Types
 -----
 
