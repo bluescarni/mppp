@@ -69,6 +69,13 @@ The real128 class
 
       https://gcc.gnu.org/onlinedocs/libquadmath/
 
+   .. cpp:member:: __float128 m_value
+
+      The internal value.
+
+      This class member gives direct access to the :cpp:type:`__float128` instance stored
+      inside a :cpp:class:`~mppp::real128`.
+
    .. cpp:function:: constexpr real128()
 
       Default constructor.
@@ -328,6 +335,106 @@ The real128 class
 
       :return: a reference to ``this``.
 
+   .. cpp:function:: real128 &sin()
+   .. cpp:function:: real128 &cos()
+   .. cpp:function:: real128 &tan()
+
+      In-place trigonometric functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sin{x}`,
+      * :math:`\cos{x}`,
+      * :math:`\tan{x}`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real128 &asin()
+   .. cpp:function:: real128 &acos()
+   .. cpp:function:: real128 &atan()
+
+      In-place inverse trigonometric functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\arcsin{x}`,
+      * :math:`\arccos{x}`,
+      * :math:`\arctan{x}`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real128 &sinh()
+   .. cpp:function:: real128 &cosh()
+   .. cpp:function:: real128 &tanh()
+
+      In-place hyperbolic functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\sinh{x}`,
+      * :math:`\cosh{x}`,
+      * :math:`\tanh{x}`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real128 &asinh()
+   .. cpp:function:: real128 &acosh()
+   .. cpp:function:: real128 &atanh()
+
+      In-place inverse hyperbolic functions.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`\operatorname{arcsinh}{x}`,
+      * :math:`\operatorname{arccosh}{x}`,
+      * :math:`\operatorname{arctanh}{x}`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real128 &exp()
+   .. cpp:function:: real128 &log()
+   .. cpp:function:: real128 &log10()
+   .. cpp:function:: real128 &log2()
+
+      In-place logarithms and exponentials.
+
+      These member functions will set ``this`` to, respectively:
+
+      * :math:`e^x`,
+      * :math:`\log{x}`,
+      * :math:`\log_{10}{x}`,
+      * :math:`\log_2{x}`,
+
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real128 &lgamma()
+
+      In-place logarithm of the gamma function.
+
+      This member function will set ``this`` to :math:`\log\Gamma\left( x \right)`,
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: real128 &erf()
+
+      In-place error function.
+
+      This member function will set ``this`` to :math:`\operatorname{erf}\left( x \right)`,
+      where :math:`x` is the current value of ``this``.
+
+      :return: a reference to ``this``.
+
 Types
 -----
 
@@ -373,16 +480,77 @@ Functions
 Conversion
 ~~~~~~~~~~
 
-.. doxygengroup:: real128_conversion
-   :content-only:
+.. cpp:function:: template <mppp::Real128Interoperable T> constexpr bool mppp::get(T &rop, const mppp::real128 &x)
+
+   .. note::
+
+     This function is marked as ``constexpr`` only if at least C++14 is being used.
+
+   Conversion function.
+
+   This function will convert the input :cpp:class:`~mppp::real128` *x* to a
+   :cpp:concept:`~mppp::Real128Interoperable` type, storing the result of the conversion into *rop*.
+   If the conversion is successful, the function
+   will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
+   not be altered. The conversion can fail only if ``T``
+   is either :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`, and *x*
+   represents a non-finite value.
+
+   :param rop: the variable which will store the result of the conversion.
+   :param x: the input value.
+
+   :return: ``true`` if the conversion succeeds, ``false`` otherwise.
+
+.. cpp:function:: mppp::real128 mppp::frexp(const mppp::real128 &x, int *exp)
+
+   Decompose a :cpp:class:`~mppp::real128` into a normalized fraction and an integral power of two.
+
+   If *x* is zero, this function will return zero and store zero in *exp*. Otherwise,
+   this function will return a :cpp:class:`~mppp::real128` :math:`r` with an absolute value in the
+   :math:`\left[0.5,1\right)` range, and it will store an integer value :math:`n` in *exp*
+   such that :math:`r \times 2^n` equals to :math:`x`. If *x* is a non-finite value, the return
+   value will be *x* and an unspecified value will be stored in *exp*.
+
+   :param x: the input :cpp:class:`~mppp::real128`.
+   :param exp: a pointer to the value that will store the exponent.
+
+   :return: the binary significand of *x*.
 
 .. _real128_arithmetic:
 
 Arithmetic
 ~~~~~~~~~~
 
-.. doxygengroup:: real128_arithmetic
-   :content-only:
+.. cpp:function:: mppp::real128 mppp::fma(const mppp::real128 &x, const mppp::real128 &y, const mppp::real128 &z)
+
+   Fused multiply-add.
+
+   This function will return :math:`\left(x \times y\right) + z` as if calculated to infinite precision and
+   rounded once.
+
+   :param x: the first factor.
+   :param y: the second factor.
+   :param z: the addend.
+
+   :return: :math:`\left(x \times y\right) + z`.
+
+.. cpp:function:: constexpr mppp::real128 mppp::abs(const mppp::real128 &x)
+
+   Absolute value.
+
+   :param x: the :cpp:class:`~mppp::real128` whose absolute value will be computed.
+
+   :return: :math:`\left| x \right|`.
+
+.. cpp:function:: mppp::real128 mppp::scalbn(const mppp::real128 &x, int n)
+.. cpp:function:: mppp::real128 mppp::scalbln(const mppp::real128 &x, long n)
+
+   Multiply by power of 2.
+
+   :param x: the input :cpp:class:`~mppp::real128`.
+   :param n: the power of 2 by which *x* will be multiplied.
+
+   :return: :math:`x \times 2^n`.
 
 .. _real128_comparison:
 
@@ -471,8 +639,26 @@ Floating-point manipulation
 Input/Output
 ~~~~~~~~~~~~
 
-.. doxygengroup:: real128_io
-   :content-only:
+.. cpp:function:: std::ostream &mppp::operator<<(std::ostream &os, const mppp::real128 &x)
+
+   Output stream operator.
+
+   This operator will print to the stream *os* the :cpp:class:`~mppp::real128` *x*. The current implementation
+   ignores any formatting flag specified in *os*, and the print format will be the one
+   described in :cpp:func:`mppp::real128::to_string()`.
+
+   .. warning::
+      In future versions of mp++, the behaviour of this operator will change to support the output stream's formatting
+      flags. For the time being, users are encouraged to use the ``quadmath_snprintf()`` function from the quadmath
+      library if precise and forward-compatible control on the printing format is needed.
+
+   :param os: the target stream.
+   :param x: the input :cpp:class:`~mppp::real128`.
+
+   :return: a reference to *os*.
+
+   :exception unspecified: any exception thrown by :cpp:func:`mppp::real128::to_string()`.
+
 
 Other
 ~~~~~

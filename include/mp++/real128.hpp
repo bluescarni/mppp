@@ -642,45 +642,14 @@ public:
     // In-place error function.
     real128 &erf();
 
-    /// The internal value.
-    /**
-     * \rststar
-     * This class member gives direct access to the :cpp:type:`__float128` instance stored
-     * inside :cpp:class:`~mppp::real128`.
-     * \endrststar
-     */
+    // The internal value.
     __float128 m_value;
 };
 
 // Double check that real128 is a standard layout class.
 static_assert(std::is_standard_layout<real128>::value, "real128 is not a standard layout class.");
 
-/** @defgroup real128_conversion real128_conversion
- *  @{
- */
-
-/// Conversion function for \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * This function will convert the input :cpp:class:`~mppp::real128` ``x`` to a
- * :cpp:concept:`~mppp::Real128Interoperable` type, storing the result of the conversion into ``rop``.
- * If the conversion is successful, the function
- * will return ``true``, otherwise the function will return ``false``. If the conversion fails, ``rop`` will
- * not be altered. The conversion can fail only if ``T``
- * is either :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`, and ``x``
- * represents a non-finite value.
- *
- * .. note::
- *
- *   This function is marked as ``constexpr`` only if at least C++14 is being used.
- *
- * \endrststar
- *
- * @param rop the variable which will store the result of the conversion.
- * @param x the input \link mppp::real128 real128\endlink.
- *
- * @return ``true`` if the conversion succeeds, ``false`` otherwise.
- */
+// Conversion function for \link mppp::real128 real128\endlink.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <Real128Interoperable T>
 #else
@@ -694,64 +663,30 @@ inline MPPP_CONSTEXPR_14 bool get(T &rop, const real128 &x)
 // Decompose into a normalized fraction and an integral power of two.
 MPPP_DLL_PUBLIC real128 frexp(const real128 &, int *);
 
-/** @} */
-
-/** @defgroup real128_arithmetic real128_arithmetic
- *  @{
- */
-
 // Fused multiply-add.
 MPPP_DLL_PUBLIC real128 fma(const real128 &, const real128 &, const real128 &);
 
-/// Unary absolute value.
-/**
- * @param x the \link mppp::real128 real128\endlink whose absolute value will be computed.
- *
- * @return the absolute value of \p x.
- */
+// Absolute value.
 constexpr real128 abs(const real128 &x)
 {
     return x.fpclassify() == FP_NAN
                ? x
-               : ((x.fpclassify() == FP_NORMAL || x.fpclassify() == FP_SUBNORMAL || x.fpclassify() == FP_INFINITE)
-                      ? (x.m_value < 0 ? real128{-x.m_value} : x)
-                      : real128{0});
+               : (x.fpclassify() == FP_ZERO ? real128{0} : (x.m_value < 0 ? real128{-x.m_value} : x));
 }
 
-/// Multiply by power of 2 (\p int overload).
-/**
- * @param x the input \link mppp::real128 real128\endlink.
- * @param n the power of 2 by which \p x will be multiplied.
- *
- * @return \p x multiplied by \f$ 2^n \f$.
- */
+// Multiply by power of 2.
 inline real128 scalbn(const real128 &x, int n)
 {
     return real128{detail::scalbnq(x.m_value, n)};
 }
 
-/// Multiply by power of 2 (\p long overload).
-/**
- * @param x the input \link mppp::real128 real128\endlink.
- * @param n the power of 2 by which \p x will be multiplied.
- *
- * @return \p x multiplied by \f$ 2^n \f$.
- */
 inline real128 scalbln(const real128 &x, long n)
 {
     return real128{detail::scalblnq(x.m_value, n)};
 }
 
-/** @} */
-
-/** @defgroup real128_io real128_io
- *  @{
- */
-
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real128 &);
-
-/** @} */
 
 /** @defgroup real128_comparison real128_comparison
  *  @{
