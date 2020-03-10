@@ -678,125 +678,44 @@ inline real128 scalbln(const real128 &x, long n)
 // Output stream operator.
 MPPP_DLL_PUBLIC std::ostream &operator<<(std::ostream &, const real128 &);
 
-/** @defgroup real128_comparison real128_comparison
- *  @{
- */
-
-/// Sign bit of a \link mppp::real128 real128\endlink.
-/**
- * @param x the \link mppp::real128 real128\endlink whose sign bit will be returned.
- *
- * @return the sign bit of \p x (as returned by mppp::real128::signbit()).
- */
+// Sign bit.
 inline bool signbit(const real128 &x)
 {
     return x.signbit();
 }
 
-/// Categorise a \link mppp::real128 real128\endlink.
-/**
- * @param x the \link mppp::real128 real128\endlink whose floating-point category will be returned.
- *
- * @return the category of the value of \p x, as established by mppp::real128::fpclassify().
- */
+// Categorisation.
 constexpr int fpclassify(const real128 &x)
 {
     return x.fpclassify();
 }
 
-/// Detect if a \link mppp::real128 real128\endlink is NaN.
-/**
- * @param x the \link mppp::real128 real128\endlink argument.
- *
- * @return \p true if \p x is NaN, \p false otherwise.
- */
+// Detect NaN.
 constexpr bool isnan(const real128 &x)
 {
     return x.isnan();
 }
 
-/// Detect if a \link mppp::real128 real128\endlink is infinite.
-/**
- * @param x the \link mppp::real128 real128\endlink argument.
- *
- * @return \p true if \p x is infinite, \p false otherwise.
- */
+// Detect infinity.
 constexpr bool isinf(const real128 &x)
 {
     return x.isinf();
 }
 
-/// Detect if a \link mppp::real128 real128\endlink is finite.
-/**
- * @param x the \link mppp::real128 real128\endlink argument.
- *
- * @return \p true if \p x is finite, \p false otherwise.
- */
+// Detect finite value.
 constexpr bool finite(const real128 &x)
 {
     return x.finite();
 }
 
-/// Equality predicate with special NaN handling for \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * If both ``x`` and ``y`` are not NaN, this function is identical to the equality operator for
- * :cpp:class:`~mppp::real128`. If at least one operand is NaN, this function will return ``true``
- * if both operands are NaN, ``false`` otherwise.
- *
- * In other words, this function behaves like an equality operator which considers all NaN
- * values equal to each other.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x = y \f$ (including the case in which both operands are NaN),
- * \p false otherwise.
- */
+// Equality predicate with special NaN handling.
 constexpr bool real128_equal_to(const real128 &, const real128 &);
 
-/// Less-than predicate with special NaN handling for \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * If both ``x`` and ``y`` are not NaN, this function is identical to the less-than operator for
- * :cpp:class:`~mppp::real128`. If at least one operand is NaN, this function will return ``true``
- * if ``x`` is not NaN, ``false`` otherwise.
- *
- * In other words, this function behaves like a less-than operator which considers NaN values
- * greater than non-NaN values. This function can be used as a comparator in various facilities of the
- * standard library (e.g., ``std::sort()``, ``std::set``, etc.).
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x < y \f$ (with NaN values considered greather than non-NaN values),
- * \p false otherwise.
- */
+// Less-than predicate with special NaN handling.
 constexpr bool real128_lt(const real128 &, const real128 &);
 
-/// Greater-than predicate with special NaN handling for \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * If both ``x`` and ``y`` are not NaN, this function is identical to the greater-than operator for
- * :cpp:class:`~mppp::real128`. If at least one operand is NaN, this function will return ``true``
- * if ``y`` is not NaN, ``false`` otherwise.
- *
- * In other words, this function behaves like a greater-than operator which considers NaN values
- * greater than non-NaN values. This function can be used as a comparator in various facilities of the
- * standard library (e.g., ``std::sort()``, ``std::set``, etc.).
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x > y \f$ (with NaN values considered greather than non-NaN values),
- * \p false otherwise.
- */
+// Greater-than predicate with special NaN handling.
 constexpr bool real128_gt(const real128 &, const real128 &);
-
-/** @} */
 
 /** @defgroup real128_roots real128_roots
  *  @{

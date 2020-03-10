@@ -557,8 +557,92 @@ Arithmetic
 Comparison
 ~~~~~~~~~~
 
-.. doxygengroup:: real128_comparison
-   :content-only:
+.. cpp:function:: bool mppp::signbit(const mppp::real128 &x)
+
+   Sign bit.
+
+   :param x: the input value.
+
+   :return: the sign bit of *x* (as returned by :cpp:func:`mppp::real128::signbit()`).
+
+.. cpp:function:: constexpr int mppp::fpclassify(const mppp::real128 &x)
+
+   Categorise a :cpp:class:`~mppp::real128`.
+
+   :param x: the value whose floating-point category will be returned.
+
+   :return: the category of the value of *x*, as established by :cpp:func:`mppp::real128::fpclassify()`.
+
+.. cpp:function:: constexpr bool mppp::isnan(const mppp::real128 &x)
+.. cpp:function:: constexpr bool mppp::isinf(const mppp::real128 &x)
+.. cpp:function:: constexpr bool mppp::finite(const mppp::real128 &x)
+
+   Detect special values.
+
+   These functions will return ``true`` is *x* is, respectively:
+
+   * NaN,
+   * an infinity,
+   * a finite value,
+
+   and ``false`` otherwise.
+
+   :param x: the input value.
+
+   :return: a boolean flag indicating if *x* is NaN, an infinity or a finite value.
+
+.. cpp:function:: constexpr bool mppp::real128_equal_to(const mppp::real128 &x, const mppp::real128 &y)
+
+   Equality predicate with special NaN handling.
+
+   If both *x* and *y* are not NaN, this function is identical to the equality operator.
+   Otherwise, this function will return ``true``
+   if both operands are NaN, ``false`` otherwise.
+
+   In other words, this function behaves like an equality operator which considers all NaN
+   values equal to each other.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: ``true`` if :math:`x = y` (including the case in which both operands are NaN),
+     ``false`` otherwise.
+
+.. cpp:function:: constexpr bool mppp::real128_lt(const mppp::real128 &x, const mppp::real128 &y)
+
+   Less-than predicate with special NaN handling.
+
+   If both *x* and *y* are not NaN, this function is identical to the less-than operator.
+   If at least one operand is NaN, this function will return ``true``
+   if *x* is not NaN, ``false`` otherwise.
+
+   In other words, this function behaves like a less-than operator which considers NaN values
+   greater than non-NaN values. This function can be used as a comparator in various facilities of the
+   standard library (e.g., ``std::sort()``, ``std::set``, etc.).
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: ``true`` if :math:`x < y` (with NaN values considered greather than non-NaN values),
+     ``false`` otherwise.
+
+.. cpp:function:: constexpr bool mppp::real128_gt(const mppp::real128 &x, const mppp::real128 &y)
+
+   Greater-than predicate with special NaN handling.
+
+   If both *x* and *y* are not NaN, this function is identical to the greater-than operator.
+   If at least one operand is NaN, this function will return ``true``
+   if *y* is not NaN, ``false`` otherwise.
+
+   In other words, this function behaves like a greater-than operator which considers NaN values
+   greater than non-NaN values. This function can be used as a comparator in various facilities of the
+   standard library (e.g., ``std::sort()``, ``std::set``, etc.).
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: ``true`` if :math:`x > y` (with NaN values considered greather than non-NaN values),
+     ``false`` otherwise.
 
 .. _real128_roots:
 
