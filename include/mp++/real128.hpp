@@ -94,6 +94,9 @@ using is_real128_mppp_interoperable = disjunction<is_integer<T>, is_rational<T>>
 
 } // namespace detail
 
+// Fwd declare the abs() function.
+constexpr real128 abs(const real128 &);
+
 // Story time!
 //
 // Since 3.9, clang supports the __float128 type. However, interactions between long double and __float128 are disabled.
@@ -578,20 +581,7 @@ public:
     // In-place absolute value.
     MPPP_CONSTEXPR_14 real128 &abs()
     {
-        const auto fpc = fpclassify();
-        if (fpc == FP_NORMAL || fpc == FP_SUBNORMAL || fpc == FP_INFINITE) {
-            // If the number is normal, subnormal or infinite compute its
-            // absolute value.
-            if (m_value < 0) {
-                m_value = -m_value;
-            }
-        } else if (fpc == FP_ZERO) {
-            // If the value is zero, it could be negative zero. Make sure we
-            // set it to positive zero.
-            m_value = 0;
-        }
-        // NOTE: for NaN, don't do anything and leave the NaN.
-        return *this;
+        return *this = mppp::abs(*this);
     }
 
     // In-place square root.
@@ -671,7 +661,7 @@ constexpr real128 abs(const real128 &x)
 {
     return x.fpclassify() == FP_NAN
                ? x
-               : (x.fpclassify() == FP_ZERO ? real128{0} : (x.m_value < 0 ? real128{-x.m_value} : x));
+               : (x.fpclassify() == FP_ZERO ? real128{} : (x.m_value < 0 ? real128{-x.m_value} : x));
 }
 
 // Multiply by power of 2.
