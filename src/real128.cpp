@@ -263,16 +263,7 @@ real128 fma(const real128 &x, const real128 &y, const real128 &z)
     return real128{::fmaq(x.m_value, y.m_value, z.m_value)};
 }
 
-/// Euclidean distance.
-/**
- * The calculation is performed without undue overflow or underflow during the intermediate
- * steps of the calculation.
- *
- * @param x the first \link mppp::real128 real128\endlink argument.
- * @param y the second \link mppp::real128 real128\endlink argument.
- *
- * @return the euclidean distance \f$ \sqrt{x^2+y^2} \f$.
- */
+// Euclidean distance.
 real128 hypot(const real128 &x, const real128 &y)
 {
     return real128{::hypotq(x.m_value, y.m_value)};

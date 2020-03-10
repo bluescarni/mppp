@@ -649,16 +649,54 @@ Comparison
 Roots
 ~~~~~
 
-.. doxygengroup:: real128_roots
-   :content-only:
+.. cpp:function:: mppp::real128 sqrt(mppp::real128 x)
+.. cpp:function:: mppp::real128 cbrt(mppp::real128 x)
+
+   Unary roots.
+
+   These functions will return, respectively:
+
+   * :math:`\sqrt{x}`,
+   * :math:`\sqrt[3]{x}`.
+
+   :param x: the input argument.
+
+   :return: the square or cubic root of *x*.
+
+.. cpp:function:: mppp::real128 hypot(const mppp::real128 &x, const mppp::real128 &y)
+
+   Euclidean distance.
+
+   This function will return :math:`\sqrt{x^2+y^2}`.
+   The calculation is performed without undue overflow or underflow during the intermediate
+   steps of the calculation.
+
+   :param x: the first argument.
+   :param y: the second argument.
+
+   :return: :math:`\sqrt{x^2+y^2}`.
 
 .. _real128_exponentiation:
 
 Exponentiation
 ~~~~~~~~~~~~~~
 
-.. doxygengroup:: real128_exponentiation
-   :content-only:
+.. cpp:function:: template <typename T, typename U> mppp::real128 pow(const T &x, const U &y)
+
+   .. note::
+
+      This function participates in overload resolution only if ``T`` and ``U`` satisfy
+      the :cpp:concept:`~mppp::Real128OpTypes` concept.
+
+   This function will compute :math:`x^y`. Internally,
+   the implementation uses the ``powq()`` function from the quadmath library,
+   after the conversion of one of the operands to :cpp:class:`~mppp::real128`
+   (if necessary).
+
+   :param x: the base.
+   :param y: the exponent.
+
+   :return: :math:`x^y`.
 
 .. _real128_trig:
 

@@ -163,6 +163,9 @@ MPPP_CONCEPT_DECL Real128OpTypes = are_real128_op_types<T, U>::value;
 // - initial code for stream formatting at 687b86d9380a534048f62aac3815c31b094e52d2. The problem to be
 //   solved is the segfault in MinGW.
 // - should we change the cast operator to C++ types to check the result of the conversion?
+// - the pattern of implementing the member function and then using it to implement the free function
+//   (e.g., for sqrt()) seems to incur in more copies than necessary. Consider the reverse, implementing
+//   the free function first and then the member function.
 
 // Quadruple-precision floating-point class.
 class MPPP_DLL_PUBLIC real128
@@ -717,29 +720,13 @@ constexpr bool real128_lt(const real128 &, const real128 &);
 // Greater-than predicate with special NaN handling.
 constexpr bool real128_gt(const real128 &, const real128 &);
 
-/** @defgroup real128_roots real128_roots
- *  @{
- */
-
-/// Unary square root.
-/**
- * If \p x is less than negative zero, the result will be NaN.
- *
- * @param x the \link mppp::real128 real128\endlink whose square root will be returned.
- *
- * @return the nonnegative square root of \p x.
- */
+// Unary square root.
 inline real128 sqrt(real128 x)
 {
     return x.sqrt();
 }
 
-/// Unary cube root.
-/**
- * @param x the \link mppp::real128 real128\endlink whose cube root will be returned.
- *
- * @return the real cube root of \p x.
- */
+// Unary cube root.
 inline real128 cbrt(real128 x)
 {
     return x.cbrt();
@@ -747,12 +734,6 @@ inline real128 cbrt(real128 x)
 
 // Euclidean distance.
 MPPP_DLL_PUBLIC real128 hypot(const real128 &, const real128 &);
-
-/** @} */
-
-/** @defgroup real128_exponentiation real128_exponentiation
- *  @{
- */
 
 namespace detail
 {
@@ -788,20 +769,7 @@ inline real128 dispatch_pow(const T &x, const real128 &y)
 
 } // namespace detail
 
-/// Exponentiation.
-/**
- * \rststar
- * This function will raise the base ``x`` to the exponent ``y``. Internally,
- * the implementation uses the ``powq()`` function from the quadmath library,
- * after the conversion of one of the operands to :cpp:class:`~mppp::real128`
- * (if necessary).
- * \endrststar
- *
- * @param x the base.
- * @param y the exponent.
- *
- * @return \f$ x^y \f$.
- */
+// Exponentiation.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -812,8 +780,6 @@ template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>
 {
     return detail::dispatch_pow(x, y);
 }
-
-/** @} */
 
 /** @defgroup real128_logexp real128_logexp
  *  @{
