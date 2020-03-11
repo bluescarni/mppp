@@ -652,7 +652,7 @@ Roots
 .. cpp:function:: mppp::real128 sqrt(mppp::real128 x)
 .. cpp:function:: mppp::real128 cbrt(mppp::real128 x)
 
-   Unary roots.
+   Root functions.
 
    These functions will return, respectively:
 
@@ -703,8 +703,27 @@ Exponentiation
 Trigonometry
 ~~~~~~~~~~~~
 
-.. doxygengroup:: real128_trig
-   :content-only:
+.. cpp:function:: mppp::real128 sin(mppp::real128 x)
+.. cpp:function:: mppp::real128 cos(mppp::real128 x)
+.. cpp:function:: mppp::real128 tan(mppp::real128 x)
+.. cpp:function:: mppp::real128 asin(mppp::real128 x)
+.. cpp:function:: mppp::real128 acos(mppp::real128 x)
+.. cpp:function:: mppp::real128 atan(mppp::real128 x)
+
+   Trigonometric functions.
+
+   These functions will return, respectively:
+
+   * :math:`\sin x`,
+   * :math:`\cos x`,
+   * :math:`\tan x`,
+   * :math:`\arcsin x`,
+   * :math:`\arccos x`,
+   * :math:`\arctan x`.
+
+   :param x: the input value.
+
+   :return: a trigonometric function of *x*.
 
 .. real128_hyper:
 
@@ -719,8 +738,29 @@ Hyperbolic functions
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. doxygengroup:: real128_logexp
-   :content-only:
+.. cpp:function:: mppp::real128 exp(mppp::real128 x)
+
+   Exponential function.
+
+   :param x: the input value.
+
+   :return: :math:`e^x`.
+
+.. cpp:function:: mppp::real128 log(mppp::real128 x)
+.. cpp:function:: mppp::real128 log10(mppp::real128 x)
+.. cpp:function:: mppp::real128 log2(mppp::real128 x)
+
+   Logarithms.
+
+   These functions will return, respectively:
+
+   * :math:`\log x`,
+   * :math:`\log_{10} x`,
+   * :math:`\log_2 x`.
+
+   :param x: the input value.
+
+   :return: a logarithm of *x*.
 
 .. _real128_gamma:
 

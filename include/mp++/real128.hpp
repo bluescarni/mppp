@@ -781,127 +781,65 @@ template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>
     return detail::dispatch_pow(x, y);
 }
 
-/** @defgroup real128_logexp real128_logexp
- *  @{
- */
-
-/// Unary natural exponential function.
-/**
- * @param x the \link mppp::real128 real128\endlink whose natural exponential function be computed.
- *
- * @return \f$ \mathrm{e} \f$ raised to the power of \p x.
- */
+// Exponential function.
 inline real128 exp(real128 x)
 {
     return x.exp();
 }
 
-/// Unary natural logarithm.
-/**
- * @param x the \link mppp::real128 real128\endlink whose natural logarithm will be computed.
- *
- * @return the natural logarithm of \p x.
- */
+// Natural logarithm.
 inline real128 log(real128 x)
 {
     return x.log();
 }
 
-/// Unary base-10 logarithm.
-/**
- * @param x the \link mppp::real128 real128\endlink whose base-10 logarithm will be computed.
- *
- * @return the base-10 logarithm of \p x.
- */
+// Base-10 logarithm.
 inline real128 log10(real128 x)
 {
     return x.log10();
 }
 
-/// Unary base-2 logarithm.
-/**
- * @param x the \link mppp::real128 real128\endlink whose base-2 logarithm will be computed.
- *
- * @return the base-2 logarithm of \p x.
- */
+// Base-2 logarithm.
 inline real128 log2(real128 x)
 {
     return x.log2();
 }
 
-/** @} */
-
-/** @defgroup real128_trig real128_trig
- *  @{
- */
-
-/// Unary sine.
-/**
- * @param x the \link mppp::real128 real128\endlink whose sine will be computed.
- *
- * @return the sine of \p x.
- */
+// Sine.
 inline real128 sin(real128 x)
 {
     return x.sin();
 }
 
-/// Unary cosine.
-/**
- * @param x the \link mppp::real128 real128\endlink whose cosine will be computed.
- *
- * @return the cosine of \p x.
- */
+// Cosine.
 inline real128 cos(real128 x)
 {
     return x.cos();
 }
 
-/// Unary tangent.
-/**
- * @param x the \link mppp::real128 real128\endlink whose tangent will be computed.
- *
- * @return the tangent of \p x.
- */
+// Tangent.
 inline real128 tan(real128 x)
 {
     return x.tan();
 }
 
-/// Unary inverse sine.
-/**
- * @param x the \link mppp::real128 real128\endlink whose inverse sine will be computed.
- *
- * @return the inverse sine of \p x.
- */
+// Inverse sine.
 inline real128 asin(real128 x)
 {
     return x.asin();
 }
 
-/// Unary inverse cosine.
-/**
- * @param x the \link mppp::real128 real128\endlink whose inverse cosine will be computed.
- *
- * @return the inverse cosine of \p x.
- */
+// Inverse cosine.
 inline real128 acos(real128 x)
 {
     return x.acos();
 }
 
-/// Unary inverse tangent.
-/**
- * @param x the \link mppp::real128 real128\endlink whose inverse tangent will be computed.
- *
- * @return the inverse tangent of \p x.
- */
+// Inverse tangent.
 inline real128 atan(real128 x)
 {
     return x.atan();
 }
-
-/** @} */
 
 /** @defgroup real128_hyper real128_hyper
  *  @{
