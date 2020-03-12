@@ -1368,7 +1368,7 @@ User-defined literals
    User-defined real literals.
 
    These numeric literal operator templates can be used to construct
-   :cpp:class:`mppp::real` instances with, respectively, 128, 256, 512
+   :cpp:class:`~mppp::real` instances with, respectively, 128, 256, 512
    and 1024 bits of precision. Floating-point literals in decimal and
    hexadecimal format are supported.
 

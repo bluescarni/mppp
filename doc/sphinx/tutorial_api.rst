@@ -95,7 +95,7 @@ Here we are computing the GCD of the integers stored in the vector ``v``. mp++ p
 Like in the previous example, the ternary overload avoids the creation and subsequent assignment of a temporary value, and will thus perform
 better. The binary GCD overload, on the other hand, is easier to use (no need to prepare a return value beforehand) and closer
 to a functional style. The presence of binary and ternary overloads for the same functionality is not restricted to :cpp:func:`~mppp::gcd()`,
-but it's a common feature for many of mp++'s binary functions and operators.
+but it is a common feature for many of mp++'s binary functions and operators.
 
 For unary functions and operators, there's an additional degree of freedom in the API. Unary functions in mp++ are often provided with the
 following set of overloads:
