@@ -841,124 +841,58 @@ inline real128 atan(real128 x)
     return x.atan();
 }
 
-/** @defgroup real128_hyper real128_hyper
- *  @{
- */
-
-/// Unary hyperbolic sine.
-/**
- * @param x the \link mppp::real128 real128\endlink whose hyperbolic sine will be computed.
- *
- * @return the hyperbolic sine of \p x.
- */
+// Hyperbolic sine.
 inline real128 sinh(real128 x)
 {
     return x.sinh();
 }
 
-/// Unary hyperbolic cosine.
-/**
- * @param x the \link mppp::real128 real128\endlink whose hyperbolic cosine will be computed.
- *
- * @return the hyperbolic cosine of \p x.
- */
+// Hyperbolic cosine.
 inline real128 cosh(real128 x)
 {
     return x.cosh();
 }
 
-/// Unary hyperbolic tangent.
-/**
- * @param x the \link mppp::real128 real128\endlink whose hyperbolic tangent will be computed.
- *
- * @return the hyperbolic tangent of \p x.
- */
+// Hyperbolic tangent.
 inline real128 tanh(real128 x)
 {
     return x.tanh();
 }
 
-/// Unary inverse hyperbolic sine.
-/**
- * @param x the \link mppp::real128 real128\endlink whose inverse hyperbolic sine will be computed.
- *
- * @return the inverse hyperbolic sine of \p x.
- */
+// Inverse hyperbolic sine.
 inline real128 asinh(real128 x)
 {
     return x.asinh();
 }
 
-/// Unary inverse hyperbolic cosine.
-/**
- * @param x the \link mppp::real128 real128\endlink whose inverse hyperbolic cosine will be computed.
- *
- * @return the inverse hyperbolic cosine of \p x.
- */
+// Inverse hyperbolic cosine.
 inline real128 acosh(real128 x)
 {
     return x.acosh();
 }
 
-/// Unary inverse hyperbolic tangent.
-/**
- * @param x the \link mppp::real128 real128\endlink whose inverse hyperbolic tangent will be computed.
- *
- * @return the inverse hyperbolic tangent of \p x.
- */
+// Inverse hyperbolic tangent.
 inline real128 atanh(real128 x)
 {
     return x.atanh();
 }
-/** @} */
 
-/** @defgroup real128_gamma real128_gamma
- *  @{
- */
-
-/// Natural logarithm of the gamma function.
-/**
- * @param x the \link mppp::real128 real128\endlink whose lgamma will be computed.
- *
- * @return the lgamma of \p x.
- */
+// Natural logarithm of the gamma function.
 inline real128 lgamma(real128 x)
 {
     return x.lgamma();
 }
 
-/** @} */
-
-/** @defgroup real128_miscfuncts real128_miscfuncts
- *  @{
- */
-
-/// Error function.
-/**
- * @param x the \link mppp::real128 real128\endlink whose erf will be computed.
- *
- * @return the erf of \p x.
- */
+// Error function.
 inline real128 erf(real128 x)
 {
     return x.erf();
 }
 
-/** @} */
-
 // Next real128 from 'from' to 'to'.
 MPPP_DLL_PUBLIC real128 nextafter(const real128 &, const real128 &);
 
-/** @defgroup real128_operators real128_operators
- *  @{
- */
-
-/// Identity operator.
-/**
- * @param x the \link mppp::real128 real128\endlink that will be copied.
- *
- * @return a copy of \p x.
- */
+// Identity operator.
 constexpr real128 operator+(real128 x)
 {
     return x;
@@ -995,16 +929,7 @@ real128 dispatch_add(const T &, const real128 &);
 
 } // namespace detail
 
-/// Binary addition involving \link mppp::real128 real128\endlink types.
-/**
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \f$ x + y \f$.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
- * from mp++ types.
- */
+// Binary addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1065,23 +990,7 @@ inline void dispatch_in_place_add(T &x, const real128 &y)
 
 } // namespace detail
 
-/// In-place addition involving \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * .. note::
- *
- *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
- *
- * \endrststar
- *
- * @param x the augend.
- * @param y the addend.
- *
- * @return a reference to \p x, after it has been incremented by \p y.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator, or by the conversion
- * of \link mppp::real128 real128\endlink to mp++ types.
- */
+// In-place addition.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1094,40 +1003,14 @@ template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>
     return x;
 }
 
-/// Prefix increment.
-/**
- * This operator will increment \p x by one.
- *
- * \rststar
- * .. note::
- *
- *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
- * \endrststar
- *
- * @param x the \link mppp::real128 real128\endlink that will be increased.
- *
- * @return a reference to \p x after the increment.
- */
+// Prefix increment.
 inline MPPP_CONSTEXPR_14 real128 &operator++(real128 &x)
 {
     x.m_value += 1;
     return x;
 }
 
-/// Suffix increment.
-/**
- * This operator will increment \p x by one and return a copy of \p x as it was before the increment.
- *
- * \rststar
- * .. note::
- *
- *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
- * \endrststar
- *
- * @param x the \link mppp::real128 real128\endlink that will be increased.
- *
- * @return a copy of \p x before the increment.
- */
+// Suffix increment.
 inline MPPP_CONSTEXPR_14 real128 operator++(real128 &x, int)
 {
     auto retval(x);
@@ -1135,12 +1018,7 @@ inline MPPP_CONSTEXPR_14 real128 operator++(real128 &x, int)
     return retval;
 }
 
-/// Negation operator.
-/**
- * @param x the \link mppp::real128 real128\endlink whose opposite will be returned.
- *
- * @return \f$ -x \f$.
- */
+// Negation operator.
 constexpr real128 operator-(const real128 &x)
 {
     return real128{-x.m_value};
@@ -1174,16 +1052,7 @@ real128 dispatch_sub(const T &, const real128 &);
 
 } // namespace detail
 
-/// Binary subtraction involving \link mppp::real128 real128\endlink.
-/**
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \f$ x - y \f$.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
- * from mp++ types.
- */
+// Binary subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1241,22 +1110,7 @@ inline void dispatch_in_place_sub(T &x, const real128 &y)
 
 } // namespace detail
 
-/// In-place subtraction involving \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * .. note::
- *
- *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
- * \endrststar
- *
- * @param x the minuend.
- * @param y the subtrahend.
- *
- * @return a reference to \p x, after it has been decremented by \p y.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator, or by the conversion
- * of \link mppp::real128 real128\endlink to mp++ types.
- */
+// In-place subtraction.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1269,40 +1123,14 @@ template <typename T, typename U, detail::enable_if_t<are_real128_op_types<T, U>
     return x;
 }
 
-/// Prefix decrement.
-/**
- * This operator will decrement \p x by one.
- *
- * \rststar
- * .. note::
- *
- *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
- * \endrststar
- *
- * @param x the \link mppp::real128 real128\endlink that will be decreased.
- *
- * @return a reference to \p x after the decrement.
- */
+// Prefix decrement.
 inline MPPP_CONSTEXPR_14 real128 &operator--(real128 &x)
 {
     x.m_value -= 1;
     return x;
 }
 
-/// Suffix decrement.
-/**
- * This operator will decrement \p x by one and return a copy of \p x as it was before the decrement.
- *
- * \rststar
- * .. note::
- *
- *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
- * \endrststar
- *
- * @param x the \link mppp::real128 real128\endlink that will be decreased.
- *
- * @return a copy of \p x before the decrement.
- */
+// Suffix decrement.
 inline MPPP_CONSTEXPR_14 real128 operator--(real128 &x, int)
 {
     auto retval(x);
@@ -1338,16 +1166,7 @@ real128 dispatch_mul(const T &, const real128 &);
 
 } // namespace detail
 
-/// Binary multiplication involving \link mppp::real128 real128\endlink.
-/**
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \f$ x \times y \f$.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
- * from mp++ types.
- */
+// Binary multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1405,22 +1224,7 @@ inline void dispatch_in_place_mul(T &x, const real128 &y)
 
 } // namespace detail
 
-/// In-place multiplication involving \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * .. note::
- *
- *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
- * \endrststar
- *
- * @param x the multiplicand.
- * @param y the multiplicator.
- *
- * @return a reference to \p x, after it has been multiplied by \p y.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator, or by the conversion
- * of \link mppp::real128 real128\endlink to mp++ types.
- */
+// In-place multiplication.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1461,16 +1265,7 @@ real128 dispatch_div(const T &, const real128 &);
 
 } // namespace detail
 
-/// Binary division involving \link mppp::real128 real128\endlink.
-/**
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \f$ x / y \f$.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
- * from mp++ types.
- */
+// Binary division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1528,22 +1323,7 @@ inline void dispatch_in_place_div(T &x, const real128 &y)
 
 } // namespace detail
 
-/// In-place division involving \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * .. note::
- *
- *   This operator is marked as ``constexpr`` only if at least C++14 is being used.
- * \endrststar
- *
- * @param x the dividend.
- * @param y the divisor.
- *
- * @return a reference to \p x, after it has been divided by \p y.
- *
- * @throws unspecified any exception thrown by the corresponding binary operator, or by the conversion
- * of \link mppp::real128 real128\endlink to mp++ types.
- */
+// In-place division.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1584,23 +1364,7 @@ bool dispatch_eq(const T &, const real128 &);
 
 } // namespace detail
 
-/// Equality operator involving \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
- *    for an equality predicate that handles NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x = y \f$, \p false otherwise.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
- * from mp++ types.
- */
+// Equality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1629,23 +1393,7 @@ inline bool dispatch_eq(const T &x, const real128 &y)
 
 } // namespace detail
 
-/// Inequality operator involving \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN compares
- *    different from any value, including NaN itself). See :cpp:func:`mppp::real128_equal_to()`
- *    for an equality predicate that handles NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x \neq y \f$, \p false otherwise.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
- * from mp++ types.
- */
+// Inequality operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1685,24 +1433,7 @@ bool dispatch_lt(const T &, const real128 &);
 
 } // namespace detail
 
-/// Less-than operator involving \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    less than any value, and no value is less than NaN).
- *    See :cpp:func:`mppp::real128_lt()` for a less-than predicate that handles
- *    NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x < y \f$, \p false otherwise.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
- * from mp++ types.
- */
+// Less-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1754,22 +1485,7 @@ bool dispatch_lte(const T &, const real128 &);
 
 } // namespace detail
 
-/// Less-than or equal operator involving \link mppp::real128 real128\endlink and C++ types.
-/**
- * \rststar
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    less than or equal to any value, and no value is less than or equal to NaN).
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x \leq y \f$, \p false otherwise.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
- * from mp++ types.
- */
+// Less-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1821,24 +1537,7 @@ bool dispatch_gt(const T &, const real128 &);
 
 } // namespace detail
 
-/// Greater-than operator involving \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    greater than any value, and no value is greater than NaN).
- *    See :cpp:func:`mppp::real128_gt()` for a greater-than predicate that handles
- *    NaN specially.
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x > y \f$, \p false otherwise.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
- * from mp++ types.
- */
+// Greater-than operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1890,22 +1589,7 @@ bool dispatch_gte(const T &, const real128 &);
 
 } // namespace detail
 
-/// Greater-than or equal operator involving \link mppp::real128 real128\endlink.
-/**
- * \rststar
- * .. note::
- *    This operator does not handle NaN in a special way (that is, NaN is never
- *    greater than or equal to any value, and no value is greater than or equal to NaN).
- * \endrststar
- *
- * @param x the first operand.
- * @param y the second operand.
- *
- * @return \p true if \f$ x \geq y \f$, \p false otherwise.
- *
- * @throws unspecified any exception thrown by the constructor of \link mppp::real128 real128\endlink
- * from mp++ types.
- */
+// Greater-than or equal operator.
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
 requires Real128OpTypes<T, U>
@@ -1958,23 +1642,13 @@ constexpr real128 two_ptwo<32ul>()
 }
 } // namespace detail
 
-/** @defgroup real128_constants real128_constants
- *  @{
- */
-
-/// The number of binary digits in the significand of a \link mppp::real128 real128\endlink.
-/**
- * @return the integral constant 113.
- */
+// The number of binary digits in the significand.
 constexpr unsigned real128_sig_digits()
 {
     return 113u;
 }
 
-/// The largest positive finite value representable by \link mppp::real128 real128\endlink.
-/**
- * @return approximately \f$ 1.18973 \times 10^{4932}\f$.
- */
+// The largest positive finite value.
 constexpr real128 real128_max()
 {
     return (18446744073709551615ull * detail::two_112() + 281474976710655ull * detail::two_48() + 1)
@@ -1983,10 +1657,7 @@ constexpr real128 real128_max()
            * detail::two_ptwo<32>() * (1ull << 31);
 }
 
-/// The smallest positive value representable by \link mppp::real128 real128\endlink with full precision.
-/**
- * @return approximately \f$ 3.3621 \times 10^{-4932}\f$.
- */
+// The smallest positive value.
 constexpr real128 real128_min()
 {
     return 1 / detail::two_ptwo<8192>() / detail::two_ptwo<4096>() / detail::two_ptwo<2048>() / detail::two_ptwo<1024>()
@@ -1994,28 +1665,19 @@ constexpr real128 real128_min()
            / detail::two_ptwo<32>() / (1ull << 30);
 }
 
-/// The difference between 1 and the next larger number representable by \link mppp::real128 real128\endlink.
-/**
- * @return \f$ 2^{-112}\f$.
- */
+// The difference between 1 and the next larger number.
 constexpr real128 real128_epsilon()
 {
     return 1 / detail::two_ptwo<64>() / detail::two_ptwo<32>() / (1ull << 16);
 }
 
-/// The smallest positive denormalized number representable by \link mppp::real128 real128\endlink.
-/**
- * @return \f$ 2^{-16494}\f$.
- */
+// The smallest positive denormalized number.
 constexpr real128 real128_denorm_min()
 {
     return 1 / detail::two_ptwo<8192>() / detail::two_ptwo<8192>() / detail::two_ptwo<64>() / (1ull << 46);
 }
 
-/// The positive \f$ \infty \f$ constant.
-/**
- * @return \f$ +\infty \f$.
- */
+// Positive inf.
 constexpr real128 real128_inf()
 {
 #if !defined(__GNUC__) || __GNUC__ < 7
@@ -2032,10 +1694,7 @@ constexpr real128 real128_inf()
 #endif
 }
 
-/// NaN constant.
-/**
- * @return a quiet NaN value with unspecified sign bit.
- */
+// NaN.
 constexpr real128 real128_nan()
 {
 #if !defined(__GNUC__) || __GNUC__ < 7
@@ -2048,28 +1707,19 @@ constexpr real128 real128_nan()
 #endif
 }
 
-/// The \f$ \pi \f$ constant.
-/**
- * @return the quadruple-precision value of \f$ \pi \f$.
- */
+// Pi.
 constexpr real128 real128_pi()
 {
     return 2 * (9541308523256152504ull * detail::two_112() + 160664882791121ull * detail::two_48() + 1);
 }
 
-/// The \f$ \mathrm{e} \f$ constant (Euler's number).
-/**
- * @return the quadruple-precision value of \f$ \mathrm{e} \f$.
- */
+// Euler's number.
 constexpr real128 real128_e()
 {
     return 2 * (10751604932185443962ull * detail::two_112() + 101089180468598ull * detail::two_48() + 1);
 }
 
-/// The \f$ \sqrt{2} \f$ constant.
-/**
- * @return the quadruple-precision value of \f$ \sqrt{2} \f$.
- */
+// Sqrt2.
 constexpr real128 real128_sqrt2()
 {
     return 14486024992869247637ull * detail::two_112() + 116590752822204ull * detail::two_48() + 1;
@@ -2082,39 +1732,37 @@ constexpr real128 real128_sqrt2()
 // http://en.cppreference.com/w/cpp/language/inline
 // Note that constexpr static member variables are implicitly inline instead.
 
-/// The number of binary digits in the significand of a \link mppp::real128 real128\endlink (113).
+// The number of binary digits in the significand.
 inline constexpr unsigned sig_digits_128 = real128_sig_digits();
 
-/// The largest positive finite value representable by \link mppp::real128 real128\endlink.
+// The largest positive finite value.
 inline constexpr real128 max_128 = real128_max();
 
-/// The smallest positive value representable by \link mppp::real128 real128\endlink with full precision.
+// The smallest positive value representable with full precision.
 inline constexpr real128 min_128 = real128_min();
 
-/// The difference between 1 and the next larger representable number by \link mppp::real128 real128\endlink.
+// The difference between 1 and the next larger representable number.
 inline constexpr real128 epsilon_128 = real128_epsilon();
 
-/// The smallest positive denormalized number representable by \link mppp::real128 real128\endlink.
+// The smallest positive denormalized number.
 inline constexpr real128 denorm_min_128 = real128_denorm_min();
 
-/// Quadruple-precision \f$ +\infty \f$ constant.
+// Inf.
 inline constexpr real128 inf_128 = real128_inf();
 
-/// Quadruple-precision quiet NaN constant.
+// NaN.
 inline constexpr real128 nan_128 = real128_nan();
 
-/// Quadruple-precision \f$ \pi \f$ constant.
+// Pi.
 inline constexpr real128 pi_128 = real128_pi();
 
-/// Quadruple-precision \f$ \mathrm{e} \f$ constant (Euler's number).
+// Euler's number.
 inline constexpr real128 e_128 = real128_e();
 
-/// Quadruple-precision \f$ \sqrt{2} \f$ constant.
+// Quadruple-precision sqrt2.
 inline constexpr real128 sqrt2_128 = real128_sqrt2();
 
 #endif
-
-/** @} */
 
 // Hash.
 inline std::size_t hash(const real128 &x)

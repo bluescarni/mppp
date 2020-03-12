@@ -730,8 +730,27 @@ Trigonometry
 Hyperbolic functions
 ~~~~~~~~~~~~~~~~~~~~
 
-.. doxygengroup:: real128_hyper
-   :content-only:
+.. cpp:function:: mppp::real128 sinh(mppp::real128 x)
+.. cpp:function:: mppp::real128 cosh(mppp::real128 x)
+.. cpp:function:: mppp::real128 tanh(mppp::real128 x)
+.. cpp:function:: mppp::real128 asinh(mppp::real128 x)
+.. cpp:function:: mppp::real128 acosh(mppp::real128 x)
+.. cpp:function:: mppp::real128 atanh(mppp::real128 x)
+
+   Hyperbolic functions.
+
+   These functions will return, respectively:
+
+   * :math:`\sinh x`,
+   * :math:`\cosh x`,
+   * :math:`\tanh x`,
+   * :math:`\operatorname{arcsinh} x`,
+   * :math:`\operatorname{arccosh} x`,
+   * :math:`\operatorname{arctanh} x`.
+
+   :param x: the input value.
+
+   :return: a hyperbolic function of *x*.
 
 .. _real128_logexp:
 
@@ -767,16 +786,26 @@ Logarithms and exponentials
 Gamma functions
 ~~~~~~~~~~~~~~~
 
-.. doxygengroup:: real128_gamma
-   :content-only:
+.. cpp:function:: mppp::real128 lgamma(mppp::real128 x)
+
+   Natural logarithm of the gamma function.
+
+   :param x: the input value.
+
+   :return: :math:`\log\Gamma\left( x \right)`.
 
 .. _real128_miscfuncts:
 
 Other special functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. doxygengroup:: real128_miscfuncts
-   :content-only:
+.. cpp:function:: mppp::real128 erf(mppp::real128 x)
+
+   Error function.
+
+   :param x: the input value.
+
+   :return: :math:`\operatorname{erf}\left( x \right)`.
 
 .. _real128_fpmanip:
 
@@ -843,8 +872,132 @@ Other
 Mathematical operators
 ----------------------
 
-.. doxygengroup:: real128_operators
-   :content-only:
+.. cpp:function:: constexpr mppp::real128 mppp::operator+(mppp::real128 x)
+.. cpp:function:: constexpr mppp::real128 mppp::operator-(mppp::real128 x)
+
+   Identity and negation.
+
+   :param x: the argument.
+
+   :return: :math:`x` and :math:`-x` respectively.
+
+.. cpp:function:: constexpr mppp::real128 &mppp::operator++(mppp::real128 &x)
+.. cpp:function:: constexpr mppp::real128 &mppp::operator--(mppp::real128 &x)
+
+   .. note::
+
+      These operators are marked as ``constexpr`` only if at least C++14 is being used.
+
+   Prefix increment and decrement.
+
+   :param x: the argument.
+
+   :return: a reference to *x* after it has been incremented/decremented by one.
+
+.. cpp:function:: constexpr mppp::real128 mppp::operator++(mppp::real128 &x, int)
+.. cpp:function:: constexpr mppp::real128 mppp::operator--(mppp::real128 &x, int)
+
+   .. note::
+
+      These operators are marked as ``constexpr`` only if at least C++14 is being used.
+
+   Suffix increment and decrement.
+
+   :param x: the argument.
+
+   :return: a copy of *x* before the increment/decrement.
+
+.. cpp:function:: template <typename T, typename U> constexpr mppp::real128 mppp::operator+(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr mppp::real128 mppp::operator-(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr mppp::real128 mppp::operator*(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr mppp::real128 mppp::operator/(const T &x, const U &y)
+
+   .. note::
+
+      These operators participate in overload resolution only if ``T`` and ``U`` satisfy
+      the :cpp:concept:`~mppp::Real128OpTypes` concept.
+
+   Binary arithmetic operators.
+
+   These operators will return, respectively:
+
+   * :math:`x+y`,
+   * :math:`x-y`,
+   * :math:`x \times y`,
+   * :math:`x / y`.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: the result of the binary operation.
+
+   :exception unspecified: any exception thrown by the constructor of :cpp:class:`~mppp::real128`
+     from mp++ types.
+
+.. cpp:function:: template <typename T, typename U> constexpr T &mppp::operator+=(T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr T &mppp::operator-=(T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr T &mppp::operator*=(T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr T &mppp::operator/=(T &x, const U &y)
+
+   .. note::
+
+      These operators participate in overload resolution only if ``T`` and ``U`` satisfy
+      the :cpp:concept:`~mppp::Real128OpTypes` concept.
+
+   .. note::
+
+      These operators are marked as ``constexpr`` only if at least C++14 is being used.
+
+   In-place arithmetic operators.
+
+   These operators will set *x* to, respectively:
+
+   * :math:`x+y`,
+   * :math:`x-y`,
+   * :math:`x \times y`,
+   * :math:`x / y`.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: a reference to *x*.
+
+   :exception unspecified: any exception thrown by the corresponding binary operator, or by the conversion
+     of :cpp:class:`~mppp::real128` to mp++ types.
+
+.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator==(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator!=(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator<(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator>(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator<=(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> constexpr bool mppp::operator>=(const T &x, const U &y)
+
+   Comparison operators.
+
+   These operators will return ``true`` if, respectively:
+
+   * :math:`x=y`,
+   * :math:`x \neq y`,
+   * :math:`x < y`,
+   * :math:`x > y`,
+   * :math:`x \leq y`,
+   * :math:`x \geq y`,
+
+   ``false`` otherwise.
+
+   .. note::
+
+     These operators will handle NaN in the same way as the builtin floating-point types.
+     For alternative comparison functions that treat NaN specially, please see the
+     :ref:`comparison functions section <real128_comparison>`.
+
+   :param x: the first operand.
+   :param y: the second operand.
+
+   :return: the result of the comparison.
+
+   :exception unspecified: any exception thrown by the constructor of :cpp:class:`~mppp::real128`
+     from mp++ types.
 
 .. _real128_constants:
 
@@ -861,8 +1014,56 @@ but inline variables are more convenient if C++17 is an option.
    `macros <https://gcc.gnu.org/onlinedocs/libquadmath/Typedef-and-constants.html#Typedef-and-constants>`__
    from the quadmath library.
 
-.. doxygengroup:: real128_constants
-   :content-only:
+.. cpp:function:: constexpr unsigned mppp::real128_sig_digits()
+.. cpp:var:: constexpr unsigned mppp::sig_digits_128
+
+   The number of binary digits in the
+   significand of a :cpp:class:`~mppp::real128` (113).
+
+.. cpp:function:: constexpr unsigned mppp::real128_max()
+.. cpp:var:: constexpr unsigned mppp::max_128
+
+   The maximum positive finite value representable by :cpp:class:`~mppp::real128`.
+
+.. cpp:function:: constexpr unsigned mppp::real128_min()
+.. cpp:var:: constexpr unsigned mppp::min_128
+
+   The minimum positive value representable by :cpp:class:`~mppp::real128`
+   with full precision.
+
+.. cpp:function:: constexpr unsigned mppp::real128_epsilon()
+.. cpp:var:: constexpr unsigned mppp::epsilon_128
+
+   The difference between 1 and the next larger number representable
+   by :cpp:class:`~mppp::real128` (:math:`2^{-112}`).
+
+.. cpp:function:: constexpr unsigned mppp::real128_denorm_min()
+.. cpp:var:: constexpr unsigned mppp::denorm_min_128
+
+   The smallest positive denormalized number representable by
+   :cpp:class:`~mppp::real128`.
+
+.. cpp:function:: constexpr unsigned mppp::real128_inf()
+.. cpp:var:: constexpr unsigned mppp::inf_128
+.. cpp:function:: constexpr unsigned mppp::real128_nan()
+.. cpp:var:: constexpr unsigned mppp::nan_128
+
+   Positive infinity and NaN.
+
+.. cpp:function:: constexpr unsigned mppp::real128_pi()
+.. cpp:var:: constexpr unsigned mppp::pi_128
+
+   Quadruple-precision :math:`\pi` constant.
+
+.. cpp:function:: constexpr unsigned mppp::real128_e()
+.. cpp:var:: constexpr unsigned mppp::e_128
+
+   Quadruple-precision :math:`\text{e}` constant (Euler's number).
+
+.. cpp:function:: constexpr unsigned mppp::real128_sqrt2()
+.. cpp:var:: constexpr unsigned mppp::sqrt2_128
+
+   Quadruple-precision :math:`\sqrt{2}` constant.
 
 .. _real128_std_specs:
 
@@ -945,7 +1146,7 @@ User-defined literal
    User-defined quadruple-precision literal.
 
    This numeric literal operator template can be used to construct
-   :cpp:class:`mppp::real128` instances. Floating-point literals in decimal and
+   :cpp:class:`~mppp::real128` instances. Floating-point literals in decimal and
    hexadecimal format are supported.
 
    .. seealso::
