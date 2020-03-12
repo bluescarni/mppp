@@ -15,6 +15,8 @@ slower than the standard C++ floating-point types. A notable
 exception are recent versions of the PowerPC architecture,
 which provide hardware-accelerated quadruple-precision
 floating-point arithmetic.
+Note that, even with software implementations, :cpp:class:`~mppp::real128`
+can be expected to be noticeably faster than :cpp:class:`~mppp::real`.
 :cpp:class:`~mppp::real128` is available in mp++ if
 the library is configured with the
 ``MPPP_WITH_QUADMATH`` option enabled
