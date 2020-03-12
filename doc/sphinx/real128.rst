@@ -649,8 +649,8 @@ Comparison
 Roots
 ~~~~~
 
-.. cpp:function:: mppp::real128 sqrt(mppp::real128 x)
-.. cpp:function:: mppp::real128 cbrt(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::sqrt(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::cbrt(mppp::real128 x)
 
    Root functions.
 
@@ -663,7 +663,7 @@ Roots
 
    :return: the square or cubic root of *x*.
 
-.. cpp:function:: mppp::real128 hypot(const mppp::real128 &x, const mppp::real128 &y)
+.. cpp:function:: mppp::real128 mppp::hypot(const mppp::real128 &x, const mppp::real128 &y)
 
    Euclidean distance.
 
@@ -681,7 +681,7 @@ Roots
 Exponentiation
 ~~~~~~~~~~~~~~
 
-.. cpp:function:: template <typename T, typename U> mppp::real128 pow(const T &x, const U &y)
+.. cpp:function:: template <typename T, typename U> mppp::real128 mppp::pow(const T &x, const U &y)
 
    .. note::
 
@@ -703,12 +703,12 @@ Exponentiation
 Trigonometry
 ~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 sin(mppp::real128 x)
-.. cpp:function:: mppp::real128 cos(mppp::real128 x)
-.. cpp:function:: mppp::real128 tan(mppp::real128 x)
-.. cpp:function:: mppp::real128 asin(mppp::real128 x)
-.. cpp:function:: mppp::real128 acos(mppp::real128 x)
-.. cpp:function:: mppp::real128 atan(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::sin(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::cos(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::tan(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::asin(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::acos(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::atan(mppp::real128 x)
 
    Trigonometric functions.
 
@@ -730,12 +730,12 @@ Trigonometry
 Hyperbolic functions
 ~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 sinh(mppp::real128 x)
-.. cpp:function:: mppp::real128 cosh(mppp::real128 x)
-.. cpp:function:: mppp::real128 tanh(mppp::real128 x)
-.. cpp:function:: mppp::real128 asinh(mppp::real128 x)
-.. cpp:function:: mppp::real128 acosh(mppp::real128 x)
-.. cpp:function:: mppp::real128 atanh(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::sinh(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::cosh(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::tanh(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::asinh(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::acosh(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::atanh(mppp::real128 x)
 
    Hyperbolic functions.
 
@@ -757,7 +757,7 @@ Hyperbolic functions
 Logarithms and exponentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 exp(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::exp(mppp::real128 x)
 
    Exponential function.
 
@@ -765,9 +765,9 @@ Logarithms and exponentials
 
    :return: :math:`e^x`.
 
-.. cpp:function:: mppp::real128 log(mppp::real128 x)
-.. cpp:function:: mppp::real128 log10(mppp::real128 x)
-.. cpp:function:: mppp::real128 log2(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::log(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::log10(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::log2(mppp::real128 x)
 
    Logarithms.
 
@@ -786,7 +786,7 @@ Logarithms and exponentials
 Gamma functions
 ~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 lgamma(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::lgamma(mppp::real128 x)
 
    Natural logarithm of the gamma function.
 
@@ -799,7 +799,7 @@ Gamma functions
 Other special functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 erf(mppp::real128 x)
+.. cpp:function:: mppp::real128 mppp::erf(mppp::real128 x)
 
    Error function.
 
@@ -812,7 +812,7 @@ Other special functions
 Floating-point manipulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:function:: mppp::real128 nextafter(const mppp::real128 &from, const mppp::real128 &to)
+.. cpp:function:: mppp::real128 mppp::nextafter(const mppp::real128 &from, const mppp::real128 &to)
 
    .. versionadded:: 0.14
 
