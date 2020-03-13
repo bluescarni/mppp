@@ -38,10 +38,14 @@ namespace mppp
 
 static_assert(std::is_same<cplex128, __complex128>::value, "Mismatched __complex128 types.");
 
+#if defined(MPPP_WITH_MPFR)
+
 __float128 complex128::cast_to_f128(const real &x)
 {
     return static_cast<real128>(x).m_value;
 }
+
+#endif
 
 std::ostream &operator<<(std::ostream &os, const complex128 &c)
 {

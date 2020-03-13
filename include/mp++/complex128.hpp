@@ -105,7 +105,9 @@ private:
     {
         return static_cast<real128>(q).m_value;
     }
+#if defined(MPPP_WITH_MPFR)
     static __float128 cast_to_f128(const real &);
+#endif
 
 public:
     // Generic ctor.
