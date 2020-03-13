@@ -13,6 +13,7 @@
 
 #if defined(MPPP_WITH_QUADMATH)
 
+#include <complex>
 #include <cstddef>
 #include <ostream>
 #include <string>
@@ -53,9 +54,21 @@ typedef _Complex float __attribute__((mode(TC))) cplex128;
 typedef _Complex float __attribute__((mode(KC))) cplex128;
 #endif
 
-// TODO what about std::complex?
-// Should this be a concept only for *real*
-// interoperable types?
+namespace detail
+{
+
+// For internal use only.
+template <typename T>
+using is_complex128_mppp_interoperable = disjunction<is_real128_mppp_interoperable<T>
+#if defined(MPPP_WITH_MPFR)
+                                                     ,
+                                                     std::is_same<T, real>
+#endif
+                                                     >;
+
+} // namespace detail
+
+// Detect real-valued interoperable types.
 template <typename T>
 using is_complex128_interoperable = detail::disjunction<is_real128_interoperable<T>, std::is_same<T, real128>
 #if defined(MPPP_WITH_MPFR)
@@ -90,24 +103,16 @@ private:
     // Helpers to cast to __float128.
     // real128 and C++ types.
     template <typename T>
-    static constexpr __float128 cast_to_f128(const T &x)
+    static constexpr __float128 cast_to_f128(const T &x, std::false_type)
     {
         return static_cast<__float128>(x);
     }
     // Integer, rational and real.
-    template <std::size_t SSize>
-    static __float128 cast_to_f128(const integer<SSize> &n)
+    template <typename T>
+    static __float128 cast_to_f128(const T &x, std::true_type)
     {
-        return static_cast<real128>(n).m_value;
+        return static_cast<real128>(x).m_value;
     }
-    template <std::size_t SSize>
-    static __float128 cast_to_f128(const rational<SSize> &q)
-    {
-        return static_cast<real128>(q).m_value;
-    }
-#if defined(MPPP_WITH_MPFR)
-    static __float128 cast_to_f128(const real &);
-#endif
 
 public:
     // Generic ctor.
@@ -116,7 +121,7 @@ public:
 #else
     template <typename T, detail::enable_if_t<is_complex128_interoperable<T>::value, int> = 0>
 #endif
-    constexpr explicit complex128(const T &x) : m_value{cast_to_f128(x)}
+    constexpr explicit complex128(const T &x) : m_value{cast_to_f128(x, detail::is_complex128_mppp_interoperable<T>{})}
     {
     }
     // Binary generic ctor.
@@ -127,7 +132,9 @@ public:
               detail::enable_if_t<
                   detail::conjunction<is_complex128_interoperable<T>, is_complex128_interoperable<U>>::value, int> = 0>
 #endif
-    constexpr explicit complex128(const T &re, const U &im) : m_value{cast_to_f128(re), cast_to_f128(im)}
+    constexpr explicit complex128(const T &re, const U &im)
+        : m_value{cast_to_f128(re, detail::is_complex128_mppp_interoperable<T>{}),
+                  cast_to_f128(im, detail::is_complex128_mppp_interoperable<U>{})}
     {
     }
     // Constructor from std::complex.
@@ -166,11 +173,11 @@ public:
     explicit complex128(const char *, const char *);
 
     // Getters for the real/imaginary parts.
-    constexpr real128 creal() const
+    constexpr real128 real() const
     {
         return real128{__real__ m_value};
     }
-    constexpr real128 cimag() const
+    constexpr real128 imag() const
     {
         return real128{__imag__ m_value};
     }
@@ -192,12 +199,12 @@ public:
 // Getters for real/imaginary parts.
 constexpr real128 creal(const complex128 &c)
 {
-    return c.creal();
+    return c.real();
 }
 
 constexpr real128 cimag(const complex128 &c)
 {
-    return c.cimag();
+    return c.imag();
 }
 
 // Setters for real/imaginary parts.
@@ -226,30 +233,33 @@ constexpr complex128 operator-(const complex128 &c)
     return complex128{-c.m_value};
 }
 
-// TODO: what about std::complex?
-// TODO: this also includes mppp::real?
-// TODO: split arith_op_types and cmp_op_types (i.e., for comparing to real)?
+// Detect types for use in the comparison operators
+// involving complex128.
 template <typename T, typename U>
-using are_complex128_op_types
+using are_complex128_cmp_op_types
     = detail::disjunction<detail::conjunction<std::is_same<T, complex128>, std::is_same<U, complex128>>,
                           detail::conjunction<std::is_same<T, complex128>, is_complex128_interoperable<U>>,
-                          detail::conjunction<std::is_same<U, complex128>, is_complex128_interoperable<T>>>;
+                          detail::conjunction<std::is_same<U, complex128>, is_complex128_interoperable<T>>,
+                          detail::conjunction<std::is_same<T, complex128>, is_cpp_complex<U>>,
+                          detail::conjunction<std::is_same<U, complex128>, is_cpp_complex<T>>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
 
 template <typename T, typename U>
-MPPP_CONCEPT_DECL Complex128OpTypes = are_complex128_op_types<T, U>::value;
+MPPP_CONCEPT_DECL Complex128CmpOpTypes = are_complex128_cmp_op_types<T, U>::value;
 
 #endif
 
 namespace detail
 {
 
+// complex128-complex128.
 constexpr bool dispatch_eq(const complex128 &c1, const complex128 &c2)
 {
     return c1.m_value == c2.m_value;
 }
 
+// complex128-real128.
 constexpr bool dispatch_eq(const complex128 &c, const real128 &x)
 {
     return c.m_value == x.m_value;
@@ -260,25 +270,52 @@ constexpr bool dispatch_eq(const real128 &x, const complex128 &c)
     return dispatch_eq(c, x);
 }
 
-template <typename T>
+// complex128-mppp.
+template <typename T, enable_if_t<is_complex128_mppp_interoperable<T>::value, int> = 0>
+inline bool dispatch_eq(const complex128 &x, const T &y)
+{
+    return x.imag() == 0 && x.real() == y;
+}
+
+template <typename T, enable_if_t<is_complex128_mppp_interoperable<T>::value, int> = 0>
+inline bool dispatch_eq(const T &y, const complex128 &x)
+{
+    return dispatch_eq(x, y);
+}
+
+// complex128-C++.
+template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_eq(const complex128 &c, const T &x)
 {
     return c.m_value == x;
 }
 
-template <typename T>
+template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_eq(const T &x, const complex128 &c)
 {
     return dispatch_eq(c, x);
+}
+
+// complex128-C++ complex.
+template <typename T>
+inline MPPP_CONSTEXPR_14 bool dispatch_eq(const complex128 &c1, const std::complex<T> &c2)
+{
+    return c1.real() == c2.real() && c1.imag() == c2.imag();
+}
+
+template <typename T>
+inline MPPP_CONSTEXPR_14 bool dispatch_eq(const std::complex<T> &c2, const complex128 &c1)
+{
+    return dispatch_eq(c1, c2);
 }
 
 } // namespace detail
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Complex128OpTypes<T, U>
+requires Complex128CmpOpTypes<T, U>
 #else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_types<T, U>::value, int> = 0>
 #endif
     constexpr bool operator==(const T &x, const U &y)
 {
@@ -287,9 +324,9 @@ template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T,
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T, typename U>
-requires Complex128OpTypes<T, U>
+requires Complex128CmpOpTypes<T, U>
 #else
-template <typename T, typename U, detail::enable_if_t<are_complex128_op_types<T, U>::value, int> = 0>
+template <typename T, typename U, detail::enable_if_t<are_complex128_cmp_op_types<T, U>::value, int> = 0>
 #endif
     constexpr bool operator!=(const T &x, const U &y)
 {

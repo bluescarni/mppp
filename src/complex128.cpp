@@ -27,30 +27,15 @@
 #include <mp++/complex128.hpp>
 #include <mp++/real128.hpp>
 
-#if defined(MPPP_WITH_MPFR)
-
-#include <mp++/real.hpp>
-
-#endif
-
 namespace mppp
 {
 
 static_assert(std::is_same<cplex128, __complex128>::value, "Mismatched __complex128 types.");
 
-#if defined(MPPP_WITH_MPFR)
-
-__float128 complex128::cast_to_f128(const real &x)
-{
-    return static_cast<real128>(x).m_value;
-}
-
-#endif
-
 std::ostream &operator<<(std::ostream &os, const complex128 &c)
 {
     // NOTE: use the same printing format as std::complex.
-    os << '(' << c.creal() << ',' << c.cimag() << ')';
+    os << '(' << c.real() << ',' << c.imag() << ')';
 
     return os;
 }

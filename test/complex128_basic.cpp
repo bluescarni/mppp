@@ -10,6 +10,8 @@
 
 #include <mp++/complex128.hpp>
 #include <mp++/config.hpp>
+#include <mp++/integer.hpp>
+#include <mp++/rational.hpp>
 
 #if defined(MPPP_WITH_MPFR)
 
@@ -27,7 +29,7 @@ TEST_CASE("complex128 constructors")
     constexpr complex128 c{std::complex<double>{1, 2}};
 #endif
     constexpr complex128 c2{3, 4};
-    constexpr auto tmp = complex128{2}.creal();
+    constexpr auto tmp = complex128{2}.real();
 
 #if MPPP_CPLUSPLUS >= 201402L
     std::cout << c << '\n';
@@ -48,6 +50,16 @@ TEST_CASE("complex128 constructors")
     std::cout << (real128{1} == complex128{1, 2}) << '\n';
     std::cout << (complex128{1, 2} == 1.5) << '\n';
     std::cout << (45ull == complex128{1, 2}) << '\n';
+    std::cout << (complex128{1, 2} == std::complex<double>{1, 2}) << '\n';
+    std::cout << (std::complex<double>{1, 2} == complex128{1, 2}) << '\n';
+    std::cout << (complex128{1, 2} == std::complex<double>{1, 0}) << '\n';
+    std::cout << (std::complex<double>{1, 0} == complex128{1, 2}) << '\n';
+    std::cout << (complex128{1, 2} == std::complex<double>{0, 2}) << '\n';
+    std::cout << (std::complex<double>{0, 2} == complex128{1, 2}) << '\n';
+    std::cout << (complex128{1, 2} == 1_z1) << '\n';
+    std::cout << (1_z1 == complex128{1, 0}) << '\n';
+    std::cout << (complex128{1, 2} == 1_q1) << '\n';
+    std::cout << (1_q1 == complex128{1, 0}) << '\n';
 
     // Testing for string ctor:
     // - leading whitespaces (outside and inside the brackets),
