@@ -12,6 +12,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #if defined(MPPP_HAVE_STRING_VIEW)
 
@@ -59,7 +60,9 @@ std::string complex128::to_string() const
     return oss.str();
 }
 
-complex128::complex128(const ptag &, const char *str)
+// Helper to construct the internal m_value
+// from a null-terminated string.
+void complex128::construct_from_nts(const char *str)
 {
     // Small helper to raise an error in case
     // of a malformed string.
@@ -145,7 +148,20 @@ complex128::complex128(const ptag &, const char *str)
     }
 }
 
+complex128::complex128(const ptag &, const char *str)
+{
+    construct_from_nts(str);
+}
+
 complex128::complex128(const ptag &, const std::string &s) : complex128(s.c_str()) {}
+
+complex128::complex128(const char *begin, const char *end)
+{
+    MPPP_MAYBE_TLS std::vector<char> buffer;
+    buffer.assign(begin, end);
+    buffer.emplace_back('\0');
+    construct_from_nts(buffer.data());
+}
 
 #if defined(MPPP_HAVE_STRING_VIEW)
 

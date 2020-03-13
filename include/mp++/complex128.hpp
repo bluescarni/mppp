@@ -148,6 +148,7 @@ private:
 #if defined(MPPP_HAVE_STRING_VIEW)
     explicit complex128(const ptag &, const std::string_view &);
 #endif
+    MPPP_DLL_LOCAL void construct_from_nts(const char *);
 
 public:
     // Constructor from string.
