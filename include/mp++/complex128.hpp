@@ -306,7 +306,7 @@ inline complex128 operator"" _cq()
 }
 
 template <char... Chars>
-inline complex128 operator"" _irq()
+constexpr complex128 operator"" _irq()
 {
     return complex128{0, operator"" _rq<Chars...>()};
 }

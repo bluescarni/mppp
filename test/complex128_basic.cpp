@@ -62,5 +62,8 @@ TEST_CASE("complex128 constructors")
     std::cout << 1.23_cq << '\n';
     std::cout << 1.23_irq << '\n';
     std::cout << 1_irq << '\n';
+
+#if MPPP_CPLUSPLUS >= 201703L
     [[maybe_unused]] constexpr auto flop = 1_irq;
+#endif
 }
