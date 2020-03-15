@@ -10,6 +10,7 @@
 
 #include <complex>
 #include <stdexcept>
+#include <string>
 #include <utility>
 
 #if defined(MPPP_HAVE_STRING_VIEW)
@@ -102,7 +103,9 @@ TEST_CASE("basic constructors")
 TEST_CASE("string constructors")
 {
     using Catch::Matchers::Message;
+#if defined(MPPP_HAVE_STRING_VIEW)
     using namespace std::literals;
+#endif
 
     // Empty strings.
     REQUIRE_THROWS_MATCHES(complex128{""}, std::invalid_argument,
@@ -114,7 +117,7 @@ TEST_CASE("string constructors")
 
     // Only the real value, no brackets.
     REQUIRE(complex128{"123"}.m_value == 123);
-    REQUIRE(complex128{"123"s}.m_value == 123);
+    REQUIRE(complex128{std::string("123")}.m_value == 123);
     constexpr char str1[] = "123456";
     REQUIRE(complex128{str1, str1 + 3}.m_value == 123);
     REQUIRE(complex128{str1 + 3, str1 + 6}.m_value == 456);
@@ -136,7 +139,7 @@ TEST_CASE("string constructors")
 
     // Strings with brackets and only the real component.
     REQUIRE(complex128{"(123)"}.m_value == 123);
-    REQUIRE(complex128{"(123)"s}.m_value == 123);
+    REQUIRE(complex128{std::string("(123)")}.m_value == 123);
     constexpr char str2[] = "(123)(456)";
     REQUIRE(complex128{str2, str2 + 5}.m_value == 123);
     REQUIRE(complex128{str2 + 5, str2 + 10}.m_value == 456);
@@ -159,7 +162,7 @@ TEST_CASE("string constructors")
 
     // Real and imaginary components.
     REQUIRE(complex128{"(123,12)"}.m_value == cplex128{123, 12});
-    REQUIRE(complex128{"(123,12)"s}.m_value == cplex128{123, 12});
+    REQUIRE(complex128{std::string("(123,12)")}.m_value == cplex128{123, 12});
     constexpr char str3[] = "(123,456)(-123,-456)";
     REQUIRE(complex128{str3, str3 + 9}.m_value == cplex128{123, 456});
     REQUIRE(complex128{str3 + 9, str3 + 20}.m_value == -cplex128{123, 456});
