@@ -6,12 +6,19 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <mp++/config.hpp>
+
 #include <complex>
 #include <stdexcept>
 #include <utility>
 
+#if defined(MPPP_HAVE_STRING_VIEW)
+
+#include <string_view>
+
+#endif
+
 #include <mp++/complex128.hpp>
-#include <mp++/config.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
@@ -95,6 +102,7 @@ TEST_CASE("basic constructors")
 TEST_CASE("string constructors")
 {
     using Catch::Matchers::Message;
+    using namespace std::literals;
 
     // Empty strings.
     REQUIRE_THROWS_MATCHES(complex128{""}, std::invalid_argument,
@@ -106,6 +114,13 @@ TEST_CASE("string constructors")
 
     // Only the real value, no brackets.
     REQUIRE(complex128{"123"}.m_value == 123);
+    REQUIRE(complex128{"123"s}.m_value == 123);
+    constexpr char str1[] = "123456";
+    REQUIRE(complex128{str1, str1 + 3}.m_value == 123);
+    REQUIRE(complex128{str1 + 3, str1 + 6}.m_value == 456);
+#if defined(MPPP_HAVE_STRING_VIEW)
+    REQUIRE(complex128{"123"sv}.m_value == 123);
+#endif
     REQUIRE(complex128{" 456"}.m_value == 456);
     REQUIRE(complex128{"  789"}.m_value == 789);
     REQUIRE(complex128{"  -0x2f2"}.m_value == -754);
@@ -121,6 +136,13 @@ TEST_CASE("string constructors")
 
     // Strings with brackets and only the real component.
     REQUIRE(complex128{"(123)"}.m_value == 123);
+    REQUIRE(complex128{"(123)"s}.m_value == 123);
+    constexpr char str2[] = "(123)(456)";
+    REQUIRE(complex128{str2, str2 + 5}.m_value == 123);
+    REQUIRE(complex128{str2 + 5, str2 + 10}.m_value == 456);
+#if defined(MPPP_HAVE_STRING_VIEW)
+    REQUIRE(complex128{"(123)"sv}.m_value == 123);
+#endif
     REQUIRE(complex128{" (123)"}.m_value == 123);
     REQUIRE(complex128{" ( 123)"}.m_value == 123);
     REQUIRE(complex128{"  ( -0x2f2)"}.m_value == -754);
@@ -137,6 +159,13 @@ TEST_CASE("string constructors")
 
     // Real and imaginary components.
     REQUIRE(complex128{"(123,12)"}.m_value == cplex128{123, 12});
+    REQUIRE(complex128{"(123,12)"s}.m_value == cplex128{123, 12});
+    constexpr char str3[] = "(123,456)(-123,-456)";
+    REQUIRE(complex128{str3, str3 + 9}.m_value == cplex128{123, 456});
+    REQUIRE(complex128{str3 + 9, str3 + 20}.m_value == -cplex128{123, 456});
+#if defined(MPPP_HAVE_STRING_VIEW)
+    REQUIRE(complex128{"(123,12)"sv}.m_value == cplex128{123, 12});
+#endif
     REQUIRE(complex128{" (123,12)"}.m_value == cplex128{123, 12});
     REQUIRE(complex128{" ( 123,12)"}.m_value == cplex128{123, 12});
     REQUIRE(complex128{" ( 123, 12)"}.m_value == cplex128{123, 12});
