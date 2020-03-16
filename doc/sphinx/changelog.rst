@@ -7,6 +7,10 @@ Changelog
 New
 ~~~
 
+- :cpp:class:`~mppp::real128` can now interact with
+  ``long double`` when using Clang >= 7
+  (`#222 <https://github.com/bluescarni/mppp/pull/222>`__).
+
 - mp++ now officially supports the ARM (``aarch64``)
   and PowerPC (``ppc64le``) architectures, which have
   been added to the continuous integration setup

@@ -94,9 +94,6 @@ using is_real128_mppp_interoperable = disjunction<is_integer<T>, is_rational<T>>
 
 } // namespace detail
 
-// Fwd declare the abs() function.
-constexpr real128 abs(const real128 &);
-
 // Story time!
 //
 // Since 3.9, clang supports the __float128 type. However, interactions between long double and __float128 are disabled.
@@ -128,16 +125,77 @@ constexpr real128 abs(const real128 &);
 // For the moment, though, it seems like on all platforms __float128 is at least the same rank as double. For long
 // double, clang and GCC diverge, and we follow whatever the compiler is doing. So we just hard-code the behaviour
 // here, we can always write a more sophisticated solution later if the need arises.
+//
+// NOTE: since version 7 the behaviour of clang changed, now matching GCC.
 
-template <typename T>
-using is_real128_interoperable = detail::disjunction<
-#if defined(MPPP_WITH_MPFR) && defined(__clang__)
-    detail::conjunction<is_cpp_interoperable<T>, detail::negation<std::is_same<T, long double>>>
+// Define the MPPP_FLOAT128_WITH_LONG_DOUBLE name
+// if __float128 can interact with long double.
+#if defined(__clang__)
+
+#if defined(__apple_build_version__)
+
+// NOTE: according to https://en.wikipedia.org/wiki/Xcode#Toolchain_versions,
+// clang 7 starts in Xcode 10.2.
+#if __clang_major__ > 10 || (__clang_major__ == 10 && __clang_minor__ >= 2)
+
+#define MPPP_FLOAT128_WITH_LONG_DOUBLE
+
+#endif
+
 #else
+
+// Vanilla clang.
+#if __clang_major__ >= 7
+
+#define MPPP_FLOAT128_WITH_LONG_DOUBLE
+
+#endif
+
+#endif
+
+#else
+
+// On non-clang, let's always assume that __float128
+// can interact with long double.
+#define MPPP_FLOAT128_WITH_LONG_DOUBLE
+
+#endif
+
+namespace detail
+{
+
+// For internal use only.
+// NOTE: the idea here is:
+// - if MPPP_FLOAT128_WITH_LONG_DOUBLE is true,
+//   then we *always* want to include long double
+//   (which might or might not be already in
+//   is_cpp_interoperable);
+// - otherwise, we *never* want to include long
+//   double (which might or might not be in
+//   is_cpp_interoperable).
+template <typename T>
+using is_real128_cpp_interoperable =
+#if defined(MPPP_WITH_MPFR) && !defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    // Case 1: long double is in is_cpp_interoperable, but not supported
+    // by __float128. Disable it for real128 interoperability.
+    detail::conjunction<is_cpp_interoperable<T>, detail::negation<std::is_same<T, long double>>>
+#elif !defined(MPPP_WITH_MPFR) && defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    // Case 2: long double is not in is_cpp_interoperable, but it
+    // is supported by __float128. Enable it for real128 interoperability.
+    detail::disjunction<is_cpp_interoperable<T>, std::is_same<T, long double>>
+#else
+    // Cases 3 and 4: long double is (not) in is_cpp_interoperable and it is
+    // (not) supported by __float128. is_real128_cpp_interoperable
+    // and is_cpp_interoperable are the same thing.
     is_cpp_interoperable<T>
 #endif
-    ,
-    detail::is_real128_mppp_interoperable<T>>;
+    ;
+
+} // namespace detail
+
+template <typename T>
+using is_real128_interoperable
+    = detail::disjunction<detail::is_real128_cpp_interoperable<T>, detail::is_real128_mppp_interoperable<T>>;
 
 #if defined(MPPP_HAVE_CONCEPTS)
 template <typename T>
@@ -154,6 +212,9 @@ using are_real128_op_types
 template <typename T, typename U>
 MPPP_CONCEPT_DECL Real128OpTypes = are_real128_op_types<T, U>::value;
 #endif
+
+// Fwd declare the abs() function.
+constexpr real128 abs(const real128 &);
 
 // For the future:
 // - finish wrapping up the quadmath API
@@ -305,6 +366,7 @@ private:
 
 public:
     // Constructor from interoperable types.
+    constexpr explicit real128(const long double &x) : m_value(cast_to_float128(x)) {}
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -350,6 +412,10 @@ public:
     }
 
     // Assignment from interoperable types.
+    MPPP_CONSTEXPR_14 real128 &operator=(const long double &x)
+    {
+        return *this = real128{x};
+    }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -507,6 +573,10 @@ private:
 
 public:
     // Conversion operator to interoperable types.
+    constexpr explicit operator long double() const
+    {
+        return static_cast<long double>(m_value);
+    }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -533,6 +603,10 @@ private:
 
 public:
     // Conversion member function to interoperable types.
+    MPPP_CONSTEXPR_14 bool get(long double &rop) const
+    {
+        return rop = static_cast<long double>(m_value), true;
+    }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -642,13 +716,9 @@ public:
 // Double check that real128 is a standard layout class.
 static_assert(std::is_standard_layout<real128>::value, "real128 is not a standard layout class.");
 
-// Conversion function for \link mppp::real128 real128\endlink.
-#if defined(MPPP_HAVE_CONCEPTS)
-template <Real128Interoperable T>
-#else
-template <typename T, detail::enable_if_t<is_real128_interoperable<T>::value, int> = 0>
-#endif
-inline MPPP_CONSTEXPR_14 bool get(T &rop, const real128 &x)
+// Conversion function.
+template <typename T>
+inline MPPP_CONSTEXPR_14 auto get(T &rop, const real128 &x) -> decltype(x.get(rop))
 {
     return x.get(rop);
 }
