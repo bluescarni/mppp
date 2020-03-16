@@ -97,12 +97,11 @@ The real128 class
 
       :param x: the :cpp:type:`__float128` that will be assigned to the internal value.
 
-   .. cpp:function:: constexpr explicit real128(const long double &x)
    .. cpp:function:: template <Real128Interoperable T> constexpr explicit real128(const T &x)
 
-      Constructors from interoperable types.
+      Constructor from interoperable types.
 
-      These constructors will initialise the internal value to *x*.
+      This constructor will initialise the internal value to *x*.
       Depending on the value and type of *x*, ``this`` may not be exactly equal
       to *x* after initialisation (e.g., if *x* is a very large
       :cpp:class:`~mppp::integer`).
@@ -163,12 +162,11 @@ The real128 class
 
       :return: a reference to ``this``.
 
-   .. cpp:function:: constexpr real128 &operator=(const long double &x)
    .. cpp:function:: template <Real128Interoperable T> constexpr real128 &operator=(const T &x)
 
       .. note::
 
-        These operators are marked as ``constexpr`` only if at least C++14 is being used.
+        This operator is marked as ``constexpr`` only if at least C++14 is being used.
 
       Assignment from interoperable types.
 
@@ -204,13 +202,11 @@ The real128 class
 
       :return: a copy of the :cpp:type:`__float128` value stored internally.
 
-   .. cpp:function:: constexpr explicit operator long double() const
    .. cpp:function:: template <Real128Interoperable T> constexpr explicit operator T() const
 
-      Conversion operators to interoperable types.
+      Conversion operator to interoperable types.
 
-      These operators will convert ``this`` to a ``long double`` or to a
-      :cpp:concept:`~mppp::Real128Interoperable` type.
+      This operator will convert ``this`` to a :cpp:concept:`~mppp::Real128Interoperable` type.
 
       Conversion to C++ types is implemented via direct cast, and thus no checks are
       performed to ensure that the value of ``this`` can be represented by the target type.
@@ -224,20 +220,18 @@ The real128 class
       :exception std\:\:domain_error: if ``this`` represents a non-finite value and ``T``
         is :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`.
 
-   .. cpp:function:: constexpr bool get(long double &rop) const
    .. cpp:function:: template <Real128Interoperable T> constexpr bool get(T &rop) const
 
       .. note::
 
-        These member functions are marked as ``constexpr`` only if at least C++14 is being used.
+        This member function is marked as ``constexpr`` only if at least C++14 is being used.
 
       Conversion member function to interoperable types.
 
-      These member functions, similarly to the conversion operators, will convert ``this`` to a
-      ``long double`` or to a :cpp:concept:`~mppp::Real128Interoperable` type,
-      storing the result of the conversion into *rop*.
-      Differently from the conversion operators, these functions do not raise any exception: if the conversion is
-      successful, the functions will return ``true``, otherwise the functions will return ``false``. If the
+      This member function, similarly to the conversion operator, will convert ``this`` to a
+      :cpp:concept:`~mppp::Real128Interoperable` type, storing the result of the conversion into *rop*.
+      Differently from the conversion operator, this function does not raise any exception: if the conversion is
+      successful, the function will return ``true``, otherwise the function will return ``false``. If the
       conversion fails, *rop* will not be altered. The conversion can fail only if ``T`` is either
       :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`, and ``this`` represents a non-finite value.
 
@@ -487,19 +481,18 @@ Functions
 Conversion
 ~~~~~~~~~~
 
-.. cpp:function:: constexpr bool mppp::get(long double &rop, const mppp::real128 &x)
 .. cpp:function:: template <mppp::Real128Interoperable T> constexpr bool mppp::get(T &rop, const mppp::real128 &x)
 
    .. note::
 
-     These functions are marked as ``constexpr`` only if at least C++14 is being used.
+     This function is marked as ``constexpr`` only if at least C++14 is being used.
 
-   Conversion functions.
+   Conversion function.
 
-   These functions will convert the input :cpp:class:`~mppp::real128` *x* to a ``long double`` or to a
+   This function will convert the input :cpp:class:`~mppp::real128` *x* to a
    :cpp:concept:`~mppp::Real128Interoperable` type, storing the result of the conversion into *rop*.
-   If the conversion is successful, the functions
-   will return ``true``, otherwise the functions will return ``false``. If the conversion fails, *rop* will
+   If the conversion is successful, the function
+   will return ``true``, otherwise the function will return ``false``. If the conversion fails, *rop* will
    not be altered. The conversion can fail only if ``T``
    is either :cpp:class:`~mppp::integer` or :cpp:class:`~mppp::rational`, and *x*
    represents a non-finite value.

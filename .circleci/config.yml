@@ -78,6 +78,7 @@ workflows:
   version: 2
   all_builds:
     jobs:
+    - bionic_clang6
     - bionic_gcc7_conda_coverage
     - bionic_gcc7_conda_release
     - focal_gcc9_conda_coverage
@@ -86,4 +87,3 @@ workflows:
     - focal_clang9_debuggmp
     - bionic_gcc7_conda_asan
     - bionic_gcc7_conda_ubsan
-    - bionic_clang6
