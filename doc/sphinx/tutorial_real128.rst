@@ -26,8 +26,8 @@ the library is configured with the
 .. note::
 
    In Clang<7, :cpp:type:`__float128` cannot be used in mixed-mode
-   arithmetic operations with ``long double``. Accordingly,
-   :cpp:class:`~mppp::real128` will disable binary operations with
+   operations with ``long double``. Accordingly,
+   :cpp:class:`~mppp::real128` will disable interoperability with
    ``long double`` if Clang<7 is being used.
 
 As a thin wrapper, :cpp:class:`~mppp::real128` adds a few extra features
