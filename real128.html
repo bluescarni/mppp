@@ -827,9 +827,10 @@ Specifically, this concept is satisfied if either:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> is <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">integer</span></code>, or</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">T</span></code> is <code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">rational</span></code>, or</p></li>
-<li><p>on GCC, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::CppInteroperable</span></code></a>, or</p></li>
-<li><p>on Clang, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::CppInteroperable</span></code></a>,
-except if <code class="docutils literal notranslate"><span class="pre">T</span></code> is <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code>.</p></li>
+<li><p>on GCC and Clang&gt;=7, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::CppInteroperable</span></code></a> or it
+is <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code>, or</p></li>
+<li><p>on Clang&lt;7, <code class="docutils literal notranslate"><span class="pre">T</span></code> satisfies <a class="reference internal" href="concepts.html#_CPPv4I0EN4mppp16CppInteroperableE" title="mppp::CppInteroperable"><code class="xref cpp cpp-concept docutils literal notranslate"><span class="pre">mppp::CppInteroperable</span></code></a>, except if
+<code class="docutils literal notranslate"><span class="pre">T</span></code> is <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code>.</p></li>
 </ul>
 </dd></dl>
 

@@ -457,9 +457,10 @@ Concepts
 
    * ``T`` is :cpp:class:`~mppp::integer`, or
    * ``T`` is :cpp:class:`~mppp::rational`, or
-   * on GCC, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable`, or
-   * on Clang, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable`,
-     except if ``T`` is ``long double``.
+   * on GCC and Clang>=7, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable` or it
+     is ``long double``, or
+   * on Clang<7, ``T`` satisfies :cpp:concept:`mppp::CppInteroperable`, except if
+     ``T`` is ``long double``.
 
 .. cpp:concept:: template <typename T, typename U> mppp::Real128OpTypes
 

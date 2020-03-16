@@ -177,8 +177,8 @@
 <span id="tutorial-real128"></span><h1>Quadruple-precision float tutorial<a class="headerlink" href="#quadruple-precision-float-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>The <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> class is a thin wrapper around
 the <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> type
-available in GCC and (more recently) Clang.
-<a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> is an implementation the
+available in GCC and (more recently) Clang.</p>
+<p><a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> is an implementation the
 <a class="reference external" href="https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format">quadruple-precision IEEE 754 binary floating-point standard</a>,
 which provides up to 36 decimal digits of precision.
 On most platforms, <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> is implemented
@@ -193,6 +193,13 @@ can be expected to be noticeably faster than <a class="reference internal" href=
 the library is configured with the
 <code class="docutils literal notranslate"><span class="pre">MPPP_WITH_QUADMATH</span></code> option enabled
 (see the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation instructions</span></a>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In Clang&lt;7, <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> cannot be used in mixed-mode
+operations with <code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code>. Accordingly,
+<a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> will disable interoperability with
+<code class="docutils literal notranslate"><span class="pre">long</span> <span class="pre">double</span></code> if Clang&lt;7 is being used.</p>
+</div>
 <p>As a thin wrapper, <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a> adds a few extra features
 on top of what <a class="reference internal" href="real128.html#_CPPv410__float128" title="__float128"><code class="xref cpp cpp-type docutils literal notranslate"><span class="pre">__float128</span></code></a> already provides. Specifically, <a class="reference internal" href="real128.html#_CPPv4N4mppp7real128E" title="mppp::real128"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">real128</span></code></a>:</p>
 <ul class="simple">

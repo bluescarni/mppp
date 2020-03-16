@@ -7,10 +7,24 @@ Changelog
 New
 ~~~
 
+- The interoperability of :cpp:class:`~mppp::real128` with
+  ``long double`` has been improved: it is now supported
+  also on Clang (since version 7) and it does not require
+  mp++ to be configured with the ``MPPP_WITH_MPFR``
+  option any more
+  (`#222 <https://github.com/bluescarni/mppp/pull/222>`__).
+
 - mp++ now officially supports the ARM (``aarch64``)
   and PowerPC (``ppc64le``) architectures, which have
   been added to the continuous integration setup
   (`#219 <https://github.com/bluescarni/mppp/pull/219>`__).
+
+Changes
+~~~~~~~
+
+- Various internal simplifications and improvements
+  to :cpp:class:`~mppp::real128`
+  (`#221 <https://github.com/bluescarni/mppp/pull/221>`__).
 
 Fix
 ~~~
