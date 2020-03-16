@@ -813,13 +813,13 @@ inline real128 dispatch_pow(const real128 &x, const real128 &y)
     return real128{detail::powq(x.m_value, y.m_value)};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_pow(const real128 &x, const T &y)
 {
     return real128{detail::powq(x.m_value, y)};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline real128 dispatch_pow(const T &x, const real128 &y)
 {
     return real128{detail::powq(x, y.m_value)};
@@ -976,13 +976,13 @@ constexpr real128 dispatch_add(const real128 &x, const real128 &y)
     return real128{x.m_value + y.m_value};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_add(const real128 &x, const T &y)
 {
     return real128{x.m_value + y};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_add(const T &x, const real128 &y)
 {
     return real128{x + y.m_value};
@@ -1034,13 +1034,13 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(real128 &x, const real128 &y
     x.m_value += y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(real128 &x, const T &y)
 {
     x.m_value += y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline MPPP_CONSTEXPR_14 void dispatch_in_place_add(T &x, const real128 &y)
 {
     x = static_cast<T>(x + y.m_value);
@@ -1102,13 +1102,13 @@ constexpr real128 dispatch_sub(const real128 &x, const real128 &y)
     return real128{x.m_value - y.m_value};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_sub(const real128 &x, const T &y)
 {
     return real128{x.m_value - y};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_sub(const T &x, const real128 &y)
 {
     return real128{x - y.m_value};
@@ -1154,13 +1154,13 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(real128 &x, const real128 &y
     x.m_value -= y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(real128 &x, const T &y)
 {
     x.m_value -= y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline MPPP_CONSTEXPR_14 void dispatch_in_place_sub(T &x, const real128 &y)
 {
     x = static_cast<T>(x - y.m_value);
@@ -1216,13 +1216,13 @@ constexpr real128 dispatch_mul(const real128 &x, const real128 &y)
     return real128{x.m_value * y.m_value};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_mul(const real128 &x, const T &y)
 {
     return real128{x.m_value * y};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_mul(const T &x, const real128 &y)
 {
     return real128{x * y.m_value};
@@ -1268,13 +1268,13 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_mul(real128 &x, const real128 &y
     x.m_value *= y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline MPPP_CONSTEXPR_14 void dispatch_in_place_mul(real128 &x, const T &y)
 {
     x.m_value *= y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline MPPP_CONSTEXPR_14 void dispatch_in_place_mul(T &x, const real128 &y)
 {
     x = static_cast<T>(x * y.m_value);
@@ -1315,13 +1315,13 @@ constexpr real128 dispatch_div(const real128 &x, const real128 &y)
     return real128{x.m_value / y.m_value};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_div(const real128 &x, const T &y)
 {
     return real128{x.m_value / y};
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr real128 dispatch_div(const T &x, const real128 &y)
 {
     return real128{x / y.m_value};
@@ -1367,13 +1367,13 @@ inline MPPP_CONSTEXPR_14 void dispatch_in_place_div(real128 &x, const real128 &y
     x.m_value /= y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline MPPP_CONSTEXPR_14 void dispatch_in_place_div(real128 &x, const T &y)
 {
     x.m_value /= y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 inline MPPP_CONSTEXPR_14 void dispatch_in_place_div(T &x, const real128 &y)
 {
     x = static_cast<T>(x / y.m_value);
@@ -1414,13 +1414,13 @@ constexpr bool dispatch_eq(const real128 &x, const real128 &y)
     return x.m_value == y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_eq(const real128 &x, const T &y)
 {
     return x.m_value == y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_eq(const T &x, const real128 &y)
 {
     return x == y.m_value;
@@ -1483,13 +1483,13 @@ constexpr bool dispatch_lt(const real128 &x, const real128 &y)
     return x.m_value < y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_lt(const real128 &x, const T &y)
 {
     return x.m_value < y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_lt(const T &x, const real128 &y)
 {
     return x < y.m_value;
@@ -1535,13 +1535,13 @@ constexpr bool dispatch_lte(const real128 &x, const real128 &y)
     return x.m_value <= y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_lte(const real128 &x, const T &y)
 {
     return x.m_value <= y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_lte(const T &x, const real128 &y)
 {
     return x <= y.m_value;
@@ -1587,13 +1587,13 @@ constexpr bool dispatch_gt(const real128 &x, const real128 &y)
     return x.m_value > y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_gt(const real128 &x, const T &y)
 {
     return x.m_value > y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_gt(const T &x, const real128 &y)
 {
     return x > y.m_value;
@@ -1639,13 +1639,13 @@ constexpr bool dispatch_gte(const real128 &x, const real128 &y)
     return x.m_value >= y.m_value;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_gte(const real128 &x, const T &y)
 {
     return x.m_value >= y;
 }
 
-template <typename T, enable_if_t<is_cpp_interoperable<T>::value, int> = 0>
+template <typename T, enable_if_t<is_real128_cpp_interoperable<T>::value, int> = 0>
 constexpr bool dispatch_gte(const T &x, const real128 &y)
 {
     return x >= y.m_value;
