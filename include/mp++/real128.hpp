@@ -366,7 +366,6 @@ private:
 
 public:
     // Constructor from interoperable types.
-    constexpr explicit real128(const long double &x) : m_value(cast_to_float128(x)) {}
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -412,10 +411,6 @@ public:
     }
 
     // Assignment from interoperable types.
-    MPPP_CONSTEXPR_14 real128 &operator=(const long double &x)
-    {
-        return *this = real128{x};
-    }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -573,10 +568,6 @@ private:
 
 public:
     // Conversion operator to interoperable types.
-    constexpr explicit operator long double() const
-    {
-        return static_cast<long double>(m_value);
-    }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
@@ -603,10 +594,6 @@ private:
 
 public:
     // Conversion member function to interoperable types.
-    MPPP_CONSTEXPR_14 bool get(long double &rop) const
-    {
-        return rop = static_cast<long double>(m_value), true;
-    }
 #if defined(MPPP_HAVE_CONCEPTS)
     template <Real128Interoperable T>
 #else
