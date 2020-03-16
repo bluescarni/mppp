@@ -80,7 +80,7 @@ using is_complex128_interoperable = detail::disjunction<is_real128_interoperable
 #if defined(MPPP_HAVE_CONCEPTS)
 
 template <typename T>
-MPPP_CONCEPT_DECL Complex128Interoperable = is_complex128_interoperable<T>::value;
+MPPP_CONCEPT_DECL complex128_interoperable = is_complex128_interoperable<T>::value;
 
 #endif
 
@@ -117,7 +117,7 @@ private:
 public:
     // Generic ctor.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <Complex128Interoperable T>
+    template <complex128_interoperable T>
 #else
     template <typename T, detail::enable_if_t<is_complex128_interoperable<T>::value, int> = 0>
 #endif
@@ -126,7 +126,7 @@ public:
     }
     // Binary generic ctor.
 #if defined(MPPP_HAVE_CONCEPTS)
-    template <Complex128Interoperable T, Complex128Interoperable U>
+    template <complex128_interoperable T, complex128_interoperable U>
 #else
     template <typename T, typename U,
               detail::enable_if_t<

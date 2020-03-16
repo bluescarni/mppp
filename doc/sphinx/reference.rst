@@ -17,4 +17,5 @@ Before perusing the C++ reference, users are encouraged to first go through the 
    rational.rst
    real128.rst
    real.rst
+   complex128.rst
    utilities.rst
