@@ -12,6 +12,13 @@ New
   been added to the continuous integration setup
   (`#219 <https://github.com/bluescarni/mppp/pull/219>`__).
 
+Changes
+~~~~~~~
+
+- Various internal simplifications and improvements
+  to :cpp:class:`~mppp::real128`
+  (`#221 <https://github.com/bluescarni/mppp/pull/221>`__).
+
 Fix
 ~~~
 
