@@ -65,6 +65,14 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_bionic_gcc7_conda_ubsan.sh
+  xenial_clang6:
+    docker:
+    - image: circleci/buildpack-deps:xenial
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_xenial_clang6.sh
 
 workflows:
   version: 2
@@ -78,3 +86,4 @@ workflows:
     - focal_clang9_debuggmp
     - bionic_gcc7_conda_asan
     - bionic_gcc7_conda_ubsan
+    - xenial_clang6
