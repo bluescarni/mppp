@@ -7,8 +7,11 @@ Changelog
 New
 ~~~
 
-- :cpp:class:`~mppp::real128` can now interact with
-  ``long double`` when using Clang >= 7
+- The interoperability of :cpp:class:`~mppp::real128` with
+  ``long double`` has been improved: it is now supported
+  also on Clang (since version 7) and it does not require
+  mp++ to be configured with the ``MPPP_WITH_MPFR``
+  option any more
   (`#222 <https://github.com/bluescarni/mppp/pull/222>`__).
 
 - mp++ now officially supports the ARM (``aarch64``)

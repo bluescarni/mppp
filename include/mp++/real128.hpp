@@ -575,7 +575,7 @@ public:
 #endif
     constexpr explicit operator T() const
     {
-        return dispatch_conversion<T>(is_real128_cpp_interoperable<T>{});
+        return dispatch_conversion<T>(detail::is_real128_cpp_interoperable<T>{});
     }
 
 private:
@@ -601,7 +601,7 @@ public:
 #endif
     MPPP_CONSTEXPR_14 bool get(T &rop) const
     {
-        return dispatch_get(rop, is_real128_cpp_interoperable<T>{});
+        return dispatch_get(rop, detail::is_real128_cpp_interoperable<T>{});
     }
 
     // Convert to string.
