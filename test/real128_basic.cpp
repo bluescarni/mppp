@@ -91,9 +91,9 @@ TEST_CASE("real128 constructors")
     REQUIRE((r8.m_value == 1.5f));
     r8 = wchar_t{6};
     REQUIRE(r8 == 6);
-#if !defined(__clang__) && defined(MPPP_WITH_MPFR)
-    real128 r8a{1.5l};
-    REQUIRE((r8a.m_value == 1.5l));
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    real128 r8a{.1l};
+    REQUIRE((r8a.m_value == .1l));
 #endif
 #if defined(MPPP_HAVE_GCC_INT128)
     constexpr real128 r8b{__int128_t{5}};
@@ -244,6 +244,10 @@ TEST_CASE("real128 constructors")
     REQUIRE((ra.m_value == 456));
     ra = -23ll;
     REQUIRE((ra.m_value == -23));
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    ra = -.1l;
+    REQUIRE((ra.m_value == -.1l));
+#endif
     REQUIRE((!std::is_assignable<real128 &, std::vector<int>>::value));
     ra = int_t{-128};
     REQUIRE((ra.m_value == -128));
@@ -267,7 +271,17 @@ TEST_CASE("real128 conversions")
     REQUIRE(static_cast<signed char>(re) == -123);
     REQUIRE(static_cast<float>(re) == -123.f);
     REQUIRE(static_cast<double>(re) == -123.);
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    REQUIRE(static_cast<long double>(real128{.1l}) == .1l);
+#endif
     REQUIRE((static_cast<__float128>(re) == re.m_value));
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    long double xld;
+    real128{.1l}.get(xld);
+    REQUIRE(xld == .1l);
+    get(xld, real128{.3l});
+    REQUIRE(xld == .3l);
+#endif
 #if defined(MPPP_HAVE_GCC_INT128)
     constexpr __int128_t n128 = static_cast<__int128_t>(real128{4});
     REQUIRE(n128 == 4);

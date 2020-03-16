@@ -65,11 +65,20 @@ jobs:
     - run:
         name: Build and test
         command: bash ./tools/circleci_bionic_gcc7_conda_ubsan.sh
+  bionic_clang6:
+    docker:
+    - image: circleci/buildpack-deps:bionic
+    steps:
+    - checkout
+    - run:
+        name: Build and test
+        command: bash ./tools/circleci_bionic_clang6.sh
 
 workflows:
   version: 2
   all_builds:
     jobs:
+    - bionic_clang6
     - bionic_gcc7_conda_coverage
     - bionic_gcc7_conda_release
     - focal_gcc9_conda_coverage
