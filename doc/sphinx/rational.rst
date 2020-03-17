@@ -212,7 +212,7 @@ User-defined literals
    User-defined rational literals.
 
    These numeric literal operator templates can be used to construct
-   :cpp:class:`mppp::rational` instances with, respectively, 1, 2 and 3
+   :cpp:class:`~mppp::rational` instances with, respectively, 1, 2 and 3
    limbs of static storage. Literals in binary, octal, decimal and
    hexadecimal format are supported.
 

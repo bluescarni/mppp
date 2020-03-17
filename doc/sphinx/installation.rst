@@ -9,18 +9,12 @@ Introduction
 mp++ is written in modern C++, and it requires a compiler able to understand
 at least C++11 (mp++ will also use features from C++14 and C++17,
 if supported by the compiler). The library is regularly tested on
-various versions of the three major compilers (GCC, Clang and MSVC)
-and operating-systems (Linux, Windows and OSX).
+a comprehensive continuous integration pipeline, which includes:
 
-mp++ has been written, tested and benchmarked on x86 processors, but it does
-not contain any architecture-specific code
-and thus it should run on any architecture supported by GMP
-(as long as a decent C++11 compiler is available).
-mp++ does use compiler-specific functionality
-(e.g., 128-bit `integers <https://gcc.gnu.org/onlinedocs/gcc/_005f_005fint128.html>`__
-or intrinsics on 64-bit architectures) for the implementation of
-fast integer arithmetics. If such functionality is not available, mp++
-will fall back to GMP's ``mpn_`` functions.
+* various versions of the three major compilers (GCC, Clang and MSVC),
+* various versions of the three major operating systems
+  (Linux, Windows and OSX),
+* x86, ARM and PowerPC processors.
 
 mp++ has the following dependencies:
 
@@ -45,7 +39,9 @@ installing from source (the minimum required version is 3.3).
 Installation from source
 ------------------------
 
-Source releases of mp++ can be downloaded from `github <https://github.com/bluescarni/mppp/releases>`__. Once in the source tree
+Source releases of mp++ can be downloaded from
+`github <https://github.com/bluescarni/mppp/releases>`__.
+Once in the source tree
 of mp++, you can use ``cmake`` to configure the build to your liking
 (e.g., enabling optional features, customizing the installation
 path, etc.). The available configuration options are:
@@ -65,8 +61,13 @@ path, etc.). The available configuration options are:
 
 Note that the ``MPPP_WITH_QUADMATH`` option, at this time, is available only
 using GCC (all the supported versions) and Clang
-(since version 3.9). When using Clang, it is still necessary to link to the
-quadmath library from GCC.
+(since version 3.9). When this option is active,
+mp++ needs access at build time to both the quadmath header
+``quadmath.h`` and the quadmath library
+``libquadmath.so``, which may be installed in
+non-standard locations. While GCC is typically
+able to resolve the correct paths automatically, Clang might need assistance
+in order to identify the correct locations of these files.
 
 To build mp++, you can run the following CMake command from the
 build directory:
@@ -173,39 +174,23 @@ system you can compile this example with the following command:
 
    The ``-std=c++11`` flag is not necessary if your GCC version is recent enough (i.e., for GCC 6 and later).
 
-If you installed mp++ with optional features enabled, you will
-need to link the required libraries as well. For instance,
-if both MPFR and quadmath support are enabled, the compilation
-command on a modern GNU/Linux system will be something like:
+Because parts of mp++ are implemented using templates,
+users of the library will have to explicitly link to GMP
+and (if enabled) MPFR. Explicit linking to the other optional
+dependencies (quadmath, Arb, etc.) is not necessary, as they are
+used only within the compiled component
+of the mp++ library.
 
-.. code-block:: console
-
-   $ g++ -std=c++11 main.cpp -lmp++ -lquadmath -lmpfr -lgmp
+If you are using CMake, it is highly recommended to make use of the config-file
+package provided with mp++ rather
+than locating and linking manually the required dependencies
+(see the next section).
 
 .. note::
 
    Unless the definition ``NDEBUG`` is activated at compile time, mp++ runs extensive
    internal debug checks at runtime which carry a large performance penalty. Users are advised
    to always define ``NDEBUG`` when compiling code using mp++ in ``Release`` builds.
-
-The full list of libraries that need to be linked when
-using mp++ is the following:
-
-* the GMP library (or the MPIR fork), always required
-  (``-lgmp`` on most Unix-like systems);
-* the MPFR library, required only if mp++ was configured with
-  the ``MPPP_WITH_MPFR`` option (``-lmpfr`` on most Unix-like systems);
-* the Arb and FLINT libraries, required only if mp++ was configured with
-  the ``MPPP_WITH_ARB`` option (``-larb -lflint`` on most
-  Unix-like systems);
-* the quadmath library, required only if mp++ was configured with the
-  ``MPPP_WITH_QUADMATH`` option (``-lquadmath`` with GCC,
-  with Clang it might be necessary to provide the full path to the library).
-
-If you are using CMake, it's highly recommended to make use of the config-file
-package provided with mp++ rather
-than locating and linking manually the required dependencies
-(see the next section).
 
 Including mp++ in your project via CMake
 ----------------------------------------

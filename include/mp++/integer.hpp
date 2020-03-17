@@ -1031,6 +1031,9 @@ void nextprime_impl(integer<SSize> &, const integer<SSize> &);
 //   (which is what the usual type coercion rules would dictate),
 //   and in any case the performance of integer vs complex arithmetics is not a high
 //   priority at this time. Perhaps revisit this topic in the future.
+// - We can probably remove the public dependency on the GMP library by writing
+//   thin wrappers for all the invoked GMP functions, implemented in the mp++ library.
+//   Same for MPFR.
 
 // NOTE: about the nails:
 // - whenever we need to read the *numerical value* of a limb (e.g., in our optimised primitives),

@@ -31,6 +31,10 @@ elif [[ "${MPPP_BUILD}" == "DebugGCC48" ]]; then
     CXX=g++-4.8 CC=gcc-4.8 cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes -DMPPP_WITH_QUADMATH=yes -DCMAKE_CXX_FLAGS="-fsanitize=address" ../;
     make -j2 VERBOSE=1;
     ctest -V;
+elif [[ "${MPPP_BUILD}" == "DebugARM64" || "${MPPP_BUILD}" == "DebugPPC64" ]]; then
+    cmake -DCMAKE_PREFIX_PATH=$deps_dir -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DMPPP_WITH_MPFR=yes -DMPPP_WITH_ARB=yes ../;
+    make -j2 VERBOSE=1;
+    ctest -V;
 elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     wget ftp://ftp.gnu.org/gnu/gmp/gmp-6.2.0.tar.bz2;
     tar xjvf gmp-6.2.0.tar.bz2;
@@ -38,7 +42,7 @@ elif [[ "${MPPP_BUILD}" == "Coverage32GCC6" ]]; then
     CXX=g++-6 CC=gcc-6 ABI=32 ./configure --disable-shared;
     make -j2;
     cd ..;
-    CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -fconcepts" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.2.0 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.2.0/.libs/libgmp.a -DMPPP_TEST_NSPLIT=${TEST_NSPLIT} -DMPPP_TEST_SPLIT_NUM=${SPLIT_TEST_NUM} ../;
+    CXX=g++-6 CC=gcc-6 cmake -DCMAKE_BUILD_TYPE=Debug -DMPPP_BUILD_TESTS=yes -DCMAKE_CXX_FLAGS="-m32 --coverage -fconcepts" -DGMP_INCLUDE_DIR=$TRAVIS_BUILD_DIR/build/gmp-6.2.0 -DGMP_LIBRARY=$TRAVIS_BUILD_DIR/build/gmp-6.2.0/.libs/libgmp.a ../;
     make -j2 VERBOSE=1;
     ctest -V;
     bash <(curl -s https://codecov.io/bash) -x gcov-6;

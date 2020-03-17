@@ -13,8 +13,10 @@
 #endif
 
 #include <type_traits>
+#include <utility>
 
 #include <mp++/config.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
@@ -96,6 +98,30 @@ static constexpr real128 test_constexpr_ipd()
 }
 
 #endif
+
+template <typename T, typename U>
+using binary_add_t = decltype(std::declval<const T &>() + std::declval<const U &>());
+
+template <typename T, typename U>
+using in_place_add_t = decltype(std::declval<T &>() += std::declval<const U &>());
+
+template <typename T, typename U>
+using binary_sub_t = decltype(std::declval<const T &>() - std::declval<const U &>());
+
+template <typename T, typename U>
+using in_place_sub_t = decltype(std::declval<T &>() -= std::declval<const U &>());
+
+template <typename T, typename U>
+using binary_mul_t = decltype(std::declval<const T &>() * std::declval<const U &>());
+
+template <typename T, typename U>
+using in_place_mul_t = decltype(std::declval<T &>() *= std::declval<const U &>());
+
+template <typename T, typename U>
+using binary_div_t = decltype(std::declval<const T &>() / std::declval<const U &>());
+
+template <typename T, typename U>
+using in_place_div_t = decltype(std::declval<T &>() /= std::declval<const U &>());
 
 TEST_CASE("real128 ops")
 {
@@ -422,5 +448,73 @@ TEST_CASE("real128 ops")
         un128 /= real128{4};
         REQUIRE(un128 == 2);
     }
+#endif
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    x = -5;
+
+    REQUIRE((std::is_same<decltype(3.l + x), real128>::value));
+    REQUIRE((std::is_same<decltype(x + 3.l), real128>::value));
+    REQUIRE(((x + 2.l) == -3));
+    REQUIRE(((2.l + x) == -3));
+    {
+        real128 tmp_x{1};
+        auto xld = 5.l;
+        REQUIRE((tmp_x += 1.l) == 2);
+        REQUIRE((xld += tmp_x) == 7);
+    }
+
+    REQUIRE((std::is_same<decltype(3.l - x), real128>::value));
+    REQUIRE((std::is_same<decltype(x - 3.l), real128>::value));
+    REQUIRE(((x - 2.l) == -7));
+    REQUIRE(((2.l - x) == 7));
+    {
+        real128 tmp_x{1};
+        auto xld = 5.l;
+        REQUIRE((tmp_x -= 2.l) == -1);
+        REQUIRE((xld -= tmp_x) == 6);
+    }
+
+    REQUIRE((std::is_same<decltype(3.l * x), real128>::value));
+    REQUIRE((std::is_same<decltype(x * 3.l), real128>::value));
+    REQUIRE(((x * 2.l) == -10));
+    REQUIRE(((2.l * x) == -10));
+    {
+        real128 tmp_x{1};
+        auto xld = 5.l;
+        REQUIRE((tmp_x *= 2.l) == 2);
+        REQUIRE((xld *= tmp_x) == 10);
+    }
+
+    REQUIRE((std::is_same<decltype(3.l / x), real128>::value));
+    REQUIRE((std::is_same<decltype(x / 3.l), real128>::value));
+    REQUIRE(((x / 2.l) == real128{-5} / 2));
+    REQUIRE(((2.l / x) == real128{2} / -5));
+    {
+        real128 tmp_x{4};
+        auto xld = 6.l;
+        REQUIRE((tmp_x /= 2.l) == 2);
+        REQUIRE((xld /= tmp_x) == 3);
+    }
+#else
+    REQUIRE(!detail::is_detected<binary_add_t, real128, long double>::value);
+    REQUIRE(!detail::is_detected<binary_add_t, long double, real128>::value);
+    REQUIRE(!detail::is_detected<in_place_add_t, real128, long double>::value);
+    REQUIRE(!detail::is_detected<in_place_add_t, long double, real128>::value);
+
+    REQUIRE(!detail::is_detected<binary_sub_t, real128, long double>::value);
+    REQUIRE(!detail::is_detected<binary_sub_t, long double, real128>::value);
+    REQUIRE(!detail::is_detected<in_place_sub_t, real128, long double>::value);
+    REQUIRE(!detail::is_detected<in_place_sub_t, long double, real128>::value);
+
+    REQUIRE(!detail::is_detected<binary_mul_t, real128, long double>::value);
+    REQUIRE(!detail::is_detected<binary_mul_t, long double, real128>::value);
+    REQUIRE(!detail::is_detected<in_place_mul_t, real128, long double>::value);
+    REQUIRE(!detail::is_detected<in_place_mul_t, long double, real128>::value);
+
+    REQUIRE(!detail::is_detected<binary_div_t, real128, long double>::value);
+    REQUIRE(!detail::is_detected<binary_div_t, long double, real128>::value);
+    REQUIRE(!detail::is_detected<in_place_div_t, real128, long double>::value);
+    REQUIRE(!detail::is_detected<in_place_div_t, long double, real128>::value);
 #endif
 }

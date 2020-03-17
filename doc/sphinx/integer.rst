@@ -898,7 +898,7 @@ User-defined literals
    User-defined integer literals.
 
    These numeric literal operator templates can be used to construct
-   :cpp:class:`mppp::integer` instances with, respectively, 1, 2 and 3
+   :cpp:class:`~mppp::integer` instances with, respectively, 1, 2 and 3
    limbs of static storage. Literals in binary, octal, decimal and
    hexadecimal format are supported.
 

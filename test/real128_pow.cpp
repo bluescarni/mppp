@@ -13,8 +13,10 @@
 #endif
 
 #include <type_traits>
+#include <utility>
 
 #include <mp++/config.hpp>
+#include <mp++/detail/type_traits.hpp>
 #include <mp++/integer.hpp>
 #include <mp++/rational.hpp>
 #include <mp++/real128.hpp>
@@ -25,6 +27,9 @@ using namespace mppp;
 
 using int_t = integer<1>;
 using rat_t = rational<1>;
+
+template <typename T, typename U>
+using pow_t = decltype(mppp::pow(std::declval<const T &>(), std::declval<const U &>()));
 
 TEST_CASE("real128 pow")
 {
@@ -61,5 +66,12 @@ TEST_CASE("real128 pow")
     REQUIRE(pow(__int128_t{2}, real128{5}) == 32);
     REQUIRE(pow(real128{5}, __uint128_t{2}) == 25);
     REQUIRE(pow(__uint128_t{2}, real128{5}) == 32);
+#endif
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    REQUIRE(pow(real128{5}, 3.5l).m_value == detail::powq(5, 3.5l));
+    REQUIRE(pow(3.5l, real128{5}).m_value == detail::powq(3.5l, 5));
+#else
+    REQUIRE(!detail::is_detected<pow_t, real128, long double>::value);
+    REQUIRE(!detail::is_detected<pow_t, long double, real128>::value);
 #endif
 }

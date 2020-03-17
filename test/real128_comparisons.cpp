@@ -129,6 +129,20 @@ TEST_CASE("real128 equality")
     constexpr bool e4 = __uint128_t{2} != real128{1};
     REQUIRE(e4);
 #endif
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    REQUIRE(real128{2} == 2.l);
+    REQUIRE(2.l == real128{2});
+
+    REQUIRE(real128{2} != 1.l);
+    REQUIRE(1.l != real128{2});
+#else
+    REQUIRE(!is_eq_comparable<real128, long double>::value);
+    REQUIRE(!is_eq_comparable<long double, real128>::value);
+
+    REQUIRE(!is_ineq_comparable<real128, long double>::value);
+    REQUIRE(!is_ineq_comparable<long double, real128>::value);
+#endif
 }
 
 template <typename T, typename U>
@@ -205,6 +219,14 @@ TEST_CASE("real128 lt")
     constexpr bool d4 = __uint128_t{1} < real128{1};
     REQUIRE(!d4);
 #endif
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    REQUIRE(real128{2} < 3.l);
+    REQUIRE(3.l < real128{4});
+#else
+    REQUIRE(!is_lt_comparable<real128, long double>::value);
+    REQUIRE(!is_lt_comparable<long double, real128>::value);
+#endif
 }
 
 template <typename T, typename U>
@@ -255,6 +277,14 @@ TEST_CASE("real128 lte")
     REQUIRE(d3);
     constexpr bool d4 = __uint128_t{0} <= real128{1};
     REQUIRE(d4);
+#endif
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    REQUIRE(real128{2} <= 3.l);
+    REQUIRE(3.l <= real128{3});
+#else
+    REQUIRE(!is_lte_comparable<real128, long double>::value);
+    REQUIRE(!is_lte_comparable<long double, real128>::value);
 #endif
 }
 
@@ -332,6 +362,14 @@ TEST_CASE("real128 gt")
     constexpr bool d4 = __uint128_t{1} > real128{1};
     REQUIRE(!d4);
 #endif
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    REQUIRE(real128{3} > 2.l);
+    REQUIRE(4.l > real128{-3});
+#else
+    REQUIRE(!is_gt_comparable<real128, long double>::value);
+    REQUIRE(!is_gt_comparable<long double, real128>::value);
+#endif
 }
 
 template <typename T, typename U>
@@ -382,6 +420,14 @@ TEST_CASE("real128 gte")
     REQUIRE(d3);
     constexpr bool d4 = __uint128_t{2} >= real128{1};
     REQUIRE(d4);
+#endif
+
+#if defined(MPPP_FLOAT128_WITH_LONG_DOUBLE)
+    REQUIRE(real128{3} >= 2.l);
+    REQUIRE(4.l >= real128{4});
+#else
+    REQUIRE(!is_gte_comparable<real128, long double>::value);
+    REQUIRE(!is_gte_comparable<long double, real128>::value);
 #endif
 }
 
