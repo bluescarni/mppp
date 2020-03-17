@@ -25,6 +25,61 @@
 namespace mppp
 {
 
+// Type trait to check if T is a C++ integral type, including possibly __(u)int128_t.
+// NOTE: mppp::detail::is_integral, for consistency with std::is_integral, will be true also for cv qualified
+// integral types. is_cpp_integral, however, is used in contexts where the cv qualifications
+// matter, and we want this type trait not to be satisfied by integral types which are, e.g.,
+// const qualified.
+template <typename T>
+using is_cpp_integral = detail::conjunction<detail::is_integral<T>, std::is_same<detail::remove_cv_t<T>, T>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL cpp_integral = is_cpp_integral<T>::value;
+
+#endif
+
+template <typename T>
+using is_cpp_unsigned_integral = detail::conjunction<is_cpp_integral<T>, detail::is_unsigned<T>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL cpp_unsigned_integral = is_cpp_unsigned_integral<T>::value;
+
+#endif
+
+template <typename T>
+using is_cpp_signed_integral = detail::conjunction<is_cpp_integral<T>, detail::is_signed<T>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL cpp_signed_integral = is_cpp_signed_integral<T>::value;
+
+#endif
+
+template <typename T>
+using is_cpp_floating_point = detail::conjunction<std::is_floating_point<T>, std::is_same<detail::remove_cv_t<T>, T>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL cpp_floating_point = is_cpp_floating_point<T>::value;
+
+#endif
+
+template <typename T>
+using is_cpp_arithmetic = detail::disjunction<is_cpp_integral<T>, is_cpp_floating_point<T>>;
+
+#if defined(MPPP_HAVE_CONCEPTS)
+
+template <typename T>
+MPPP_CONCEPT_DECL cpp_arithmetic = is_cpp_arithmetic<T>::value;
+
+#endif
+
 // Type trait to check if T is a supported integral type.
 // NOTE: mppp::detail::is_integral, for consistency with std::is_integral, will be true also for cv qualified
 // integral types. is_cpp_integral_interoperable, however, is used in contexts where the cv qualifications
