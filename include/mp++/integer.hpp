@@ -1767,22 +1767,7 @@ public:
     {
         return T(static_cast<typename T::value_type>(*this));
     }
-    /// Generic conversion member function to a C++ fundamental type.
-    /**
-     * \rststar
-     * This member function, similarly to the conversion operator, will convert ``this`` to a
-     * :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into ``rop``. Differently
-     * from the conversion operator, this member function does not raise any exception: if the conversion is successful,
-     * the member function will return ``true``, otherwise the member function will return ``false``. If the conversion
-     * fails,
-     * ``rop`` will not be altered.
-     * \endrststar
-     *
-     * @param rop the variable which will store the result of the conversion.
-     *
-     * @return ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if ``rop`` is
-     * a C++ integral which cannot represent the value of ``this``.
-     */
+    // Generic conversion member function to a C++ fundamental type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -1797,21 +1782,7 @@ public:
         }
         return false;
     }
-    /// Generic conversion member function to a C++ complex type.
-    /**
-     * \rststar
-     * .. versionadded:: 0.19
-     *
-     * This member function, similarly to the conversion operator, will convert ``this`` to a
-     * :cpp:concept:`~mppp::CppComplex` type, storing the result of the conversion into ``rop``.
-     * The conversion is always successful, and this member function
-     * will always return ``true``.
-     * \endrststar
-     *
-     * @param rop the variable which will store the result of the conversion.
-     *
-     * @return ``true``.
-     */
+    // Generic conversion member function to a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppComplex T>
 #else
@@ -1822,13 +1793,7 @@ public:
         rop = static_cast<T>(*this);
         return true;
     }
-    /// Promote to dynamic storage.
-    /**
-     * This member function will promote the storage type of \p this from static to dynamic.
-     *
-     * @return \p false if the storage type of \p this is already dynamic and no promotion takes place, \p true
-     * otherwise.
-     */
+    // Promote to dynamic storage.
     bool promote()
     {
         if (is_static()) {
@@ -1837,13 +1802,7 @@ public:
         }
         return false;
     }
-    /// Demote to static storage.
-    /**
-     * This member function will demote the storage type of \p this from dynamic to static.
-     *
-     * @return \p false if the storage type of \p this is already static and no demotion takes place, or if the current
-     * value of \p this does not fit in static storage, \p true otherwise.
-     */
+    // Demote to static storage.
     bool demote()
     {
         if (is_dynamic()) {
@@ -1851,12 +1810,7 @@ public:
         }
         return false;
     }
-    /// Size in bits.
-    /**
-     * @return the number of bits needed to represent \p this. If \p this is zero, zero will be returned.
-     *
-     * @throws std::overflow_error if the size in bits of \p this is larger than an implementation-defined value.
-     */
+    // Size in bits.
     std::size_t nbits() const
     {
         const std::size_t ls = size();
@@ -1875,10 +1829,7 @@ public:
         const std::size_t idx = ls - 1u;
         return static_cast<std::size_t>(idx * unsigned(GMP_NUMB_BITS) + detail::limb_size_nbits(lptr[idx]));
     }
-    /// Size in limbs.
-    /**
-     * @return the number of limbs needed to represent \p this. If \p this is zero, zero will be returned.
-     */
+    // Size in limbs.
     std::size_t size() const
     {
         // NOTE: the idea here is that, regardless of what mpz_size_t is exactly, the
@@ -1887,42 +1838,13 @@ public:
         return (m_int.m_st._mp_size) >= 0 ? static_cast<std::size_t>(m_int.m_st._mp_size)
                                           : static_cast<std::size_t>(detail::nint_abs(m_int.m_st._mp_size));
     }
-    /// Sign.
-    /**
-     * @return 0 if \p this is zero, 1 if \p this is positive, -1 if \p this is negative.
-     */
+    // Sign.
     int sgn() const
     {
         // NOTE: size is part of the common initial sequence.
         return detail::integral_sign(m_int.m_st._mp_size);
     }
-    /// Get an \p mpz_t view.
-    /**
-     * This member function will return an object of an unspecified type \p mpz_view which is implicitly convertible
-     * to a const pointer to an \p mpz_t struct (and which can thus be used as a <tt>const mpz_t</tt>
-     * parameter in GMP functions). In addition to the implicit conversion operator, the <tt>const mpz_t</tt>
-     * object can also be retrieved via the <tt>%get()</tt> member function of the \p mpz_view class.
-     * The view provides a read-only GMP-compatible representation of the integer stored in \p this.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   It is important to keep in mind the following facts about the returned ``mpz_view`` object:
-     *
-     *   * ``mpz_view`` objects are strictly read-only: it is impossible to alter ``this`` through an ``mpz_view``, and
-     *     ``mpz_view`` objects can be used in the GMP API only where a ``const mpz_t`` parameter is expected;
-     *   * ``mpz_view`` objects can only be move-constructed (the other constructors and the assignment operators
-     *     are disabled);
-     *   * the returned object and the pointer returned by its ``get()`` member function might reference internal data
-     *     belonging to ``this``, and they can thus be used safely only during the lifetime of ``this``;
-     *   * the lifetime of the pointer returned by the ``get()`` member function is tied to the lifetime of the
-     *     ``mpz_view`` object (that is, if the ``mpz_view`` object is destroyed, any pointer previously returned by
-     *     ``get()`` becomes invalid);
-     *   * any modification to ``this`` will also invalidate the view and the pointer.
-     * \endrststar
-     *
-     * @return an \p mpz view of \p this.
-     */
+    // Get an mpz_t view.
     mpz_view get_mpz_view() const
     {
         return mpz_view(*this);

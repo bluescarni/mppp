@@ -12,7 +12,7 @@ The integer class
 
    Multiprecision integer class.
 
-   This class represents arbitrary-precision signed integers. It acts as a wrapper around the GMP ``mpz_t`` type, with
+   This class represents arbitrary-precision signed integers. It acts as a wrapper around the GMP :cpp:type:`mpz_t` type, with
    a small value optimisation: integers whose size is up to ``SSize`` limbs are stored directly in the storage
    occupied by the :cpp:class:`~mppp::integer` object, without resorting to dynamic memory allocation. The value of
    ``SSize`` must be at least 1 and less than an implementation-defined upper limit. On most modern architectures,
@@ -48,15 +48,15 @@ The integer class
    Several facilities for interfacing with the GMP library are provided. Specifically, :cpp:class:`~mppp::integer`
    features:
 
-   * a constructor and an assignment operator from the GMP integer type ``mpz_t``,
+   * a constructor and an assignment operator from the GMP integer type :cpp:type:`mpz_t`,
    * a :cpp:func:`~mppp::integer::get_mpz_t()` method that promotes ``this`` to dynamic
-     storage and returns a pointer to the internal ``mpz_t`` instance,
-   * an ``mpz_view`` class, an instance of which can be requested via the :cpp:func:`~mppp::integer::get_mpz_view()`
+     storage and returns a pointer to the internal :cpp:type:`mpz_t` instance,
+   * an :cpp:class:`mpz_view` class, an instance of which can be requested via the :cpp:func:`~mppp::integer::get_mpz_view()`
      method, which allows to use :cpp:class:`~mppp::integer` in the GMP API as a drop-in replacement for
-     ``const mpz_t`` function arguments.
+     ``const`` :cpp:type:`mpz_t` function arguments.
 
-   The ``mpz_view`` class represent a read-only view of an integer object which is implicitly convertible to the type
-   ``const mpz_t`` and which is thus usable as an argument to GMP functions. For example:
+   The :cpp:class:`mpz_view` class represent a read-only view of an integer object which is implicitly convertible to the type
+   ``const`` :cpp:type:`mpz_t` and which is thus usable as an argument to GMP functions. For example:
 
    .. code-block:: c++
 
@@ -66,7 +66,7 @@ The integer class
       mpz_add(m,m,n.get_mpz_view()); // Compute the result of n + m and store
                                      // it in m using the GMP API.
 
-   See the documentation of :cpp:func:`~mppp::integer::get_mpz_view()` for more details about the ``mpz_view`` class.
+   See the documentation of :cpp:func:`~mppp::integer::get_mpz_view()` for more details about the :cpp:class:`mpz_view` class.
    Via the GMP interfacing facilities, it is thus possible to use directly the GMP C API with
    :cpp:class:`~mppp::integer` objects whenever necessary (e.g., if a GMP function has not been wrapped yet by mp++).
 
@@ -74,7 +74,7 @@ The integer class
    such as :cpp:func:`~mppp::integer::binary_save()` and :cpp:func:`~mppp::integer::binary_load()`, and the
    corresponding :ref:`free function overloads <integer_s11n>`.
 
-   An :ref:`integer tutorial <tutorial_integer>` showcasing various features of :cpp:class:`~mppp::integer`
+   A :ref:`tutorial <tutorial_integer>` showcasing various features of :cpp:class:`~mppp::integer`
    is available.
 
    .. cpp:member:: static constexpr std::size_t ssize = SSize
@@ -458,6 +458,115 @@ The integer class
       The conversion might yield inexact values and infinities.
 
       :return: ``this`` converted to the target type.
+
+   .. cpp:function:: template <CppInteroperable T> bool get(T &rop) const
+
+      Generic conversion member function to a C++ fundamental type.
+
+      This member function, similarly to the conversion operator, will convert ``this`` to a
+      :cpp:concept:`~mppp::CppInteroperable` type, storing the result of the conversion into *rop*. Differently
+      from the conversion operator, this member function does not raise any exception: if the conversion is successful,
+      the member function will return ``true``, otherwise the member function will return ``false``. If the conversion
+      fails, *rop* will not be altered.
+
+      :param rop: the variable which will store the result of the conversion.
+
+      :return: ``true`` if the conversion succeeded, ``false`` otherwise. The conversion can fail only if *rop* is
+        a C++ integral which cannot represent the value of ``this``.
+
+   .. cpp:function:: template <CppComplex T> bool get(T &rop) const
+
+      .. versionadded:: 0.19
+
+      Generic conversion member function to a C++ complex type.
+
+      This member function, similarly to the conversion operator, will convert ``this`` to a
+      :cpp:concept:`~mppp::CppComplex` type, storing the result of the conversion into *rop*.
+      The conversion is always successful, and this member function
+      will always return ``true``.
+
+      :param rop: the variable which will store the result of the conversion.
+
+      :return: ``true``.
+
+   .. cpp:function:: bool promote()
+
+      Promote to dynamic storage.
+
+      This member function will promote the storage type of ``this`` from static to dynamic.
+
+      :return: ``false`` if the storage type of ``this`` is already dynamic and no promotion
+        takes place, ``true`` otherwise.
+
+   .. cpp:function:: bool demote()
+
+      Demote to static storage.
+
+      This member function will demote the storage type of ``this`` from dynamic to static.
+
+      :return: ``false`` if the storage type of ``this`` is already static and no demotion
+        takes place, or if the current value of ``this`` does not fit in static storage,
+        ``true`` otherwise.
+
+   .. cpp:function:: std::size_t nbits() const
+   .. cpp:function:: std::size_t size() const
+
+      Size in bits or limbs.
+
+      :return: the number of bits/limbs needed to represent ``this``. If ``this``
+        is zero, zero will be returned.
+
+      :exception std\:\:overflow_error: if the size in bits of ``this`` is
+        larger than an implementation-defined value.
+
+   .. cpp:function:: int sgn() const
+
+      Sign.
+
+      :return: :math:`0` if ``this`` is zero, :math:`1` if ``this`` is positive,
+        :math:`-1` if ``this`` is negative.
+
+   .. cpp:class:: mpz_view
+
+      Read-only view onto an :cpp:type:`mpz_t`.
+
+      This is a proxy class with an implicit conversion operator to a ``const`` pointer
+      to the ``struct`` underlying :cpp:type:`mpz_t`. Thus, objects of this class can be
+      passed as read-only parameters to GMP functions.
+
+      In addition to the implicit conversion operator, a ``get()`` member function
+      provides the same functionality (i.e., conversion to a ``const`` pointer
+      to the ``struct`` underlying :cpp:type:`mpz_t`).
+
+      Objects of this class can only be constructed by :cpp:func:`mppp::integer::get_mpz_view()`,
+      or move-constructed. All assignment operators are disabled.
+
+   .. cpp:function:: mpz_view get_mpz_view() const
+
+      Get a GMP-compatible read-only view of ``this``.
+
+      This member function will return an :cpp:class:`mpz_view` object containing
+      a read-only GMP-compatible representation of the value stored in ``this``.
+      That is, the return value of this function can be used in the GMP API
+      where a ``const`` :cpp:type:`mpz_t` parameter is expected.
+
+      .. warning::
+
+         Because the returned object is a non-owning view of ``this``,
+         it is important to keep in mind the following facts in order
+         to avoid undefined behaviour at runtime:
+
+         * the returned object and the pointer returned by its conversion operator
+           might reference internal data belonging to ``this``, and they can
+           thus be safely used only during the lifetime of ``this``;
+         * the lifetime of the pointer returned by the conversion operator
+           of the returned object is tied to the lifetime of the
+           returned object itself (that is, if the :cpp:class:`mpz_view` object is
+           destroyed,
+           any pointer previously returned by its conversion operator becomes invalid);
+         * any modification to ``this`` will also invalidate the view and the pointer.
+
+      :return: an :cpp:class:`mpz_view` of ``this``.
 
 Types
 -----
