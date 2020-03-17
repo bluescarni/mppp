@@ -1213,25 +1213,10 @@ public:
     // Move constructor from \p mpz_t.
     explicit integer(::mpz_t &&n) : m_int(std::move(n)) {}
 #endif
-    /// Copy assignment operator.
-    /**
-     * This operator will perform a deep copy of \p other, copying its storage type as well.
-     *
-     * @param other the assignment argument.
-     *
-     * @return a reference to \p this.
-     */
-    integer &operator=(const integer &other) = default;
-    /// Move assignment operator.
-    /**
-     * After the move, \p other will be in an unspecified but valid state, and the storage type of \p this will be
-     * <tt>other</tt>'s original storage type.
-     *
-     * @param other the assignment argument.
-     *
-     * @return a reference to \p this.
-     */
-    integer &operator=(integer &&other) = default;
+    // Copy assignment operator.
+    integer &operator=(const integer &) = default;
+    // Move assignment operator.
+    integer &operator=(integer &&) = default;
 
 private:
     // Implementation of the assignment from unsigned C++ integral.
@@ -1373,21 +1358,7 @@ private:
 #endif
 
 public:
-    /// Generic assignment operator from a fundamental C++ type.
-    /**
-     * \rststar
-     * This operator will assign ``x`` to ``this``. The storage type of ``this`` after the assignment
-     * will depend only on the value of ``x`` (that is, the storage type will be static if the value of ``x``
-     * is small enough, dynamic otherwise). Assignment from floating-point types will assign the truncated
-     * counterpart of ``x``.
-     * \endrststar
-     *
-     * @param x the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if ``x`` is a non-finite floating-point value.
-     */
+    // Generic assignment operator from a fundamental C++ type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -1398,24 +1369,7 @@ public:
         dispatch_assignment(x);
         return *this;
     }
-    /// Generic assignment operator from a complex C++ type.
-    /**
-     * \rststar
-     * .. versionadded:: 0.19
-     *
-     * This operator will assign ``c`` to ``this``. The storage type of ``this`` after the assignment
-     * will depend only on the value of ``c`` (that is, the storage type will be static if the value of ``c``
-     * is small enough, dynamic otherwise). The assignment will be successful only if
-     * the imaginary part of ``c`` is zero and the real part of ``c`` is finite.
-     * \endrststar
-     *
-     * @param c the assignment argument.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if the imaginary part of \p c is not zero or if
-     * the real part of \p c is not finite.
-     */
+    // Generic assignment operator from a complex C++ type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppComplex T>
 #else
@@ -1429,25 +1383,7 @@ public:
         }
         return *this = c.real();
     }
-    /// Assignment from string.
-    /**
-     * \rststar
-     * The body of this operator is equivalent to:
-     *
-     * .. code-block:: c++
-     *
-     *    return *this = integer{s};
-     *
-     * That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
-     * ``s`` and it is then move-assigned to ``this``.
-     * \endrststar
-     *
-     * @param s the string that will be used for the assignment.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws unspecified any exception thrown by the constructor from string.
-     */
+    // Assignment from string.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <StringType T>
 #else
@@ -1457,24 +1393,7 @@ public:
     {
         return *this = integer{s};
     }
-    /// Copy assignment from \p mpz_t.
-    /**
-     * This assignment operator will copy into \p this the value of the GMP integer \p n. The storage type of \p this
-     * after the assignment will be static if \p n fits in the static storage, otherwise it will be dynamic.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` results in undefined behaviour. Also, no aliasing is allowed: the data in ``n``
-     *    must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of ``this`` then
-     *    it might point to internal data of ``this``, and the behaviour of this operator will thus be undefined).
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     *
-     * @return a reference to \p this.
-     */
+    // Copy assignment from mpz_t.
     integer &operator=(const ::mpz_t n)
     {
         const auto asize = detail::get_mpz_size(n);
@@ -1506,32 +1425,7 @@ public:
         return *this;
     }
 #if !defined(_MSC_VER)
-    /// Move assignment from \p mpz_t.
-    /**
-     * This assignment operator will move into \p this the GMP integer \p n. The storage type of \p this
-     * after the assignment will be static if \p n fits in the static storage, otherwise it will be dynamic.
-     *
-     * \rststar
-     * .. warning::
-     *
-     *    It is the user's responsibility to ensure that ``n`` has been correctly initialized. Calling this operator
-     *    with an uninitialized ``n`` results in undefined behaviour. Also, no aliasing is allowed: the data in ``n``
-     *    must be completely distinct from the data in ``this`` (e.g., if ``n`` is an ``mpz_view`` of ``this`` then
-     *    it might point to internal data of ``this``, and the behaviour of this operator will thus be undefined).
-     *
-     *    Additionally, the user must ensure that, after the assignment, ``mpz_clear()`` is never
-     *    called on ``n``: the resources previously owned by ``n`` are now owned by ``this``, which
-     *    will take care of releasing them when the destructor is called.
-     *
-     * .. note::
-     *
-     *    Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
-     * \endrststar
-     *
-     * @param n the input GMP integer.
-     *
-     * @return a reference to \p this.
-     */
+    // Move assignment from mpz_t.
     integer &operator=(::mpz_t &&n)
     {
         const auto asize = detail::get_mpz_size(n);
@@ -1567,18 +1461,7 @@ public:
         return *this;
     }
 #endif
-    /// Set to zero.
-    /**
-     * After calling this member function, the storage type of \p this will be static and its value will be zero.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This is a specialised higher-performance alternative to the assignment operator.
-     * \endrststar
-     *
-     * @return a reference to \p this.
-     */
+    // Set to zero.
     integer &set_zero()
     {
         if (is_static()) {
@@ -1611,70 +1494,27 @@ private:
     }
 
 public:
-    /// Set to one.
-    /**
-     * After calling this member function, the storage type of \p this will be static and its value will be one.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This is a specialised higher-performance alternative to the assignment operator.
-     * \endrststar
-     *
-     * @return a reference to \p this.
-     */
+    // Set to one.
     integer &set_one()
     {
         return set_one_impl<true>();
     }
-    /// Set to minus one.
-    /**
-     * After calling this member function, the storage type of \p this will be static and its value will be minus one.
-     *
-     * \rststar
-     * .. note::
-     *
-     *   This is a specialised higher-performance alternative to the assignment operator.
-     * \endrststar
-     *
-     * @return a reference to \p this.
-     */
+    // Set to minus one.
     integer &set_negative_one()
     {
         return set_one_impl<false>();
     }
-    /// Test for static storage.
-    /**
-     * @return \p true if the storage type is static, \p false otherwise.
-     */
+    // Test for static storage.
     bool is_static() const
     {
         return m_int.is_static();
     }
-    /// Check for dynamic storage.
-    /**
-     * @return \p true if the storage type is dynamic, \p false otherwise.
-     */
+    // Test for dynamic storage.
     bool is_dynamic() const
     {
         return m_int.is_dynamic();
     }
-    /// Conversion to string.
-    /**
-     * This member function will convert \p this into a string in base \p base using the GMP function \p mpz_get_str().
-     *
-     * @param base the desired base.
-     *
-     * @return a string representation of \p this.
-     *
-     * @throws std::invalid_argument if \p base is smaller than 2 or greater than 62.
-     *
-     * \rststar
-     * .. seealso::
-     *
-     *    https://gmplib.org/manual/Converting-Integers.html
-     * \endrststar
-     */
+    // Conversion to string.
     std::string to_string(int base = 10) const
     {
         if (mppp_unlikely(base < 2 || base > 62)) {
@@ -1902,21 +1742,7 @@ private:
     }
 
 public:
-    /// Generic conversion operator to a C++ fundamental type.
-    /**
-     * \rststar
-     * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppInteroperable` type.
-     * Conversion to ``bool`` yields ``false`` if ``this`` is zero,
-     * ``true`` otherwise. Conversion to other integral types yields the exact result, if representable by the target
-     * :cpp:concept:`~mppp::CppInteroperable` type. Conversion to floating-point types might yield inexact values and
-     * infinities.
-     * \endrststar
-     *
-     * @return \p this converted to the target type.
-     *
-     * @throws std::overflow_error if the target type is an integral type and the value of ``this`` cannot be
-     * represented by it.
-     */
+    // Generic conversion operator to a C++ fundamental type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppInteroperable T>
 #else
@@ -1931,17 +1757,7 @@ public:
         }
         return std::move(retval.second);
     }
-    /// Generic conversion operator to a C++ complex type.
-    /**
-     * \rststar
-     * .. versionadded:: 0.19
-     *
-     * This operator will convert ``this`` to a :cpp:concept:`~mppp::CppComplex` type.
-     * The conversion might yield inexact values and infinities.
-     * \endrststar
-     *
-     * @return \p this converted to the target type.
-     */
+    // Generic conversion operator to a C++ complex type.
 #if defined(MPPP_HAVE_CONCEPTS)
     template <CppComplex T>
 #else

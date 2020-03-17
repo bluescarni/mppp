@@ -28,24 +28,6 @@ The integer class
    the ``mpn_`` low-level functions of the GMP API are used if the storage type is static. If the storage type is
    dynamic, the usual ``mpz_`` functions from the GMP API are used.
 
-   This class has the look and feel of a C++ builtin type: it can interact with most of C++'s integral and
-   floating-point primitive types (see the :cpp:concept:`~mppp::CppInteroperable` concept for the full list),
-   and it provides overloaded :ref:`operators <integer_operators>`. Differently from the builtin types,
-   however, this class does not allow any implicit conversion to/from other types (apart from ``bool``): construction
-   from and conversion to primitive types must always be requested explicitly. As a side effect, syntax such as
-
-   .. code-block:: c++
-
-      integer<1> n = 5;
-      int m = n;
-
-   will not work, and direct initialization should be used instead:
-
-   .. code-block:: c++
-
-      integer<1> n{5};
-      int m{n};
-
    Most of the functionality is exposed via plain :ref:`functions <integer_functions>`, with the
    general convention that the functions are named after the corresponding GMP functions minus the leading ``mpz_``
    prefix. For instance, the GMP call
@@ -61,74 +43,7 @@ The integer class
       add(rop,a,b);
 
    where the ``add()`` function is resolved via argument-dependent lookup. Function calls with overlapping arguments
-   are allowed, unless noted otherwise.
-
-   Multiple overloads of the same functionality are often available.
-   Binary functions in GMP are usually implemented via three-arguments functions, in which the first
-   argument is a reference to the return value. The exponentiation function ``mpz_pow_ui()``, for instance,
-   takes three arguments: the return value, the base and the exponent. There are two overloads of the corresponding
-   :ref:`exponentiation <integer_exponentiation>` function for :cpp:class:`~mppp::integer`:
-
-   * a ternary overload semantically equivalent to ``mpz_pow_ui()``,
-   * a binary overload taking as inputs the base and the exponent, and returning the result
-     of the exponentiation.
-
-   This allows to avoid having to set up a return value for one-off invocations of ``pow_ui()`` (the binary overload
-   will do it for you). For example:
-
-   .. code-block:: c++
-
-      integer<1> r1, r2, n{3};
-      pow_ui(r1,n,2);   // Ternary pow_ui(): computes n**2 and stores
-                        // the result in r1.
-      r2 = pow_ui(n,2); // Binary pow_ui(): returns n**2, which is then
-                        // assigned to r2.
-
-   In case of unary functions, there are often three overloads available:
-
-   * a binary overload taking as first parameter a reference to the return value (GMP style),
-   * a unary overload returning the result of the operation,
-   * a nullary member function that modifies the calling object in-place.
-
-   For instance, here are three possible ways of computing the absolute value:
-
-   .. code-block:: c++
-
-      integer<1> r1, r2, n{-5};
-      abs(r1,n);   // Binary abs(): computes and stores the absolute value
-                   // of n into r1.
-      r2 = abs(n); // Unary abs(): returns the absolute value of n, which is
-                   // then assigned to r2.
-      n.abs();     // Member function abs(): replaces the value of n with its
-                   // absolute value.
-
-   Note that at this time a subset of the GMP API has been wrapped by :cpp:class:`~mppp::integer`.
-
-   Various :ref:`overloaded operators <integer_operators>` are provided.
-   For the common arithmetic operations (``+``, ``-``, ``*`` and ``/``), the type promotion
-   rules are a natural extension of the corresponding rules for native C++ types: if the other argument
-   is a C++ integral, the result will be of type :cpp:class:`~mppp::integer`, if the other argument is a C++
-   floating-point the result will be of the same floating-point type. For example:
-
-   .. code-block:: c++
-
-      integer<1> n1{1}, n2{2};
-      auto res1 = n1 + n2; // res1 is an integer
-      auto res2 = n1 * 2; // res2 is an integer
-      auto res3 = 2 - n2; // res3 is an integer
-      auto res4 = n1 / 2.f; // res4 is a float
-      auto res5 = 12. / n1; // res5 is a double
-
-   The modulo operator ``%`` and the bitwise logic operators accept only :cpp:class:`~mppp::integer`
-   and :cpp:concept:`~mppp::CppIntegralInteroperable` types as arguments,
-   and they always return :cpp:class:`~mppp::integer` as result. The bit shifting operators ``<<`` and ``>>`` accept
-   only :cpp:concept:`~mppp::CppIntegralInteroperable` types as shift arguments, and they always return
-   :cpp:class:`~mppp::integer` as result.
-
-   The relational operators, ``==``, ``!=``, ``<``, ``>``, ``<=`` and ``>=`` will promote the arguments to a common type
-   before comparing them. The promotion rules are the same as in the arithmetic operators (that is, both arguments are
-   promoted to :cpp:class:`~mppp::integer` if they are both integral types, otherwise they are promoted to the type
-   of the floating-point argument).
+   are allowed, unless noted otherwise. Various :ref:`overloaded operators <integer_operators>` are also provided.
 
    Several facilities for interfacing with the GMP library are provided. Specifically, :cpp:class:`~mppp::integer`
    features:
@@ -157,8 +72,10 @@ The integer class
 
    The :cpp:class:`~mppp::integer` class supports a simple binary serialisation API, through member functions
    such as :cpp:func:`~mppp::integer::binary_save()` and :cpp:func:`~mppp::integer::binary_load()`, and the
-   corresponding :ref:`free function overloads <integer_s11n>`. Examples of usage are described in the
-   :ref:`integer tutorial <tutorial_integer_s11n>`.
+   corresponding :ref:`free function overloads <integer_s11n>`.
+
+   An :ref:`integer tutorial <tutorial_integer>` showcasing various features of :cpp:class:`~mppp::integer`
+   is available.
 
    .. cpp:member:: static constexpr std::size_t ssize = SSize
 
@@ -212,6 +129,12 @@ The integer class
       and it requires the most significant limb of *p* to be nonzero. It also requires
       every member of the input array not to be greater than the ``GMP_NUMB_MAX`` GMP constant.
       If *size* is zero, ``this`` will be initialised to zero without ever dereferencing *p*.
+
+      .. warning::
+
+         The effects of this constructor are highly dependent on the platform
+         currently in use and also on the build configuration of the GMP library.
+         Do not use it for portable initialisation.
 
       .. seealso::
          https://gmplib.org/manual/Low_002dlevel-Functions.html#Low_002dlevel-Functions
@@ -351,6 +274,190 @@ The integer class
          Due to a compiler bug, this constructor is not available on Microsoft Visual Studio.
 
       :param n: the input GMP integer.
+
+   .. cpp:function:: integer &operator=(const integer &other)
+
+      Copy assignment operator.
+
+      This operator will perform a deep copy of *other*, copying its storage type as well.
+
+      :param other: the assignment argument.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: integer &operator=(integer &&other)
+
+      Move assignment operator.
+
+      After the move, *other* will be in an unspecified but valid state,
+      and the storage type of ``this`` will be
+      *other*'s original storage type.
+
+      :param other: the assignment argument.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: template <CppInteroperable T> integer &operator=(const T &x)
+
+      Generic assignment operator from a fundamental C++ type.
+
+      This operator will assign *x* to ``this``. The storage type of ``this`` after the assignment
+      will depend only on the value of *x* (that is, the storage type will be static if the value of *x*
+      is small enough, dynamic otherwise). Assignment from floating-point types will assign the truncated
+      counterpart of *x*.
+
+      :param x: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:domain_error: if *x* is a non-finite floating-point value.
+
+   .. cpp:function:: template <CppComplex T> integer &operator=(const T &c)
+
+      .. versionadded:: 0.19
+
+      Generic assignment operator from a complex C++ type.
+
+      This operator will assign *c* to ``this``. The storage type of ``this`` after the assignment
+      will depend only on the value of *c* (that is, the storage type will be static if the value of *c*
+      is small enough, dynamic otherwise). The assignment will be successful only if
+      the imaginary part of *c* is zero and the real part of *c* is finite.
+
+      :param c: the assignment argument.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:domain_error: if the imaginary part of *c* is not zero or if
+        the real part of *c* is not finite.
+
+   .. cpp:function:: template <StringType T> integer &operator=(const T &s)
+
+      Assignment from string.
+
+      The body of this operator is equivalent to:
+
+      .. code-block:: c++
+
+         return *this = integer{s};
+
+      That is, a temporary integer is constructed from the :cpp:concept:`~mppp::StringType`
+      *s* and it is then move-assigned to ``this``.
+
+      :param s: the string that will be used for the assignment.
+
+      :return: a reference to ``this``.
+
+      :exception unspecified: any exception thrown by the constructor from string.
+
+   .. cpp:function:: integer &operator=(const mpz_t n)
+
+      Copy assignment from :cpp:type:`mpz_t`.
+
+      This assignment operator will copy into ``this`` the value of the GMP integer *n*.
+      The storage type of ``this`` after the assignment will be static if *n* fits in
+      the static storage, otherwise it will be dynamic.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *n* has been correctly initialized. Calling this operator
+         with an uninitialized *n* results in undefined behaviour. Also, no aliasing is allowed: the data in *n*
+         must be completely distinct from the data in ``this`` (e.g., if *n* is an :cpp:class:`~mppp::integer::mpz_view`
+         of ``this`` then it might point to internal data of ``this``, and the behaviour of this operator will thus be undefined).
+
+      :param n: the input GMP integer.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: integer &operator=(mpz_t &&n)
+
+      Move assignment from :cpp:type:`mpz_t`.
+
+      This assignment operator will move into ``this`` the GMP integer *n*. The storage type of ``this``
+      after the assignment will be static if *n* fits in the static storage, otherwise it will be dynamic.
+
+      .. warning::
+
+         It is the user's responsibility to ensure that *n* has been correctly initialized. Calling this operator
+         with an uninitialized *n* results in undefined behaviour. Also, no aliasing is allowed: the data in *n*
+         must be completely distinct from the data in ``this`` (e.g., if *n* is an :cpp:class:`~mppp::integer::mpz_view`
+         of ``this`` then it might point to internal data of ``this``, and the behaviour of this operator will thus be undefined).
+
+         Additionally, the user must ensure that, after the assignment, ``mpz_clear()`` is never
+         called on *n*: the resources previously owned by *n* are now owned by ``this``, which
+         will take care of releasing them when the destructor is called.
+
+      .. note::
+
+         Due to a compiler bug, this operator is not available on Microsoft Visual Studio.
+
+      :param n: the input GMP integer.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: integer &set_zero()
+   .. cpp:function:: integer &set_one()
+   .. cpp:function:: integer &set_negative_one()
+
+      Set to :math:`0`, :math:`1` or :math:`-1`.
+
+      After calling these member functions, the storage type of ``this`` will be static.
+
+      .. note::
+
+         These are specialised higher-performance alternatives to the assignment operators.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: bool is_static() const
+   .. cpp:function:: bool is_dynamic() const
+
+      Query the storage type currently in use.
+
+      :return: ``true`` if the current storage type is static (resp. dynamic),
+        ``false`` otherwise.
+
+   .. cpp:function:: std::string to_string(int base = 10) const
+
+      Conversion to string.
+
+      This member function will convert ``this`` into a string in base *base*
+      using the GMP function ``mpz_get_str()``.
+
+      .. seealso::
+
+         https://gmplib.org/manual/Converting-Integers.html
+
+      :param base: the desired base.
+
+      :return: a string representation of ``this``.
+
+      :exception std\:\:invalid_argument: if *base* is smaller than 2 or greater than 62.
+
+   .. cpp:function:: template <CppInteroperable T> explicit operator T() const
+
+      Generic conversion operator to a C++ fundamental type.
+
+      This operator will convert ``this`` to a :cpp:concept:`~mppp::CppInteroperable` type.
+      Conversion to ``bool`` yields ``false`` if ``this`` is zero,
+      ``true`` otherwise. Conversion to other integral types yields the exact result, if representable by the target
+      :cpp:concept:`~mppp::CppInteroperable` type. Conversion to floating-point types might yield inexact values and
+      infinities.
+
+      :return: ``this`` converted to the target type.
+
+      :exception std\:\:overflow_error: if the target type is an integral type and the value of
+        ``this`` cannot be represented by it.
+
+   .. cpp:function:: template <CppComplex T> explicit operator T() const
+
+      .. versionadded:: 0.19
+
+      Generic conversion operator to a C++ complex type.
+
+      This operator will convert ``this`` to a :cpp:concept:`~mppp::CppComplex` type.
+      The conversion might yield inexact values and infinities.
+
+      :return: ``this`` converted to the target type.
 
 Types
 -----
