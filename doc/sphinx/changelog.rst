@@ -33,7 +33,7 @@ Fix
   release mode
   (`#219 <https://github.com/bluescarni/mppp/pull/219>`__).
 
-0.19 (29-02-2020)
+0.19 (2020-02-29)
 -----------------
 
 New
@@ -88,7 +88,7 @@ Fix
 - Fix compilation with older Clang versions in C++17 mode
   (`#213 <https://github.com/bluescarni/mppp/pull/213>`__).
 
-0.18 (14-02-2020)
+0.18 (2020-02-14)
 -----------------
 
 New
@@ -129,7 +129,7 @@ Fix
   (`#200 <https://github.com/bluescarni/mppp/pull/200>`__,
   `#202 <https://github.com/bluescarni/mppp/pull/202>`__).
 
-0.17 (13-09-2019)
+0.17 (2019-09-13)
 -----------------
 
 New
@@ -165,7 +165,7 @@ Fix
 - Fix C++17 builds with MSVC 2015
   (`#191 <https://github.com/bluescarni/mppp/pull/191>`__).
 
-0.16 (25-05-2019)
+0.16 (2019-05-25)
 -----------------
 
 Fix
@@ -174,7 +174,7 @@ Fix
 - Properly set the version numbers for the mp++ dynamic library
   (`#187 <https://github.com/bluescarni/mppp/pull/187>`__).
 
-0.15 (24-05-2019)
+0.15 (2019-05-24)
 -----------------
 
 New
