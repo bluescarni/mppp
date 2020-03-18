@@ -1077,8 +1077,82 @@ Arithmetic
 Division
 ~~~~~~~~
 
-.. doxygengroup:: integer_division
-   :content-only:
+.. cpp:function:: template <std::size_t SSize> void mppp::tdiv_qr(mppp::integer<SSize> &q, mppp::integer<SSize> &r, const mppp::integer<SSize> &n, const mppp::integer<SSize> &d)
+
+   Truncated division with remainder.
+
+   This function will set *q* to the truncated quotient, :math:`n \operatorname{div} d`, and *r* to
+   the remainder, :math:`n \bmod d`. The remainder *r* has the same sign as *n*. *q* and *r* must be
+   distinct objects.
+
+   :param q: the quotient.
+   :param r: the remainder.
+   :param n: the dividend.
+   :param d: the divisor.
+
+   :exception std\:\:invalid_argument: if *q* and *r* are the same object.
+   :exception mppp\:\:zero_division_error: if *d* is zero.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::tdiv_q(mppp::integer<SSize> &q, const mppp::integer<SSize> &n, const mppp::integer<SSize> &d)
+
+   Truncated division without remainder.
+
+   This function will set *q* to the truncated quotient, :math:`n \operatorname{div} d`.
+
+   :param q: the quotient.
+   :param n: the dividend.
+   :param d: the divisor.
+
+   :return: a reference to *q*.
+
+   :exception mppp\:\:zero_division_error: if *d* is zero.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::divexact(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n, const mppp::integer<SSize> &d)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::divexact_gcd(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n, const mppp::integer<SSize> &d)
+
+   Ternary exact divisions.
+
+   These functions will set *rop* to the quotient :math:`\frac{n}{d}`.
+
+   .. warning::
+
+      Both functions require *d* to divide *n* **exactly**. ``divexact_gcd()``
+      additionally requires *d* to be positive.
+
+   :param rop: the return value.
+   :param n: the dividend.
+   :param d: the divisor.
+
+   :return: a reference to *rop*.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::divexact(const mppp::integer<SSize> &n, const mppp::integer<SSize> &d)
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> mppp::divexact_gcd(const mppp::integer<SSize> &n, const mppp::integer<SSize> &d)
+
+   Binary exact divisions.
+
+   These functions will return the quotient :math:`\frac{n}{d}`.
+
+   .. warning::
+
+      Both functions require *d* to divide *n* **exactly**. ``divexact_gcd()``
+      additionally requires *d* to be positive.
+
+   :param n: the dividend.
+   :param d: the divisor.
+
+   :return: :math:`\frac{n}{d}`.
+
+.. cpp:function:: template <std::size_t SSize> mppp::integer<SSize> &mppp::tdiv_q_2exp(mppp::integer<SSize> &rop, const mppp::integer<SSize> &n, mp_bitcnt_t s)
+
+   Ternary right shift.
+
+   This function will set *rop* to the truncated quotient :math:`n \operatorname{div} 2^s`.
+
+   :param rop: the return value.
+   :param n: the dividend.
+   :param s: the bit shift value.
+
+   :return: a reference to *rop*.
 
 .. _integer_comparison:
 

@@ -4234,10 +4234,6 @@ inline integer<SSize> abs(const integer<SSize> &n)
     return ret;
 }
 
-/** @defgroup integer_division integer_division
- *  @{
- */
-
 namespace detail
 {
 
@@ -4449,19 +4445,7 @@ inline void static_tdiv_qr(static_int<SSize> &q, static_int<SSize> &r, const sta
 }
 } // namespace detail
 
-/// Ternary truncated division with remainder.
-/**
- * This function will set \p q to the truncated quotient <tt>n / d</tt> and \p r to
- * <tt>n % d</tt>. The remainder \p r has the same sign as \p n. \p q and \p r must be two distinct objects.
- *
- * @param q the quotient.
- * @param r the remainder.
- * @param n the dividend.
- * @param d the divisor.
- *
- * @throws std::invalid_argument if \p q and \p r are the same object.
- * @throws zero_division_error if \p d is zero.
- */
+// Truncated division with remainder.
 template <std::size_t SSize>
 inline void tdiv_qr(integer<SSize> &q, integer<SSize> &r, const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -4607,18 +4591,7 @@ inline void static_tdiv_q(static_int<SSize> &q, const static_int<SSize> &op1, co
 }
 } // namespace detail
 
-/// Ternary truncated division without remainder.
-/**
- * This function will set \p q to the truncated quotient <tt>n / d</tt>.
- *
- * @param q the quotient.
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return a reference to ``q``.
- *
- * @throws zero_division_error if \p d is zero.
- */
+// Truncated division without remainder.
 template <std::size_t SSize>
 inline integer<SSize> &tdiv_q(integer<SSize> &q, const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -4742,22 +4715,7 @@ inline void static_divexact(static_int<SSize> &q, const static_int<SSize> &op1, 
 }
 } // namespace detail
 
-/// Exact division (ternary version).
-/**
- * This function will set \p rop to the quotient of \p n and \p d.
- *
- * \rststar
- * .. warning::
- *
- *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
- * \endrststar
- *
- * @param rop the return value.
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return a reference to \p rop.
- */
+// Exact division (ternary version).
 template <std::size_t SSize>
 inline integer<SSize> &divexact(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -4777,19 +4735,7 @@ inline integer<SSize> &divexact(integer<SSize> &rop, const integer<SSize> &n, co
     return rop;
 }
 
-/// Exact division (binary version).
-/**
- * \rststar
- * .. warning::
- *
- *    If ``d`` does not divide ``n`` exactly, the behaviour will be undefined.
- * \endrststar
- *
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return the quotient of \p n and \p d.
- */
+// Exact division (binary version).
 template <std::size_t SSize>
 inline integer<SSize> divexact(const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -4821,22 +4767,7 @@ inline void static_divexact_gcd(static_int<SSize> &q, const static_int<SSize> &o
 }
 } // namespace detail
 
-/// Exact division with positive divisor (ternary version).
-/**
- * This function will set \p rop to the quotient of \p n and \p d.
- *
- * \rststar
- * .. warning::
- *
- *    If ``d`` does not divide ``n`` exactly, or if ``d`` is not strictly positive, the behaviour will be undefined.
- * \endrststar
- *
- * @param rop the return value.
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return a reference to \p rop.
- */
+// Exact division with positive divisor (ternary version).
 template <std::size_t SSize>
 inline integer<SSize> &divexact_gcd(integer<SSize> &rop, const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -4859,19 +4790,7 @@ inline integer<SSize> &divexact_gcd(integer<SSize> &rop, const integer<SSize> &n
     return rop;
 }
 
-/// Exact division with positive divisor (binary version).
-/**
- * \rststar
- * .. warning::
- *
- *    If ``d`` does not divide ``n`` exactly, or if ``d`` is not strictly positive, the behaviour will be undefined.
- * \endrststar
- *
- * @param n the dividend.
- * @param d the divisor.
- *
- * @return the quotient of \p n and \p d.
- */
+// Exact division with positive divisor (binary version).
 template <std::size_t SSize>
 inline integer<SSize> divexact_gcd(const integer<SSize> &n, const integer<SSize> &d)
 {
@@ -4994,17 +4913,7 @@ inline void static_tdiv_q_2exp(static_int<2> &rop, const static_int<2> &n, ::mp_
 }
 } // namespace detail
 
-/// Ternary right shift.
-/**
- * This function will set \p rop to \p n divided by <tt>2**s</tt>. \p rop will be the truncated result of the
- * division.
- *
- * @param rop the return value.
- * @param n the dividend.
- * @param s the bit shift value.
- *
- * @return a reference to \p rop.
- */
+// Ternary right shift.
 template <std::size_t SSize>
 inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n, ::mp_bitcnt_t s)
 {
@@ -5022,8 +4931,6 @@ inline integer<SSize> &tdiv_q_2exp(integer<SSize> &rop, const integer<SSize> &n,
     ::mpz_tdiv_q_2exp(&rop._get_union().g_dy(), n.get_mpz_view(), s);
     return rop;
 }
-
-/** @} */
 
 /** @defgroup integer_comparison integer_comparison
  *  @{
