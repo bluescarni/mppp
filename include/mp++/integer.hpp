@@ -1849,23 +1849,13 @@ public:
     {
         return mpz_view(*this);
     }
-    /// Negate in-place.
-    /**
-     * This member function will set \p this to <tt>-this</tt>.
-     *
-     * @return a reference to \p this.
-     */
+    // Negate in-place.
     integer &neg()
     {
         m_int.neg();
         return *this;
     }
-    /// In-place absolute value.
-    /**
-     * This member function will set \p this to its absolute value.
-     *
-     * @return a reference to \p this.
-     */
+    // In-place absolute value.
     integer &abs()
     {
         if (is_static()) {
@@ -1877,29 +1867,13 @@ public:
         }
         return *this;
     }
-    /// Compute next prime number (in-place version).
-    /**
-     * This member function will set \p this to the first prime number greater than the current value.
-     *
-     * @return a reference to \p this.
-     */
+    // Compute next prime number (in-place version).
     integer &nextprime()
     {
         detail::nextprime_impl(*this, *this);
         return *this;
     }
-    /// Test primality.
-    /**
-     * This member function will run a series of probabilistic tests to determine if \p this is a prime number.
-     * It will return \p 2 if \p this is definitely a prime, \p 1 if \p this is probably a prime and \p 0 if \p this
-     * is definitely not-prime.
-     *
-     * @param reps the number of tests to run.
-     *
-     * @return an integer indicating if \p this is a prime.
-     *
-     * @throws std::invalid_argument if \p reps is less than 1 or if \p this is negative.
-     */
+    // Test primality.
     int probab_prime_p(int reps = 25) const
     {
         if (mppp_unlikely(reps < 1)) {
@@ -1911,32 +1885,17 @@ public:
         }
         return ::mpz_probab_prime_p(get_mpz_view(), reps);
     }
-    /// Integer square root (in-place version).
-    /**
-     * This member function will set \p this to its integer square root.
-     *
-     * @return a reference to \p this.
-     *
-     * @throws std::domain_error if \p this is negative.
-     */
+    // Integer square root (in-place version).
     integer &sqrt()
     {
         return mppp::sqrt(*this, *this);
     }
-    /// Integer squaring (in-place version).
-    /**
-     * This member function will set \p this to its square.
-     *
-     * @return a reference to \p this.
-     */
+    // Integer squaring (in-place version).
     integer &sqr()
     {
         return mppp::sqr(*this, *this);
     }
-    /// Test if value is odd.
-    /**
-     * @return \p true if \p this is odd, \p false otherwise.
-     */
+    // Test if value is odd.
     bool odd_p() const
     {
         if (is_static()) {
@@ -1951,60 +1910,28 @@ public:
         }
         return mpz_odd_p(&m_int.g_dy());
     }
-    /// Test if value is even.
-    /**
-     * @return \p true if \p this is even, \p false otherwise.
-     */
+    // Test if value is even.
     bool even_p() const
     {
         return !odd_p();
     }
-    /// Return a reference to the internal union.
-    /**
-     * This member function returns a reference to the union used internally to implement the integer class.
-     *
-     * @return a reference to the internal union member.
-     */
+    // Return a reference to the internal union.
     detail::integer_union<SSize> &_get_union()
     {
         return m_int;
     }
-    /// Return a const reference to the internal union.
-    /**
-     * This member function returns a const reference to the union used internally to implement the integer class.
-     *
-     * @return a const reference to the internal union member.
-     */
+    // Return a const reference to the internal union.
     const detail::integer_union<SSize> &_get_union() const
     {
         return m_int;
     }
-    /// Get a pointer to the dynamic storage.
-    /**
-     * This member function will first promote \p this to dynamic storage (if \p this is not already employing dynamic
-     * storage), and it will then return a pointer to the internal \p mpz_t structure. The returned pointer can be used
-     * as an argument for the functions of the GMP API.
-     *
-     * \rststar
-     * .. note::
-     *
-     *    The returned pointer is a raw, non-owning pointer tied to the lifetime of ``this``. Calling
-     *    :cpp:func:`~mppp::integer::demote()` or
-     *    assigning an :cpp:class:`~mppp::integer` with static storage to ``this`` will invalidate the returned
-     *    pointer.
-     * \endrststar
-     *
-     * @return a pointer to the internal \p mpz_t structure.
-     */
+    // Get a pointer to the dynamic storage.
     std::remove_extent<::mpz_t>::type *get_mpz_t()
     {
         promote();
         return &m_int.g_dy();
     }
-    /// Test if the value is zero.
-    /**
-     * @return \p true if the value represented by \p this is zero, \p false otherwise.
-     */
+    // Test if the value is zero.
     bool is_zero() const
     {
         return m_int.m_st._mp_size == 0;
@@ -2024,18 +1951,12 @@ private:
     }
 
 public:
-    /// Test if the value is equal to one.
-    /**
-     * @return \p true if the value represented by \p this is 1, \p false otherwise.
-     */
+    // Test if the value is equal to one.
     bool is_one() const
     {
         return is_one_impl<1>();
     }
-    /// Test if the value is equal to minus one.
-    /**
-     * @return \p true if the value represented by \p this is -1, \p false otherwise.
-     */
+    // Test if the value is equal to minus one.
     bool is_negative_one() const
     {
         return is_one_impl<-1>();
@@ -2046,20 +1967,7 @@ private:
     static const char binary_size_errmsg[];
 
 public:
-    /// Size of the serialised binary representation.
-    /**
-     * \rststar
-     * This member function will return a value representing the number of bytes necessary
-     * to serialise ``this`` into a memory buffer in binary format via one of the available
-     * :cpp:func:`~mppp::integer::binary_save()` overloads. The returned value
-     * is platform-dependent.
-     * \endrststar
-     *
-     * @return the number of bytes needed for the binary serialisation of ``this``.
-     *
-     * @throws std::overflow_error if the size in limbs of ``this`` is larger than an
-     * implementation-defined limit.
-     */
+    // Size of the serialised binary representation.
     std::size_t binary_size() const
     {
         const auto asize = size();
@@ -2090,64 +1998,14 @@ private:
     }
 
 public:
-    /// Serialise into a memory buffer.
-    /**
-     * \rststar
-     * This member function will write into ``dest`` a binary representation of ``this``. The serialised
-     * representation produced by this member function can be read back with one of the
-     * :cpp:func:`~mppp::integer::binary_load()` overloads.
-     *
-     * ``dest`` must point to a memory area whose size is at least equal to the value returned
-     * by :cpp:func:`~mppp::integer::binary_size()`, otherwise the behaviour will be undefined.
-     * ``dest`` does not have any special alignment requirements.
-     *
-     * .. warning::
-     *
-     *    The binary representation produced by this member function is compiler, platform and architecture
-     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
-     *    it should not be used as an exchange format or for long-term data storage.
-     * \endrststar
-     *
-     * @param dest a pointer to a memory buffer into which the serialised representation of ``this``
-     * will be written.
-     *
-     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size()).
-     *
-     * @throws unspecified any exception thrown by binary_size().
-     */
+    // Serialise into a memory buffer.
     std::size_t binary_save(char *dest) const
     {
         const auto bs = binary_size();
         binary_save_impl(dest, bs);
         return bs;
     }
-    /// Serialise into a ``std::vector<char>``.
-    /**
-     * \rststar
-     * This member function will write into ``dest`` a binary representation of ``this``. The serialised
-     * representation produced by this member function can be read back with one of the
-     * :cpp:func:`~mppp::integer::binary_load()` overloads.
-     *
-     * The size of ``dest`` must be at least equal to the value returned by
-     * :cpp:func:`~mppp::integer::binary_size()`. If that is not the case, ``dest`` will be resized
-     * to :cpp:func:`~mppp::integer::binary_size()`.
-     *
-     * .. warning::
-     *
-     *    The binary representation produced by this member function is compiler, platform and architecture
-     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
-     *    it should not be used as an exchange format or for long-term data storage.
-     * \endrststar
-     *
-     * @param dest a vector that will hold the serialised representation of ``this``.
-     *
-     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size()).
-     *
-     * @throws std::overflow_error if the binary size of ``this`` is larger than an
-     * implementation-defined limit.
-     * @throws unspecified any exception thrown by binary_size(), or by memory errors in
-     * standard containers.
-     */
+    // Serialise into a ``std::vector<char>``.
     std::size_t binary_save(std::vector<char> &dest) const
     {
         const auto bs = binary_size();
@@ -2157,31 +2015,7 @@ public:
         binary_save_impl(dest.data(), bs);
         return bs;
     }
-    /// Serialise into a ``std::array<char>``.
-    /**
-     * \rststar
-     * This member function will write into ``dest`` a binary representation of ``this``. The serialised
-     * representation produced by this member function can be read back with one of the
-     * :cpp:func:`~mppp::integer::binary_load()` overloads.
-     *
-     * The size of ``dest`` must be at least equal to the value returned by
-     * :cpp:func:`~mppp::integer::binary_size()`. If that is not the case, no data
-     * will be written to ``dest`` and zero will be returned.
-     *
-     * .. warning::
-     *
-     *    The binary representation produced by this member function is compiler, platform and architecture
-     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
-     *    it should not be used as an exchange format or for long-term data storage.
-     * \endrststar
-     *
-     * @param dest an array that will hold the serialised representation of ``this``.
-     *
-     * @return the number of bytes written into ``dest`` (i.e., the output of binary_size() if ``dest``
-     * provides enough storage to store ``this``, zero otherwise).
-     *
-     * @throws unspecified any exception thrown by binary_size().
-     */
+    // Serialise into a ``std::array<char>``.
     template <std::size_t S>
     std::size_t binary_save(std::array<char, S> &dest) const
     {
@@ -2192,33 +2026,7 @@ public:
         binary_save_impl(dest.data(), bs);
         return bs;
     }
-    /// Serialise into a ``std::ostream``.
-    /**
-     * \rststar
-     * This member function will write into the output stream ``dest`` a binary representation of ``this``, starting
-     * from the current stream position. The serialised representation produced by this member function can be read back
-     * with one of the :cpp:func:`~mppp::integer::binary_load()` overloads.
-     *
-     * If the serialisation is successful (that is, no stream error state is ever detected in ``dest`` after write
-     * operations), then the binary size of ``this`` (that is, the number of bytes written into ``dest``) will be
-     * returned. Otherwise, zero will be returned. Note that a return value of zero does not necessarily imply that no
-     * bytes were written into ``dest``, just that an error occurred at some point during the serialisation process.
-     *
-     * .. warning::
-     *
-     *    The binary representation produced by this member function is compiler, platform and architecture
-     *    specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
-     *    it should not be used as an exchange format or for long-term data storage.
-     * \endrststar
-     *
-     * @param dest the destination stream.
-     *
-     * @return the output of binary_size() if the serialisation was successful, zero otherwise.
-     *
-     * @throws std::overflow_error in case of internal overflows.
-     * @throws unspecified any exception thrown by binary_size(), or by the public interface
-     * of ``std::ostream``.
-     */
+    // Serialise into a ``std::ostream``.
     std::size_t binary_save(std::ostream &dest) const
     {
         const auto bs = binary_size();

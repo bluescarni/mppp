@@ -568,6 +568,155 @@ The integer class
 
       :return: an :cpp:class:`mpz_view` of ``this``.
 
+   .. cpp:function:: integer &neg()
+
+      Negate in-place.
+
+      This member function will set ``this`` to ``-this``.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: integer &abs()
+
+      In-place absolute value.
+
+      This member function will set ``this`` to its absolute value.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: integer &nextprime()
+
+      Compute next prime number in-place.
+
+      This member function will set ``this`` to the first prime number
+      greater than the current value.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: int probab_prime_p(int reps = 25) const
+
+     Test primality.
+
+     This member function will run a series of probabilistic tests to determine if ``this`` is a prime number.
+     It will return 2 if ``this`` is definitely a prime, 1 if ``this`` is probably a prime and 0 if ``this``
+     is definitely not-prime.
+
+     :param reps: the number of tests to run.
+
+     :return: an integer indicating if ``this`` is a prime.
+
+     :exception std\:\:invalid_argument: if *reps* is less than 1 or if ``this`` is negative.
+
+   .. cpp:function:: integer &sqrt()
+
+      Integer square root.
+
+      This member function will set ``this`` to its integer square root.
+
+      :return: a reference to ``this``.
+
+      :exception std\:\:domain_error: if ``this`` is negative.
+
+   .. cpp:function:: integer &sqr()
+
+      Integer squaring.
+
+      This member function will set ``this`` to its square.
+
+      :return: a reference to ``this``.
+
+   .. cpp:function:: bool odd_p() const
+   .. cpp:function:: bool even_p() const
+
+      Parity detection.
+
+      :return: ``true`` if ``this`` is odd (resp. even), ``false`` otherwise.
+
+   .. cpp:function:: std::remove_extent<mpz_t>::type *get_mpz_t()
+
+      Get a pointer to the dynamic storage.
+
+      This member function will first promote ``this`` to dynamic storage (if ``this`` is not already employing dynamic
+      storage), and it will then return a pointer to the internal :cpp:type:`mpz_t`. The returned pointer can be used
+      as an argument for the functions of the GMP API.
+
+      .. note::
+
+         The returned pointer is a raw, non-owning pointer tied to the lifetime of ``this``. Calling
+         :cpp:func:`~mppp::integer::demote()` or
+         assigning an :cpp:class:`~mppp::integer` with static storage to ``this`` will invalidate the returned
+         pointer.
+
+      :return: a pointer to the internal GMP integer.
+
+   .. cpp:function:: bool is_zero() const
+   .. cpp:function:: bool is_one() const
+   .. cpp:function:: bool is_negative_one() const
+
+      Detect special values.
+
+      :return: ``true`` if ``this`` is :math:`0`, :math:`1` or :math:`-1` respectively,
+        ``false`` otherwise.
+
+   .. cpp:function:: std::size_t binary_size() const
+
+      Size of the serialised binary representation.
+
+      This member function will return a value representing the number of bytes necessary
+      to serialise ``this`` into a memory buffer in binary format via one of the available
+      :cpp:func:`~mppp::integer::binary_save()` overloads. The returned value
+      is platform-dependent.
+
+      :return: the number of bytes needed for the binary serialisation of ``this``.
+
+      :exception std\:\:overflow_error: if the size in limbs of ``this`` is larger than an
+        implementation-defined limit.
+
+   .. cpp:function:: std::size_t binary_save(char *dest) const
+   .. cpp:function:: std::size_t binary_save(std::vector<char> &dest) const
+   .. cpp:function:: template <std::size_t S> std::size_t binary_save(std::array<char, S> &dest) const
+   .. cpp:function:: std::size_t binary_save(std::ostream &dest) const
+
+      Serialise into a memory buffer or an output stream.
+
+      These member functions will write into *dest* a binary representation of ``this``. The serialised
+      representation produced by these member functions can be read back with one of the
+      :cpp:func:`~mppp::integer::binary_load()` overloads.
+
+      For the first overload, *dest* must point to a memory area whose size is at least equal to the value returned
+      by :cpp:func:`~mppp::integer::binary_size()`, otherwise the behaviour will be undefined.
+      *dest* does not have any special alignment requirements.
+
+      For the second overload, the size of *dest* must be at least equal to the value returned by
+      :cpp:func:`~mppp::integer::binary_size()`. If that is not the case, *dest* will be resized
+      to :cpp:func:`~mppp::integer::binary_size()`.
+
+      For the third overload, the size of *dest* must be at least equal to the value returned by
+      :cpp:func:`~mppp::integer::binary_size()`. If that is not the case, no data
+      will be written to *dest* and zero will be returned.
+
+      For the fourth overload, if the serialisation is successful (that is, no stream error state is ever detected
+      in *dest* after write
+      operations), then the binary size of ``this`` (that is, the number of bytes written into *dest*) will be
+      returned. Otherwise, zero will be returned. Note that a return value of zero does not necessarily imply that no
+      bytes were written into *dest*, just that an error occurred at some point during the serialisation process.
+
+      .. warning::
+
+         The binary representation produced by these member functions is compiler, platform and architecture
+         specific, and it is subject to possible breaking changes in future versions of mp++. Thus,
+         it should not be used as an exchange format or for long-term data storage.
+
+      :param dest: the output buffer or stream.
+
+      :return: the number of bytes written into ``dest`` (i.e., the output of :cpp:func:`~mppp::integer::binary_size()`,
+        if the serialisation was successful).
+
+      :exception std\:\:overflow_error: in case of (unlikely) overflow errors.
+      :exception unspecified: any exception thrown by :cpp:func:`~mppp::integer::binary_size()`, by memory errors in
+        standard containers, or by the public interface of ``std::ostream``.
+
+
 Types
 -----
 
